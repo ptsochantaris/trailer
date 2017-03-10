@@ -75,7 +75,6 @@ final class API {
 	}
 
 	static var refreshesSinceLastStatusCheck = [NSManagedObjectID : Int]()
-	static var refreshesSinceLastLabelsCheck = [NSManagedObjectID : Int]()
 	static var currentNetworkStatus = NetworkStatus.NotReachable
 
 	private static let cacheDirectory = { ()->String in
@@ -313,33 +312,100 @@ final class API {
 
 	private class func sync(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
-		markDirtyRepos(in: moc) {
+		let repos = Repo.syncableRepos(in: moc)
 
-			let repos = Repo.syncableRepos(in: moc)
-
-			var completionCount = 0
-			let totalOperations = 2
-			let completionCallback = {
-				completionCount += 1
-				if completionCount == totalOperations {
-					NotificationCenter.default.post(name: RefreshProcessingNotification, object: nil)
-					for r in repos { r.dirty = false }
-					completeSync(in: moc, andCallback: callback)
-				}
+		var completionCount = 0
+		let totalOperations = 2
+		let completionCallback = {
+			completionCount += 1
+			if completionCount == totalOperations {
+				NotificationCenter.default.post(name: RefreshProcessingNotification, object: nil)
+				completeSync(in: moc, andCallback: callback)
 			}
+		}
 
-			fetchIssues(for: repos, to: moc) {
+		fetchItems(from: repos, to: moc) {
+			markExtraUpdatedItems(from: repos, to: moc) {
 				fetchCommentsForCurrentIssues(to: moc) {
 					checkIssueClosures(in: moc)
 					completionCallback()
 				}
-			}
-
-			fetchPullRequests(for: repos, to: moc) {
 				updatePullRequests(in: moc) {
 					completionCallback()
 				}
 			}
+		}
+	}
+
+	private class func fetchItems(from repos: [Repo], to moc: NSManagedObjectContext, callback: @escaping Completion) {
+
+		var completionCount = 0
+		let totalOperations = 2
+		let completionCallback = {
+			completionCount += 1
+			if completionCount == totalOperations {
+				callback()
+			}
+		}
+
+		fetchIssues(for: repos, to: moc, callback: completionCallback)
+		fetchPullRequests(for: repos, to: moc, callback: completionCallback)
+	}
+
+	private class func markExtraUpdatedItems(from repos: [Repo], to moc: NSManagedObjectContext, callback: @escaping Completion) {
+
+		var completionCount = 0
+		let totalOperations = repos.count
+		let completionCallback = {
+			completionCount += 1
+			if completionCount == totalOperations {
+				callback()
+			}
+		}
+
+		for r in repos {
+			getPagedData(at: "/repos/\(r.fullName ?? "UNKNOWN")/issues/events", from: r.apiServer, perPageCallback: { data, lastPage in
+				guard let data = data else { return false }
+
+				let lastLocalEvent = r.lastScannedIssueEventId
+				if lastLocalEvent != 0 {
+
+					var numbers = Set<Int64>()
+					var foundLastEvent = false
+					for event in data {
+						if let eventId = event["id"] as? Int64, let issue = event["issue"] as? [AnyHashable:Any], let issueNumber = issue["number"] as? Int64 {
+							if eventId == lastLocalEvent {
+								foundLastEvent = true
+								break // we're done
+							}
+							numbers.insert(issueNumber)
+							if eventId > r.lastScannedIssueEventId {
+								r.lastScannedIssueEventId = eventId
+							}
+						}
+					}
+					if numbers.count > 0 {
+						ListableItem.markItemsAsUpdatedWithNumbers(numbers, in: moc)
+					}
+					return foundLastEvent
+
+				} else if let latestEvent = data.first {
+					DLog("First event check for this repo. Let's ensure all items are marked as updated")
+					for i in r.pullRequests { i.setToUpdatedIfIdle() }
+					for i in r.issues { i.setToUpdatedIfIdle() }
+					r.lastScannedIssueEventId = latestEvent["id"] as? Int64 ?? 0
+					return true
+				} else {
+					return false
+				}
+
+			}) { success, resultCode in
+				if !success {
+					r.apiServer.lastSyncSucceeded = false
+				}
+				completionCallback()
+			}
+
 		}
 	}
 
@@ -393,13 +459,8 @@ final class API {
 	private class func updatePullRequests(in moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		let willScanForStatuses = shouldScanForStatuses(in: moc)
-		let willScanForLabels = shouldScanForLabels(in: moc)
-		let willScanReviews = Settings.supportReviews
 
-		var totalOperations = 3
-		if willScanForStatuses { totalOperations += 1 }
-		if willScanForLabels { totalOperations += 1 }
-		if willScanReviews { totalOperations += 1 }
+		let totalOperations = 5 + (willScanForStatuses ? 1 : 0)
 
 		var completionCount = 0
 		let completionCallback = {
@@ -412,61 +473,13 @@ final class API {
 		if willScanForStatuses {
 			fetchStatusesForCurrentPullRequests(to: moc, callback: completionCallback)
 		}
-		if willScanForLabels {
-			fetchLabelsForForCurrentPullRequests(to: moc, callback: completionCallback)
-		}
-		if willScanReviews {
-			fetchReviewsForForCurrentPullRequests(to: moc) {
-				fetchCommentsForCurrentReviews(to: moc, callback: completionCallback)
-			}
+		fetchLabelsForForCurrentPullRequests(to: moc, callback: completionCallback)
+		fetchReviewsForForCurrentPullRequests(to: moc) {
+			fetchCommentsForCurrentReviews(to: moc, callback: completionCallback)
 		}
 		fetchCommentsForCurrentPullRequests(to: moc, callback: completionCallback)
 		checkPrClosures(in: moc, callback: completionCallback)
 		detectAssignedPullRequests(in: moc, callback: completionCallback)
-	}
-
-	private class func markDirtyRepos(in moc: NSManagedObjectContext, callback: @escaping Completion) {
-
-		let allApiServers = ApiServer.allApiServers(in: moc)
-		let totalOperations = 2 * allApiServers.count
-		if totalOperations==0 {
-			callback()
-			return
-		}
-
-		var completionCount = 0
-		let repoIdsToMarkDirty = NSMutableSet()
-
-		let completionCallback = {
-			completionCount += 1
-			if completionCount==totalOperations {
-
-				if repoIdsToMarkDirty.count>0 {
-					Repo.markDirtyReposWithIds(repoIdsToMarkDirty, in: moc)
-					DLog("Marked %@ dirty repos that have new events in their event stream", repoIdsToMarkDirty.count)
-				}
-
-				let reposNotRecentlyDirtied = Repo.reposNotRecentlyDirtied(in: moc)
-				if reposNotRecentlyDirtied.count>0 {
-					for r in reposNotRecentlyDirtied {
-						r.resetSyncState()
-					}
-					DLog("Marked dirty %@ repos which haven't been refreshed in over an hour", reposNotRecentlyDirtied.count)
-				}
-
-				callback()
-			}
-		}
-
-		for apiServer in allApiServers {
-			if apiServer.goodToGo && apiServer.lastSyncSucceeded {
-				markDirty(repoIds: repoIdsToMarkDirty, usingUserEventsFrom: apiServer, callback: completionCallback)
-				markDirty(repoIds: repoIdsToMarkDirty, usingReceivedEventsFrom: apiServer, callback: completionCallback)
-			} else {
-				completionCallback()
-				completionCallback()
-			}
-		}
 	}
 
 	private class func fetchUserTeams(from server: ApiServer, callback: @escaping Completion) {
@@ -477,96 +490,6 @@ final class API {
 
 		getPagedData(at: "/user/teams", from: server, perPageCallback: { data, lastPage in
 			Team.syncTeams(from: data, server: server)
-			return false
-		}) { success, resultCode in
-			if !success {
-				server.lastSyncSucceeded = false
-			}
-			callback()
-		}
-	}
-
-	private class func markDirty(repoIds toMarkDirty: NSMutableSet, usingUserEventsFrom server: ApiServer, callback: @escaping Completion) {
-
-		if !server.lastSyncSucceeded {
-			callback()
-			return
-		}
-
-		var latestDate = server.latestUserEventDateProcessed
-		if latestDate == nil {
-			latestDate = .distantPast
-			server.latestUserEventDateProcessed = latestDate
-		}
-
-		let userName = S(server.userName)
-		let serverLabel = S(server.label)
-
-		getPagedData(at: "/users/\(userName)/events", from: server, perPageCallback: { data, lastPage in
-			for d in data ?? [] {
-				let eventDate = parseGH8601(d["created_at"] as? String) ?? .distantPast
-				if latestDate! < eventDate {
-					if let repoId = (d["repo"] as? [AnyHashable : Any])?["id"] as? NSNumber {
-						DLog("(%@) New event at %@ from Repo ID %@", serverLabel, eventDate, repoId)
-						toMarkDirty.add(repoId)
-					}
-					if server.latestUserEventDateProcessed! < eventDate {
-						server.latestUserEventDateProcessed = eventDate
-						if latestDate! == .distantPast {
-							DLog("(%@) First sync, all repos are dirty so we don't need to read further, we have the latest received event date: %@", serverLabel, eventDate)
-							return true
-						}
-					}
-				} else {
-					DLog("(%@) No further user events", serverLabel)
-					return true
-				}
-			}
-			return false
-		}) { success, resultCode in
-			if !success {
-				server.lastSyncSucceeded = false
-			}
-			callback()
-		}
-	}
-
-	private class func markDirty(repoIds toMarkDirty: NSMutableSet, usingReceivedEventsFrom server: ApiServer, callback: @escaping Completion) {
-
-		if !server.lastSyncSucceeded {
-			callback()
-			return
-		}
-
-		var latestDate = server.latestReceivedEventDateProcessed
-		if latestDate == nil {
-			latestDate = .distantPast
-			server.latestReceivedEventDateProcessed = latestDate
-		}
-
-		let userName = S(server.userName)
-		let serverLabel = S(server.label)
-
-		getPagedData(at: "/users/\(userName)/received_events", from: server, perPageCallback: { data, lastPage in
-			for d in data ?? [] {
-				let eventDate = parseGH8601(d["created_at"] as? String) ?? .distantPast
-				if latestDate! < eventDate {
-					if let repoId = (d["repo"] as? [AnyHashable : Any])?["id"] as? NSNumber {
-						DLog("(%@) New event at %@ from Repo ID %@", serverLabel, eventDate, repoId)
-						toMarkDirty.add(repoId)
-					}
-					if server.latestReceivedEventDateProcessed! < eventDate {
-						server.latestReceivedEventDateProcessed = eventDate
-						if latestDate! == .distantPast {
-							DLog("(%@) First sync, all repos are dirty so we don't need to read further, we have the latest received event date: %@", serverLabel, eventDate)
-							return true
-						}
-					}
-				} else {
-					DLog("(%@) No further received events", serverLabel)
-					return true
-				}
-			}
 			return false
 		}) { success, resultCode in
 			if !success {
@@ -792,15 +715,7 @@ final class API {
 
 	private class func fetchCommentsForCurrentIssues(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
-		let allIssues = DataItem.newOrUpdatedItems(of: Issue.self, in: moc)
-
-		for i in allIssues {
-			for c in i.comments {
-				c.postSyncAction = PostSyncAction.delete.rawValue
-			}
-		}
-
-		let issues = allIssues.filter { $0.apiServer.lastSyncSucceeded }
+		let issues = DataItem.newOrUpdatedItems(of: Issue.self, in: moc).filter { $0.apiServer.lastSyncSucceeded }
 
 		let totalOperations = issues.count
 		if totalOperations == 0 {
@@ -811,6 +726,10 @@ final class API {
 		var completionCount = 0
 
 		for i in issues {
+
+			for c in i.comments {
+				c.postSyncAction = PostSyncAction.delete.rawValue
+			}
 
 			if let link = i.commentsLink {
 
@@ -839,9 +758,7 @@ final class API {
 
 	private class func fetchReviewsForForCurrentPullRequests(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
-		let prs = PullRequest.active(in: moc, visibleOnly: true).filter { pr in
-			return pr.apiServer.lastSyncSucceeded && pr.condition == ItemCondition.open.rawValue
-		}
+		let prs = DataItem.newOrUpdatedItems(of: PullRequest.self, in: moc).filter { $0.apiServer.lastSyncSucceeded }
 
 		let totalOperations = prs.count
 		if totalOperations == 0 {
@@ -914,19 +831,7 @@ final class API {
 
 	private class func fetchLabelsForForCurrentPullRequests(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
-		let prs = PullRequest.active(in: moc, visibleOnly: true).filter { pr in
-			guard pr.apiServer.lastSyncSucceeded && pr.condition == ItemCondition.open.rawValue else { return false }
-			let oid = pr.objectID
-			let refreshes = refreshesSinceLastLabelsCheck[oid]
-			if refreshes == nil || refreshes! >= Settings.labelRefreshInterval {
-				//DLog("Will check labels for PR: '%@'", pr.title)
-				return true
-			} else {
-				//DLog("No need to get labels for PR: '%@' (%@ refreshes since last check)", pr.title, refreshes)
-				refreshesSinceLastLabelsCheck[oid] = (refreshes ?? 0)+1
-				return false
-			}
-		}
+		let prs = DataItem.newOrUpdatedItems(of: PullRequest.self, in: moc).filter { $0.apiServer.lastSyncSucceeded }
 
 		let totalOperations = prs.count
 		if totalOperations == 0 {
@@ -948,17 +853,11 @@ final class API {
 					return false
 				}) { success, resultCode in
 					completionCount += 1
-					var allGood = success
 					if !success {
 						// 404/410 means the label has been deleted
 						if !(resultCode==404 || resultCode==410) {
 							p.apiServer.lastSyncSucceeded = false
-						} else {
-							allGood = true
 						}
-					}
-					if allGood {
-						refreshesSinceLastLabelsCheck[p.objectID] = 1
 					}
 					if completionCount == totalOperations {
 						callback()
@@ -966,7 +865,6 @@ final class API {
 				}
 			} else {
 				// no labels link, so presumably no labels
-				refreshesSinceLastLabelsCheck[p.objectID] = 1
 				completionCount += 1
 				if completionCount == totalOperations {
 					callback()
@@ -1245,18 +1143,6 @@ final class API {
 		}
 	}
 
-	private class func shouldScanForLabels(in moc: NSManagedObjectContext) -> Bool {
-		if Settings.showLabels {
-			return true
-		} else {
-			refreshesSinceLastLabelsCheck.removeAll()
-			for l in DataItem.allItems(of: PRLabel.self, in: moc) {
-				l.postSyncAction = PostSyncAction.delete.rawValue
-			}
-			return false
-		}
-	}
-
 	private class func syncWatchedRepos(from server: ApiServer, callback: @escaping Completion) {
 
 		if !server.lastSyncSucceeded {
@@ -1425,15 +1311,11 @@ final class API {
 	private static let apiQueue = { () -> OperationQueue in
 		let n = OperationQueue()
 		n.underlyingQueue = DispatchQueue.main
-		n.maxConcurrentOperationCount = 2
+		n.maxConcurrentOperationCount = 4
 		return n
 	}()
 
-	private class func start(
-		call path: String,
-		on server: ApiServer,
-		ignoreLastSync: Bool,
-		completion: @escaping ApiCompletion) {
+	private class func start(call path: String, on server: ApiServer, ignoreLastSync: Bool, completion: @escaping ApiCompletion) {
 
 		let apiServerLabel: String
 		if server.lastSyncSucceeded || ignoreLastSync {
@@ -1451,12 +1333,7 @@ final class API {
 
 		var r = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 60.0)
 		var acceptTypes = [String]()
-		if Settings.supportReactions {
-			acceptTypes.append("application/vnd.github.squirrel-girl-preview")
-		}
-		if Settings.supportReviews {
-			acceptTypes.append("application/vnd.github.black-cat-preview+json")
-		}
+		acceptTypes.append("application/vnd.github.black-cat-preview+json")
 		acceptTypes.append("application/vnd.github.v3+json")
 		r.setValue(acceptTypes.joined(separator: ", "), forHTTPHeaderField:"Accept")
 		if let a = server.authToken {

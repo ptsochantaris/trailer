@@ -9,7 +9,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	func reset() {
 		preferencesDirty = true
 		API.refreshesSinceLastStatusCheck.removeAll()
-		API.refreshesSinceLastLabelsCheck.removeAll()
 		Settings.lastSuccessfulRefresh = nil
 		lastRepoCheck = .distantPast
 		projectsTable.reloadData()
@@ -66,7 +65,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var teamMentionMovePolicy: NSPopUpButton!
 	@IBOutlet weak var newItemInOwnedRepoMovePolicy: NSPopUpButton!
 	@IBOutlet weak var highlightItemsWithNewCommits: NSButton!
-	@IBOutlet weak var supportReviews: NSButton!
 
 	// Display
 	@IBOutlet weak var useVibrancy: NSButton!
@@ -86,12 +84,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var showSeparateApiServersInMenu: NSButton!
 	@IBOutlet weak var displayRepositoryNames: NSButton!
 	@IBOutlet weak var hideCountsOnMenubar: NSButton!
-
-	// Labels
-	@IBOutlet weak var labelRescanLabel: NSTextField!
-	@IBOutlet weak var labelRefreshNote: NSTextField!
-	@IBOutlet weak var labelRefreshCounter: NSStepper!
-	@IBOutlet weak var showLabels: NSButton!
 
 	// Servers
 	@IBOutlet weak var serverList: NSTableView!
@@ -211,7 +203,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		allPrsSetting.toolTip = "Set the PR visibility of all (or the currently selected/filtered) repositories"
 		allIssuesSetting.toolTip = "Set the issue visibility of all (or the currently selected/filtered) repositories"
 		allHidingSetting.toolTip = "Set the any special hiding settings of all (or the currently selected/filtered) repositories"
-		supportReviews.toolTip = Settings.supportReviewsHelp
 		showCreationDates.toolTip = Settings.showCreatedInsteadOfUpdatedHelp
 		highlightItemsWithNewCommits.toolTip = Settings.markPrsAsUnreadOnNewCommitsHelp
 		markUnmergeableOnUserSectionsOnly.toolTip = Settings.markUnmergeableOnUserSectionsOnlyHelp
@@ -248,12 +239,9 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		openPrAtFirstUnreadComment.toolTip = Settings.openPrAtFirstUnreadCommentHelp
 		assumeCommentsBeforeMineAreRead.toolTip = Settings.assumeReadItemIfUserHasNewerCommentsHelp
 		disableAllCommentNotifications.toolTip = Settings.disableAllCommentNotificationsHelp
-		showLabels.toolTip = Settings.showLabelsHelp
 		showStatusItems.toolTip = Settings.showStatusItemsHelp
 		statusItemRefreshCounter.toolTip = Settings.statusItemRefreshIntervalHelp
 		statusItemRescanLabel.toolTip = Settings.statusItemRefreshIntervalHelp
-		labelRefreshCounter.toolTip = Settings.labelRefreshIntervalHelp
-		labelRescanLabel.toolTip = Settings.labelRefreshIntervalHelp
 		makeStatusItemsSelectable.toolTip = Settings.makeStatusItemsSelectableHelp
 		notifyOnStatusUpdates.toolTip = Settings.notifyOnStatusUpdatesHelp
 		notifyOnStatusUpdatesForAllPrs.toolTip = Settings.notifyOnStatusUpdatesForAllPrsHelp
@@ -351,13 +339,11 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		openPrAtFirstUnreadComment.integerValue = Settings.openPrAtFirstUnreadComment ? 1 : 0
 		logActivityToConsole.integerValue = Settings.logActivityToConsole ? 1 : 0
 		dumpApiResponsesToConsole.integerValue = Settings.dumpAPIResponsesInConsole ? 1 : 0
-		showLabels.integerValue = Settings.showLabels ? 1 : 0
 		useVibrancy.integerValue = Settings.useVibrancy ? 1 : 0
 		hidePrsThatDontPass.integerValue = Settings.hidePrsThatArentPassing ? 1 : 0
 		hidePrsThatDontPassOnlyInAll.integerValue = Settings.hidePrsThatDontPassOnlyInAll ? 1 : 0
 		highlightItemsWithNewCommits.integerValue = Settings.markPrsAsUnreadOnNewCommits ? 1 : 0
 		hideSnoozedItems.integerValue = Settings.hideSnoozedItems ? 1 : 0
-		supportReviews.integerValue = Settings.supportReviews ? 1 : 0
 
 		allNewPrsSetting.selectItem(at: Settings.displayPolicyForNewPrs)
 		allNewIssuesSetting.selectItem(at: Settings.displayPolicyForNewIssues)
@@ -379,7 +365,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 		refreshUpdatePreferences()
 		updateStatusItemsOptions()
-		updateLabelOptions()
 		updateHistoryOptions()
 
 		hotkeyEnable.isEnabled = true
@@ -404,17 +389,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			projectsTable.reloadData()
 		}
 		advancedReposWindow?.updateActivity()
-	}
-
-	@IBAction func showLabelsSelected(_ sender: NSButton) {
-		Settings.showLabels = (sender.integerValue==1)
-		deferredUpdateTimer.push()
-		updateLabelOptions()
-
-		API.refreshesSinceLastLabelsCheck.removeAll()
-		if Settings.showLabels {
-			ApiServer.resetSyncOfEverything()
-		}
 	}
 
 	@IBAction func newMentionMovePolicySelected(_ sender: NSPopUpButton) {
@@ -549,10 +523,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction func highlightItemsWithNewCommitsSelected(_ sender: NSButton) {
 		Settings.markPrsAsUnreadOnNewCommits = (sender.integerValue==1)
-	}
-
-	@IBAction func supportReviewsSelected(_ sender: NSButton) {
-		Settings.supportReviews = (sender.integerValue==1)
 	}
 
 	@IBAction func grayOutWhenRefreshingSelected(_ sender: NSButton) {
@@ -739,22 +709,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		statusItemRescanLabel.stringValue = count>1 ? "...and re-scan once every \(count) refreshes" : "...and re-scan on every refresh"
 
 		updateStatusTermPreferenceControls()
-	}
-
-	private func updateLabelOptions() {
-		let enable = Settings.showLabels
-		labelRefreshCounter.isEnabled = enable
-		labelRescanLabel.alphaValue = enable ? 1.0 : 0.5
-		labelRefreshNote.alphaValue = enable ? 1.0 : 0.5
-
-		let count = Settings.labelRefreshInterval
-		labelRefreshCounter.integerValue = count
-		labelRescanLabel.stringValue = count>1 ? "...and re-scan once every \(count) refreshes" : "...and re-scan on every refresh"
-	}
-
-	@IBAction func labelRefreshCounterChanged(_ sender: NSStepper) {
-		Settings.labelRefreshInterval = labelRefreshCounter.integerValue
-		updateLabelOptions()
 	}
 
 	@IBAction func statusItemRefreshCountChanged(_ sender: NSStepper) {

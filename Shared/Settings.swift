@@ -271,12 +271,6 @@ final class Settings {
 		set { set("STATUS_ITEM_REFRESH_COUNT", newValue) }
 	}
 
-	static let labelRefreshIntervalHelp = "Querying labels can be moderately bandwidth-intensive, but it does involve making some extra API calls. Since labels don't change often, you may want to raise this to a higher value if you have a lot of items on your lists. You can always see how much API usage you have left per-hour from the 'Servers' tab."
-	class var labelRefreshInterval: Int {
-		get { if let n = get("LABEL_REFRESH_COUNT") as? Int { return n>0 ? n : 4 } else { return 4 } }
-		set { set("LABEL_REFRESH_COUNT", newValue) }
-	}
-
 	class var checkForUpdatesInterval: Int {
 		get { return get("UPDATE_CHECK_INTERVAL_KEY") as? Int ?? 8 }
 		set { set("UPDATE_CHECK_INTERVAL_KEY", newValue) }
@@ -457,12 +451,6 @@ final class Settings {
 	class var groupByRepo: Bool {
 		get { return get("GROUP_BY_REPO") as? Bool ?? false }
 		set { set("GROUP_BY_REPO", newValue) }
-	}
-
-	static let showLabelsHelp = "Show labels associated with items, usually a good idea"
-	class var showLabels: Bool {
-		get { return get("SHOW_LABELS") as? Bool ?? false }
-		set { set("SHOW_LABELS", newValue) }
 	}
 
 	static let showStatusItemsHelp = "Show status items, such as CI results or messages from code review services, that are attached to items on the server."
@@ -718,17 +706,5 @@ final class Settings {
 	class var assumeReadItemIfUserHasNewerComments: Bool {
 		get { return get("ASSUME_READ_ITEM_IF_USER_HAS_NEWER_COMMENTS") as? Bool ?? false }
 		set { set("ASSUME_READ_ITEM_IF_USER_HAS_NEWER_COMMENTS", newValue) }
-	}
-
-	static let supportReactionsHelp = "Count reactions as comments. Count a reaction to a comment of yours as unread."
-	class var supportReactions: Bool {
-		get { return get("SUPPORT_REACTIONS") as? Bool ?? false }
-		set { set("SUPPORT_REACTIONS", newValue) }
-	}
-
-	static let supportReviewsHelp = "List any pending reviews alongside a PR's title, as well as the name of the reviewer."
-	class var supportReviews: Bool {
-		get { return get("SUPPORT_REVIEWS") as? Bool ?? false }
-		set { set("SUPPORT_REVIEWS", newValue) }
 	}
 }

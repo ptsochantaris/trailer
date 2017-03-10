@@ -32,6 +32,7 @@ class ListableItem: DataItem {
 	@NSManaged var muted: Bool
 	@NSManaged var wasAwokenFromSnooze: Bool
 	@NSManaged var milestone: String?
+	@NSManaged var dirty: Bool
 
 	@NSManaged var snoozeUntil: Date?
 	@NSManaged var snoozingPreset: SnoozePreset?
@@ -98,13 +99,39 @@ class ListableItem: DataItem {
 		}
 	}
 
+	final class func markItemsAsUpdatedWithNumbers(_ numbers: Set<Int64>, in moc: NSManagedObjectContext) {
+
+		let fp = NSFetchRequest<PullRequest>(entityName: "PullRequest")
+		fp.returnsObjectsAsFaults = false
+		fp.includesSubentities = false
+		fp.predicate = NSPredicate(format: "number IN %@", numbers)
+
+		for i in try! moc.fetch(fp) {
+			i.setToUpdatedIfIdle()
+		}
+
+		let fi = NSFetchRequest<Issue>(entityName: "Issue")
+		fi.returnsObjectsAsFaults = false
+		fi.includesSubentities = false
+		fi.predicate = NSPredicate(format: "number IN %@", numbers)
+
+		for i in try! moc.fetch(fi) {
+			i.setToUpdatedIfIdle()
+		}
+	}
+
+	final func setToUpdatedIfIdle() {
+		if postSyncAction == PostSyncAction.doNothing.rawValue {
+			postSyncAction = PostSyncAction.isUpdated.rawValue
+		}
+	}
+
 	final override func resetSyncState() {
 		super.resetSyncState()
 		repo.resetSyncState()
 	}
 
 	final override func prepareForDeletion() {
-		API.refreshesSinceLastLabelsCheck[objectID] = nil
 		API.refreshesSinceLastStatusCheck[objectID] = nil
 		ensureInvisible()
 		super.prepareForDeletion()
@@ -425,12 +452,10 @@ class ListableItem: DataItem {
 		if let t = title {
 			components.append(t)
 		}
-		if Settings.showLabels {
-			components.append("\(labels.count) labels:")
-			for l in sortedLabels {
-				if let n = l.name {
-					components.append(n)
-				}
+		components.append("\(labels.count) labels:")
+		for l in sortedLabels {
+			if let n = l.name {
+				components.append(n)
 			}
 		}
 		return components.joined(separator: ",")
@@ -450,44 +475,65 @@ class ListableItem: DataItem {
 		let _title = NSMutableAttributedString()
 		if let t = title {
 			_title.append(NSAttributedString(string: t, attributes: titleAttributes))
-			if Settings.showLabels {
-				let labelCount = labels.count
-				if labelCount > 0 {
+			let labelCount = labels.count
+			if labelCount > 0 {
 
-					_title.append(NSAttributedString(string: "\n", attributes: titleAttributes))
+				_title.append(NSAttributedString(string: "\n", attributes: titleAttributes))
 
-					let lp = NSMutableParagraphStyle()
-					#if os(iOS)
-						lp.lineHeightMultiple = 1.15
-						let labelAttributes = [NSFontAttributeName: labelFont,
-						                       NSBaselineOffsetAttributeName: 2.0,
-						                       NSParagraphStyleAttributeName: lp] as [String : Any]
-					#elseif os(OSX)
-						lp.minimumLineHeight = labelFont.pointSize+5.0
-						let labelAttributes = [NSFontAttributeName: labelFont,
-						                       NSBaselineOffsetAttributeName: 1.0,
-						                       NSParagraphStyleAttributeName: lp] as [String : Any]
-					#endif
+				let lp = NSMutableParagraphStyle()
+				#if os(iOS)
+					lp.lineHeightMultiple = 1.15
+					let labelAttributes = [NSFontAttributeName: labelFont,
+										   NSBaselineOffsetAttributeName: 2.0,
+										   NSParagraphStyleAttributeName: lp] as [String : Any]
+				#elseif os(OSX)
+					lp.minimumLineHeight = labelFont.pointSize+5.0
+					let labelAttributes = [NSFontAttributeName: labelFont,
+										   NSBaselineOffsetAttributeName: 1.0,
+										   NSParagraphStyleAttributeName: lp] as [String : Any]
+				#endif
 
-					func isDark(color: COLOR_CLASS) -> Bool {
-						var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0
-						color.getRed(&r, green: &g, blue: &b, alpha: nil)
-						let lum = 0.2126 * r + 0.7152 * g + 0.0722 * b
-						return (lum < 0.5)
+				let reviewAttributes = [NSFontAttributeName: labelFont,
+				                        NSForegroundColorAttributeName: COLOR_CLASS(red: 0.7, green: 0.0, blue: 0.0, alpha: 1.0),
+				                        NSBaselineOffsetAttributeName: 2.0,
+				                        NSParagraphStyleAttributeName: lp] as [String : Any]
+
+				func isDark(color: COLOR_CLASS) -> Bool {
+					var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0
+					color.getRed(&r, green: &g, blue: &b, alpha: nil)
+					let lum = 0.2126 * r + 0.7152 * g + 0.0722 * b
+					return (lum < 0.5)
+				}
+
+				var count = 0
+				for l in sortedLabels {
+					var a = labelAttributes
+					let color = l.colorForDisplay
+					a[NSBackgroundColorAttributeName] = color
+					a[NSForegroundColorAttributeName] = isDark(color: color) ? COLOR_CLASS.white : COLOR_CLASS.black
+					let name = l.name!.replacingOccurrences(of: " ", with: "\u{a0}")
+					_title.append(NSAttributedString(string: "\u{a0}\(name)\u{a0}", attributes: a))
+					if count < labelCount-1 {
+						_title.append(NSAttributedString(string: " ", attributes: labelAttributes))
 					}
+					count += 1
+				}
 
-					var count = 0
-					for l in sortedLabels {
-						var a = labelAttributes
-						let color = l.colorForDisplay
-						a[NSBackgroundColorAttributeName] = color
-						a[NSForegroundColorAttributeName] = isDark(color: color) ? COLOR_CLASS.white : COLOR_CLASS.black
-						let name = l.name!.replacingOccurrences(of: " ", with: "\u{a0}")
-						_title.append(NSAttributedString(string: "\u{a0}\(name)\u{a0}", attributes: a))
-						if count < labelCount-1 {
-							_title.append(NSAttributedString(string: " ", attributes: labelAttributes))
-                        }
-                        count += 1
+				if let p = self as? PullRequest {
+					let reviews = p.sortedReviews
+					if reviews.count > 0 {
+						_title.append(NSAttributedString(string: " ", attributes: reviewAttributes))
+						count = 0
+						for r in reviews {
+							let name = "@" + r.username!.replacingOccurrences(of: " ", with: "\u{a0}")
+							_title.append(NSAttributedString(string: "\u{a0}\(name)\u{a0}", attributes: reviewAttributes))
+							if count < reviews.count - 1 {
+								_title.append(NSAttributedString(string: " ", attributes: reviewAttributes))
+							} else {
+								_title.append(NSAttributedString(string: " requesting changes", attributes: reviewAttributes))
+							}
+							count += 1
+						}
 					}
 				}
 			}

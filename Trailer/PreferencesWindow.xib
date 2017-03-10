@@ -1170,37 +1170,26 @@ Token</string>
                                                             </subviews>
                                                         </view>
                                                     </box>
-                                                    <button misplaced="YES" id="tRk-sr-Xbo">
-                                                        <rect key="frame" x="362" y="18" width="301" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Enable support for Reviews (BETA)" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="qKe-te-fMd">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="supportReviewsSelected:" target="vQH-WF-vh2" id="rRS-zA-25z"/>
-                                                        </connections>
-                                                    </button>
                                                 </subviews>
                                             </view>
                                         </box>
                                     </subviews>
                                 </view>
                             </tabViewItem>
-                            <tabViewItem label="Labels &amp; Statuses" identifier="" id="q4f-6k-kbo">
+                            <tabViewItem label="Statuses" identifier="" id="q4f-6k-kbo">
                                 <view key="view" id="JDe-Yc-l44">
                                     <rect key="frame" x="10" y="33" width="736" height="366"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <box autoresizesSubviews="NO" borderType="none" titlePosition="noTitle" id="lHO-RU-wff">
-                                            <rect key="frame" x="107" y="19" width="522" height="330"/>
+                                        <box autoresizesSubviews="NO" misplaced="YES" borderType="none" titlePosition="noTitle" id="lHO-RU-wff">
+                                            <rect key="frame" x="107" y="49" width="522" height="280"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <view key="contentView" id="8fH-5J-WtZ">
-                                                <rect key="frame" x="0.0" y="0.0" width="522" height="330"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="522" height="280"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="0eZ-9u-qmt">
-                                                        <rect key="frame" x="200" y="245" width="284" height="17"/>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" id="0eZ-9u-qmt">
+                                                        <rect key="frame" x="200" y="250" width="284" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="...re-scan all statuses every X refreshes" id="RuW-TF-DmH">
                                                             <font key="font" metaFont="system"/>
@@ -1208,8 +1197,8 @@ Token</string>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <button id="ANN-xo-ud5">
-                                                        <rect key="frame" x="17" y="243" width="189" height="18"/>
+                                                    <button misplaced="YES" id="ANN-xo-ud5">
+                                                        <rect key="frame" x="17" y="248" width="189" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Show PR CI / statuses" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="uz2-FE-mKJ">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1219,8 +1208,8 @@ Token</string>
                                                             <action selector="showStatusItemsSelected:" target="vQH-WF-vh2" id="o8b-hu-8z0"/>
                                                         </connections>
                                                     </button>
-                                                    <button id="KjN-FO-XTd">
-                                                        <rect key="frame" x="17" y="175" width="477" height="18"/>
+                                                    <button misplaced="YES" id="KjN-FO-XTd">
+                                                        <rect key="frame" x="17" y="180" width="477" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Make any displayed PR status line always selectable (don't require ⌘-click)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="tnU-bc-se6">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1230,8 +1219,8 @@ Token</string>
                                                             <action selector="makeStatusItemsSelectableSelected:" target="vQH-WF-vh2" id="8aC-yz-v5g"/>
                                                         </connections>
                                                     </button>
-                                                    <popUpButton verticalHuggingPriority="750" id="irr-Zv-gfS">
-                                                        <rect key="frame" x="16" y="84" width="489" height="26"/>
+                                                    <popUpButton verticalHuggingPriority="750" misplaced="YES" id="irr-Zv-gfS">
+                                                        <rect key="frame" x="16" y="89" width="489" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" title="Only show status items that include any of the terms below:" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="c1f-8Q-BIX" id="cqY-EB-jjP">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1248,8 +1237,8 @@ Token</string>
                                                             <action selector="statusFilterMenuChanged:" target="vQH-WF-vh2" id="8Ua-bI-K9Z"/>
                                                         </connections>
                                                     </popUpButton>
-                                                    <tokenField verticalHuggingPriority="750" id="oW9-uY-e0m">
-                                                        <rect key="frame" x="18" y="5" width="484" height="78"/>
+                                                    <tokenField verticalHuggingPriority="750" misplaced="YES" id="oW9-uY-e0m">
+                                                        <rect key="frame" x="18" y="10" width="484" height="78"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <tokenFieldCell key="cell" selectable="YES" editable="YES" borderStyle="bezel" alignment="left" placeholderString="Comma separated list of terms for the above" drawsBackground="YES" allowsEditingTextAttributes="YES" id="5ep-1e-o3q">
                                                             <font key="font" metaFont="system"/>
@@ -1260,16 +1249,16 @@ Token</string>
                                                             <outlet property="delegate" destination="vQH-WF-vh2" id="nVV-N5-jew"/>
                                                         </connections>
                                                     </tokenField>
-                                                    <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="98O-9a-RJR">
-                                                        <rect key="frame" x="487" y="238" width="19" height="27"/>
+                                                    <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" misplaced="YES" id="98O-9a-RJR">
+                                                        <rect key="frame" x="487" y="243" width="19" height="27"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <stepperCell key="cell" continuous="YES" alignment="left" minValue="1" maxValue="1000" doubleValue="1" id="r9b-4g-VVM"/>
                                                         <connections>
                                                             <action selector="statusItemRefreshCountChanged:" target="vQH-WF-vh2" id="7C6-8L-ggg"/>
                                                         </connections>
                                                     </stepper>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="4P5-8J-j5N">
-                                                        <rect key="frame" x="103" y="199" width="381" height="44"/>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" id="4P5-8J-j5N">
+                                                        <rect key="frame" x="103" y="204" width="381" height="44"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" id="ITh-gE-qyn">
                                                             <font key="font" metaFont="miniSystem"/>
@@ -1280,48 +1269,8 @@ to a higher number in order to keep your API usage reasonable</string>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="awU-SO-Gwd">
-                                                        <rect key="frame" x="188" y="312" width="296" height="17"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="...re-scan PR labels every X refreshes" id="Jlv-T3-UQ9">
-                                                            <font key="font" metaFont="system"/>
-                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
-                                                    <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="omI-5I-heJ">
-                                                        <rect key="frame" x="487" y="305" width="19" height="27"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <stepperCell key="cell" continuous="YES" alignment="left" minValue="1" maxValue="1000" doubleValue="1" id="dky-1e-6lk"/>
-                                                        <connections>
-                                                            <action selector="labelRefreshCounterChanged:" target="vQH-WF-vh2" id="zvx-8M-EcK"/>
-                                                        </connections>
-                                                    </stepper>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="l28-ij-akN">
-                                                        <rect key="frame" x="103" y="266" width="381" height="44"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" id="Aaw-4h-ESu">
-                                                            <font key="font" metaFont="miniSystem"/>
-                                                            <string key="title">Labels need to be rescanned fully in order be updated.  If you
-usually manage a lot of items, then you may want to set this value
-to a higher number in order to keep your API usage reasonable</string>
-                                                            <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
-                                                    <button id="GGQ-fB-uWX">
-                                                        <rect key="frame" x="17" y="310" width="160" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Show labels" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="fbv-gG-Lv3">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="showLabelsSelected:" target="vQH-WF-vh2" id="VCh-eE-iBC"/>
-                                                        </connections>
-                                                    </button>
-                                                    <button id="UVq-TH-zaK">
-                                                        <rect key="frame" x="338" y="147" width="164" height="18"/>
+                                                    <button misplaced="YES" id="UVq-TH-zaK">
+                                                        <rect key="frame" x="338" y="152" width="164" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="..in the &quot;All&quot; section too" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="bjn-sR-CJj">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1331,8 +1280,8 @@ to a higher number in order to keep your API usage reasonable</string>
                                                             <action selector="notifyOnStatusUpdatesOnAllPrsSelected:" target="vQH-WF-vh2" id="PPW-Gz-Zf5"/>
                                                         </connections>
                                                     </button>
-                                                    <button id="5WZ-7z-gJ2">
-                                                        <rect key="frame" x="17" y="119" width="307" height="18"/>
+                                                    <button misplaced="YES" id="5WZ-7z-gJ2">
+                                                        <rect key="frame" x="17" y="124" width="307" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Hide PRs whose status items are not all green.." bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="cw8-e1-f8e">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1342,8 +1291,8 @@ to a higher number in order to keep your API usage reasonable</string>
                                                             <action selector="hidePrsThatDontPassSelected:" target="vQH-WF-vh2" id="3pu-u3-h8l"/>
                                                         </connections>
                                                     </button>
-                                                    <button id="lAL-hp-XJt">
-                                                        <rect key="frame" x="17" y="147" width="321" height="18"/>
+                                                    <button misplaced="YES" id="lAL-hp-XJt">
+                                                        <rect key="frame" x="17" y="152" width="321" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Notify status changes for my &amp; participated PRs.." bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="5Yc-fv-0lA">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1353,8 +1302,8 @@ to a higher number in order to keep your API usage reasonable</string>
                                                             <action selector="notifyOnStatusUpdatesSelected:" target="vQH-WF-vh2" id="xMh-YT-y8X"/>
                                                         </connections>
                                                     </button>
-                                                    <button id="ByB-sN-fU6">
-                                                        <rect key="frame" x="333" y="119" width="169" height="18"/>
+                                                    <button misplaced="YES" id="ByB-sN-fU6">
+                                                        <rect key="frame" x="333" y="124" width="169" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="..only in the &quot;All&quot; section" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="FUM-tF-nrf">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2035,9 +1984,6 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="includeStatusesInFiltering" destination="Jr3-YU-DrS" id="48Y-gR-fNe"/>
                 <outlet property="includeTitlesInFiltering" destination="Iwj-YJ-JSd" id="DJq-eG-Dyn"/>
                 <outlet property="includeUsersInFiltering" destination="0Tg-YN-sVl" id="uuv-NJ-EjC"/>
-                <outlet property="labelRefreshCounter" destination="omI-5I-heJ" id="ZB6-4B-2tU"/>
-                <outlet property="labelRefreshNote" destination="l28-ij-akN" id="HUl-So-xgU"/>
-                <outlet property="labelRescanLabel" destination="awU-SO-Gwd" id="mHs-Uc-l8O"/>
                 <outlet property="lastExportReport" destination="zef-fb-l71" id="ld1-mW-3n5"/>
                 <outlet property="launchAtStartup" destination="H3d-cL-Izf" id="3dL-Lp-v9U"/>
                 <outlet property="logActivityToConsole" destination="3fA-qA-38f" id="Vph-lO-Ng2"/>
@@ -2060,7 +2006,6 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="serverList" destination="wPh-gi-N9t" id="B6u-Jh-imO"/>
                 <outlet property="showAllComments" destination="UGp-d4-lNW" id="nt3-bL-T3b"/>
                 <outlet property="showCreationDates" destination="Efg-Id-lOP" id="cZu-0h-5hD"/>
-                <outlet property="showLabels" destination="GGQ-fB-uWX" id="OqS-V0-V7c"/>
                 <outlet property="showSeparateApiServersInMenu" destination="VrU-mc-Czw" id="wwI-oe-SHY"/>
                 <outlet property="showStatusItems" destination="ANN-xo-ud5" id="z7y-d1-UkL"/>
                 <outlet property="snoozeDateTimeDay" destination="51F-wD-jRc" id="7l4-x6-WVo"/>
@@ -2086,7 +2031,6 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="statusItemsRefreshNote" destination="4P5-8J-j5N" id="5Kj-d9-gHG"/>
                 <outlet property="statusTermMenu" destination="irr-Zv-gfS" id="Aoi-h9-I2e"/>
                 <outlet property="statusTermsField" destination="oW9-uY-e0m" id="xZo-19-rE2"/>
-                <outlet property="supportReviews" destination="tRk-sr-Xbo" id="ale-UZ-Z8K"/>
                 <outlet property="tabs" destination="RGK-bv-JXB" id="B5b-gW-VDa"/>
                 <outlet property="teamMentionMovePolicy" destination="gM2-vc-gT5" id="ZPB-jw-m7v"/>
                 <outlet property="useVibrancy" destination="onl-1T-RTg" id="7Tr-3j-g1y"/>

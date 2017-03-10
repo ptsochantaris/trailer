@@ -6,8 +6,6 @@
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="label" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="lastSyncSucceeded" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="latestReceivedEventDateProcessed" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
-        <attribute name="latestUserEventDateProcessed" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="reportRefreshFailures" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="requestsLimit" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="requestsRemaining" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
@@ -164,7 +162,6 @@
     </entity>
     <entity name="Repo" representedClassName=".Repo" syncable="YES">
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
-        <attribute name="dirty" optional="YES" attributeType="Boolean" usesScalarValueType="YES" indexed="YES" syncable="YES"/>
         <attribute name="displayPolicyForIssues" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="displayPolicyForPrs" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="fork" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
@@ -174,6 +171,7 @@
         <attribute name="inaccessible" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="itemHidingPolicy" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="lastDirtied" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="lastScannedIssueEventId" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="manuallyAdded" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="ownerId" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="postSyncAction" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" indexed="YES" syncable="YES"/>
@@ -183,12 +181,6 @@
         <relationship name="apiServer" maxCount="1" deletionRule="Nullify" destinationEntity="ApiServer" inverseName="repos" inverseEntity="ApiServer" syncable="YES"/>
         <relationship name="issues" toMany="YES" deletionRule="Cascade" destinationEntity="Issue" inverseName="repo" inverseEntity="Issue" syncable="YES"/>
         <relationship name="pullRequests" toMany="YES" deletionRule="Cascade" destinationEntity="PullRequest" inverseName="repo" inverseEntity="PullRequest" syncable="YES"/>
-        <compoundIndexes>
-            <compoundIndex>
-                <index value="dirty"/>
-                <index value="lastDirtied"/>
-            </compoundIndex>
-        </compoundIndexes>
     </entity>
     <entity name="Review" representedClassName=".Review" syncable="YES">
         <attribute name="body" optional="YES" attributeType="String" syncable="YES"/>
@@ -227,7 +219,7 @@
         <relationship name="apiServer" maxCount="1" deletionRule="Nullify" destinationEntity="ApiServer" inverseName="teams" inverseEntity="ApiServer" syncable="YES"/>
     </entity>
     <elements>
-        <element name="ApiServer" positionX="9" positionY="153" width="128" height="375"/>
+        <element name="ApiServer" positionX="9" positionY="153" width="128" height="345"/>
         <element name="CacheEntry" positionX="9" positionY="153" width="128" height="150"/>
         <element name="Issue" positionX="9" positionY="153" width="128" height="540"/>
         <element name="PRComment" positionX="0" positionY="0" width="128" height="240"/>
@@ -235,8 +227,8 @@
         <element name="PRStatus" positionX="0" positionY="0" width="128" height="180"/>
         <element name="PullRequest" positionX="0" positionY="0" width="128" height="675"/>
         <element name="Repo" positionX="0" positionY="0" width="128" height="345"/>
+        <element name="Review" positionX="9" positionY="153" width="128" height="195"/>
         <element name="SnoozePreset" positionX="9" positionY="153" width="128" height="225"/>
         <element name="Team" positionX="9" positionY="153" width="128" height="165"/>
-        <element name="Review" positionX="9" positionY="153" width="128" height="195"/>
     </elements>
 </model>

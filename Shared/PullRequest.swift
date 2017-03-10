@@ -39,7 +39,6 @@ final class PullRequest: ListableItem {
 					item.issueUrl = (linkInfo["issue"] as? [AnyHashable : Any])?["href"] as? String
 				}
 
-				API.refreshesSinceLastLabelsCheck[item.objectID] = nil
 				API.refreshesSinceLastStatusCheck[item.objectID] = nil
 			}
 			item.reopened = item.condition == ItemCondition.closed.rawValue
@@ -288,6 +287,12 @@ final class PullRequest: ListableItem {
 			}
 			return false
 		}
+	}
+
+	var sortedReviews: [Review] {
+		return Array(reviews.filter({ return $0.shouldDisplay })).sorted(by: { (l1: Review, l2: Review) -> Bool in
+			return l1.username!.compare(l2.username!) == .orderedAscending
+		})
 	}
 
 	var labelsLink: String? {

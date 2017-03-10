@@ -75,7 +75,7 @@ final class DataManager {
 			ApiServer.ensureAtLeastGithub(in: main)
 		}
 
-		DLog("Marking all repos as dirty")
+		DLog("Resetting sync state of everything")
 		ApiServer.resetSyncOfEverything()
 
 		DLog("Marking all unspecified (nil) announced flags as announced")
@@ -196,6 +196,14 @@ final class DataManager {
 
 		for i in allIssues {
 			i.postSyncAction = PostSyncAction.doNothing.rawValue
+		}
+
+		for r in Review.newOrUpdatedItems(of: Review.self, in: main) {
+			r.postSyncAction = PostSyncAction.doNothing.rawValue
+		}
+
+		for r in PRComment.newOrUpdatedItems(of: PRComment.self, in: main) {
+			r.postSyncAction = PostSyncAction.doNothing.rawValue
 		}
 
 		saveDB()

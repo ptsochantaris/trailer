@@ -7,8 +7,6 @@ final class ApiServer: NSManagedObject {
     @NSManaged var authToken: String?
     @NSManaged var label: String?
     @NSManaged var lastSyncSucceeded: Bool
-    @NSManaged var latestReceivedEventDateProcessed: Date?
-    @NSManaged var latestUserEventDateProcessed: Date?
     @NSManaged var reportRefreshFailures: Bool
     @NSManaged var requestsLimit: Int64
     @NSManaged var requestsRemaining: Int64
@@ -185,8 +183,6 @@ final class ApiServer: NSManagedObject {
 			lastRepoCheck = .distantPast
 		}
 		lastSyncSucceeded = true
-		latestReceivedEventDateProcessed = .distantPast
-		latestUserEventDateProcessed = .distantPast
 	}
 
 	class func server(host: String, moc: NSManagedObjectContext) -> ApiServer? {

@@ -22,32 +22,18 @@ final class PRStatus: DataItem {
 		}
 	}
 
-	private let darkStatusRed = COLOR_CLASS(red: 0.8, green: 0.5, blue: 0.5, alpha: 1.0)
-	private let darkStatusYellow = COLOR_CLASS(red: 0.9, green: 0.8, blue: 0.3, alpha: 1.0)
-	private let darkStatusGreen = COLOR_CLASS(red: 0.6, green: 0.8, blue: 0.6, alpha: 1.0)
-	private let lightStatusRed = COLOR_CLASS(red: 0.5, green: 0.2, blue: 0.2, alpha: 1.0)
-	private let lightStatusYellow = COLOR_CLASS(red: 0.6, green: 0.5, blue: 0.0, alpha: 1.0)
-	private let lightStatusGreen = COLOR_CLASS(red: 0.3, green: 0.5, blue: 0.3, alpha: 1.0)
-
-	var colorForDarkDisplay: COLOR_CLASS {
-		switch S(state) {
-		case "pending":
-			return darkStatusYellow
-		case "success":
-			return darkStatusGreen
-		default:
-			return darkStatusRed
-		}
-	}
+	private static let lightStatusRed = COLOR_CLASS(red: 0.5, green: 0.2, blue: 0.2, alpha: 1.0)
+	private static let lightStatusYellow = COLOR_CLASS(red: 0.6, green: 0.5, blue: 0.0, alpha: 1.0)
+	private static let lightStatusGreen = COLOR_CLASS(red: 0.3, green: 0.5, blue: 0.3, alpha: 1.0)
 
 	var colorForDisplay: COLOR_CLASS {
 		switch S(state) {
 		case "pending":
-			return lightStatusYellow
+			return PRStatus.lightStatusYellow
 		case "success":
-			return lightStatusGreen
+			return PRStatus.lightStatusGreen
 		default:
-			return lightStatusRed
+			return PRStatus.lightStatusRed
 		}
 	}
 

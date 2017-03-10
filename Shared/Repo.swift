@@ -3,12 +3,10 @@ import CoreData
 
 final class Repo: DataItem {
 
-    @NSManaged var dirty: Bool
     @NSManaged var fork: Bool
     @NSManaged var fullName: String?
 	@NSManaged var groupLabel: String?
     @NSManaged var inaccessible: Bool
-    @NSManaged var lastDirtied: Date?
     @NSManaged var webUrl: String?
 	@NSManaged var displayPolicyForPrs: Int64
 	@NSManaged var displayPolicyForIssues: Int64
@@ -17,6 +15,7 @@ final class Repo: DataItem {
 	@NSManaged var issues: Set<Issue>
 	@NSManaged var ownerId: Int64
 	@NSManaged var manuallyAdded: Bool
+	@NSManaged var lastScannedIssueEventId: Int64
 
 	class func syncRepos(from data: [[AnyHashable : Any]]?, server: ApiServer, addNewRepos: Bool, manuallyAdded: Bool) {
 		let filteredData = data?.filter { info -> Bool in
@@ -44,10 +43,8 @@ final class Repo: DataItem {
 				item.fullName = info["full_name"] as? String
 				item.fork = info["fork"] as? Bool ?? false
 				item.webUrl = info["html_url"] as? String
-				item.dirty = true
 				item.inaccessible = false
 				item.ownerId = (info["owner"] as? [AnyHashable : Any])?["id"] as? Int64 ?? 0
-				item.lastDirtied = Date()
 				item.manuallyAdded = manuallyAdded
 				if item.postSyncAction == PostSyncAction.isNew.rawValue {
 					item.displayPolicyForPrs = Int64(Settings.displayPolicyForNewPrs)
@@ -63,12 +60,6 @@ final class Repo: DataItem {
 
 	var shouldSync: Bool {
 		return displayPolicyForPrs > 0 || displayPolicyForIssues > 0
-	}
-
-	override func resetSyncState() {
-		super.resetSyncState()
-		dirty = true
-		lastDirtied = .distantPast
 	}
 
 	class func repos(for group: String, in moc: NSManagedObjectContext) -> [Repo] {
@@ -152,17 +143,7 @@ final class Repo: DataItem {
 		f.relationshipKeyPathsForPrefetching = ["issues", "pullRequests"]
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false
-		f.predicate = NSPredicate(format: "dirty = YES and (displayPolicyForPrs > 0 or displayPolicyForIssues > 0) and inaccessible != YES")
-		return try! moc.fetch(f)
-	}
-
-	class func reposNotRecentlyDirtied(in moc: NSManagedObjectContext) -> [Repo] {
-		let f = NSFetchRequest<Repo>(entityName: "Repo")
-		let date = Date(timeIntervalSinceNow: -3600) as CVarArg
-		f.predicate = NSPredicate(format: "dirty != YES and lastDirtied < %@ and postSyncAction != %lld and (displayPolicyForPrs > 0 or displayPolicyForIssues > 0)", date, PostSyncAction.delete.rawValue)
-		f.includesPropertyValues = false
-		f.returnsObjectsAsFaults = false
-		f.includesSubentities = false
+		f.predicate = NSPredicate(format: "(displayPolicyForPrs > 0 or displayPolicyForIssues > 0) and inaccessible != YES")
 		return try! moc.fetch(f)
 	}
 
@@ -173,16 +154,6 @@ final class Repo: DataItem {
 		f.includesSubentities = false
 		f.predicate = NSPredicate(format: "(not (displayPolicyForPrs > 0 or displayPolicyForIssues > 0)) or inaccessible = YES")
 		return try! moc.fetch(f)
-	}
-
-	class func markDirtyReposWithIds(_ ids: NSSet, in moc: NSManagedObjectContext) {
-		let f = NSFetchRequest<Repo>(entityName: "Repo")
-		f.returnsObjectsAsFaults = false
-		f.includesSubentities = false
-		f.predicate = NSPredicate(format: "serverId IN %@", ids)
-		for repo in try! moc.fetch(f) {
-			repo.dirty = repo.shouldSync
-		}
 	}
 
 	class func reposFiltered(by filter: String?) -> [Repo] {
