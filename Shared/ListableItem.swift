@@ -99,27 +99,6 @@ class ListableItem: DataItem {
 		}
 	}
 
-	final class func markItemsAsUpdatedWithNumbers(_ numbers: Set<Int64>, in moc: NSManagedObjectContext) {
-
-		let fp = NSFetchRequest<PullRequest>(entityName: "PullRequest")
-		fp.returnsObjectsAsFaults = false
-		fp.includesSubentities = false
-		fp.predicate = NSPredicate(format: "number IN %@", numbers)
-
-		for i in try! moc.fetch(fp) {
-			i.setToUpdatedIfIdle()
-		}
-
-		let fi = NSFetchRequest<Issue>(entityName: "Issue")
-		fi.returnsObjectsAsFaults = false
-		fi.includesSubentities = false
-		fi.predicate = NSPredicate(format: "number IN %@", numbers)
-
-		for i in try! moc.fetch(fi) {
-			i.setToUpdatedIfIdle()
-		}
-	}
-
 	final func setToUpdatedIfIdle() {
 		if postSyncAction == PostSyncAction.doNothing.rawValue {
 			postSyncAction = PostSyncAction.isUpdated.rawValue

@@ -186,4 +186,30 @@ final class Repo: DataItem {
 		}
 		return try! DataManager.main.count(for: f)
 	}
+
+	func markItemsAsUpdated(with numbers: Set<Int64>) {
+
+		let predicate = NSPredicate(format: "repo == %@ and number IN %@", self, numbers)
+
+		let fp = NSFetchRequest<PullRequest>(entityName: "PullRequest")
+		fp.returnsObjectsAsFaults = false
+		fp.includesSubentities = false
+		fp.predicate = predicate
+
+		for i in try! managedObjectContext!.fetch(fp) {
+			DLog("Ensuring PR %lld in repo %lld is marked as updated", i.serverId, serverId)
+			i.setToUpdatedIfIdle()
+		}
+
+		let fi = NSFetchRequest<Issue>(entityName: "Issue")
+		fi.returnsObjectsAsFaults = false
+		fi.includesSubentities = false
+		fp.predicate = predicate
+
+		for i in try! managedObjectContext!.fetch(fi) {
+			DLog("Ensuring Issue %lld in repo %lld is marked as updated", i.serverId, serverId)
+			i.setToUpdatedIfIdle()
+		}
+	}
+
 }

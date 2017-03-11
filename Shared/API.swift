@@ -418,7 +418,7 @@ final class API {
 						r.lastScannedIssueEventId = lastLocalEvent
 					}
 					if numbers.count > 0 {
-						ListableItem.markItemsAsUpdatedWithNumbers(numbers, in: moc)
+						r.markItemsAsUpdated(with: numbers)
 					}
 					return foundLastEvent
 
