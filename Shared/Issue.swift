@@ -24,8 +24,9 @@ final class Issue: ListableItem {
 					l.postSyncAction = PostSyncAction.delete.rawValue
 				}
 
-				let labelList = info["labels"] as? [[AnyHashable : Any]]
-				PRLabel.syncLabels(from: labelList, withParent: item)
+				if Settings.showLabels, let labelList = info["labels"] as? [[AnyHashable : Any]] {
+					PRLabel.syncLabels(from: labelList, withParent: item)
+				}
 			}
 			item.reopened = item.condition == ItemCondition.closed.rawValue
 			item.condition = ItemCondition.open.rawValue

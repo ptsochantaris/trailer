@@ -291,7 +291,18 @@ final class API {
 
 	////////////////////////////////////// API interface
 
+	private static let longConcurrency = 3
+	private static let burstConcurrency = 16
+
+	private static let apiQueue = { () -> OperationQueue in
+		let n = OperationQueue()
+		n.underlyingQueue = DispatchQueue.main
+		n.maxConcurrentOperationCount = API.longConcurrency
+		return n
+	}()
+
 	class func syncItemsForActiveReposAndCallback(callback: @escaping Completion) {
+
 		let syncContext = DataManager.buildChildContext()
 
 		let shouldRefreshReposToo = lastRepoCheck == .distantPast
@@ -324,8 +335,12 @@ final class API {
 			}
 		}
 
+		apiQueue.maxConcurrentOperationCount = API.longConcurrency
+
 		fetchItems(from: repos, to: moc) {
+
 			markExtraUpdatedItems(from: repos, to: moc) {
+
 				fetchCommentsForCurrentIssues(to: moc) {
 					checkIssueClosures(in: moc)
 					completionCallback()
@@ -354,11 +369,14 @@ final class API {
 
 	private class func markExtraUpdatedItems(from repos: [Repo], to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
+		apiQueue.maxConcurrentOperationCount = API.burstConcurrency
+
 		var completionCount = 0
 		let totalOperations = repos.count
 		let completionCallback = {
 			completionCount += 1
 			if completionCount == totalOperations {
+				apiQueue.maxConcurrentOperationCount = API.longConcurrency
 				callback()
 			}
 		}
@@ -465,9 +483,11 @@ final class API {
 
 	private class func updatePullRequests(in moc: NSManagedObjectContext, callback: @escaping Completion) {
 
-		let willScanForStatuses = shouldScanForStatuses(in: moc)
-
-		let totalOperations = 6 + (willScanForStatuses ? 1 : 0)
+		let totalOperations = 3
+			+ (Settings.showStatusItems ? 1 : 0)
+			+ (Settings.showLabels ? 1 : 0)
+			+ (shouldSyncReviews ? 1 : 0)
+			+ (shouldSyncReviewAssignments ? 1 : 0)
 
 		var completionCount = 0
 		let completionCallback = {
@@ -477,14 +497,40 @@ final class API {
 			}
 		}
 
-		if willScanForStatuses {
+		if Settings.showStatusItems {
 			fetchStatusesForCurrentPullRequests(to: moc, callback: completionCallback)
+		} else {
+			refreshesSinceLastStatusCheck.removeAll()
+			for s in DataItem.allItems(of: PRStatus.self, in: moc) {
+				s.postSyncAction = PostSyncAction.delete.rawValue
+			}
 		}
-		fetchLabelsForForCurrentPullRequests(to: moc, callback: completionCallback)
-		fetchReviewsForForCurrentPullRequests(to: moc) {
-			fetchCommentsForCurrentReviews(to: moc, callback: completionCallback)
+
+		if Settings.showLabels {
+			fetchLabelsForForCurrentPullRequests(to: moc, callback: completionCallback)
+		} else {
+			for l in DataItem.allItems(of: PRLabel.self, in: moc) {
+				l.postSyncAction = PostSyncAction.delete.rawValue
+			}
 		}
-		fetchReviewAssignmentsForCurrentPullRequests(to: moc, callback: completionCallback)
+
+		if shouldSyncReviews {
+			fetchReviewsForForCurrentPullRequests(to: moc) {
+				fetchCommentsForCurrentReviews(to: moc, callback: completionCallback)
+			}
+		} else {
+			for r in DataItem.allItems(of: Review.self, in: moc) {
+				r.postSyncAction = PostSyncAction.delete.rawValue
+				for c in r.comments {
+					c.postSyncAction = PostSyncAction.delete.rawValue
+				}
+			}
+		}
+
+		if shouldSyncReviewAssignments {
+			fetchReviewAssignmentsForCurrentPullRequests(to: moc, callback: completionCallback)
+		}
+
 		fetchCommentsForCurrentPullRequests(to: moc, callback: completionCallback)
 		checkPrClosures(in: moc, callback: completionCallback)
 		detectAssignedPullRequests(in: moc, callback: completionCallback)
@@ -797,6 +843,13 @@ final class API {
 		}
 	}
 
+	static var shouldSyncReviews: Bool {
+		return Settings.displayReviewChangeRequests || Settings.notifyOnReviewDismissals || Settings.notifyOnReviewAcceptances || Settings.notifyOnReviewChangeRequests
+	}
+	static var shouldSyncReviewAssignments: Bool {
+		return Settings.notifyOnReviewAssignments || (Int64(Settings.assignedReviewHandlingPolicy) != Section.none.rawValue)
+	}
+
 	private class func fetchReviewAssignmentsForCurrentPullRequests(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		let prs = DataItem.newOrUpdatedItems(of: PullRequest.self, in: moc).filter { $0.apiServer.lastSyncSucceeded }
@@ -826,7 +879,7 @@ final class API {
 			}) { success, resultCode in
 				completionCount += 1
 				if success {
-					if assignedForReview && !p.assignedForReview {
+					if assignedForReview && !p.assignedForReview && Settings.notifyOnReviewAssignments {
 						NotificationQueue.add(type: .assignedForReview, for: p)
 					}
 					p.assignedForReview = assignedForReview
@@ -1182,18 +1235,6 @@ final class API {
 		}
 	}
 
-	private class func shouldScanForStatuses(in moc: NSManagedObjectContext) -> Bool {
-		if Settings.showStatusItems {
-			return true
-		} else {
-			refreshesSinceLastStatusCheck.removeAll()
-			for s in DataItem.allItems(of: PRStatus.self, in: moc) {
-				s.postSyncAction = PostSyncAction.delete.rawValue
-			}
-			return false
-		}
-	}
-
 	private class func syncWatchedRepos(from server: ApiServer, callback: @escaping Completion) {
 
 		if !server.lastSyncSucceeded {
@@ -1359,13 +1400,6 @@ final class API {
 		})
 	}
 
-	private static let apiQueue = { () -> OperationQueue in
-		let n = OperationQueue()
-		n.underlyingQueue = DispatchQueue.main
-		n.maxConcurrentOperationCount = 3
-		return n
-	}()
-
 	private class func start(call path: String, on server: ApiServer, ignoreLastSync: Bool, completion: @escaping ApiCompletion) {
 
 		let apiServerLabel: String
@@ -1384,7 +1418,9 @@ final class API {
 
 		var r = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 60.0)
 		var acceptTypes = [String]()
-		acceptTypes.append("application/vnd.github.black-cat-preview+json")
+		if shouldSyncReviews || shouldSyncReviewAssignments {
+			acceptTypes.append("application/vnd.github.black-cat-preview+json")
+		}
 		acceptTypes.append("application/vnd.github.v3+json")
 		r.setValue(acceptTypes.joined(separator: ", "), forHTTPHeaderField:"Accept")
 		if let a = server.authToken {

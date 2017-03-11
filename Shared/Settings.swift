@@ -10,18 +10,18 @@ final class Settings {
 
 	private class var allFields: [String] {
 		return [
-			"SORT_METHOD_KEY", "STATUS_FILTERING_METHOD_KEY", "LAST_PREFS_TAB_SELECTED", "STATUS_ITEM_REFRESH_COUNT", "LABEL_REFRESH_COUNT", "UPDATE_CHECK_INTERVAL_KEY",
+			"SORT_METHOD_KEY", "STATUS_FILTERING_METHOD_KEY", "LAST_PREFS_TAB_SELECTED", "STATUS_ITEM_REFRESH_COUNT", "UPDATE_CHECK_INTERVAL_KEY", "ASSIGNED_REVIEW_HANDLING_POLICY", "NOTIFY_ON_REVIEW_CHANGE_REQUESTS", "NOTIFY_ON_ALL_REVIEW_CHANGE_REQUESTS",
 			"STATUS_FILTERING_TERMS_KEY", "COMMENT_AUTHOR_BLACKLIST", "HOTKEY_LETTER", "REFRESH_PERIOD_KEY", "IOS_BACKGROUND_REFRESH_PERIOD_KEY", "NEW_REPO_CHECK_PERIOD", "LAST_SUCCESSFUL_REFRESH",
 			"LAST_RUN_VERSION_KEY", "UPDATE_CHECK_AUTO_KEY", "HIDE_UNCOMMENTED_PRS_KEY", "SHOW_COMMENTS_EVERYWHERE_KEY", "SORT_ORDER_KEY", "SHOW_UPDATED_KEY", "DONT_KEEP_MY_PRS_KEY", "HIDE_AVATARS_KEY",
-			"DONT_ASK_BEFORE_WIPING_MERGED", "DONT_ASK_BEFORE_WIPING_CLOSED", "HIDE_NEW_REPOS_KEY", "GROUP_BY_REPO", "HIDE_ALL_SECTION", "SHOW_LABELS", "SHOW_STATUS_ITEMS",
-			"MAKE_STATUS_ITEMS_SELECTABLE", "MARK_UNMERGEABLE_ON_USER_SECTIONS_ONLY", "COUNT_ONLY_LISTED_PRS", "OPEN_PR_AT_FIRST_UNREAD_COMMENT_KEY", "LOG_ACTIVITY_TO_CONSOLE_KEY",
+			"DONT_ASK_BEFORE_WIPING_MERGED", "DONT_ASK_BEFORE_WIPING_CLOSED", "HIDE_NEW_REPOS_KEY", "GROUP_BY_REPO", "HIDE_ALL_SECTION", "SHOW_STATUS_ITEMS", "NOTIFY_ON_REVIEW_ACCEPTANCES", "NOTIFY_ON_ALL_REVIEW_ACCEPTANCES", "NOTIFY_ON_REVIEW_ASSIGNMENTS",
+			"MAKE_STATUS_ITEMS_SELECTABLE", "MARK_UNMERGEABLE_ON_USER_SECTIONS_ONLY", "COUNT_ONLY_LISTED_PRS", "OPEN_PR_AT_FIRST_UNREAD_COMMENT_KEY", "LOG_ACTIVITY_TO_CONSOLE_KEY", "NOTIFY_ON_REVIEW_DISMISSALS", "NOTIFY_ON_ALL_REVIEW_DISMISSALS",
 			"HOTKEY_ENABLE", "HOTKEY_CONTROL_MODIFIER", "USE_VIBRANCY_UI", "DISABLE_ALL_COMMENT_NOTIFICATIONS", "NOTIFY_ON_STATUS_UPDATES", "NOTIFY_ON_STATUS_UPDATES_ALL", "SHOW_REPOS_IN_NAME", "INCLUDE_REPOS_IN_FILTER",
 			"INCLUDE_LABELS_IN_FILTER", "INCLUDE_STATUSES_IN_FILTER", "HOTKEY_COMMAND_MODIFIER", "HOTKEY_OPTION_MODIFIER", "HOTKEY_SHIFT_MODIFIER", "GRAY_OUT_WHEN_REFRESHING", "SHOW_ISSUES_MENU",
 			"SHOW_ISSUES_IN_WATCH_GLANCE", "ASSIGNED_PR_HANDLING_POLICY", "HIDE_DESCRIPTION_IN_WATCH_DETAIL_VIEW", "AUTO_REPEAT_SETTINGS_EXPORT", "DONT_CONFIRM_SETTINGS_IMPORT",
 			"LAST_EXPORT_URL", "LAST_EXPORT_TIME", "CLOSE_HANDLING_POLICY_2", "MERGE_HANDLING_POLICY_2", "LAST_PREFS_TAB_SELECTED_OSX", "NEW_PR_DISPLAY_POLICY_INDEX", "NEW_ISSUE_DISPLAY_POLICY_INDEX", "HIDE_PRS_THAT_ARENT_PASSING_ONLY_IN_ALL",
             "INCLUDE_SERVERS_IN_FILTER", "INCLUDE_USERS_IN_FILTER", "INCLUDE_TITLES_IN_FILTER", "INCLUDE_NUMBERS_IN_FILTER", "DUMP_API_RESPONSES_IN_CONSOLE", "OPEN_ITEMS_DIRECTLY_IN_SAFARI", "HIDE_PRS_THAT_ARENT_PASSING",
             "REMOVE_RELATED_NOTIFICATIONS_ON_ITEM_REMOVE", "HIDE_SNOOZED_ITEMS", "INCLUDE_MILESTONES_IN_FILTER", "INCLUDE_ASSIGNEE_NAMES_IN_FILTER", "API_SERVERS_IN_SEPARATE_MENUS", "ASSUME_READ_ITEM_IF_USER_HAS_NEWER_COMMENTS",
-            "AUTO_SNOOZE_DAYS", "HIDE_MENUBAR_COUNTS", "AUTO_ADD_NEW_REPOS", "AUTO_REMOVE_DELETED_REPOS", "MARK_PRS_AS_UNREAD_ON_NEW_COMMITS"]
+            "AUTO_SNOOZE_DAYS", "HIDE_MENUBAR_COUNTS", "AUTO_ADD_NEW_REPOS", "AUTO_REMOVE_DELETED_REPOS", "MARK_PRS_AS_UNREAD_ON_NEW_COMMITS", "SHOW_LABELS", "DISPLAY_REVIEW_CHANGE_REQUESTS"]
 	}
 
     class func checkMigration() {
@@ -276,6 +276,12 @@ final class Settings {
 		set { set("UPDATE_CHECK_INTERVAL_KEY", newValue) }
 	}
 
+	static let assignedReviewHandlingPolicyHelp = "If an item is assigned for you to review, Trailer can move it to a specific section or leave it as-is."
+	class var assignedReviewHandlingPolicy: Int {
+		get { return get("ASSIGNED_REVIEW_HANDLING_POLICY") as? Int ?? 2 }
+		set { set("ASSIGNED_REVIEW_HANDLING_POLICY", newValue) }
+	}
+
 	static let assignedPrHandlingPolicyHelp = "If an item is assigned to you, Trailer can move it to a specific section or leave it as-is."
 	class var assignedPrHandlingPolicy: Int {
 		get { return get("ASSIGNED_PR_HANDLING_POLICY") as? Int ?? 1 }
@@ -453,6 +459,12 @@ final class Settings {
 		set { set("GROUP_BY_REPO", newValue) }
 	}
 
+	static let showLabelsHelp = "Show labels associated with items, usually a good idea"
+	class var showLabels: Bool {
+		get { return get("SHOW_LABELS") as? Bool ?? false }
+		set { set("SHOW_LABELS", newValue) }
+	}
+
 	static let showStatusItemsHelp = "Show status items, such as CI results or messages from code review services, that are attached to items on the server."
 	class var showStatusItems: Bool {
 		get { return get("SHOW_STATUS_ITEMS") as? Bool ?? false }
@@ -591,6 +603,50 @@ final class Settings {
         set { set("COUNT_ONLY_LISTED_PRS", newValue) }
     }
 
+
+	static let notifyOnReviewChangeRequestsHelp = "Issue a notification when someone creates a review in a PR that requires changes."
+	class var notifyOnReviewChangeRequests: Bool {
+		get { return get("NOTIFY_ON_REVIEW_CHANGE_REQUESTS") as? Bool ?? true }
+		set { set("NOTIFY_ON_REVIEW_CHANGE_REQUESTS", newValue) }
+	}
+
+	static let notifyOnReviewAcceptancesHelp = "Issue a notification when someone accepts the changes related to a review in a PR that required changes."
+	class var notifyOnReviewAcceptances: Bool {
+		get { return get("NOTIFY_ON_REVIEW_ACCEPTANCES") as? Bool ?? true }
+		set { set("NOTIFY_ON_REVIEW_ACCEPTANCES", newValue) }
+	}
+
+	static let notifyOnReviewDismissalsHelp = "Issue a notification when someone dismissed a review in a PR that required changes."
+	class var notifyOnReviewDismissals: Bool {
+		get { return get("NOTIFY_ON_REVIEW_DISMISSALS") as? Bool ?? true }
+		set { set("NOTIFY_ON_REVIEW_DISMISSALS", newValue) }
+	}
+
+	static let notifyOnAllReviewChangeRequestsHelp = "Do this for all items, not just those created by me."
+	class var notifyOnAllReviewChangeRequests: Bool {
+		get { return get("NOTIFY_ON_ALL_REVIEW_CHANGE_REQUESTS") as? Bool ?? false }
+		set { set("NOTIFY_ON_ALL_REVIEW_CHANGE_REQUESTS", newValue) }
+	}
+
+	static let notifyOnAllReviewAcceptancesHelp = "Do this for all items, not just those created by me."
+	class var notifyOnAllReviewAcceptances: Bool {
+		get { return get("NOTIFY_ON_ALL_REVIEW_ACCEPTANCES") as? Bool ?? false }
+		set { set("NOTIFY_ON_ALL_REVIEW_ACCEPTANCES", newValue) }
+	}
+
+	static let notifyOnAllReviewDismissalsHelp = "Do this for all items, not just those created by me."
+	class var notifyOnAllReviewDismissals: Bool {
+		get { return get("NOTIFY_ON_ALL_REVIEW_DISMISSALS") as? Bool ?? false }
+		set { set("NOTIFY_ON_ALL_REVIEW_DISMISSALS", newValue) }
+	}
+
+	static let notifyOnReviewAssignmentsHelp = "Issue a notification when someone assigns me a PR to review."
+	class var notifyOnReviewAssignments: Bool {
+		get { return get("NOTIFY_ON_REVIEW_ASSIGNMENTS") as? Bool ?? true }
+		set { set("NOTIFY_ON_REVIEW_ASSIGNMENTS", newValue) }
+	}
+
+
 	static let checkForUpdatesAutomaticallyHelp = "Check for updates to Trailer automatically. It is generally a very good idea to keep this selected, unless you are using an external package manager to manage the updates."
 	class var checkForUpdatesAutomatically: Bool {
 		get { return get("UPDATE_CHECK_AUTO_KEY") as? Bool ?? true }
@@ -706,5 +762,11 @@ final class Settings {
 	class var assumeReadItemIfUserHasNewerComments: Bool {
 		get { return get("ASSUME_READ_ITEM_IF_USER_HAS_NEWER_COMMENTS") as? Bool ?? false }
 		set { set("ASSUME_READ_ITEM_IF_USER_HAS_NEWER_COMMENTS", newValue) }
+	}
+
+	static let displayReviewChangeRequestsHelp = "List change requests in the list of Pull Requests. Sync information with the server in order to enable the review options below."
+	class var displayReviewChangeRequests: Bool {
+		get { return get("DISPLAY_REVIEW_CHANGE_REQUESTS") as? Bool ?? false }
+		set { set("DISPLAY_REVIEW_CHANGE_REQUESTS", newValue) }
 	}
 }

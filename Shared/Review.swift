@@ -22,11 +22,17 @@ final class Review: DataItem {
 					if let n = newState {
 						switch n {
 						case "CHANGES_REQUESTED":
-							NotificationQueue.add(type: .changesRequested, for: withParent)
+							if Settings.notifyOnAllReviewChangeRequests || (Settings.notifyOnReviewChangeRequests && withParent.createdByMe) {
+								NotificationQueue.add(type: .changesRequested, for: withParent)
+							}
 						case "APPROVED":
-							NotificationQueue.add(type: .changesApproved, for: withParent)
+							if Settings.notifyOnAllReviewAcceptances || (Settings.notifyOnReviewAcceptances && withParent.createdByMe) {
+								NotificationQueue.add(type: .changesApproved, for: withParent)
+							}
 						case "DISMISSED":
-							NotificationQueue.add(type: .changesDismissed, for: withParent)
+							if Settings.notifyOnAllReviewDismissals || (Settings.notifyOnReviewDismissals && withParent.createdByMe) {
+								NotificationQueue.add(type: .changesDismissed, for: withParent)
+							}
 						default: break
 						}
 					}

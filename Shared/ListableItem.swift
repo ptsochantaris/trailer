@@ -324,7 +324,10 @@ class ListableItem: DataItem {
 
 		if targetSection == .all || targetSection == .none {
 
-			if Int64(Settings.newMentionMovePolicy) > Section.none.rawValue && contains(terms: ["@\(S(apiServer.userName))"]) {
+			if let p = self as? PullRequest, Int64(Settings.assignedReviewHandlingPolicy) > Section.none.rawValue, p.assignedForReview {
+				targetSection = Section(Settings.assignedReviewHandlingPolicy)!
+
+			} else if Int64(Settings.newMentionMovePolicy) > Section.none.rawValue && contains(terms: ["@\(S(apiServer.userName))"]) {
 				targetSection = Section(Settings.newMentionMovePolicy)!
 
 			} else if Int64(Settings.teamMentionMovePolicy) > Section.none.rawValue && contains(terms: apiServer.teams.flatMap { $0.calculatedReferral }) {
@@ -468,10 +471,11 @@ class ListableItem: DataItem {
 	}
 
 	final func title(with font: FONT_CLASS, labelFont: FONT_CLASS, titleColor: COLOR_CLASS) -> NSMutableAttributedString {
+
 		let p = NSMutableParagraphStyle()
 		p.paragraphSpacing = 1.0
-
 		let titleAttributes = [NSFontAttributeName: font, NSForegroundColorAttributeName: titleColor, NSParagraphStyleAttributeName: p]
+
 		let _title = NSMutableAttributedString()
 		if let t = title {
 			_title.append(NSAttributedString(string: t, attributes: titleAttributes))
@@ -493,11 +497,6 @@ class ListableItem: DataItem {
 										   NSParagraphStyleAttributeName: lp] as [String : Any]
 				#endif
 
-				let reviewAttributes = [NSFontAttributeName: labelFont,
-				                        NSForegroundColorAttributeName: COLOR_CLASS(red: 0.7, green: 0.0, blue: 0.0, alpha: 1.0),
-				                        NSBaselineOffsetAttributeName: 2.0,
-				                        NSParagraphStyleAttributeName: lp] as [String : Any]
-
 				func isDark(color: COLOR_CLASS) -> Bool {
 					var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0
 					color.getRed(&r, green: &g, blue: &b, alpha: nil)
@@ -518,20 +517,32 @@ class ListableItem: DataItem {
 					}
 					count += 1
 				}
+			}
 
-				if let p = self as? PullRequest {
-					let reviews = p.sortedReviews
-					if reviews.count > 0 {
-						_title.append(NSAttributedString(string: " ", attributes: reviewAttributes))
-						count = 0
-						for r in reviews {
-							let name = "@" + r.username!.replacingOccurrences(of: " ", with: "\u{a0}")
-							_title.append(NSAttributedString(string: "\u{a0}\(name)\u{a0}", attributes: reviewAttributes))
-							if count == reviews.count - 1 {
-								_title.append(NSAttributedString(string: reviews.count > 1 ? "request changes" : " requests changes", attributes: reviewAttributes))
-							}
-							count += 1
+			if Settings.displayReviewChangeRequests, let p = self as? PullRequest {
+
+				let lp = NSMutableParagraphStyle()
+				#if os(iOS)
+					lp.lineHeightMultiple = 1.15
+				#else
+					lp.minimumLineHeight = labelFont.pointSize+5.0
+				#endif
+				let reviewAttributes = [NSFontAttributeName: labelFont,
+				                        NSForegroundColorAttributeName: COLOR_CLASS(red: 0.7, green: 0.0, blue: 0.0, alpha: 1.0),
+				                        NSBaselineOffsetAttributeName: 2.0,
+				                        NSParagraphStyleAttributeName: lp] as [String : Any]
+
+				let reviews = p.sortedReviews
+				if reviews.count > 0 {
+					_title.append(NSAttributedString(string: " ", attributes: reviewAttributes))
+					var count = 0
+					for r in reviews {
+						let name = "@" + r.username!.replacingOccurrences(of: " ", with: "\u{a0}")
+						_title.append(NSAttributedString(string: "\u{a0}\(name)\u{a0}", attributes: reviewAttributes))
+						if count == reviews.count - 1 {
+							_title.append(NSAttributedString(string: reviews.count > 1 ? "request changes" : " requests changes", attributes: reviewAttributes))
 						}
+						count += 1
 					}
 				}
 			}

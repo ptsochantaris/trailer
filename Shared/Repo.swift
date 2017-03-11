@@ -17,6 +17,11 @@ final class Repo: DataItem {
 	@NSManaged var manuallyAdded: Bool
 	@NSManaged var lastScannedIssueEventId: Int64
 
+	override func resetSyncState() {
+		super.resetSyncState()
+		lastScannedIssueEventId = 0
+	}
+
 	class func syncRepos(from data: [[AnyHashable : Any]]?, server: ApiServer, addNewRepos: Bool, manuallyAdded: Bool) {
 		let filteredData = data?.filter { info -> Bool in
 			if info["private"] as? Bool ?? false {
