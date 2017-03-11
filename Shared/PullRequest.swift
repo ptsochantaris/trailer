@@ -273,21 +273,18 @@ final class PullRequest: ListableItem {
 			}
 		}
 
-		var targetUrls = Set<String>()
-		var descriptions = Set<String>()
-		return rawStatuses.filter { s in
-			let targetUrl = S(s.targetUrl)
-			let desc = S(s.descriptionText)
-
-			if !desc.isEmpty && !descriptions.contains(desc) {
-				descriptions.insert(desc)
-				if !targetUrls.contains(targetUrl) {
-					targetUrls.insert(targetUrl)
-					return true
+		var contexts = [String : PRStatus]()
+		for s in rawStatuses {
+			let context = s.context ?? "//NO CONTEXT/-/"
+			if let latestStatusInContext = contexts[context] {
+				if (latestStatusInContext.createdAt ?? .distantPast) < (s.createdAt ?? .distantPast) {
+					contexts[context] = s
 				}
+			} else {
+				contexts[context] = s
 			}
-			return false
 		}
+		return contexts.values.sorted { ($0.createdAt ?? .distantPast) < ($1.createdAt ?? .distantPast) }
 	}
 
 	var sortedReviews: [Review] {

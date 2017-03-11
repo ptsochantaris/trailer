@@ -100,6 +100,7 @@
         <relationship name="pullRequest" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="PullRequest" inverseName="labels" inverseEntity="PullRequest" syncable="YES"/>
     </entity>
     <entity name="PRStatus" representedClassName=".PRStatus" syncable="YES">
+        <attribute name="context" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="descriptionText" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="postSyncAction" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" indexed="YES" syncable="YES"/>
@@ -225,7 +226,7 @@
         <element name="Issue" positionX="9" positionY="153" width="128" height="540"/>
         <element name="PRComment" positionX="0" positionY="0" width="128" height="240"/>
         <element name="PRLabel" positionX="9" positionY="153" width="128" height="195"/>
-        <element name="PRStatus" positionX="0" positionY="0" width="128" height="180"/>
+        <element name="PRStatus" positionX="0" positionY="0" width="128" height="195"/>
         <element name="PullRequest" positionX="0" positionY="0" width="128" height="690"/>
         <element name="Repo" positionX="0" positionY="0" width="128" height="345"/>
         <element name="Review" positionX="9" positionY="153" width="128" height="195"/>

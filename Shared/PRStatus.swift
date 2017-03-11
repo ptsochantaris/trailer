@@ -4,6 +4,7 @@ final class PRStatus: DataItem {
 
     @NSManaged var descriptionText: String?
     @NSManaged var state: String?
+	@NSManaged var context: String?
     @NSManaged var targetUrl: String?
 
 	@NSManaged var pullRequest: PullRequest
@@ -12,6 +13,7 @@ final class PRStatus: DataItem {
 		items(with: data, type: PRStatus.self, server: pullRequest.apiServer) { item, info, isNewOrUpdated in
 			if isNewOrUpdated {
 				item.state = info["state"] as? String
+				item.context = info["context"] as? String
 				item.targetUrl = info["target_url"] as? String
 				item.pullRequest = pullRequest
 
@@ -38,20 +40,26 @@ final class PRStatus: DataItem {
 	}
 
 	var displayText: String {
-		if let desc = descriptionText {
-			let prefix: String
-			switch S(state) {
-			case "pending":
-				prefix = "⚡️"
-			case "success":
-				prefix = "✅"
-			default:
-				prefix = "❌"
-			}
-			return String(format: "%@ %@ %@", prefix, shortDateFormatter.string(from: createdAt!), desc)
-		} else {
-			return "(No description)"
+		var text: String
+
+		switch S(state) {
+		case "pending":
+			text = "⚡️ "
+		case "success":
+			text = "✅ "
+		default:
+			text = "❌ "
 		}
+
+		if let c = context, !c.isEmpty {
+			text += c
+		}
+
+		if let t = descriptionText, !t.isEmpty {
+			text += " - \(t)"
+		}
+
+		return text
 	}
 
 	var parentShouldSkipNotifications: Bool {

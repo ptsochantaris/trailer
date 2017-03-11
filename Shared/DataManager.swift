@@ -117,6 +117,12 @@ final class DataManager {
 				s.wakeOnStatusChange = m
 			}
 		}
+
+		for s in DataItem.allItems(of: PRStatus.self, in: DataManager.main) {
+			if s.context == nil {
+				s.resetSyncState()
+			}
+		}
 	}
 
 	class func sendNotificationsIndexAndSave() {
