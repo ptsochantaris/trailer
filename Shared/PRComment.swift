@@ -91,6 +91,12 @@ final class PRComment: DataItem {
 	func fill(from info: [AnyHashable : Any]) {
 		body = info["body"] as? String
 
+		if let id = info["pull_request_review_id"] as? Int64, let moc = managedObjectContext, let r = Review.review(with: id, in: moc) {
+			review = r
+		} else {
+			review = nil
+		}
+
 		if let userInfo = info["user"] as? [AnyHashable : Any] {
 			userName = userInfo["login"] as? String
 			userId = userInfo["id"] as? Int64 ?? 0

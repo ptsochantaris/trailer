@@ -400,6 +400,7 @@ final class API {
 				} else {
 
 					var numbers = Set<Int64>()
+					var reasons = Set<String>()
 					var foundLastEvent = false
 					for event in data {
 						if let eventId = event["id"] as? Int64, let issue = event["issue"] as? [AnyHashable:Any], let issueNumber = issue["number"] as? Int64 {
@@ -412,13 +413,16 @@ final class API {
 								break // we're done
 							}
 							numbers.insert(issueNumber)
+							if let reason = event["event"] as? String {
+								reasons.insert(reason)
+							}
 						}
 					}
 					if r.lastScannedIssueEventId == 0 {
 						r.lastScannedIssueEventId = lastLocalEvent
 					}
 					if numbers.count > 0 {
-						r.markItemsAsUpdated(with: numbers)
+						r.markItemsAsUpdated(with: numbers, reasons: reasons)
 					}
 					return foundLastEvent
 
@@ -486,7 +490,6 @@ final class API {
 		let totalOperations = 3
 			+ (Settings.showStatusItems ? 1 : 0)
 			+ (Settings.showLabels ? 1 : 0)
-			+ (shouldSyncReviews ? 1 : 0)
 			+ (shouldSyncReviewAssignments ? 1 : 0)
 
 		var completionCount = 0
@@ -516,24 +519,22 @@ final class API {
 
 		if shouldSyncReviews {
 			fetchReviewsForForCurrentPullRequests(to: moc) {
-				fetchCommentsForCurrentReviews(to: moc, callback: completionCallback)
+				fetchCommentsForCurrentPullRequests(to: moc, callback: completionCallback)
 			}
 		} else {
 			for r in DataItem.allItems(of: Review.self, in: moc) {
 				r.postSyncAction = PostSyncAction.delete.rawValue
-				for c in r.comments {
-					c.postSyncAction = PostSyncAction.delete.rawValue
-				}
 			}
+			fetchCommentsForCurrentPullRequests(to: moc, callback: completionCallback)
 		}
+
+		checkPrClosures(in: moc, callback: completionCallback)
+
+		detectAssignedPullRequests(in: moc, callback: completionCallback)
 
 		if shouldSyncReviewAssignments {
 			fetchReviewAssignmentsForCurrentPullRequests(to: moc, callback: completionCallback)
 		}
-
-		fetchCommentsForCurrentPullRequests(to: moc, callback: completionCallback)
-		checkPrClosures(in: moc, callback: completionCallback)
-		detectAssignedPullRequests(in: moc, callback: completionCallback)
 	}
 
 	private class func fetchUserTeams(from server: ApiServer, callback: @escaping Completion) {
@@ -885,46 +886,6 @@ final class API {
 					p.assignedForReview = assignedForReview
 				} else {
 					p.apiServer.lastSyncSucceeded = false
-				}
-				if completionCount == totalOperations {
-					callback()
-				}
-			}
-		}
-	}
-
-	private class func fetchCommentsForCurrentReviews(to moc: NSManagedObjectContext, callback: @escaping Completion) {
-
-		let allReviews = DataItem.newOrUpdatedItems(of: Review.self, in: moc)
-
-		for r in allReviews {
-			for c in r.comments {
-				c.postSyncAction = PostSyncAction.delete.rawValue
-			}
-		}
-
-		let reviews = allReviews.filter { $0.apiServer.lastSyncSucceeded }
-
-		let totalOperations = reviews.count
-		if totalOperations == 0 {
-			callback()
-			return
-		}
-
-		var completionCount = 0
-
-		for r in reviews {
-
-			let apiServer = r.apiServer
-			let p = r.pullRequest
-			let repoFullName = S(p.repo.fullName)
-			getPagedData(at: "/repos/\(repoFullName)/pulls/\(p.number)/reviews/\(r.serverId)/comments", from: apiServer, perPageCallback: { data, lastPage in
-				PRComment.syncComments(from: data, review: r)
-				return false
-			}) { success, resultCode in
-				completionCount += 1
-				if !success {
-					apiServer.lastSyncSucceeded = false
 				}
 				if completionCount == totalOperations {
 					callback()

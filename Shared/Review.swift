@@ -43,6 +43,14 @@ final class Review: DataItem {
 		}
 	}
 
+	class func review(with id: Int64, in moc: NSManagedObjectContext) -> Review? {
+		let f = NSFetchRequest<Review>(entityName: "Review")
+		f.returnsObjectsAsFaults = false
+		f.includesSubentities = false
+		f.predicate = NSPredicate(format: "serverId == %lld", id)
+		return try! moc.fetch(f).first
+	}
+
 	var shouldDisplay: Bool {
 		return state == "CHANGES_REQUESTED"
 	}
