@@ -287,12 +287,6 @@ final class PullRequest: ListableItem {
 		return contexts.values.sorted { ($0.createdAt ?? .distantPast) < ($1.createdAt ?? .distantPast) }
 	}
 
-	var sortedReviews: [Review] {
-		return Array(reviews.filter({ return $0.shouldDisplay })).sorted(by: { (l1: Review, l2: Review) -> Bool in
-			return l1.username!.compare(l2.username!) == .orderedAscending
-		})
-	}
-
 	var labelsLink: String? {
 		return issueUrl?.appending(pathComponent: "labels")
 	}

@@ -505,8 +505,22 @@ class ListableItem: DataItem {
 
 			if Settings.displayReviewChangeRequests, let p = self as? PullRequest {
 
-				let reviews = p.sortedReviews
-				if reviews.count > 0 {
+				let visibleReviews = p.reviews.filter { $0.shouldDisplay }
+				if visibleReviews.count > 0 {
+
+					var latestReviewByUser = [String:Review]()
+					for r in visibleReviews {
+						let user = S(r.username)
+						if let latestReview = latestReviewByUser[user] {
+							if (latestReview.createdAt ?? .distantPast) < (r.createdAt ?? .distantPast) {
+								latestReviewByUser[user] = r
+							}
+						} else {
+							latestReviewByUser[user] = r
+						}
+					}
+
+					let reviews = latestReviewByUser.values.sorted { ($0.createdAt ?? .distantPast) < ($1.createdAt ?? .distantPast) }
 
 					let lp = NSMutableParagraphStyle()
 					#if os(iOS)
@@ -535,18 +549,7 @@ class ListableItem: DataItem {
 						}
 					}
 
-					let requesters = reviews.filter { r in
-						guard r.state == "CHANGES_REQUESTED" else { return false }
-						if let u = r.username {
-							for approvalBySameUser in approvers.filter({ $0.username == u }) {
-								if (approvalBySameUser.createdAt ?? .distantPast) > (r.createdAt ?? .distantPast) {
-									return false
-								}
-							}
-						}
-						return true
-					}
-
+					let requesters = reviews.filter { $0.state == "CHANGES_REQUESTED" }
 					if requesters.count > 0 {
 
 						let requestAttributes = [NSFontAttributeName: labelFont,
