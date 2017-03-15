@@ -278,7 +278,7 @@ final class Settings {
 
 	static let assignedReviewHandlingPolicyHelp = "If an item is assigned for you to review, Trailer can move it to a specific section or leave it as-is."
 	class var assignedReviewHandlingPolicy: Int {
-		get { return get("ASSIGNED_REVIEW_HANDLING_POLICY") as? Int ?? 2 }
+		get { return get("ASSIGNED_REVIEW_HANDLING_POLICY") as? Int ?? 0 }
 		set { set("ASSIGNED_REVIEW_HANDLING_POLICY", newValue) }
 	}
 
@@ -606,19 +606,19 @@ final class Settings {
 
 	static let notifyOnReviewChangeRequestsHelp = "Issue a notification when someone creates a review in a PR that requires changes."
 	class var notifyOnReviewChangeRequests: Bool {
-		get { return get("NOTIFY_ON_REVIEW_CHANGE_REQUESTS") as? Bool ?? true }
+		get { return get("NOTIFY_ON_REVIEW_CHANGE_REQUESTS") as? Bool ?? false }
 		set { set("NOTIFY_ON_REVIEW_CHANGE_REQUESTS", newValue) }
 	}
 
 	static let notifyOnReviewAcceptancesHelp = "Issue a notification when someone accepts the changes related to a review in a PR that required changes."
 	class var notifyOnReviewAcceptances: Bool {
-		get { return get("NOTIFY_ON_REVIEW_ACCEPTANCES") as? Bool ?? true }
+		get { return get("NOTIFY_ON_REVIEW_ACCEPTANCES") as? Bool ?? false }
 		set { set("NOTIFY_ON_REVIEW_ACCEPTANCES", newValue) }
 	}
 
 	static let notifyOnReviewDismissalsHelp = "Issue a notification when someone dismissed a review in a PR that required changes."
 	class var notifyOnReviewDismissals: Bool {
-		get { return get("NOTIFY_ON_REVIEW_DISMISSALS") as? Bool ?? true }
+		get { return get("NOTIFY_ON_REVIEW_DISMISSALS") as? Bool ?? false }
 		set { set("NOTIFY_ON_REVIEW_DISMISSALS", newValue) }
 	}
 
@@ -642,7 +642,7 @@ final class Settings {
 
 	static let notifyOnReviewAssignmentsHelp = "Issue a notification when someone assigns me a PR to review."
 	class var notifyOnReviewAssignments: Bool {
-		get { return get("NOTIFY_ON_REVIEW_ASSIGNMENTS") as? Bool ?? true }
+		get { return get("NOTIFY_ON_REVIEW_ASSIGNMENTS") as? Bool ?? false }
 		set { set("NOTIFY_ON_REVIEW_ASSIGNMENTS", newValue) }
 	}
 
