@@ -458,70 +458,112 @@ class ListableItem: DataItem {
 		let _title = NSMutableAttributedString()
 		if let t = title {
 			_title.append(NSAttributedString(string: t, attributes: titleAttributes))
-			let labelCount = labels.count
-			if labelCount > 0 {
 
-				_title.append(NSAttributedString(string: "\n", attributes: titleAttributes))
+			if Settings.showLabels {
 
-				let lp = NSMutableParagraphStyle()
-				#if os(iOS)
-					lp.lineHeightMultiple = 1.15
-					let labelAttributes = [NSFontAttributeName: labelFont,
-										   NSBaselineOffsetAttributeName: 2.0,
-										   NSParagraphStyleAttributeName: lp] as [String : Any]
-				#elseif os(OSX)
-					lp.minimumLineHeight = labelFont.pointSize+5.0
-					let labelAttributes = [NSFontAttributeName: labelFont,
-										   NSBaselineOffsetAttributeName: 1.0,
-										   NSParagraphStyleAttributeName: lp] as [String : Any]
-				#endif
+				let sorted = sortedLabels
+				let labelCount = sorted.count
+				if labelCount > 0 {
 
-				func isDark(color: COLOR_CLASS) -> Bool {
-					var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0
-					color.getRed(&r, green: &g, blue: &b, alpha: nil)
-					let lum = 0.2126 * r + 0.7152 * g + 0.0722 * b
-					return (lum < 0.5)
-				}
+					let lp = NSMutableParagraphStyle()
+					#if os(iOS)
+						lp.lineHeightMultiple = 1.15
+						let labelAttributes = [NSFontAttributeName: labelFont,
+						                       NSBaselineOffsetAttributeName: 2.0,
+						                       NSParagraphStyleAttributeName: lp] as [String : Any]
+					#elseif os(OSX)
+						lp.minimumLineHeight = labelFont.pointSize + 4
+						let labelAttributes = [NSFontAttributeName: labelFont,
+						                       NSBaselineOffsetAttributeName: 2.0,
+						                       NSParagraphStyleAttributeName: lp] as [String : Any]
+					#endif
 
-				var count = 0
-				for l in sortedLabels {
-					var a = labelAttributes
-					let color = l.colorForDisplay
-					a[NSBackgroundColorAttributeName] = color
-					a[NSForegroundColorAttributeName] = isDark(color: color) ? COLOR_CLASS.white : COLOR_CLASS.black
-					let name = l.name!.replacingOccurrences(of: " ", with: "\u{a0}")
-					_title.append(NSAttributedString(string: "\u{a0}\(name)\u{a0}", attributes: a))
-					if count < labelCount-1 {
-						_title.append(NSAttributedString(string: " ", attributes: labelAttributes))
+					func isDark(color: COLOR_CLASS) -> Bool {
+						var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0
+						color.getRed(&r, green: &g, blue: &b, alpha: nil)
+						let lum = 0.2126 * r + 0.7152 * g + 0.0722 * b
+						return (lum < 0.5)
 					}
-					count += 1
+
+					_title.append(NSAttributedString(string: "\n", attributes: titleAttributes))
+
+					var count = 0
+					for l in sorted {
+						var a = labelAttributes
+						let color = l.colorForDisplay
+						a[NSBackgroundColorAttributeName] = color
+						a[NSForegroundColorAttributeName] = isDark(color: color) ? COLOR_CLASS.white : COLOR_CLASS.black
+						let name = l.name!.replacingOccurrences(of: " ", with: "\u{a0}")
+						_title.append(NSAttributedString(string: "\u{a0}\(name)\u{a0}", attributes: a))
+						if count < labelCount-1 {
+							_title.append(NSAttributedString(string: " ", attributes: labelAttributes))
+						}
+						count += 1
+					}
 				}
 			}
 
 			if Settings.displayReviewChangeRequests, let p = self as? PullRequest {
 
-				let lp = NSMutableParagraphStyle()
-				#if os(iOS)
-					lp.lineHeightMultiple = 1.15
-				#else
-					lp.minimumLineHeight = labelFont.pointSize+5.0
-				#endif
-				let reviewAttributes = [NSFontAttributeName: labelFont,
-				                        NSForegroundColorAttributeName: COLOR_CLASS(red: 0.7, green: 0.0, blue: 0.0, alpha: 1.0),
-				                        NSBaselineOffsetAttributeName: 2.0,
-				                        NSParagraphStyleAttributeName: lp] as [String : Any]
-
 				let reviews = p.sortedReviews
 				if reviews.count > 0 {
-					_title.append(NSAttributedString(string: " ", attributes: reviewAttributes))
-					var count = 0
-					for r in reviews {
-						let name = "@" + r.username!.replacingOccurrences(of: " ", with: "\u{a0}")
-						_title.append(NSAttributedString(string: "\u{a0}\(name)\u{a0}", attributes: reviewAttributes))
-						if count == reviews.count - 1 {
-							_title.append(NSAttributedString(string: reviews.count > 1 ? "request changes" : " requests changes", attributes: reviewAttributes))
+
+					let lp = NSMutableParagraphStyle()
+					#if os(iOS)
+						lp.lineHeightMultiple = 1.15
+					#else
+						lp.minimumLineHeight = labelFont.pointSize + 5
+					#endif
+
+					let approvers = reviews.filter { $0.state == "APPROVED" }
+					if approvers.count > 0 {
+
+						let approveAttributes = [NSFontAttributeName: labelFont,
+						                         NSForegroundColorAttributeName: COLOR_CLASS(red: 0, green: 0.5, blue: 0, alpha: 1.0),
+						                         NSParagraphStyleAttributeName: lp] as [String : Any]
+
+						_title.append(NSAttributedString(string: "\n", attributes: approveAttributes))
+
+						var count = 0
+						for r in approvers {
+							let name = "@" + r.username!.replacingOccurrences(of: " ", with: "\u{a0}")
+							_title.append(NSAttributedString(string: "\(name) ", attributes: approveAttributes))
+							if count == approvers.count - 1 {
+								_title.append(NSAttributedString(string: "approved changes", attributes: approveAttributes))
+							}
+							count += 1
 						}
-						count += 1
+					}
+
+					let requesters = reviews.filter { r in
+						guard r.state == "CHANGES_REQUESTED" else { return false }
+						if let u = r.username {
+							for approvalBySameUser in approvers.filter({ $0.username == u }) {
+								if (approvalBySameUser.createdAt ?? .distantPast) > (r.createdAt ?? .distantPast) {
+									return false
+								}
+							}
+						}
+						return true
+					}
+
+					if requesters.count > 0 {
+
+						let requestAttributes = [NSFontAttributeName: labelFont,
+						                         NSForegroundColorAttributeName: COLOR_CLASS(red: 0.7, green: 0, blue: 0, alpha: 1.0),
+						                         NSParagraphStyleAttributeName: lp] as [String : Any]
+
+						_title.append(NSAttributedString(string: "\n", attributes: requestAttributes))
+
+						var count = 0
+						for r in requesters {
+							let name = "@" + r.username!.replacingOccurrences(of: " ", with: "\u{a0}")
+							_title.append(NSAttributedString(string: "\(name) ", attributes: requestAttributes))
+							if count == requesters.count - 1 {
+								_title.append(NSAttributedString(string: requesters.count > 1 ? "request changes" : "requests changes", attributes: requestAttributes))
+							}
+							count += 1
+						}
 					}
 				}
 			}

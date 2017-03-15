@@ -52,7 +52,7 @@ final class Review: DataItem {
 	}
 
 	var shouldDisplay: Bool {
-		return state == "CHANGES_REQUESTED"
+		return state == "CHANGES_REQUESTED" || state == "APPROVED"
 	}
 }
 
