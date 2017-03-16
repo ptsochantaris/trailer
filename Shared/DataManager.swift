@@ -273,7 +273,7 @@ final class DataManager {
 				let parentUri = comment.parent?.objectID.uriRepresentation().absoluteString ?? ""
 				return [COMMENT_ID_KEY: uri, LISTABLE_URI_KEY: parentUri]
 			} else {
-				assert(false)
+				abort()
 			}
 		}
 	}
