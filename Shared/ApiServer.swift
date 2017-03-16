@@ -24,6 +24,7 @@ final class ApiServer: NSManagedObject {
 	@NSManaged var teams: Set<Team>
     @NSManaged var issues: Set<Issue>
 	@NSManaged var reviews: Set<Review>
+	@NSManaged var reactions: Set<Reaction>
 
 	static var lastReportedOverLimit = Set<NSManagedObjectID>()
 	static var lastReportedNearLimit = Set<NSManagedObjectID>()
@@ -140,7 +141,7 @@ final class ApiServer: NSManagedObject {
 
 	func rollBackAllUpdates(in moc: NSManagedObjectContext) {
 		DLog("Rolling back changes for failed sync on API server '%@'",label)
-		for set in [repos, pullRequests, comments, statuses, labels, issues, teams, reviews] as [Set<DataItem>] {
+		for set in [repos, pullRequests, comments, statuses, labels, issues, teams, reviews, reactions] as [Set<DataItem>] {
 			var i = set.makeIterator()
 			while let dataItem = i.next() {
 				switch dataItem.postSyncAction {

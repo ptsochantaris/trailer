@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="11759" systemVersion="16D32" minimumToolsVersion="Xcode 8.0" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="ApiServer" representedClassName=".ApiServer" syncable="YES">
+        <attribute name="apiPath" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="authToken" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="label" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="lastSyncSucceeded" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="reportRefreshFailures" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="requestsLimit" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="requestsRemaining" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="resetDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="userId" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="userName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="webPath" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="comments" toMany="YES" deletionRule="Cascade" destinationEntity="PRComment" inverseName="apiServer" inverseEntity="PRComment" syncable="YES"/>
+        <relationship name="issues" toMany="YES" deletionRule="Cascade" destinationEntity="Issue" inverseName="apiServer" inverseEntity="Issue" syncable="YES"/>
+        <relationship name="labels" toMany="YES" deletionRule="Cascade" destinationEntity="PRLabel" inverseName="apiServer" inverseEntity="PRLabel" syncable="YES"/>
+        <relationship name="pullRequests" toMany="YES" deletionRule="Cascade" destinationEntity="PullRequest" inverseName="apiServer" inverseEntity="PullRequest" syncable="YES"/>
+        <relationship name="reactions" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Reaction" inverseName="apiServer" inverseEntity="Reaction" syncable="YES"/>
+        <relationship name="repos" toMany="YES" deletionRule="Cascade" destinationEntity="Repo" inverseName="apiServer" inverseEntity="Repo" syncable="YES"/>
+        <relationship name="reviews" toMany="YES" deletionRule="Cascade" destinationEntity="Review" inverseName="apiServer" inverseEntity="Review" syncable="YES"/>
+        <relationship name="statuses" toMany="YES" deletionRule="Cascade" destinationEntity="PRStatus" inverseName="apiServer" inverseEntity="PRStatus" syncable="YES"/>
+        <relationship name="teams" toMany="YES" deletionRule="Cascade" destinationEntity="Team" inverseName="apiServer" inverseEntity="Team" syncable="YES"/>
+    </entity>
+    <entity name="CacheEntry" representedClassName=".CacheEntry" syncable="YES">
+        <attribute name="code" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="data" attributeType="Binary" allowsExternalBinaryDataStorage="YES" syncable="YES"/>
+        <attribute name="etag" attributeType="String" syncable="YES"/>
+        <attribute name="headers" attributeType="Binary" allowsExternalBinaryDataStorage="YES" syncable="YES"/>
+        <attribute name="key" attributeType="String" indexed="YES" syncable="YES"/>
+        <attribute name="lastFetched" attributeType="Date" usesScalarValueType="NO" indexed="YES" syncable="YES"/>
+        <attribute name="lastTouched" attributeType="Date" usesScalarValueType="NO" indexed="YES" syncable="YES"/>
+    </entity>
+    <entity name="Issue" representedClassName=".Issue" syncable="YES">
+        <attribute name="announced" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="assignedToMe" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="assigneeName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="body" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="commentsLink" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="condition" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" indexed="YES" syncable="YES"/>
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="isNewAssignment" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="latestReadCommentDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="milestone" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="muted" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="number" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" indexed="YES" syncable="YES"/>
+        <attribute name="postSyncAction" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" indexed="YES" syncable="YES"/>
+        <attribute name="reopened" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="requiresReactionRefreshFromUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="sectionIndex" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="serverId" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" indexed="YES" syncable="YES"/>
+        <attribute name="snoozeUntil" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="state" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="totalComments" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="unreadComments" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="updatedAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userAvatarUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userId" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="userLogin" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="wasAwokenFromSnooze" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="webUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="apiServer" maxCount="1" deletionRule="Nullify" destinationEntity="ApiServer" inverseName="issues" inverseEntity="ApiServer" syncable="YES"/>
+        <relationship name="comments" toMany="YES" deletionRule="Cascade" destinationEntity="PRComment" inverseName="issue" inverseEntity="PRComment" syncable="YES"/>
+        <relationship name="labels" toMany="YES" deletionRule="Cascade" destinationEntity="PRLabel" inverseName="issue" inverseEntity="PRLabel" syncable="YES"/>
+        <relationship name="reactions" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Reaction" inverseName="issue" inverseEntity="Reaction" syncable="YES"/>
+        <relationship name="repo" maxCount="1" deletionRule="Nullify" destinationEntity="Repo" inverseName="issues" inverseEntity="Repo" syncable="YES"/>
+        <relationship name="snoozingPreset" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SnoozePreset" inverseName="appliedToIssues" inverseEntity="SnoozePreset" syncable="YES"/>
+        <compoundIndexes>
+            <compoundIndex>
+                <index value="postSyncAction"/>
+                <index value="condition"/>
+            </compoundIndex>
+        </compoundIndexes>
+    </entity>
+    <entity name="PRComment" representedClassName=".PRComment" syncable="YES">
+        <attribute name="avatarUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="body" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="postSyncAction" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" indexed="YES" syncable="YES"/>
+        <attribute name="requiresReactionRefreshFromUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="serverId" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" indexed="YES" syncable="YES"/>
+        <attribute name="updatedAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="userId" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="userName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="webUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="apiServer" maxCount="1" deletionRule="Nullify" destinationEntity="ApiServer" inverseName="comments" inverseEntity="ApiServer" syncable="YES"/>
+        <relationship name="issue" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Issue" inverseName="comments" inverseEntity="Issue" syncable="YES"/>
+        <relationship name="pullRequest" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="PullRequest" inverseName="comments" inverseEntity="PullRequest" syncable="YES"/>
+        <relationship name="reactions" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Reaction" inverseName="comment" inverseEntity="Reaction" syncable="YES"/>
+        <relationship name="review" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Review" inverseName="comments" inverseEntity="Review" syncable="YES"/>
+    </entity>
+    <entity name="PRLabel" representedClassName=".PRLabel" syncable="YES">
+        <attribute name="color" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="postSyncAction" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" indexed="YES" syncable="YES"/>
+        <attribute name="serverId" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" indexed="YES" syncable="YES"/>
+        <attribute name="updatedAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="apiServer" maxCount="1" deletionRule="Nullify" destinationEntity="ApiServer" inverseName="labels" inverseEntity="ApiServer" syncable="YES"/>
+        <relationship name="issue" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Issue" inverseName="labels" inverseEntity="Issue" syncable="YES"/>
+        <relationship name="pullRequest" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="PullRequest" inverseName="labels" inverseEntity="PullRequest" syncable="YES"/>
+    </entity>
+    <entity name="PRStatus" representedClassName=".PRStatus" syncable="YES">
+        <attribute name="context" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="descriptionText" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="postSyncAction" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" indexed="YES" syncable="YES"/>
+        <attribute name="serverId" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" indexed="YES" syncable="YES"/>
+        <attribute name="state" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="targetUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="updatedAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <relationship name="apiServer" maxCount="1" deletionRule="Nullify" destinationEntity="ApiServer" inverseName="statuses" inverseEntity="ApiServer" syncable="YES"/>
+        <relationship name="pullRequest" maxCount="1" deletionRule="Nullify" destinationEntity="PullRequest" inverseName="statuses" inverseEntity="PullRequest" syncable="YES"/>
+    </entity>
+    <entity name="PullRequest" representedClassName=".PullRequest" syncable="YES">
+        <attribute name="announced" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="assignedForReview" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="assignedToMe" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="assigneeName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="body" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="condition" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" indexed="YES" syncable="YES"/>
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="hasNewCommits" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isNewAssignment" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="issueCommentLink" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="issueUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="lastStatusNotified" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="latestReadCommentDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="mergeable" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="mergeCommitSha" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="milestone" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="muted" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="number" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" indexed="YES" syncable="YES"/>
+        <attribute name="postSyncAction" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" indexed="YES" syncable="YES"/>
+        <attribute name="reopened" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="requiresReactionRefreshFromUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="reviewCommentLink" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="reviewers" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="sectionIndex" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="serverId" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" indexed="YES" syncable="YES"/>
+        <attribute name="snoozeUntil" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="state" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="statusesLink" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="totalComments" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="unreadComments" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="updatedAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userAvatarUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userId" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="userLogin" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="wasAwokenFromSnooze" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="webUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="apiServer" maxCount="1" deletionRule="Nullify" destinationEntity="ApiServer" inverseName="pullRequests" inverseEntity="ApiServer" syncable="YES"/>
+        <relationship name="comments" toMany="YES" deletionRule="Cascade" destinationEntity="PRComment" inverseName="pullRequest" inverseEntity="PRComment" syncable="YES"/>
+        <relationship name="labels" toMany="YES" deletionRule="Cascade" destinationEntity="PRLabel" inverseName="pullRequest" inverseEntity="PRLabel" syncable="YES"/>
+        <relationship name="reactions" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Reaction" inverseName="pullRequest" inverseEntity="Reaction" syncable="YES"/>
+        <relationship name="repo" maxCount="1" deletionRule="Nullify" destinationEntity="Repo" inverseName="pullRequests" inverseEntity="Repo" syncable="YES"/>
+        <relationship name="reviews" toMany="YES" deletionRule="Cascade" destinationEntity="Review" inverseName="pullRequest" inverseEntity="Review" syncable="YES"/>
+        <relationship name="snoozingPreset" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SnoozePreset" inverseName="appliedToPullRequests" inverseEntity="SnoozePreset" syncable="YES"/>
+        <relationship name="statuses" toMany="YES" deletionRule="Cascade" destinationEntity="PRStatus" inverseName="pullRequest" inverseEntity="PRStatus" syncable="YES"/>
+        <compoundIndexes>
+            <compoundIndex>
+                <index value="postSyncAction"/>
+                <index value="condition"/>
+            </compoundIndex>
+        </compoundIndexes>
+    </entity>
+    <entity name="Reaction" representedClassName=".Reaction" syncable="YES">
+        <attribute name="avatarUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="content" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="postSyncAction" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="serverId" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="updatedAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="userId" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="userName" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="apiServer" maxCount="1" deletionRule="Nullify" destinationEntity="ApiServer" inverseName="reactions" inverseEntity="ApiServer" syncable="YES"/>
+        <relationship name="comment" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="PRComment" inverseName="reactions" inverseEntity="PRComment" syncable="YES"/>
+        <relationship name="issue" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Issue" inverseName="reactions" inverseEntity="Issue" syncable="YES"/>
+        <relationship name="pullRequest" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="PullRequest" inverseName="reactions" inverseEntity="PullRequest" syncable="YES"/>
+    </entity>
+    <entity name="Repo" representedClassName=".Repo" syncable="YES">
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="displayPolicyForIssues" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="displayPolicyForPrs" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="fork" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="fullName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="groupLabel" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="hidden" optional="YES" attributeType="Boolean" usesScalarValueType="NO" indexed="YES" syncable="YES"/>
+        <attribute name="inaccessible" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="itemHidingPolicy" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="lastDirtied" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="lastScannedIssueEventId" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="manuallyAdded" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="ownerId" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="postSyncAction" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" indexed="YES" syncable="YES"/>
+        <attribute name="serverId" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" indexed="YES" syncable="YES"/>
+        <attribute name="updatedAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="webUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="apiServer" maxCount="1" deletionRule="Nullify" destinationEntity="ApiServer" inverseName="repos" inverseEntity="ApiServer" syncable="YES"/>
+        <relationship name="issues" toMany="YES" deletionRule="Cascade" destinationEntity="Issue" inverseName="repo" inverseEntity="Issue" syncable="YES"/>
+        <relationship name="pullRequests" toMany="YES" deletionRule="Cascade" destinationEntity="PullRequest" inverseName="repo" inverseEntity="PullRequest" syncable="YES"/>
+    </entity>
+    <entity name="Review" representedClassName=".Review" syncable="YES">
+        <attribute name="body" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="postSyncAction" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="serverId" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="state" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="updatedAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="username" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="apiServer" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ApiServer" inverseName="reviews" inverseEntity="ApiServer" syncable="YES"/>
+        <relationship name="comments" toMany="YES" deletionRule="Cascade" destinationEntity="PRComment" inverseName="review" inverseEntity="PRComment" syncable="YES"/>
+        <relationship name="pullRequest" maxCount="1" deletionRule="Nullify" destinationEntity="PullRequest" inverseName="reviews" inverseEntity="PullRequest" syncable="YES"/>
+    </entity>
+    <entity name="SnoozePreset" representedClassName=".SnoozePreset" syncable="YES">
+        <attribute name="day" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="duration" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="hour" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="minute" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="month" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="sortOrder" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="wakeOnComment" optional="YES" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="wakeOnMention" optional="YES" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="wakeOnStatusChange" optional="YES" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="year" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
+        <relationship name="appliedToIssues" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Issue" inverseName="snoozingPreset" inverseEntity="Issue" syncable="YES"/>
+        <relationship name="appliedToPullRequests" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="PullRequest" inverseName="snoozingPreset" inverseEntity="PullRequest" syncable="YES"/>
+    </entity>
+    <entity name="Team" representedClassName=".Team" syncable="YES">
+        <attribute name="calculatedReferral" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="organisationLogin" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="postSyncAction" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" indexed="YES" syncable="YES"/>
+        <attribute name="serverId" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" indexed="YES" syncable="YES"/>
+        <attribute name="slug" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="updatedAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <relationship name="apiServer" maxCount="1" deletionRule="Nullify" destinationEntity="ApiServer" inverseName="teams" inverseEntity="ApiServer" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="ApiServer" positionX="9" positionY="153" width="128" height="360"/>
+        <element name="CacheEntry" positionX="9" positionY="153" width="128" height="150"/>
+        <element name="Issue" positionX="9" positionY="153" width="128" height="570"/>
+        <element name="PRComment" positionX="0" positionY="0" width="128" height="270"/>
+        <element name="PRLabel" positionX="9" positionY="153" width="128" height="195"/>
+        <element name="PRStatus" positionX="0" positionY="0" width="128" height="195"/>
+        <element name="PullRequest" positionX="0" positionY="0" width="128" height="735"/>
+        <element name="Reaction" positionX="9" positionY="153" width="128" height="225"/>
+        <element name="Repo" positionX="0" positionY="0" width="128" height="345"/>
+        <element name="Review" positionX="9" positionY="153" width="128" height="195"/>
+        <element name="SnoozePreset" positionX="9" positionY="153" width="128" height="225"/>
+        <element name="Team" positionX="9" positionY="153" width="128" height="165"/>
+    </elements>
+</model>

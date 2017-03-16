@@ -1019,9 +1019,9 @@ Token</string>
                                                         </connections>
                                                     </button>
                                                     <button misplaced="YES" id="UGp-d4-lNW">
-                                                        <rect key="frame" x="9" y="304" width="296" height="18"/>
+                                                        <rect key="frame" x="9" y="304" width="308" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Badge &amp; send alerts for items in &quot;all&quot; too" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="z6Z-nh-Y6O">
+                                                        <buttonCell key="cell" type="check" title="Badge &amp; send notifications for items in &quot;all&quot; too" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="z6Z-nh-Y6O">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
@@ -1193,25 +1193,14 @@ Token</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box misplaced="YES" boxType="custom" borderType="none" titlePosition="noTitle" id="49Q-X3-TvK">
-                                            <rect key="frame" x="142" y="23" width="550" height="333"/>
+                                            <rect key="frame" x="142" y="17" width="550" height="339"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <view key="contentView" id="Hr7-ca-s5X">
-                                                <rect key="frame" x="0.0" y="0.0" width="550" height="333"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="550" height="339"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <button misplaced="YES" id="7m1-w3-6Le">
-                                                        <rect key="frame" x="127" y="235" width="298" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Display review-based change requests in PRs" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="NJt-Z2-5f6">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="supportReviewsSelected:" target="vQH-WF-vh2" id="tqA-fU-hhj"/>
-                                                        </connections>
-                                                    </button>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="wjr-eU-VtB">
-                                                        <rect key="frame" x="58" y="260" width="436" height="54"/>
+                                                        <rect key="frame" x="58" y="266" width="436" height="54"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" id="I1A-bw-5tI">
                                                             <font key="font" metaFont="miniSystem"/>
@@ -1221,7 +1210,7 @@ Token</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <box misplaced="YES" borderType="none" title="When a PR is assigned to me for review..." id="zDt-bc-lCe">
-                                                        <rect key="frame" x="119" y="175" width="315" height="46"/>
+                                                        <rect key="frame" x="119" y="181" width="315" height="46"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="eGN-JN-FT6">
                                                             <rect key="frame" x="0.0" y="0.0" width="315" height="31"/>
@@ -1250,14 +1239,14 @@ Token</string>
                                                         </view>
                                                     </box>
                                                     <box misplaced="YES" title="Notify me when..." id="C58-hf-r5t">
-                                                        <rect key="frame" x="39" y="5" width="475" height="162"/>
+                                                        <rect key="frame" x="39" y="22" width="475" height="151"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="FlM-UP-339">
-                                                            <rect key="frame" x="2" y="2" width="471" height="145"/>
+                                                            <rect key="frame" x="2" y="2" width="471" height="134"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <button id="W7P-8B-zzm">
-                                                                    <rect key="frame" x="18" y="109" width="349" height="18"/>
+                                                                <button misplaced="YES" id="W7P-8B-zzm">
+                                                                    <rect key="frame" x="18" y="103" width="349" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="Someone requests changes to a PR I created..." bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="p1O-O4-Ugb">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1267,8 +1256,8 @@ Token</string>
                                                                         <action selector="notifyOnChangeRequestsSelected:" target="vQH-WF-vh2" id="ZOl-As-NTo"/>
                                                                     </connections>
                                                                 </button>
-                                                                <button id="cUX-93-pkY">
-                                                                    <rect key="frame" x="18" y="79" width="349" height="18"/>
+                                                                <button misplaced="YES" id="cUX-93-pkY">
+                                                                    <rect key="frame" x="18" y="73" width="349" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="Someone accepts changes on a PR I created..." bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="pNh-wM-EPz">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1278,8 +1267,8 @@ Token</string>
                                                                         <action selector="notifyOnAcceptancesSelected:" target="vQH-WF-vh2" id="nvU-FJ-KvX"/>
                                                                     </connections>
                                                                 </button>
-                                                                <button id="8kt-mf-c4i">
-                                                                    <rect key="frame" x="18" y="49" width="349" height="18"/>
+                                                                <button misplaced="YES" id="8kt-mf-c4i">
+                                                                    <rect key="frame" x="18" y="43" width="349" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="Someone dismisses a review on a PR I created..." bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="edL-Bg-Zov">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1289,8 +1278,8 @@ Token</string>
                                                                         <action selector="notifyOnReviewDismissalsSelected:" target="vQH-WF-vh2" id="ZbN-Q6-X42"/>
                                                                     </connections>
                                                                 </button>
-                                                                <button id="z39-OC-9iv">
-                                                                    <rect key="frame" x="18" y="19" width="349" height="18"/>
+                                                                <button misplaced="YES" id="z39-OC-9iv">
+                                                                    <rect key="frame" x="18" y="13" width="349" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="Someone assigns me a PR to review" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="THH-72-g8l">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1300,8 +1289,8 @@ Token</string>
                                                                         <action selector="notifyOnReviewAssignmentsSelected:" target="vQH-WF-vh2" id="CO2-lv-LnF"/>
                                                                     </connections>
                                                                 </button>
-                                                                <button id="4hX-kx-RH5">
-                                                                    <rect key="frame" x="371" y="109" width="84" height="18"/>
+                                                                <button misplaced="YES" id="4hX-kx-RH5">
+                                                                    <rect key="frame" x="371" y="103" width="84" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="...or All" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="Rbb-Fj-bP3">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1311,8 +1300,8 @@ Token</string>
                                                                         <action selector="notifyOnAllChangeRequestsSelected:" target="vQH-WF-vh2" id="LwF-kf-p0I"/>
                                                                     </connections>
                                                                 </button>
-                                                                <button id="Cle-hT-Lca">
-                                                                    <rect key="frame" x="371" y="79" width="84" height="18"/>
+                                                                <button misplaced="YES" id="Cle-hT-Lca">
+                                                                    <rect key="frame" x="371" y="73" width="84" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="...or All" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="5eI-7r-swf">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1322,8 +1311,8 @@ Token</string>
                                                                         <action selector="notifyOnAllAcceptancesSelected:" target="vQH-WF-vh2" id="1Az-IF-tXh"/>
                                                                     </connections>
                                                                 </button>
-                                                                <button id="jjg-cq-Lfe">
-                                                                    <rect key="frame" x="371" y="49" width="84" height="18"/>
+                                                                <button misplaced="YES" id="jjg-cq-Lfe">
+                                                                    <rect key="frame" x="371" y="43" width="84" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="...or All" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="26G-BO-CIp">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1336,6 +1325,26 @@ Token</string>
                                                             </subviews>
                                                         </view>
                                                     </box>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="PC0-Di-dZ3">
+                                                        <rect key="frame" x="-2" y="1" width="554" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="To disble usage of the Reviews API, uncheck all options here &amp; set the drop-down option to &quot;None&quot;" id="bis-lC-jvI">
+                                                            <font key="font" metaFont="miniSystem"/>
+                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <button misplaced="YES" id="7m1-w3-6Le">
+                                                        <rect key="frame" x="161" y="242" width="272" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Display review statuses for PRs" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="NJt-Z2-5f6">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="supportReviewsSelected:" target="vQH-WF-vh2" id="tqA-fU-hhj"/>
+                                                        </connections>
+                                                    </button>
                                                 </subviews>
                                             </view>
                                         </box>
@@ -1348,43 +1357,33 @@ Token</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box misplaced="YES" titlePosition="noTitle" id="zHV-fn-HSK">
-                                            <rect key="frame" x="134" y="76" width="566" height="153"/>
+                                            <rect key="frame" x="134" y="142" width="566" height="87"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <view key="contentView" id="IBf-ZQ-tKp">
-                                                <rect key="frame" x="2" y="2" width="562" height="149"/>
+                                                <rect key="frame" x="2" y="2" width="562" height="83"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <button misplaced="YES" id="6X8-zY-Oss">
-                                                        <rect key="frame" x="18" y="53" width="526" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Post notifications when someone adds a reaction my comments or items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Rli-RA-Aa4">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                    </button>
                                                     <button misplaced="YES" id="ccb-WQ-p0n">
-                                                        <rect key="frame" x="18" y="113" width="526" height="18"/>
+                                                        <rect key="frame" x="18" y="48" width="526" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Count reactions to my own PRs or issues as comments" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="2SI-4J-Y6e">
+                                                        <buttonCell key="cell" type="check" title="Post notifications when someone adds a reaction to PRs or issues" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="2SI-4J-Y6e">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
+                                                        <connections>
+                                                            <action selector="notifyOnItemReactionsSelected:" target="vQH-WF-vh2" id="kWv-0I-Poq"/>
+                                                        </connections>
                                                     </button>
-                                                    <button misplaced="YES" id="s01-Fh-pGF">
-                                                        <rect key="frame" x="18" y="83" width="526" height="18"/>
+                                                    <button misplaced="YES" id="6X8-zY-Oss">
+                                                        <rect key="frame" x="18" y="18" width="526" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Count reactions to others' PRs or issues as comments" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="V8N-Qe-AG1">
+                                                        <buttonCell key="cell" type="check" title="Post notifications when someone adds a reaction to comments" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Rli-RA-Aa4">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
-                                                    </button>
-                                                    <button misplaced="YES" id="q7Y-d7-RXG">
-                                                        <rect key="frame" x="18" y="23" width="526" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Post notifications when someone adds a reaction others' comments or items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="OwF-hE-JgH">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="notifyOnCommentReactionsSelected:" target="vQH-WF-vh2" id="EyD-rp-tlU"/>
+                                                        </connections>
                                                     </button>
                                                 </subviews>
                                             </view>
@@ -1397,6 +1396,25 @@ Token</string>
                                                 <string key="title">Please note that due to the structure of the API, enabling any of the options below can significantly increase sync times and API usage. Also, this feature is using a preview API from Github, which means it may stop working or create unexpected sync problems without warning. If you use this feature please ensure you often check for Trailer updates!</string>
                                                 <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="hYX-l4-6Qc">
+                                            <rect key="frame" x="135" y="121" width="564" height="17"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="To completely disble all usage of the Reactions API, uncheck all options." id="zca-XG-6Sh">
+                                                <font key="font" metaFont="miniSystem"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="iEL-pK-LcM">
+                                            <rect key="frame" x="161" y="17" width="513" height="78"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" id="VEf-qR-HnU">
+                                                <font key="font" metaFont="system"/>
+                                                <string key="title">Tip: Reactions are treated like comments, i.e. the rules about being notified only for your own or participated items, or all items, can be changed from th eoptions in the "comments" section.</string>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
                                     </subviews>
@@ -2223,6 +2241,8 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="notifyOnAllChangeRequests" destination="4hX-kx-RH5" id="v0F-Kh-u4w"/>
                 <outlet property="notifyOnAllReviewDismissals" destination="jjg-cq-Lfe" id="Wlg-gy-n40"/>
                 <outlet property="notifyOnChangeRequests" destination="W7P-8B-zzm" id="512-je-bpL"/>
+                <outlet property="notifyOnCommentReactions" destination="6X8-zY-Oss" id="UFi-ne-Bc7"/>
+                <outlet property="notifyOnItemReactions" destination="ccb-WQ-p0n" id="J2b-31-J9w"/>
                 <outlet property="notifyOnReviewAssignments" destination="z39-OC-9iv" id="D8e-oi-A4Y"/>
                 <outlet property="notifyOnReviewDismissals" destination="8kt-mf-c4i" id="co3-xA-Iiq"/>
                 <outlet property="notifyOnStatusUpdates" destination="lAL-hp-XJt" id="Amv-PJ-TtL"/>

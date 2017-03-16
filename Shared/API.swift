@@ -326,12 +326,14 @@ final class API {
 		let repos = Repo.syncableRepos(in: moc)
 
 		var completionCount = 0
-		let totalOperations = 2
+		let totalOperations = 4
 		let completionCallback = {
 			completionCount += 1
 			if completionCount == totalOperations {
-				NotificationCenter.default.post(name: RefreshProcessingNotification, object: nil)
-				completeSync(in: moc, andCallback: callback)
+				fetchCommentReactionsIfNeeded(to: moc) {
+					NotificationCenter.default.post(name: RefreshProcessingNotification, object: nil)
+					completeSync(in: moc, andCallback: callback)
+				}
 			}
 		}
 
@@ -340,6 +342,9 @@ final class API {
 		fetchItems(from: repos, to: moc) {
 
 			markExtraUpdatedItems(from: repos, to: moc) {
+
+				fetchIssueReactionsIfNeeded(to: moc, callback: completionCallback)
+				fetchPullRequestReactionsIfNeeded(to: moc, callback: completionCallback)
 
 				fetchCommentsForCurrentIssues(to: moc) {
 					checkIssueClosures(in: moc)
@@ -706,6 +711,102 @@ final class API {
 		}
 	}
 
+	private class func fetchCommentReactionsIfNeeded(to moc: NSManagedObjectContext, callback: @escaping Completion) {
+		guard Settings.notifyOnCommentReactions else { callback(); return }
+
+		let comments = PRComment.commentsThatNeedReactionsToBeRefreshed(in: moc).filter { $0.apiServer.lastSyncSucceeded }
+		let totalOperations = comments.count
+		guard totalOperations > 0 else { callback(); return }
+
+		var completionCount = 0
+		for c in comments {
+
+			for r in c.reactions {
+				r.postSyncAction = PostSyncAction.delete.rawValue
+			}
+
+			let apiServer = c.apiServer
+			getPagedData(at: c.requiresReactionRefreshFromUrl!, from: apiServer, perPageCallback: { data, lastPage in
+				Reaction.syncReactions(from: data, comment: c)
+				return false
+			}) { success, resultCode in
+				if success {
+					c.requiresReactionRefreshFromUrl = nil
+				} else {
+					apiServer.lastSyncSucceeded = false
+				}
+				completionCount += 1
+				if completionCount == totalOperations {
+					callback()
+				}
+			}
+		}
+	}
+
+	private class func fetchIssueReactionsIfNeeded(to moc: NSManagedObjectContext, callback: @escaping Completion) {
+		guard Settings.notifyOnItemReactions else { callback(); return }
+
+		let items = Issue.issuesThatNeedReactionsToBeRefreshed(in: moc).filter { $0.apiServer.lastSyncSucceeded }
+		let totalOperations = items.count
+		guard totalOperations > 0 else { callback(); return }
+
+		var completionCount = 0
+		for i in items {
+
+			for r in i.reactions {
+				r.postSyncAction = PostSyncAction.delete.rawValue
+			}
+
+			let apiServer = i.apiServer
+			getPagedData(at: i.requiresReactionRefreshFromUrl!, from: apiServer, perPageCallback: { data, lastPage in
+				Reaction.syncReactions(from: data, parent: i)
+				return false
+			}) { success, resultCode in
+				if success {
+					i.requiresReactionRefreshFromUrl = nil
+				} else {
+					apiServer.lastSyncSucceeded = false
+				}
+				completionCount += 1
+				if completionCount == totalOperations {
+					callback()
+				}
+			}
+		}
+	}
+
+	private class func fetchPullRequestReactionsIfNeeded(to moc: NSManagedObjectContext, callback: @escaping Completion) {
+		guard Settings.notifyOnItemReactions else { callback(); return }
+
+		let items = PullRequest.pullRequestsThatNeedReactionsToBeRefreshed(in: moc).filter { $0.apiServer.lastSyncSucceeded }
+		let totalOperations = items.count
+		guard totalOperations > 0 else { callback(); return }
+
+		var completionCount = 0
+		for p in items {
+
+			for r in p.reactions {
+				r.postSyncAction = PostSyncAction.delete.rawValue
+			}
+
+			let apiServer = p.apiServer
+			getPagedData(at: p.requiresReactionRefreshFromUrl!, from: apiServer, perPageCallback: { data, lastPage in
+				Reaction.syncReactions(from: data, parent: p)
+				return false
+			}) { success, resultCode in
+				if success {
+					p.requiresReactionRefreshFromUrl = nil
+				} else {
+					apiServer.lastSyncSucceeded = false
+				}
+				completionCount += 1
+				if completionCount == totalOperations {
+					callback()
+				}
+			}
+		}
+	}
+
 	private class func fetchCommentsForCurrentPullRequests(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		let prs = DataItem.newOrUpdatedItems(of: PullRequest.self, in: moc).filter { $0.apiServer.lastSyncSucceeded }
@@ -844,11 +945,14 @@ final class API {
 		}
 	}
 
+	static var shouldSyncReactions: Bool {
+		return Settings.notifyOnItemReactions || Settings.notifyOnCommentReactions
+	}
 	static var shouldSyncReviews: Bool {
 		return Settings.displayReviewChangeRequests || Settings.notifyOnReviewDismissals || Settings.notifyOnReviewAcceptances || Settings.notifyOnReviewChangeRequests
 	}
 	static var shouldSyncReviewAssignments: Bool {
-		return Settings.notifyOnReviewAssignments || (Int64(Settings.assignedReviewHandlingPolicy) != Section.none.rawValue)
+		return Settings.displayReviewChangeRequests || Settings.notifyOnReviewAssignments || (Int64(Settings.assignedReviewHandlingPolicy) != Section.none.rawValue)
 	}
 
 	private class func fetchReviewAssignmentsForCurrentPullRequests(to moc: NSManagedObjectContext, callback: @escaping Completion) {
@@ -865,25 +969,20 @@ final class API {
 
 		for p in prs {
 
-			let myId = p.apiServer.userId
-			var assignedForReview = false
+			var reviewers = Set<String>()
 			let repoFullName = S(p.repo.fullName)
 			getPagedData(at: "/repos/\(repoFullName)/pulls/\(p.number)/requested_reviewers", from: p.apiServer, perPageCallback: { data, lastPage in
 				guard let data = data else { return true }
-				for userInfo in data {
-					if let userId = userInfo["id"] as? Int64, userId == myId {
-						assignedForReview = true
-						return true
-					}
+				for userName in data.flatMap({ $0["login"] as? String }) {
+					reviewers.insert(userName)
 				}
 				return false
 			}) { success, resultCode in
 				completionCount += 1
 				if success {
-					if assignedForReview && !p.assignedForReview && Settings.notifyOnReviewAssignments {
+					if p.checkAndStoreReviewAssignments(reviewers) && Settings.notifyOnReviewAssignments {
 						NotificationQueue.add(type: .assignedForReview, for: p)
 					}
-					p.assignedForReview = assignedForReview
 				} else {
 					p.apiServer.lastSyncSucceeded = false
 				}
@@ -1379,6 +1478,9 @@ final class API {
 
 		var r = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 60.0)
 		var acceptTypes = [String]()
+		if shouldSyncReactions {
+			acceptTypes.append("application/vnd.github.squirrel-girl-preview")
+		}
 		if shouldSyncReviews || shouldSyncReviewAssignments {
 			acceptTypes.append("application/vnd.github.black-cat-preview+json")
 		}

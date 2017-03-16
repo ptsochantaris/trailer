@@ -166,7 +166,7 @@ enum PostSyncAction: Int64 {
 }
 
 enum NotificationType: Int {
-	case newComment, newPr, prMerged, prReopened, newMention, prClosed, newRepoSubscribed, newRepoAnnouncement, newPrAssigned, newStatus, newIssue, issueClosed, newIssueAssigned, issueReopened, assignedForReview, changesRequested, changesApproved, changesDismissed
+	case newComment, newPr, prMerged, prReopened, newMention, prClosed, newRepoSubscribed, newRepoAnnouncement, newPrAssigned, newStatus, newIssue, issueClosed, newIssueAssigned, issueReopened, assignedForReview, changesRequested, changesApproved, changesDismissed, newReaction
 }
 
 enum SortingMethod: Int {

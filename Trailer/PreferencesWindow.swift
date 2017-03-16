@@ -152,6 +152,10 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var notifyOnAllReviewDismissals: NSButton!
 	@IBOutlet weak var supportReviews: NSButton!
 
+	// Reactions
+	@IBOutlet weak var notifyOnItemReactions: NSButton!
+	@IBOutlet weak var notifyOnCommentReactions: NSButton!
+
 	// Tabs
 	@IBOutlet weak var tabs: NSTabView!
 
@@ -388,6 +392,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		notifyOnReviewAssignments.toolTip = Settings.notifyOnReviewAssignmentsHelp
 		assignedReviewHandlingPolicy.toolTip = Settings.assignedReviewHandlingPolicyHelp
 		supportReviews.toolTip = Settings.displayReviewChangeRequestsHelp
+		notifyOnItemReactions.toolTip = Settings.notifyOnItemReactionsHelp
+		notifyOnCommentReactions.toolTip = Settings.notifyOnCommentReactionsHelp
 		showLabels.toolTip = Settings.showLabelsHelp
 	}
 
@@ -475,6 +481,9 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		hideSnoozedItems.integerValue = Settings.hideSnoozedItems ? 1 : 0
 		showLabels.integerValue = Settings.showLabels ? 1 : 0
 
+		notifyOnItemReactions.integerValue = Settings.notifyOnItemReactions ? 1 : 0
+		notifyOnCommentReactions.integerValue = Settings.notifyOnCommentReactions ? 1 : 0
+
 		supportReviews.integerValue = Settings.displayReviewChangeRequests ? 1 : 0
 		notifyOnReviewAssignments.integerValue = Settings.notifyOnReviewAssignments ? 1 : 0
 
@@ -526,6 +535,14 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			projectsTable.reloadData()
 		}
 		advancedReposWindow?.updateActivity()
+	}
+
+	@IBAction func notifyOnItemReactionsSelected(_ sender: NSButton) {
+		Settings.notifyOnItemReactions = sender.integerValue == 1
+	}
+
+	@IBAction func notifyOnCommentReactionsSelected(_ sender: NSButton) {
+		Settings.notifyOnCommentReactions = sender.integerValue == 1
 	}
 
 	@IBAction func newMentionMovePolicySelected(_ sender: NSPopUpButton) {

@@ -260,6 +260,21 @@ final class DataManager {
 			let pr = (item as! PRStatus).pullRequest
 			let uri = pr.objectID.uriRepresentation().absoluteString
 			return [NOTIFICATION_URL_KEY: pr.webUrl!, LISTABLE_URI_KEY: uri]
+		case .newReaction:
+			let reaction = item as! Reaction
+			if let issue = reaction.issue {
+				let uri = issue.objectID.uriRepresentation().absoluteString
+				return [NOTIFICATION_URL_KEY: issue.webUrl!, LISTABLE_URI_KEY: uri]
+			} else if let pr = reaction.pullRequest {
+				let uri = pr.objectID.uriRepresentation().absoluteString
+				return [NOTIFICATION_URL_KEY: pr.webUrl!, LISTABLE_URI_KEY: uri]
+			} else if let comment = reaction.comment {
+				let uri = comment.objectID.uriRepresentation().absoluteString
+				let parentUri = comment.parent?.objectID.uriRepresentation().absoluteString ?? ""
+				return [COMMENT_ID_KEY: uri, LISTABLE_URI_KEY: parentUri]
+			} else {
+				assert(false)
+			}
 		}
 	}
 

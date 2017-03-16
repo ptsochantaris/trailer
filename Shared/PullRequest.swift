@@ -15,6 +15,7 @@ final class PullRequest: ListableItem {
 	@NSManaged var mergeCommitSha: String?
 	@NSManaged var hasNewCommits: Bool
 	@NSManaged var assignedForReview: Bool
+	@NSManaged var reviewers: String
 
 	@NSManaged var statuses: Set<PRStatus>
 	@NSManaged var reviews: Set<Review>
@@ -55,6 +56,20 @@ final class PullRequest: ListableItem {
 
 	override var hasUnreadCommentsOrAlert: Bool {
 		return super.hasUnreadCommentsOrAlert || hasNewCommits
+	}
+
+	func checkAndStoreReviewAssignments(_ reviewerNames: Set<String>) -> Bool {
+		reviewers = reviewerNames.joined(separator: ",")
+		let assigned = reviewerNames.contains(S(apiServer.userName))
+		assignedForReview = assigned
+		return assigned
+	}
+
+	class func pullRequestsThatNeedReactionsToBeRefreshed(in moc: NSManagedObjectContext) -> [PullRequest] {
+		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
+		f.returnsObjectsAsFaults = false
+		f.predicate = NSPredicate(format: "requiresReactionRefreshFromUrl != nil")
+		return try! moc.fetch(f)
 	}
 
 	class func active(in moc: NSManagedObjectContext, visibleOnly: Bool) -> [PullRequest] {

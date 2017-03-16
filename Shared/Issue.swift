@@ -33,6 +33,13 @@ final class Issue: ListableItem {
 		}
 	}
 
+	class func issuesThatNeedReactionsToBeRefreshed(in moc: NSManagedObjectContext) -> [Issue] {
+		let f = NSFetchRequest<Issue>(entityName: "Issue")
+		f.returnsObjectsAsFaults = false
+		f.predicate = NSPredicate(format: "requiresReactionRefreshFromUrl != nil")
+		return try! moc.fetch(f)
+	}
+
 	class func reasonForEmpty(with filterValue: String?, criterion: GroupingCriterion?) -> NSAttributedString {
 		let openIssueCount = Issue.countOpen(in: DataManager.main, criterion: criterion)
 		return reasonForEmpty(with: filterValue, criterion: criterion, openItemCount: openIssueCount)

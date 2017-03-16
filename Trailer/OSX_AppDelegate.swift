@@ -307,6 +307,22 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			notification.subtitle = p.repo.fullName
 			notification.informativeText = p.title
 			addPotentialExtraActions()
+		case .newReaction:
+			guard let r = item as? Reaction else { return }
+			notification.title = r.displaySymbol
+			notification.subtitle = "@\(S(r.userName))"
+			if let c = r.comment, let p = c.pullRequest, !p.shouldSkipNotifications {
+				notification.informativeText = c.body
+				addPotentialExtraActions()
+			} else if let p = r.pullRequest, !p.shouldSkipNotifications {
+				notification.informativeText = p.title
+				addPotentialExtraActions()
+			} else if let i = r.issue, !i.shouldSkipNotifications {
+				notification.informativeText = i.title
+				addPotentialExtraActions()
+			} else {
+				return
+			}
 		}
 
 		let t = S(notification.title)

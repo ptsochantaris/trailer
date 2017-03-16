@@ -94,6 +94,8 @@
 		169205641E34DA9F00FB9547 /* CustomReposViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169205631E34DA9F00FB9547 /* CustomReposViewController.swift */; };
 		169205661E34DACA00FB9547 /* WatchlistSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169205651E34DACA00FB9547 /* WatchlistSettingsViewController.swift */; };
 		169205681E34EB4D00FB9547 /* CustomRepoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169205671E34EB4D00FB9547 /* CustomRepoCell.swift */; };
+		1694008C1E7AAE32002C5DAD /* Reaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1694008B1E7AAE32002C5DAD /* Reaction.swift */; };
+		1694008D1E7AAE32002C5DAD /* Reaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1694008B1E7AAE32002C5DAD /* Reaction.swift */; };
 		169B92961CC52C05002774A8 /* SnoozePreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169B92951CC52C05002774A8 /* SnoozePreset.swift */; };
 		169B92971CC52C05002774A8 /* SnoozePreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169B92951CC52C05002774A8 /* SnoozePreset.swift */; };
 		169FB2361A3DBD7D00E00771 /* SectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169FB2351A3DBD7D00E00771 /* SectionHeader.swift */; };
@@ -326,6 +328,8 @@
 		169205631E34DA9F00FB9547 /* CustomReposViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomReposViewController.swift; sourceTree = "<group>"; };
 		169205651E34DACA00FB9547 /* WatchlistSettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WatchlistSettingsViewController.swift; sourceTree = "<group>"; };
 		169205671E34EB4D00FB9547 /* CustomRepoCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomRepoCell.swift; sourceTree = "<group>"; };
+		1694008A1E7AAADF002C5DAD /* Trailer 35.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 35.xcdatamodel"; sourceTree = "<group>"; };
+		1694008B1E7AAE32002C5DAD /* Reaction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Reaction.swift; path = Shared/Reaction.swift; sourceTree = SOURCE_ROOT; };
 		169B92941CC3E5AD002774A8 /* Trailer 25.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 25.xcdatamodel"; sourceTree = "<group>"; };
 		169B92951CC52C05002774A8 /* SnoozePreset.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = SnoozePreset.swift; path = ../Shared/SnoozePreset.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		169FB2351A3DBD7D00E00771 /* SectionHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SectionHeader.swift; sourceTree = "<group>"; };
@@ -777,6 +781,7 @@
 				1633C1911ABCEC4A0086C692 /* Issue.swift */,
 				16A69ED91AC83020008231F9 /* ListableItem.swift */,
 				16B3B3121A34E8E2000BE6CC /* PRComment.swift */,
+				1694008B1E7AAE32002C5DAD /* Reaction.swift */,
 				16B3B3131A34E8E2000BE6CC /* PRLabel.swift */,
 				16B3B3141A34E8E2000BE6CC /* PRStatus.swift */,
 				16B3B3151A34E8E2000BE6CC /* PullRequest.swift */,
@@ -1081,6 +1086,7 @@
 				16B3B3181A34E8E2000BE6CC /* ApiServer.swift in Sources */,
 				16259BCE1A449400009C5745 /* OpenInSafariActivity.swift in Sources */,
 				1668CFE91D5E16B70021CDC5 /* Reachability.swift in Sources */,
+				1694008D1E7AAE32002C5DAD /* Reaction.swift in Sources */,
 				169205661E34DACA00FB9547 /* WatchlistSettingsViewController.swift in Sources */,
 				16C9A27A1A44DD0200EE54EC /* CommentBlacklistViewController.swift in Sources */,
 				166ADEC81CCB009A001BA61F /* SnoozingEditorViewController.swift in Sources */,
@@ -1193,6 +1199,7 @@
 				167B10571E6A86A300B0E1AE /* Review.swift in Sources */,
 				16B3B34F1A34E990000BE6CC /* Trailer.xcdatamodeld in Sources */,
 				1633C1921ABCEC4A0086C692 /* Issue.swift in Sources */,
+				1694008C1E7AAE32002C5DAD /* Reaction.swift in Sources */,
 				1639E2C11E4007B900C561E1 /* Timer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1625,6 +1632,7 @@
 		16B3B33B1A34E990000BE6CC /* Trailer.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				1694008A1E7AAADF002C5DAD /* Trailer 35.xcdatamodel */,
 				167B10551E6A856A00B0E1AE /* Trailer 34.xcdatamodel */,
 				16B415611E3D054500741E6F /* Trailer 33.xcdatamodel */,
 				16DB793F1E32D6460076A36D /* Trailer 32.xcdatamodel */,
@@ -1660,7 +1668,7 @@
 				16B3B34D1A34E990000BE6CC /* Trailer 9.xcdatamodel */,
 				16B3B34E1A34E990000BE6CC /* Trailer.xcdatamodel */,
 			);
-			currentVersion = 167B10551E6A856A00B0E1AE /* Trailer 34.xcdatamodel */;
+			currentVersion = 1694008A1E7AAADF002C5DAD /* Trailer 35.xcdatamodel */;
 			name = Trailer.xcdatamodeld;
 			path = ../Shared/Trailer.xcdatamodeld;
 			sourceTree = "<group>";

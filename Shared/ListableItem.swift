@@ -33,12 +33,14 @@ class ListableItem: DataItem {
 	@NSManaged var wasAwokenFromSnooze: Bool
 	@NSManaged var milestone: String?
 	@NSManaged var dirty: Bool
+	@NSManaged var requiresReactionRefreshFromUrl: String?
 
 	@NSManaged var snoozeUntil: Date?
 	@NSManaged var snoozingPreset: SnoozePreset?
 
 	@NSManaged var comments: Set<PRComment>
 	@NSManaged var labels: Set<PRLabel>
+	@NSManaged var reactions: Set<Reaction>
 
 	final func baseSync(from info: [AnyHashable : Any], in repo: Repo) {
 
@@ -59,6 +61,13 @@ class ListableItem: DataItem {
 		}
 
 		processAssignmentStatus(from: info)
+
+		if let r = info["reactions"] as? [AnyHashable : Any] {
+			requiresReactionRefreshFromUrl = Reaction.changesDetected(in: reactions, from: r)
+		} else {
+			reactions.forEach { $0.postSyncAction = PostSyncAction.delete.rawValue }
+			requiresReactionRefreshFromUrl = nil
+		}
 	}
 
 	final func processAssignmentStatus(from info: [AnyHashable : Any]?) {
@@ -532,18 +541,18 @@ class ListableItem: DataItem {
 					let approvers = reviews.filter { $0.state == "APPROVED" }
 					if approvers.count > 0 {
 
-						let approveAttributes = [NSFontAttributeName: labelFont,
-						                         NSForegroundColorAttributeName: COLOR_CLASS(red: 0, green: 0.5, blue: 0, alpha: 1.0),
-						                         NSParagraphStyleAttributeName: lp] as [String : Any]
+						let a = [NSFontAttributeName: labelFont,
+						         NSForegroundColorAttributeName: COLOR_CLASS(red: 0, green: 0.5, blue: 0, alpha: 1.0),
+						         NSParagraphStyleAttributeName: lp] as [String : Any]
 
-						_title.append(NSAttributedString(string: "\n", attributes: approveAttributes))
+						_title.append(NSAttributedString(string: "\n", attributes: a))
 
 						var count = 0
 						for r in approvers {
-							let name = "@" + r.username!.replacingOccurrences(of: " ", with: "\u{a0}")
-							_title.append(NSAttributedString(string: "\(name) ", attributes: approveAttributes))
+							let name = r.username!.replacingOccurrences(of: " ", with: "\u{a0}")
+							_title.append(NSAttributedString(string: "@\(name) ", attributes: a))
 							if count == approvers.count - 1 {
-								_title.append(NSAttributedString(string: "approved changes", attributes: approveAttributes))
+								_title.append(NSAttributedString(string: "approved changes", attributes: a))
 							}
 							count += 1
 						}
@@ -552,18 +561,40 @@ class ListableItem: DataItem {
 					let requesters = reviews.filter { $0.state == "CHANGES_REQUESTED" }
 					if requesters.count > 0 {
 
-						let requestAttributes = [NSFontAttributeName: labelFont,
-						                         NSForegroundColorAttributeName: COLOR_CLASS(red: 0.7, green: 0, blue: 0, alpha: 1.0),
-						                         NSParagraphStyleAttributeName: lp] as [String : Any]
+						let a = [NSFontAttributeName: labelFont,
+						         NSForegroundColorAttributeName: COLOR_CLASS(red: 0.7, green: 0, blue: 0, alpha: 1.0),
+						         NSParagraphStyleAttributeName: lp] as [String : Any]
 
-						_title.append(NSAttributedString(string: "\n", attributes: requestAttributes))
+						_title.append(NSAttributedString(string: "\n", attributes: a))
 
 						var count = 0
 						for r in requesters {
-							let name = "@" + r.username!.replacingOccurrences(of: " ", with: "\u{a0}")
-							_title.append(NSAttributedString(string: "\(name) ", attributes: requestAttributes))
+							let name = r.username!.replacingOccurrences(of: " ", with: "\u{a0}")
+							_title.append(NSAttributedString(string: "@\(name) ", attributes: a))
 							if count == requesters.count - 1 {
-								_title.append(NSAttributedString(string: requesters.count > 1 ? "request changes" : "requests changes", attributes: requestAttributes))
+								_title.append(NSAttributedString(string: requesters.count > 1 ? "request changes" : "requests changes", attributes: a))
+							}
+							count += 1
+						}
+					}
+
+					let approverNames = approvers.flatMap { $0.username }
+					let requesterNames = requesters.flatMap { $0.username }
+					let otherReviewers = p.reviewers.components(separatedBy: ",").filter({ !($0.isEmpty || approverNames.contains($0) || requesterNames.contains($0)) })
+					if otherReviewers.count > 0 {
+
+						let a = [NSFontAttributeName: labelFont,
+						         NSForegroundColorAttributeName: COLOR_CLASS(red: 0.7, green: 0.7, blue: 0, alpha: 1.0),
+						         NSParagraphStyleAttributeName: lp] as [String : Any]
+
+						_title.append(NSAttributedString(string: "\n", attributes: a))
+
+						var count = 0
+						for r in otherReviewers {
+							let name = r.replacingOccurrences(of: " ", with: "\u{a0}")
+							_title.append(NSAttributedString(string: "@\(name) ", attributes: a))
+							if count == otherReviewers.count - 1 {
+								_title.append(NSAttributedString(string: otherReviewers.count > 1 ? "haven't reviewed yet" : "hasn't reviewed yet", attributes: a))
 							}
 							count += 1
 						}

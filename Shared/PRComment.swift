@@ -7,10 +7,13 @@ final class PRComment: DataItem {
     @NSManaged var userId: Int64
     @NSManaged var userName: String?
     @NSManaged var webUrl: String?
+	@NSManaged var requiresReactionRefreshFromUrl: String?
 
     @NSManaged var pullRequest: PullRequest?
 	@NSManaged var issue: Issue?
 	@NSManaged var review: Review?
+
+	@NSManaged var reactions: Set<Reaction>
 
 	class func syncComments(from data: [[AnyHashable : Any]]?, pullRequest: PullRequest) {
 		items(with: data, type: PRComment.self, server: pullRequest.apiServer) { item, info, newOrUpdated in
@@ -28,18 +31,6 @@ final class PRComment: DataItem {
 				item.issue = issue
 				item.fill(from: info)
 				item.fastForwardIfNeeded(parent: issue)
-			}
-		}
-	}
-
-	class func syncComments(from data: [[AnyHashable : Any]]?, review: Review) {
-		items(with: data, type: PRComment.self, server: review.apiServer) { item, info, newOrUpdated in
-			if newOrUpdated {
-				let pr = review.pullRequest
-				item.review = review
-				item.pullRequest = pr
-				item.fill(from: info)
-				item.fastForwardIfNeeded(parent: pr)
 			}
 		}
 	}
@@ -112,6 +103,20 @@ final class PRComment: DataItem {
 
 			webUrl = href
 		}
+
+		if let r = info["reactions"] as? [AnyHashable : Any] {
+			requiresReactionRefreshFromUrl = Reaction.changesDetected(in: reactions, from: r)
+		} else {
+			reactions.forEach { $0.postSyncAction = PostSyncAction.delete.rawValue }
+			requiresReactionRefreshFromUrl = nil
+		}
+	}
+
+	class func commentsThatNeedReactionsToBeRefreshed(in moc: NSManagedObjectContext) -> [PRComment] {
+		let f = NSFetchRequest<PRComment>(entityName: "PRComment")
+		f.returnsObjectsAsFaults = false
+		f.predicate = NSPredicate(format: "requiresReactionRefreshFromUrl != nil")
+		return try! moc.fetch(f)
 	}
 
 	var notificationSubtitle: String {
