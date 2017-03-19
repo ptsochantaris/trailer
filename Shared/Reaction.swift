@@ -32,7 +32,7 @@ final class Reaction: DataItem {
 		}
 	}
 
-	func fill(from info: [AnyHashable : Any]) {
+	private func fill(from info: [AnyHashable : Any]) {
 		content = info["content"] as? String
 		if let user = info["user"] as? [AnyHashable:Any] {
 			userName = user["login"] as? String
@@ -40,7 +40,19 @@ final class Reaction: DataItem {
 			userId = user["id"] as? Int64 ?? 0
 		}
 		if postSyncAction == PostSyncAction.isNew.rawValue && userId != apiServer.userId {
-			NotificationQueue.add(type: .newReaction, for: self)
+			if let parentItem = (pullRequest ?? issue), Settings.notifyOnItemReactions, parentItem.postSyncAction != PostSyncAction.isNew.rawValue {
+
+				if Settings.showCommentsEverywhere || (parentItem.sectionIndex != Section.all.rawValue && parentItem.sectionIndex != Section.none.rawValue) {
+					NotificationQueue.add(type: .newReaction, for: self)
+				}
+
+			} else if let c = comment, let parentItem = (c.pullRequest ?? c.issue), Settings.notifyOnCommentReactions, parentItem.postSyncAction != PostSyncAction.isNew.rawValue {
+
+				if Settings.showCommentsEverywhere || (parentItem.sectionIndex != Section.all.rawValue && parentItem.sectionIndex != Section.none.rawValue) {
+					NotificationQueue.add(type: .newReaction, for: self)
+				}
+
+			}
 		}
 		postSyncAction = PostSyncAction.doNothing.rawValue
 	}

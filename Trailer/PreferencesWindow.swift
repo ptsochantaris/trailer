@@ -1596,7 +1596,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		return nil
 	}
 
-	func fillSnoozeFormFromSelectedPreset() {
+	private func fillSnoozeFormFromSelectedPreset() {
 		if let s = selectedSnoozePreset {
 			if s.duration {
 				snoozeTypeDuration.integerValue = 1
