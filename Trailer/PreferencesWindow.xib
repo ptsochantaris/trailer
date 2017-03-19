@@ -1328,7 +1328,7 @@ Token</string>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="PC0-Di-dZ3">
                                                         <rect key="frame" x="-2" y="1" width="554" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="To disble usage of the Reviews API, uncheck all options here &amp; set the drop-down option to &quot;None&quot;" id="bis-lC-jvI">
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="To disble usage of the Reviews API, uncheck all options here &amp; set the drop-down option to &quot;Don't Move It&quot;" id="bis-lC-jvI">
                                                             <font key="font" metaFont="miniSystem"/>
                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1357,7 +1357,7 @@ Token</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box misplaced="YES" titlePosition="noTitle" id="zHV-fn-HSK">
-                                            <rect key="frame" x="134" y="142" width="566" height="87"/>
+                                            <rect key="frame" x="134" y="152" width="566" height="87"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <view key="contentView" id="IBf-ZQ-tKp">
                                                 <rect key="frame" x="2" y="2" width="562" height="83"/>
@@ -1389,7 +1389,7 @@ Token</string>
                                             </view>
                                         </box>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="sx9-sf-15g">
-                                            <rect key="frame" x="199" y="235" width="436" height="64"/>
+                                            <rect key="frame" x="199" y="255" width="436" height="64"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" id="rYW-sF-P0d">
                                                 <font key="font" metaFont="miniSystem"/>
@@ -1399,7 +1399,7 @@ Token</string>
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="hYX-l4-6Qc">
-                                            <rect key="frame" x="135" y="121" width="564" height="17"/>
+                                            <rect key="frame" x="135" y="131" width="564" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="To completely disble all usage of the Reactions API, uncheck all options." id="zca-XG-6Sh">
                                                 <font key="font" metaFont="miniSystem"/>
@@ -1408,11 +1408,11 @@ Token</string>
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="iEL-pK-LcM">
-                                            <rect key="frame" x="161" y="17" width="513" height="78"/>
+                                            <rect key="frame" x="161" y="27" width="513" height="78"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" id="VEf-qR-HnU">
                                                 <font key="font" metaFont="system"/>
-                                                <string key="title">Tip: Reactions are treated like comments, i.e. the rules about being notified only for your own or participated items, or all items, can be changed from th eoptions in the "comments" section.</string>
+                                                <string key="title">Tip: Reactions are treated like comments, i.e. the rules about being notified only for your own or participated items, or all items, can be changed from the options in the "comments" section.</string>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>

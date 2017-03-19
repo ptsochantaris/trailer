@@ -234,12 +234,22 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	@IBAction func supportReviewsSelected(_ sender: NSButton) {
+		if API.shouldSyncReactions && sender.integerValue == 1 {
+			alertThatReactionsMustBeDisabled()
+			sender.integerValue = 0
+			return
+		}
 		let previousShouldSync = API.shouldSyncReviews
 		Settings.displayReviewChangeRequests = sender.integerValue == 1
 		showOptionalReviewWarning(previousSync: previousShouldSync)
 	}
 
 	@IBAction func notifyOnChangeRequestsSelected(_ sender: NSButton) {
+		if API.shouldSyncReactions && sender.integerValue == 1 {
+			alertThatReactionsMustBeDisabled()
+			sender.integerValue = 0
+			return
+		}
 		let previousShouldSync = API.shouldSyncReviews
 		Settings.notifyOnReviewChangeRequests = sender.integerValue == 1
 		showOptionalReviewWarning(previousSync: previousShouldSync)
@@ -249,6 +259,11 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	@IBAction func notifyOnAcceptancesSelected(_ sender: NSButton) {
+		if API.shouldSyncReactions && sender.integerValue == 1 {
+			alertThatReactionsMustBeDisabled()
+			sender.integerValue = 0
+			return
+		}
 		let previousShouldSync = API.shouldSyncReviews
 		Settings.notifyOnReviewAcceptances = sender.integerValue == 1
 		showOptionalReviewWarning(previousSync: previousShouldSync)
@@ -258,6 +273,11 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	@IBAction func notifyOnReviewDismissalsSelected(_ sender: NSButton) {
+		if API.shouldSyncReactions && sender.integerValue == 1 {
+			alertThatReactionsMustBeDisabled()
+			sender.integerValue = 0
+			return
+		}
 		let previousShouldSync = API.shouldSyncReviews
 		Settings.notifyOnReviewDismissals = sender.integerValue == 1
 		showOptionalReviewWarning(previousSync: previousShouldSync)
@@ -281,14 +301,25 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	@IBAction func notifyOnReviewAssignmentsSelected(_ sender: NSButton) {
+		if API.shouldSyncReactions && sender.integerValue == 1 {
+			alertThatReactionsMustBeDisabled()
+			sender.integerValue = 0
+			return
+		}
 		let previousShouldSync = API.shouldSyncReviewAssignments
 		Settings.notifyOnReviewAssignments = sender.integerValue == 1
 		showOptionalReviewAssignmentWarning(previousSync: previousShouldSync)
 	}
 
 	@IBAction func assignedReviewHandlingPolicySelected(_ sender: NSPopUpButton) {
+		let index = sender.index(of: sender.selectedItem!)
+		if API.shouldSyncReactions && index > 0 {
+			alertThatReactionsMustBeDisabled()
+			sender.select(sender.item(at: 0))
+			return
+		}
 		let previousShouldSync = API.shouldSyncReviewAssignments
-		Settings.assignedReviewHandlingPolicy = sender.index(of: sender.selectedItem!)
+		Settings.assignedReviewHandlingPolicy = index
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 		showOptionalReviewAssignmentWarning(previousSync: previousShouldSync)
@@ -537,11 +568,35 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		advancedReposWindow?.updateActivity()
 	}
 
+	private func alertThatReactionsMustBeDisabled() {
+		let a = NSAlert()
+		a.messageText = "Because Reviews are currently a preview API, they cannot be enabled together with any feature from the Reactions section."
+		a.informativeText = "If you would like to use any of the features from this section, please visit the Reactions section and disable all features from there. Hopefully GitHub will finalise this API soon and this won't be nessescary."
+		a.beginSheetModal(for: self)
+	}
+
+	private func alertThatReviewsMustBeDisabled() {
+		let a = NSAlert()
+		a.messageText = "Because Reactions are currently a preview API, they cannot be enabled together with any feature from the Reviews section."
+		a.informativeText = "If you would like to use any of the features from this section, please visit the Reviews section and disable all features from there. Hopefully GitHub will finalise this API soon and this won't be nessescary."
+		a.beginSheetModal(for: self)
+	}
+
 	@IBAction func notifyOnItemReactionsSelected(_ sender: NSButton) {
+		if (API.shouldSyncReviews || API.shouldSyncReviewAssignments) && sender.integerValue == 1 {
+			alertThatReviewsMustBeDisabled()
+			sender.integerValue = 0
+			return
+		}
 		Settings.notifyOnItemReactions = sender.integerValue == 1
 	}
 
 	@IBAction func notifyOnCommentReactionsSelected(_ sender: NSButton) {
+		if (API.shouldSyncReviews || API.shouldSyncReviewAssignments) && sender.integerValue == 1 {
+			alertThatReviewsMustBeDisabled()
+			sender.integerValue = 0
+			return
+		}
 		Settings.notifyOnCommentReactions = sender.integerValue == 1
 	}
 

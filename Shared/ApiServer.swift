@@ -33,6 +33,7 @@ final class ApiServer: NSManagedObject {
 		if requestsRemaining == 0 {
 			if !ApiServer.lastReportedOverLimit.contains(objectID) {
 				ApiServer.lastReportedOverLimit.insert(objectID)
+				ApiServer.lastReportedNearLimit.insert(objectID) // so if we start over the limit, we don't also warn about being near the limit
 				return true
 			}
 		} else {
