@@ -189,27 +189,21 @@ final class Repo: DataItem {
 
 	func markItemsAsUpdated(with numbers: Set<Int64>, reasons: Set<String>) {
 
-		let predicate = NSPredicate(format: "repo == %@ and number IN %@", self, numbers)
+		let predicate = NSPredicate(format: "(number IN %@) AND (repo == %@)", numbers, self)
 
-		let fp = NSFetchRequest<PullRequest>(entityName: "PullRequest")
-		fp.returnsObjectsAsFaults = false
-		fp.includesSubentities = false
-		fp.predicate = predicate
-
-		for i in try! managedObjectContext!.fetch(fp) {
-			DLog("Ensuring PR '%@' in repo '%@' is marked as updated - reasons: %@", S(i.title), S(i.repo.fullName), reasons.joined(separator: ", "))
-			i.setToUpdatedIfIdle()
+		func mark<T>(type: T.Type) where T : ListableItem {
+			let f = NSFetchRequest<T>(entityName: String(describing: type))
+			f.returnsObjectsAsFaults = false
+			f.includesSubentities = false
+			f.predicate = predicate
+			for i in try! managedObjectContext!.fetch(f) {
+				DLog("Ensuring item '%@' in repo '%@' is marked as updated - reasons: %@", S(i.title), S(i.repo.fullName), reasons.joined(separator: ", "))
+				i.setToUpdatedIfIdle()
+			}
 		}
 
-		let fi = NSFetchRequest<Issue>(entityName: "Issue")
-		fi.returnsObjectsAsFaults = false
-		fi.includesSubentities = false
-		fp.predicate = predicate
-
-		for i in try! managedObjectContext!.fetch(fi) {
-			DLog("Ensuring Issue '%@' in repo '%@' is marked as updated, reasons: %@", S(i.title), S(i.repo.fullName), reasons.joined(separator: ", "))
-			i.setToUpdatedIfIdle()
-		}
+		mark(type: PullRequest.self)
+		mark(type: Issue.self)
 	}
 
 }

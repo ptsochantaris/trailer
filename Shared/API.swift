@@ -325,13 +325,19 @@ final class API {
 
 		let repos = Repo.syncableRepos(in: moc)
 
+		let willSyncCommentReactions = Settings.notifyOnCommentReactions
+		let willSyncItemReactions = Settings.notifyOnItemReactions
+
 		var completionCount = 0
-		let totalOperations = 4
+		let totalOperations = 2 + (willSyncItemReactions ? 2 : 0)
 		let completionCallback = {
 			completionCount += 1
 			if completionCount == totalOperations {
-				fetchCommentReactionsIfNeeded(to: moc) {
-					NotificationCenter.default.post(name: RefreshProcessingNotification, object: nil)
+				if willSyncCommentReactions {
+					fetchCommentReactionsIfNeeded(to: moc) {
+						completeSync(in: moc, andCallback: callback)
+					}
+				} else {
 					completeSync(in: moc, andCallback: callback)
 				}
 			}
@@ -344,8 +350,10 @@ final class API {
 			let reposWithSomeItems = repos.filter { $0.issues.count > 0 || $0.pullRequests.count > 0 }
 			markExtraUpdatedItems(from: reposWithSomeItems, to: moc) {
 
-				fetchIssueReactionsIfNeeded(to: moc, callback: completionCallback)
-				fetchPullRequestReactionsIfNeeded(to: moc, callback: completionCallback)
+				if willSyncItemReactions {
+					fetchIssueReactionsIfNeeded(to: moc, callback: completionCallback)
+					fetchPullRequestReactionsIfNeeded(to: moc, callback: completionCallback)
+				}
 
 				fetchCommentsForCurrentIssues(to: moc) {
 					checkIssueClosures(in: moc)
@@ -418,8 +426,8 @@ final class API {
 								DLog("Parsed all repo issue events up to the one we already have");
 								break // we're done
 							}
-							numbers.insert(issueNumber)
 							if let reason = event["event"] as? String {
+								numbers.insert(issueNumber)
 								reasons.insert(reason)
 							}
 						}
@@ -447,6 +455,8 @@ final class API {
 	private class func completeSync(in moc: NSManagedObjectContext, andCallback: @escaping Completion) {
 
 		DLog("Wrapping up sync")
+
+		NotificationCenter.default.post(name: RefreshProcessingNotification, object: nil)
 
 		// discard any changes related to any failed API server
 		for apiServer in ApiServer.allApiServers(in: moc) {
@@ -713,8 +723,6 @@ final class API {
 	}
 
 	private class func fetchCommentReactionsIfNeeded(to moc: NSManagedObjectContext, callback: @escaping Completion) {
-		guard Settings.notifyOnCommentReactions else { callback(); return }
-
 		let comments = PRComment.commentsThatNeedReactionsToBeRefreshed(in: moc).filter { $0.apiServer.lastSyncSucceeded }
 		let totalOperations = comments.count
 		guard totalOperations > 0 else { callback(); return }
@@ -745,8 +753,6 @@ final class API {
 	}
 
 	private class func fetchIssueReactionsIfNeeded(to moc: NSManagedObjectContext, callback: @escaping Completion) {
-		guard Settings.notifyOnItemReactions else { callback(); return }
-
 		let items = Issue.issuesThatNeedReactionsToBeRefreshed(in: moc).filter { $0.apiServer.lastSyncSucceeded }
 		let totalOperations = items.count
 		guard totalOperations > 0 else { callback(); return }
@@ -777,8 +783,6 @@ final class API {
 	}
 
 	private class func fetchPullRequestReactionsIfNeeded(to moc: NSManagedObjectContext, callback: @escaping Completion) {
-		guard Settings.notifyOnItemReactions else { callback(); return }
-
 		let items = PullRequest.pullRequestsThatNeedReactionsToBeRefreshed(in: moc).filter { $0.apiServer.lastSyncSucceeded }
 		let totalOperations = items.count
 		guard totalOperations > 0 else { callback(); return }
@@ -1486,7 +1490,7 @@ final class API {
 			acceptTypes.append("application/vnd.github.black-cat-preview+json")
 		}
 		acceptTypes.append("application/vnd.github.v3+json")
-		r.setValue(acceptTypes.joined(separator: ", "), forHTTPHeaderField:"Accept")
+		r.setValue(acceptTypes.joined(separator: ", "), forHTTPHeaderField: "Accept")
 		if let a = server.authToken {
 			r.setValue("token \(a)", forHTTPHeaderField: "Authorization")
 		}
