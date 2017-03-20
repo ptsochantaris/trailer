@@ -291,13 +291,13 @@ final class API {
 
 	////////////////////////////////////// API interface
 
-	private static let longConcurrency = 3
-	private static let burstConcurrency = 16
+	private static let sustainedConcurrency = 3
+	private static let burstConcurrency = 8
 
 	private static let apiQueue = { () -> OperationQueue in
 		let n = OperationQueue()
 		n.underlyingQueue = DispatchQueue.main
-		n.maxConcurrentOperationCount = API.longConcurrency
+		n.maxConcurrentOperationCount = API.sustainedConcurrency
 		return n
 	}()
 
@@ -337,11 +337,12 @@ final class API {
 			}
 		}
 
-		apiQueue.maxConcurrentOperationCount = API.longConcurrency
+		apiQueue.maxConcurrentOperationCount = API.sustainedConcurrency
 
 		fetchItems(from: repos, to: moc) {
 
-			markExtraUpdatedItems(from: repos, to: moc) {
+			let reposWithSomeItems = repos.filter { $0.issues.count > 0 || $0.pullRequests.count > 0 }
+			markExtraUpdatedItems(from: reposWithSomeItems, to: moc) {
 
 				fetchIssueReactionsIfNeeded(to: moc, callback: completionCallback)
 				fetchPullRequestReactionsIfNeeded(to: moc, callback: completionCallback)
@@ -381,7 +382,7 @@ final class API {
 		let completionCallback = {
 			completionCount += 1
 			if completionCount == totalOperations {
-				apiQueue.maxConcurrentOperationCount = API.longConcurrency
+				apiQueue.maxConcurrentOperationCount = API.sustainedConcurrency
 				callback()
 			}
 		}
@@ -1406,7 +1407,7 @@ final class API {
 			return
 		}
 
-		let p = page > 1 ? "\(path)?page=\(page)" : path
+		let p = page > 1 ? "\(path)?page=\(page)&per_page=100" : "\(path)?per_page=100"
 		getData(in: p, from: server) { data, lastPage, resultCode in
 
 			if let d = data as? [[AnyHashable : Any]] {
