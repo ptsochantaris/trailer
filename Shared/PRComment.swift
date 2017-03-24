@@ -22,6 +22,7 @@ final class PRComment: DataItem {
 				item.fill(from: info)
 				item.fastForwardIfNeeded(parent: pullRequest)
 			}
+			item.processReactions(from: info)
 		}
 	}
 
@@ -32,6 +33,7 @@ final class PRComment: DataItem {
 				item.fill(from: info)
 				item.fastForwardIfNeeded(parent: issue)
 			}
+			item.processReactions(from: info)
 		}
 	}
 
@@ -103,8 +105,10 @@ final class PRComment: DataItem {
 
 			webUrl = href
 		}
+	}
 
-		if let r = info["reactions"] as? [AnyHashable : Any] {
+	private func processReactions(from info: [AnyHashable : Any]?) {
+		if API.shouldSyncReactions, let info = info, let r = info["reactions"] as? [AnyHashable : Any] {
 			requiresReactionRefreshFromUrl = Reaction.changesDetected(in: reactions, from: r)
 		} else {
 			reactions.forEach { $0.postSyncAction = PostSyncAction.delete.rawValue }

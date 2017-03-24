@@ -596,6 +596,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 		Settings.notifyOnItemReactions = sender.integerValue == 1
 		API.refreshesSinceLastReactionsCheck.removeAll()
+		updateReactionItemOptions()
 	}
 
 	@IBAction func notifyOnCommentReactionsSelected(_ sender: NSButton) {
@@ -606,6 +607,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 		Settings.notifyOnCommentReactions = sender.integerValue == 1
 		API.refreshesSinceLastReactionsCheck.removeAll()
+		updateReactionItemOptions()
 	}
 
 	@IBAction func newMentionMovePolicySelected(_ sender: NSPopUpButton) {
@@ -943,6 +945,10 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		let count = Settings.reactionScanningInterval
 		reactionIntervalStepper.integerValue = count
 		reactionIntervalLabel.stringValue = count>1 ? "Re-scan all reaction-related items every \(count) refreshes" : "Re-scan all reaction-related items on every refresh"
+		let enabled = API.shouldSyncReactions
+		reactionIntervalStepper.isEnabled = enabled
+		reactionIntervalLabel.isEnabled = enabled
+		reactionIntervalLabel.textColor = enabled ? NSColor.labelColor : NSColor.disabledControlTextColor
 	}
 
 	@IBAction func reactionIntervalCountChanged(_ sender: NSStepper) {

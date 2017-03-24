@@ -61,8 +61,11 @@ class ListableItem: DataItem {
 		}
 
 		processAssignmentStatus(from: info)
+	}
 
-		if let r = info["reactions"] as? [AnyHashable : Any] {
+	final func processReactions(from info: [AnyHashable : Any]?) {
+
+		if API.shouldSyncReactions, let info = info, let r = info["reactions"] as? [AnyHashable : Any] {
 			requiresReactionRefreshFromUrl = Reaction.changesDetected(in: reactions, from: r)
 		} else {
 			reactions.forEach { $0.postSyncAction = PostSyncAction.delete.rawValue }

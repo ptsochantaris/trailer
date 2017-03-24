@@ -12,8 +12,8 @@ final class Reaction: DataItem {
 
 	class func syncReactions(from data: [[AnyHashable : Any]]?, comment: PRComment) {
 		items(with: data, type: Reaction.self, server: comment.apiServer) { item, info, isNewOrUpdated in
-			item.comment = comment
 			if isNewOrUpdated {
+				item.comment = comment
 				item.fill(from: info)
 			}
 		}
@@ -21,12 +21,9 @@ final class Reaction: DataItem {
 
 	class func syncReactions(from data: [[AnyHashable : Any]]?, parent: ListableItem) {
 		items(with: data, type: Reaction.self, server: parent.apiServer) { item, info, isNewOrUpdated in
-			if let p = parent as? PullRequest {
-				item.pullRequest = p
-			} else {
-				item.issue = parent as? Issue
-			}
 			if isNewOrUpdated {
+				item.pullRequest = parent as? PullRequest
+				item.issue = parent as? Issue
 				item.fill(from: info)
 			}
 		}

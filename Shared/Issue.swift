@@ -27,10 +27,12 @@ final class Issue: ListableItem {
 				if Settings.showLabels, let labelList = info["labels"] as? [[AnyHashable : Any]] {
 					PRLabel.syncLabels(from: labelList, withParent: item)
 				}
+
+				item.processReactions(from: info)
 			}
 			item.reopened = item.condition == ItemCondition.closed.rawValue
 			item.condition = ItemCondition.open.rawValue
-			API.refreshesSinceLastReactionsCheck[item.objectID] = 0
+			API.refreshesSinceLastReactionsCheck[item.objectID] = 1
 		}
 	}
 

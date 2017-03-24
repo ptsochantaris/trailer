@@ -42,10 +42,10 @@ final class PullRequest: ListableItem {
 				}
 
 				API.refreshesSinceLastStatusCheck[item.objectID] = nil
+				API.refreshesSinceLastReactionsCheck[item.objectID] = 1
 			}
 			item.reopened = item.condition == ItemCondition.closed.rawValue
 			item.condition = ItemCondition.open.rawValue
-			API.refreshesSinceLastReactionsCheck[item.objectID] = nil
 		}
 	}
 

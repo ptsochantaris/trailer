@@ -1208,7 +1208,10 @@ final class API {
 			if let issueLink = p.issueUrl {
 				getData(in: issueLink, from: apiServer) { data, lastPage, resultCode in
 					if resultCode == 200 || resultCode == 404 || resultCode == 410 {
-						p.processAssignmentStatus(from: data as? [AnyHashable : Any])
+						if let d = data as? [AnyHashable : Any] {
+							p.processAssignmentStatus(from: d)
+							p.processReactions(from: d)
+						}
 					} else {
 						apiServer.lastSyncSucceeded = false
 					}
