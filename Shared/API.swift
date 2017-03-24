@@ -75,6 +75,7 @@ final class API {
 	}
 
 	static var refreshesSinceLastStatusCheck = [NSManagedObjectID : Int]()
+	static var refreshesSinceLastReactionsCheck = [NSManagedObjectID : Int]()
 	static var currentNetworkStatus = NetworkStatus.NotReachable
 
 	private static let cacheDirectory = { ()->String in
@@ -321,6 +322,36 @@ final class API {
 		}
 	}
 
+	private class func markItemsForPeriodicReactionsCheck(in moc: NSManagedObjectContext) {
+
+		func markItemsNeedingReactionsCheck(items: [ListableItem]) {
+
+			for item in items {
+				guard item.apiServer.lastSyncSucceeded else { continue }
+
+				let oid = item.objectID
+				let refreshes = refreshesSinceLastReactionsCheck[oid]
+				if refreshes == nil || refreshes! >= Settings.reactionScanningInterval {
+					DLog("Will check reactions for item: '%@'", item.title)
+					for s in item.reactions {
+						s.postSyncAction = PostSyncAction.delete.rawValue
+					}
+					item.updatedAt = .distantPast
+					item.postSyncAction = PostSyncAction.isUpdated.rawValue
+				} else {
+					DLog("No need to get reactions for item: '%@' (%@ refreshes since last check)", item.title, refreshes)
+					refreshesSinceLastReactionsCheck[oid] = (refreshes ?? 0) + 1
+				}
+			}
+		}
+
+		let prItems = PullRequest.active(of: PullRequest.self, in: moc, visibleOnly: true)
+		markItemsNeedingReactionsCheck(items: prItems)
+
+		let issueItems = Issue.active(of: Issue.self, in: moc, visibleOnly: true)
+		markItemsNeedingReactionsCheck(items: issueItems)
+	}
+
 	private class func sync(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		let repos = Repo.syncableRepos(in: moc)
@@ -344,6 +375,15 @@ final class API {
 		}
 
 		apiQueue.maxConcurrentOperationCount = API.sustainedConcurrency
+
+		if shouldSyncReactions {
+			markItemsForPeriodicReactionsCheck(in: moc)
+		} else {
+			refreshesSinceLastReactionsCheck.removeAll()
+			for s in DataItem.allItems(of: Reaction.self, in: moc) {
+				s.postSyncAction = PostSyncAction.delete.rawValue
+			}
+		}
 
 		fetchItems(from: repos, to: moc) {
 
@@ -1044,7 +1084,7 @@ final class API {
 
 	private class func fetchStatusesForCurrentPullRequests(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
-		let prs = PullRequest.active(in: moc, visibleOnly: !Settings.hidePrsThatArentPassing).filter { pr in
+		let prs = PullRequest.active(of: PullRequest.self, in: moc, visibleOnly: !Settings.hidePrsThatArentPassing).filter { pr in
 			guard pr.apiServer.lastSyncSucceeded else { return false }
 
 			let oid = pr.objectID

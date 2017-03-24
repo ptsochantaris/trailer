@@ -39,7 +39,7 @@ final class Reaction: DataItem {
 			avatarUrl = user["avatar_url"] as? String
 			userId = user["id"] as? Int64 ?? 0
 		}
-		if postSyncAction == PostSyncAction.isNew.rawValue && userId != apiServer.userId {
+		if postSyncAction == PostSyncAction.isNew.rawValue && !isMine {
 			if let parentItem = (pullRequest ?? issue), Settings.notifyOnItemReactions, parentItem.postSyncAction != PostSyncAction.isNew.rawValue {
 
 				if Settings.showCommentsEverywhere || (parentItem.sectionIndex != Section.all.rawValue && parentItem.sectionIndex != Section.none.rawValue) {
@@ -55,6 +55,10 @@ final class Reaction: DataItem {
 			}
 		}
 		postSyncAction = PostSyncAction.doNothing.rawValue
+	}
+
+	var isMine: Bool {
+		return userId == apiServer.userId
 	}
 
 	class func changesDetected(in reactions: Set<Reaction>, from info: [AnyHashable : Any]) -> String? {

@@ -30,6 +30,7 @@ final class Issue: ListableItem {
 			}
 			item.reopened = item.condition == ItemCondition.closed.rawValue
 			item.condition = ItemCondition.open.rawValue
+			API.refreshesSinceLastReactionsCheck[item.objectID] = 0
 		}
 	}
 

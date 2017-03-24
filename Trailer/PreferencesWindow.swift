@@ -9,6 +9,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	func reset() {
 		preferencesDirty = true
 		API.refreshesSinceLastStatusCheck.removeAll()
+		API.refreshesSinceLastReactionsCheck.removeAll()
 		Settings.lastSuccessfulRefresh = nil
 		lastRepoCheck = .distantPast
 		projectsTable.reloadData()
@@ -155,6 +156,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	// Reactions
 	@IBOutlet weak var notifyOnItemReactions: NSButton!
 	@IBOutlet weak var notifyOnCommentReactions: NSButton!
+	@IBOutlet weak var reactionIntervalLabel: NSTextField!
+	@IBOutlet weak var reactionIntervalStepper: NSStepper!
 
 	// Tabs
 	@IBOutlet weak var tabs: NSTabView!
@@ -426,6 +429,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		notifyOnItemReactions.toolTip = Settings.notifyOnItemReactionsHelp
 		notifyOnCommentReactions.toolTip = Settings.notifyOnCommentReactionsHelp
 		showLabels.toolTip = Settings.showLabelsHelp
+		reactionIntervalLabel.toolTip = Settings.reactionScanningIntervalHelp
+		reactionIntervalStepper.toolTip = Settings.reactionScanningIntervalHelp
 	}
 
 	private func updateAllItemSettingButtons() {
@@ -540,6 +545,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 		refreshUpdatePreferences()
 		updateStatusItemsOptions()
+		updateReactionItemOptions()
 		updateHistoryOptions()
 
 		hotkeyEnable.isEnabled = true
@@ -589,6 +595,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			return
 		}
 		Settings.notifyOnItemReactions = sender.integerValue == 1
+		API.refreshesSinceLastReactionsCheck.removeAll()
 	}
 
 	@IBAction func notifyOnCommentReactionsSelected(_ sender: NSButton) {
@@ -598,6 +605,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			return
 		}
 		Settings.notifyOnCommentReactions = sender.integerValue == 1
+		API.refreshesSinceLastReactionsCheck.removeAll()
 	}
 
 	@IBAction func newMentionMovePolicySelected(_ sender: NSPopUpButton) {
@@ -931,8 +939,19 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		updateStatusTermPreferenceControls()
 	}
 
+	private func updateReactionItemOptions() {
+		let count = Settings.reactionScanningInterval
+		reactionIntervalStepper.integerValue = count
+		reactionIntervalLabel.stringValue = count>1 ? "Re-scan all reaction-related items every \(count) refreshes" : "Re-scan all reaction-related items on every refresh"
+	}
+
+	@IBAction func reactionIntervalCountChanged(_ sender: NSStepper) {
+		Settings.reactionScanningInterval = sender.integerValue
+		updateReactionItemOptions()
+	}
+
 	@IBAction func statusItemRefreshCountChanged(_ sender: NSStepper) {
-		Settings.statusItemRefreshInterval = statusItemRefreshCounter.integerValue
+		Settings.statusItemRefreshInterval = sender.integerValue
 		updateStatusItemsOptions()
 	}
 

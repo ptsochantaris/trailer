@@ -114,6 +114,18 @@ class ListableItem: DataItem {
 		}
 	}
 
+	class func active<T>(of type: T.Type, in moc: NSManagedObjectContext, visibleOnly: Bool) -> [T] where T : ListableItem {
+		let f = NSFetchRequest<T>(entityName: String(describing: type))
+		f.returnsObjectsAsFaults = false
+		f.includesSubentities = false
+		if visibleOnly {
+			f.predicate = NSCompoundPredicate(type: .or, subpredicates: [Section.mine.matchingPredicate, Section.participated.matchingPredicate, Section.all.matchingPredicate])
+		} else {
+			f.predicate = ItemCondition.open.matchingPredicate
+		}
+		return try! moc.fetch(f)
+	}
+
 	final override func resetSyncState() {
 		super.resetSyncState()
 		repo.resetSyncState()
@@ -121,6 +133,7 @@ class ListableItem: DataItem {
 
 	final override func prepareForDeletion() {
 		API.refreshesSinceLastStatusCheck[objectID] = nil
+		API.refreshesSinceLastReactionsCheck[objectID] = nil
 		ensureInvisible()
 		super.prepareForDeletion()
 	}

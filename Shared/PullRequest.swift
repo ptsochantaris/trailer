@@ -45,6 +45,7 @@ final class PullRequest: ListableItem {
 			}
 			item.reopened = item.condition == ItemCondition.closed.rawValue
 			item.condition = ItemCondition.open.rawValue
+			API.refreshesSinceLastReactionsCheck[item.objectID] = nil
 		}
 	}
 
@@ -69,18 +70,6 @@ final class PullRequest: ListableItem {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "requiresReactionRefreshFromUrl != nil")
-		return try! moc.fetch(f)
-	}
-
-	class func active(in moc: NSManagedObjectContext, visibleOnly: Bool) -> [PullRequest] {
-		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
-		f.returnsObjectsAsFaults = false
-		f.includesSubentities = false
-		if visibleOnly {
-			f.predicate = NSCompoundPredicate(type: .or, subpredicates: [Section.mine.matchingPredicate, Section.participated.matchingPredicate, Section.all.matchingPredicate])
-		} else {
-			f.predicate = ItemCondition.open.matchingPredicate
-		}
 		return try! moc.fetch(f)
 	}
 
