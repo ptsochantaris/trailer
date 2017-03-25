@@ -597,6 +597,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		Settings.notifyOnItemReactions = sender.integerValue == 1
 		API.refreshesSinceLastReactionsCheck.removeAll()
 		updateReactionItemOptions()
+		DataManager.postProcessAllItems()
+		deferredUpdateTimer.push()
 	}
 
 	@IBAction func notifyOnCommentReactionsSelected(_ sender: NSButton) {
@@ -608,6 +610,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		Settings.notifyOnCommentReactions = sender.integerValue == 1
 		API.refreshesSinceLastReactionsCheck.removeAll()
 		updateReactionItemOptions()
+		DataManager.postProcessAllItems()
+		deferredUpdateTimer.push()
 	}
 
 	@IBAction func newMentionMovePolicySelected(_ sender: NSPopUpButton) {

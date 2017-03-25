@@ -332,14 +332,14 @@ final class API {
 				let oid = item.objectID
 				let refreshes = refreshesSinceLastReactionsCheck[oid]
 				if refreshes == nil || refreshes! >= Settings.reactionScanningInterval {
-					DLog("Will check reactions for item: '%@'", item.title)
+					//DLog("Will check reactions for item: '%@'", item.title)
 					for s in item.reactions {
 						s.postSyncAction = PostSyncAction.delete.rawValue
 					}
 					item.updatedAt = .distantPast
 					item.postSyncAction = PostSyncAction.isUpdated.rawValue
 				} else {
-					DLog("No need to get reactions for item: '%@' (%@ refreshes since last check)", item.title, refreshes)
+					//DLog("No need to get reactions for item: '%@' (%@ refreshes since last check)", item.title, refreshes)
 					refreshesSinceLastReactionsCheck[oid] = (refreshes ?? 0) + 1
 				}
 			}
@@ -517,13 +517,13 @@ final class API {
 			try! cacheMoc.save()
 		}
 
-		for r in DataItem.items(of: PullRequest.self, surviving: true, in: moc, prefetchRelationships: ["comments"]) {
+		for r in DataItem.items(of: PullRequest.self, surviving: true, in: moc, prefetchRelationships: ["comments", "reactions"]) {
 			mainQueue.addOperation {
 				r.postProcess()
 			}
 		}
 
-		for i in DataItem.items(of: Issue.self, surviving: true, in: moc, prefetchRelationships: ["comments"]) {
+		for i in DataItem.items(of: Issue.self, surviving: true, in: moc, prefetchRelationships: ["comments", "reactions"]) {
 			mainQueue.addOperation {
 				i.postProcess()
 			}
@@ -792,8 +792,7 @@ final class API {
 		}
 	}
 
-	private class func fetchIssueReactionsIfNeeded(to moc: NSManagedObjectContext, callback: @escaping Completion) {
-		let items = Issue.issuesThatNeedReactionsToBeRefreshed(in: moc).filter { $0.apiServer.lastSyncSucceeded }
+	private class func _fetchItemReactionsIfNeeded(to moc: NSManagedObjectContext, items: [ListableItem], callback: @escaping Completion) {
 		let totalOperations = items.count
 		guard totalOperations > 0 else { callback(); return }
 
@@ -822,34 +821,14 @@ final class API {
 		}
 	}
 
+	private class func fetchIssueReactionsIfNeeded(to moc: NSManagedObjectContext, callback: @escaping Completion) {
+		let items = Issue.issuesThatNeedReactionsToBeRefreshed(in: moc).filter { $0.apiServer.lastSyncSucceeded }
+		_fetchItemReactionsIfNeeded(to: moc, items: items, callback: callback)
+	}
+
 	private class func fetchPullRequestReactionsIfNeeded(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 		let items = PullRequest.pullRequestsThatNeedReactionsToBeRefreshed(in: moc).filter { $0.apiServer.lastSyncSucceeded }
-		let totalOperations = items.count
-		guard totalOperations > 0 else { callback(); return }
-
-		var completionCount = 0
-		for p in items {
-
-			for r in p.reactions {
-				r.postSyncAction = PostSyncAction.delete.rawValue
-			}
-
-			let apiServer = p.apiServer
-			getPagedData(at: p.requiresReactionRefreshFromUrl!, from: apiServer, perPageCallback: { data, lastPage in
-				Reaction.syncReactions(from: data, parent: p)
-				return false
-			}) { success, resultCode in
-				if success {
-					p.requiresReactionRefreshFromUrl = nil
-				} else {
-					apiServer.lastSyncSucceeded = false
-				}
-				completionCount += 1
-				if completionCount == totalOperations {
-					callback()
-				}
-			}
-		}
+		_fetchItemReactionsIfNeeded(to: moc, items: items, callback: callback)
 	}
 
 	private class func fetchCommentsForCurrentPullRequests(to moc: NSManagedObjectContext, callback: @escaping Completion) {
