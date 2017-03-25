@@ -244,37 +244,47 @@ final class DataManager {
 		return c
 	}
 
-	class func info(for type: NotificationType, item: DataItem) -> [String : Any] {
-		switch type {
-		case .newMention, .newComment:
+	class func info(for item: DataItem) -> [String : Any] {
+
+		if let item = item as? PRComment {
 			let uri = item.objectID.uriRepresentation().absoluteString
-			let parent = (item as! PRComment).parent
-			let parentUri = parent?.objectID.uriRepresentation().absoluteString ?? ""
+			let parentUri = item.parent?.objectID.uriRepresentation().absoluteString ?? ""
 			return [COMMENT_ID_KEY: uri, LISTABLE_URI_KEY: parentUri]
-		case .newPr, .prReopened, .newPrAssigned, .prClosed, .prMerged, .newIssue, .issueReopened, .newIssueAssigned, .issueClosed, .changesRequested, .changesApproved, .assignedForReview, .changesDismissed:
+
+		} else if let item = item as? ListableItem {
 			let uri = item.objectID.uriRepresentation().absoluteString
-			return [NOTIFICATION_URL_KEY: (item as! ListableItem).webUrl!, LISTABLE_URI_KEY: uri]
-		case .newRepoSubscribed, .newRepoAnnouncement:
-			return [NOTIFICATION_URL_KEY: (item as! Repo).webUrl!]
-		case .newStatus:
-			let pr = (item as! PRStatus).pullRequest
+			return [NOTIFICATION_URL_KEY: item.webUrl!, LISTABLE_URI_KEY: uri]
+
+		} else if let item = item as? Review {
+			let pr = item.pullRequest
 			let uri = pr.objectID.uriRepresentation().absoluteString
 			return [NOTIFICATION_URL_KEY: pr.webUrl!, LISTABLE_URI_KEY: uri]
-		case .newReaction:
-			let reaction = item as! Reaction
-			if let issue = reaction.issue {
+
+		} else if let item = item as? Repo {
+			return [NOTIFICATION_URL_KEY: item.webUrl!]
+
+		} else if let item = item as? PRStatus {
+			let pr = item.pullRequest
+			let uri = pr.objectID.uriRepresentation().absoluteString
+			return [NOTIFICATION_URL_KEY: pr.webUrl!, LISTABLE_URI_KEY: uri]
+
+		} else if let item = item as? Reaction {
+			if let issue = item.issue {
 				let uri = issue.objectID.uriRepresentation().absoluteString
 				return [NOTIFICATION_URL_KEY: issue.webUrl!, LISTABLE_URI_KEY: uri]
-			} else if let pr = reaction.pullRequest {
+			} else if let pr = item.pullRequest {
 				let uri = pr.objectID.uriRepresentation().absoluteString
 				return [NOTIFICATION_URL_KEY: pr.webUrl!, LISTABLE_URI_KEY: uri]
-			} else if let comment = reaction.comment {
+			} else if let comment = item.comment {
 				let uri = comment.objectID.uriRepresentation().absoluteString
 				let parentUri = comment.parent?.objectID.uriRepresentation().absoluteString ?? ""
 				return [COMMENT_ID_KEY: uri, LISTABLE_URI_KEY: parentUri]
 			} else {
 				abort()
 			}
+
+		} else {
+			abort()
 		}
 	}
 
@@ -287,7 +297,7 @@ final class DataManager {
 
 	class func postProcessAllItems() {
 
-		for p in DataItem.allItems(of: PullRequest.self, in: main, prefetchRelationships: ["comments", "reactions"]) {
+		for p in DataItem.allItems(of: PullRequest.self, in: main, prefetchRelationships: ["comments", "reactions", "reviews"]) {
 			p.postProcess()
 		}
 		for i in DataItem.allItems(of: Issue.self, in: main, prefetchRelationships: ["comments", "reactions"]) {

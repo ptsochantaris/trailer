@@ -433,7 +433,18 @@ class ListableItem: DataItem {
 			return
 		}
 
-		totalComments = Int64(comments.count) + (Settings.notifyOnItemReactions ? Int64(reactions.count) : 0) + (Settings.notifyOnCommentReactions ? countCommentReactions : 0)
+		let reviewCount: Int64
+		if let p = self as? PullRequest, API.shouldSyncReviews || API.shouldSyncReviewAssignments {
+			reviewCount = Int64(p.reviews.count)
+		} else {
+			reviewCount = 0
+		}
+
+		totalComments = Int64(comments.count)
+			+ (Settings.notifyOnItemReactions ? Int64(reactions.count) : 0)
+			+ (Settings.notifyOnCommentReactions ? countCommentReactions : 0)
+			+ reviewCount
+
 		sectionIndex = targetSection.rawValue
 		if title==nil { title = "(No title)" }
 

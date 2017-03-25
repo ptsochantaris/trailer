@@ -517,7 +517,7 @@ final class API {
 			try! cacheMoc.save()
 		}
 
-		for r in DataItem.items(of: PullRequest.self, surviving: true, in: moc, prefetchRelationships: ["comments", "reactions"]) {
+		for r in DataItem.items(of: PullRequest.self, surviving: true, in: moc, prefetchRelationships: ["comments", "reactions", "reviews"]) {
 			mainQueue.addOperation {
 				r.postProcess()
 			}

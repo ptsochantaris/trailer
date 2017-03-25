@@ -23,15 +23,15 @@ final class Review: DataItem {
 						switch n {
 						case "CHANGES_REQUESTED":
 							if Settings.notifyOnAllReviewChangeRequests || (Settings.notifyOnReviewChangeRequests && withParent.createdByMe) {
-								NotificationQueue.add(type: .changesRequested, for: withParent)
+								NotificationQueue.add(type: .changesRequested, for: item)
 							}
 						case "APPROVED":
 							if Settings.notifyOnAllReviewAcceptances || (Settings.notifyOnReviewAcceptances && withParent.createdByMe) {
-								NotificationQueue.add(type: .changesApproved, for: withParent)
+								NotificationQueue.add(type: .changesApproved, for: item)
 							}
 						case "DISMISSED":
 							if Settings.notifyOnAllReviewDismissals || (Settings.notifyOnReviewDismissals && withParent.createdByMe) {
-								NotificationQueue.add(type: .changesDismissed, for: withParent)
+								NotificationQueue.add(type: .changesDismissed, for: item)
 							}
 						default: break
 						}

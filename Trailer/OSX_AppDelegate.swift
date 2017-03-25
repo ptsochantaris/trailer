@@ -207,13 +207,13 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		switch type {
 		case .newMention:
 			guard let c = item as? PRComment, let parent = c.parent, !parent.shouldSkipNotifications else { return }
-			notification.title = "@\(S(c.userName)) mentioned you:"
+			notification.title = "@\(S(c.userName)) Mentioned You:"
 			notification.subtitle = c.notificationSubtitle
 			notification.informativeText = c.body
 			addPotentialExtraActions()
 		case .newComment:
 			guard let c = item as? PRComment, let parent = c.parent, !parent.shouldSkipNotifications else { return }
-			notification.title = "@\(S(c.userName)) commented:"
+			notification.title = "@\(S(c.userName)) Commented:"
 			notification.subtitle = c.notificationSubtitle
 			notification.informativeText = c.body
 			addPotentialExtraActions()
@@ -284,26 +284,32 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			notification.informativeText = i.title
 			addPotentialExtraActions()
 		case .changesApproved:
-			guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
-			notification.title = "Review: Changes Approved"
-			notification.subtitle = p.repo.fullName
-			notification.informativeText = p.title
+			guard let r = item as? Review else { return }
+			let p = r.pullRequest
+			if p.shouldSkipNotifications { return }
+			notification.title = "@\(S(r.username)) Approved Changes"
+			notification.subtitle = p.title
+			notification.informativeText = r.body
 			addPotentialExtraActions()
 		case .changesRequested:
-			guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
-			notification.title = "Review: Changes Requested"
-			notification.subtitle = p.repo.fullName
-			notification.informativeText = p.title
+			guard let r = item as? Review else { return }
+			let p = r.pullRequest
+			if p.shouldSkipNotifications { return }
+			notification.title = "@\(S(r.username)) Requests Changes"
+			notification.subtitle = p.title
+			notification.informativeText = r.body
+			addPotentialExtraActions()
+		case .changesDismissed:
+			guard let r = item as? Review else { return }
+			let p = r.pullRequest
+			if p.shouldSkipNotifications { return }
+			notification.title = "@\(S(r.username)) Dismissed A Review"
+			notification.subtitle = p.title
+			notification.informativeText = r.body
 			addPotentialExtraActions()
 		case .assignedForReview:
 			guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
 			notification.title = "PR Assigned For Review"
-			notification.subtitle = p.repo.fullName
-			notification.informativeText = p.title
-			addPotentialExtraActions()
-		case .changesDismissed:
-			guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
-			notification.title = "Review: Changes Dismissed"
 			notification.subtitle = p.repo.fullName
 			notification.informativeText = p.title
 			addPotentialExtraActions()
@@ -330,7 +336,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		let i = S(notification.informativeText)
 		notification.identifier = "\(t) - \(s) - \(i)"
 
-		notification.userInfo = DataManager.info(for: type, item: item)
+		notification.userInfo = DataManager.info(for: item)
 
 		let d = NSUserNotificationCenter.default
 		if let c = item as? PRComment, let url = c.avatarUrl, !Settings.hideAvatars {
