@@ -1377,7 +1377,7 @@ Token</string>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" id="FvT-We-mFk">
                                             <rect key="frame" x="279" y="175" width="319" height="17"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Re-scan all reaction-related items every X refreshes" id="ghh-hQ-3ia">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1386,7 +1386,7 @@ Token</string>
                                         </textField>
                                         <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" misplaced="YES" id="hX6-QR-e19">
                                             <rect key="frame" x="601" y="168" width="19" height="27"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <stepperCell key="cell" continuous="YES" alignment="left" minValue="1" maxValue="1000" doubleValue="1" id="Qpz-oV-bts"/>
                                             <connections>
                                                 <action selector="reactionIntervalCountChanged:" target="vQH-WF-vh2" id="93K-7O-o2v"/>
@@ -1394,7 +1394,7 @@ Token</string>
                                         </stepper>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" id="8Mg-65-BNv">
                                             <rect key="frame" x="217" y="129" width="381" height="44"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" id="IV8-6v-teN">
                                                 <font key="font" metaFont="miniSystem"/>
                                                 <string key="title">Reactions need to be rescanned fully in order be updated.  If you

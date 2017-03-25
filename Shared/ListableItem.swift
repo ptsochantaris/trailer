@@ -171,6 +171,32 @@ class ListableItem: DataItem {
 					latestReadCommentDate = commentCreation
 				}
 			}
+			if Settings.notifyOnCommentReactions {
+				for r in c.reactions {
+					if let reactionCreation = r.createdAt {
+						if let latestRead = latestReadCommentDate {
+							if latestRead < reactionCreation {
+								latestReadCommentDate = reactionCreation
+							}
+						} else {
+							latestReadCommentDate = reactionCreation
+						}
+					}
+				}
+			}
+		}
+		if Settings.notifyOnItemReactions {
+			for r in reactions {
+				if let reactionCreation = r.createdAt {
+					if let latestRead = latestReadCommentDate {
+						if latestRead < reactionCreation {
+							latestReadCommentDate = reactionCreation
+						}
+					} else {
+						latestReadCommentDate = reactionCreation
+					}
+				}
+			}
 		}
 	}
 
@@ -407,12 +433,20 @@ class ListableItem: DataItem {
 			return
 		}
 
-		totalComments = Int64(comments.count)
+		totalComments = Int64(comments.count) + (Settings.notifyOnItemReactions ? Int64(reactions.count) : 0) + (Settings.notifyOnCommentReactions ? countCommentReactions : 0)
 		sectionIndex = targetSection.rawValue
 		if title==nil { title = "(No title)" }
 
 		//let T = D.timeIntervalSinceNow
 		//print("postprocess: \(T * -1000)")
+	}
+
+	private var countCommentReactions: Int64 {
+		var count: Int64 = 0
+		for c in comments {
+			count += c.reactions.count
+		}
+		return count
 	}
 
 	private final func myComments(since: Date) -> [PRComment] {
@@ -428,6 +462,20 @@ class ListableItem: DataItem {
 		for c in comments {
 			if !c.isMine && (c.createdAt ?? .distantPast) > since {
 				count += 1
+			}
+			if Settings.notifyOnCommentReactions {
+				for r in c.reactions {
+					if !r.isMine && (r.createdAt ?? .distantPast) > since {
+						count += 1
+					}
+				}
+			}
+		}
+		if Settings.notifyOnItemReactions {
+			for r in reactions {
+				if !r.isMine && (r.createdAt ?? .distantPast) > since {
+					count += 1
+				}
 			}
 		}
 		return count
