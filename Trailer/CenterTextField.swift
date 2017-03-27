@@ -16,10 +16,6 @@ class CenterTextField: NSTextField {
 	    fatalError("init(coder:) has not been implemented")
 	}
 
-	override class func initialize() {
-		setCellClass(CenterTextFieldCell.self)
-	}
-
     override var allowsVibrancy: Bool {
 		return vibrant
 	}

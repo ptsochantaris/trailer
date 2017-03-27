@@ -1584,14 +1584,14 @@ final class API {
 			} else if code == 0 {
 				error = apiError("Server did not repond")
 				parsedData = nil
-				shouldRetry = (e as? NSError)?.code == -1001 // retry if it was a timeout
+				shouldRetry = (e as NSError?)?.code == -1001 // retry if it was a timeout
 			} else if Int64(data?.count ?? 0) < (response?.expectedContentLength ?? 0) {
 				error = apiError("Server data was truncated")
 				parsedData = nil
 				shouldRetry = true // transfer truncation, try again
 			} else {
 				DLog("(%@) GET %@ - RESULT: %@", apiServerLabel, expandedPath, code)
-				error = e as? NSError
+				error = e as NSError?
 				shouldRetry = false
 				if let d = data {
 					parsedData = try? JSONSerialization.jsonObject(with: d, options: [])

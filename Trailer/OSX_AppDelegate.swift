@@ -64,6 +64,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	func applicationWillFinishLaunching(_ notification: Notification) {
 		app = self
 		bootUp()
+		NSTextField.setCellClass(CenterTextFieldCell.self)
 	}
 
 	func applicationDidFinishLaunching(_ notification: Notification) {

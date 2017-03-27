@@ -455,7 +455,7 @@ class ListableItem: DataItem {
 	private var countCommentReactions: Int64 {
 		var count: Int64 = 0
 		for c in comments {
-			count += c.reactions.count
+			count += Int64(c.reactions.count)
 		}
 		return count
 	}
