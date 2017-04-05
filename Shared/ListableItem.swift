@@ -587,7 +587,7 @@ class ListableItem: DataItem {
 				}
 			}
 
-			if Settings.displayReviewChangeRequests, let p = self as? PullRequest, !S(p.reviewers).isEmpty {
+			if Settings.displayReviewChangeRequests, let p = self as? PullRequest {
 
 				var latestReviewByUser = [String:Review]()
 				for r in p.reviews.filter({ $0.shouldDisplay }) {
@@ -601,74 +601,77 @@ class ListableItem: DataItem {
 					}
 				}
 
-				let reviews = latestReviewByUser.values.sorted { ($0.createdAt ?? .distantPast) < ($1.createdAt ?? .distantPast) }
+				if latestReviewByUser.count > 0 || !p.reviewers.isEmpty {
 
-				let lp = NSMutableParagraphStyle()
-				#if os(iOS)
-					lp.lineHeightMultiple = 1.15
-				#else
-					lp.minimumLineHeight = labelFont.pointSize + 5
-				#endif
+					let reviews = latestReviewByUser.values.sorted { ($0.createdAt ?? .distantPast) < ($1.createdAt ?? .distantPast) }
 
-				let approvers = reviews.filter { $0.state == "APPROVED" }
-				if approvers.count > 0 {
+					let lp = NSMutableParagraphStyle()
+					#if os(iOS)
+						lp.lineHeightMultiple = 1.15
+					#else
+						lp.minimumLineHeight = labelFont.pointSize + 5
+					#endif
 
-					let a = [NSFontAttributeName: labelFont,
-							 NSForegroundColorAttributeName: COLOR_CLASS(red: 0, green: 0.5, blue: 0, alpha: 1.0),
-							 NSParagraphStyleAttributeName: lp] as [String : Any]
+					let approvers = reviews.filter { $0.state == "APPROVED" }
+					if approvers.count > 0 {
 
-					_title.append(NSAttributedString(string: "\n", attributes: a))
+						let a = [NSFontAttributeName: labelFont,
+								 NSForegroundColorAttributeName: COLOR_CLASS(red: 0, green: 0.5, blue: 0, alpha: 1.0),
+								 NSParagraphStyleAttributeName: lp] as [String : Any]
 
-					var count = 0
-					for r in approvers {
-						let name = r.username!.replacingOccurrences(of: " ", with: "\u{a0}")
-						_title.append(NSAttributedString(string: "@\(name) ", attributes: a))
-						if count == approvers.count - 1 {
-							_title.append(NSAttributedString(string: "approved changes", attributes: a))
+						_title.append(NSAttributedString(string: "\n", attributes: a))
+
+						var count = 0
+						for r in approvers {
+							let name = r.username!.replacingOccurrences(of: " ", with: "\u{a0}")
+							_title.append(NSAttributedString(string: "@\(name) ", attributes: a))
+							if count == approvers.count - 1 {
+								_title.append(NSAttributedString(string: "approved changes", attributes: a))
+							}
+							count += 1
 						}
-						count += 1
 					}
-				}
 
-				let requesters = reviews.filter { $0.state == "CHANGES_REQUESTED" }
-				if requesters.count > 0 {
+					let requesters = reviews.filter { $0.state == "CHANGES_REQUESTED" }
+					if requesters.count > 0 {
 
-					let a = [NSFontAttributeName: labelFont,
-							 NSForegroundColorAttributeName: COLOR_CLASS(red: 0.7, green: 0, blue: 0, alpha: 1.0),
-							 NSParagraphStyleAttributeName: lp] as [String : Any]
+						let a = [NSFontAttributeName: labelFont,
+								 NSForegroundColorAttributeName: COLOR_CLASS(red: 0.7, green: 0, blue: 0, alpha: 1.0),
+								 NSParagraphStyleAttributeName: lp] as [String : Any]
 
-					_title.append(NSAttributedString(string: "\n", attributes: a))
+						_title.append(NSAttributedString(string: "\n", attributes: a))
 
-					var count = 0
-					for r in requesters {
-						let name = r.username!.replacingOccurrences(of: " ", with: "\u{a0}")
-						_title.append(NSAttributedString(string: "@\(name) ", attributes: a))
-						if count == requesters.count - 1 {
-							_title.append(NSAttributedString(string: requesters.count > 1 ? "request changes" : "requests changes", attributes: a))
+						var count = 0
+						for r in requesters {
+							let name = r.username!.replacingOccurrences(of: " ", with: "\u{a0}")
+							_title.append(NSAttributedString(string: "@\(name) ", attributes: a))
+							if count == requesters.count - 1 {
+								_title.append(NSAttributedString(string: requesters.count > 1 ? "request changes" : "requests changes", attributes: a))
+							}
+							count += 1
 						}
-						count += 1
 					}
-				}
 
-				let approverNames = approvers.flatMap { $0.username }
-				let requesterNames = requesters.flatMap { $0.username }
-				let otherReviewers = p.reviewers.components(separatedBy: ",").filter({ !($0.isEmpty || approverNames.contains($0) || requesterNames.contains($0)) })
-				if otherReviewers.count > 0 {
+					let approverNames = approvers.flatMap { $0.username }
+					let requesterNames = requesters.flatMap { $0.username }
+					let otherReviewers = p.reviewers.components(separatedBy: ",").filter({ !($0.isEmpty || approverNames.contains($0) || requesterNames.contains($0)) })
+					if otherReviewers.count > 0 {
 
-					let a = [NSFontAttributeName: labelFont,
-							 NSForegroundColorAttributeName: COLOR_CLASS(red: 0.7, green: 0.7, blue: 0, alpha: 1.0),
-							 NSParagraphStyleAttributeName: lp] as [String : Any]
+						let a = [NSFontAttributeName: labelFont,
+								 NSForegroundColorAttributeName: COLOR_CLASS(red: 0.7, green: 0.7, blue: 0, alpha: 1.0),
+								 NSParagraphStyleAttributeName: lp] as [String : Any]
 
-					_title.append(NSAttributedString(string: "\n", attributes: a))
+						_title.append(NSAttributedString(string: "\n", attributes: a))
 
-					var count = 0
-					for r in otherReviewers {
-						let name = r.replacingOccurrences(of: " ", with: "\u{a0}")
-						_title.append(NSAttributedString(string: "@\(name) ", attributes: a))
-						if count == otherReviewers.count - 1 {
-							_title.append(NSAttributedString(string: otherReviewers.count > 1 ? "haven't reviewed yet" : "hasn't reviewed yet", attributes: a))
+						var count = 0
+						for r in otherReviewers {
+							let name = r.replacingOccurrences(of: " ", with: "\u{a0}")
+							_title.append(NSAttributedString(string: "@\(name) ", attributes: a))
+							if count == otherReviewers.count - 1 {
+								_title.append(NSAttributedString(string: otherReviewers.count > 1 ? "haven't reviewed yet" : "hasn't reviewed yet", attributes: a))
+							}
+							count += 1
 						}
-						count += 1
 					}
 				}
 			}
