@@ -612,7 +612,7 @@ class ListableItem: DataItem {
 						lp.minimumLineHeight = labelFont.pointSize + 5
 					#endif
 
-					let approvers = reviews.filter { $0.state == "APPROVED" }
+					let approvers = reviews.filter { $0.state == Review.State.APPROVED.rawValue }
 					if approvers.count > 0 {
 
 						let a = [NSFontAttributeName: labelFont,
@@ -632,7 +632,7 @@ class ListableItem: DataItem {
 						}
 					}
 
-					let requesters = reviews.filter { $0.state == "CHANGES_REQUESTED" }
+					let requesters = reviews.filter { $0.state == Review.State.CHANGES_REQUESTED.rawValue }
 					if requesters.count > 0 {
 
 						let a = [NSFontAttributeName: labelFont,

@@ -291,6 +291,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			notification.title = "@\(S(r.username)) Approved Changes"
 			notification.subtitle = p.title
 			notification.informativeText = r.body
+			notification.contentImage = #imageLiteral(resourceName: "approvesChangesIcon")
 			addPotentialExtraActions()
 		case .changesRequested:
 			guard let r = item as? Review else { return }
@@ -299,6 +300,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			notification.title = "@\(S(r.username)) Requests Changes"
 			notification.subtitle = p.title
 			notification.informativeText = r.body
+			notification.contentImage = #imageLiteral(resourceName: "requestsChangesIcon")
 			addPotentialExtraActions()
 		case .changesDismissed:
 			guard let r = item as? Review else { return }
@@ -339,14 +341,13 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 		notification.userInfo = DataManager.info(for: item)
 
-		let d = NSUserNotificationCenter.default
 		if let c = item as? PRComment, let url = c.avatarUrl, !Settings.hideAvatars {
 			API.haveCachedAvatar(from: url) { image, _ in
 				notification.contentImage = image
-				d.deliver(notification)
+				NSUserNotificationCenter.default.deliver(notification)
 			}
 		} else {
-			d.deliver(notification)
+			NSUserNotificationCenter.default.deliver(notification)
 		}
 	}
 

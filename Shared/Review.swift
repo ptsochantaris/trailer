@@ -10,35 +10,43 @@ final class Review: DataItem {
 	@NSManaged var pullRequest: PullRequest
 	@NSManaged var comments: Set<PRComment>
 
+	enum State: String {
+		case CHANGES_REQUESTED
+		case APPROVED
+		case DISMISSED
+	}
+
 	class func syncReviews(from data: [[AnyHashable : Any]]?, withParent: PullRequest) {
 
 		items(with: data, type: Review.self, server: withParent.apiServer) { item, info, isNewOrUpdated in
 			if isNewOrUpdated {
 				item.pullRequest = withParent
 				item.body = info["body"] as? String
+				item.username = (info["user"] as? [AnyHashable : Any])?["login"] as? String
+
 				let previousState = item.state
 				let newState = info["state"] as? String
 				if previousState != newState {
-					if let n = newState {
+
+					item.state = newState
+
+					if !item.isMine, let ns = newState, let n = State(rawValue: ns) {
 						switch n {
-						case "CHANGES_REQUESTED":
+						case .CHANGES_REQUESTED:
 							if Settings.notifyOnAllReviewChangeRequests || (Settings.notifyOnReviewChangeRequests && withParent.createdByMe) {
 								NotificationQueue.add(type: .changesRequested, for: item)
 							}
-						case "APPROVED":
+						case .APPROVED:
 							if Settings.notifyOnAllReviewAcceptances || (Settings.notifyOnReviewAcceptances && withParent.createdByMe) {
 								NotificationQueue.add(type: .changesApproved, for: item)
 							}
-						case "DISMISSED":
+						case .DISMISSED:
 							if Settings.notifyOnAllReviewDismissals || (Settings.notifyOnReviewDismissals && withParent.createdByMe) {
 								NotificationQueue.add(type: .changesDismissed, for: item)
 							}
-						default: break
 						}
 					}
 				}
-				item.state = newState
-				item.username = (info["user"] as? [AnyHashable : Any])?["login"] as? String
 			}
 		}
 	}
@@ -51,8 +59,12 @@ final class Review: DataItem {
 		return try! moc.fetch(f).first
 	}
 
+	private var isMine: Bool {
+		return username == apiServer.userName
+	}
+
 	var shouldDisplay: Bool {
-		return state == "CHANGES_REQUESTED" || state == "APPROVED"
+		return state == State.CHANGES_REQUESTED.rawValue || state == State.APPROVED.rawValue
 	}
 }
 
