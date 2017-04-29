@@ -75,7 +75,9 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 	}
 
 	private func checkRefreshDone() {
-		if !appIsRefreshing {
+		if appIsRefreshing {
+			feedback.text = "\nSyncing GitHub data for the first time. This could take a little while, please wait...\n\n(\(API.pendingCallCount) calls remaining)"
+		} else {
 			checkTimer = nil
 			if newServer.lastSyncSucceeded {
 				dismiss(animated: true) {

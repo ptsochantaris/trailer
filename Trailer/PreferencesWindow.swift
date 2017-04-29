@@ -650,17 +650,14 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	@IBAction func showLabelsSelected(_ sender: NSButton) {
+		let wasOff = Settings.showLabels
 		Settings.showLabels = sender.integerValue == 1
-		if Settings.showLabels {
-			for p in DataItem.allItems(of: PullRequest.self, in: DataManager.main) {
-				p.resetSyncState()
-			}
+		if wasOff && Settings.showLabels {
+			ApiServer.resetSyncOfEverything()
 			preferencesDirty = true
-
 			showLongSyncWarning()
-		} else {
-			deferredUpdateTimer.push()
 		}
+		deferredUpdateTimer.push()
 	}
 
 	@IBAction func logActivityToConsoleSelected(_ sender: NSButton) {

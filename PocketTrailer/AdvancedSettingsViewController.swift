@@ -4,8 +4,8 @@ import UIKit
 final class AdvancedSettingsViewController: UITableViewController, PickerViewControllerDelegate, UISearchBarDelegate {
 
 	private enum SettingsSection: Int {
-		case Refresh, Display, Filtering, AppleWatch, Comments, Repos, StausesAndLabels, History, Confirm, Sort, Misc
-		static let allNames = ["Auto Refresh", "Display", "Filtering", "Apple Watch", "Comments", "Watchlist", "Statuses & Labels", "History", "Don't confirm when", "Sorting", "Misc"]
+		case Refresh, Display, Filtering, AppleWatch, Comments, Repos, Stauses, History, Confirm, Sort, Misc
+		static let allNames = ["Auto Refresh", "Display", "Filtering", "Apple Watch", "Comments", "Watchlist", "Statuses", "History", "Don't confirm when", "Sorting", "Misc"]
 		var title: String { return SettingsSection.allNames[rawValue] }
 	}
 
@@ -38,6 +38,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		        description: Settings.newRepoCheckPeriodHelp,
 		        valueDisplayed: { String(format: "%.0f hours", Settings.newRepoCheckPeriod) }),
 
+		Setting(section: .Display,
+		        title: "Show item labels",
+		        description: Settings.showLabelsHelp,
+		        valueDisplayed: { Settings.showLabels ? "✓" : " " }),
 		Setting(section: .Display,
 		        title: "Display item creation times instead of update times",
 		        description: Settings.showCreatedInsteadOfUpdatedHelp,
@@ -163,35 +167,27 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		        description: Settings.displayPolicyForNewIssuesHelp,
 		        valueDisplayed: { RepoDisplayPolicy(Settings.displayPolicyForNewIssues)?.name }),
 
-		Setting(section: .StausesAndLabels,
+		Setting(section: .Stauses,
 		        title: "Show statuses",
 		        description: Settings.showStatusItemsHelp,
 		        valueDisplayed: { Settings.showStatusItems ? "✓" : " " }),
-		Setting(section: .StausesAndLabels,
+		Setting(section: .Stauses,
 		        title: "Re-query statuses",
 		        description: Settings.statusItemRefreshIntervalHelp,
 		        valueDisplayed: { Settings.statusItemRefreshInterval == 1 ? "Every refresh" : "Every \(Settings.statusItemRefreshInterval) refreshes" }),
-		Setting(section: .StausesAndLabels,
-		        title: "Show labels",
-		        description: Settings.showLabelsHelp,
-		        valueDisplayed: { Settings.showLabels ? "✓" : " " }),
-		Setting(section: .StausesAndLabels,
-		        title: "Re-query labels",
-		        description: Settings.labelRefreshIntervalHelp,
-		        valueDisplayed: { Settings.labelRefreshInterval == 1 ? "Every refresh" : "Every \(Settings.labelRefreshInterval) refreshes" }),
-		Setting(section: .StausesAndLabels,
+		Setting(section: .Stauses,
 		        title: "Notify status changes for my & participated PRs",
 		        description: Settings.notifyOnStatusUpdatesHelp,
 		        valueDisplayed: { Settings.notifyOnStatusUpdates ? "✓" : " " }),
-		Setting(section: .StausesAndLabels,
+		Setting(section: .Stauses,
 		        title: "...in the 'All' section too",
 		        description: Settings.notifyOnStatusUpdatesForAllPrsHelp,
 		        valueDisplayed: { Settings.notifyOnStatusUpdatesForAllPrs ? "✓" : " " }),
-		Setting(section: .StausesAndLabels,
+		Setting(section: .Stauses,
 		        title: "Hide PRs whose status items are not all green",
 		        description: Settings.hidePrsThatArentPassingHelp,
 		        valueDisplayed: { Settings.hidePrsThatArentPassing ? "✓" : " " }),
-		Setting(section: .StausesAndLabels,
+		Setting(section: .Stauses,
 		        title: "...only in the 'All' section",
 		        description: Settings.hidePrsThatDontPassOnlyInAllHelp,
 		        valueDisplayed: { Settings.hidePrsThatDontPassOnlyInAll ? "✓" : " " }),
@@ -413,6 +409,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		}
 	}
 
+	private func showLongSyncWarning() {
+		showMessage("The next sync may take a while, because everything will need to be fully re-synced. This will be needed only once: Subsequent syncs will be fast again.", nil)
+	}
+
 	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 
 		let setting = filteredItemsForTableSection(section: indexPath.section)[indexPath.row]
@@ -464,26 +464,35 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		} else if section == SettingsSection.Display {
 			switch originalIndex {
 			case 0:
-				Settings.showCreatedInsteadOfUpdated = !Settings.showCreatedInsteadOfUpdated
+				let wasOff = !Settings.showLabels
+				Settings.showLabels = !Settings.showLabels
+				if wasOff && Settings.showLabels {
+					ApiServer.resetSyncOfEverything()
+					preferencesDirty = true
+					showLongSyncWarning()
+				}
 				settingsChangedTimer.push()
 			case 1:
+				Settings.showCreatedInsteadOfUpdated = !Settings.showCreatedInsteadOfUpdated
+				settingsChangedTimer.push()
+			case 2:
 				pickerName = setting.title
 				selectedIndexPath = indexPath
 				valuesToPush = AssignmentPolicy.labels
 				previousValue = Settings.assignedPrHandlingPolicy
 				performSegue(withIdentifier: "showPicker", sender: self)
-			case 2:
+			case 3:
 				Settings.markUnmergeableOnUserSectionsOnly = !Settings.markUnmergeableOnUserSectionsOnly
 				settingsChangedTimer.push()
-			case 3:
+			case 4:
 				Settings.showReposInName = !Settings.showReposInName
 				settingsChangedTimer.push()
-			case 4:
-				Settings.openItemsDirectlyInSafari = !Settings.openItemsDirectlyInSafari
 			case 5:
+				Settings.openItemsDirectlyInSafari = !Settings.openItemsDirectlyInSafari
+			case 6:
 				Settings.showSeparateApiServersInMenu = !Settings.showSeparateApiServersInMenu
 				settingsChangedTimer.push()
-			case 6:
+			case 7:
 				Settings.alwaysRequestDesktopSite = !Settings.alwaysRequestDesktopSite
 			default: break
 			}
@@ -560,7 +569,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			default: break
 			}
 			performSegue(withIdentifier: "showPicker", sender: self)
-		} else if section == SettingsSection.StausesAndLabels {
+		} else if section == SettingsSection.Stauses {
 			switch originalIndex {
 			case 0:
 				Settings.showStatusItems = !Settings.showStatusItems
@@ -585,35 +594,13 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				valuesToPush = values
 				performSegue(withIdentifier: "showPicker", sender: self)
 			case 2:
-				Settings.showLabels = !Settings.showLabels
-				API.refreshesSinceLastLabelsCheck.removeAll()
-				if Settings.showLabels {
-					ApiServer.resetSyncOfEverything()
-				}
-				settingsChangedTimer.push()
-				preferencesDirty = true
-			case 3:
-				selectedIndexPath = indexPath
-				pickerName = setting.title
-				var values = [String]()
-				var count = 1
-				values.append("Every refresh")
-				previousValue = 0
-				for f in 2..<100 {
-					if f == Settings.labelRefreshInterval { previousValue = count }
-					values.append("Every \(f) refreshes")
-					count += 1
-				}
-				valuesToPush = values
-				performSegue(withIdentifier: "showPicker", sender: self)
-			case 4:
 				Settings.notifyOnStatusUpdates = !Settings.notifyOnStatusUpdates
-			case 5:
+			case 3:
 				Settings.notifyOnStatusUpdatesForAllPrs = !Settings.notifyOnStatusUpdatesForAllPrs
-			case 6:
+			case 4:
 				Settings.hidePrsThatArentPassing = !Settings.hidePrsThatArentPassing
 				settingsChangedTimer.push()
-			case 7:
+			case 5:
 				Settings.hidePrsThatDontPassOnlyInAll = !Settings.hidePrsThatDontPassOnlyInAll
 				settingsChangedTimer.push()
 			default: break
@@ -768,11 +755,9 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				} else if sip.row == 1 {
 					Settings.closeHandlingPolicy = Int(didSelectIndexPath.row)
 				}
-			} else if sip.section == SettingsSection.StausesAndLabels.rawValue {
+			} else if sip.section == SettingsSection.Stauses.rawValue {
 				if sip.row == 1 {
 					Settings.statusItemRefreshInterval = Int(didSelectIndexPath.row+1)
-				} else  if sip.row == 3 {
-					Settings.labelRefreshInterval = Int(didSelectIndexPath.row+1)
 				}
 			} else if sip.section == SettingsSection.Comments.rawValue {
 				if sip.row == 2 {

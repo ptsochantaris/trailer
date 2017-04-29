@@ -158,9 +158,13 @@ final class API {
 
 	/////////////////////////////////////////////////////// Utilities
 
+	class var pendingCallCount: Int {
+		return apiQueue.operationCount
+	}
+
 	class var lastUpdateDescription: String {
 		if appIsRefreshing {
-			let operations = apiQueue.operationCount
+			let operations = pendingCallCount
 			if operations < 2 {
 				return "Refreshing..."
 			} else {

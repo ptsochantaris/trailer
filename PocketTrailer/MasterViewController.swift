@@ -217,6 +217,12 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
 		updateStatus()
+
+		if let s = splitViewController, !s.isCollapsed {
+			return
+		} else if let i = tableView.indexPathForSelectedRow {
+			tableView.deselectRow(at: i, animated: true)
+		}
 	}
 
 	override func viewDidLoad() {

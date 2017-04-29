@@ -212,78 +212,92 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			notification.subtitle = c.notificationSubtitle
 			notification.informativeText = c.body
 			addPotentialExtraActions()
+			
 		case .newComment:
 			guard let c = item as? PRComment, let parent = c.parent, !parent.shouldSkipNotifications else { return }
 			notification.title = "@\(S(c.userName)) Commented:"
 			notification.subtitle = c.notificationSubtitle
 			notification.informativeText = c.body
 			addPotentialExtraActions()
+
 		case .newPr:
 			guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
 			notification.title = "New PR"
 			notification.subtitle = p.repo.fullName
 			notification.informativeText = p.title
 			addPotentialExtraActions()
+
 		case .prReopened:
 			guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
 			notification.title = "Re-Opened PR"
 			notification.subtitle = p.repo.fullName
 			notification.informativeText = p.title
 			addPotentialExtraActions()
+
 		case .prMerged:
 			guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
 			notification.title = "PR Merged!"
 			notification.subtitle = p.repo.fullName
 			notification.informativeText = p.title
 			addPotentialExtraActions()
+
 		case .prClosed:
 			guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
 			notification.title = "PR Closed"
 			notification.subtitle = p.repo.fullName
 			notification.informativeText = p.title
 			addPotentialExtraActions()
+
 		case .newRepoSubscribed:
 			notification.title = "New Repository Subscribed"
 			notification.subtitle = (item as! Repo).fullName
+
 		case .newRepoAnnouncement:
 			notification.title = "New Repository"
 			notification.subtitle = (item as! Repo).fullName
+
 		case .newPrAssigned:
 			guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
 			notification.title = "PR Assigned"
 			notification.subtitle = p.repo.fullName
 			notification.informativeText = p.title
 			addPotentialExtraActions()
+
 		case .newStatus:
-			guard let s = item as? PRStatus, !s.parentShouldSkipNotifications else { return }
+			guard let s = item as? PRStatus, !s.pullRequest.shouldSkipNotifications else { return }
 			notification.title = "PR Status Update"
 			notification.subtitle = s.descriptionText
 			notification.informativeText = s.pullRequest.title
 			addPotentialExtraActions()
+
 		case .newIssue:
 			guard let i = item as? Issue, !i.shouldSkipNotifications else { return }
 			notification.title = "New Issue"
 			notification.subtitle = i.repo.fullName
 			notification.informativeText = i.title
 			addPotentialExtraActions()
+
 		case .issueReopened:
 			guard let i = item as? Issue, !i.shouldSkipNotifications else { return }
 			notification.title = "Re-Opened Issue"
 			notification.subtitle = i.repo.fullName
 			notification.informativeText = i.title
 			addPotentialExtraActions()
+
 		case .issueClosed:
 			guard let i = item as? Issue, !i.shouldSkipNotifications else { return }
 			notification.title = "Issue Closed"
 			notification.subtitle = i.repo.fullName
 			notification.informativeText = i.title
 			addPotentialExtraActions()
+
 		case .newIssueAssigned:
 			guard let i = item as? Issue, !i.shouldSkipNotifications else { return }
 			notification.title = "Issue Assigned"
 			notification.subtitle = i.repo.fullName
 			notification.informativeText = i.title
 			addPotentialExtraActions()
+
 		case .changesApproved:
 			guard let r = item as? Review else { return }
 			let p = r.pullRequest
@@ -293,6 +307,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			notification.informativeText = r.body
 			notification.contentImage = #imageLiteral(resourceName: "approvesChangesIcon")
 			addPotentialExtraActions()
+
 		case .changesRequested:
 			guard let r = item as? Review else { return }
 			let p = r.pullRequest
@@ -302,6 +317,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			notification.informativeText = r.body
 			notification.contentImage = #imageLiteral(resourceName: "requestsChangesIcon")
 			addPotentialExtraActions()
+
 		case .changesDismissed:
 			guard let r = item as? Review else { return }
 			let p = r.pullRequest
@@ -310,12 +326,14 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			notification.subtitle = p.title
 			notification.informativeText = r.body
 			addPotentialExtraActions()
+
 		case .assignedForReview:
 			guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
 			notification.title = "PR Assigned For Review"
 			notification.subtitle = p.repo.fullName
 			notification.informativeText = p.title
 			addPotentialExtraActions()
+
 		case .newReaction:
 			guard let r = item as? Reaction else { return }
 			notification.title = r.displaySymbol

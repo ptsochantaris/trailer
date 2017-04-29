@@ -1,4 +1,5 @@
 import Foundation
+import CoreData
 
 final class PRComment: DataItem {
 
