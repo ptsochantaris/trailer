@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" customObjectInstantitationMethod="direct">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12120" systemVersion="16E195" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" customObjectInstantitationMethod="direct">
     <dependencies>
-        <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12120"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSWindowController">
@@ -25,11 +25,11 @@
                         <rect key="frame" x="0.0" y="-1" width="376" height="680"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="aIr-Gz-XxZ">
-                            <rect key="frame" x="1" y="0.0" width="238" height="134"/>
+                            <rect key="frame" x="0.0" y="0.0" width="376" height="680"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView appearanceType="vibrantLight" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowSizeStyle="automatic" viewBased="YES" floatsGroupRows="NO" id="hNF-nS-iAp" userLabel="Table" customClass="PrTable" customModule="Trailer" customModuleProvider="target">
-                                    <rect key="frame" x="0.0" y="0.0" width="376" height="0.0"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="376" height="680"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="deviceWhite"/>
@@ -50,7 +50,7 @@
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                         </clipView>
                         <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="hfE-XJ-obm">
-                            <rect key="frame" x="1" y="116.55263048410416" width="235" height="16"/>
+                            <rect key="frame" x="1" y="116.5" width="235" height="16"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="4yq-z6-AqJ">
@@ -62,10 +62,10 @@
                         <rect key="frame" x="0.0" y="678" width="376" height="32"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <subviews>
-                            <searchField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" id="hd8-Kf-Vmz">
+                            <searchField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="hd8-Kf-Vmz">
                                 <rect key="frame" x="33" y="5" width="338" height="22"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" focusRingType="none" placeholderString="Filter..." usesSingleLineMode="YES" bezelStyle="round" id="FQ8-VW-FZN">
+                                <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" focusRingType="none" placeholderString="Filter…" usesSingleLineMode="YES" bezelStyle="round" id="FQ8-VW-FZN">
                                     <font key="font" metaFont="cellTitle"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -93,7 +93,7 @@
                                                     <action selector="markAllReadSelected:" target="KHN-KI-GyO" id="KK0-Pl-naY"/>
                                                 </connections>
                                             </menuItem>
-                                            <menuItem title=" Preferences..." keyEquivalent="," id="Ge4-eX-4m1">
+                                            <menuItem title=" Preferences…" keyEquivalent="," id="Ge4-eX-4m1">
                                                 <connections>
                                                     <action selector="preferencesSelected:" target="KHN-KI-GyO" id="8RT-VU-NuQ"/>
                                                 </connections>

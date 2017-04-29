@@ -145,7 +145,7 @@ final class API {
 	}
 
 	class var hasNetworkConnection: Bool {
-		DLog("Actively verifying reported network availability state...")
+		DLog("Actively verifying reported network availability state…")
 		let previousNetworkStatus = currentNetworkStatus
 		checkNetworkAvailability()
 		if previousNetworkStatus != currentNetworkStatus {
@@ -166,9 +166,9 @@ final class API {
 		if appIsRefreshing {
 			let operations = pendingCallCount
 			if operations < 2 {
-				return "Refreshing..."
+				return "Refreshing…"
 			} else {
-				return "Refreshing... (\(operations) calls remaining)"
+				return "Refreshing… (\(operations) calls remaining)"
 			}
 		} else if ApiServer.shouldReportRefreshFailure(in: DataManager.main) {
 			return "Last update failed"
@@ -977,10 +977,10 @@ final class API {
 		return Settings.notifyOnItemReactions || Settings.notifyOnCommentReactions
 	}
 	static var shouldSyncReviews: Bool {
-		return Settings.displayReviewChangeRequests || Settings.notifyOnReviewDismissals || Settings.notifyOnReviewAcceptances || Settings.notifyOnReviewChangeRequests
+		return Settings.displayReviewsOnItems || Settings.notifyOnReviewDismissals || Settings.notifyOnReviewAcceptances || Settings.notifyOnReviewChangeRequests
 	}
 	static var shouldSyncReviewAssignments: Bool {
-		return Settings.displayReviewChangeRequests || Settings.notifyOnReviewAssignments || (Int64(Settings.assignedReviewHandlingPolicy) != Section.none.rawValue)
+		return Settings.displayReviewsOnItems || Settings.notifyOnReviewAssignments || (Int64(Settings.assignedReviewHandlingPolicy) != Section.none.rawValue)
 	}
 
 	private class func fetchReviewAssignmentsForCurrentPullRequests(to moc: NSManagedObjectContext, callback: @escaping Completion) {

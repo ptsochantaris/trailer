@@ -224,7 +224,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 		updateReviewOptions()
 
-		if !previousSync && API.shouldSyncReviews {
+		if !previousSync && (API.shouldSyncReviews || API.shouldSyncReviewAssignments) {
 			for p in DataItem.allItems(of: PullRequest.self, in: DataManager.main) {
 				p.resetSyncState()
 			}
@@ -242,8 +242,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			sender.integerValue = 0
 			return
 		}
-		let previousShouldSync = API.shouldSyncReviews
-		Settings.displayReviewChangeRequests = sender.integerValue == 1
+		let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
+		Settings.displayReviewsOnItems = sender.integerValue == 1
 		showOptionalReviewWarning(previousSync: previousShouldSync)
 	}
 
@@ -253,7 +253,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			sender.integerValue = 0
 			return
 		}
-		let previousShouldSync = API.shouldSyncReviews
+		let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
 		Settings.notifyOnReviewChangeRequests = sender.integerValue == 1
 		showOptionalReviewWarning(previousSync: previousShouldSync)
 	}
@@ -267,7 +267,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			sender.integerValue = 0
 			return
 		}
-		let previousShouldSync = API.shouldSyncReviews
+		let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
 		Settings.notifyOnReviewAcceptances = sender.integerValue == 1
 		showOptionalReviewWarning(previousSync: previousShouldSync)
 	}
@@ -281,7 +281,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			sender.integerValue = 0
 			return
 		}
-		let previousShouldSync = API.shouldSyncReviews
+		let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
 		Settings.notifyOnReviewDismissals = sender.integerValue == 1
 		showOptionalReviewWarning(previousSync: previousShouldSync)
 	}
@@ -291,7 +291,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	private func showOptionalReviewAssignmentWarning(previousSync: Bool) {
 
-		if !previousSync && API.shouldSyncReviewAssignments {
+		if !previousSync && (API.shouldSyncReviews || API.shouldSyncReviewAssignments) {
 			for p in DataItem.allItems(of: PullRequest.self, in: DataManager.main) {
 				p.resetSyncState()
 			}
@@ -309,7 +309,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			sender.integerValue = 0
 			return
 		}
-		let previousShouldSync = API.shouldSyncReviewAssignments
+		let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
 		Settings.notifyOnReviewAssignments = sender.integerValue == 1
 		showOptionalReviewAssignmentWarning(previousSync: previousShouldSync)
 	}
@@ -321,7 +321,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			sender.select(sender.item(at: 0))
 			return
 		}
-		let previousShouldSync = API.shouldSyncReviewAssignments
+		let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
 		Settings.assignedReviewHandlingPolicy = index
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
@@ -425,7 +425,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		notifyOnAllReviewDismissals.toolTip = Settings.notifyOnAllReviewDismissalsHelp
 		notifyOnReviewAssignments.toolTip = Settings.notifyOnReviewAssignmentsHelp
 		assignedReviewHandlingPolicy.toolTip = Settings.assignedReviewHandlingPolicyHelp
-		supportReviews.toolTip = Settings.displayReviewChangeRequestsHelp
+		supportReviews.toolTip = Settings.displayReviewsOnItemsHelp
 		notifyOnItemReactions.toolTip = Settings.notifyOnItemReactionsHelp
 		notifyOnCommentReactions.toolTip = Settings.notifyOnCommentReactionsHelp
 		showLabels.toolTip = Settings.showLabelsHelp
@@ -440,17 +440,17 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		allHidingSetting.removeAllItems()
 
 		if projectsTable.selectedRowIndexes.count > 1 {
-			allPrsSetting.addItem(withTitle: "Set selected PRs...")
-			allIssuesSetting.addItem(withTitle: "Set selected issues...")
-			allHidingSetting.addItem(withTitle: "Set selected hiding...")
+			allPrsSetting.addItem(withTitle: "Set selected PRs…")
+			allIssuesSetting.addItem(withTitle: "Set selected issues…")
+			allHidingSetting.addItem(withTitle: "Set selected hiding…")
 		} else if !repoFilter.stringValue.isEmpty {
-			allPrsSetting.addItem(withTitle: "Set filtered PRs...")
-			allIssuesSetting.addItem(withTitle: "Set filtered issues...")
-			allHidingSetting.addItem(withTitle: "Set filtered hiding...")
+			allPrsSetting.addItem(withTitle: "Set filtered PRs…")
+			allIssuesSetting.addItem(withTitle: "Set filtered issues…")
+			allHidingSetting.addItem(withTitle: "Set filtered hiding…")
 		} else {
-			allPrsSetting.addItem(withTitle: "Set all PRs...")
-			allIssuesSetting.addItem(withTitle: "Set all issues...")
-			allHidingSetting.addItem(withTitle: "Set all hiding...")
+			allPrsSetting.addItem(withTitle: "Set all PRs…")
+			allIssuesSetting.addItem(withTitle: "Set all issues…")
+			allHidingSetting.addItem(withTitle: "Set all hiding…")
 		}
 
 		allPrsSetting.addItems(withTitles: RepoDisplayPolicy.labels)
@@ -520,7 +520,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		notifyOnItemReactions.integerValue = Settings.notifyOnItemReactions ? 1 : 0
 		notifyOnCommentReactions.integerValue = Settings.notifyOnCommentReactions ? 1 : 0
 
-		supportReviews.integerValue = Settings.displayReviewChangeRequests ? 1 : 0
+		supportReviews.integerValue = Settings.displayReviewsOnItems ? 1 : 0
 		notifyOnReviewAssignments.integerValue = Settings.notifyOnReviewAssignments ? 1 : 0
 
 		allNewPrsSetting.selectItem(at: Settings.displayPolicyForNewPrs)
@@ -937,7 +937,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 		let count = Settings.statusItemRefreshInterval
 		statusItemRefreshCounter.integerValue = count
-		statusItemRescanLabel.stringValue = count>1 ? "...and re-scan once every \(count) refreshes" : "...and re-scan on every refresh"
+		statusItemRescanLabel.stringValue = count>1 ? "…and re-scan once every \(count) refreshes" : "…and re-scan on every refresh"
 
 		updateStatusTermPreferenceControls()
 	}
@@ -1090,10 +1090,10 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction func exportCurrentSettingsSelected(_ sender: NSButton) {
 		let s = NSSavePanel()
-		s.title = "Export Current Settings..."
+		s.title = "Export Current Settings…"
 		s.prompt = "Export"
 		s.nameFieldLabel = "Settings File"
-		s.message = "Export Current Settings..."
+		s.message = "Export Current Settings…"
 		s.isExtensionHidden = false
 		s.nameFieldStringValue = "Trailer Settings"
 		s.allowedFileTypes = ["trailerSettings"]
@@ -1107,10 +1107,10 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction func importSettingsSelected(_ sender: NSButton) {
 		let o = NSOpenPanel()
-		o.title = "Import Settings From File..."
+		o.title = "Import Settings From File…"
 		o.prompt = "Import"
 		o.nameFieldLabel = "Settings File"
-		o.message = "Import Settings From File..."
+		o.message = "Import Settings From File…"
 		o.isExtensionHidden = false
 		o.allowedFileTypes = ["trailerSettings"]
 		o.beginSheetModal(for: self) { response in

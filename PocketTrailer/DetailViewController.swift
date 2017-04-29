@@ -23,7 +23,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 
-		title = "Loading..."
+		title = "Loading…"
 
 		let webConfiguration = WKWebViewConfiguration()
 		let w = WKWebView(frame: view.bounds, configuration: webConfiguration)
@@ -101,7 +101,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 		statusLabel.isHidden = true
 		statusLabel.text = nil
 		webView.isHidden = true
-		title = "Loading..."
+		title = "Loading…"
 		navigationItem.rightBarButtonItem = nil
 	}
 

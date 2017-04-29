@@ -70,7 +70,7 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 		if section == 0 {
 			return "You can create presets here that can be used to 'snooze' items for a specific time duration, until a date, or if a specific event occurs."
 		} else if section == 1 {
-			return "Automatically snooze items after a specific amount of time..."
+			return "Automatically snooze items after a specific amount of time…"
 		} else {
 			return "Existing presets:"
 		}

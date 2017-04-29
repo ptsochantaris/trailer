@@ -587,7 +587,7 @@ class ListableItem: DataItem {
 				}
 			}
 
-			if Settings.displayReviewChangeRequests, let p = self as? PullRequest {
+			if Settings.displayReviewsOnItems, let p = self as? PullRequest {
 
 				var latestReviewByUser = [String:Review]()
 				for r in p.reviews.filter({ $0.shouldDisplay }) {
@@ -983,7 +983,7 @@ class ListableItem: DataItem {
 			message = "There are no configured API servers in your settings, please ensure you have added at least one server with a valid API token."
 		} else if appIsRefreshing {
 			color = COLOR_CLASS.lightGray
-			message = "Refreshing information, please wait a moment..."
+			message = "Refreshing information, please wait a moment…"
 		} else if !S(filterValue).isEmpty {
 			color = COLOR_CLASS.lightGray
 			message = "There are no items matching this filter."

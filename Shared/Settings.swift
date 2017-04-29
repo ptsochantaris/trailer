@@ -764,8 +764,8 @@ final class Settings {
 		set { set("ASSUME_READ_ITEM_IF_USER_HAS_NEWER_COMMENTS", newValue) }
 	}
 
-	static let displayReviewChangeRequestsHelp = "List requested, approving, and blocking reviews in the list of Pull Requests."
-	class var displayReviewChangeRequests: Bool {
+	static let displayReviewsOnItemsHelp = "List requested, approving, and blocking reviews in the list of Pull Requests."
+	class var displayReviewsOnItems: Bool {
 		get { return get("DISPLAY_REVIEW_CHANGE_REQUESTS") as? Bool ?? false }
 		set { set("DISPLAY_REVIEW_CHANGE_REQUESTS", newValue) }
 	}

@@ -29,7 +29,7 @@ final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 		let allServers = ApiServer.allApiServers(in: DataManager.main)
 		if allServers.count > 1 {
 			let m = NSMenuItem()
-			m.title = "Select a server..."
+			m.title = "Select a server…"
 			serverPicker.menu?.addItem(m)
 		}
 		for s in allServers {
@@ -68,7 +68,7 @@ final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 			removeRepoList.isEnabled = false
 		} else if manuallyAddedRepos.count > 1 {
 			let m = NSMenuItem()
-			m.title = "Select a custom repository to remove..."
+			m.title = "Select a custom repository to remove…"
 			removeRepoList.menu?.addItem(m)
 			removeRepoList.isEnabled = true
 		}

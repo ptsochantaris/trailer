@@ -333,7 +333,7 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 		if section == 0 {
 			return typeSelector.selectedSegmentIndex == 0 ? "Snooze an item for a specific duration of time" : "Snooze an item until a specific time or day"
 		} else {
-			return "Wake up an item snoozed by this preset if any of these occur..."
+			return "Wake up an item snoozed by this preset if any of these occur…"
 		}
 	}
 

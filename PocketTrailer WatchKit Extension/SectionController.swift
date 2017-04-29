@@ -135,9 +135,9 @@ final class SectionController: CommonController {
 				case .inactive:
 					show(status: "Not connected to Trailer on your iOS device.", hideTable: true)
 				case .notActivated:
-					show(status: "Connecting...", hideTable: true)
+					show(status: "Connecting…", hideTable: true)
 				case .activated:
-					show(status: "Loading...", hideTable: true)
+					show(status: "Loading…", hideTable: true)
 				}
 			}
 			return

@@ -53,13 +53,13 @@ final class MenuBarSet {
 		if prMenu.messageView != nil {
 			updatePrMenu()
 		}
-		prMenu.refreshMenuItem.title = " Refreshing..."
+		prMenu.refreshMenuItem.title = " Refreshing…"
 		(prMenu.statusItem?.view as? StatusItemView)?.grayOut = grayOut
 
 		if issuesMenu.messageView != nil {
 			updateIssuesMenu()
 		}
-		issuesMenu.refreshMenuItem.title = " Refreshing..."
+		issuesMenu.refreshMenuItem.title = " Refreshing…"
 		(issuesMenu.statusItem?.view as? StatusItemView)?.grayOut = grayOut
 	}
 
