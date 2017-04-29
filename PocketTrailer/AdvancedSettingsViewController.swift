@@ -938,7 +938,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 	func pickerViewController(picker: PickerViewController, didSelectIndexPath: IndexPath) {
 		if let sip = selectedIndexPath {
-			
+
 			if sip.section == SettingsSection.Refresh.rawValue {
 				if sip.row == 0 {
 					Settings.refreshPeriod = Float(didSelectIndexPath.row*10+60)

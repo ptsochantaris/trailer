@@ -4,6 +4,8 @@ import UIKit
 let statusAttributes: [String : Any] = {
 	let paragraphStyle = NSMutableParagraphStyle()
 	paragraphStyle.paragraphSpacing = 6.0
+	paragraphStyle.lineSpacing = 1
+	paragraphStyle.headIndent = 19
 
 	return [
 		NSFontAttributeName: UIFont(name: "Menlo-Regular", size: 10)!,
