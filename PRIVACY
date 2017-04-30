@@ -15,7 +15,7 @@ executing app to construct the required API calls to GitHub.
 GitHub Login
 
 The iOS version of Trailer, specifically, displays an
-inline web-view, you can directly browse your items
+inline web-view so you can directly browse your items
 inside the app.  In order to view your private items you may
 need to provide login information to GitHub's web interface.
 This is done directly inside the web-view and Trailer never

@@ -14,8 +14,11 @@ final class PullRequest: ListableItem {
 	@NSManaged var lastStatusNotified: String?
 	@NSManaged var mergeCommitSha: String?
 	@NSManaged var hasNewCommits: Bool
+	@NSManaged var assignedForReview: Bool
+	@NSManaged var reviewers: String
 
 	@NSManaged var statuses: Set<PRStatus>
+	@NSManaged var reviews: Set<Review>
 
 	class func syncPullRequests(from data: [[AnyHashable : Any]]?, in repo: Repo) {
 		items(with: data, type: PullRequest.self, server: repo.apiServer) { item, info, isNewOrUpdated in
@@ -38,8 +41,8 @@ final class PullRequest: ListableItem {
 					item.issueUrl = (linkInfo["issue"] as? [AnyHashable : Any])?["href"] as? String
 				}
 
-				API.refreshesSinceLastLabelsCheck[item.objectID] = nil
 				API.refreshesSinceLastStatusCheck[item.objectID] = nil
+				API.refreshesSinceLastReactionsCheck[item.objectID] = 1
 			}
 			item.reopened = item.condition == ItemCondition.closed.rawValue
 			item.condition = ItemCondition.open.rawValue
@@ -56,15 +59,17 @@ final class PullRequest: ListableItem {
 		return super.hasUnreadCommentsOrAlert || hasNewCommits
 	}
 
-	class func active(in moc: NSManagedObjectContext, visibleOnly: Bool) -> [PullRequest] {
+	func checkAndStoreReviewAssignments(_ reviewerNames: Set<String>) -> Bool {
+		reviewers = reviewerNames.joined(separator: ",")
+		let assigned = reviewerNames.contains(S(apiServer.userName))
+		assignedForReview = assigned
+		return assigned
+	}
+
+	class func pullRequestsThatNeedReactionsToBeRefreshed(in moc: NSManagedObjectContext) -> [PullRequest] {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
-		f.includesSubentities = false
-		if visibleOnly {
-			f.predicate = NSCompoundPredicate(type: .or, subpredicates: [Section.mine.matchingPredicate, Section.participated.matchingPredicate, Section.all.matchingPredicate])
-		} else {
-			f.predicate = ItemCondition.open.matchingPredicate
-		}
+		f.predicate = NSPredicate(format: "requiresReactionRefreshFromUrl != nil")
 		return try! moc.fetch(f)
 	}
 
@@ -272,21 +277,18 @@ final class PullRequest: ListableItem {
 			}
 		}
 
-		var targetUrls = Set<String>()
-		var descriptions = Set<String>()
-		return rawStatuses.filter { s in
-			let targetUrl = S(s.targetUrl)
-			let desc = S(s.descriptionText)
-
-			if !desc.isEmpty && !descriptions.contains(desc) {
-				descriptions.insert(desc)
-				if !targetUrls.contains(targetUrl) {
-					targetUrls.insert(targetUrl)
-					return true
+		var contexts = [String : PRStatus]()
+		for s in rawStatuses {
+			let context = s.context ?? "//NO CONTEXT/-/"
+			if let latestStatusInContext = contexts[context] {
+				if (latestStatusInContext.createdAt ?? .distantPast) < (s.createdAt ?? .distantPast) {
+					contexts[context] = s
 				}
+			} else {
+				contexts[context] = s
 			}
-			return false
 		}
+		return contexts.values.sorted { ($0.createdAt ?? .distantPast) < ($1.createdAt ?? .distantPast) }
 	}
 
 	var labelsLink: String? {

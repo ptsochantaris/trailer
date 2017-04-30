@@ -69,7 +69,7 @@ final class WatchlistSettingsViewController: UITableViewController, PickerViewCo
 
 	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
 		if let p = segue.destination as? PickerViewController {
-			p.title = "Re-scan every..."
+			p.title = "Re-scan every…"
 			p.values = (2 ..< 1000).map { "\($0) hours" }
 			p.previousValue = Int(Settings.newRepoCheckPeriod) - 2
 			p.delegate = self

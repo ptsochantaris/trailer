@@ -143,7 +143,7 @@ class TrailerCell: NSTableCellView {
 				let snoozeItems = SnoozePreset.allSnoozePresets(in: DataManager.main)
 				if snoozeItems.count > 0 {
 					var count = 1
-					let c = m.addItem(withTitle: "Snooze...", action: nil, keyEquivalent: "")
+					let c = m.addItem(withTitle: "Snooze…", action: nil, keyEquivalent: "")
 					let s = NSMenu(title: "Snooze")
 					for i in snoozeItems {
 						let keyEquivalent = count < 10 ? "\(count)" : ""
@@ -154,7 +154,7 @@ class TrailerCell: NSTableCellView {
 							count += 1
 						}
 					}
-					s.addItem(withTitle: "Configure...", action: #selector(snoozeConfigSelected), keyEquivalent: "")
+					s.addItem(withTitle: "Configure…", action: #selector(snoozeConfigSelected), keyEquivalent: "")
 					c.submenu = s
 				}
 			}

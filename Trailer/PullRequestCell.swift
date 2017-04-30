@@ -4,7 +4,7 @@ final class PullRequestCell: TrailerCell {
 	static let statusAttributes: [String : Any] = {
 
 		let paragraphStyle = NSMutableParagraphStyle()
-		paragraphStyle.headIndent = 92.0
+		paragraphStyle.headIndent = 17.0
 
 		return [
 			NSFontAttributeName: NSFont(name: "Monaco", size: 9)!,

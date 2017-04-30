@@ -24,12 +24,23 @@ final class Issue: ListableItem {
 					l.postSyncAction = PostSyncAction.delete.rawValue
 				}
 
-				let labelList = info["labels"] as? [[AnyHashable : Any]]
-				PRLabel.syncLabels(from: labelList, withParent: item)
+				if Settings.showLabels, let labelList = info["labels"] as? [[AnyHashable : Any]] {
+					PRLabel.syncLabels(from: labelList, withParent: item)
+				}
+
+				item.processReactions(from: info)
 			}
 			item.reopened = item.condition == ItemCondition.closed.rawValue
 			item.condition = ItemCondition.open.rawValue
+			API.refreshesSinceLastReactionsCheck[item.objectID] = 1
 		}
+	}
+
+	class func issuesThatNeedReactionsToBeRefreshed(in moc: NSManagedObjectContext) -> [Issue] {
+		let f = NSFetchRequest<Issue>(entityName: "Issue")
+		f.returnsObjectsAsFaults = false
+		f.predicate = NSPredicate(format: "requiresReactionRefreshFromUrl != nil")
+		return try! moc.fetch(f)
 	}
 
 	class func reasonForEmpty(with filterValue: String?, criterion: GroupingCriterion?) -> NSAttributedString {

@@ -1,5 +1,3 @@
-*Important: Due to security changes under macOS, if you are running v1.3.9 or earlier under El Capitan, please upgrade to the latest version manually from [the latest releases page](https://github.com/ptsochantaris/trailer/releases)*
-
 Trailer
 =======
 
@@ -13,7 +11,7 @@ For maintained binaries and/or more info:
 
 - [Latest macOS version](http://ptsochantaris.github.io/trailer/)
 
-- [Latest iOS version](https://itunes.apple.com/US/app/id806104975?mt=8)
+- [Latest iOS version](https://itunes.apple.com/app/id806104975?mt=8)
 
 - [Trailer for Android](https://github.com/amencarini/droidtrailer)
 

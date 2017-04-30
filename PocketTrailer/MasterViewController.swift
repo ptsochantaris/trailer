@@ -217,6 +217,12 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
 		updateStatus()
+
+		if let s = splitViewController, !s.isCollapsed {
+			return
+		} else if let i = tableView.indexPathForSelectedRow {
+			tableView.deselectRow(at: i, animated: true)
+		}
 	}
 
 	override func viewDidLoad() {
@@ -271,8 +277,8 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	func refreshProcessing() {
-		title = "Processing..."
-		refreshLabel.text = "Processing..."
+		title = "Processing…"
+		refreshLabel.text = "Processing…"
 	}
 
 	override var canBecomeFirstResponder: Bool {
@@ -1110,7 +1116,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		updateFooter()
 
 		if appIsRefreshing {
-			title = "Refreshing..."
+			title = "Refreshing…"
 			if let r = refreshControl {
 				refreshUpdated()
 				updateRefreshControls()

@@ -10,18 +10,18 @@ final class Settings {
 
 	private class var allFields: [String] {
 		return [
-			"SORT_METHOD_KEY", "STATUS_FILTERING_METHOD_KEY", "LAST_PREFS_TAB_SELECTED", "STATUS_ITEM_REFRESH_COUNT", "LABEL_REFRESH_COUNT", "UPDATE_CHECK_INTERVAL_KEY",
+			"SORT_METHOD_KEY", "STATUS_FILTERING_METHOD_KEY", "LAST_PREFS_TAB_SELECTED", "STATUS_ITEM_REFRESH_COUNT", "UPDATE_CHECK_INTERVAL_KEY", "ASSIGNED_REVIEW_HANDLING_POLICY", "NOTIFY_ON_REVIEW_CHANGE_REQUESTS", "NOTIFY_ON_ALL_REVIEW_CHANGE_REQUESTS",
 			"STATUS_FILTERING_TERMS_KEY", "COMMENT_AUTHOR_BLACKLIST", "HOTKEY_LETTER", "REFRESH_PERIOD_KEY", "IOS_BACKGROUND_REFRESH_PERIOD_KEY", "NEW_REPO_CHECK_PERIOD", "LAST_SUCCESSFUL_REFRESH",
 			"LAST_RUN_VERSION_KEY", "UPDATE_CHECK_AUTO_KEY", "HIDE_UNCOMMENTED_PRS_KEY", "SHOW_COMMENTS_EVERYWHERE_KEY", "SORT_ORDER_KEY", "SHOW_UPDATED_KEY", "DONT_KEEP_MY_PRS_KEY", "HIDE_AVATARS_KEY",
-			"DONT_ASK_BEFORE_WIPING_MERGED", "DONT_ASK_BEFORE_WIPING_CLOSED", "HIDE_NEW_REPOS_KEY", "GROUP_BY_REPO", "HIDE_ALL_SECTION", "SHOW_LABELS", "SHOW_STATUS_ITEMS",
-			"MAKE_STATUS_ITEMS_SELECTABLE", "MARK_UNMERGEABLE_ON_USER_SECTIONS_ONLY", "COUNT_ONLY_LISTED_PRS", "OPEN_PR_AT_FIRST_UNREAD_COMMENT_KEY", "LOG_ACTIVITY_TO_CONSOLE_KEY",
+			"DONT_ASK_BEFORE_WIPING_MERGED", "DONT_ASK_BEFORE_WIPING_CLOSED", "HIDE_NEW_REPOS_KEY", "GROUP_BY_REPO", "HIDE_ALL_SECTION", "SHOW_STATUS_ITEMS", "NOTIFY_ON_REVIEW_ACCEPTANCES", "NOTIFY_ON_ALL_REVIEW_ACCEPTANCES", "NOTIFY_ON_REVIEW_ASSIGNMENTS",
+			"MAKE_STATUS_ITEMS_SELECTABLE", "MARK_UNMERGEABLE_ON_USER_SECTIONS_ONLY", "COUNT_ONLY_LISTED_PRS", "OPEN_PR_AT_FIRST_UNREAD_COMMENT_KEY", "LOG_ACTIVITY_TO_CONSOLE_KEY", "NOTIFY_ON_REVIEW_DISMISSALS", "NOTIFY_ON_ALL_REVIEW_DISMISSALS",
 			"HOTKEY_ENABLE", "HOTKEY_CONTROL_MODIFIER", "USE_VIBRANCY_UI", "DISABLE_ALL_COMMENT_NOTIFICATIONS", "NOTIFY_ON_STATUS_UPDATES", "NOTIFY_ON_STATUS_UPDATES_ALL", "SHOW_REPOS_IN_NAME", "INCLUDE_REPOS_IN_FILTER",
-			"INCLUDE_LABELS_IN_FILTER", "INCLUDE_STATUSES_IN_FILTER", "HOTKEY_COMMAND_MODIFIER", "HOTKEY_OPTION_MODIFIER", "HOTKEY_SHIFT_MODIFIER", "GRAY_OUT_WHEN_REFRESHING", "SHOW_ISSUES_MENU",
-			"SHOW_ISSUES_IN_WATCH_GLANCE", "ASSIGNED_PR_HANDLING_POLICY", "HIDE_DESCRIPTION_IN_WATCH_DETAIL_VIEW", "AUTO_REPEAT_SETTINGS_EXPORT", "DONT_CONFIRM_SETTINGS_IMPORT",
+			"INCLUDE_LABELS_IN_FILTER", "INCLUDE_STATUSES_IN_FILTER", "HOTKEY_COMMAND_MODIFIER", "HOTKEY_OPTION_MODIFIER", "HOTKEY_SHIFT_MODIFIER", "GRAY_OUT_WHEN_REFRESHING", "SHOW_ISSUES_MENU", "NOTIFY_ON_ITEM_REACTIONS",
+			"SHOW_ISSUES_IN_WATCH_GLANCE", "ASSIGNED_PR_HANDLING_POLICY", "HIDE_DESCRIPTION_IN_WATCH_DETAIL_VIEW", "AUTO_REPEAT_SETTINGS_EXPORT", "DONT_CONFIRM_SETTINGS_IMPORT", "NOTIFY_ON_COMMENT_REACTIONS", "REACTION_SCANNING_INTERVAL",
 			"LAST_EXPORT_URL", "LAST_EXPORT_TIME", "CLOSE_HANDLING_POLICY_2", "MERGE_HANDLING_POLICY_2", "LAST_PREFS_TAB_SELECTED_OSX", "NEW_PR_DISPLAY_POLICY_INDEX", "NEW_ISSUE_DISPLAY_POLICY_INDEX", "HIDE_PRS_THAT_ARENT_PASSING_ONLY_IN_ALL",
             "INCLUDE_SERVERS_IN_FILTER", "INCLUDE_USERS_IN_FILTER", "INCLUDE_TITLES_IN_FILTER", "INCLUDE_NUMBERS_IN_FILTER", "DUMP_API_RESPONSES_IN_CONSOLE", "OPEN_ITEMS_DIRECTLY_IN_SAFARI", "HIDE_PRS_THAT_ARENT_PASSING",
             "REMOVE_RELATED_NOTIFICATIONS_ON_ITEM_REMOVE", "HIDE_SNOOZED_ITEMS", "INCLUDE_MILESTONES_IN_FILTER", "INCLUDE_ASSIGNEE_NAMES_IN_FILTER", "API_SERVERS_IN_SEPARATE_MENUS", "ASSUME_READ_ITEM_IF_USER_HAS_NEWER_COMMENTS",
-            "AUTO_SNOOZE_DAYS", "HIDE_MENUBAR_COUNTS", "AUTO_ADD_NEW_REPOS", "AUTO_REMOVE_DELETED_REPOS", "MARK_PRS_AS_UNREAD_ON_NEW_COMMITS"]
+            "AUTO_SNOOZE_DAYS", "HIDE_MENUBAR_COUNTS", "AUTO_ADD_NEW_REPOS", "AUTO_REMOVE_DELETED_REPOS", "MARK_PRS_AS_UNREAD_ON_NEW_COMMITS", "SHOW_LABELS", "DISPLAY_REVIEW_CHANGE_REQUESTS"]
 	}
 
     class func checkMigration() {
@@ -271,15 +271,15 @@ final class Settings {
 		set { set("STATUS_ITEM_REFRESH_COUNT", newValue) }
 	}
 
-	static let labelRefreshIntervalHelp = "Querying labels can be moderately bandwidth-intensive, but it does involve making some extra API calls. Since labels don't change often, you may want to raise this to a higher value if you have a lot of items on your lists. You can always see how much API usage you have left per-hour from the 'Servers' tab."
-	class var labelRefreshInterval: Int {
-		get { if let n = get("LABEL_REFRESH_COUNT") as? Int { return n>0 ? n : 4 } else { return 4 } }
-		set { set("LABEL_REFRESH_COUNT", newValue) }
-	}
-
 	class var checkForUpdatesInterval: Int {
 		get { return get("UPDATE_CHECK_INTERVAL_KEY") as? Int ?? 8 }
 		set { set("UPDATE_CHECK_INTERVAL_KEY", newValue) }
+	}
+
+	static let assignedReviewHandlingPolicyHelp = "If an item is assigned for you to review, Trailer can move it to a specific section or leave it as-is."
+	class var assignedReviewHandlingPolicy: Int {
+		get { return get("ASSIGNED_REVIEW_HANDLING_POLICY") as? Int ?? 0 }
+		set { set("ASSIGNED_REVIEW_HANDLING_POLICY", newValue) }
 	}
 
 	static let assignedPrHandlingPolicyHelp = "If an item is assigned to you, Trailer can move it to a specific section or leave it as-is."
@@ -603,6 +603,50 @@ final class Settings {
         set { set("COUNT_ONLY_LISTED_PRS", newValue) }
     }
 
+
+	static let notifyOnReviewChangeRequestsHelp = "Issue a notification when someone creates a review in a PR that requires changes."
+	class var notifyOnReviewChangeRequests: Bool {
+		get { return get("NOTIFY_ON_REVIEW_CHANGE_REQUESTS") as? Bool ?? false }
+		set { set("NOTIFY_ON_REVIEW_CHANGE_REQUESTS", newValue) }
+	}
+
+	static let notifyOnReviewAcceptancesHelp = "Issue a notification when someone accepts the changes related to a review in a PR that required changes."
+	class var notifyOnReviewAcceptances: Bool {
+		get { return get("NOTIFY_ON_REVIEW_ACCEPTANCES") as? Bool ?? false }
+		set { set("NOTIFY_ON_REVIEW_ACCEPTANCES", newValue) }
+	}
+
+	static let notifyOnReviewDismissalsHelp = "Issue a notification when someone dismissed a review in a PR that required changes."
+	class var notifyOnReviewDismissals: Bool {
+		get { return get("NOTIFY_ON_REVIEW_DISMISSALS") as? Bool ?? false }
+		set { set("NOTIFY_ON_REVIEW_DISMISSALS", newValue) }
+	}
+
+	static let notifyOnAllReviewChangeRequestsHelp = "Do this for all items, not just those created by me."
+	class var notifyOnAllReviewChangeRequests: Bool {
+		get { return get("NOTIFY_ON_ALL_REVIEW_CHANGE_REQUESTS") as? Bool ?? false }
+		set { set("NOTIFY_ON_ALL_REVIEW_CHANGE_REQUESTS", newValue) }
+	}
+
+	static let notifyOnAllReviewAcceptancesHelp = "Do this for all items, not just those created by me."
+	class var notifyOnAllReviewAcceptances: Bool {
+		get { return get("NOTIFY_ON_ALL_REVIEW_ACCEPTANCES") as? Bool ?? false }
+		set { set("NOTIFY_ON_ALL_REVIEW_ACCEPTANCES", newValue) }
+	}
+
+	static let notifyOnAllReviewDismissalsHelp = "Do this for all items, not just those created by me."
+	class var notifyOnAllReviewDismissals: Bool {
+		get { return get("NOTIFY_ON_ALL_REVIEW_DISMISSALS") as? Bool ?? false }
+		set { set("NOTIFY_ON_ALL_REVIEW_DISMISSALS", newValue) }
+	}
+
+	static let notifyOnReviewAssignmentsHelp = "Issue a notification when someone assigns me a PR to review."
+	class var notifyOnReviewAssignments: Bool {
+		get { return get("NOTIFY_ON_REVIEW_ASSIGNMENTS") as? Bool ?? false }
+		set { set("NOTIFY_ON_REVIEW_ASSIGNMENTS", newValue) }
+	}
+
+
 	static let checkForUpdatesAutomaticallyHelp = "Check for updates to Trailer automatically. It is generally a very good idea to keep this selected, unless you are using an external package manager to manage the updates."
 	class var checkForUpdatesAutomatically: Bool {
 		get { return get("UPDATE_CHECK_AUTO_KEY") as? Bool ?? true }
@@ -718,5 +762,29 @@ final class Settings {
 	class var assumeReadItemIfUserHasNewerComments: Bool {
 		get { return get("ASSUME_READ_ITEM_IF_USER_HAS_NEWER_COMMENTS") as? Bool ?? false }
 		set { set("ASSUME_READ_ITEM_IF_USER_HAS_NEWER_COMMENTS", newValue) }
+	}
+
+	static let displayReviewsOnItemsHelp = "List requested, approving, and blocking reviews in the list of Pull Requests."
+	class var displayReviewsOnItems: Bool {
+		get { return get("DISPLAY_REVIEW_CHANGE_REQUESTS") as? Bool ?? false }
+		set { set("DISPLAY_REVIEW_CHANGE_REQUESTS", newValue) }
+	}
+
+	static let reactionScanningIntervalHelp = "Items need to be regularly re-scanned in order to detect any added reactions, which can raise API usage and slow down sync. This option controls how often items will be marked for a reaction checkup."
+	class var reactionScanningInterval: Int {
+		get { return get("REACTION_SCANNING_INTERVAL") as? Int ?? 4 }
+		set { set("REACTION_SCANNING_INTERVAL", newValue) }
+	}
+
+	static let notifyOnItemReactionsHelp = "Count reactions to PRs and issues as comments. Increase the total count. Notify and badge an item as unread depending on the comment section settings."
+	class var notifyOnItemReactions: Bool {
+		get { return get("NOTIFY_ON_ITEM_REACTIONS") as? Bool ?? false }
+		set { set("NOTIFY_ON_ITEM_REACTIONS", newValue) }
+	}
+
+	static let notifyOnCommentReactionsHelp = "Count reactions to comments themselves as comments. Increase the total count of the item that contains the comment being reacted to. Notify and badge it as unread depending on the comment section settings."
+	class var notifyOnCommentReactions: Bool {
+		get { return get("NOTIFY_ON_COMMENT_REACTIONS") as? Bool ?? false }
+		set { set("NOTIFY_ON_COMMENT_REACTIONS", newValue) }
 	}
 }

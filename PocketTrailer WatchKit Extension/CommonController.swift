@@ -10,7 +10,7 @@ class CommonController: WKInterfaceController {
 		super.willActivate()
 		if let app = WKExtension.shared().delegate as? ExtensionDelegate, app.lastView != self {
 			if showLoadingFeedback {
-				show(status: "Connecting...", hideTable: false)
+				show(status: "Connecting…", hideTable: false)
 			}
 			app.lastView = self
 		}
@@ -39,7 +39,7 @@ class CommonController: WKInterfaceController {
 	func send(request: [String : Any]) {
 		if loading == 0 {
 			if showLoadingFeedback {
-				show(status: "Loading...", hideTable: false)
+				show(status: "Loading…", hideTable: false)
 			}
 			attempt(request: request)
 		}

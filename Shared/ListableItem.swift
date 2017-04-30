@@ -32,12 +32,15 @@ class ListableItem: DataItem {
 	@NSManaged var muted: Bool
 	@NSManaged var wasAwokenFromSnooze: Bool
 	@NSManaged var milestone: String?
+	@NSManaged var dirty: Bool
+	@NSManaged var requiresReactionRefreshFromUrl: String?
 
 	@NSManaged var snoozeUntil: Date?
 	@NSManaged var snoozingPreset: SnoozePreset?
 
 	@NSManaged var comments: Set<PRComment>
 	@NSManaged var labels: Set<PRLabel>
+	@NSManaged var reactions: Set<Reaction>
 
 	final func baseSync(from info: [AnyHashable : Any], in repo: Repo) {
 
@@ -58,6 +61,16 @@ class ListableItem: DataItem {
 		}
 
 		processAssignmentStatus(from: info)
+	}
+
+	final func processReactions(from info: [AnyHashable : Any]?) {
+
+		if API.shouldSyncReactions, let info = info, let r = info["reactions"] as? [AnyHashable : Any] {
+			requiresReactionRefreshFromUrl = Reaction.changesDetected(in: reactions, from: r)
+		} else {
+			reactions.forEach { $0.postSyncAction = PostSyncAction.delete.rawValue }
+			requiresReactionRefreshFromUrl = nil
+		}
 	}
 
 	final func processAssignmentStatus(from info: [AnyHashable : Any]?) {
@@ -98,14 +111,32 @@ class ListableItem: DataItem {
 		}
 	}
 
+	final func setToUpdatedIfIdle() {
+		if postSyncAction == PostSyncAction.doNothing.rawValue {
+			postSyncAction = PostSyncAction.isUpdated.rawValue
+		}
+	}
+
+	class func active<T>(of type: T.Type, in moc: NSManagedObjectContext, visibleOnly: Bool) -> [T] where T : ListableItem {
+		let f = NSFetchRequest<T>(entityName: String(describing: type))
+		f.returnsObjectsAsFaults = false
+		f.includesSubentities = false
+		if visibleOnly {
+			f.predicate = NSCompoundPredicate(type: .or, subpredicates: [Section.mine.matchingPredicate, Section.participated.matchingPredicate, Section.all.matchingPredicate])
+		} else {
+			f.predicate = ItemCondition.open.matchingPredicate
+		}
+		return try! moc.fetch(f)
+	}
+
 	final override func resetSyncState() {
 		super.resetSyncState()
 		repo.resetSyncState()
 	}
 
 	final override func prepareForDeletion() {
-		API.refreshesSinceLastLabelsCheck[objectID] = nil
 		API.refreshesSinceLastStatusCheck[objectID] = nil
+		API.refreshesSinceLastReactionsCheck[objectID] = nil
 		ensureInvisible()
 		super.prepareForDeletion()
 	}
@@ -138,6 +169,32 @@ class ListableItem: DataItem {
 					}
 				} else {
 					latestReadCommentDate = commentCreation
+				}
+			}
+			if Settings.notifyOnCommentReactions {
+				for r in c.reactions {
+					if let reactionCreation = r.createdAt {
+						if let latestRead = latestReadCommentDate {
+							if latestRead < reactionCreation {
+								latestReadCommentDate = reactionCreation
+							}
+						} else {
+							latestReadCommentDate = reactionCreation
+						}
+					}
+				}
+			}
+		}
+		if Settings.notifyOnItemReactions {
+			for r in reactions {
+				if let reactionCreation = r.createdAt {
+					if let latestRead = latestReadCommentDate {
+						if latestRead < reactionCreation {
+							latestReadCommentDate = reactionCreation
+						}
+					} else {
+						latestReadCommentDate = reactionCreation
+					}
 				}
 			}
 		}
@@ -297,7 +354,10 @@ class ListableItem: DataItem {
 
 		if targetSection == .all || targetSection == .none {
 
-			if Int64(Settings.newMentionMovePolicy) > Section.none.rawValue && contains(terms: ["@\(S(apiServer.userName))"]) {
+			if let p = self as? PullRequest, Int64(Settings.assignedReviewHandlingPolicy) > Section.none.rawValue, p.assignedForReview {
+				targetSection = Section(Settings.assignedReviewHandlingPolicy)!
+
+			} else if Int64(Settings.newMentionMovePolicy) > Section.none.rawValue && contains(terms: ["@\(S(apiServer.userName))"]) {
 				targetSection = Section(Settings.newMentionMovePolicy)!
 
 			} else if Int64(Settings.teamMentionMovePolicy) > Section.none.rawValue && contains(terms: apiServer.teams.flatMap { $0.calculatedReferral }) {
@@ -373,12 +433,31 @@ class ListableItem: DataItem {
 			return
 		}
 
+		let reviewCount: Int64
+		if let p = self as? PullRequest, API.shouldSyncReviews || API.shouldSyncReviewAssignments {
+			reviewCount = Int64(p.reviews.count)
+		} else {
+			reviewCount = 0
+		}
+
 		totalComments = Int64(comments.count)
+			+ (Settings.notifyOnItemReactions ? Int64(reactions.count) : 0)
+			+ (Settings.notifyOnCommentReactions ? countCommentReactions : 0)
+			+ reviewCount
+
 		sectionIndex = targetSection.rawValue
 		if title==nil { title = "(No title)" }
 
 		//let T = D.timeIntervalSinceNow
 		//print("postprocess: \(T * -1000)")
+	}
+
+	private var countCommentReactions: Int64 {
+		var count: Int64 = 0
+		for c in comments {
+			count += Int64(c.reactions.count)
+		}
+		return count
 	}
 
 	private final func myComments(since: Date) -> [PRComment] {
@@ -394,6 +473,20 @@ class ListableItem: DataItem {
 		for c in comments {
 			if !c.isMine && (c.createdAt ?? .distantPast) > since {
 				count += 1
+			}
+			if Settings.notifyOnCommentReactions {
+				for r in c.reactions {
+					if !r.isMine && (r.createdAt ?? .distantPast) > since {
+						count += 1
+					}
+				}
+			}
+		}
+		if Settings.notifyOnItemReactions {
+			for r in reactions {
+				if !r.isMine && (r.createdAt ?? .distantPast) > since {
+					count += 1
+				}
 			}
 		}
 		return count
@@ -425,12 +518,10 @@ class ListableItem: DataItem {
 		if let t = title {
 			components.append(t)
 		}
-		if Settings.showLabels {
-			components.append("\(labels.count) labels:")
-			for l in sortedLabels {
-				if let n = l.name {
-					components.append(n)
-				}
+		components.append("\(labels.count) labels:")
+		for l in sortedLabels {
+			if let n = l.name {
+				components.append(n)
 			}
 		}
 		return components.joined(separator: ",")
@@ -443,18 +534,20 @@ class ListableItem: DataItem {
 	}
 
 	final func title(with font: FONT_CLASS, labelFont: FONT_CLASS, titleColor: COLOR_CLASS) -> NSMutableAttributedString {
+
 		let p = NSMutableParagraphStyle()
 		p.paragraphSpacing = 1.0
-
 		let titleAttributes = [NSFontAttributeName: font, NSForegroundColorAttributeName: titleColor, NSParagraphStyleAttributeName: p]
+
 		let _title = NSMutableAttributedString()
 		if let t = title {
 			_title.append(NSAttributedString(string: t, attributes: titleAttributes))
-			if Settings.showLabels {
-				let labelCount = labels.count
-				if labelCount > 0 {
 
-					_title.append(NSAttributedString(string: "\n", attributes: titleAttributes))
+			if Settings.showLabels {
+
+				let sorted = sortedLabels
+				let labelCount = sorted.count
+				if labelCount > 0 {
 
 					let lp = NSMutableParagraphStyle()
 					#if os(iOS)
@@ -463,9 +556,9 @@ class ListableItem: DataItem {
 						                       NSBaselineOffsetAttributeName: 2.0,
 						                       NSParagraphStyleAttributeName: lp] as [String : Any]
 					#elseif os(OSX)
-						lp.minimumLineHeight = labelFont.pointSize+5.0
+						lp.minimumLineHeight = labelFont.pointSize + 4
 						let labelAttributes = [NSFontAttributeName: labelFont,
-						                       NSBaselineOffsetAttributeName: 1.0,
+						                       NSBaselineOffsetAttributeName: 2.0,
 						                       NSParagraphStyleAttributeName: lp] as [String : Any]
 					#endif
 
@@ -476,8 +569,10 @@ class ListableItem: DataItem {
 						return (lum < 0.5)
 					}
 
+					_title.append(NSAttributedString(string: "\n", attributes: titleAttributes))
+
 					var count = 0
-					for l in sortedLabels {
+					for l in sorted {
 						var a = labelAttributes
 						let color = l.colorForDisplay
 						a[NSBackgroundColorAttributeName] = color
@@ -486,8 +581,97 @@ class ListableItem: DataItem {
 						_title.append(NSAttributedString(string: "\u{a0}\(name)\u{a0}", attributes: a))
 						if count < labelCount-1 {
 							_title.append(NSAttributedString(string: " ", attributes: labelAttributes))
-                        }
-                        count += 1
+						}
+						count += 1
+					}
+				}
+			}
+
+			if Settings.displayReviewsOnItems, let p = self as? PullRequest {
+
+				var latestReviewByUser = [String:Review]()
+				for r in p.reviews.filter({ $0.shouldDisplay }) {
+					let user = S(r.username)
+					if let latestReview = latestReviewByUser[user] {
+						if (latestReview.createdAt ?? .distantPast) < (r.createdAt ?? .distantPast) {
+							latestReviewByUser[user] = r
+						}
+					} else {
+						latestReviewByUser[user] = r
+					}
+				}
+
+				if latestReviewByUser.count > 0 || !p.reviewers.isEmpty {
+
+					let reviews = latestReviewByUser.values.sorted { ($0.createdAt ?? .distantPast) < ($1.createdAt ?? .distantPast) }
+
+					let lp = NSMutableParagraphStyle()
+					#if os(iOS)
+						lp.lineHeightMultiple = 1.15
+					#else
+						lp.minimumLineHeight = labelFont.pointSize + 5
+					#endif
+
+					let approvers = reviews.filter { $0.state == Review.State.APPROVED.rawValue }
+					if approvers.count > 0 {
+
+						let a = [NSFontAttributeName: labelFont,
+								 NSForegroundColorAttributeName: COLOR_CLASS(red: 0, green: 0.5, blue: 0, alpha: 1.0),
+								 NSParagraphStyleAttributeName: lp] as [String : Any]
+
+						_title.append(NSAttributedString(string: "\n", attributes: a))
+
+						var count = 0
+						for r in approvers {
+							let name = r.username!.replacingOccurrences(of: " ", with: "\u{a0}")
+							_title.append(NSAttributedString(string: "@\(name) ", attributes: a))
+							if count == approvers.count - 1 {
+								_title.append(NSAttributedString(string: "approved changes", attributes: a))
+							}
+							count += 1
+						}
+					}
+
+					let requesters = reviews.filter { $0.state == Review.State.CHANGES_REQUESTED.rawValue }
+					if requesters.count > 0 {
+
+						let a = [NSFontAttributeName: labelFont,
+								 NSForegroundColorAttributeName: COLOR_CLASS(red: 0.7, green: 0, blue: 0, alpha: 1.0),
+								 NSParagraphStyleAttributeName: lp] as [String : Any]
+
+						_title.append(NSAttributedString(string: "\n", attributes: a))
+
+						var count = 0
+						for r in requesters {
+							let name = r.username!.replacingOccurrences(of: " ", with: "\u{a0}")
+							_title.append(NSAttributedString(string: "@\(name) ", attributes: a))
+							if count == requesters.count - 1 {
+								_title.append(NSAttributedString(string: requesters.count > 1 ? "request changes" : "requests changes", attributes: a))
+							}
+							count += 1
+						}
+					}
+
+					let approverNames = approvers.flatMap { $0.username }
+					let requesterNames = requesters.flatMap { $0.username }
+					let otherReviewers = p.reviewers.components(separatedBy: ",").filter({ !($0.isEmpty || approverNames.contains($0) || requesterNames.contains($0)) })
+					if otherReviewers.count > 0 {
+
+						let a = [NSFontAttributeName: labelFont,
+								 NSForegroundColorAttributeName: COLOR_CLASS(red: 0.7, green: 0.7, blue: 0, alpha: 1.0),
+								 NSParagraphStyleAttributeName: lp] as [String : Any]
+
+						_title.append(NSAttributedString(string: "\n", attributes: a))
+
+						var count = 0
+						for r in otherReviewers {
+							let name = r.replacingOccurrences(of: " ", with: "\u{a0}")
+							_title.append(NSAttributedString(string: "@\(name) ", attributes: a))
+							if count == otherReviewers.count - 1 {
+								_title.append(NSAttributedString(string: otherReviewers.count > 1 ? "haven't reviewed yet" : "hasn't reviewed yet", attributes: a))
+							}
+							count += 1
+						}
 					}
 				}
 			}
@@ -799,7 +983,7 @@ class ListableItem: DataItem {
 			message = "There are no configured API servers in your settings, please ensure you have added at least one server with a valid API token."
 		} else if appIsRefreshing {
 			color = COLOR_CLASS.lightGray
-			message = "Refreshing information, please wait a moment..."
+			message = "Refreshing information, please wait a moment…"
 		} else if !S(filterValue).isEmpty {
 			color = COLOR_CLASS.lightGray
 			message = "There are no items matching this filter."

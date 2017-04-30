@@ -75,7 +75,7 @@ final class API {
 	}
 
 	static var refreshesSinceLastStatusCheck = [NSManagedObjectID : Int]()
-	static var refreshesSinceLastLabelsCheck = [NSManagedObjectID : Int]()
+	static var refreshesSinceLastReactionsCheck = [NSManagedObjectID : Int]()
 	static var currentNetworkStatus = NetworkStatus.NotReachable
 
 	private static let cacheDirectory = { ()->String in
@@ -145,7 +145,7 @@ final class API {
 	}
 
 	class var hasNetworkConnection: Bool {
-		DLog("Actively verifying reported network availability state...")
+		DLog("Actively verifying reported network availability state…")
 		let previousNetworkStatus = currentNetworkStatus
 		checkNetworkAvailability()
 		if previousNetworkStatus != currentNetworkStatus {
@@ -158,13 +158,17 @@ final class API {
 
 	/////////////////////////////////////////////////////// Utilities
 
+	class var pendingCallCount: Int {
+		return apiQueue.operationCount
+	}
+
 	class var lastUpdateDescription: String {
 		if appIsRefreshing {
-			let operations = apiQueue.operationCount
+			let operations = pendingCallCount
 			if operations < 2 {
-				return "Refreshing..."
+				return "Refreshing…"
 			} else {
-				return "Refreshing... (\(operations) calls remaining)"
+				return "Refreshing… (\(operations) calls remaining)"
 			}
 		} else if ApiServer.shouldReportRefreshFailure(in: DataManager.main) {
 			return "Last update failed"
@@ -292,7 +296,18 @@ final class API {
 
 	////////////////////////////////////// API interface
 
+	private static let sustainedConcurrency = 3
+	private static let burstConcurrency = 8
+
+	private static let apiQueue = { () -> OperationQueue in
+		let n = OperationQueue()
+		n.underlyingQueue = DispatchQueue.main
+		n.maxConcurrentOperationCount = API.sustainedConcurrency
+		return n
+	}()
+
 	class func syncItemsForActiveReposAndCallback(callback: @escaping Completion) {
+
 		let syncContext = DataManager.buildChildContext()
 
 		let shouldRefreshReposToo = lastRepoCheck == .distantPast
@@ -311,31 +326,83 @@ final class API {
 		}
 	}
 
+	private class func markItemsForPeriodicReactionsCheck(in moc: NSManagedObjectContext) {
+
+		func markItemsNeedingReactionsCheck(items: [ListableItem]) {
+
+			for item in items {
+				guard item.apiServer.lastSyncSucceeded else { continue }
+
+				let oid = item.objectID
+				let refreshes = refreshesSinceLastReactionsCheck[oid]
+				if refreshes == nil || refreshes! >= Settings.reactionScanningInterval {
+					//DLog("Will check reactions for item: '%@'", item.title)
+					for s in item.reactions {
+						s.postSyncAction = PostSyncAction.delete.rawValue
+					}
+					item.updatedAt = .distantPast
+					item.postSyncAction = PostSyncAction.isUpdated.rawValue
+				} else {
+					//DLog("No need to get reactions for item: '%@' (%@ refreshes since last check)", item.title, refreshes)
+					refreshesSinceLastReactionsCheck[oid] = (refreshes ?? 0) + 1
+				}
+			}
+		}
+
+		let prItems = PullRequest.active(of: PullRequest.self, in: moc, visibleOnly: true)
+		markItemsNeedingReactionsCheck(items: prItems)
+
+		let issueItems = Issue.active(of: Issue.self, in: moc, visibleOnly: true)
+		markItemsNeedingReactionsCheck(items: issueItems)
+	}
+
 	private class func sync(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
-		markDirtyRepos(in: moc) {
+		let repos = Repo.syncableRepos(in: moc)
 
-			let repos = Repo.syncableRepos(in: moc)
+		let willSyncCommentReactions = Settings.notifyOnCommentReactions
+		let willSyncItemReactions = Settings.notifyOnItemReactions
 
-			var completionCount = 0
-			let totalOperations = 2
-			let completionCallback = {
-				completionCount += 1
-				if completionCount == totalOperations {
-					NotificationCenter.default.post(name: RefreshProcessingNotification, object: nil)
-					for r in repos { r.dirty = false }
+		var completionCount = 0
+		let totalOperations = 2 + (willSyncItemReactions ? 2 : 0)
+		let completionCallback = {
+			completionCount += 1
+			if completionCount == totalOperations {
+				if willSyncCommentReactions {
+					fetchCommentReactionsIfNeeded(to: moc) {
+						completeSync(in: moc, andCallback: callback)
+					}
+				} else {
 					completeSync(in: moc, andCallback: callback)
 				}
 			}
+		}
 
-			fetchIssues(for: repos, to: moc) {
+		apiQueue.maxConcurrentOperationCount = API.sustainedConcurrency
+
+		if shouldSyncReactions {
+			markItemsForPeriodicReactionsCheck(in: moc)
+		} else {
+			refreshesSinceLastReactionsCheck.removeAll()
+			for s in DataItem.allItems(of: Reaction.self, in: moc) {
+				s.postSyncAction = PostSyncAction.delete.rawValue
+			}
+		}
+
+		fetchItems(from: repos, to: moc) {
+
+			let reposWithSomeItems = repos.filter { $0.issues.count > 0 || $0.pullRequests.count > 0 }
+			markExtraUpdatedItems(from: reposWithSomeItems, to: moc) {
+
+				if willSyncItemReactions {
+					fetchIssueReactionsIfNeeded(to: moc, callback: completionCallback)
+					fetchPullRequestReactionsIfNeeded(to: moc, callback: completionCallback)
+				}
+
 				fetchCommentsForCurrentIssues(to: moc) {
 					checkIssueClosures(in: moc)
 					completionCallback()
 				}
-			}
-
-			fetchPullRequests(for: repos, to: moc) {
 				updatePullRequests(in: moc) {
 					completionCallback()
 				}
@@ -343,9 +410,97 @@ final class API {
 		}
 	}
 
+	private class func fetchItems(from repos: [Repo], to moc: NSManagedObjectContext, callback: @escaping Completion) {
+
+		var completionCount = 0
+		let totalOperations = 2
+		let completionCallback = {
+			completionCount += 1
+			if completionCount == totalOperations {
+				callback()
+			}
+		}
+
+		fetchIssues(for: repos, to: moc, callback: completionCallback)
+		fetchPullRequests(for: repos, to: moc, callback: completionCallback)
+	}
+
+	private class func markExtraUpdatedItems(from repos: [Repo], to moc: NSManagedObjectContext, callback: @escaping Completion) {
+
+		apiQueue.maxConcurrentOperationCount = API.burstConcurrency
+
+		var completionCount = 0
+		let totalOperations = repos.count
+		let completionCallback = {
+			completionCount += 1
+			if completionCount == totalOperations {
+				apiQueue.maxConcurrentOperationCount = API.sustainedConcurrency
+				callback()
+			}
+		}
+
+		for r in repos {
+			let repoFullName = S(r.fullName)
+			let lastLocalEvent = r.lastScannedIssueEventId
+			let isFirstEventSync = lastLocalEvent == 0
+			r.lastScannedIssueEventId = 0
+			getPagedData(at: "/repos/\(repoFullName)/issues/events", from: r.apiServer, perPageCallback: { data, lastPage in
+				guard let data = data, data.count > 0 else { return true }
+
+				if isFirstEventSync {
+
+					DLog("First event check for this repo. Let's ensure all items are marked as updated")
+					for i in r.pullRequests { i.setToUpdatedIfIdle() }
+					for i in r.issues { i.setToUpdatedIfIdle() }
+					r.lastScannedIssueEventId = data.first!["id"] as? Int64 ?? 0
+					return true
+
+				} else {
+
+					var numbers = Set<Int64>()
+					var reasons = Set<String>()
+					var foundLastEvent = false
+					for event in data {
+						if let eventId = event["id"] as? Int64, let issue = event["issue"] as? [AnyHashable:Any], let issueNumber = issue["number"] as? Int64 {
+							if r.lastScannedIssueEventId == 0 {
+								r.lastScannedIssueEventId = eventId
+							}
+							if eventId == lastLocalEvent {
+								foundLastEvent = true
+								DLog("Parsed all repo issue events up to the one we already have");
+								break // we're done
+							}
+							if let reason = event["event"] as? String {
+								numbers.insert(issueNumber)
+								reasons.insert(reason)
+							}
+						}
+					}
+					if r.lastScannedIssueEventId == 0 {
+						r.lastScannedIssueEventId = lastLocalEvent
+					}
+					if numbers.count > 0 {
+						r.markItemsAsUpdated(with: numbers, reasons: reasons)
+					}
+					return foundLastEvent
+
+				}
+
+			}) { success, resultCode in
+				if !success {
+					r.apiServer.lastSyncSucceeded = false
+				}
+				completionCallback()
+			}
+
+		}
+	}
+
 	private class func completeSync(in moc: NSManagedObjectContext, andCallback: @escaping Completion) {
 
 		DLog("Wrapping up sync")
+
+		NotificationCenter.default.post(name: RefreshProcessingNotification, object: nil)
 
 		// discard any changes related to any failed API server
 		for apiServer in ApiServer.allApiServers(in: moc) {
@@ -366,13 +521,13 @@ final class API {
 			try! cacheMoc.save()
 		}
 
-		for r in DataItem.items(of: PullRequest.self, surviving: true, in: moc, prefetchRelationships: ["comments"]) {
+		for r in DataItem.items(of: PullRequest.self, surviving: true, in: moc, prefetchRelationships: ["comments", "reactions", "reviews"]) {
 			mainQueue.addOperation {
 				r.postProcess()
 			}
 		}
 
-		for i in DataItem.items(of: Issue.self, surviving: true, in: moc, prefetchRelationships: ["comments"]) {
+		for i in DataItem.items(of: Issue.self, surviving: true, in: moc, prefetchRelationships: ["comments", "reactions"]) {
 			mainQueue.addOperation {
 				i.postProcess()
 			}
@@ -392,12 +547,10 @@ final class API {
 
 	private class func updatePullRequests(in moc: NSManagedObjectContext, callback: @escaping Completion) {
 
-		let willScanForStatuses = shouldScanForStatuses(in: moc)
-		let willScanForLabels = shouldScanForLabels(in: moc)
-
-		var totalOperations = 3
-		if willScanForStatuses { totalOperations += 1 }
-		if willScanForLabels { totalOperations += 1 }
+		let totalOperations = 3
+			+ (Settings.showStatusItems ? 1 : 0)
+			+ (Settings.showLabels ? 1 : 0)
+			+ (shouldSyncReviewAssignments ? 1 : 0)
 
 		var completionCount = 0
 		let completionCallback = {
@@ -407,58 +560,40 @@ final class API {
 			}
 		}
 
-		if willScanForStatuses {
+		if Settings.showStatusItems {
 			fetchStatusesForCurrentPullRequests(to: moc, callback: completionCallback)
+		} else {
+			refreshesSinceLastStatusCheck.removeAll()
+			for s in DataItem.allItems(of: PRStatus.self, in: moc) {
+				s.postSyncAction = PostSyncAction.delete.rawValue
+			}
 		}
-		if willScanForLabels {
+
+		if Settings.showLabels {
 			fetchLabelsForForCurrentPullRequests(to: moc, callback: completionCallback)
+		} else {
+			for l in DataItem.allItems(of: PRLabel.self, in: moc) {
+				l.postSyncAction = PostSyncAction.delete.rawValue
+			}
 		}
-		fetchCommentsForCurrentPullRequests(to: moc, callback: completionCallback)
+
+		if shouldSyncReviews {
+			fetchReviewsForForCurrentPullRequests(to: moc) {
+				fetchCommentsForCurrentPullRequests(to: moc, callback: completionCallback)
+			}
+		} else {
+			for r in DataItem.allItems(of: Review.self, in: moc) {
+				r.postSyncAction = PostSyncAction.delete.rawValue
+			}
+			fetchCommentsForCurrentPullRequests(to: moc, callback: completionCallback)
+		}
+
 		checkPrClosures(in: moc, callback: completionCallback)
+
 		detectAssignedPullRequests(in: moc, callback: completionCallback)
-	}
 
-	private class func markDirtyRepos(in moc: NSManagedObjectContext, callback: @escaping Completion) {
-
-		let allApiServers = ApiServer.allApiServers(in: moc)
-		let totalOperations = 2 * allApiServers.count
-		if totalOperations==0 {
-			callback()
-			return
-		}
-
-		var completionCount = 0
-		let repoIdsToMarkDirty = NSMutableSet()
-
-		let completionCallback = {
-			completionCount += 1
-			if completionCount==totalOperations {
-
-				if repoIdsToMarkDirty.count>0 {
-					Repo.markDirtyReposWithIds(repoIdsToMarkDirty, in: moc)
-					DLog("Marked %@ dirty repos that have new events in their event stream", repoIdsToMarkDirty.count)
-				}
-
-				let reposNotRecentlyDirtied = Repo.reposNotRecentlyDirtied(in: moc)
-				if reposNotRecentlyDirtied.count>0 {
-					for r in reposNotRecentlyDirtied {
-						r.resetSyncState()
-					}
-					DLog("Marked dirty %@ repos which haven't been refreshed in over an hour", reposNotRecentlyDirtied.count)
-				}
-
-				callback()
-			}
-		}
-
-		for apiServer in allApiServers {
-			if apiServer.goodToGo && apiServer.lastSyncSucceeded {
-				markDirty(repoIds: repoIdsToMarkDirty, usingUserEventsFrom: apiServer, callback: completionCallback)
-				markDirty(repoIds: repoIdsToMarkDirty, usingReceivedEventsFrom: apiServer, callback: completionCallback)
-			} else {
-				completionCallback()
-				completionCallback()
-			}
+		if shouldSyncReviewAssignments {
+			fetchReviewAssignmentsForCurrentPullRequests(to: moc, callback: completionCallback)
 		}
 	}
 
@@ -470,96 +605,6 @@ final class API {
 
 		getPagedData(at: "/user/teams", from: server, perPageCallback: { data, lastPage in
 			Team.syncTeams(from: data, server: server)
-			return false
-		}) { success, resultCode in
-			if !success {
-				server.lastSyncSucceeded = false
-			}
-			callback()
-		}
-	}
-
-	private class func markDirty(repoIds toMarkDirty: NSMutableSet, usingUserEventsFrom server: ApiServer, callback: @escaping Completion) {
-
-		if !server.lastSyncSucceeded {
-			callback()
-			return
-		}
-
-		var latestDate = server.latestUserEventDateProcessed
-		if latestDate == nil {
-			latestDate = .distantPast
-			server.latestUserEventDateProcessed = latestDate
-		}
-
-		let userName = S(server.userName)
-		let serverLabel = S(server.label)
-
-		getPagedData(at: "/users/\(userName)/events", from: server, perPageCallback: { data, lastPage in
-			for d in data ?? [] {
-				let eventDate = parseGH8601(d["created_at"] as? String) ?? .distantPast
-				if latestDate! < eventDate {
-					if let repoId = (d["repo"] as? [AnyHashable : Any])?["id"] as? NSNumber {
-						DLog("(%@) New event at %@ from Repo ID %@", serverLabel, eventDate, repoId)
-						toMarkDirty.add(repoId)
-					}
-					if server.latestUserEventDateProcessed! < eventDate {
-						server.latestUserEventDateProcessed = eventDate
-						if latestDate! == .distantPast {
-							DLog("(%@) First sync, all repos are dirty so we don't need to read further, we have the latest received event date: %@", serverLabel, eventDate)
-							return true
-						}
-					}
-				} else {
-					DLog("(%@) No further user events", serverLabel)
-					return true
-				}
-			}
-			return false
-		}) { success, resultCode in
-			if !success {
-				server.lastSyncSucceeded = false
-			}
-			callback()
-		}
-	}
-
-	private class func markDirty(repoIds toMarkDirty: NSMutableSet, usingReceivedEventsFrom server: ApiServer, callback: @escaping Completion) {
-
-		if !server.lastSyncSucceeded {
-			callback()
-			return
-		}
-
-		var latestDate = server.latestReceivedEventDateProcessed
-		if latestDate == nil {
-			latestDate = .distantPast
-			server.latestReceivedEventDateProcessed = latestDate
-		}
-
-		let userName = S(server.userName)
-		let serverLabel = S(server.label)
-
-		getPagedData(at: "/users/\(userName)/received_events", from: server, perPageCallback: { data, lastPage in
-			for d in data ?? [] {
-				let eventDate = parseGH8601(d["created_at"] as? String) ?? .distantPast
-				if latestDate! < eventDate {
-					if let repoId = (d["repo"] as? [AnyHashable : Any])?["id"] as? NSNumber {
-						DLog("(%@) New event at %@ from Repo ID %@", serverLabel, eventDate, repoId)
-						toMarkDirty.add(repoId)
-					}
-					if server.latestReceivedEventDateProcessed! < eventDate {
-						server.latestReceivedEventDateProcessed = eventDate
-						if latestDate! == .distantPast {
-							DLog("(%@) First sync, all repos are dirty so we don't need to read further, we have the latest received event date: %@", serverLabel, eventDate)
-							return true
-						}
-					}
-				} else {
-					DLog("(%@) No further received events", serverLabel)
-					return true
-				}
-			}
 			return false
 		}) { success, resultCode in
 			if !success {
@@ -721,6 +766,75 @@ final class API {
 		}
 	}
 
+	private class func fetchCommentReactionsIfNeeded(to moc: NSManagedObjectContext, callback: @escaping Completion) {
+		let comments = PRComment.commentsThatNeedReactionsToBeRefreshed(in: moc).filter { $0.apiServer.lastSyncSucceeded }
+		let totalOperations = comments.count
+		guard totalOperations > 0 else { callback(); return }
+
+		var completionCount = 0
+		for c in comments {
+
+			for r in c.reactions {
+				r.postSyncAction = PostSyncAction.delete.rawValue
+			}
+
+			let apiServer = c.apiServer
+			getPagedData(at: c.requiresReactionRefreshFromUrl!, from: apiServer, perPageCallback: { data, lastPage in
+				Reaction.syncReactions(from: data, comment: c)
+				return false
+			}) { success, resultCode in
+				if success {
+					c.requiresReactionRefreshFromUrl = nil
+				} else {
+					apiServer.lastSyncSucceeded = false
+				}
+				completionCount += 1
+				if completionCount == totalOperations {
+					callback()
+				}
+			}
+		}
+	}
+
+	private class func _fetchItemReactionsIfNeeded(to moc: NSManagedObjectContext, items: [ListableItem], callback: @escaping Completion) {
+		let totalOperations = items.count
+		guard totalOperations > 0 else { callback(); return }
+
+		var completionCount = 0
+		for i in items {
+
+			for r in i.reactions {
+				r.postSyncAction = PostSyncAction.delete.rawValue
+			}
+
+			let apiServer = i.apiServer
+			getPagedData(at: i.requiresReactionRefreshFromUrl!, from: apiServer, perPageCallback: { data, lastPage in
+				Reaction.syncReactions(from: data, parent: i)
+				return false
+			}) { success, resultCode in
+				if success {
+					i.requiresReactionRefreshFromUrl = nil
+				} else {
+					apiServer.lastSyncSucceeded = false
+				}
+				completionCount += 1
+				if completionCount == totalOperations {
+					callback()
+				}
+			}
+		}
+	}
+
+	private class func fetchIssueReactionsIfNeeded(to moc: NSManagedObjectContext, callback: @escaping Completion) {
+		let items = Issue.issuesThatNeedReactionsToBeRefreshed(in: moc).filter { $0.apiServer.lastSyncSucceeded }
+		_fetchItemReactionsIfNeeded(to: moc, items: items, callback: callback)
+	}
+
+	private class func fetchPullRequestReactionsIfNeeded(to moc: NSManagedObjectContext, callback: @escaping Completion) {
+		let items = PullRequest.pullRequestsThatNeedReactionsToBeRefreshed(in: moc).filter { $0.apiServer.lastSyncSucceeded }
+		_fetchItemReactionsIfNeeded(to: moc, items: items, callback: callback)
+	}
+
 	private class func fetchCommentsForCurrentPullRequests(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		let prs = DataItem.newOrUpdatedItems(of: PullRequest.self, in: moc).filter { $0.apiServer.lastSyncSucceeded }
@@ -785,15 +899,7 @@ final class API {
 
 	private class func fetchCommentsForCurrentIssues(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
-		let allIssues = DataItem.newOrUpdatedItems(of: Issue.self, in: moc)
-
-		for i in allIssues {
-			for c in i.comments {
-				c.postSyncAction = PostSyncAction.delete.rawValue
-			}
-		}
-
-		let issues = allIssues.filter { $0.apiServer.lastSyncSucceeded }
+		let issues = DataItem.newOrUpdatedItems(of: Issue.self, in: moc).filter { $0.apiServer.lastSyncSucceeded }
 
 		let totalOperations = issues.count
 		if totalOperations == 0 {
@@ -804,6 +910,10 @@ final class API {
 		var completionCount = 0
 
 		for i in issues {
+
+			for c in i.comments {
+				c.postSyncAction = PostSyncAction.delete.rawValue
+			}
 
 			if let link = i.commentsLink {
 
@@ -830,27 +940,90 @@ final class API {
 		}
 	}
 
-	private class func fetchLabelsForForCurrentPullRequests(to moc: NSManagedObjectContext, callback: @escaping Completion) {
+	private class func fetchReviewsForForCurrentPullRequests(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
-		let prs = PullRequest.active(in: moc, visibleOnly: true).filter { pr in
-			if !pr.apiServer.lastSyncSucceeded {
-				return false
+		let prs = DataItem.newOrUpdatedItems(of: PullRequest.self, in: moc).filter { $0.apiServer.lastSyncSucceeded }
+
+		let totalOperations = prs.count
+		if totalOperations == 0 {
+			callback()
+			return
+		}
+
+		var completionCount = 0
+
+		for p in prs {
+			for l in p.reviews {
+				l.postSyncAction = PostSyncAction.delete.rawValue
 			}
-			if pr.condition != ItemCondition.open.rawValue {
-				//DLog("Won't check labels for closed/merged PR: %@", pr.title)
+
+			let repoFullName = S(p.repo.fullName)
+			getPagedData(at: "/repos/\(repoFullName)/pulls/\(p.number)/reviews", from: p.apiServer, perPageCallback: { data, lastPage in
+				Review.syncReviews(from: data, withParent: p)
 				return false
-			}
-			let oid = pr.objectID
-			let refreshes = refreshesSinceLastLabelsCheck[oid]
-			if refreshes == nil || refreshes! >= Settings.labelRefreshInterval {
-				//DLog("Will check labels for PR: '%@'", pr.title)
-				return true
-			} else {
-				//DLog("No need to get labels for PR: '%@' (%@ refreshes since last check)", pr.title, refreshes)
-				refreshesSinceLastLabelsCheck[oid] = (refreshes ?? 0)+1
-				return false
+			}) { success, resultCode in
+				completionCount += 1
+				if !success {
+					p.apiServer.lastSyncSucceeded = false
+				}
+				if completionCount == totalOperations {
+					callback()
+				}
 			}
 		}
+	}
+
+	static var shouldSyncReactions: Bool {
+		return Settings.notifyOnItemReactions || Settings.notifyOnCommentReactions
+	}
+	static var shouldSyncReviews: Bool {
+		return Settings.displayReviewsOnItems || Settings.notifyOnReviewDismissals || Settings.notifyOnReviewAcceptances || Settings.notifyOnReviewChangeRequests
+	}
+	static var shouldSyncReviewAssignments: Bool {
+		return Settings.displayReviewsOnItems || Settings.notifyOnReviewAssignments || (Int64(Settings.assignedReviewHandlingPolicy) != Section.none.rawValue)
+	}
+
+	private class func fetchReviewAssignmentsForCurrentPullRequests(to moc: NSManagedObjectContext, callback: @escaping Completion) {
+
+		let prs = DataItem.newOrUpdatedItems(of: PullRequest.self, in: moc).filter { $0.apiServer.lastSyncSucceeded }
+
+		let totalOperations = prs.count
+		if totalOperations == 0 {
+			callback()
+			return
+		}
+
+		var completionCount = 0
+
+		for p in prs {
+
+			var reviewers = Set<String>()
+			let repoFullName = S(p.repo.fullName)
+			getPagedData(at: "/repos/\(repoFullName)/pulls/\(p.number)/requested_reviewers", from: p.apiServer, perPageCallback: { data, lastPage in
+				guard let data = data else { return true }
+				for userName in data.flatMap({ $0["login"] as? String }) {
+					reviewers.insert(userName)
+				}
+				return false
+			}) { success, resultCode in
+				completionCount += 1
+				if success {
+					if p.checkAndStoreReviewAssignments(reviewers) && Settings.notifyOnReviewAssignments {
+						NotificationQueue.add(type: .assignedForReview, for: p)
+					}
+				} else {
+					p.apiServer.lastSyncSucceeded = false
+				}
+				if completionCount == totalOperations {
+					callback()
+				}
+			}
+		}
+	}
+
+	private class func fetchLabelsForForCurrentPullRequests(to moc: NSManagedObjectContext, callback: @escaping Completion) {
+
+		let prs = DataItem.newOrUpdatedItems(of: PullRequest.self, in: moc).filter { $0.apiServer.lastSyncSucceeded }
 
 		let totalOperations = prs.count
 		if totalOperations == 0 {
@@ -872,17 +1045,11 @@ final class API {
 					return false
 				}) { success, resultCode in
 					completionCount += 1
-					var allGood = success
 					if !success {
 						// 404/410 means the label has been deleted
 						if !(resultCode==404 || resultCode==410) {
 							p.apiServer.lastSyncSucceeded = false
-						} else {
-							allGood = true
 						}
-					}
-					if allGood {
-						refreshesSinceLastLabelsCheck[p.objectID] = 1
 					}
 					if completionCount == totalOperations {
 						callback()
@@ -890,7 +1057,6 @@ final class API {
 				}
 			} else {
 				// no labels link, so presumably no labels
-				refreshesSinceLastLabelsCheck[p.objectID] = 1
 				completionCount += 1
 				if completionCount == totalOperations {
 					callback()
@@ -901,7 +1067,7 @@ final class API {
 
 	private class func fetchStatusesForCurrentPullRequests(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
-		let prs = PullRequest.active(in: moc, visibleOnly: !Settings.hidePrsThatArentPassing).filter { pr in
+		let prs = PullRequest.active(of: PullRequest.self, in: moc, visibleOnly: !Settings.hidePrsThatArentPassing).filter { pr in
 			guard pr.apiServer.lastSyncSucceeded else { return false }
 
 			let oid = pr.objectID
@@ -1025,7 +1191,10 @@ final class API {
 			if let issueLink = p.issueUrl {
 				getData(in: issueLink, from: apiServer) { data, lastPage, resultCode in
 					if resultCode == 200 || resultCode == 404 || resultCode == 410 {
-						p.processAssignmentStatus(from: data as? [AnyHashable : Any])
+						if let d = data as? [AnyHashable : Any] {
+							p.processAssignmentStatus(from: d)
+							p.processReactions(from: d)
+						}
 					} else {
 						apiServer.lastSyncSucceeded = false
 					}
@@ -1157,30 +1326,6 @@ final class API {
 		}
 	}
 
-	private class func shouldScanForStatuses(in moc: NSManagedObjectContext) -> Bool {
-		if Settings.showStatusItems {
-			return true
-		} else {
-			refreshesSinceLastStatusCheck.removeAll()
-			for s in DataItem.allItems(of: PRStatus.self, in: moc) {
-				s.postSyncAction = PostSyncAction.delete.rawValue
-			}
-			return false
-		}
-	}
-
-	private class func shouldScanForLabels(in moc: NSManagedObjectContext) -> Bool {
-		if Settings.showLabels {
-			return true
-		} else {
-			refreshesSinceLastLabelsCheck.removeAll()
-			for l in DataItem.allItems(of: PRLabel.self, in: moc) {
-				l.postSyncAction = PostSyncAction.delete.rawValue
-			}
-			return false
-		}
-	}
-
 	private class func syncWatchedRepos(from server: ApiServer, callback: @escaping Completion) {
 
 		if !server.lastSyncSucceeded {
@@ -1292,7 +1437,7 @@ final class API {
 			return
 		}
 
-		let p = page > 1 ? "\(path)?page=\(page)" : path
+		let p = page > 1 ? "\(path)?page=\(page)&per_page=100" : "\(path)?per_page=100"
 		getData(in: p, from: server) { data, lastPage, resultCode in
 
 			if let d = data as? [[AnyHashable : Any]] {
@@ -1330,10 +1475,10 @@ final class API {
 				}
 				callback(data, lastPage, code ?? 0)
 			} else {
-				if shouldRetry && attemptCount < 2 { // timeout, truncation, connection issue, etc
+				if shouldRetry && attemptCount < 3 { // timeout, truncation, connection issue, etc
 					let nextAttemptCount = attemptCount+1
 					DLog("(%@) Will retry failed API call to %@ (attempt #%@)", S(server.label), path, nextAttemptCount)
-					delay(2.0) {
+					delay(3.0) {
 						getData(in: path, from: server, attemptCount: nextAttemptCount, callback: callback)
 					}
 				} else {
@@ -1346,23 +1491,7 @@ final class API {
 		})
 	}
 
-	private static let apiQueue = { () -> OperationQueue in
-		let n = OperationQueue()
-		n.underlyingQueue = DispatchQueue.main
-		#if os(iOS)
-			let archIs64Bit = (MemoryLayout<Int>.size == MemoryLayout<Int64>.size)
-			n.maxConcurrentOperationCount = archIs64Bit ? 8 : 2
-		#else
-			n.maxConcurrentOperationCount = 8
-		#endif
-		return n
-	}()
-
-	private class func start(
-		call path: String,
-		on server: ApiServer,
-		ignoreLastSync: Bool,
-		completion: @escaping ApiCompletion) {
+	private class func start(call path: String, on server: ApiServer, ignoreLastSync: Bool, completion: @escaping ApiCompletion) {
 
 		let apiServerLabel: String
 		if server.lastSyncSucceeded || ignoreLastSync {
@@ -1379,7 +1508,15 @@ final class API {
 		let url = URL(string: expandedPath)!
 
 		var r = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 60.0)
-		r.setValue("application/vnd.github.v3+json", forHTTPHeaderField:"Accept")
+		var acceptTypes = [String]()
+		if shouldSyncReactions {
+			acceptTypes.append("application/vnd.github.squirrel-girl-preview")
+		}
+		if shouldSyncReviews || shouldSyncReviewAssignments {
+			acceptTypes.append("application/vnd.github.black-cat-preview+json")
+		}
+		acceptTypes.append("application/vnd.github.v3+json")
+		r.setValue(acceptTypes.joined(separator: ", "), forHTTPHeaderField: "Accept")
 		if let a = server.authToken {
 			r.setValue("token \(a)", forHTTPHeaderField: "Authorization")
 		}
@@ -1451,14 +1588,14 @@ final class API {
 			} else if code == 0 {
 				error = apiError("Server did not repond")
 				parsedData = nil
-				shouldRetry = (e as? NSError)?.code == -1001 // retry if it was a timeout
+				shouldRetry = (e as NSError?)?.code == -1001 // retry if it was a timeout
 			} else if Int64(data?.count ?? 0) < (response?.expectedContentLength ?? 0) {
 				error = apiError("Server data was truncated")
 				parsedData = nil
 				shouldRetry = true // transfer truncation, try again
 			} else {
 				DLog("(%@) GET %@ - RESULT: %@", apiServerLabel, expandedPath, code)
-				error = e as? NSError
+				error = e as NSError?
 				shouldRetry = false
 				if let d = data {
 					parsedData = try? JSONSerialization.jsonObject(with: d, options: [])
@@ -1502,7 +1639,7 @@ final class API {
 	                                  headers: [AnyHashable : Any]?,
 	                                  completion: ApiCompletion) {
 		if let e = error {
-			if code > 399 {
+			if code > 399 && !shouldRetry {
 				if var backoff = existingBackOff {
 					DLog("(%@) Extending backoff for already throttled URL %@ by %@ seconds", serverLabel, urlPath, backOffIncrement)
 					if backoff.nextIncrement < 3600.0 {

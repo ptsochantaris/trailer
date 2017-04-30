@@ -64,7 +64,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 				showMessage("Testing the token failed - please check that you have pasted your token correctly", e.localizedDescription)
 				s.normalMode()
 			} else {
-				s.feedback.text = "Syncing GitHub data for the first time.\n\nThis could take a little while, please wait..."
+				s.feedback.text = "Syncing GitHub data for the first time.\n\nThis could take a little while, please wait…"
 				Settings.lastSuccessfulRefresh = nil
 				app.startRefreshIfItIsDue()
 				s.checkTimer = Timer(repeats: true, interval: 1) {
@@ -75,7 +75,9 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 	}
 
 	private func checkRefreshDone() {
-		if !appIsRefreshing {
+		if appIsRefreshing {
+			feedback.text = "\nSyncing GitHub data for the first time. This could take a little while, please wait…\n\n(\(API.pendingCallCount) calls remaining)"
+		} else {
 			checkTimer = nil
 			if newServer.lastSyncSucceeded {
 				dismiss(animated: true) {
@@ -110,7 +112,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 		skip.isEnabled = false
 		importer.isEnabled = false
 		spinner.startAnimating()
-		feedback.text = "\nTesting the token..."
+		feedback.text = "\nTesting the token…"
 
 		navigationController?.setToolbarHidden(true, animated: true)
 

@@ -82,6 +82,8 @@
 		166ADEC81CCB009A001BA61F /* SnoozingEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166ADEC71CCB009A001BA61F /* SnoozingEditorViewController.swift */; };
 		1671A11F1AC73CCB0047440A /* SetupAssistant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1671A11E1AC73CCB0047440A /* SetupAssistant.swift */; };
 		1671A1231AC74BC30047440A /* SetupAssistant.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1671A1221AC74BC30047440A /* SetupAssistant.xib */; };
+		167B10571E6A86A300B0E1AE /* Review.swift in Sources */ = {isa = PBXBuildFile; fileRef = 167B10561E6A86A300B0E1AE /* Review.swift */; };
+		167B10581E6A86A300B0E1AE /* Review.swift in Sources */ = {isa = PBXBuildFile; fileRef = 167B10561E6A86A300B0E1AE /* Review.swift */; };
 		16813CBF1BA16D660020F8EB /* CommonController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16813CBE1BA16D660020F8EB /* CommonController.swift */; };
 		168839C71DEF8C3B002D9448 /* ImportExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 168839C61DEF8C3B002D9448 /* ImportExport.swift */; };
 		168BC6C417EC2DF000BC4584 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 168BC6C217EC2DF000BC4584 /* MainMenu.xib */; };
@@ -92,6 +94,8 @@
 		169205641E34DA9F00FB9547 /* CustomReposViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169205631E34DA9F00FB9547 /* CustomReposViewController.swift */; };
 		169205661E34DACA00FB9547 /* WatchlistSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169205651E34DACA00FB9547 /* WatchlistSettingsViewController.swift */; };
 		169205681E34EB4D00FB9547 /* CustomRepoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169205671E34EB4D00FB9547 /* CustomRepoCell.swift */; };
+		1694008C1E7AAE32002C5DAD /* Reaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1694008B1E7AAE32002C5DAD /* Reaction.swift */; };
+		1694008D1E7AAE32002C5DAD /* Reaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1694008B1E7AAE32002C5DAD /* Reaction.swift */; };
 		169B92961CC52C05002774A8 /* SnoozePreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169B92951CC52C05002774A8 /* SnoozePreset.swift */; };
 		169B92971CC52C05002774A8 /* SnoozePreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169B92951CC52C05002774A8 /* SnoozePreset.swift */; };
 		169FB2361A3DBD7D00E00771 /* SectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169FB2351A3DBD7D00E00771 /* SectionHeader.swift */; };
@@ -122,6 +126,8 @@
 		16B94072182D136700F32061 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 16B94070182D136700F32061 /* dsa_pub.pem */; };
 		16C3048C1CF4EC590017D79F /* SectionHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 16C3048B1CF4EC590017D79F /* SectionHeaderView.xib */; };
 		16C3048E1CF4ECEF0017D79F /* SectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C3048D1CF4ECEF0017D79F /* SectionHeaderView.swift */; };
+		16C4ACF71EB553E20022C33B /* requestsChangesIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 16C4ACF51EB553E20022C33B /* requestsChangesIcon.png */; };
+		16C4ACF81EB553E20022C33B /* approvesChangesIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 16C4ACF61EB553E20022C33B /* approvesChangesIcon.png */; };
 		16C90F021B13BC180095E8D5 /* RepoSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C90F011B13BC180095E8D5 /* RepoSettingsViewController.swift */; };
 		16C9A2761A44D12600EE54EC /* AboutTrailerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C9A2751A44D12600EE54EC /* AboutTrailerViewController.swift */; };
 		16C9A27A1A44DD0200EE54EC /* CommentBlacklistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C9A2791A44DD0200EE54EC /* CommentBlacklistViewController.swift */; };
@@ -303,10 +309,12 @@
 		166A84C31A45CEE000A3B292 /* PickerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerViewController.swift; sourceTree = "<group>"; };
 		166ADEC51CCAFF77001BA61F /* SnoozingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SnoozingViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		166ADEC71CCB009A001BA61F /* SnoozingEditorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SnoozingEditorViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		1671A11E1AC73CCB0047440A /* SetupAssistant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SetupAssistant.swift; sourceTree = "<group>"; };
+		1671A11E1AC73CCB0047440A /* SetupAssistant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SetupAssistant.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		1671A1221AC74BC30047440A /* SetupAssistant.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SetupAssistant.xib; sourceTree = "<group>"; };
 		1672DF2D1AB0D7CC00381AEB /* PocketTrailer WatchKit Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "PocketTrailer WatchKit Extension.entitlements"; sourceTree = "<group>"; };
 		16791B161C0A1B0D003A527F /* Trailer 23.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 23.xcdatamodel"; sourceTree = "<group>"; };
+		167B10551E6A856A00B0E1AE /* Trailer 34.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 34.xcdatamodel"; sourceTree = "<group>"; };
+		167B10561E6A86A300B0E1AE /* Review.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Review.swift; path = Shared/Review.swift; sourceTree = SOURCE_ROOT; };
 		167E399B1CF981D900593204 /* Trailer 29.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 29.xcdatamodel"; sourceTree = "<group>"; };
 		16813CBE1BA16D660020F8EB /* CommonController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = CommonController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		1686B1D41AE59AED009118C5 /* PocketTrailer.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PocketTrailer.entitlements; sourceTree = "<group>"; };
@@ -320,8 +328,10 @@
 		168FD00D1A2A7AD1005929CB /* MessageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageView.swift; sourceTree = "<group>"; };
 		16901A441D659E9500141595 /* NotificationQueue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NotificationQueue.swift; path = Shared/NotificationQueue.swift; sourceTree = "<group>"; };
 		169205631E34DA9F00FB9547 /* CustomReposViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomReposViewController.swift; sourceTree = "<group>"; };
-		169205651E34DACA00FB9547 /* WatchlistSettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WatchlistSettingsViewController.swift; sourceTree = "<group>"; };
+		169205651E34DACA00FB9547 /* WatchlistSettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = WatchlistSettingsViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		169205671E34EB4D00FB9547 /* CustomRepoCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomRepoCell.swift; sourceTree = "<group>"; };
+		1694008A1E7AAADF002C5DAD /* Trailer 35.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 35.xcdatamodel"; sourceTree = "<group>"; };
+		1694008B1E7AAE32002C5DAD /* Reaction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Reaction.swift; path = Shared/Reaction.swift; sourceTree = SOURCE_ROOT; };
 		169B92941CC3E5AD002774A8 /* Trailer 25.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 25.xcdatamodel"; sourceTree = "<group>"; };
 		169B92951CC52C05002774A8 /* SnoozePreset.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = SnoozePreset.swift; path = ../Shared/SnoozePreset.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		169FB2351A3DBD7D00E00771 /* SectionHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SectionHeader.swift; sourceTree = "<group>"; };
@@ -362,6 +372,8 @@
 		16B94070182D136700F32061 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
 		16C3048B1CF4EC590017D79F /* SectionHeaderView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SectionHeaderView.xib; sourceTree = "<group>"; };
 		16C3048D1CF4ECEF0017D79F /* SectionHeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SectionHeaderView.swift; sourceTree = "<group>"; };
+		16C4ACF51EB553E20022C33B /* requestsChangesIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = requestsChangesIcon.png; sourceTree = "<group>"; };
+		16C4ACF61EB553E20022C33B /* approvesChangesIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = approvesChangesIcon.png; sourceTree = "<group>"; };
 		16C90F011B13BC180095E8D5 /* RepoSettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = RepoSettingsViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16C9A2751A44D12600EE54EC /* AboutTrailerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutTrailerViewController.swift; sourceTree = "<group>"; };
 		16C9A2791A44DD0200EE54EC /* CommentBlacklistViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentBlacklistViewController.swift; sourceTree = "<group>"; };
@@ -566,6 +578,8 @@
 				162FB97E1CF517F200F380E1 /* Document Icons */,
 				1628A6C918789E73005EDA69 /* Main.storyboard */,
 				16154E2E19C43E8E00E49139 /* Launch.storyboard */,
+				16C4ACF51EB553E20022C33B /* requestsChangesIcon.png */,
+				16C4ACF61EB553E20022C33B /* approvesChangesIcon.png */,
 				1628A6D518789E73005EDA69 /* Images.xcassets */,
 			);
 			name = Resources;
@@ -773,6 +787,7 @@
 				1633C1911ABCEC4A0086C692 /* Issue.swift */,
 				16A69ED91AC83020008231F9 /* ListableItem.swift */,
 				16B3B3121A34E8E2000BE6CC /* PRComment.swift */,
+				1694008B1E7AAE32002C5DAD /* Reaction.swift */,
 				16B3B3131A34E8E2000BE6CC /* PRLabel.swift */,
 				16B3B3141A34E8E2000BE6CC /* PRStatus.swift */,
 				16B3B3151A34E8E2000BE6CC /* PullRequest.swift */,
@@ -780,6 +795,7 @@
 				161B851B1AB8E12C00AD4C5D /* Team.swift */,
 				169B92951CC52C05002774A8 /* SnoozePreset.swift */,
 				160129C81CD8A2A300151D6C /* CacheEntry.swift */,
+				167B10561E6A86A300B0E1AE /* Review.swift */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -1000,6 +1016,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				16C4ACF81EB553E20022C33B /* approvesChangesIcon.png in Resources */,
+				16C4ACF71EB553E20022C33B /* requestsChangesIcon.png in Resources */,
 				1628A6CB18789E73005EDA69 /* Main.storyboard in Resources */,
 				1628A6D618789E73005EDA69 /* Images.xcassets in Resources */,
 				16DD6AB21AE457C300145425 /* trailerDoc320.png in Resources */,
@@ -1076,6 +1094,7 @@
 				16B3B3181A34E8E2000BE6CC /* ApiServer.swift in Sources */,
 				16259BCE1A449400009C5745 /* OpenInSafariActivity.swift in Sources */,
 				1668CFE91D5E16B70021CDC5 /* Reachability.swift in Sources */,
+				1694008D1E7AAE32002C5DAD /* Reaction.swift in Sources */,
 				169205661E34DACA00FB9547 /* WatchlistSettingsViewController.swift in Sources */,
 				16C9A27A1A44DD0200EE54EC /* CommentBlacklistViewController.swift in Sources */,
 				166ADEC81CCB009A001BA61F /* SnoozingEditorViewController.swift in Sources */,
@@ -1107,6 +1126,7 @@
 				166A84C01A4582C100A3B292 /* ServerDetailViewController.swift in Sources */,
 				169B92971CC52C05002774A8 /* SnoozePreset.swift in Sources */,
 				164841001AD198A6009E6383 /* WatchManager.swift in Sources */,
+				167B10581E6A86A300B0E1AE /* Review.swift in Sources */,
 				162A29DA1A4085FD008F41A9 /* GroupingCriterion.swift in Sources */,
 				160823F51A44997F006F91AD /* UINavigationControllerExtensions.swift in Sources */,
 				16275DF61CF8944100EEBF48 /* API.swift in Sources */,
@@ -1184,8 +1204,10 @@
 				160D312C1A9619CE006B74BC /* FilledView.swift in Sources */,
 				16DB793C1E326C950076A36D /* AdvancedReposWindow.swift in Sources */,
 				162A29D91A4085FD008F41A9 /* GroupingCriterion.swift in Sources */,
+				167B10571E6A86A300B0E1AE /* Review.swift in Sources */,
 				16B3B34F1A34E990000BE6CC /* Trailer.xcdatamodeld in Sources */,
 				1633C1921ABCEC4A0086C692 /* Issue.swift in Sources */,
+				1694008C1E7AAE32002C5DAD /* Reaction.swift in Sources */,
 				1639E2C11E4007B900C561E1 /* Timer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1618,6 +1640,8 @@
 		16B3B33B1A34E990000BE6CC /* Trailer.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				1694008A1E7AAADF002C5DAD /* Trailer 35.xcdatamodel */,
+				167B10551E6A856A00B0E1AE /* Trailer 34.xcdatamodel */,
 				16B415611E3D054500741E6F /* Trailer 33.xcdatamodel */,
 				16DB793F1E32D6460076A36D /* Trailer 32.xcdatamodel */,
 				1605EDCB1D58B71900D91F50 /* Trailer 31.xcdatamodel */,
@@ -1652,7 +1676,7 @@
 				16B3B34D1A34E990000BE6CC /* Trailer 9.xcdatamodel */,
 				16B3B34E1A34E990000BE6CC /* Trailer.xcdatamodel */,
 			);
-			currentVersion = 16B415611E3D054500741E6F /* Trailer 33.xcdatamodel */;
+			currentVersion = 1694008A1E7AAADF002C5DAD /* Trailer 35.xcdatamodel */;
 			name = Trailer.xcdatamodeld;
 			path = ../Shared/Trailer.xcdatamodeld;
 			sourceTree = "<group>";

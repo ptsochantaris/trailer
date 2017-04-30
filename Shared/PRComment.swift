@@ -1,4 +1,5 @@
 import Foundation
+import CoreData
 
 final class PRComment: DataItem {
 
@@ -7,9 +8,13 @@ final class PRComment: DataItem {
     @NSManaged var userId: Int64
     @NSManaged var userName: String?
     @NSManaged var webUrl: String?
+	@NSManaged var requiresReactionRefreshFromUrl: String?
 
     @NSManaged var pullRequest: PullRequest?
 	@NSManaged var issue: Issue?
+	@NSManaged var review: Review?
+
+	@NSManaged var reactions: Set<Reaction>
 
 	class func syncComments(from data: [[AnyHashable : Any]]?, pullRequest: PullRequest) {
 		items(with: data, type: PRComment.self, server: pullRequest.apiServer) { item, info, newOrUpdated in
@@ -18,6 +23,7 @@ final class PRComment: DataItem {
 				item.fill(from: info)
 				item.fastForwardIfNeeded(parent: pullRequest)
 			}
+			item.processReactions(from: info)
 		}
 	}
 
@@ -28,6 +34,7 @@ final class PRComment: DataItem {
 				item.fill(from: info)
 				item.fastForwardIfNeeded(parent: issue)
 			}
+			item.processReactions(from: info)
 		}
 	}
 
@@ -75,9 +82,14 @@ final class PRComment: DataItem {
 		}
 	}
 
-	func fill(from info: [AnyHashable : Any]) {
+	private func fill(from info: [AnyHashable : Any]) {
 		body = info["body"] as? String
-		webUrl = info["html_url"] as? String
+
+		if let id = info["pull_request_review_id"] as? Int64, let moc = managedObjectContext, let r = Review.review(with: id, in: moc) {
+			review = r
+		} else {
+			review = nil
+		}
 
 		if let userInfo = info["user"] as? [AnyHashable : Any] {
 			userName = userInfo["login"] as? String
@@ -85,9 +97,31 @@ final class PRComment: DataItem {
 			avatarUrl = userInfo["avatar_url"] as? String
 		}
 
-		if webUrl==nil, let links = info["links"] as? [AnyHashable : Any] {
-			webUrl = (links["html"] as? [AnyHashable : Any])?["href"] as? String
+		if let href = info["html_url"] as? String {
+			webUrl = href
+
+		} else if let links = info["_links"] as? [AnyHashable : Any],
+			let html = links["html"] as? [AnyHashable : Any],
+			let href = html["href"] as? String {
+
+			webUrl = href
 		}
+	}
+
+	private func processReactions(from info: [AnyHashable : Any]?) {
+		if API.shouldSyncReactions, let info = info, let r = info["reactions"] as? [AnyHashable : Any] {
+			requiresReactionRefreshFromUrl = Reaction.changesDetected(in: reactions, from: r)
+		} else {
+			reactions.forEach { $0.postSyncAction = PostSyncAction.delete.rawValue }
+			requiresReactionRefreshFromUrl = nil
+		}
+	}
+
+	class func commentsThatNeedReactionsToBeRefreshed(in moc: NSManagedObjectContext) -> [PRComment] {
+		let f = NSFetchRequest<PRComment>(entityName: "PRComment")
+		f.returnsObjectsAsFaults = false
+		f.predicate = NSPredicate(format: "requiresReactionRefreshFromUrl != nil")
+		return try! moc.fetch(f)
 	}
 
 	var notificationSubtitle: String {

@@ -9,7 +9,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	func reset() {
 		preferencesDirty = true
 		API.refreshesSinceLastStatusCheck.removeAll()
-		API.refreshesSinceLastLabelsCheck.removeAll()
+		API.refreshesSinceLastReactionsCheck.removeAll()
 		Settings.lastSuccessfulRefresh = nil
 		lastRepoCheck = .distantPast
 		projectsTable.reloadData()
@@ -85,11 +85,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var showSeparateApiServersInMenu: NSButton!
 	@IBOutlet weak var displayRepositoryNames: NSButton!
 	@IBOutlet weak var hideCountsOnMenubar: NSButton!
-
-	// Labels
-	@IBOutlet weak var labelRescanLabel: NSTextField!
-	@IBOutlet weak var labelRefreshNote: NSTextField!
-	@IBOutlet weak var labelRefreshCounter: NSStepper!
 	@IBOutlet weak var showLabels: NSButton!
 
 	// Servers
@@ -147,6 +142,23 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var allNewPrsSetting: NSPopUpButton!
 	@IBOutlet weak var allNewIssuesSetting: NSPopUpButton!
 
+	// Reviews
+	@IBOutlet weak var assignedReviewHandlingPolicy: NSPopUpButton!
+	@IBOutlet weak var notifyOnChangeRequests: NSButton!
+	@IBOutlet weak var notifyOnAcceptances: NSButton!
+	@IBOutlet weak var notifyOnReviewDismissals: NSButton!
+	@IBOutlet weak var notifyOnReviewAssignments: NSButton!
+	@IBOutlet weak var notifyOnAllChangeRequests: NSButton!
+	@IBOutlet weak var notifyOnAllAcceptances: NSButton!
+	@IBOutlet weak var notifyOnAllReviewDismissals: NSButton!
+	@IBOutlet weak var supportReviews: NSButton!
+
+	// Reactions
+	@IBOutlet weak var notifyOnItemReactions: NSButton!
+	@IBOutlet weak var notifyOnCommentReactions: NSButton!
+	@IBOutlet weak var reactionIntervalLabel: NSTextField!
+	@IBOutlet weak var reactionIntervalStepper: NSStepper!
+
 	// Tabs
 	@IBOutlet weak var tabs: NSTabView!
 
@@ -172,7 +184,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		n.addObserver(self, selector: #selector(updateApiTable), name: ApiUsageUpdateNotification, object: nil)
 		n.addObserver(self, selector: #selector(updateImportExportSettings), name: SettingsExportedNotification, object: nil)
 
-		deferredUpdateTimer = PopTimer(timeInterval: 0.5) { [weak self] in
+		deferredUpdateTimer = PopTimer(timeInterval: 1.0) { [weak self] in
 			if let s = self, s.serversDirty {
 				s.serversDirty = false
 				DataManager.saveDB()
@@ -183,6 +195,143 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 				app.updateAllMenus()
 			}
 		}
+	}
+
+	private func updateReviewOptions() {
+		if !Settings.notifyOnReviewChangeRequests {
+			Settings.notifyOnAllReviewChangeRequests = false
+		}
+		if !Settings.notifyOnReviewDismissals {
+			Settings.notifyOnAllReviewDismissals = false
+		}
+		if !Settings.notifyOnReviewAcceptances {
+			Settings.notifyOnAllReviewAcceptances = false
+		}
+
+		notifyOnAllChangeRequests.isEnabled = Settings.notifyOnReviewChangeRequests
+		notifyOnAllReviewDismissals.isEnabled = Settings.notifyOnReviewDismissals
+		notifyOnAllAcceptances.isEnabled = Settings.notifyOnReviewAcceptances
+
+		notifyOnChangeRequests.integerValue = Settings.notifyOnReviewChangeRequests ? 1 : 0
+		notifyOnReviewDismissals.integerValue = Settings.notifyOnReviewDismissals ? 1 : 0
+		notifyOnAcceptances.integerValue = Settings.notifyOnReviewAcceptances ? 1 : 0
+		notifyOnAllChangeRequests.integerValue = Settings.notifyOnAllReviewChangeRequests ? 1 : 0
+		notifyOnAllReviewDismissals.integerValue = Settings.notifyOnAllReviewDismissals ? 1 : 0
+		notifyOnAllAcceptances.integerValue = Settings.notifyOnAllReviewAcceptances ? 1 : 0
+	}
+
+	private func showOptionalReviewWarning(previousSync: Bool) {
+
+		updateReviewOptions()
+
+		if !previousSync && (API.shouldSyncReviews || API.shouldSyncReviewAssignments) {
+			for p in DataItem.allItems(of: PullRequest.self, in: DataManager.main) {
+				p.resetSyncState()
+			}
+			preferencesDirty = true
+
+			showLongSyncWarning()
+		} else {
+			deferredUpdateTimer.push()
+		}
+	}
+
+	@IBAction func supportReviewsSelected(_ sender: NSButton) {
+		if API.shouldSyncReactions && sender.integerValue == 1 {
+			alertThatReactionsMustBeDisabled()
+			sender.integerValue = 0
+			return
+		}
+		let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
+		Settings.displayReviewsOnItems = sender.integerValue == 1
+		showOptionalReviewWarning(previousSync: previousShouldSync)
+	}
+
+	@IBAction func notifyOnChangeRequestsSelected(_ sender: NSButton) {
+		if API.shouldSyncReactions && sender.integerValue == 1 {
+			alertThatReactionsMustBeDisabled()
+			sender.integerValue = 0
+			return
+		}
+		let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
+		Settings.notifyOnReviewChangeRequests = sender.integerValue == 1
+		showOptionalReviewWarning(previousSync: previousShouldSync)
+	}
+	@IBAction func notifyOnAllChangeRequestsSelected(_ sender: NSButton) {
+		Settings.notifyOnAllReviewChangeRequests = sender.integerValue == 1
+	}
+
+	@IBAction func notifyOnAcceptancesSelected(_ sender: NSButton) {
+		if API.shouldSyncReactions && sender.integerValue == 1 {
+			alertThatReactionsMustBeDisabled()
+			sender.integerValue = 0
+			return
+		}
+		let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
+		Settings.notifyOnReviewAcceptances = sender.integerValue == 1
+		showOptionalReviewWarning(previousSync: previousShouldSync)
+	}
+	@IBAction func notifyOnAllAcceptancesSelected(_ sender: NSButton) {
+		Settings.notifyOnAllReviewAcceptances = sender.integerValue == 1
+	}
+
+	@IBAction func notifyOnReviewDismissalsSelected(_ sender: NSButton) {
+		if API.shouldSyncReactions && sender.integerValue == 1 {
+			alertThatReactionsMustBeDisabled()
+			sender.integerValue = 0
+			return
+		}
+		let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
+		Settings.notifyOnReviewDismissals = sender.integerValue == 1
+		showOptionalReviewWarning(previousSync: previousShouldSync)
+	}
+	@IBAction func notifyOnAllReviewDismissalsSelected(_ sender: NSButton) {
+		Settings.notifyOnAllReviewDismissals = sender.integerValue == 1
+	}
+
+	private func showOptionalReviewAssignmentWarning(previousSync: Bool) {
+
+		if !previousSync && (API.shouldSyncReviews || API.shouldSyncReviewAssignments) {
+			for p in DataItem.allItems(of: PullRequest.self, in: DataManager.main) {
+				p.resetSyncState()
+			}
+			preferencesDirty = true
+
+			showLongSyncWarning()
+		} else {
+			deferredUpdateTimer.push()
+		}
+	}
+
+	@IBAction func notifyOnReviewAssignmentsSelected(_ sender: NSButton) {
+		if API.shouldSyncReactions && sender.integerValue == 1 {
+			alertThatReactionsMustBeDisabled()
+			sender.integerValue = 0
+			return
+		}
+		let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
+		Settings.notifyOnReviewAssignments = sender.integerValue == 1
+		showOptionalReviewAssignmentWarning(previousSync: previousShouldSync)
+	}
+
+	@IBAction func assignedReviewHandlingPolicySelected(_ sender: NSPopUpButton) {
+		let index = sender.index(of: sender.selectedItem!)
+		if API.shouldSyncReactions && index > 0 {
+			alertThatReactionsMustBeDisabled()
+			sender.select(sender.item(at: 0))
+			return
+		}
+		let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
+		Settings.assignedReviewHandlingPolicy = index
+		DataManager.postProcessAllItems()
+		deferredUpdateTimer.push()
+		showOptionalReviewAssignmentWarning(previousSync: previousShouldSync)
+	}
+
+	private func showLongSyncWarning() {
+		let a = NSAlert()
+		a.messageText = "The next sync may take a while, because everything will need to be fully re-synced. This will be needed only once: Subsequent syncs will be fast again."
+		a.beginSheetModal(for: self, completionHandler: nil)
 	}
 
 	func updateApiTable() {
@@ -246,12 +395,9 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		openPrAtFirstUnreadComment.toolTip = Settings.openPrAtFirstUnreadCommentHelp
 		assumeCommentsBeforeMineAreRead.toolTip = Settings.assumeReadItemIfUserHasNewerCommentsHelp
 		disableAllCommentNotifications.toolTip = Settings.disableAllCommentNotificationsHelp
-		showLabels.toolTip = Settings.showLabelsHelp
 		showStatusItems.toolTip = Settings.showStatusItemsHelp
 		statusItemRefreshCounter.toolTip = Settings.statusItemRefreshIntervalHelp
 		statusItemRescanLabel.toolTip = Settings.statusItemRefreshIntervalHelp
-		labelRefreshCounter.toolTip = Settings.labelRefreshIntervalHelp
-		labelRescanLabel.toolTip = Settings.labelRefreshIntervalHelp
 		makeStatusItemsSelectable.toolTip = Settings.makeStatusItemsSelectableHelp
 		notifyOnStatusUpdates.toolTip = Settings.notifyOnStatusUpdatesHelp
 		notifyOnStatusUpdatesForAllPrs.toolTip = Settings.notifyOnStatusUpdatesForAllPrsHelp
@@ -270,6 +416,21 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		newMentionMovePolicy.toolTip = Settings.newMentionMovePolicyHelp
 		teamMentionMovePolicy.toolTip = Settings.teamMentionMovePolicyHelp
 		newItemInOwnedRepoMovePolicy.toolTip = Settings.newItemInOwnedRepoMovePolicyHelp
+		notifyOnAllChangeRequests.toolTip = Settings.notifyOnAllReviewChangeRequestsHelp
+		notifyOnChangeRequests.toolTip = Settings.notifyOnReviewChangeRequestsHelp
+		notifyOnAllAcceptances.toolTip = Settings.notifyOnAllReviewChangeRequestsHelp
+		notifyOnAcceptances.toolTip = Settings.notifyOnReviewAcceptancesHelp
+		notifyOnAllAcceptances.toolTip = Settings.notifyOnAllReviewAcceptancesHelp
+		notifyOnReviewDismissals.toolTip = Settings.notifyOnReviewDismissalsHelp
+		notifyOnAllReviewDismissals.toolTip = Settings.notifyOnAllReviewDismissalsHelp
+		notifyOnReviewAssignments.toolTip = Settings.notifyOnReviewAssignmentsHelp
+		assignedReviewHandlingPolicy.toolTip = Settings.assignedReviewHandlingPolicyHelp
+		supportReviews.toolTip = Settings.displayReviewsOnItemsHelp
+		notifyOnItemReactions.toolTip = Settings.notifyOnItemReactionsHelp
+		notifyOnCommentReactions.toolTip = Settings.notifyOnCommentReactionsHelp
+		showLabels.toolTip = Settings.showLabelsHelp
+		reactionIntervalLabel.toolTip = Settings.reactionScanningIntervalHelp
+		reactionIntervalStepper.toolTip = Settings.reactionScanningIntervalHelp
 	}
 
 	private func updateAllItemSettingButtons() {
@@ -279,17 +440,17 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		allHidingSetting.removeAllItems()
 
 		if projectsTable.selectedRowIndexes.count > 1 {
-			allPrsSetting.addItem(withTitle: "Set selected PRs...")
-			allIssuesSetting.addItem(withTitle: "Set selected issues...")
-			allHidingSetting.addItem(withTitle: "Set selected hiding...")
+			allPrsSetting.addItem(withTitle: "Set selected PRs…")
+			allIssuesSetting.addItem(withTitle: "Set selected issues…")
+			allHidingSetting.addItem(withTitle: "Set selected hiding…")
 		} else if !repoFilter.stringValue.isEmpty {
-			allPrsSetting.addItem(withTitle: "Set filtered PRs...")
-			allIssuesSetting.addItem(withTitle: "Set filtered issues...")
-			allHidingSetting.addItem(withTitle: "Set filtered hiding...")
+			allPrsSetting.addItem(withTitle: "Set filtered PRs…")
+			allIssuesSetting.addItem(withTitle: "Set filtered issues…")
+			allHidingSetting.addItem(withTitle: "Set filtered hiding…")
 		} else {
-			allPrsSetting.addItem(withTitle: "Set all PRs...")
-			allIssuesSetting.addItem(withTitle: "Set all issues...")
-			allHidingSetting.addItem(withTitle: "Set all hiding...")
+			allPrsSetting.addItem(withTitle: "Set all PRs…")
+			allIssuesSetting.addItem(withTitle: "Set all issues…")
+			allHidingSetting.addItem(withTitle: "Set all hiding…")
 		}
 
 		allPrsSetting.addItems(withTitles: RepoDisplayPolicy.labels)
@@ -349,12 +510,18 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		openPrAtFirstUnreadComment.integerValue = Settings.openPrAtFirstUnreadComment ? 1 : 0
 		logActivityToConsole.integerValue = Settings.logActivityToConsole ? 1 : 0
 		dumpApiResponsesToConsole.integerValue = Settings.dumpAPIResponsesInConsole ? 1 : 0
-		showLabels.integerValue = Settings.showLabels ? 1 : 0
 		useVibrancy.integerValue = Settings.useVibrancy ? 1 : 0
 		hidePrsThatDontPass.integerValue = Settings.hidePrsThatArentPassing ? 1 : 0
 		hidePrsThatDontPassOnlyInAll.integerValue = Settings.hidePrsThatDontPassOnlyInAll ? 1 : 0
 		highlightItemsWithNewCommits.integerValue = Settings.markPrsAsUnreadOnNewCommits ? 1 : 0
 		hideSnoozedItems.integerValue = Settings.hideSnoozedItems ? 1 : 0
+		showLabels.integerValue = Settings.showLabels ? 1 : 0
+
+		notifyOnItemReactions.integerValue = Settings.notifyOnItemReactions ? 1 : 0
+		notifyOnCommentReactions.integerValue = Settings.notifyOnCommentReactions ? 1 : 0
+
+		supportReviews.integerValue = Settings.displayReviewsOnItems ? 1 : 0
+		notifyOnReviewAssignments.integerValue = Settings.notifyOnReviewAssignments ? 1 : 0
 
 		allNewPrsSetting.selectItem(at: Settings.displayPolicyForNewPrs)
 		allNewIssuesSetting.selectItem(at: Settings.displayPolicyForNewIssues)
@@ -369,6 +536,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		hotkeyOptionModifier.integerValue = Settings.hotkeyOptionModifier ? 1 : 0
 		hotkeyShiftModifier.integerValue = Settings.hotkeyShiftModifier ? 1 : 0
 
+		assignedReviewHandlingPolicy.select(assignedReviewHandlingPolicy.item(at: Settings.assignedReviewHandlingPolicy))
+
 		enableHotkeySegments()
 
 		hotkeyLetter.addItems(withTitles: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"])
@@ -376,7 +545,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 		refreshUpdatePreferences()
 		updateStatusItemsOptions()
-		updateLabelOptions()
+		updateReactionItemOptions()
 		updateHistoryOptions()
 
 		hotkeyEnable.isEnabled = true
@@ -385,6 +554,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		refreshDurationChanged(nil)
 
 		updateImportExportSettings()
+
+		updateReviewOptions()
 
 		updateActivity()
 	}
@@ -403,15 +574,44 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		advancedReposWindow?.updateActivity()
 	}
 
-	@IBAction func showLabelsSelected(_ sender: NSButton) {
-		Settings.showLabels = (sender.integerValue==1)
-		deferredUpdateTimer.push()
-		updateLabelOptions()
+	private func alertThatReactionsMustBeDisabled() {
+		let a = NSAlert()
+		a.messageText = "Because Reviews are currently a preview API, they cannot be enabled together with any feature from the Reactions section."
+		a.informativeText = "If you would like to use any of the features from this section, please visit the Reactions section and disable all features from there. Hopefully GitHub will finalise this API soon and this won't be nessescary."
+		a.beginSheetModal(for: self)
+	}
 
-		API.refreshesSinceLastLabelsCheck.removeAll()
-		if Settings.showLabels {
-			ApiServer.resetSyncOfEverything()
+	private func alertThatReviewsMustBeDisabled() {
+		let a = NSAlert()
+		a.messageText = "Because Reactions are currently a preview API, they cannot be enabled together with any feature from the Reviews section."
+		a.informativeText = "If you would like to use any of the features from this section, please visit the Reviews section and disable all features from there. Hopefully GitHub will finalise this API soon and this won't be nessescary."
+		a.beginSheetModal(for: self)
+	}
+
+	@IBAction func notifyOnItemReactionsSelected(_ sender: NSButton) {
+		if (API.shouldSyncReviews || API.shouldSyncReviewAssignments) && sender.integerValue == 1 {
+			alertThatReviewsMustBeDisabled()
+			sender.integerValue = 0
+			return
 		}
+		Settings.notifyOnItemReactions = sender.integerValue == 1
+		API.refreshesSinceLastReactionsCheck.removeAll()
+		updateReactionItemOptions()
+		DataManager.postProcessAllItems()
+		deferredUpdateTimer.push()
+	}
+
+	@IBAction func notifyOnCommentReactionsSelected(_ sender: NSButton) {
+		if (API.shouldSyncReviews || API.shouldSyncReviewAssignments) && sender.integerValue == 1 {
+			alertThatReviewsMustBeDisabled()
+			sender.integerValue = 0
+			return
+		}
+		Settings.notifyOnCommentReactions = sender.integerValue == 1
+		API.refreshesSinceLastReactionsCheck.removeAll()
+		updateReactionItemOptions()
+		DataManager.postProcessAllItems()
+		deferredUpdateTimer.push()
 	}
 
 	@IBAction func newMentionMovePolicySelected(_ sender: NSPopUpButton) {
@@ -447,6 +647,17 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBAction func useVibrancySelected(_ sender: NSButton) {
 		Settings.useVibrancy = (sender.integerValue==1)
 		app.updateVibrancies()
+	}
+
+	@IBAction func showLabelsSelected(_ sender: NSButton) {
+		let wasOff = Settings.showLabels
+		Settings.showLabels = sender.integerValue == 1
+		if wasOff && Settings.showLabels {
+			ApiServer.resetSyncOfEverything()
+			preferencesDirty = true
+			showLongSyncWarning()
+		}
+		deferredUpdateTimer.push()
 	}
 
 	@IBAction func logActivityToConsoleSelected(_ sender: NSButton) {
@@ -699,9 +910,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		updateStatusItemsOptions()
 
 		API.refreshesSinceLastStatusCheck.removeAll()
-		if Settings.showStatusItems {
-			ApiServer.resetSyncOfEverything()
-		}
 	}
 
 	private func setupSortMethodMenu() {
@@ -729,29 +937,28 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 		let count = Settings.statusItemRefreshInterval
 		statusItemRefreshCounter.integerValue = count
-		statusItemRescanLabel.stringValue = count>1 ? "...and re-scan once every \(count) refreshes" : "...and re-scan on every refresh"
+		statusItemRescanLabel.stringValue = count>1 ? "…and re-scan once every \(count) refreshes" : "…and re-scan on every refresh"
 
 		updateStatusTermPreferenceControls()
 	}
 
-	private func updateLabelOptions() {
-		let enable = Settings.showLabels
-		labelRefreshCounter.isEnabled = enable
-		labelRescanLabel.alphaValue = enable ? 1.0 : 0.5
-		labelRefreshNote.alphaValue = enable ? 1.0 : 0.5
-
-		let count = Settings.labelRefreshInterval
-		labelRefreshCounter.integerValue = count
-		labelRescanLabel.stringValue = count>1 ? "...and re-scan once every \(count) refreshes" : "...and re-scan on every refresh"
+	private func updateReactionItemOptions() {
+		let count = Settings.reactionScanningInterval
+		reactionIntervalStepper.integerValue = count
+		reactionIntervalLabel.stringValue = count>1 ? "Re-scan all reaction-related items every \(count) refreshes" : "Re-scan all reaction-related items on every refresh"
+		let enabled = API.shouldSyncReactions
+		reactionIntervalStepper.isEnabled = enabled
+		reactionIntervalLabel.isEnabled = enabled
+		reactionIntervalLabel.textColor = enabled ? NSColor.labelColor : NSColor.disabledControlTextColor
 	}
 
-	@IBAction func labelRefreshCounterChanged(_ sender: NSStepper) {
-		Settings.labelRefreshInterval = labelRefreshCounter.integerValue
-		updateLabelOptions()
+	@IBAction func reactionIntervalCountChanged(_ sender: NSStepper) {
+		Settings.reactionScanningInterval = sender.integerValue
+		updateReactionItemOptions()
 	}
 
 	@IBAction func statusItemRefreshCountChanged(_ sender: NSStepper) {
-		Settings.statusItemRefreshInterval = statusItemRefreshCounter.integerValue
+		Settings.statusItemRefreshInterval = sender.integerValue
 		updateStatusItemsOptions()
 	}
 
@@ -883,10 +1090,10 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction func exportCurrentSettingsSelected(_ sender: NSButton) {
 		let s = NSSavePanel()
-		s.title = "Export Current Settings..."
+		s.title = "Export Current Settings…"
 		s.prompt = "Export"
 		s.nameFieldLabel = "Settings File"
-		s.message = "Export Current Settings..."
+		s.message = "Export Current Settings…"
 		s.isExtensionHidden = false
 		s.nameFieldStringValue = "Trailer Settings"
 		s.allowedFileTypes = ["trailerSettings"]
@@ -900,10 +1107,10 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction func importSettingsSelected(_ sender: NSButton) {
 		let o = NSOpenPanel()
-		o.title = "Import Settings From File..."
+		o.title = "Import Settings From File…"
 		o.prompt = "Import"
 		o.nameFieldLabel = "Settings File"
-		o.message = "Import Settings From File..."
+		o.message = "Import Settings From File…"
 		o.isExtensionHidden = false
 		o.allowedFileTypes = ["trailerSettings"]
 		o.beginSheetModal(for: self) { response in
@@ -1415,7 +1622,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		return nil
 	}
 
-	func fillSnoozeFormFromSelectedPreset() {
+	private func fillSnoozeFormFromSelectedPreset() {
 		if let s = selectedSnoozePreset {
 			if s.duration {
 				snoozeTypeDuration.integerValue = 1

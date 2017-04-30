@@ -153,6 +153,8 @@ class DataItem: NSManagedObject {
 		count += nukeDeletedItems(of: PRLabel.self, in: moc)
 		count += nukeDeletedItems(of: Issue.self, in: moc)
 		count += nukeDeletedItems(of: Team.self, in: moc)
+		count += nukeDeletedItems(of: Review.self, in: moc)
+		count += nukeDeletedItems(of: Reaction.self, in: moc)
 		DLog("Nuked total %@ items marked for deletion", count)
 	}
 

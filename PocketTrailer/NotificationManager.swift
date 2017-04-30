@@ -54,127 +54,170 @@ final class NotificationManager {
 
 		switch (type) {
 		case .newMention:
-			if let c = item as? PRComment {
-				guard let parent = c.parent else { return }
-				if parent.shouldSkipNotifications { return }
-				notification.title = "@\(S(c.userName)) mentioned you:"
-				notification.subtitle = c.notificationSubtitle
-				if let b = c.body { notification.body = b }
-				notification.categoryIdentifier = "mutable"
-			}
+			guard let c = item as? PRComment, let parent = c.parent, !parent.shouldSkipNotifications else { return }
+			notification.title = "@\(S(c.userName)) mentioned you:"
+			notification.subtitle = c.notificationSubtitle
+			if let b = c.body { notification.body = b }
+			notification.categoryIdentifier = "mutable"
+
 		case .newComment:
-			if let c = item as? PRComment {
-				guard let parent = c.parent else { return }
-				if parent.shouldSkipNotifications { return }
-				notification.title = "@\(S(c.userName)) commented:"
-				notification.subtitle = c.notificationSubtitle
+			guard let c = item as? PRComment, let parent = c.parent, !parent.shouldSkipNotifications else { return }
+			notification.title = "@\(S(c.userName)) commented:"
+			notification.subtitle = c.notificationSubtitle
+			if let b = c.body { notification.body = b }
+			notification.categoryIdentifier = "mutable"
+
+		case .newPr:
+			guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
+			notification.title = "New PR"
+			if let r = p.repo.fullName { notification.subtitle = r }
+			if let b = p.title { notification.body = b }
+			notification.categoryIdentifier = "mutable"
+
+		case .prReopened:
+			guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
+			notification.title = "Re-Opened PR"
+			if let r = p.repo.fullName { notification.subtitle = r }
+			if let b = p.title { notification.body = b }
+			notification.categoryIdentifier = "mutable"
+
+		case .prMerged:
+			guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
+			notification.title = "PR Merged!"
+			if let r = p.repo.fullName { notification.subtitle = r }
+			if let b = p.title { notification.body = b }
+			notification.categoryIdentifier = "mutable"
+
+		case .prClosed:
+			guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
+			notification.title = "PR Closed"
+			if let r = p.repo.fullName { notification.subtitle = r }
+			if let b = p.title { notification.body = b }
+			notification.categoryIdentifier = "mutable"
+
+		case .newRepoSubscribed:
+			guard let r = item as? Repo else { return }
+			notification.title = "New Repository Subscribed"
+			notification.body = S(r.fullName)
+			notification.categoryIdentifier = "repo"
+
+		case .newRepoAnnouncement:
+			guard let r = item as? Repo else { return }
+			notification.title = "New Repository"
+			notification.body = S(r.fullName)
+			notification.categoryIdentifier = "repo"
+
+		case .newPrAssigned:
+			guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
+			notification.title = "PR Assigned"
+			if let r = p.repo.fullName { notification.subtitle = r }
+			if let b = p.title { notification.body = b }
+			notification.categoryIdentifier = "mutable"
+
+		case .newStatus:
+			guard let s = item as? PRStatus, !s.pullRequest.shouldSkipNotifications else { return }
+			notification.title = "PR Status Update"
+			if let d = s.descriptionText { notification.subtitle = d }
+			if let t = s.pullRequest.title { notification.body = t }
+			notification.categoryIdentifier = "mutable"
+
+		case .newIssue:
+			guard let i = item as? Issue, !i.shouldSkipNotifications else { return }
+			notification.title = "New Issue"
+			if let n = i.repo.fullName { notification.subtitle = n }
+			if let t = i.title { notification.body = t }
+			notification.categoryIdentifier = "mutable"
+
+		case .issueReopened:
+			guard let i = item as? Issue, !i.shouldSkipNotifications else { return }
+			notification.title = "Re-Opened Issue"
+			if let n =  i.repo.fullName { notification.subtitle = n }
+			if let t = i.title { notification.body = t }
+			notification.categoryIdentifier = "mutable"
+
+		case .issueClosed:
+			guard let i = item as? Issue, !i.shouldSkipNotifications else { return }
+			notification.title = "Issue Closed"
+			if let n =  i.repo.fullName { notification.subtitle = n }
+			if let t = i.title { notification.body = t }
+			notification.categoryIdentifier = "mutable"
+
+		case .newIssueAssigned:
+			guard let i = item as? Issue, !i.shouldSkipNotifications else { return }
+			notification.title = "Issue Assigned"
+			if let n =  i.repo.fullName { notification.subtitle = n }
+			if let t = i.title { notification.body = t }
+			notification.categoryIdentifier = "mutable"
+
+		case .changesApproved:
+			guard let r = item as? Review else { return }
+			let p = r.pullRequest
+			if p.shouldSkipNotifications { return }
+			notification.title = "@\(S(r.username)) Approved Changes"
+			if let t = p.title { notification.subtitle = t }
+			if let b = r.body { notification.body = b }
+			notification.categoryIdentifier = "mutable"
+
+			let path = Bundle.main.path(forResource: "approvesChangesIcon", ofType: "png")!
+			if let attachment = try? UNNotificationAttachment(identifier: path, url: URL(fileURLWithPath: path), options: nil) {
+				notification.attachments = [attachment]
+			}
+
+		case .changesRequested:
+			guard let r = item as? Review else { return }
+			let p = r.pullRequest
+			if p.shouldSkipNotifications { return }
+			notification.title = "@\(S(r.username)) Requests Changes"
+			if let t = p.title { notification.subtitle = t }
+			if let b = r.body { notification.body = b }
+			notification.categoryIdentifier = "mutable"
+
+			let path = Bundle.main.path(forResource: "requestsChangesIcon", ofType: "png")!
+			if let attachment = try? UNNotificationAttachment(identifier: path, url: URL(fileURLWithPath: path), options: nil) {
+				notification.attachments = [attachment]
+			}
+
+		case .changesDismissed:
+			guard let r = item as? Review else { return }
+			let p = r.pullRequest
+			if p.shouldSkipNotifications { return }
+			notification.title = "@\(S(r.username)) Dismissed A Review"
+			if let t = p.title { notification.subtitle = t }
+			if let b = r.body { notification.body = b }
+			notification.categoryIdentifier = "mutable"
+
+		case .assignedForReview:
+			guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
+			notification.title = "PR Assigned For Review"
+			if let n = p.repo.fullName { notification.subtitle = n }
+			if let t = p.title { notification.body = t }
+			notification.categoryIdentifier = "mutable"
+
+		case .newReaction:
+			guard let r = item as? Reaction else { return }
+			notification.title = r.displaySymbol
+			notification.subtitle = "@\(S(r.userName))"
+			if let c = r.comment, let p = c.pullRequest, !p.shouldSkipNotifications {
 				if let b = c.body { notification.body = b }
 				notification.categoryIdentifier = "mutable"
-			}
-		case .newPr:
-			if let p = item as? PullRequest {
-				if p.shouldSkipNotifications { return }
-				notification.title = "New PR"
-				if let r = p.repo.fullName { notification.subtitle = r }
-				if let b = p.title { notification.body = b }
+			} else if let p = r.pullRequest, !p.shouldSkipNotifications {
+				if let t = p.title { notification.body = t }
 				notification.categoryIdentifier = "mutable"
-			}
-		case .prReopened:
-			if let p = item as? PullRequest {
-				if p.shouldSkipNotifications { return }
-				notification.title = "Re-Opened PR"
-				if let r = p.repo.fullName { notification.subtitle = r }
-				if let b = p.title { notification.body = b }
-				notification.categoryIdentifier = "mutable"
-			}
-		case .prMerged:
-			if let p = item as? PullRequest {
-				if p.shouldSkipNotifications { return }
-				notification.title = "PR Merged!"
-				if let r = p.repo.fullName { notification.subtitle = r }
-				if let b = p.title { notification.body = b }
-				notification.categoryIdentifier = "mutable"
-			}
-		case .prClosed:
-			if let p = item as? PullRequest {
-				if p.shouldSkipNotifications { return }
-				notification.title = "PR Closed"
-				if let r = p.repo.fullName { notification.subtitle = r }
-				if let b = p.title { notification.body = b }
-				notification.categoryIdentifier = "mutable"
-			}
-		case .newRepoSubscribed:
-			if let r = item as? Repo {
-				notification.title = "New Repository Subscribed"
-				notification.body = S(r.fullName)
-				notification.categoryIdentifier = "repo"
-			}
-		case .newRepoAnnouncement:
-			if let r = item as? Repo {
-				notification.title = "New Repository"
-				notification.body = S(r.fullName)
-				notification.categoryIdentifier = "repo"
-			}
-		case .newPrAssigned:
-			if let p = item as? PullRequest {
-				if p.shouldSkipNotifications { return }
-				notification.title = "PR Assigned"
-				if let r = p.repo.fullName { notification.subtitle = r }
-				if let b = p.title { notification.body = b }
-				notification.categoryIdentifier = "mutable"
-			}
-		case .newStatus:
-			if let s = item as? PRStatus {
-				if s.parentShouldSkipNotifications { return }
-				notification.title = "PR Status Update"
-				if let d = s.descriptionText { notification.subtitle = d }
-				if let t = s.pullRequest.title { notification.body = t }
-				notification.categoryIdentifier = "mutable"
-			}
-		case .newIssue:
-			if let i = item as? Issue {
-				if i.shouldSkipNotifications { return }
-				notification.title = "New Issue"
-				if let n = i.repo.fullName { notification.subtitle = n }
+			} else if let i = r.issue, !i.shouldSkipNotifications {
 				if let t = i.title { notification.body = t }
 				notification.categoryIdentifier = "mutable"
-			}
-		case .issueReopened:
-			if let i = item as? Issue {
-				if i.shouldSkipNotifications { return }
-				notification.title = "Re-Opened Issue"
-				if let n =  i.repo.fullName { notification.subtitle = n }
-				if let t = i.title { notification.body = t }
-				notification.categoryIdentifier = "mutable"
-			}
-		case .issueClosed:
-			if let i = item as? Issue {
-				if i.shouldSkipNotifications { return }
-				notification.title = "Issue Closed"
-				if let n =  i.repo.fullName { notification.subtitle = n }
-				if let t = i.title { notification.body = t }
-				notification.categoryIdentifier = "mutable"
-			}
-		case .newIssueAssigned:
-			if let i = item as? Issue {
-				if i.shouldSkipNotifications { return }
-				notification.title = "Issue Assigned"
-				if let n =  i.repo.fullName { notification.subtitle = n }
-				if let t = i.title { notification.body = t }
-				notification.categoryIdentifier = "mutable"
+			} else {
+				return
 			}
 		}
 
-		let t = S(notification.title)
-		let s = S(notification.subtitle)
-		let b = S(notification.body)
-		let identifier = "\(t) - \(s) - \(b)"
+		let identifier = "\(S(notification.title)) - \(S(notification.subtitle)) - \(S(notification.body))"
 
-		notification.userInfo = DataManager.info(for: type, item: item)
+		notification.userInfo = DataManager.info(for: item)
 
 		if let c = item as? PRComment, let url = c.avatarUrl, !Settings.hideAvatars {
 			API.haveCachedAvatar(from: url) { image, cachePath in
-				if image != nil, let attachment = try? UNNotificationAttachment(identifier: cachePath, url: URL(fileURLWithPath: cachePath), options: [:]) {
+				if image != nil, let attachment = try? UNNotificationAttachment(identifier: cachePath, url: URL(fileURLWithPath: cachePath), options: nil) {
 					notification.attachments = [attachment]
 				}
 				let request = UNNotificationRequest(identifier: identifier, content: notification, trigger: nil)

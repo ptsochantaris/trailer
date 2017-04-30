@@ -91,13 +91,13 @@ final class CustomReposViewController: UIViewController, UITableViewDelegate, UI
 		let segments = components.path.components(separatedBy: "/")
 		let count = segments.count
 		if count < 2 {
-			showMessage("Path not found", "We can't locate a valid repo path in the URL provided. Please ensure it ends with the owner and repo name components (.../owner/repo)")
+			showMessage("Path not found", "We can't locate a valid repo path in the URL provided. Please ensure it ends with the owner and repo name components (…/owner/repo)")
 			return
 		}
 		let ownerName = segments[count-2]
 		let repoName = segments[count-1]
 		if ownerName.isEmpty || repoName.isEmpty {
-			showMessage("Path not found", "We can't locate a valid repo path in the URL provided. Please ensure it ends with the owner and repo name components (.../owner/repo)")
+			showMessage("Path not found", "We can't locate a valid repo path in the URL provided. Please ensure it ends with the owner and repo name components (…/owner/repo)")
 			return
 		}
 

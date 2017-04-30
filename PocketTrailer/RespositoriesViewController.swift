@@ -50,10 +50,10 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 		let r = UIAlertAction(title: "Refresh teams & watchlists", style: .destructive) { [weak self] a in
 			self?.refreshList()
 		}
-		let w = UIAlertAction(title: "Watchlist & team options...", style: .default) { [weak self] a in
+		let w = UIAlertAction(title: "Watchlist & team options…", style: .default) { [weak self] a in
 			self?.performSegue(withIdentifier: "showWatchlistSettings", sender: self)
 		}
-		let c = UIAlertAction(title: "Custom repos...", style: .default) { [weak self] a in
+		let c = UIAlertAction(title: "Custom repos…", style: .default) { [weak self] a in
 			self?.performSegue(withIdentifier: "showCustomRepos", sender: self)
 		}
 		let cancel = UIAlertAction(title: "Cancel", style: .cancel)
@@ -76,7 +76,7 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 	private func refreshList() {
 		self.navigationItem.rightBarButtonItem?.isEnabled = false
 		let originalName = navigationItem.title
-		navigationItem.title = "Loading..."
+		navigationItem.title = "Loading…"
 		actionsButton.isEnabled = false
 		tableView.isUserInteractionEnabled = false
 		tableView.alpha = 0.5

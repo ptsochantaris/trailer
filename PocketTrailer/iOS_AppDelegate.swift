@@ -156,7 +156,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 					let resetDateString = itemDateFormatter.string(from: resetDate)
 
 					showMessage("\(apiLabel) API request usage is close to full",
-						"Try to make fewer manual refreshes, increasing the automatic refresh time, or reducing the number of repos you are monitoring.\n\nYour allowance will be reset by GitHub on \(resetDateString).\n\nYou can check your API usage from the bottom of the preferences pane.")
+						"Try to make fewer manual refreshes, increasing the automatic refresh time, or reducing the number of repos you are monitoring.\n\nYour allowance will be reset by GitHub \(resetDateString).\n\nYou can check your API usage from the bottom of the preferences pane.")
 				}
 			}
 		}

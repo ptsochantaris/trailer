@@ -76,7 +76,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 						s.normalState()
 					}
 				} else {
-					s.quickstart.stringValue = "\nSyncing GitHub data for the first time.\n\nThis could take a little while, please wait..."
+					s.quickstart.stringValue = "\nSyncing GitHub data for the first time.\n\nThis could take a little while, please wait…"
 					Settings.lastSuccessfulRefresh = nil
 					app.startRefreshIfItIsDue()
 					s.checkTimer = Timer(repeats: true, interval: 0.5) {
@@ -125,7 +125,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 
 	private func testingState() {
 		spinner.startAnimation(nil)
-		quickstart.stringValue = "\nTesting your access token..."
+		quickstart.stringValue = "\nTesting your access token…"
 		spinner.isHidden = false
 		buttonLink.isHidden = true
 		buttonDescription.isHidden = true
@@ -140,10 +140,10 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 
 	@IBAction func importSettingsSelected(_ sender: NSButton) {
 		let o = NSOpenPanel()
-		o.title = "Import Settings From File..."
+		o.title = "Import Settings From File…"
 		o.prompt = "Import"
 		o.nameFieldLabel = "Settings File"
-		o.message = "Import Settings From File..."
+		o.message = "Import Settings From File…"
 		o.isExtensionHidden = false
 		o.allowedFileTypes = ["trailerSettings"]
 		o.beginSheetModal(for: self) { response in

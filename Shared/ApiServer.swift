@@ -7,8 +7,6 @@ final class ApiServer: NSManagedObject {
     @NSManaged var authToken: String?
     @NSManaged var label: String?
     @NSManaged var lastSyncSucceeded: Bool
-    @NSManaged var latestReceivedEventDateProcessed: Date?
-    @NSManaged var latestUserEventDateProcessed: Date?
     @NSManaged var reportRefreshFailures: Bool
     @NSManaged var requestsLimit: Int64
     @NSManaged var requestsRemaining: Int64
@@ -25,6 +23,8 @@ final class ApiServer: NSManagedObject {
     @NSManaged var statuses: Set<PRStatus>
 	@NSManaged var teams: Set<Team>
     @NSManaged var issues: Set<Issue>
+	@NSManaged var reviews: Set<Review>
+	@NSManaged var reactions: Set<Reaction>
 
 	static var lastReportedOverLimit = Set<NSManagedObjectID>()
 	static var lastReportedNearLimit = Set<NSManagedObjectID>()
@@ -33,6 +33,7 @@ final class ApiServer: NSManagedObject {
 		if requestsRemaining == 0 {
 			if !ApiServer.lastReportedOverLimit.contains(objectID) {
 				ApiServer.lastReportedOverLimit.insert(objectID)
+				ApiServer.lastReportedNearLimit.insert(objectID) // so if we start over the limit, we don't also warn about being near the limit
 				return true
 			}
 		} else {
@@ -141,7 +142,7 @@ final class ApiServer: NSManagedObject {
 
 	func rollBackAllUpdates(in moc: NSManagedObjectContext) {
 		DLog("Rolling back changes for failed sync on API server '%@'",label)
-		for set in [repos, pullRequests, comments, statuses, labels, issues, teams] as [Set<DataItem>] {
+		for set in [repos, pullRequests, comments, statuses, labels, issues, teams, reviews, reactions] as [Set<DataItem>] {
 			var i = set.makeIterator()
 			while let dataItem = i.next() {
 				switch dataItem.postSyncAction {
@@ -184,8 +185,6 @@ final class ApiServer: NSManagedObject {
 			lastRepoCheck = .distantPast
 		}
 		lastSyncSucceeded = true
-		latestReceivedEventDateProcessed = .distantPast
-		latestUserEventDateProcessed = .distantPast
 	}
 
 	class func server(host: String, moc: NSManagedObjectContext) -> ApiServer? {
