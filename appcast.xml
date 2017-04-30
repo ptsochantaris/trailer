@@ -7,6 +7,25 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.5.6</title>
+			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Introducing BETA support for Reviews: View and be notified of review statuses for PRs, requested reviewers, approvals or requests for changes, or being assigned to a review. Review comments are now included in the comment count and handled as new comments.</li>
+				<li>Introducing BETA support for Responses: Be notified of responses to an issue, PR, or comment, as a comment itself. Get notifications of people posting responses to items. (Please note that due to API limitations this feature can be 'costly' in terms of number of calls made to the server.)</li>
+				<li>IMPORTANT: Due to GitHub beta API limitations, both of these features cannot currently be enabled at the same time, as long as they are marked as beta by GitHub. Additionally, these APIs may change and syncs may fail if that occurs. If syncs start failing, try disabling these features before trying to debug anything else. (And if you’re feeling adventurous, log the API calls that are failing and open an issue at Trailer’s GitHub site.)</li>
+				<li>Correction to tab bar sizing when using multiple view groups.</li>
+				<li>Minor improvements to memory usage.</li>
+				</ul></font>]]></description>
+			<pubDate>Sun, 20 Apr 2017 13:00:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer156.zip"
+			sparkle:version="1429"
+			sparkle:shortVersionString="1.5.6"
+			sparkle:dsaSignature="MC4CFQDJkupuZZ5KgOHtzhXmb/XYoNFjuAIVAJd6M7pCEbPE7D/Qsk2gscXk4zyI"
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.5.5</title>
 			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
