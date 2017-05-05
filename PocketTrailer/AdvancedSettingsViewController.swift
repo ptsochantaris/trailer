@@ -5,7 +5,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 	private enum SettingsSection: Int {
 		case Refresh, Display, Filtering, AppleWatch, Comments, Watchlist, Reviews, Reactions, Stauses, History, Confirm, Sort, Misc
-		static let allNames = ["Auto Refresh", "Display", "Filtering", "Apple Watch", "Comments", "Watchlist", "Reviews (BETA)", "Reactions (BETA)", "Statuses", "History", "Don't confirm when", "Sorting", "Misc"]
+		static let allNames = ["Auto Refresh", "Display", "Filtering", "Apple Watch", "Comments", "Watchlist", "Reviews", "Reactions", "Statuses", "History", "Don't confirm when", "Sorting", "Misc"]
 		var title: String { return SettingsSection.allNames[rawValue] }
 	}
 
