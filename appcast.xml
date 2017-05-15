@@ -7,6 +7,22 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.5.7</title>
+			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Review APIs are out of beta, and can now be used in conjunction with the Reactions feature.</li>
+				<li>Minor improvements to marking new commits on PRs.</li>
+				</ul></font>]]></description>
+			<pubDate>Mon, 15 May 2017 11:00:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer157.zip"
+			sparkle:version="1431"
+			sparkle:shortVersionString="1.5.7"
+			sparkle:dsaSignature="MC0CFQC/M3cIG6ePvt2tdW/V5jnOvCwAMQIUPxFXK+7tKoGT0EfG1HeRoJa44Y0="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.5.6</title>
 			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
