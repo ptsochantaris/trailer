@@ -29,9 +29,9 @@ final class PullRequest: ListableItem {
 				item.mergeable = info["mergeable"] as? Bool ?? true
 				let newMergeCommitSha = info["merge_commit_sha"] as? String
 				if item.mergeCommitSha != newMergeCommitSha {
+					let hadOneBefore = item.mergeCommitSha != nil
 					item.mergeCommitSha = newMergeCommitSha
-					let markWithAlert = Settings.markPrsAsUnreadOnNewCommits && !(item.postSyncAction == PostSyncAction.isNew.rawValue)
-					item.hasNewCommits = markWithAlert
+					item.hasNewCommits = hadOneBefore && Settings.markPrsAsUnreadOnNewCommits && !(item.postSyncAction == PostSyncAction.isNew.rawValue)
 				}
 
 				if let linkInfo = info["_links"] as? [AnyHashable : Any] {
