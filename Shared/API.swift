@@ -1512,9 +1512,6 @@ final class API {
 		if shouldSyncReactions {
 			acceptTypes.append("application/vnd.github.squirrel-girl-preview")
 		}
-		if shouldSyncReviews || shouldSyncReviewAssignments {
-			acceptTypes.append("application/vnd.github.black-cat-preview+json")
-		}
 		acceptTypes.append("application/vnd.github.v3+json")
 		r.setValue(acceptTypes.joined(separator: ", "), forHTTPHeaderField: "Accept")
 		if let a = server.authToken {

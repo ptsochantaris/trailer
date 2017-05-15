@@ -468,16 +468,6 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		showMessage("The next sync may take a while, because everything will need to be fully re-synced. This will be needed only once: Subsequent syncs will be fast again.", nil)
 	}
 
-	private func alertThatReactionsMustBeDisabled() {
-		showMessage("Because Reviews are currently a preview API, they cannot be enabled together with any feature from the Reactions section.",
-		            "If you would like to use any of the features from this section, please visit the Reactions section and disable all features from there. Hopefully GitHub will finalise this API soon and this won't be nessescary.")
-	}
-
-	private func alertThatReviewsMustBeDisabled() {
-		showMessage("Because Reactions are currently a preview API, they cannot be enabled together with any feature from the Reviews section.",
-		            "If you would like to use any of the features from this section, please visit the Reviews section and disable all features from there. Hopefully GitHub will finalise this API soon and this won't be nessescary.")
-	}
-
 	private func showOptionalReviewWarning(previousSync: Bool) {
 		if !previousSync && (API.shouldSyncReviews || API.shouldSyncReviewAssignments) {
 			for p in DataItem.allItems(of: PullRequest.self, in: DataManager.main) {
@@ -642,13 +632,8 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 			switch originalIndex {
 			case 0:
-				let shouldActivate = !Settings.displayReviewsOnItems
-				if API.shouldSyncReactions && shouldActivate {
-					alertThatReactionsMustBeDisabled()
-					return
-				}
 				let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
-				Settings.displayReviewsOnItems = shouldActivate
+				Settings.displayReviewsOnItems = !Settings.displayReviewsOnItems
 				showOptionalReviewWarning(previousSync: previousShouldSync)
 
 			case 1:
@@ -659,53 +644,32 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				performSegue(withIdentifier: "showPicker", sender: self)
 
 			case 2:
-				let shouldActivate = !Settings.notifyOnReviewChangeRequests
-				if API.shouldSyncReactions && shouldActivate {
-					alertThatReactionsMustBeDisabled()
-					return
-				}
 				let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
-				Settings.notifyOnReviewChangeRequests = shouldActivate
+				Settings.notifyOnReviewChangeRequests = !Settings.notifyOnReviewChangeRequests
 				showOptionalReviewWarning(previousSync: previousShouldSync)
 
 			case 3:
 				Settings.notifyOnAllReviewChangeRequests = !Settings.notifyOnAllReviewChangeRequests
 
 			case 4:
-				let shouldActivate = !Settings.notifyOnReviewAcceptances
-				if API.shouldSyncReactions && shouldActivate {
-					alertThatReactionsMustBeDisabled()
-					return
-				}
 				let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
-				Settings.notifyOnReviewAcceptances = shouldActivate
+				Settings.notifyOnReviewAcceptances = !Settings.notifyOnReviewAcceptances
 				showOptionalReviewWarning(previousSync: previousShouldSync)
 
 			case 5:
 				Settings.notifyOnAllReviewAcceptances = !Settings.notifyOnAllReviewAcceptances
 
 			case 6:
-
-				let shouldActivate = !Settings.notifyOnReviewDismissals
-				if API.shouldSyncReactions && shouldActivate {
-					alertThatReactionsMustBeDisabled()
-					return
-				}
 				let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
-				Settings.notifyOnReviewDismissals = shouldActivate
+				Settings.notifyOnReviewDismissals = !Settings.notifyOnReviewDismissals
 				showOptionalReviewWarning(previousSync: previousShouldSync)
 
 			case 7:
 				Settings.notifyOnAllReviewDismissals = !Settings.notifyOnAllReviewDismissals
 
 			case 8:
-				let shouldActivate = !Settings.notifyOnReviewAssignments
-				if API.shouldSyncReactions && shouldActivate {
-					alertThatReactionsMustBeDisabled()
-					return
-				}
 				let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
-				Settings.notifyOnReviewAssignments = shouldActivate
+				Settings.notifyOnReviewAssignments = !Settings.notifyOnReviewAssignments
 				showOptionalReviewWarning(previousSync: previousShouldSync)
 
 			default: break
@@ -725,22 +689,12 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 			switch originalIndex {
 			case 0:
-				let shouldActivate = !Settings.notifyOnItemReactions
-				if (API.shouldSyncReviews || API.shouldSyncReviewAssignments) && shouldActivate {
-					alertThatReviewsMustBeDisabled()
-					return
-				}
-				Settings.notifyOnItemReactions = shouldActivate
+				Settings.notifyOnItemReactions = !Settings.notifyOnItemReactions
 				API.refreshesSinceLastReactionsCheck.removeAll()
 				settingsChangedTimer.push()
 
 			case 1:
-				let shouldActivate = !Settings.notifyOnCommentReactions
-				if (API.shouldSyncReviews || API.shouldSyncReviewAssignments) && shouldActivate {
-					alertThatReviewsMustBeDisabled()
-					return
-				}
-				Settings.notifyOnCommentReactions = shouldActivate
+				Settings.notifyOnCommentReactions = !Settings.notifyOnCommentReactions
 				API.refreshesSinceLastReactionsCheck.removeAll()
 				settingsChangedTimer.push()
 

@@ -320,7 +320,7 @@ Token</string>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <clipView key="contentView" id="hCD-zR-3bF">
                                                 <rect key="frame" x="1" y="0.0" width="805" height="254"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" rowHeight="20" headerView="qia-ub-v1J" id="6pK-a1-URw">
                                                         <rect key="frame" x="0.0" y="0.0" width="805" height="237"/>
@@ -1193,24 +1193,14 @@ Token</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box misplaced="YES" boxType="custom" borderType="none" titlePosition="noTitle" id="49Q-X3-TvK">
-                                            <rect key="frame" x="142" y="17" width="550" height="339"/>
+                                            <rect key="frame" x="142" y="53" width="550" height="273"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <view key="contentView" id="Hr7-ca-s5X">
-                                                <rect key="frame" x="0.0" y="0.0" width="550" height="339"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="550" height="273"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="wjr-eU-VtB">
-                                                        <rect key="frame" x="58" y="266" width="436" height="54"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" id="I1A-bw-5tI">
-                                                            <font key="font" metaFont="miniSystem"/>
-                                                            <string key="title">This feature is accessing a preview API from Github, which means it may stop working or create unexpected sync problems without warning. If you use this feature please ensure you often check for Trailer updates!</string>
-                                                            <color key="textColor" red="1" green="0.0" blue="0.070606581870000004" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
                                                     <box misplaced="YES" borderType="none" title="When a PR is assigned to me for review…" id="zDt-bc-lCe">
-                                                        <rect key="frame" x="119" y="181" width="315" height="46"/>
+                                                        <rect key="frame" x="119" y="185" width="315" height="46"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="eGN-JN-FT6">
                                                             <rect key="frame" x="0.0" y="0.0" width="315" height="31"/>
@@ -1239,14 +1229,14 @@ Token</string>
                                                         </view>
                                                     </box>
                                                     <box misplaced="YES" title="Notify me when…" id="C58-hf-r5t">
-                                                        <rect key="frame" x="39" y="22" width="475" height="151"/>
+                                                        <rect key="frame" x="39" y="23" width="475" height="154"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="FlM-UP-339">
-                                                            <rect key="frame" x="2" y="2" width="471" height="134"/>
+                                                            <rect key="frame" x="2" y="2" width="471" height="137"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <button misplaced="YES" id="W7P-8B-zzm">
-                                                                    <rect key="frame" x="18" y="103" width="349" height="18"/>
+                                                                    <rect key="frame" x="18" y="106" width="349" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="Someone requests changes to a PR I created…" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="p1O-O4-Ugb">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1257,7 +1247,7 @@ Token</string>
                                                                     </connections>
                                                                 </button>
                                                                 <button misplaced="YES" id="cUX-93-pkY">
-                                                                    <rect key="frame" x="18" y="73" width="349" height="18"/>
+                                                                    <rect key="frame" x="18" y="76" width="349" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="Someone accepts changes on a PR I created…" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="pNh-wM-EPz">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1268,7 +1258,7 @@ Token</string>
                                                                     </connections>
                                                                 </button>
                                                                 <button misplaced="YES" id="8kt-mf-c4i">
-                                                                    <rect key="frame" x="18" y="43" width="349" height="18"/>
+                                                                    <rect key="frame" x="18" y="46" width="349" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="Someone dismisses a review on a PR I created…" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="edL-Bg-Zov">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1279,7 +1269,7 @@ Token</string>
                                                                     </connections>
                                                                 </button>
                                                                 <button misplaced="YES" id="z39-OC-9iv">
-                                                                    <rect key="frame" x="18" y="13" width="349" height="18"/>
+                                                                    <rect key="frame" x="18" y="16" width="349" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="Someone assigns me a PR to review" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="THH-72-g8l">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1290,7 +1280,7 @@ Token</string>
                                                                     </connections>
                                                                 </button>
                                                                 <button misplaced="YES" id="4hX-kx-RH5">
-                                                                    <rect key="frame" x="371" y="103" width="84" height="18"/>
+                                                                    <rect key="frame" x="371" y="106" width="84" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="…or All" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="Rbb-Fj-bP3">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1301,7 +1291,7 @@ Token</string>
                                                                     </connections>
                                                                 </button>
                                                                 <button misplaced="YES" id="Cle-hT-Lca">
-                                                                    <rect key="frame" x="371" y="73" width="84" height="18"/>
+                                                                    <rect key="frame" x="371" y="76" width="84" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="…or All" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="5eI-7r-swf">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1312,7 +1302,7 @@ Token</string>
                                                                     </connections>
                                                                 </button>
                                                                 <button misplaced="YES" id="jjg-cq-Lfe">
-                                                                    <rect key="frame" x="371" y="43" width="84" height="18"/>
+                                                                    <rect key="frame" x="371" y="46" width="84" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="…or All" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="26G-BO-CIp">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1325,17 +1315,8 @@ Token</string>
                                                             </subviews>
                                                         </view>
                                                     </box>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="PC0-Di-dZ3">
-                                                        <rect key="frame" x="-2" y="1" width="554" height="17"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="To disble usage of the Reviews API, uncheck all options here &amp; set the drop-down option to &quot;Don't Move It&quot;" id="bis-lC-jvI">
-                                                            <font key="font" metaFont="miniSystem"/>
-                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
                                                     <button misplaced="YES" id="7m1-w3-6Le">
-                                                        <rect key="frame" x="161" y="242" width="272" height="18"/>
+                                                        <rect key="frame" x="161" y="246" width="272" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Display review statuses for PRs" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="NJt-Z2-5f6">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1345,6 +1326,15 @@ Token</string>
                                                             <action selector="supportReviewsSelected:" target="vQH-WF-vh2" id="tqA-fU-hhj"/>
                                                         </connections>
                                                     </button>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="PC0-Di-dZ3">
+                                                        <rect key="frame" x="-2" y="2" width="554" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="To disble usage of the Reviews API, uncheck all options here &amp; set the drop-down option to &quot;Don't Move It&quot;" id="bis-lC-jvI">
+                                                            <font key="font" metaFont="miniSystem"/>
+                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
                                                 </subviews>
                                             </view>
                                         </box>
@@ -1602,7 +1592,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" heightSizable="YES"/>
                                             <clipView key="contentView" id="Fou-QI-zfT">
                                                 <rect key="frame" x="1" y="1" width="311" height="299"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="20" id="EjH-yo-GqO">
                                                         <rect key="frame" x="0.0" y="0.0" width="311" height="299"/>
