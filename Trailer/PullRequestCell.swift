@@ -24,7 +24,7 @@ final class PullRequestCell: TrailerCell {
 
 		var W = MENU_WIDTH-LEFTPADDING-app.scrollBarWidth
 
-		let showUnpin = (pullRequest.condition != ItemCondition.open.rawValue) || pullRequest.markUnmergeable
+		let showUnpin = pullRequest.condition != ItemCondition.open.rawValue
 		if showUnpin { W -= REMOVE_BUTTON_WIDTH } else { W -= 4.0 }
 
 		let showAvatar = !S(pullRequest.userAvatarUrl).isEmpty && !Settings.hideAvatars
@@ -86,25 +86,14 @@ final class PullRequestCell: TrailerCell {
 		statusRects = statusRects.map { $0.offsetBy(dx: shift, dy: 0) }
 
 		if showUnpin {
-			if pullRequest.condition == ItemCondition.open.rawValue {
-				let unmergeableLabel = CenterTextField(frame: pinRect)
-				unmergeableLabel.textColor = .red
-				unmergeableLabel.font = NSFont(name: "Menlo-Regular", size: 8.0)
-				unmergeableLabel.alignment = .center
-				unmergeableLabel.stringValue = "Cannot be merged"
-				addSubview(unmergeableLabel)
-			}
-			else
-			{
-				let unpin = NSButton(frame: pinRect)
-				unpin.title = "Remove"
-				unpin.target = self
-				unpin.action = #selector(unPinSelected)
-				unpin.setButtonType(.momentaryLight)
-				unpin.bezelStyle = .roundRect
-				unpin.font = NSFont.systemFont(ofSize: 10.0)
-				addSubview(unpin)
-			}
+			let unpin = NSButton(frame: pinRect)
+			unpin.title = "Remove"
+			unpin.target = self
+			unpin.action = #selector(unPinSelected)
+			unpin.setButtonType(.momentaryLight)
+			unpin.bezelStyle = .roundRect
+			unpin.font = NSFont.systemFont(ofSize: 10.0)
+			addSubview(unpin)
 		}
 
 		title = CenterTextField(frame: titleRect)

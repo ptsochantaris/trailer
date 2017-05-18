@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12120" systemVersion="16E195" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12120" systemVersion="16F73" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" customObjectInstantitationMethod="direct">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12120"/>
         <capability name="box content view" minToolsVersion="7.0"/>
@@ -530,50 +530,6 @@ Token</string>
                                     <rect key="frame" x="10" y="33" width="834" height="366"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <button misplaced="YES" id="Y5g-gh-uLn">
-                                            <rect key="frame" x="25" y="308" width="366" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Mark un-mergeable PRs only in &quot;My&quot; or &quot;Participated&quot;" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="rZv-TW-Nxj">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="markUnmergeableOnUserSectionsOnlySelected:" target="vQH-WF-vh2" id="5X6-AW-0x9"/>
-                                            </connections>
-                                        </button>
-                                        <button misplaced="YES" id="rEz-q1-QZq">
-                                            <rect key="frame" x="25" y="282" width="366" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Count all open items of synced repos in the menubar" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="23T-vx-oJZ">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="countOnlyListedItemsSelected:" target="vQH-WF-vh2" id="lwo-3S-huG"/>
-                                            </connections>
-                                        </button>
-                                        <button misplaced="YES" id="yK4-xL-QRu">
-                                            <rect key="frame" x="25" y="256" width="366" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Show repository names" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="oZY-hH-Udu">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="displayRepositoryNameSelected:" target="vQH-WF-vh2" id="PMz-8Z-bde"/>
-                                            </connections>
-                                        </button>
-                                        <button misplaced="YES" id="onl-1T-RTg">
-                                            <rect key="frame" x="25" y="230" width="366" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Use UI vibrancy in macOS if supported" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="Mtr-gs-YsM">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="useVibrancySelected:" target="vQH-WF-vh2" id="tWv-cu-dmX"/>
-                                            </connections>
-                                        </button>
                                         <box autoresizesSubviews="NO" misplaced="YES" boxType="secondary" borderType="line" title="Refreshing" id="zpr-xa-Rug">
                                             <rect key="frame" x="454" y="7" width="373" height="102"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
@@ -640,17 +596,6 @@ Token</string>
                                                 </subviews>
                                             </view>
                                         </box>
-                                        <button misplaced="YES" id="3CV-9S-gLw">
-                                            <rect key="frame" x="25" y="204" width="366" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Hide author avatars" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="UOs-3D-XyL">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="hideAvatarsSelected:" target="vQH-WF-vh2" id="45w-QA-Tcd"/>
-                                            </connections>
-                                        </button>
                                         <box autoresizesSubviews="NO" misplaced="YES" boxType="secondary" borderType="line" title="When filtering, always check…" id="iei-ab-K9r">
                                             <rect key="frame" x="454" y="113" width="373" height="158"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
@@ -770,50 +715,6 @@ Token</string>
                                                 </subviews>
                                             </view>
                                         </box>
-                                        <button misplaced="YES" id="Efg-Id-lOP">
-                                            <rect key="frame" x="25" y="334" width="366" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Display item creation times instead of update times" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="yUS-qR-eV4">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="showCreationSelected:" target="vQH-WF-vh2" id="ie4-88-nBp"/>
-                                            </connections>
-                                        </button>
-                                        <button misplaced="YES" id="VrU-mc-Czw">
-                                            <rect key="frame" x="25" y="178" width="366" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Separate each API server in its own menu bar item" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="C7K-xS-315">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="showSeparateApiServersInMenuSelected:" target="vQH-WF-vh2" id="BHL-pf-2SO"/>
-                                            </connections>
-                                        </button>
-                                        <button misplaced="YES" id="9fQ-lN-76c">
-                                            <rect key="frame" x="25" y="152" width="366" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Hide item count in menubar items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="mAZ-e8-NLS">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="hideCountsOnMenubarSelected:" target="vQH-WF-vh2" id="zMz-z0-ZEU"/>
-                                            </connections>
-                                        </button>
-                                        <button misplaced="YES" id="TdQ-hP-A3t">
-                                            <rect key="frame" x="25" y="126" width="366" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Sync and display labels for items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="5sv-cq-odI">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="showLabelsSelected:" target="vQH-WF-vh2" id="qDj-Oe-xbz"/>
-                                            </connections>
-                                        </button>
                                         <box misplaced="YES" borderType="line" title="Sorting" id="fNC-DY-p8H">
                                             <rect key="frame" x="6" y="5" width="446" height="104"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
@@ -864,6 +765,94 @@ Token</string>
                                                 </subviews>
                                             </view>
                                         </box>
+                                        <button misplaced="YES" id="rEz-q1-QZq">
+                                            <rect key="frame" x="15" y="300" width="366" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Count all open items of synced repos in the menubar" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="23T-vx-oJZ">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="countOnlyListedItemsSelected:" target="vQH-WF-vh2" id="lwo-3S-huG"/>
+                                            </connections>
+                                        </button>
+                                        <button misplaced="YES" id="yK4-xL-QRu">
+                                            <rect key="frame" x="15" y="273" width="366" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Show repository names" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="oZY-hH-Udu">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="displayRepositoryNameSelected:" target="vQH-WF-vh2" id="PMz-8Z-bde"/>
+                                            </connections>
+                                        </button>
+                                        <button misplaced="YES" id="onl-1T-RTg">
+                                            <rect key="frame" x="15" y="246" width="366" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Use UI vibrancy in macOS if supported" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="Mtr-gs-YsM">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="useVibrancySelected:" target="vQH-WF-vh2" id="tWv-cu-dmX"/>
+                                            </connections>
+                                        </button>
+                                        <button misplaced="YES" id="3CV-9S-gLw">
+                                            <rect key="frame" x="15" y="219" width="366" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Hide author avatars" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="UOs-3D-XyL">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="hideAvatarsSelected:" target="vQH-WF-vh2" id="45w-QA-Tcd"/>
+                                            </connections>
+                                        </button>
+                                        <button misplaced="YES" id="Efg-Id-lOP">
+                                            <rect key="frame" x="15" y="327" width="366" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Display item creation times instead of update times" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="yUS-qR-eV4">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="showCreationSelected:" target="vQH-WF-vh2" id="ie4-88-nBp"/>
+                                            </connections>
+                                        </button>
+                                        <button misplaced="YES" id="VrU-mc-Czw">
+                                            <rect key="frame" x="15" y="192" width="366" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Separate each API server in its own menu bar item" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="C7K-xS-315">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="showSeparateApiServersInMenuSelected:" target="vQH-WF-vh2" id="BHL-pf-2SO"/>
+                                            </connections>
+                                        </button>
+                                        <button misplaced="YES" id="9fQ-lN-76c">
+                                            <rect key="frame" x="15" y="165" width="366" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Hide item count in menubar items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="mAZ-e8-NLS">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="hideCountsOnMenubarSelected:" target="vQH-WF-vh2" id="zMz-z0-ZEU"/>
+                                            </connections>
+                                        </button>
+                                        <button misplaced="YES" id="TdQ-hP-A3t">
+                                            <rect key="frame" x="15" y="138" width="366" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Sync and display labels for items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="5sv-cq-odI">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="showLabelsSelected:" target="vQH-WF-vh2" id="qDj-Oe-xbz"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                 </view>
                             </tabViewItem>
@@ -1346,93 +1335,103 @@ Token</string>
                                     <rect key="frame" x="10" y="33" width="834" height="366"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="sx9-sf-15g">
-                                            <rect key="frame" x="200" y="294" width="436" height="43"/>
+                                        <box misplaced="YES" boxType="custom" borderType="none" cornerRadius="4" titlePosition="noTitle" id="6p4-At-yAg">
+                                            <rect key="frame" x="17" y="18" width="800" height="340"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" id="rYW-sF-P0d">
-                                                <font key="font" metaFont="miniSystem"/>
-                                                <string key="title">This feature is accessing a preview API from Github, which means it may stop working or create unexpected sync problems without warning. If you use this feature please ensure you often check for Trailer updates!</string>
-                                                <color key="textColor" red="1" green="0.0" blue="0.070606581870000004" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="hYX-l4-6Qc">
-                                            <rect key="frame" x="135" y="104" width="564" height="17"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="To completely disble all usage of the Reactions API, uncheck all options." id="zca-XG-6Sh">
-                                                <font key="font" metaFont="miniSystem"/>
-                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" id="FvT-We-mFk">
-                                            <rect key="frame" x="279" y="175" width="319" height="17"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Re-scan all reaction-related items every X refreshes" id="ghh-hQ-3ia">
-                                                <font key="font" metaFont="system"/>
-                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                        <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" misplaced="YES" id="hX6-QR-e19">
-                                            <rect key="frame" x="601" y="168" width="19" height="27"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                            <stepperCell key="cell" continuous="YES" alignment="left" minValue="1" maxValue="1000" doubleValue="1" id="Qpz-oV-bts"/>
-                                            <connections>
-                                                <action selector="reactionIntervalCountChanged:" target="vQH-WF-vh2" id="93K-7O-o2v"/>
-                                            </connections>
-                                        </stepper>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" id="8Mg-65-BNv">
-                                            <rect key="frame" x="217" y="129" width="381" height="44"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" id="IV8-6v-teN">
-                                                <font key="font" metaFont="miniSystem"/>
-                                                <string key="title">Reactions need to be rescanned fully in order be updated.  If you
-usually manage a lot of items, then you may want to set this value
-to a higher number in order to keep your API usage reasonable</string>
-                                                <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="iEL-pK-LcM">
-                                            <rect key="frame" x="162" y="23" width="513" height="78"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" id="VEf-qR-HnU">
-                                                <font key="font" metaFont="system"/>
-                                                <string key="title">Tip: Reactions are treated like comments, i.e. the rules about being notified only for your own or participated items, or all items, can be changed from the options in the "comments" section.</string>
-                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                        <box misplaced="YES" titlePosition="noTitle" id="zHV-fn-HSK">
-                                            <rect key="frame" x="155" y="196" width="566" height="84"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                            <view key="contentView" id="IBf-ZQ-tKp">
-                                                <rect key="frame" x="2" y="2" width="562" height="80"/>
+                                            <view key="contentView" id="vi2-4f-qWe">
+                                                <rect key="frame" x="0.0" y="0.0" width="800" height="340"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <button misplaced="YES" id="ccb-WQ-p0n">
-                                                        <rect key="frame" x="18" y="47" width="526" height="18"/>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="sx9-sf-15g">
+                                                        <rect key="frame" x="173" y="285" width="436" height="43"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Count &amp; post notifications when someone adds a reaction to PRs or issues" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="2SI-4J-Y6e">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="notifyOnItemReactionsSelected:" target="vQH-WF-vh2" id="kWv-0I-Poq"/>
-                                                        </connections>
-                                                    </button>
-                                                    <button misplaced="YES" id="6X8-zY-Oss">
-                                                        <rect key="frame" x="18" y="19" width="526" height="18"/>
+                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" id="rYW-sF-P0d">
+                                                            <font key="font" metaFont="miniSystem"/>
+                                                            <string key="title">This feature is accessing a preview API from Github, which means it may stop working or create unexpected sync problems without warning. If you use this feature please ensure you often check for Trailer updates!</string>
+                                                            <color key="textColor" red="1" green="0.0" blue="0.070606581870000004" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="hYX-l4-6Qc">
+                                                        <rect key="frame" x="108" y="93.5" width="564" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Count &amp; post notifications when someone adds a reaction to comments" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Rli-RA-Aa4">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="To completely disble all usage of the Reactions API, uncheck all options." id="zca-XG-6Sh">
+                                                            <font key="font" metaFont="miniSystem"/>
+                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" id="FvT-We-mFk">
+                                                        <rect key="frame" x="252" y="165" width="319" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Re-scan all reaction-related items every X refreshes" id="ghh-hQ-3ia">
                                                             <font key="font" metaFont="system"/>
-                                                        </buttonCell>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" misplaced="YES" id="hX6-QR-e19">
+                                                        <rect key="frame" x="574.5" y="158" width="19" height="27"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <stepperCell key="cell" continuous="YES" alignment="left" minValue="1" maxValue="1000" doubleValue="1" id="Qpz-oV-bts"/>
                                                         <connections>
-                                                            <action selector="notifyOnCommentReactionsSelected:" target="vQH-WF-vh2" id="EyD-rp-tlU"/>
+                                                            <action selector="reactionIntervalCountChanged:" target="vQH-WF-vh2" id="93K-7O-o2v"/>
                                                         </connections>
-                                                    </button>
+                                                    </stepper>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" id="8Mg-65-BNv">
+                                                        <rect key="frame" x="190" y="119" width="381" height="44"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" id="IV8-6v-teN">
+                                                            <font key="font" metaFont="miniSystem"/>
+                                                            <string key="title">Reactions need to be rescanned fully in order be updated.  If you
+usually manage a lot of items, then you may want to set this value
+to a higher number in order to keep your API usage reasonable</string>
+                                                            <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="iEL-pK-LcM">
+                                                        <rect key="frame" x="135" y="12" width="513" height="78"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" id="VEf-qR-HnU">
+                                                            <font key="font" metaFont="system"/>
+                                                            <string key="title">Tip: Reactions are treated like comments, i.e. the rules about being notified only for your own or participated items, or all items, can be changed from the options in the "comments" section.</string>
+                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <box misplaced="YES" titlePosition="noTitle" id="zHV-fn-HSK">
+                                                        <rect key="frame" x="128" y="186.5" width="566" height="84"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <view key="contentView" id="IBf-ZQ-tKp">
+                                                            <rect key="frame" x="2" y="2" width="562" height="80"/>
+                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                            <subviews>
+                                                                <button id="ccb-WQ-p0n">
+                                                                    <rect key="frame" x="18" y="47" width="526" height="18"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <buttonCell key="cell" type="check" title="Count &amp; post notifications when someone adds a reaction to PRs or issues" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="2SI-4J-Y6e">
+                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                        <font key="font" metaFont="system"/>
+                                                                    </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="notifyOnItemReactionsSelected:" target="vQH-WF-vh2" id="kWv-0I-Poq"/>
+                                                                    </connections>
+                                                                </button>
+                                                                <button id="6X8-zY-Oss">
+                                                                    <rect key="frame" x="18" y="19" width="526" height="18"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <buttonCell key="cell" type="check" title="Count &amp; post notifications when someone adds a reaction to comments" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Rli-RA-Aa4">
+                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                        <font key="font" metaFont="system"/>
+                                                                    </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="notifyOnCommentReactionsSelected:" target="vQH-WF-vh2" id="EyD-rp-tlU"/>
+                                                                    </connections>
+                                                                </button>
+                                                            </subviews>
+                                                        </view>
+                                                    </box>
                                                 </subviews>
                                             </view>
                                         </box>
@@ -2252,7 +2251,6 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="launchAtStartup" destination="H3d-cL-Izf" id="3dL-Lp-v9U"/>
                 <outlet property="logActivityToConsole" destination="3fA-qA-38f" id="Vph-lO-Ng2"/>
                 <outlet property="makeStatusItemsSelectable" destination="KjN-FO-XTd" id="qFV-nW-SWA"/>
-                <outlet property="markUnmergeableOnUserSectionsOnly" destination="Y5g-gh-uLn" id="ka6-Ll-b9Q"/>
                 <outlet property="newItemInOwnedRepoMovePolicy" destination="tH9-aj-JJe" id="dWN-Fr-u7n"/>
                 <outlet property="newMentionMovePolicy" destination="dTC-mN-8dT" id="EPV-dK-9nd"/>
                 <outlet property="notifyOnAcceptances" destination="cUX-93-pkY" id="14e-Db-SMA"/>

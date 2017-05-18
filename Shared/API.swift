@@ -40,19 +40,18 @@ final class API {
 				API.networkIndicationStart()
 			#endif
 
-			API.start(call: path, on: server, ignoreLastSync: ignoreLastSync) { [weak self] code, headers, data, error, shouldRetry in
-				guard let s = self else { return }
+			API.start(call: path, on: server, ignoreLastSync: ignoreLastSync) { code, headers, data, error, shouldRetry in
 
-				s.completion(code, headers, data, error, shouldRetry)
+				self.completion(code, headers, data, error, shouldRetry)
 				NotificationCenter.default.post(name: SyncProgressUpdateNotification, object: nil)
 
 				#if os(iOS)
 					API.networkIndicationEnd()
 				#endif
 
-				s.willChangeValue(forKey: "isFinished")
-				s._isFinished = true
-				s.didChangeValue(forKey: "isFinished")
+				self.willChangeValue(forKey: "isFinished")
+				self._isFinished = true
+				self.didChangeValue(forKey: "isFinished")
 			}
 		}
 
@@ -337,9 +336,6 @@ final class API {
 				let refreshes = refreshesSinceLastReactionsCheck[oid]
 				if refreshes == nil || refreshes! >= Settings.reactionScanningInterval {
 					//DLog("Will check reactions for item: '%@'", item.title)
-					for s in item.reactions {
-						s.postSyncAction = PostSyncAction.delete.rawValue
-					}
 					item.updatedAt = .distantPast
 					item.postSyncAction = PostSyncAction.isUpdated.rawValue
 				} else {

@@ -49,23 +49,14 @@ final class IssueCell: TrailerCell {
 		titleRect = NSOffsetRect(titleRect, shift, 0)
 
 		if showUnpin {
-			if issue.condition == ItemCondition.open.rawValue {
-				let unmergeableLabel = CenterTextField(frame: pinRect)
-				unmergeableLabel.textColor = .red
-				unmergeableLabel.font = NSFont(name: "Monaco", size: 8.0)
-				unmergeableLabel.alignment = .center
-				unmergeableLabel.stringValue = "Cannot be merged"
-				addSubview(unmergeableLabel)
-			} else {
-				let unpin = NSButton(frame: pinRect)
-				unpin.title = "Remove"
-				unpin.target = self
-				unpin.action = #selector(unPinSelected)
-				unpin.setButtonType(.momentaryLight)
-				unpin.bezelStyle = .roundRect
-				unpin.font = NSFont.systemFont(ofSize: 10.0)
-				addSubview(unpin)
-			}
+			let unpin = NSButton(frame: pinRect)
+			unpin.title = "Remove"
+			unpin.target = self
+			unpin.action = #selector(unPinSelected)
+			unpin.setButtonType(.momentaryLight)
+			unpin.bezelStyle = .roundRect
+			unpin.font = NSFont.systemFont(ofSize: 10.0)
+			addSubview(unpin)
 		}
 
 		title = CenterTextField(frame: titleRect)

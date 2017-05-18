@@ -51,10 +51,6 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		        description: "How to handle items that have been detected as assigned to you.",
 		        valueDisplayed: { AssignmentPolicy(Settings.assignedPrHandlingPolicy)?.name }),
 		Setting(section: .Display,
-		        title: "Mark unmergeable PRs only in 'My' or 'Participated' sections",
-		        description: Settings.markUnmergeableOnUserSectionsOnlyHelp,
-		        valueDisplayed: { Settings.markUnmergeableOnUserSectionsOnly ? "✓" : " " }),
-		Setting(section: .Display,
 		        title: "Display repository names",
 		        description: Settings.showReposInNameHelp,
 		        valueDisplayed: { Settings.showReposInName ? "✓" : " " }),
@@ -549,17 +545,14 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				previousValue = Settings.assignedPrHandlingPolicy
 				performSegue(withIdentifier: "showPicker", sender: self)
 			case 3:
-				Settings.markUnmergeableOnUserSectionsOnly = !Settings.markUnmergeableOnUserSectionsOnly
-				settingsChangedTimer.push()
-			case 4:
 				Settings.showReposInName = !Settings.showReposInName
 				settingsChangedTimer.push()
-			case 5:
+			case 4:
 				Settings.openItemsDirectlyInSafari = !Settings.openItemsDirectlyInSafari
-			case 6:
+			case 5:
 				Settings.showSeparateApiServersInMenu = !Settings.showSeparateApiServersInMenu
 				settingsChangedTimer.push()
-			case 7:
+			case 6:
 				Settings.alwaysRequestDesktopSite = !Settings.alwaysRequestDesktopSite
 			default: break
 			}

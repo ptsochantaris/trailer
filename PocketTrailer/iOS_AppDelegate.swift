@@ -190,52 +190,53 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 		prepareForRefresh()
 
 		API.syncItemsForActiveReposAndCallback { [weak self] in
-
-			guard let s = self else { return }
-
-			let success = !ApiServer.shouldReportRefreshFailure(in: DataManager.main)
-
-			s.lastUpdateFailed = !success
-
-			if success {
-				Settings.lastSuccessfulRefresh = Date()
-				preferencesDirty = false
-			}
-
-			s.checkApiUsage()
-			appIsRefreshing = false
-			DataManager.saveDB() // Ensure object IDs are permanent before sending notifications
-			DataManager.sendNotificationsIndexAndSave()
-			NotificationCenter.default.post(name: RefreshEndedNotification, object: nil)
-
-			if !success && UIApplication.shared.applicationState == .active {
-				showMessage("Refresh failed", "Loading the latest data from GitHub failed")
-			}
-
-			s.refreshTimer = Timer(repeats: false, interval: TimeInterval(Settings.refreshPeriod)) {
-				s.refreshTimerDone()
-			}
-			DLog("Refresh done")
-
-			s.updateBadge()
-			s.endBGTask()
-
-			if let bc = s.backgroundCallback {
-				if success && DataManager.main.hasChanges {
-					DLog("Background fetch: Got new data")
-					bc(.newData)
-				} else if success {
-					DLog("Background fetch: No new data")
-					bc(.noData)
-				} else {
-					DLog("Background fetch: FAILED")
-					bc(.failed)
-				}
-				s.backgroundCallback = nil
-			}
+			self?.processRefresh()
 		}
 
 		return true
+	}
+
+	private func processRefresh() {
+		let success = !ApiServer.shouldReportRefreshFailure(in: DataManager.main)
+
+		lastUpdateFailed = !success
+
+		if success {
+			Settings.lastSuccessfulRefresh = Date()
+			preferencesDirty = false
+		}
+
+		checkApiUsage()
+		appIsRefreshing = false
+		DataManager.saveDB() // Ensure object IDs are permanent before sending notifications
+		DataManager.sendNotificationsIndexAndSave()
+		NotificationCenter.default.post(name: RefreshEndedNotification, object: nil)
+
+		if !success && UIApplication.shared.applicationState == .active {
+			showMessage("Refresh failed", "Loading the latest data from GitHub failed")
+		}
+
+		refreshTimer = Timer(repeats: false, interval: TimeInterval(Settings.refreshPeriod)) {
+			self.refreshTimerDone()
+		}
+		DLog("Refresh done")
+
+		updateBadge()
+		endBGTask()
+
+		if let bc = backgroundCallback {
+			if success && DataManager.main.hasChanges {
+				DLog("Background fetch: Got new data")
+				bc(.newData)
+			} else if success {
+				DLog("Background fetch: No new data")
+				bc(.noData)
+			} else {
+				DLog("Background fetch: FAILED")
+				bc(.failed)
+			}
+			backgroundCallback = nil
+		}
 	}
 
 	private func endBGTask() {

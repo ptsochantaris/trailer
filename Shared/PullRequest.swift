@@ -8,7 +8,6 @@ final class PullRequest: ListableItem {
 
 	@NSManaged var issueCommentLink: String?
 	@NSManaged var issueUrl: String?
-	@NSManaged var mergeable: Bool
 	@NSManaged var reviewCommentLink: String?
 	@NSManaged var statusesLink: String?
 	@NSManaged var lastStatusNotified: String?
@@ -26,7 +25,6 @@ final class PullRequest: ListableItem {
 
 				item.baseSync(from: info, in: repo)
 
-				item.mergeable = info["mergeable"] as? Bool ?? true
 				let newMergeCommitSha = info["merge_commit_sha"] as? String
 				if item.mergeCommitSha != newMergeCommitSha {
 					let hadOneBefore = item.mergeCommitSha != nil
@@ -151,21 +149,7 @@ final class PullRequest: ListableItem {
 		return Settings.markPrsAsUnreadOnNewCommits ? _unreadOrNewCommitsPredicate : super.includeInUnreadPredicate
 	}
 
-	var markUnmergeable: Bool {
-		if !mergeable {
-			let s = sectionIndex
-			if s == ItemCondition.merged.rawValue || s == ItemCondition.closed.rawValue {
-				return false
-			}
-			if s == Section.all.rawValue && Settings.markUnmergeableOnUserSectionsOnly {
-				return false
-			}
-			return true
-		}
-		return false
-	}
-
-	class func reasonForEmpty(with filterValue: String?, criterion: GroupingCriterion? = nil) -> NSAttributedString {
+	class func reasonForEmpty(with filterValue: String?, criterion: GroupingCriterion?) -> NSAttributedString {
 		let openRequestCount = PullRequest.countOpen(in: DataManager.main, criterion: criterion)
 		return reasonForEmpty(with: filterValue, criterion: criterion, openItemCount: openRequestCount)
 	}
@@ -205,15 +189,6 @@ final class PullRequest: ListableItem {
 			_subtitle.append(NSAttributedString(string: itemDateFormatter.string(from: updatedAt!), attributes: lightSubtitle))
 		}
 
-		#if os(iOS)
-			if !mergeable {
-				_subtitle.append(separator)
-				var redSubtitle = lightSubtitle
-				redSubtitle[NSForegroundColorAttributeName] = UIColor.red
-				_subtitle.append(NSAttributedString(string: "Cannot be merged!", attributes: redSubtitle))
-			}
-		#endif
-
 		return _subtitle
 	}
 
@@ -230,10 +205,6 @@ final class PullRequest: ListableItem {
 			components.append("Created \(itemDateFormatter.string(from: createdAt!))")
 		} else {
 			components.append("Updated \(itemDateFormatter.string(from: updatedAt!))")
-		}
-
-		if !mergeable {
-			components.append("Cannot be merged!")
 		}
 
 		return components.joined(separator: ",")

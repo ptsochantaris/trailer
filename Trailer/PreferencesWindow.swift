@@ -29,7 +29,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var sortModeSelect: NSPopUpButton!
 	@IBOutlet weak var includeRepositoriesInFiltering: NSButton!
 	@IBOutlet weak var groupByRepo: NSButton!
-	@IBOutlet weak var markUnmergeableOnUserSectionsOnly: NSButton!
 	@IBOutlet weak var countOnlyListedItems: NSButton!
 	@IBOutlet weak var checkForUpdatesAutomatically: NSButton!
 	@IBOutlet weak var checkForUpdatesLabel: NSTextField!
@@ -330,7 +329,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		allHidingSetting.toolTip = "Set the any special hiding settings of all (or the currently selected/filtered) repositories"
 		showCreationDates.toolTip = Settings.showCreatedInsteadOfUpdatedHelp
 		highlightItemsWithNewCommits.toolTip = Settings.markPrsAsUnreadOnNewCommitsHelp
-		markUnmergeableOnUserSectionsOnly.toolTip = Settings.markUnmergeableOnUserSectionsOnlyHelp
 		countOnlyListedItems.toolTip = Settings.countOnlyListedItemsHelp
 		displayRepositoryNames.toolTip = Settings.showReposInNameHelp
 		useVibrancy.toolTip = Settings.useVibrancyHelp
@@ -474,7 +472,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		assignedPrHandlingPolicy.selectItem(at: Settings.assignedPrHandlingPolicy)
 		showStatusItems.integerValue = Settings.showStatusItems ? 1 : 0
 		makeStatusItemsSelectable.integerValue = Settings.makeStatusItemsSelectable ? 1 : 0
-		markUnmergeableOnUserSectionsOnly.integerValue = Settings.markUnmergeableOnUserSectionsOnly ? 1 : 0
 		countOnlyListedItems.integerValue = Settings.countOnlyListedItems ? 0 : 1
 		openPrAtFirstUnreadComment.integerValue = Settings.openPrAtFirstUnreadComment ? 1 : 0
 		logActivityToConsole.integerValue = Settings.logActivityToConsole ? 1 : 0
@@ -577,11 +574,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction func dontConfirmRemoveAllMergedSelected(_ sender: NSButton) {
 		Settings.dontAskBeforeWipingMerged = (sender.integerValue==1)
-	}
-
-	@IBAction func markUnmergeableOnUserSectionsOnlySelected(_ sender: NSButton) {
-		Settings.markUnmergeableOnUserSectionsOnly = (sender.integerValue==1)
-		deferredUpdateTimer.push()
 	}
 
 	@IBAction func displayRepositoryNameSelected(_ sender: NSButton) {
@@ -1660,7 +1652,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 				alert.addButton(withTitle: "Cancel")
 				alert.addButton(withTitle: "Wake Them Up")
 				alert.addButton(withTitle: "Keep Them Snoozed")
-				alert.beginSheetModal(for: self) { [weak self] response in
+				alert.beginSheetModal(for: self) { response in
 					switch response {
 					case 1000:
 						break
@@ -1668,7 +1660,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 						selectedPreset.wakeUpAllAssociatedItems()
 						fallthrough
 					case 1002:
-						self?.completeSnoozeDelete(for: selectedPreset, index)
+						self.completeSnoozeDelete(for: selectedPreset, index)
 					default: break
 					}
 				}

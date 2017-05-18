@@ -22,12 +22,12 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 				                          preferredStyle: .alert)
 
 				a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-				a.addAction(UIAlertAction(title: "Wake Them Up", style: .destructive) { [weak self] action in
+				a.addAction(UIAlertAction(title: "Wake Them Up", style: .destructive) { action in
 					s.wakeUpAllAssociatedItems()
-					self?.deletePreset()
+					self.deletePreset()
 				})
-				a.addAction(UIAlertAction(title: "Keep Them Snoozed", style: .destructive) { [weak self] action in
-					self?.deletePreset()
+				a.addAction(UIAlertAction(title: "Keep Them Snoozed", style: .destructive) { action in
+					self.deletePreset()
 				})
 
 				present(a, animated: true)
@@ -39,8 +39,8 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 				                          preferredStyle: .alert)
 
 				a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-				a.addAction(UIAlertAction(title: "Delete", style: .destructive) { [weak self] action in
-					self?.deletePreset()
+				a.addAction(UIAlertAction(title: "Delete", style: .destructive) { action in
+					self.deletePreset()
 				})
 				
 				present(a, animated: true)
@@ -356,11 +356,11 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 		picker.reloadAllComponents()
 		picker.selectRow(indexForPicker, inComponent: 0, animated: false)
 		pickerBottom.constant = tabBarController?.tabBar.frame.size.height ?? 0
-		UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: { [weak self] in
-			self?.pickerShield.alpha = 1.0
-			self?.view.layoutIfNeeded()
-		}) { [weak self] finished in
-			self?.pickerShield.isUserInteractionEnabled = true
+		UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: {
+			self.pickerShield.alpha = 1.0
+			self.view.layoutIfNeeded()
+		}) { finished in
+			self.pickerShield.isUserInteractionEnabled = true
 		}
 	}
 
@@ -368,11 +368,11 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 		pickerBottom.constant = -(picker.frame.size.height+pickerNavBar.frame.size.height)
 
 		if animate {
-			UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: { [weak self] in
-				self?.pickerShield.alpha = 0.0
-				self?.view.layoutIfNeeded()
-			}) { [weak self] finished in
-				self?.pickerShield.isUserInteractionEnabled = false
+			UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: {
+				self.pickerShield.alpha = 0.0
+				self.view.layoutIfNeeded()
+			}) { finished in
+				self.pickerShield.isUserInteractionEnabled = false
 			}
 		} else {
 			pickerShield.alpha = 0.0

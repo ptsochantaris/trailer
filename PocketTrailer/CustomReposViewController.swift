@@ -63,8 +63,8 @@ final class CustomReposViewController: UIViewController, UITableViewDelegate, UI
 			field.placeholder = "http://github.com/owner_or_org/repo_name"
 		}
 		let cancel = UIAlertAction(title: "Cancel", style: .cancel)
-		let ok = UIAlertAction(title: "Add", style: .default) { [weak self] a in
-			self?.addRepo(url: v.textFields?.first!.text)
+		let ok = UIAlertAction(title: "Add", style: .default) { a in
+			self.addRepo(url: v.textFields?.first!.text)
 		}
 		v.addAction(cancel)
 		v.addAction(ok)
@@ -105,9 +105,9 @@ final class CustomReposViewController: UIViewController, UITableViewDelegate, UI
 		a.startAnimating()
 		addButton.customView = a
 
-		API.fetchRepo(named: repoName, owner: ownerName, from: server) { [weak self] error in
+		API.fetchRepo(named: repoName, owner: ownerName, from: server) { error in
 			a.stopAnimating()
-			self?.addButton.customView = nil
+			self.addButton.customView = nil
 
 			if let e = error {
 				showMessage("Fetching Repository Information Failed", e.localizedDescription)
@@ -118,7 +118,7 @@ final class CustomReposViewController: UIViewController, UITableViewDelegate, UI
 					showMessage("Repository added", "The new repository has been added to your local list. Trailer will refresh after you close preferences to fetch any items from it.")
 				}
 				DataManager.saveDB()
-				self?.updateRepos()
+				self.updateRepos()
 			}
 		}
 	}

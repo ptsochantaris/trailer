@@ -80,8 +80,8 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		let a = UIAlertController(title: promptTitle, message: "Mark all as read?", preferredStyle: .alert)
 		a.addAction(UIAlertAction(title: "No", style: .cancel) { action in
 		})
-		a.addAction(UIAlertAction(title: "Yes", style: .default) { [weak self] action in
-			self?.markAllAsRead()
+		a.addAction(UIAlertAction(title: "Yes", style: .default) { action in
+			self.markAllAsRead()
 		})
 		present(a, animated: true)
 	}

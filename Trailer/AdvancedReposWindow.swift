@@ -141,12 +141,10 @@ final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 		newRepoSpinner.startAnimation(nil)
 		addButton.isEnabled = false
 
-		API.fetchRepo(named: name, owner: owner, from: server) { [weak self] error in
+		API.fetchRepo(named: name, owner: owner, from: server) { error in
 
-			guard let s = self else { return }
-
-			s.newRepoSpinner.stopAnimation(nil)
-			s.addButton.isEnabled = true
+			self.newRepoSpinner.stopAnimation(nil)
+			self.addButton.isEnabled = true
 			preferencesDirty = true
 
 			let alert = NSAlert()
@@ -161,12 +159,12 @@ final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 					alert.informativeText = "The new repository has been added to your local list. Trailer will refresh after you close preferences to fetch any items from it."
 				}
 				DataManager.saveDB()
-				s.prefs?.projectsTable.reloadData()
-				self?.updateRemovableRepos()
+				self.prefs?.projectsTable.reloadData()
+				self.updateRemovableRepos()
 				app.updateAllMenus()
 			}
 			alert.addButton(withTitle: "OK")
-			alert.beginSheetModal(for: s, completionHandler: nil)
+			alert.beginSheetModal(for: self, completionHandler: nil)
 		}
 	}
 

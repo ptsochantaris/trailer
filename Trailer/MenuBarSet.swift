@@ -148,11 +148,11 @@ final class MenuBarSet {
 		if Repo.interestedInIssues(fromServerWithId: viewCriterion?.apiServerId) {
 
 			updateMenu(of: Issue.self, menu: issuesMenu, lengthOffset: 2, totalCount: { () -> Int in
-				return Issue.countOpen(in: DataManager.main)
-			}, hasUnread: { [weak self] () -> Bool in
-				return Issue.badgeCount(in: DataManager.main, criterion: self?.viewCriterion) > 0
-			}, reasonForEmpty: { [weak self] filter -> NSAttributedString in
-				return Issue.reasonForEmpty(with: filter, criterion: self?.viewCriterion)
+				return Issue.countOpen(in: DataManager.main, criterion: self.viewCriterion)
+			}, hasUnread: { () -> Bool in
+				return Issue.badgeCount(in: DataManager.main, criterion: self.viewCriterion) > 0
+			}, reasonForEmpty: { filter -> NSAttributedString in
+				return Issue.reasonForEmpty(with: filter, criterion: self.viewCriterion)
 			})
 
 		} else {
@@ -166,11 +166,11 @@ final class MenuBarSet {
 		if forceVisible || Repo.interestedInPrs(fromServerWithId: sid) || !Repo.interestedInIssues(fromServerWithId: sid) {
 
 			updateMenu(of: PullRequest.self, menu: prMenu, lengthOffset: 0, totalCount: { () -> Int in
-				return PullRequest.countOpen(in: DataManager.main)
-			}, hasUnread: { [weak self] () -> Bool in
-				return PullRequest.badgeCount(in: DataManager.main, criterion: self?.viewCriterion) > 0
-			}, reasonForEmpty: { [weak self] filter -> NSAttributedString in
-				return PullRequest.reasonForEmpty(with: filter, criterion: self?.viewCriterion)
+				return PullRequest.countOpen(in: DataManager.main, criterion: self.viewCriterion)
+			}, hasUnread: { () -> Bool in
+				return PullRequest.badgeCount(in: DataManager.main, criterion: self.viewCriterion) > 0
+			}, reasonForEmpty: { filter -> NSAttributedString in
+				return PullRequest.reasonForEmpty(with: filter, criterion: self.viewCriterion)
 			})
 
 		} else {

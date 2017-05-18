@@ -48,10 +48,8 @@ final class Reaction: DataItem {
 				if Settings.showCommentsEverywhere || (parentItem.sectionIndex != Section.all.rawValue && parentItem.sectionIndex != Section.none.rawValue) {
 					NotificationQueue.add(type: .newReaction, for: self)
 				}
-
 			}
 		}
-		postSyncAction = PostSyncAction.doNothing.rawValue
 	}
 
 	var isMine: Bool {

@@ -153,8 +153,8 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 			preferredStyle: .alert)
 
 		a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-		a.addAction(UIAlertAction(title: "Delete", style: .destructive) { [weak self] action in
-			self?.deleteServer()
+		a.addAction(UIAlertAction(title: "Delete", style: .destructive) { action in
+			self.deleteServer()
 		})
 
 		present(a, animated: true)

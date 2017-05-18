@@ -60,8 +60,8 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 			let alert = NSAlert()
 			alert.messageText = "Please enter your personal access token first"
 			alert.addButton(withTitle: "OK")
-			alert.beginSheetModal(for: self) { [weak self] response in
-				self?.normalState()
+			alert.beginSheetModal(for: self) { response in
+				self.normalState()
 			}
 		} else {
 			testingState()
@@ -103,8 +103,8 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 				let alert = NSAlert()
 				alert.messageText = "Syncing with this server failed - please check that your network connection is working and that you have pasted your token correctly"
 				alert.addButton(withTitle: "OK")
-				alert.beginSheetModal(for: self) { [weak self] response in
-					self?.normalState()
+				alert.beginSheetModal(for: self) { response in
+					self.normalState()
 				}
 			}
 		}

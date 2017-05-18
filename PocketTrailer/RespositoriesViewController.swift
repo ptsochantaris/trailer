@@ -47,14 +47,14 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 	}
 
 	@IBAction func actionSelected(_ sender: UIBarButtonItem) {
-		let r = UIAlertAction(title: "Refresh teams & watchlists", style: .destructive) { [weak self] a in
-			self?.refreshList()
+		let r = UIAlertAction(title: "Refresh teams & watchlists", style: .destructive) { a in
+			self.refreshList()
 		}
-		let w = UIAlertAction(title: "Watchlist & team options…", style: .default) { [weak self] a in
-			self?.performSegue(withIdentifier: "showWatchlistSettings", sender: self)
+		let w = UIAlertAction(title: "Watchlist & team options…", style: .default) { a in
+			self.performSegue(withIdentifier: "showWatchlistSettings", sender: self)
 		}
-		let c = UIAlertAction(title: "Custom repos…", style: .default) { [weak self] a in
-			self?.performSegue(withIdentifier: "showCustomRepos", sender: self)
+		let c = UIAlertAction(title: "Custom repos…", style: .default) { a in
+			self.performSegue(withIdentifier: "showCustomRepos", sender: self)
 		}
 		let cancel = UIAlertAction(title: "Cancel", style: .cancel)
 

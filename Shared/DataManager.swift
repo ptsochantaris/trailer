@@ -204,11 +204,15 @@ final class DataManager {
 			i.postSyncAction = PostSyncAction.doNothing.rawValue
 		}
 
-		for r in Review.newOrUpdatedItems(of: Review.self, in: main) {
+		for r in DataItem.newOrUpdatedItems(of: Review.self, in: main) {
 			r.postSyncAction = PostSyncAction.doNothing.rawValue
 		}
 
-		for r in PRComment.newOrUpdatedItems(of: PRComment.self, in: main) {
+		for r in DataItem.newOrUpdatedItems(of: PRComment.self, in: main) {
+			r.postSyncAction = PostSyncAction.doNothing.rawValue
+		}
+
+		for r in DataItem.newOrUpdatedItems(of: Reaction.self, in: main) {
 			r.postSyncAction = PostSyncAction.doNothing.rawValue
 		}
 

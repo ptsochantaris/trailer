@@ -58,11 +58,13 @@ class DataItem: NSManagedObject {
 		f.predicate = NSPredicate(format:"serverId in %@ and apiServer == %@", idsOfItems, server)
 		let existingItems = try! server.managedObjectContext?.fetch(f) ?? []
 
+		let now = Date()
+
 		for i in existingItems {
 			let serverId = i.serverId
 			if let idx = idsOfItems.index(of: serverId), let info = idsToInfo[serverId] {
 				idsOfItems.remove(at: idx)
-				let updatedDate = parseGH8601(info["updated_at"] as? String) ?? Date()
+				let updatedDate = parseGH8601(info["updated_at"] as? String) ?? i.createdAt ?? now
 				if updatedDate != i.updatedAt {
 					DLog("Updating %@: %@", entityName, serverId)
 					i.postSyncAction = PostSyncAction.isUpdated.rawValue
@@ -86,8 +88,8 @@ class DataItem: NSManagedObject {
 				i.postSyncAction = PostSyncAction.isNew.rawValue
 				i.apiServer = server
 
-				i.createdAt = parseGH8601(info["created_at"] as? String) ?? Date()
-				i.updatedAt = parseGH8601(info["updated_at"] as? String) ?? Date()
+				i.createdAt = parseGH8601(info["created_at"] as? String) ?? now
+				i.updatedAt = parseGH8601(info["updated_at"] as? String) ?? i.createdAt
 
 				postProcessCallback(i, info, true)
 			}
