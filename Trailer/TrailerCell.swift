@@ -49,7 +49,7 @@ class TrailerCell: NSTableCellView {
 
 		if let pullRequest = item as? PullRequest, Settings.showStatusItems {
 			cellPadding = 10
-			bottom = ceil(cellPadding * 0.5)
+			bottom = 5
 
 			for status in pullRequest.displayedStatuses.reversed() {
 				let text = status.displayText
@@ -67,8 +67,8 @@ class TrailerCell: NSTableCellView {
 			}
 
 		} else {
-			cellPadding = 6.0
-			bottom = ceil(cellPadding * 0.5)
+			cellPadding = 6
+			bottom = 3
 		}
 
 		let _title = item.title(with: titleFont, labelFont: detailFont, titleColor: unselectedTitleColor)
