@@ -43,7 +43,7 @@ final class PRDetailController: CommonController {
 
 	override func update(from response: [AnyHashable : Any]) {
 
-		table.removeRows(at: IndexSet(integersIn: NSMakeRange(0, table.numberOfRows).toRange()!))
+		table.removeRows(at: IndexSet(integersIn: Range(uncheckedBounds: (0, table.numberOfRows))))
 
 		rowControllers.removeAll(keepingCapacity: false)
 		let itemInfo = response["result"] as! [AnyHashable : Any]
@@ -51,7 +51,7 @@ final class PRDetailController: CommonController {
 		var rowCount = 0
 
 		if let statuses = itemInfo["statuses"] as? [[AnyHashable : Any]] {
-			table.insertRows(at: IndexSet(integersIn: NSMakeRange(rowCount, statuses.count).toRange() ?? 0..<0), withRowType: "StatusRow")
+			table.insertRows(at: IndexSet(integersIn: Range(uncheckedBounds: (rowCount, statuses.count))), withRowType: "StatusRow")
 			for status in statuses {
 				if let s = table.rowController(at: rowCount) as? StatusRow {
 					s.labelL.setText(status["text"] as? String)
@@ -77,7 +77,7 @@ final class PRDetailController: CommonController {
 			} else {
 				setTitle("Details")
 			}
-			table.insertRows(at: IndexSet(integersIn: NSMakeRange(rowCount, comments.count).toRange() ?? 0..<0), withRowType: "CommentRow")
+			table.insertRows(at: IndexSet(integersIn: Range(uncheckedBounds: (rowCount, comments.count))), withRowType: "CommentRow")
 			var unreadIndex = 0
 			let unreadCount = itemInfo["unreadCount"] as? Int ?? 0
 			for comment in comments {

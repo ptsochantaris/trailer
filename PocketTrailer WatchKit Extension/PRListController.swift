@@ -127,9 +127,9 @@ final class PRListController: CommonController {
 			if lastCount == 0 {
 				table.setNumberOfRows(C, withRowType: "PRRow")
 			} else if lastCount < C {
-				table.removeRows(at: IndexSet(integersIn: NSMakeRange(0, C-lastCount).toRange()!))
+				table.removeRows(at: IndexSet(integersIn: Range(uncheckedBounds: (0, C-lastCount))))
 			} else if lastCount > C {
-				table.insertRows(at: IndexSet(integersIn: NSMakeRange(0, lastCount-C).toRange()!), withRowType: "PRRow")
+				table.insertRows(at: IndexSet(integersIn: Range(uncheckedBounds: (0, lastCount-C))), withRowType: "PRRow")
 			}
 
 			lastCount = C

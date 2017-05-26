@@ -19,7 +19,7 @@ final class PrTable: NSTableView, NSPasteboardItemDataProvider {
 	}
 
 	func scale(image: NSImage, toFillSize: CGSize) -> NSImage {
-		let targetFrame = NSMakeRect(0, 0, toFillSize.width, toFillSize.height)
+		let targetFrame = CGRect(origin: .zero, size: toFillSize)
 		let sourceImageRep = image.bestRepresentation(for: targetFrame, context: nil, hints: nil)
 		let targetImage = NSImage(size: toFillSize)
 		targetImage.lockFocus()
@@ -62,7 +62,7 @@ final class PrTable: NSTableView, NSPasteboardItemDataProvider {
 			var dragPosition = convert(theEvent.locationInWindow, from: nil)
 			dragPosition.x -= 17
 			dragPosition.y -= 17
-			dragItem.setDraggingFrame(NSMakeRect(dragPosition.x, dragPosition.y, dragIcon.size.width, dragIcon.size.height), contents: dragIcon)
+			dragItem.setDraggingFrame(CGRect(origin: dragPosition, size: dragIcon.size), contents: dragIcon)
 
 			let draggingSession = beginDraggingSession(with: [dragItem], event: theEvent, source: self)
 			draggingSession.animatesToStartingPositionsOnCancelOrFail = true

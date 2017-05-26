@@ -307,11 +307,11 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 
 		heightCache.removeAll()
 
-		let currentIndexes = IndexSet(integersIn: NSMakeRange(0, fetchedResultsController.sections?.count ?? 0).toRange()!)
+		let currentIndexes = IndexSet(integersIn: Range(uncheckedBounds: (0, fetchedResultsController.sections?.count ?? 0)))
 
 		_fetchedResultsController = nil
 
-		let dataIndexes = IndexSet(integersIn: NSMakeRange(0, fetchedResultsController.sections?.count ?? 0).toRange()!)
+		let dataIndexes = IndexSet(integersIn: Range(uncheckedBounds: (0, fetchedResultsController.sections?.count ?? 0)))
 
 		let removedIndexes = currentIndexes.filter { !dataIndexes.contains($0) }
 		let addedIndexes = dataIndexes.filter { !currentIndexes.contains($0) }

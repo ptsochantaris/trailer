@@ -1061,7 +1061,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	private func color(button: NSButton, withColor: NSColor) {
 		let title = button.attributedTitle.mutableCopy() as! NSMutableAttributedString
-		title.addAttribute(NSForegroundColorAttributeName, value: withColor, range: NSMakeRange(0, title.length))
+		title.addAttribute(NSForegroundColorAttributeName, value: withColor, range: NSRange(location: 0, length: title.length))
 		button.attributedTitle = title
 	}
 

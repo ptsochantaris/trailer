@@ -44,7 +44,7 @@ final class StatusItemView: NSView {
 		let width = Settings.hideMenubarCounts ? (title == nil ? 0 : 4) : statusLabel.size(withAttributes: textAttributes).width
 		let H = NSStatusBar.system().thickness
 		let itemWidth = (H + width + StatusItemView.padding*3) + labelOffset
-		frame = NSMakeRect(0, 0, itemWidth, H)
+		frame = CGRect(x: 0, y: 0, width: itemWidth, height: H)
 		needsDisplay = true
 	}
 
@@ -80,7 +80,7 @@ final class StatusItemView: NSView {
 
 	private func drawStandard(titleColor: NSColor, countAttributes: [String : Any], inRect: NSRect) {
 
-		let imagePoint = NSMakePoint(StatusItemView.padding, 0)
+		let imagePoint = CGPoint(x: StatusItemView.padding, y: 0)
 		var labelRect = CGRect(x: bounds.size.height + labelOffset, y: -5, width: bounds.size.width, height: bounds.size.height)
 		let img = tintedImage(from: icon, tint: titleColor)
 
@@ -88,7 +88,7 @@ final class StatusItemView: NSView {
 
 			labelRect = labelRect.offsetBy(dx: -3, dy: -3)
 
-			let r = NSMakeRect(1, inRect.height-7, inRect.width-2, 7)
+			let r = CGRect(x: 1, y: inRect.height-7, width: inRect.width-2, height: 7)
 			let p = NSMutableParagraphStyle()
 			p.alignment = .center
 			p.lineBreakMode = .byTruncatingMiddle
@@ -112,7 +112,7 @@ final class StatusItemView: NSView {
 
 		if let t = title {
 
-			let r = NSMakeRect(1, inRect.height-7, inRect.width-2, 7)
+			let r = CGRect(x: 1, y: inRect.height-7, width: inRect.width-2, height: 7)
 			let p = NSMutableParagraphStyle()
 			p.alignment = .center
 			p.lineBreakMode = .byTruncatingMiddle

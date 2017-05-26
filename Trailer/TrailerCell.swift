@@ -71,7 +71,7 @@ class TrailerCell: NSTableCellView {
 				let H = ceil(text.boundingRect(with: CGSize(width: W, height: .greatestFiniteMagnitude),
 				                               options: stringDrawingOptions,
 				                               attributes: TrailerCell.statusAttributes).size.height)
-				let rect = NSMakeRect(LEFTPADDING + shift, bottom + statusBottom, W, H)
+				let rect = CGRect(x: LEFTPADDING + shift, y: bottom + statusBottom, width: W, height: H)
 				statusBottom += H
 
 				let statusLabel = LinkField(frame: rect)
@@ -88,17 +88,17 @@ class TrailerCell: NSTableCellView {
 			bottom = ceil(cellPadding * 0.5)
 		}
 
-		frame = NSMakeRect(0, 0, MENU_WIDTH, titleHeight + subtitleHeight + statusBottom + cellPadding)
+		frame = CGRect(x: 0, y: 0, width: MENU_WIDTH, height: titleHeight + subtitleHeight + statusBottom + cellPadding)
 		let hasNewCommits = (item as? PullRequest)?.hasNewCommits ?? false
 		addCounts(total: _commentsTotal, unread: _commentsNew, alert: hasNewCommits, faded: faded)
 
-		let titleRect = NSMakeRect(LEFTPADDING + shift, subtitleHeight + bottom + statusBottom, W, titleHeight)
-		let dateRect = NSMakeRect(LEFTPADDING + shift, statusBottom + bottom, W, subtitleHeight)
-		let pinRect = NSMakeRect(LEFTPADDING + W + shift, floor((bounds.size.height-24)*0.5), REMOVE_BUTTON_WIDTH-10, 24)
+		let titleRect = CGRect(x: LEFTPADDING + shift, y: subtitleHeight + bottom + statusBottom, width: W, height: titleHeight)
+		let dateRect = CGRect(x: LEFTPADDING + shift, y: statusBottom + bottom, width: W, height: subtitleHeight)
+		let pinRect = CGRect(x: LEFTPADDING + W + shift, y: floor((bounds.size.height-24)*0.5), width: REMOVE_BUTTON_WIDTH-10, height: 24)
 
 		if showAvatar {
 			let userImage = AvatarView(
-				frame: NSMakeRect(LEFTPADDING, bounds.size.height-AVATAR_SIZE-7.0, AVATAR_SIZE, AVATAR_SIZE),
+				frame: CGRect(x: LEFTPADDING, y: bounds.size.height-AVATAR_SIZE-7.0, width: AVATAR_SIZE, height: AVATAR_SIZE),
 				url: S(item.userAvatarUrl))
 			if faded { userImage.alphaValue = DISABLED_FADE }
 			addSubview(userImage)
@@ -370,7 +370,7 @@ class TrailerCell: NSTableCellView {
 		var bottom = bounds.size.height-height-10.0
 		var left = (LEFTPADDING-width)*0.5
 
-		let c = FilledView(frame: NSIntegralRect(NSMakeRect(left, bottom, width, height)))
+		let c = FilledView(frame: CGRect(x: left, y: bottom, width: width, height: height).integral)
 		c.cornerRadius = floor(height/2.0)
 
 		countView = CenterTextField(frame: c.bounds)
@@ -396,7 +396,7 @@ class TrailerCell: NSTableCellView {
 			bottom -= height * 0.5 + 1
 			left -= width * 0.5
 
-			let cc = FilledView(frame: NSIntegralRect(NSMakeRect(left, bottom, width, height)))
+			let cc = FilledView(frame: CGRect(x: left, y: bottom, width: width, height: height).integral)
 			cc.cornerRadius = floor(height*0.5)
 
 			let alertCount = CenterTextField(frame: cc.bounds)
@@ -425,7 +425,7 @@ class TrailerCell: NSTableCellView {
 				newBackground?.backgroundColor = NSColor(red: 1.0, green: 0.4, blue: 0.4, alpha: 1.0)
 			}
 			if let a = countView?.attributedStringValue.mutableCopy() as? NSMutableAttributedString {
-				a.addAttribute(NSForegroundColorAttributeName, value: color, range: NSMakeRange(0, a.length))
+				a.addAttribute(NSForegroundColorAttributeName, value: color, range: NSRange(location: 0, length: a.length))
 				countView?.attributedStringValue = a
 			}
 		}
