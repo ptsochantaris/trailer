@@ -60,12 +60,8 @@ final class ItemDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 
 	func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
 		let object = itemIds[row]
-		if let id = object as? NSManagedObjectID, let i = existingObject(with: id) {
-			if let pr = i as? PullRequest {
-				return PullRequestCell(pullRequest: pr)
-			} else if let issue = i as? Issue {
-				return IssueCell(issue: issue)
-			}
+		if let id = object as? NSManagedObjectID, let i = existingObject(with: id) as? ListableItem {
+			return TrailerCell(item: i)
 		} else if let title = object as? String {
 			return SectionHeader(title: title, showRemoveAllButton: removalSections.contains(title))
 		}

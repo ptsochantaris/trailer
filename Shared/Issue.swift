@@ -85,44 +85,6 @@ final class Issue: ListableItem {
 		return try! moc.count(for: f)
 	}
 
-	func subtitle(with font: FONT_CLASS, lightColor: COLOR_CLASS, darkColor: COLOR_CLASS) -> NSMutableAttributedString {
-		let _subtitle = NSMutableAttributedString()
-		let p = NSMutableParagraphStyle()
-		#if os(iOS)
-			p.lineHeightMultiple = 1.3
-		#endif
-
-		let lightSubtitle = [NSForegroundColorAttributeName: lightColor, NSFontAttributeName: font, NSParagraphStyleAttributeName: p]
-
-		#if os(iOS)
-			let separator = NSAttributedString(string:"\n", attributes: lightSubtitle)
-		#elseif os(OSX)
-			let separator = NSAttributedString(string:"   ", attributes: lightSubtitle)
-		#endif
-
-		if Settings.showReposInName {
-			if let n = repo.fullName {
-				var darkSubtitle = lightSubtitle
-				darkSubtitle[NSForegroundColorAttributeName] = darkColor
-				_subtitle.append(NSAttributedString(string: n, attributes: darkSubtitle))
-				_subtitle.append(separator)
-			}
-		}
-
-		if let l = userLogin {
-			_subtitle.append(NSAttributedString(string: "@\(l)", attributes: lightSubtitle))
-			_subtitle.append(separator)
-		}
-
-		if Settings.showCreatedInsteadOfUpdated {
-			_subtitle.append(NSAttributedString(string: itemDateFormatter.string(from: createdAt!), attributes: lightSubtitle))
-		} else {
-			_subtitle.append(NSAttributedString(string: itemDateFormatter.string(from: updatedAt!), attributes: lightSubtitle))
-		}
-		
-		return _subtitle
-	}
-
 	var sectionName: String {
 		return Section.issueMenuTitles[Int(sectionIndex)]
 	}
@@ -134,23 +96,5 @@ final class Issue: ListableItem {
 		let p = ItemCondition.closed.matchingPredicate
 		add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc, includeAllGroups: includeAllGroups)
 		return try! moc.fetch(f)
-	}
-
-	var accessibleSubtitle: String {
-		var components = [String]()
-
-		if Settings.showReposInName {
-			components.append("Repository: \(S(repo.fullName))")
-		}
-
-		if let l = userLogin { components.append("Author: \(l)") }
-
-		if Settings.showCreatedInsteadOfUpdated {
-			components.append("Created \(itemDateFormatter.string(from: createdAt!))")
-		} else {
-			components.append("Updated \(itemDateFormatter.string(from: updatedAt!))")
-		}
-
-		return components.joined(separator: ",")
 	}
 }

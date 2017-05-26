@@ -1,6 +1,17 @@
 
 class TrailerCell: NSTableCellView {
 
+	static let statusAttributes: [String : Any] = {
+
+		let paragraphStyle = NSMutableParagraphStyle()
+		paragraphStyle.headIndent = 17.0
+
+		return [
+			NSFontAttributeName: NSFont(name: "Monaco", size: 9)!,
+			NSParagraphStyleAttributeName: paragraphStyle
+			] as [String:Any]
+	}()
+
 	var title: CenterTextField!
 	let unselectedTitleColor: NSColor
 	let detailFont: NSFont!, titleFont: NSFont!
@@ -9,7 +20,7 @@ class TrailerCell: NSTableCellView {
 	private let isDark: Bool
 	private var trackingArea: NSTrackingArea?
 
-	init(frame frameRect: NSRect, item: ListableItem) {
+	init(item: ListableItem) {
 
 		dataItemId = item.objectID
 		detailFont = NSFont.menuFont(ofSize: 10.0)
@@ -19,7 +30,103 @@ class TrailerCell: NSTableCellView {
 
 		unselectedTitleColor = isDark ? .controlHighlightColor : .controlTextColor
 
-		super.init(frame: frameRect)
+		super.init(frame: .zero)
+
+		let _commentsNew = item.unreadComments
+		let _commentsTotal = item.totalComments
+
+		let _title = item.title(with: titleFont, labelFont: detailFont, titleColor: unselectedTitleColor)
+		let _subtitle = item.subtitle(with: detailFont, lightColor: .gray, darkColor: .darkGray)
+
+		var W = MENU_WIDTH-LEFTPADDING-app.scrollBarWidth
+
+		let faded = item.shouldSkipNotifications
+
+		let showUnpin = item.condition != ItemCondition.open.rawValue
+		if showUnpin { W -= REMOVE_BUTTON_WIDTH } else { W -= 4.0 }
+
+		let showAvatar = !S(item.userAvatarUrl).isEmpty && !Settings.hideAvatars
+		let shift: CGFloat
+		if showAvatar {
+			W -= AVATAR_SIZE+AVATAR_PADDING
+			shift = AVATAR_PADDING+AVATAR_SIZE
+		} else {
+			W += 4
+			shift = -4
+		}
+
+		let titleHeight = ceil(_title.boundingRect(with: CGSize(width: W - 4.0, height: .greatestFiniteMagnitude), options: stringDrawingOptions).size.height)
+		let subtitleHeight = ceil(_subtitle.boundingRect(with: CGSize(width: W - 4.0, height: .greatestFiniteMagnitude), options: stringDrawingOptions).size.height+4.0)
+
+		let bottom: CGFloat
+		let cellPadding: CGFloat
+		var statusBottom: CGFloat = 0
+
+		if let pullRequest = item as? PullRequest, Settings.showStatusItems {
+			cellPadding = 10
+			bottom = ceil(cellPadding * 0.5)
+
+			for status in pullRequest.displayedStatuses.reversed() {
+				let text = status.displayText
+				let H = ceil(text.boundingRect(with: CGSize(width: W, height: .greatestFiniteMagnitude),
+				                               options: stringDrawingOptions,
+				                               attributes: TrailerCell.statusAttributes).size.height)
+				let rect = NSMakeRect(LEFTPADDING + shift, bottom + statusBottom, W, H)
+				statusBottom += H
+
+				let statusLabel = LinkField(frame: rect)
+				statusLabel.targetUrl = status.targetUrl
+				statusLabel.needsCommand = !Settings.makeStatusItemsSelectable
+				statusLabel.attributedStringValue = NSAttributedString(string: text, attributes: TrailerCell.statusAttributes)
+				statusLabel.textColor = status.colorForDisplay
+				statusLabel.alphaValue = faded ? DISABLED_FADE : 1.0
+				addSubview(statusLabel)
+			}
+
+		} else {
+			cellPadding = 6.0
+			bottom = ceil(cellPadding * 0.5)
+		}
+
+		frame = NSMakeRect(0, 0, MENU_WIDTH, titleHeight + subtitleHeight + statusBottom + cellPadding)
+		let hasNewCommits = (item as? PullRequest)?.hasNewCommits ?? false
+		addCounts(total: _commentsTotal, unread: _commentsNew, alert: hasNewCommits, faded: faded)
+
+		let titleRect = NSMakeRect(LEFTPADDING + shift, subtitleHeight + bottom + statusBottom, W, titleHeight)
+		let dateRect = NSMakeRect(LEFTPADDING + shift, statusBottom + bottom, W, subtitleHeight)
+		let pinRect = NSMakeRect(LEFTPADDING + W + shift, floor((bounds.size.height-24)*0.5), REMOVE_BUTTON_WIDTH-10, 24)
+
+		if showAvatar {
+			let userImage = AvatarView(
+				frame: NSMakeRect(LEFTPADDING, bounds.size.height-AVATAR_SIZE-7.0, AVATAR_SIZE, AVATAR_SIZE),
+				url: S(item.userAvatarUrl))
+			if faded { userImage.alphaValue = DISABLED_FADE }
+			addSubview(userImage)
+		}
+
+		if showUnpin {
+			let unpin = NSButton(frame: pinRect)
+			unpin.title = "Remove"
+			unpin.target = self
+			unpin.action = #selector(unPinSelected)
+			unpin.setButtonType(.momentaryLight)
+			unpin.bezelStyle = .roundRect
+			unpin.font = NSFont.systemFont(ofSize: 10.0)
+			addSubview(unpin)
+		}
+
+		title = CenterTextField(frame: titleRect)
+		title.attributedStringValue = _title
+		addSubview(title)
+
+		let subtitle = CenterTextField(frame: dateRect)
+		subtitle.attributedStringValue = _subtitle
+		addSubview(subtitle)
+
+		if faded {
+			title.alphaValue = DISABLED_FADE
+			subtitle.alphaValue = DISABLED_FADE
+		}
 	}
 
 	required init?(coder: NSCoder) {
@@ -59,11 +166,11 @@ class TrailerCell: NSTableCellView {
 		}
 	}
 
-    func openRepo() {
-        if let u = associatedDataItem?.repo.webUrl, let url = URL(string: u) {
-            NSWorkspace.shared().open(url)
-        }
-    }
+	func openRepo() {
+		if let u = associatedDataItem?.repo.webUrl, let url = URL(string: u) {
+			NSWorkspace.shared().open(url)
+		}
+	}
 
 	func copyToClipboard() {
 		if let s = associatedDataItem?.webUrl {
@@ -98,10 +205,10 @@ class TrailerCell: NSTableCellView {
 			title = muted ? "Issue #\(n) (muted)" : "Issue #\(n)"
 		}
 
-        let m = NSMenu(title: title)
+		let m = NSMenu(title: title)
 		m.addItem(withTitle: title, action: #selector(copyNumberToClipboard), keyEquivalent: "")
 		m.addItem(NSMenuItem.separator())
-		
+
 		let c1 = m.addItem(withTitle: "Copy URL", action: #selector(copyToClipboard), keyEquivalent: "c")
 		c1.keyEquivalentModifierMask = [.command]
 
@@ -161,7 +268,7 @@ class TrailerCell: NSTableCellView {
 		}
 
 		return m
-    }
+	}
 
 	func snoozeConfigSelected() {
 		app.showPreferencesWindow(andSelect: 6)
@@ -267,7 +374,7 @@ class TrailerCell: NSTableCellView {
 		c.cornerRadius = floor(height/2.0)
 
 		countView = CenterTextField(frame: c.bounds)
-        countView!.vibrant = false
+		countView!.vibrant = false
 		countView!.attributedStringValue = countString
 		if faded { countView!.alphaValue = DISABLED_FADE }
 		c.addSubview(countView!)
@@ -293,7 +400,7 @@ class TrailerCell: NSTableCellView {
 			cc.cornerRadius = floor(height*0.5)
 
 			let alertCount = CenterTextField(frame: cc.bounds)
-            alertCount.vibrant = false
+			alertCount.vibrant = false
 			alertCount.attributedStringValue = alertString
 			if faded { alertCount.alphaValue = DISABLED_FADE }
 			cc.addSubview(alertCount)
