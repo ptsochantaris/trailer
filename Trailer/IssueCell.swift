@@ -71,8 +71,6 @@ final class IssueCell: TrailerCell {
 			title.alphaValue = DISABLED_FADE
 			subtitle.alphaValue = DISABLED_FADE
 		}
-
-		updateMenu()
 	}
 
 	required init?(coder: NSCoder) {

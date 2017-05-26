@@ -126,8 +126,6 @@ final class PullRequestCell: TrailerCell {
 				rectIndex -= 1
 			}
 		}
-
-		updateMenu()
 	}
 
 	required init?(coder: NSCoder) {

@@ -83,11 +83,10 @@ class TrailerCell: NSTableCellView {
 		}
 	}
 
-	func updateMenu() {
+	override func menu(for event: NSEvent) -> NSMenu? {
 
 		guard let item = associatedDataItem else {
-			menu = nil
-			return
+			return nil
 		}
 
 		let title: String
@@ -130,6 +129,7 @@ class TrailerCell: NSTableCellView {
 				}
 				let c = m.addItem(withTitle: title, action: #selector(wakeUpSelected), keyEquivalent: "0")
 				c.keyEquivalentModifierMask = [.command, .shift]
+
 			} else {
 
 				if muted {
@@ -160,7 +160,7 @@ class TrailerCell: NSTableCellView {
 			}
 		}
 
-		menu = m
+		return m
     }
 
 	func snoozeConfigSelected() {
