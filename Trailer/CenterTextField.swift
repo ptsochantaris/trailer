@@ -6,10 +6,10 @@ class CenterTextField: NSTextField {
 	override init(frame frameRect: NSRect) {
 		super.init(frame: frameRect)
 		isBezeled = false
+		isEnabled = false
 		isEditable = false
 		isSelectable = false
 		drawsBackground = false
-		(cell as! CenterTextFieldCell).isScrollable = false
 	}
 
 	required init?(coder: NSCoder) {
