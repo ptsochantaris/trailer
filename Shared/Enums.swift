@@ -55,7 +55,7 @@ func S(_ s: String?) -> String {
 
 typealias Completion = () -> Void
 
-let shortDateFormatter = { () -> DateFormatter in
+let shortDateFormatter: DateFormatter = {
 	let d = DateFormatter()
 	d.dateStyle = .short
 	d.timeStyle = .short

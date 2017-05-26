@@ -140,13 +140,11 @@ final class Settings {
 		possibleExport(key)
 	}
 
-	private static let saveTimer = { () -> PopTimer in
-		return PopTimer(timeInterval: 2.0) {
-			if let e = Settings.lastExportUrl {
-				Settings.writeToURL(e)
-			}
+	private static let saveTimer = PopTimer(timeInterval: 2) {
+		if let e = Settings.lastExportUrl {
+			Settings.writeToURL(e)
 		}
-	}()
+	}
 
 	class func possibleExport(_ key: String?) {
 		#if os(OSX)

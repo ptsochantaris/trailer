@@ -46,7 +46,7 @@ final class CacheEntry: NSManagedObject {
 		E.lastTouched = Date()
 	}
 
-	static let entryFetch = { () -> NSFetchRequest<CacheEntry> in
+	static let entryFetch: NSFetchRequest<CacheEntry> = {
 		let f = NSFetchRequest<CacheEntry>(entityName: "CacheEntry")
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false

@@ -63,7 +63,7 @@ func existingObject(with id: NSManagedObjectID) -> NSManagedObject? {
 	return try? DataManager.main.existingObject(with: id)
 }
 
-let itemDateFormatter = { () -> DateFormatter in
+let itemDateFormatter: DateFormatter = {
 	let f = DateFormatter()
 	f.dateStyle = .medium
 	f.timeStyle = .short
@@ -82,7 +82,7 @@ func DLog(_ message: String, _ arg1: @autoclosure ()->Any? = nil, _ arg2: @autoc
 	}
 }
 
-let itemCountFormatter = { () -> NumberFormatter in
+let itemCountFormatter: NumberFormatter = {
     let n = NumberFormatter()
     n.numberStyle = .decimal
     return n
@@ -331,9 +331,9 @@ extension String {
 		CC_MD5(chars, CC_LONG(strlen(chars)), result)
 
 		var hash = String()
-		for i in 0..<digestLen {
-			let digit = String(format: "%02X", result[i])
-			hash.append(digit)
+		hash.reserveCapacity(32)
+		for i in 0 ..< digestLen {
+			hash.append(String(format: "%02X", result[i]))
 		}
 
 		result.deallocate(capacity: digestLen)

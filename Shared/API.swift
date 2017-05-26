@@ -298,7 +298,7 @@ final class API {
 	private static let sustainedConcurrency = 3
 	private static let burstConcurrency = 8
 
-	private static let apiQueue = { () -> OperationQueue in
+	private static let apiQueue: OperationQueue = {
 		let n = OperationQueue()
 		n.underlyingQueue = DispatchQueue.main
 		n.maxConcurrentOperationCount = API.sustainedConcurrency
