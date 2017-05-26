@@ -1,10 +1,10 @@
 
 class TrailerCell: NSTableCellView {
 
-	static let statusAttributes: [String : Any] = {
+	private static let statusAttributes: [String : Any] = {
 
 		let paragraphStyle = NSMutableParagraphStyle()
-		paragraphStyle.headIndent = 17.0
+		paragraphStyle.headIndent = 17
 
 		return [
 			NSFontAttributeName: NSFont(name: "Monaco", size: 9)!,
@@ -12,55 +12,40 @@ class TrailerCell: NSTableCellView {
 			] as [String:Any]
 	}()
 
-	var title: CenterTextField!
-	let unselectedTitleColor: NSColor
-	let detailFont: NSFont!, titleFont: NSFont!
+
+	private let detailFont = NSFont.menuFont(ofSize: 10.0)
+	private let titleFont = NSFont.menuFont(ofSize: 13.0)
 
 	private let dataItemId: NSManagedObjectID!
-	private let isDark: Bool
+	private let isDark = Settings.useVibrancy && app.darkMode
+	private let unselectedTitleColor: NSColor
+
+	private var title: CenterTextField!
 	private var trackingArea: NSTrackingArea?
 
 	init(item: ListableItem) {
 
 		dataItemId = item.objectID
-		detailFont = NSFont.menuFont(ofSize: 10.0)
-		titleFont = NSFont.menuFont(ofSize: 13.0)
-
-		isDark = Settings.useVibrancy && app.darkMode
 
 		unselectedTitleColor = isDark ? .controlHighlightColor : .controlTextColor
 
 		super.init(frame: .zero)
 
-		let _commentsNew = item.unreadComments
-		let _commentsTotal = item.totalComments
-
-		let _title = item.title(with: titleFont, labelFont: detailFont, titleColor: unselectedTitleColor)
-		let _subtitle = item.subtitle(with: detailFont, lightColor: .gray, darkColor: .darkGray)
+		let faded = item.shouldSkipNotifications
 
 		var W = MENU_WIDTH-LEFTPADDING-app.scrollBarWidth
 
-		let faded = item.shouldSkipNotifications
-
 		let showUnpin = item.condition != ItemCondition.open.rawValue
-		if showUnpin { W -= REMOVE_BUTTON_WIDTH } else { W -= 4.0 }
+		if showUnpin { W -= REMOVE_BUTTON_WIDTH } else { W -= 4 }
 
-		let showAvatar = !S(item.userAvatarUrl).isEmpty && !Settings.hideAvatars
-		let shift: CGFloat
-		if showAvatar {
-			W -= AVATAR_SIZE+AVATAR_PADDING
-			shift = AVATAR_PADDING+AVATAR_SIZE
-		} else {
-			W += 4
-			shift = -4
-		}
-
-		let titleHeight = ceil(_title.boundingRect(with: CGSize(width: W - 4.0, height: .greatestFiniteMagnitude), options: stringDrawingOptions).size.height)
-		let subtitleHeight = ceil(_subtitle.boundingRect(with: CGSize(width: W - 4.0, height: .greatestFiniteMagnitude), options: stringDrawingOptions).size.height+4.0)
+		let showAvatar = !(S(item.userAvatarUrl).isEmpty || Settings.hideAvatars)
+		let shift: CGFloat = showAvatar ? AVATAR_SIZE + AVATAR_PADDING : -4
+		W -= shift
 
 		let bottom: CGFloat
 		let cellPadding: CGFloat
 		var statusBottom: CGFloat = 0
+		let widthLimit = CGSize(width: W, height: .greatestFiniteMagnitude)
 
 		if let pullRequest = item as? PullRequest, Settings.showStatusItems {
 			cellPadding = 10
@@ -68,9 +53,7 @@ class TrailerCell: NSTableCellView {
 
 			for status in pullRequest.displayedStatuses.reversed() {
 				let text = status.displayText
-				let H = ceil(text.boundingRect(with: CGSize(width: W, height: .greatestFiniteMagnitude),
-				                               options: stringDrawingOptions,
-				                               attributes: TrailerCell.statusAttributes).size.height)
+				let H = text.boundingRect(with: widthLimit, options: stringDrawingOptions, attributes: TrailerCell.statusAttributes).integral.size.height
 				let rect = CGRect(x: LEFTPADDING + shift, y: bottom + statusBottom, width: W, height: H)
 				statusBottom += H
 
@@ -88,23 +71,25 @@ class TrailerCell: NSTableCellView {
 			bottom = ceil(cellPadding * 0.5)
 		}
 
+		let _title = item.title(with: titleFont, labelFont: detailFont, titleColor: unselectedTitleColor)
+		let titleHeight = _title.boundingRect(with: widthLimit, options: stringDrawingOptions).integral.size.height
+
+		let _subtitle = item.subtitle(with: detailFont, lightColor: .gray, darkColor: .darkGray)
+		let subtitleHeight = _subtitle.boundingRect(with: widthLimit, options: stringDrawingOptions).integral.size.height + 4
+
 		frame = CGRect(x: 0, y: 0, width: MENU_WIDTH, height: titleHeight + subtitleHeight + statusBottom + cellPadding)
 		let hasNewCommits = (item as? PullRequest)?.hasNewCommits ?? false
-		addCounts(total: _commentsTotal, unread: _commentsNew, alert: hasNewCommits, faded: faded)
-
-		let titleRect = CGRect(x: LEFTPADDING + shift, y: subtitleHeight + bottom + statusBottom, width: W, height: titleHeight)
-		let dateRect = CGRect(x: LEFTPADDING + shift, y: statusBottom + bottom, width: W, height: subtitleHeight)
-		let pinRect = CGRect(x: LEFTPADDING + W + shift, y: floor((bounds.size.height-24)*0.5), width: REMOVE_BUTTON_WIDTH-10, height: 24)
+		addCounts(total: item.totalComments, unread: item.unreadComments, alert: hasNewCommits, faded: faded)
 
 		if showAvatar {
-			let userImage = AvatarView(
-				frame: CGRect(x: LEFTPADDING, y: bounds.size.height-AVATAR_SIZE-7.0, width: AVATAR_SIZE, height: AVATAR_SIZE),
-				url: S(item.userAvatarUrl))
-			if faded { userImage.alphaValue = DISABLED_FADE }
+			let avatarRect = CGRect(x: LEFTPADDING, y: bounds.size.height-AVATAR_SIZE-7.0, width: AVATAR_SIZE, height: AVATAR_SIZE)
+			let userImage = AvatarView(frame: avatarRect, url: S(item.userAvatarUrl))
+			userImage.alphaValue = faded ? DISABLED_FADE : 1.0
 			addSubview(userImage)
 		}
 
 		if showUnpin {
+			let pinRect = CGRect(x: LEFTPADDING + W + shift, y: floor((bounds.size.height-24)*0.5), width: REMOVE_BUTTON_WIDTH-10, height: 24)
 			let unpin = NSButton(frame: pinRect)
 			unpin.title = "Remove"
 			unpin.target = self
@@ -115,11 +100,13 @@ class TrailerCell: NSTableCellView {
 			addSubview(unpin)
 		}
 
+		let titleRect = CGRect(x: LEFTPADDING + shift, y: subtitleHeight + bottom + statusBottom, width: W, height: titleHeight)
 		title = CenterTextField(frame: titleRect)
 		title.attributedStringValue = _title
 		addSubview(title)
 
-		let subtitle = CenterTextField(frame: dateRect)
+		let subtitleRect = CGRect(x: LEFTPADDING + shift, y: statusBottom + bottom, width: W, height: subtitleHeight)
+		let subtitle = CenterTextField(frame: subtitleRect)
 		subtitle.attributedStringValue = _subtitle
 		addSubview(subtitle)
 
