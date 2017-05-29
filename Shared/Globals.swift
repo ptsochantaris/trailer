@@ -323,21 +323,7 @@ extension String {
 		return trimmingCharacters(in: .whitespacesAndNewlines)
 	}
 	var md5hashed: String {
-
-		let digestLen = Int(CC_MD5_DIGEST_LENGTH)
-		let result = UnsafeMutablePointer<UInt8>.allocate(capacity: digestLen)
-
-		let chars = cString(using: .utf8)!
-		CC_MD5(chars, CC_LONG(strlen(chars)), result)
-
-		var hash = String()
-		hash.reserveCapacity(32)
-		for i in 0 ..< digestLen {
-			hash.append(String(format: "%02X", result[i]))
-		}
-
-		result.deallocate(capacity: digestLen)
-		return hash
+		return MD5Hashing.md5(str: self)
 	}
 }
 
