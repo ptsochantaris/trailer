@@ -83,9 +83,7 @@ final class API {
 		return appSupportURL.appendingPathComponent("com.housetrip.Trailer").path
 	}()
 
-	private static let cacheMoc = DataManager.buildThreadParallelContext()
-
-	private static let urlSession = { ()->URLSession in
+	private static let urlSession: URLSession = {
 
 		#if DEBUG
 			#if os(iOS)
@@ -104,7 +102,7 @@ final class API {
 		let config = URLSessionConfiguration.default
 		config.httpShouldUsePipelining = true
 		config.httpAdditionalHeaders = ["User-Agent" : userAgent]
-		return URLSession(configuration: config)
+		return URLSession(configuration: config, delegate: nil, delegateQueue: OperationQueue.main)
 	}()
 
 	private static var badLinks = [String : UrlBackOffEntry]()
@@ -510,21 +508,17 @@ final class API {
 
 		mainQueue.addOperation {
 			DataItem.nukeDeletedItems(in: moc)
+			CacheEntry.cleanOldEntries(in: moc)
 		}
 
-		cacheMoc.performAndWait {
-			CacheEntry.cleanOldEntries(in: cacheMoc)
-			try! cacheMoc.save()
-		}
-
-		for r in DataItem.items(of: PullRequest.self, surviving: true, in: moc, prefetchRelationships: ["comments", "reactions", "reviews"]) {
-			mainQueue.addOperation {
+		mainQueue.addOperation {
+			for r in DataItem.items(of: PullRequest.self, surviving: true, in: moc, prefetchRelationships: ["comments", "reactions", "reviews"]) {
 				r.postProcess()
 			}
 		}
 
-		for i in DataItem.items(of: Issue.self, surviving: true, in: moc, prefetchRelationships: ["comments", "reactions"]) {
-			mainQueue.addOperation {
+		mainQueue.addOperation {
+			for i in DataItem.items(of: Issue.self, surviving: true, in: moc, prefetchRelationships: ["comments", "reactions"]) {
 				i.postProcess()
 			}
 		}
@@ -1532,10 +1526,7 @@ final class API {
 		}
 
 		let cacheKey = "\(server.objectID.uriRepresentation().absoluteString) \(expandedPath)"
-		var previousCacheEntry: CacheUnit?
-		cacheMoc.performAndWait {
-			previousCacheEntry = CacheEntry.entry(for: cacheKey, in: cacheMoc)?.cacheUnit // move data out of thread-specific context
-		}
+		let previousCacheEntry = CacheEntry.entry(for: cacheKey, in: DataManager.main)
 		if let p = previousCacheEntry {
 			/////////////////////// 60 second dumb-caching
 			if p.lastFetched > Date(timeIntervalSinceNow: -60), let parsedData = p.parsedData {
@@ -1570,9 +1561,7 @@ final class API {
 				shouldRetry = false
 				code = p.code
 				headers = p.actualHeaders
-				cacheMoc.perform {
-					CacheEntry.markFetched(for: cacheKey, in: cacheMoc)
-				}
+				CacheEntry.markFetched(for: cacheKey, in: DataManager.main)
 				DLog("(%@) GET %@ - NO CHANGE (304): %@", apiServerLabel, expandedPath, code)
 			} else if code > 299 {
 				error = apiError("Server responded with error \(code)")
@@ -1593,31 +1582,24 @@ final class API {
 				if let d = data {
 					parsedData = try? JSONSerialization.jsonObject(with: d, options: [])
 					if let headers = headers, let etag = headers["Etag"] as? String {
-						cacheMoc.perform {
-							CacheEntry.setEntry(key: cacheKey, code: code, etag: etag, data: d, headers: headers, in: cacheMoc)
-						}
+						CacheEntry.setEntry(key: cacheKey, code: code, etag: etag, data: d, headers: headers, in: DataManager.main)
 					}
 				} else {
 					parsedData = nil
 				}
 			}
 
-			DispatchQueue.main.sync {
-				handleResponse(with: data,
-				               parsedData: parsedData,
-				               serverLabel: apiServerLabel,
-				               urlPath: expandedPath,
-				               code: code,
-				               error: error,
-				               shouldRetry: shouldRetry,
-				               existingBackOff: existingBackOff,
-				               headers: headers,
-				               completion: completion)
-			}
+			handleResponse(with: data,
+						   parsedData: parsedData,
+						   serverLabel: apiServerLabel,
+						   urlPath: expandedPath,
+						   code: code,
+						   error: error,
+						   shouldRetry: shouldRetry,
+						   existingBackOff: existingBackOff,
+						   headers: headers,
+						   completion: completion)
 		}
-		#if os(iOS)
-			task.priority = URLSessionTask.lowPriority
-		#endif
 		task.resume()
 	}
 

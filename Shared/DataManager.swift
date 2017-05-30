@@ -232,14 +232,6 @@ final class DataManager {
 		}
 	}
 
-	class func buildThreadParallelContext() -> NSManagedObjectContext {
-		let c = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-		c.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
-		c.persistentStoreCoordinator = main.persistentStoreCoordinator
-		c.undoManager = nil
-		return c
-	}
-
 	class func buildChildContext() -> NSManagedObjectContext {
 		let c = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
 		c.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)

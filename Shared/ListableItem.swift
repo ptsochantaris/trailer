@@ -253,6 +253,10 @@ class ListableItem: DataItem {
 		return false
 	}
 
+	var reviewedByMe: Bool {
+		return false
+	}
+
 	final var isVisibleOnMenu: Bool {
 		return sectionIndex != Section.none.rawValue
 	}
@@ -343,12 +347,12 @@ class ListableItem: DataItem {
 		var targetSection: Section
 		let currentCondition = condition
 
-		if currentCondition == ItemCondition.merged.rawValue		{ targetSection = .merged }
-		else if currentCondition == ItemCondition.closed.rawValue	{ targetSection = .closed }
-		else if shouldMoveToSnoozing								{ targetSection = .snoozed }
-		else if isMine || assignedToMySection						{ targetSection = .mine }
-		else if assignedToParticipated || commentedByMe				{ targetSection = .participated }
-		else														{ targetSection = .all }
+		if currentCondition == ItemCondition.merged.rawValue			{ targetSection = .merged }
+		else if currentCondition == ItemCondition.closed.rawValue		{ targetSection = .closed }
+		else if shouldMoveToSnoozing									{ targetSection = .snoozed }
+		else if isMine || assignedToMySection							{ targetSection = .mine }
+		else if assignedToParticipated || commentedByMe	|| reviewedByMe	{ targetSection = .participated }
+		else															{ targetSection = .all }
 
 		/////////// Pick out any items that need to move to "mentioned"
 

@@ -57,6 +57,15 @@ final class PullRequest: ListableItem {
 		return super.hasUnreadCommentsOrAlert || hasNewCommits
 	}
 
+	override var reviewedByMe: Bool {
+		for r in reviews {
+			if r.isMine {
+				return true
+			}
+		}
+		return false
+	}
+
 	func checkAndStoreReviewAssignments(_ reviewerNames: Set<String>) -> Bool {
 		reviewers = reviewerNames.joined(separator: ",")
 		let assigned = reviewerNames.contains(S(apiServer.userName))

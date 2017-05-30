@@ -59,7 +59,7 @@ final class Review: DataItem {
 		return try! moc.fetch(f).first
 	}
 
-	private var isMine: Bool {
+	var isMine: Bool {
 		return username == apiServer.userName
 	}
 

@@ -1,22 +1,6 @@
 
 import CoreData
 
-struct CacheUnit {
-	let data: Data
-	let code: Int64
-	let etag: String
-	let headers: Data
-	let lastFetched: Date
-
-	var actualHeaders: [AnyHashable : Any] {
-		return NSKeyedUnarchiver.unarchiveObject(with: headers) as! [AnyHashable : Any]
-	}
-
-	var parsedData: Any? {
-		return try? JSONSerialization.jsonObject(with: data, options: [])
-	}
-}
-
 final class CacheEntry: NSManagedObject {
 
 	@NSManaged var etag: String
@@ -27,8 +11,12 @@ final class CacheEntry: NSManagedObject {
 	@NSManaged var key: String
 	@NSManaged var headers: Data
 
-	var cacheUnit: CacheUnit {
-		return CacheUnit(data: data, code: code, etag: etag, headers: headers, lastFetched: lastFetched)
+	var actualHeaders: [AnyHashable : Any] {
+		return NSKeyedUnarchiver.unarchiveObject(with: headers) as! [AnyHashable : Any]
+	}
+
+	var parsedData: Any? {
+		return try? JSONSerialization.jsonObject(with: data, options: [])
 	}
 
 	class func setEntry(key: String, code: Int64, etag: String, data: Data, headers: [AnyHashable : Any], in moc: NSManagedObjectContext) {
