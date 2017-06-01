@@ -7,6 +7,25 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.5.8</title>
+			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Pull requests for which you have written reviews will be promoted to the Participated section, in the same way that writing comments is done.</li>
+				<li>Options menu changed to be a pulldown rather than a popup to keep menu item positions consistent.</li>
+				<li>Improved syncing of reactions and of items without dates.</li>
+				<li>Item menu performance improvements.</li>
+				<li>API cache stability improvements.</li>
+				</ul></font>]]></description>
+			<pubDate>Thu, 1 Jun 2017 21:00:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer158.zip"
+			sparkle:version="1436"
+			sparkle:shortVersionString="1.5.8"
+			sparkle:dsaSignature="MC4CFQDDA3OxvwoThMcuL3Qdo7PnhmdYugIVAKAlISIQrGn5u8xy1B94N8Tac613"
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.5.7</title>
 			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
