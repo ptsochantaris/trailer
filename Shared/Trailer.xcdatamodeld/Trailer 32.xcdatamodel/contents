@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="11759" systemVersion="16C67" minimumToolsVersion="Xcode 8.0" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="11759" systemVersion="16B2548a" minimumToolsVersion="Xcode 8.0" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="ApiServer" representedClassName="Trailer.ApiServer" syncable="YES">
         <attribute name="apiPath" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="authToken" optional="YES" attributeType="String" syncable="YES"/>
@@ -49,6 +49,7 @@
         <attribute name="reopened" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="sectionIndex" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="serverId" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" indexed="YES" syncable="YES"/>
+        <attribute name="shorthandReference" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="snoozeUntil" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="state" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
@@ -212,7 +213,7 @@
     <elements>
         <element name="ApiServer" positionX="9" positionY="153" width="128" height="360"/>
         <element name="CacheEntry" positionX="9" positionY="153" width="128" height="150"/>
-        <element name="Issue" positionX="9" positionY="153" width="128" height="540"/>
+        <element name="Issue" positionX="9" positionY="153" width="128" height="555"/>
         <element name="PRComment" positionX="0" positionY="0" width="128" height="225"/>
         <element name="PRLabel" positionX="9" positionY="153" width="128" height="195"/>
         <element name="PRStatus" positionX="0" positionY="0" width="128" height="180"/>

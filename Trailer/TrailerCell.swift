@@ -168,6 +168,15 @@ class TrailerCell: NSTableCellView {
 		}
 	}
 
+    func copyshorthandReferenceToClipboard() {
+        if let s = associatedDataItem?.shorthandReference {
+            let p = NSPasteboard.general()
+            p.clearContents()
+            p.declareTypes([NSStringPboardType], owner: self)
+            p.setString(s, forType: NSStringPboardType)
+        }
+    }
+
 	func copyNumberToClipboard() {
 		if let s = associatedDataItem?.number {
 			let p = NSPasteboard.general()
@@ -198,9 +207,13 @@ class TrailerCell: NSTableCellView {
 
 		let c1 = m.addItem(withTitle: "Copy URL", action: #selector(copyToClipboard), keyEquivalent: "c")
 		c1.keyEquivalentModifierMask = [.command]
+        
+        let c2 = m.addItem(withTitle: "Copy Issue Reference", action: #selector(copyshorthandReferenceToClipboard), keyEquivalent: "s")
+        c2.keyEquivalentModifierMask = [.command]
 
-		let c2 = m.addItem(withTitle: "Open Repo", action: #selector(openRepo), keyEquivalent: "o")
-		c2.keyEquivalentModifierMask = [.command]
+
+		let c3 = m.addItem(withTitle: "Open Repo", action: #selector(openRepo), keyEquivalent: "o")
+		c3.keyEquivalentModifierMask = [.command]
 
 		if item.snoozeUntil == nil {
 			if item.hasUnreadCommentsOrAlert {
