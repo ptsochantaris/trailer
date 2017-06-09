@@ -9,7 +9,13 @@ final class DataManager {
 	static var postMigrationSnoozeWakeOnMention: Bool?
 	static var postMigrationSnoozeWakeOnStatusUpdate: Bool?
 
-	static let main = DataManager.buildMainContext()
+	static var main: NSManagedObjectContext = {
+		let m = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
+		m.undoManager = nil
+		m.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
+		m.persistentStoreCoordinator = persistentStoreCoordinator
+		return m
+	}()
 
 	class func checkMigration() {
 
@@ -291,12 +297,15 @@ final class DataManager {
 		}
 	}
 
-	class func postProcessAllItems() {
-
-		for p in DataItem.allItems(of: PullRequest.self, in: main, prefetchRelationships: ["comments", "reactions", "reviews"]) {
+	class func postProcessAllItems(in moc: NSManagedObjectContext? = nil) {
+		let context = moc ?? main
+		let pp = DataItem.allItems(of: PullRequest.self, in: context, prefetchRelationships: ["comments", "reactions", "reviews"])
+		for p in pp {
 			p.postProcess()
 		}
-		for i in DataItem.allItems(of: Issue.self, in: main, prefetchRelationships: ["comments", "reactions"]) {
+
+		let ii = DataItem.allItems(of: Issue.self, in: context, prefetchRelationships: ["comments", "reactions"])
+		for i in ii {
 			i.postProcess()
 		}
 	}
@@ -308,25 +317,16 @@ final class DataManager {
 		return nil
 	}
 
-	private class var dataFilesDirectory: URL {
+	private static let dataFilesDirectory: URL = {
 		#if os(iOS)
-			let sharedFiles = sharedFilesDirectory
+			let finalURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.Trailer")!
 		#else
-			let sharedFiles = legacyFilesDirectory
+			let appSupportURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).last!
+			let finalURL = appSupportURL.appendingPathComponent("com.housetrip.Trailer")
 		#endif
-		DLog("Files in %@", sharedFiles.absoluteString)
-		return sharedFiles
-	}
-
-	private class var legacyFilesDirectory: URL {
-		let f = FileManager.default
-		let appSupportURL = f.urls(for: .applicationSupportDirectory, in: .userDomainMask).last!
-		return appSupportURL.appendingPathComponent("com.housetrip.Trailer")
-	}
-
-	class var sharedFilesDirectory: URL {
-		return FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.Trailer")!
-	}
+		DLog("Files in %@", finalURL.absoluteString)
+		return finalURL
+	}()
 
 	class func removeDatabaseFiles() {
 		let fm = FileManager.default
@@ -347,7 +347,7 @@ final class DataManager {
 
 	private static var _justMigrated = false
 
-	class func buildMainContext() -> NSManagedObjectContext {
+	private static var persistentStoreCoordinator: NSPersistentStoreCoordinator? = {
 
 		let storeOptions: [AnyHashable : Any] = [
 			NSMigratePersistentStoresAutomaticallyOption: true,
@@ -367,22 +367,22 @@ final class DataManager {
 				_justMigrated = !mom.isConfiguration(withName: nil, compatibleWithStoreMetadata: m)
 			}
 		} else {
-			try! fileManager.createDirectory(atPath: dataDir.path, withIntermediateDirectories: true, attributes: nil)
+			do {
+				try fileManager.createDirectory(atPath: dataDir.path, withIntermediateDirectories: true, attributes: nil)
+			} catch {
+				DLog("Database directory creation error: %@", error.localizedDescription)
+				return nil
+			}
 		}
-
-		let m = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
-		m.undoManager = nil
-		m.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
 
 		do {
 			let persistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel: mom)
 			try persistentStoreCoordinator.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: sqlStorePath, options: storeOptions)
-			m.persistentStoreCoordinator = persistentStoreCoordinator
 			DLog("Database setup complete")
+			return persistentStoreCoordinator
 		} catch {
 			DLog("Database setup error: %@", error.localizedDescription)
+			return nil
 		}
-
-		return m
-	}
+	}()
 }

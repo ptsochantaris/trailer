@@ -5,7 +5,6 @@
 
 final class Settings {
 
-	private static var valuesCache = [AnyHashable : Any]()
 	private static let sharedDefaults = UserDefaults(suiteName: "group.Trailer")!
 
 	private class var allFields: [String] {
@@ -128,7 +127,6 @@ final class Settings {
 				sharedDefaults.removeObject(forKey: key)
 			}
 		}
-		valuesCache[key] = value
 		sharedDefaults.synchronize()
 
 		if let v = value {
@@ -161,14 +159,7 @@ final class Settings {
 	}
 
 	private class func get(_ key: String) -> Any? {
-		if let v = valuesCache[key] {
-			return v
-		} else if let v = sharedDefaults.object(forKey: key) {
-			valuesCache[key] = v
-			return v
-		} else {
-			return nil
-		}
+		return sharedDefaults.object(forKey: key)
 	}
 
 	///////////////////////////////// IMPORT / EXPORT
@@ -207,7 +198,6 @@ final class Settings {
 				}
 			}
 			sharedDefaults.synchronize()
-			valuesCache.removeAll(keepingCapacity: false)
 			return ApiServer.configure(from: settings["DB_CONFIG_OBJECTS"] as! [String : [String : NSObject]])
 			&& SnoozePreset.configure(from: settings["DB_SNOOZE_OBJECTS"] as! [[String : NSObject]])
 		}
@@ -219,7 +209,6 @@ final class Settings {
 			sharedDefaults.removeObject(forKey: k)
 		}
 		sharedDefaults.synchronize()
-		valuesCache.removeAll(keepingCapacity: false)
 	}
 
 	///////////////////////////////// NUMBERS

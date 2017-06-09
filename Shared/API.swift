@@ -512,17 +512,9 @@ final class API {
 		}
 
 		mainQueue.addOperation {
-			for r in DataItem.items(of: PullRequest.self, surviving: true, in: moc, prefetchRelationships: ["comments", "reactions", "reviews"]) {
-				r.postProcess()
-			}
+			DataManager.postProcessAllItems(in: moc)
 		}
-
-		mainQueue.addOperation {
-			for i in DataItem.items(of: Issue.self, surviving: true, in: moc, prefetchRelationships: ["comments", "reactions"]) {
-				i.postProcess()
-			}
-		}
-
+		
 		mainQueue.addOperation {
 			do {
 				DLog("Committing synced data")

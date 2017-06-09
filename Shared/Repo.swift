@@ -197,7 +197,7 @@ final class Repo: DataItem {
 			f.includesSubentities = false
 			f.predicate = predicate
 			for i in try! managedObjectContext!.fetch(f) {
-				DLog("Ensuring item '%@' in repo '%@' is marked as updated - reasons: %@", S(i.title), S(i.repo.fullName), reasons.joined(separator: ", "))
+				//DLog("Ensuring item '%@' in repo '%@' is marked as updated - reasons: %@", S(i.title), S(i.repo.fullName), reasons.joined(separator: ", "))
 				i.setToUpdatedIfIdle()
 			}
 		}
