@@ -17,23 +17,19 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		}
 	}
 
-	private var validSession: WCSession? {
-		if let s = session, s.isReachable, s.isPaired, s.isWatchAppInstalled, s.activationState == .activated {
-			return s
-		} else {
-			return nil
-		}
-	}
-
 	func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
-		atNextEvent(self) { S in
-			S.updateContext(andSave: false)
+		if session.isPaired, session.isWatchAppInstalled, activationState == .activated {
+			atNextEvent(self) { S in
+				S.updateContext(andSave: false)
+			}
 		}
 	}
 
 	func sessionReachabilityDidChange(_ session: WCSession) {
-		atNextEvent(self) { S in
-			S.updateContext(andSave: false)
+		if session.isPaired, session.isWatchAppInstalled, session.activationState == .activated, session.isReachable {
+			atNextEvent(self) { S in
+				S.updateContext(andSave: false)
+			}
 		}
 	}
 
@@ -45,7 +41,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 		var overview: [String : Any]?
 
-		if let s = validSession {
+		if let s = session, s.isPaired, s.isWatchAppInstalled, s.activationState == .activated {
 			overview = buildOverview()
 			do {
 				try s.updateApplicationContext(["overview": overview!])
