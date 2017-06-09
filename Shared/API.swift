@@ -955,13 +955,13 @@ final class API {
 		}
 	}
 
-	static var shouldSyncReactions: Bool {
+	class var shouldSyncReactions: Bool {
 		return Settings.notifyOnItemReactions || Settings.notifyOnCommentReactions
 	}
-	static var shouldSyncReviews: Bool {
+	class var shouldSyncReviews: Bool {
 		return Settings.displayReviewsOnItems || Settings.notifyOnReviewDismissals || Settings.notifyOnReviewAcceptances || Settings.notifyOnReviewChangeRequests
 	}
-	static var shouldSyncReviewAssignments: Bool {
+	class var shouldSyncReviewAssignments: Bool {
 		return Settings.displayReviewsOnItems || Settings.notifyOnReviewAssignments || (Int64(Settings.assignedReviewHandlingPolicy) != Section.none.rawValue)
 	}
 

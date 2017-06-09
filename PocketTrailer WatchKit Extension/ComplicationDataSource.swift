@@ -8,25 +8,18 @@ final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
 	}
 
 	func getPlaceholderTemplate(for complication: CLKComplication, withHandler handler: @escaping (CLKComplicationTemplate?) -> Void) {
-		handler(constructTemplate(for: complication, issues: false, prCount: nil, issueCount: nil, commentCount: 0))
+		let emptyTemplate = constructTemplate(for: complication, issues: false, prCount: nil, issueCount: nil, commentCount: 0)
+		handler(emptyTemplate)
 	}
 
 	func getPrivacyBehavior(for complication: CLKComplication, withHandler handler: @escaping (CLKComplicationPrivacyBehavior) -> Void) {
-		handler(CLKComplicationPrivacyBehavior.showOnLockScreen)
+		handler(.showOnLockScreen)
 	}
 
 	func getCurrentTimelineEntry(for complication: CLKComplication, withHandler handler: @escaping (CLKComplicationTimelineEntry?) -> Void) {
-		getTimelineEntries(for: complication, before: Date(), limit: 1) { entries in
+		entriesFor(complication) { entries in
 			handler(entries?.first)
 		}
-	}
-
-	func getTimelineEntries(for complication: CLKComplication, before date: Date, limit: Int, withHandler handler: @escaping ([CLKComplicationTimelineEntry]?) -> Void) {
-		entriesFor(complication, handler)
-	}
-
-	func getTimelineEntries(for complication: CLKComplication, after date: Date, limit: Int, withHandler handler: @escaping ([CLKComplicationTimelineEntry]?) -> Void) {
-		entriesFor(complication, handler)
 	}
 
 	private func entriesFor(_ complication: CLKComplication, _ handler: @escaping ([CLKComplicationTimelineEntry]?) -> Void) {
@@ -61,14 +54,6 @@ final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
 
 	func getSupportedTimeTravelDirections(for complication: CLKComplication, withHandler handler: @escaping (CLKComplicationTimeTravelDirections) -> Void) {
 		handler([])
-	}
-
-	func getTimelineStartDate(for complication: CLKComplication, withHandler handler: @escaping (Date?) -> Void) {
-		handler(Date())
-	}
-
-	func getTimelineEndDate(for complication: CLKComplication, withHandler handler: @escaping (Date?) -> Void) {
-		handler(Date())
 	}
 
 	private func count(_ count: Int?, unit: String?) -> String {

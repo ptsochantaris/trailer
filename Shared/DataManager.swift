@@ -317,7 +317,7 @@ final class DataManager {
 		return nil
 	}
 
-	private static let dataFilesDirectory: URL = {
+	static let dataFilesDirectory: URL = {
 		#if os(iOS)
 			let finalURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.Trailer")!
 		#else

@@ -16,7 +16,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 
 	func updateBadge() {
 		UIApplication.shared.applicationIconBadgeNumber = PullRequest.badgeCount(in: DataManager.main) + Issue.badgeCount(in: DataManager.main)
-		watchManager?.updateContext()
+		watchManager?.updateContext(andSave: true)
 	}
 
 	func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {

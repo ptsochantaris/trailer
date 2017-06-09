@@ -17,23 +17,50 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		}
 	}
 
-	func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
-		if activationState == .activated {
-			atNextEvent(self) { S in
-				S.updateContext()
-			}
+	private var validSession: WCSession? {
+		if let s = session, s.isReachable, s.isPaired, s.isWatchAppInstalled, s.activationState == .activated {
+			return s
+		} else {
+			return nil
 		}
 	}
 
-	func sessionDidDeactivate(_ session: WCSession) { }
+	func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+		atNextEvent(self) { S in
+			S.updateContext(andSave: false)
+		}
+	}
 
-	func sessionDidBecomeInactive(_ session: WCSession) { }
+	func sessionReachabilityDidChange(_ session: WCSession) {
+		atNextEvent(self) { S in
+			S.updateContext(andSave: false)
+		}
+	}
 
-	func updateContext() {
-		let overview = buildOverview()
-		_ = try? session?.updateApplicationContext(["overview": overview])
-		let overviewPath = DataManager.sharedFilesDirectory.appendingPathComponent("overview.plist")
-		(overview as NSDictionary).write(to: overviewPath, atomically: true)
+	func sessionDidDeactivate(_ session: WCSession) {}
+
+	func sessionDidBecomeInactive(_ session: WCSession) {}
+
+	func updateContext(andSave: Bool) {
+
+		var overview: [String : Any]?
+
+		if let s = validSession {
+			overview = buildOverview()
+			do {
+				try s.updateApplicationContext(["overview": overview!])
+			} catch {
+				DLog("Error updating watch session: %@", error.localizedDescription)
+			}
+		}
+
+		if andSave {
+			if overview == nil {
+				overview = buildOverview()
+			}
+			let overviewPath = DataManager.dataFilesDirectory.appendingPathComponent("overview.plist")
+			(overview! as NSDictionary).write(to: overviewPath, atomically: true)
+		}
 	}
 
 	private func startBGTask() {
@@ -123,7 +150,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				s.processList(message: message, replyHandler: replyHandler)
 
 			case "needsOverview":
-				s.updateContext()
+				s.updateContext(andSave: false)
 				s.reportSuccess(result: [:], replyHandler: replyHandler)
 
 			default:

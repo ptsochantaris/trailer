@@ -14,6 +14,13 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 
 	private let session = WCSession.default()
 	private var requestedUpdate = false
+	private var appIsLaunched = false
+
+	override init() {
+		super.init()
+		session.delegate = self
+		session.activate()
+	}
 
 	weak var lastView: CommonController? {
 		didSet {
@@ -22,7 +29,7 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 	}
 
 	func applicationDidFinishLaunching() {
-		session.delegate = self
+		appIsLaunched = true
 	}
 
 	func sessionReachabilityDidChange(_ session: WCSession) {
@@ -31,10 +38,15 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 
 	func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
 		potentialUpdate()
-	}
-
-	func applicationDidBecomeActive() {
-		session.activate()
+		if applicationContext.keys.contains("overview") {
+			atNextEvent(self) { S in
+				S.updateComplications()
+				if S.appIsLaunched {
+					WKExtension.shared().scheduleSnapshotRefresh(withPreferredDate: Date(), userInfo: nil) { error in
+					}
+				}
+			}
+		}
 	}
 
 	func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
@@ -58,7 +70,6 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 
 	func applicationWillResignActive() {
 		lastView = nil
-		updateComplications()
 	}
 
 	func handle(_ backgroundTasks: Set<WKRefreshBackgroundTask>) {
@@ -68,7 +79,6 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 					lastView?.popToRootController()
 					(lastView as? SectionController)?.resetUI()
 				}
-				updateComplications()
 				t.setTaskCompleted(restoredDefaultState: t.returnToDefaultState, estimatedSnapshotExpiration: .distantFuture, userInfo: nil)
 			} else {
 				task.setTaskCompleted()
