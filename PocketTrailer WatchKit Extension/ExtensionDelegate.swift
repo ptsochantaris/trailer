@@ -33,7 +33,9 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 	}
 
 	func sessionReachabilityDidChange(_ session: WCSession) {
-		potentialUpdate()
+		if session.isReachable {
+			potentialUpdate()
+		}
 	}
 
 	func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
@@ -64,6 +66,8 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 				delay(0.5, S) { S in
 					S.requestedUpdate = false
 				}
+			} else if !S.appIsLaunched, S.session.isReachable, !S.session.receivedApplicationContext.keys.contains("overview") {
+				S.session.sendMessage(["command": "needsOverview"], replyHandler: nil, errorHandler: nil)
 			}
 		}
 	}

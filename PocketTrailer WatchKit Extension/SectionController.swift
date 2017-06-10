@@ -45,7 +45,7 @@ final class SectionController: CommonController {
 	override func requestData(command: String?) {
 		if let c = command {
 			send(request: ["command": c])
-		} else if WCSession.default().receivedApplicationContext["overview"] != nil {
+		} else if WCSession.default().receivedApplicationContext.keys.contains("overview") {
 			updateUI()
 		} else {
 			requestData(command: "needsOverview")

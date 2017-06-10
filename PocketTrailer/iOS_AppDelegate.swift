@@ -15,7 +15,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 	private var actOnLocalNotification = true
 
 	func updateBadgeAndSaveDB() {
-		watchManager?.updateContext(andSave: true)
+		watchManager?.updateContext()
 	}
 
 	func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {

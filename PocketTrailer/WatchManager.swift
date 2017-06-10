@@ -20,7 +20,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 	func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
 		if session.isPaired, session.isWatchAppInstalled, activationState == .activated {
 			atNextEvent(self) { S in
-				S.updateContext(andSave: false)
+				S.sendOverview()
 			}
 		}
 	}
@@ -28,7 +28,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 	func sessionReachabilityDidChange(_ session: WCSession) {
 		if session.isPaired, session.isWatchAppInstalled, session.activationState == .activated, session.isReachable {
 			atNextEvent(self) { S in
-				S.updateContext(andSave: false)
+				S.sendOverview()
 			}
 		}
 	}
@@ -37,34 +37,34 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	func sessionDidBecomeInactive(_ session: WCSession) {}
 
-	func updateContext(andSave: Bool) {
-
-		if andSave {
-			DataManager.saveDB()
-		}
+	private func sendOverview() {
 
 		let validSession = (session?.isPaired ?? false)
 			&& (session?.isWatchAppInstalled ?? false)
 			&& session?.activationState == .activated
 
-		let needOverview = validSession || andSave
+		do {
+			if validSession, let overview = NSDictionary(contentsOf: overviewPath) {
+				try session?.updateApplicationContext(["overview": overview])
+			}
+		} catch {
+			DLog("Error updating watch session: %@", error.localizedDescription)
+		}
+	}
 
-		guard needOverview else { return }
+	func updateContext() {
+		DataManager.saveDB()
 
 		buildOverview { [weak self] overview in
-			if validSession {
-				do {
-					try self?.session?.updateApplicationContext(["overview": overview])
-				} catch {
-					DLog("Error updating watch session: %@", error.localizedDescription)
-				}
-			}
+			guard let s = self else { return }
 
-			if andSave {
-				let overviewPath = DataManager.dataFilesDirectory.appendingPathComponent("overview.plist")
-				(overview as NSDictionary).write(to: overviewPath, atomically: true)
-			}
+			(overview as NSDictionary).write(to: s.overviewPath, atomically: true)
+			s.sendOverview()
 		}
+	}
+
+	private var overviewPath: URL {
+		return DataManager.dataFilesDirectory.appendingPathComponent("overview.plist")
 	}
 
 	private func startBGTask() {
@@ -150,7 +150,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				s.processList(message: message, replyHandler: replyHandler)
 
 			case "needsOverview":
-				s.updateContext(andSave: false)
+				s.sendOverview()
 				s.reportSuccess(result: [:], replyHandler: replyHandler)
 
 			default:
