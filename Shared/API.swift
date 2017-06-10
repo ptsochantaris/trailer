@@ -83,6 +83,11 @@ final class API {
 		return appSupportURL.appendingPathComponent("com.housetrip.Trailer").path
 	}()
 
+	private static let sessionCallbackQueue: OperationQueue = {
+		let o = OperationQueue()
+		o.maxConcurrentOperationCount = 1
+		return o
+	}()
 	private static let urlSession: URLSession = {
 
 		#if DEBUG
@@ -102,7 +107,7 @@ final class API {
 		let config = URLSessionConfiguration.default
 		config.httpShouldUsePipelining = true
 		config.httpAdditionalHeaders = ["User-Agent" : userAgent]
-		return URLSession(configuration: config, delegate: nil, delegateQueue: OperationQueue.main)
+		return URLSession(configuration: config, delegate: nil, delegateQueue: sessionCallbackQueue)
 	}()
 
 	private static var badLinks = [String : UrlBackOffEntry]()
@@ -218,11 +223,6 @@ final class API {
 				} else {
 					completion(nil)
 				}
-				#if os(iOS)
-					atNextEvent {
-						networkIndicationEnd()
-					}
-				#endif
 			}
 
 			#if os(iOS)
@@ -269,13 +269,13 @@ final class API {
 
 
 		getImage(at: absolutePath) { data in
-
+			// in thread
 			var result: IMAGE_CLASS?
 			#if os(iOS)
 				if let d = data, let i = UIImage(data: d, scale: GLOBAL_SCREEN_SCALE) {
 					result = i
 					if let imageData = UIImageJPEGRepresentation(i, 1.0) {
-						try! imageData.write(to: URL(fileURLWithPath: cachePath), options: .atomic)
+						try? imageData.write(to: URL(fileURLWithPath: cachePath), options: .atomic)
 					}
 				}
 			#else
@@ -286,6 +286,9 @@ final class API {
 			#endif
 			atNextEvent {
 				callback(result, cachePath)
+				#if os(iOS)
+					networkIndicationEnd()
+				#endif
 			}
 		}
 		return false
@@ -508,7 +511,10 @@ final class API {
 
 		mainQueue.addOperation {
 			DataItem.nukeDeletedItems(in: moc)
-			CacheEntry.cleanOldEntries(in: moc)
+		}
+
+		CacheEntry.cacheMoc.perform {
+			CacheEntry.cleanAndCheckpoint()
 		}
 
 		mainQueue.addOperation {
@@ -1489,15 +1495,15 @@ final class API {
 		let expandedPath = path.hasPrefix("/") ? S(server.apiPath).appending(pathComponent: path) : path
 		let url = URL(string: expandedPath)!
 
-		var r = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 60.0)
+		var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 60.0)
 		var acceptTypes = [String]()
 		if shouldSyncReactions {
 			acceptTypes.append("application/vnd.github.squirrel-girl-preview")
 		}
 		acceptTypes.append("application/vnd.github.v3+json")
-		r.setValue(acceptTypes.joined(separator: ", "), forHTTPHeaderField: "Accept")
+		request.setValue(acceptTypes.joined(separator: ", "), forHTTPHeaderField: "Accept")
 		if let a = server.authToken {
-			r.setValue("token \(a)", forHTTPHeaderField: "Authorization")
+			request.setValue("token \(a)", forHTTPHeaderField: "Authorization")
 		}
 
 		////////////////////////// preempt with error backoff algorithm
@@ -1518,79 +1524,106 @@ final class API {
 		}
 
 		let cacheKey = "\(server.objectID.uriRepresentation().absoluteString) \(expandedPath)"
-		let previousCacheEntry = CacheEntry.entry(for: cacheKey, in: DataManager.main)
-		if let p = previousCacheEntry {
-			/////////////////////// 60 second dumb-caching
-			if p.lastFetched > Date(timeIntervalSinceNow: -60), let parsedData = p.parsedData {
-				DLog("(%@) GET %@ - CACHED", apiServerLabel, expandedPath)
-				handleResponse(with: p.data,
-				               parsedData: parsedData,
-				               serverLabel: apiServerLabel,
-				               urlPath: expandedPath,
-				               code: p.code,
-				               error: nil,
-				               shouldRetry: false,
-				               existingBackOff: nil,
-				               headers: p.actualHeaders,
-				               completion: completion)
-				return
+		var previousCacheEntry: CacheEntry?
+		CacheEntry.cacheMoc.perform {
+			previousCacheEntry = CacheEntry.entry(for: cacheKey)
+			if let p = previousCacheEntry {
+				/////////////////////// 60 second dumb-caching
+				if p.lastFetched > Date(timeIntervalSinceNow: -60), let parsedData = p.parsedData {
+					DLog("(%@) GET %@ - CACHED", apiServerLabel, expandedPath)
+					DispatchQueue.global(qos: .background).asyncAfter(deadline: .now()+0.1) { // avoid overloading the UI with callbacks in case of cached entries
+						handleResponse(with: p.data,
+									   parsedData: parsedData,
+									   serverLabel: apiServerLabel,
+									   urlPath: expandedPath,
+									   code: p.code,
+									   error: nil,
+									   shouldRetry: false,
+									   existingBackOff: nil,
+									   headers: p.actualHeaders,
+									   completion: completion)
+					}
+				} else {
+					request.setValue(p.etag, forHTTPHeaderField: "If-None-Match")
+					proceedWithNetworkRequest(request, previousCacheEntry: p, cacheKey: cacheKey, urlPath: expandedPath, apiServerLabel: apiServerLabel, existingBackOff: existingBackOff, completion: completion)
+				}
+			} else {
+				proceedWithNetworkRequest(request, previousCacheEntry: nil, cacheKey: cacheKey, urlPath: expandedPath, apiServerLabel: apiServerLabel, existingBackOff: existingBackOff, completion: completion)
 			}
-			r.setValue(p.etag, forHTTPHeaderField: "If-None-Match")
 		}
+	}
 
-		let task = urlSession.dataTask(with: r) { data, res, e in
+	private class func proceedWithNetworkRequest(_ request: URLRequest,
+	                                             previousCacheEntry: CacheEntry?,
+	                                             cacheKey: String,
+	                                             urlPath: String,
+	                                             apiServerLabel: String,
+	                                             existingBackOff: UrlBackOffEntry?,
+	                                             completion: @escaping ApiCompletion) {
+		let task = urlSession.dataTask(with: request) { data, res, e in
 
 			let response = res as? HTTPURLResponse
-			let parsedData: Any?
 			let error: Error?
 			let shouldRetry: Bool
+			var parsedData: Any?
 			var code = Int64(response?.statusCode ?? 0)
 			var headers = response?.allHeaderFields
 
-			if code == 304, let p = previousCacheEntry {
+			func done() {
+				handleResponse(with: data,
+							   parsedData: parsedData,
+							   serverLabel: apiServerLabel,
+							   urlPath: urlPath,
+							   code: code,
+							   error: error,
+							   shouldRetry: shouldRetry,
+							   existingBackOff: existingBackOff,
+							   headers: headers,
+							   completion: completion)
+			}
+
+			if code == 304, let previousCacheEntry = previousCacheEntry {
 				error = nil
-				parsedData = p.parsedData
 				shouldRetry = false
-				code = p.code
-				headers = p.actualHeaders
-				CacheEntry.markFetched(for: cacheKey, in: DataManager.main)
-				DLog("(%@) GET %@ - NO CHANGE (304): %@", apiServerLabel, expandedPath, code)
+				CacheEntry.cacheMoc.perform {
+					parsedData = previousCacheEntry.parsedData
+					code = previousCacheEntry.code
+					headers = previousCacheEntry.actualHeaders
+					CacheEntry.markFetched(for: cacheKey)
+					DLog("(%@) GET %@ - NO CHANGE (304): %@", apiServerLabel, urlPath, code)
+					done()
+				}
 			} else if code > 299 {
 				error = apiError("Server responded with error \(code)")
 				parsedData = nil
 				shouldRetry = (code == 502 || code == 503) // retry in case GH is deploying
+				done()
 			} else if code == 0 {
 				error = apiError("Server did not repond")
 				parsedData = nil
 				shouldRetry = (e as NSError?)?.code == -1001 // retry if it was a timeout
+				done()
 			} else if Int64(data?.count ?? 0) < (response?.expectedContentLength ?? 0) {
 				error = apiError("Server data was truncated")
 				parsedData = nil
 				shouldRetry = true // transfer truncation, try again
+				done()
 			} else {
-				DLog("(%@) GET %@ - RESULT: %@", apiServerLabel, expandedPath, code)
+				DLog("(%@) GET %@ - RESULT: %@", apiServerLabel, urlPath, code)
 				error = e as NSError?
 				shouldRetry = false
 				if let d = data {
 					parsedData = try? JSONSerialization.jsonObject(with: d, options: [])
 					if let headers = headers, let etag = headers["Etag"] as? String {
-						CacheEntry.setEntry(key: cacheKey, code: code, etag: etag, data: d, headers: headers, in: DataManager.main)
+						CacheEntry.cacheMoc.perform {
+							CacheEntry.setEntry(key: cacheKey, code: code, etag: etag, data: d, headers: headers)
+						}
 					}
 				} else {
 					parsedData = nil
 				}
+				done()
 			}
-
-			handleResponse(with: data,
-						   parsedData: parsedData,
-						   serverLabel: apiServerLabel,
-						   urlPath: expandedPath,
-						   code: code,
-						   error: error,
-						   shouldRetry: shouldRetry,
-						   existingBackOff: existingBackOff,
-						   headers: headers,
-						   completion: completion)
 		}
 		task.resume()
 	}
@@ -1604,7 +1637,7 @@ final class API {
 	                                  shouldRetry: Bool,
 	                                  existingBackOff: UrlBackOffEntry?,
 	                                  headers: [AnyHashable : Any]?,
-	                                  completion: ApiCompletion) {
+	                                  completion: @escaping ApiCompletion) {
 		if let e = error {
 			if code > 399 && !shouldRetry {
 				if var backoff = existingBackOff {
@@ -1613,12 +1646,17 @@ final class API {
 						backoff.nextIncrement += backOffIncrement
 					}
 					backoff.nextAttemptAt = Date(timeIntervalSinceNow: backoff.nextIncrement)
-					badLinks[urlPath] = backoff
+					atNextEvent {
+						badLinks[urlPath] = backoff
+					}
 				} else {
 					DLog("(%@) Placing URL %@ on the throttled list", serverLabel, urlPath)
-					badLinks[urlPath] = UrlBackOffEntry(
+					let newEntry = UrlBackOffEntry(
 						nextAttemptAt: Date(timeIntervalSinceNow: backOffIncrement),
 						nextIncrement: backOffIncrement)
+					atNextEvent {
+						badLinks[urlPath] = newEntry
+					}
 				}
 			}
 			DLog("(%@) GET %@ - FAILED: (code %@) %@", serverLabel, urlPath, code, e.localizedDescription)
@@ -1628,7 +1666,9 @@ final class API {
 			DLog("API data from %@: %@", urlPath, String(bytes: d, encoding: .utf8))
 		}
 
-		completion(code, headers, parsedData, error, shouldRetry)
+		atNextEvent {
+			completion(code, headers, parsedData, error, shouldRetry)
+		}
 	}
 
 	#if os(iOS)

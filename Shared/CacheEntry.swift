@@ -11,6 +11,8 @@ final class CacheEntry: NSManagedObject {
 	@NSManaged var key: String
 	@NSManaged var headers: Data
 
+	static let cacheMoc = DataManager.buildParallelContext()
+
 	var actualHeaders: [AnyHashable : Any] {
 		return NSKeyedUnarchiver.unarchiveObject(with: headers) as! [AnyHashable : Any]
 	}
@@ -19,10 +21,10 @@ final class CacheEntry: NSManagedObject {
 		return try? JSONSerialization.jsonObject(with: data, options: [])
 	}
 
-	class func setEntry(key: String, code: Int64, etag: String, data: Data, headers: [AnyHashable : Any], in moc: NSManagedObjectContext) {
-		var e = entry(for: key, in: moc)
+	class func setEntry(key: String, code: Int64, etag: String, data: Data, headers: [AnyHashable : Any]) {
+		var e = entry(for: key)
 		if e == nil {
-			e = NSEntityDescription.insertNewObject(forEntityName: "CacheEntry", into: moc) as? CacheEntry
+			e = NSEntityDescription.insertNewObject(forEntityName: "CacheEntry", into: cacheMoc) as? CacheEntry
 			e!.key = key
 		}
 		let E = e!
@@ -34,7 +36,7 @@ final class CacheEntry: NSManagedObject {
 		E.lastTouched = Date()
 	}
 
-	static let entryFetch: NSFetchRequest<CacheEntry> = {
+	private static let entryFetch: NSFetchRequest<CacheEntry> = {
 		let f = NSFetchRequest<CacheEntry>(entityName: "CacheEntry")
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false
@@ -42,9 +44,9 @@ final class CacheEntry: NSManagedObject {
 		return f
 	}()
 
-	class func entry(for key: String, in moc: NSManagedObjectContext) -> CacheEntry? {
+	class func entry(for key: String) -> CacheEntry? {
 		entryFetch.predicate = NSPredicate(format: "key == %@", key)
-		if let e = try! moc.fetch(entryFetch).first {
+		if let e = try! cacheMoc.fetch(entryFetch).first {
 			e.lastTouched = Date()
 			return e
 		} else {
@@ -52,20 +54,23 @@ final class CacheEntry: NSManagedObject {
 		}
 	}
 
-	class func cleanOldEntries(in moc: NSManagedObjectContext) {
+	class func cleanAndCheckpoint() {
 		let f = NSFetchRequest<CacheEntry>(entityName: "CacheEntry")
 		f.returnsObjectsAsFaults = true
 		f.includesSubentities = false
 		let date = Date(timeIntervalSinceNow: -3600.0*24.0*7.0) as CVarArg // week-old
 		f.predicate = NSPredicate(format: "lastTouched < %@", date)
-		for e in try! moc.fetch(f) {
+		for e in try! cacheMoc.fetch(f) {
 			DLog("Expiring unused cache entry for key %@", e.key)
-			moc.delete(e)
+			cacheMoc.delete(e)
+		}
+		if cacheMoc.hasChanges {
+			try? cacheMoc.save()
 		}
 	}
 
-	class func markFetched(for key: String, in moc: NSManagedObjectContext) {
-		if let e = entry(for: key, in: moc) {
+	class func markFetched(for key: String) {
+		if let e = entry(for: key) {
 			e.lastFetched = Date()
 		}
 	}
