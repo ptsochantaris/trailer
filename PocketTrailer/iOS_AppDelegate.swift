@@ -14,8 +14,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 	private var backgroundCallback: ((UIBackgroundFetchResult) -> Void)?
 	private var actOnLocalNotification = true
 
-	func updateBadge() {
-		UIApplication.shared.applicationIconBadgeNumber = PullRequest.badgeCount(in: DataManager.main) + Issue.badgeCount(in: DataManager.main)
+	func updateBadgeAndSaveDB() {
 		watchManager?.updateContext(andSave: true)
 	}
 
@@ -221,7 +220,6 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 		}
 		DLog("Refresh done")
 
-		updateBadge()
 		endBGTask()
 
 		if let bc = backgroundCallback {
@@ -273,8 +271,6 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 	func markEverythingRead() {
 		PullRequest.markEverythingRead(in: .none, in: DataManager.main)
 		Issue.markEverythingRead(in: .none, in: DataManager.main)
-		DataManager.saveDB()
-		app.updateBadge()
 	}
 
 	func clearAllClosed() {
@@ -284,15 +280,11 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 		for i in Issue.allClosed(in: DataManager.main, includeAllGroups: true) {
 			DataManager.main.delete(i)
 		}
-		DataManager.saveDB()
-		popupManager.masterController.updateStatus()
 	}
 
 	func clearAllMerged() {
 		for p in PullRequest.allMerged(in: DataManager.main, includeAllGroups: true) {
 			DataManager.main.delete(p)
 		}
-		DataManager.saveDB()
-		popupManager.masterController.updateStatus()
 	}
 }

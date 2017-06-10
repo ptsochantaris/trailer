@@ -227,19 +227,7 @@ final class DataManager {
 		NotificationQueue.commit()
 	}
 
-	private static let saveTimer = PopTimer(timeInterval: 0.5) {
-		DataManager.saveDB()
-	}
-
-	class func saveDB(safeToDefer: Bool = false) {
-
-		if safeToDefer {
-			saveTimer.push()
-			return
-		}
-
-		saveTimer.abort()
-
+	class func saveDB() {
 		if main.hasChanges {
 			DLog("Saving DB")
 			do {
@@ -311,13 +299,10 @@ final class DataManager {
 
 	class func postProcessAllItems(in moc: NSManagedObjectContext? = nil) {
 		let context = moc ?? main
-		let pp = DataItem.allItems(of: PullRequest.self, in: context, prefetchRelationships: ["comments", "reactions", "reviews"])
-		for p in pp {
+		for p in DataItem.allItems(of: PullRequest.self, in: context, prefetchRelationships: ["comments", "reactions", "reviews"]) {
 			p.postProcess()
 		}
-
-		let ii = DataItem.allItems(of: Issue.self, in: context, prefetchRelationships: ["comments", "reactions"])
-		for i in ii {
+		for i in DataItem.allItems(of: Issue.self, in: context, prefetchRelationships: ["comments", "reactions"]) {
 			i.postProcess()
 		}
 	}

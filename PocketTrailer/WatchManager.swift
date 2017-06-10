@@ -39,23 +39,31 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	func updateContext(andSave: Bool) {
 
-		var overview: [String : Any]?
-
-		if let s = session, s.isPaired, s.isWatchAppInstalled, s.activationState == .activated {
-			overview = buildOverview()
-			do {
-				try s.updateApplicationContext(["overview": overview!])
-			} catch {
-				DLog("Error updating watch session: %@", error.localizedDescription)
-			}
+		if andSave {
+			DataManager.saveDB()
 		}
 
-		if andSave {
-			if overview == nil {
-				overview = buildOverview()
+		let validSession = (session?.isPaired ?? false)
+			&& (session?.isWatchAppInstalled ?? false)
+			&& session?.activationState == .activated
+
+		let needOverview = validSession || andSave
+
+		guard needOverview else { return }
+
+		buildOverview { [weak self] overview in
+			if validSession {
+				do {
+					try self?.session?.updateApplicationContext(["overview": overview])
+				} catch {
+					DLog("Error updating watch session: %@", error.localizedDescription)
+				}
 			}
-			let overviewPath = DataManager.dataFilesDirectory.appendingPathComponent("overview.plist")
-			(overview! as NSDictionary).write(to: overviewPath, atomically: true)
+
+			if andSave {
+				let overviewPath = DataManager.dataFilesDirectory.appendingPathComponent("overview.plist")
+				(overview as NSDictionary).write(to: overviewPath, atomically: true)
+			}
 		}
 	}
 
@@ -98,14 +106,12 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			case "openItem":
 				if let itemId = message["localId"] as? String {
 					popupManager.masterController.openItemWithUriPath(uriPath: itemId)
-					DataManager.saveDB(safeToDefer: true)
 				}
 				s.processList(message: message, replyHandler: replyHandler)
 
 			case "opencomment":
 				if let itemId = message["id"] as? String {
 					popupManager.masterController.openCommentWithId(cId: itemId)
-					DataManager.saveDB(safeToDefer: true)
 				}
 				s.processList(message: message, replyHandler: replyHandler)
 
@@ -141,8 +147,6 @@ final class WatchManager : NSObject, WCSessionDelegate {
 						}
 					}
 				}
-				DataManager.saveDB(safeToDefer: true)
-				app.updateBadge()
 				s.processList(message: message, replyHandler: replyHandler)
 
 			case "needsOverview":
@@ -162,8 +166,10 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		switch(S(message["list"] as? String)) {
 
 		case "overview":
-			result["result"] = buildOverview()
-			reportSuccess(result: result, replyHandler: replyHandler)
+			buildOverview { [weak self] overview in
+				result["result"] = overview
+				self?.reportSuccess(result: result, replyHandler: replyHandler)
+			}
 
 		case "item_list":
 			buildItemList(type: message["type"] as! String,
@@ -234,13 +240,15 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		f.fetchOffset = from
 		f.fetchLimit = count
 
-		// This is needed to avoid a Core Data bug with fetchOffset
-		let tempMoc = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
-		tempMoc.persistentStoreCoordinator = DataManager.main.persistentStoreCoordinator
+		let tempMoc = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 		tempMoc.undoManager = nil
-
-		let items = try! tempMoc.fetch(f).map { baseDataForItem(item: $0, showStatuses: showStatuses, showLabels: showLabels) }
-		replyHandler(["result" : items])
+		tempMoc.persistentStoreCoordinator = DataManager.main.persistentStoreCoordinator
+		tempMoc.perform { [weak self] in
+			let items = try! tempMoc.fetch(f).map { self?.baseDataForItem(item: $0, showStatuses: showStatuses, showLabels: showLabels) }
+			DispatchQueue.main.async {
+				replyHandler(["result" : items])
+			}
+		}
 	}
 
 	private func baseDataForItem(item: ListableItem, showStatuses: Bool, showLabels: Bool) -> [String : Any] {
@@ -333,102 +341,120 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	//////////////////////////////
 
-	private func buildOverview() -> [String : Any] {
+	private func buildOverview(completion: @escaping ([String:Any])->Void) {
 
-		var views = [[String : Any]]()
+		DLog("Building remote overview")
 
-		for tabSet in popupManager.masterController.allTabSets {
+		let tempMoc = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+		tempMoc.undoManager = nil
+		tempMoc.persistentStoreCoordinator = DataManager.main.persistentStoreCoordinator
+		tempMoc.perform {
 
-			let c = tabSet.viewCriterion
+			var views = [[String : Any]]()
 
-			let myPrs = counts(for: PullRequest.self, in: .mine, criterion: c)
-			let participatedPrs = counts(for: PullRequest.self, in: .participated, criterion: c)
-			let mentionedPrs = counts(for: PullRequest.self, in: .mentioned, criterion: c)
-			let mergedPrs = counts(for: PullRequest.self, in: .merged, criterion: c)
-			let closedPrs = counts(for: PullRequest.self, in: .closed, criterion: c)
-			let otherPrs = counts(for: PullRequest.self, in: .all, criterion: c)
-			let snoozedPrs = counts(for: PullRequest.self, in: .snoozed, criterion: c)
-			let totalPrs = [ myPrs, participatedPrs, mentionedPrs, mergedPrs, closedPrs, otherPrs, snoozedPrs ].reduce(0, { $0 + $1["total"]! })
+			var totalUnreadPrCount = 0
+			var totalUnreadIssueCount = 0
 
-			let totalOpenPrs = countOpenAndVisible(of: PullRequest.self, criterion: c)
-			let unreadPrCount = PullRequest.badgeCount(in: DataManager.main, criterion: c)
+			for tabSet in popupManager.masterController.allTabSets {
 
-			let myIssues = counts(for: Issue.self, in: .mine, criterion: c)
-			let participatedIssues = counts(for: Issue.self, in: .participated, criterion: c)
-			let mentionedIssues = counts(for: Issue.self, in: .mentioned, criterion: c)
-			let closedIssues = counts(for: Issue.self, in: .closed, criterion: c)
-			let otherIssues = counts(for: Issue.self, in: .all, criterion: c)
-			let snoozedIssues = counts(for: Issue.self, in: .snoozed, criterion: c)
-			let totalIssues = [ myIssues, participatedIssues, mentionedIssues, closedIssues, otherIssues, snoozedIssues ].reduce(0, { $0 + $1["total"]! })
+				let c = tabSet.viewCriterion
 
-			let totalOpenIssues = countOpenAndVisible(of: Issue.self, criterion: c)
-			let unreadIssueCount = Issue.badgeCount(in: DataManager.main, criterion: c)
+				let myPrs = WatchManager.counts(for: PullRequest.self, in: .mine, criterion: c, moc: tempMoc)
+				let participatedPrs = WatchManager.counts(for: PullRequest.self, in: .participated, criterion: c, moc: tempMoc)
+				let mentionedPrs = WatchManager.counts(for: PullRequest.self, in: .mentioned, criterion: c, moc: tempMoc)
+				let mergedPrs = WatchManager.counts(for: PullRequest.self, in: .merged, criterion: c, moc: tempMoc)
+				let closedPrs = WatchManager.counts(for: PullRequest.self, in: .closed, criterion: c, moc: tempMoc)
+				let otherPrs = WatchManager.counts(for: PullRequest.self, in: .all, criterion: c, moc: tempMoc)
+				let snoozedPrs = WatchManager.counts(for: PullRequest.self, in: .snoozed, criterion: c, moc: tempMoc)
+				let totalPrs = [ myPrs, participatedPrs, mentionedPrs, mergedPrs, closedPrs, otherPrs, snoozedPrs ].reduce(0, { $0 + $1["total"]! })
 
-			views.append([
-				"title": S(c?.label),
-				"apiUri": S(c?.apiServerId?.uriRepresentation().absoluteString),
-				"prs": [
-					"mine": myPrs, "participated": participatedPrs, "mentioned": mentionedPrs,
-					"merged": mergedPrs, "closed": closedPrs, "other": otherPrs, "snoozed": snoozedPrs,
-					"total": totalPrs, "total_open": totalOpenPrs, "unread": unreadPrCount,
-					"error": totalPrs == 0 ? PullRequest.reasonForEmpty(with: nil, criterion: c).string : ""
-				],
-				"issues": [
-					"mine": myIssues, "participated": participatedIssues, "mentioned": mentionedIssues,
-					"closed": closedIssues, "other": otherIssues, "snoozed": snoozedIssues,
-					"total": totalIssues, "total_open": totalOpenIssues, "unread": unreadIssueCount,
-					"error": totalIssues == 0 ? Issue.reasonForEmpty(with: nil, criterion: c).string : ""
-				]])
+				let totalOpenPrs = WatchManager.countOpenAndVisible(of: PullRequest.self, criterion: c, moc: tempMoc)
+				let unreadPrCount = PullRequest.badgeCount(in: tempMoc, criterion: c)
+				totalUnreadPrCount += unreadPrCount
+
+				let myIssues = WatchManager.counts(for: Issue.self, in: .mine, criterion: c, moc: tempMoc)
+				let participatedIssues = WatchManager.counts(for: Issue.self, in: .participated, criterion: c, moc: tempMoc)
+				let mentionedIssues = WatchManager.counts(for: Issue.self, in: .mentioned, criterion: c, moc: tempMoc)
+				let closedIssues = WatchManager.counts(for: Issue.self, in: .closed, criterion: c, moc: tempMoc)
+				let otherIssues = WatchManager.counts(for: Issue.self, in: .all, criterion: c, moc: tempMoc)
+				let snoozedIssues = WatchManager.counts(for: Issue.self, in: .snoozed, criterion: c, moc: tempMoc)
+				let totalIssues = [ myIssues, participatedIssues, mentionedIssues, closedIssues, otherIssues, snoozedIssues ].reduce(0, { $0 + $1["total"]! })
+
+				let totalOpenIssues = WatchManager.countOpenAndVisible(of: Issue.self, criterion: c, moc: tempMoc)
+				let unreadIssueCount = Issue.badgeCount(in: tempMoc, criterion: c)
+				totalUnreadIssueCount += unreadIssueCount
+
+				views.append([
+					"title": S(c?.label),
+					"apiUri": S(c?.apiServerId?.uriRepresentation().absoluteString),
+					"prs": [
+						"mine": myPrs, "participated": participatedPrs, "mentioned": mentionedPrs,
+						"merged": mergedPrs, "closed": closedPrs, "other": otherPrs, "snoozed": snoozedPrs,
+						"total": totalPrs, "total_open": totalOpenPrs, "unread": unreadPrCount,
+						"error": totalPrs == 0 ? PullRequest.reasonForEmpty(with: nil, criterion: c).string : ""
+					],
+					"issues": [
+						"mine": myIssues, "participated": participatedIssues, "mentioned": mentionedIssues,
+						"closed": closedIssues, "other": otherIssues, "snoozed": snoozedIssues,
+						"total": totalIssues, "total_open": totalOpenIssues, "unread": unreadIssueCount,
+						"error": totalIssues == 0 ? Issue.reasonForEmpty(with: nil, criterion: c).string : ""
+					]])
+			}
+
+			DispatchQueue.main.async {
+				completion([
+					"views": views,
+					"preferIssues": Settings.preferIssuesInWatch,
+					"lastUpdated": Settings.lastSuccessfulRefresh ?? .distantPast
+					])
+				UIApplication.shared.applicationIconBadgeNumber = totalUnreadPrCount + totalUnreadIssueCount
+			}
+
+			DLog("Remote overview built")
 		}
-
-		return [
-			"views": views,
-			"preferIssues": Settings.preferIssuesInWatch,
-			"lastUpdated": Settings.lastSuccessfulRefresh ?? .distantPast
-		]
 	}
 
-	private func counts<T: ListableItem>(for type: T.Type, in section: Section, criterion: GroupingCriterion?) -> [String : Int] {
-		return ["total": countItems(of: type, in: section, criterion: criterion),
-		        "unread": badgeCount(for: type, in: section, criterion: criterion)]
+	private class func counts<T: ListableItem>(for type: T.Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> [String : Int] {
+		return ["total": countItems(of: type, in: section, criterion: criterion, moc: moc),
+		        "unread": badgeCount(for: type, in: section, criterion: criterion, moc: moc)]
 	}
 
-	private func countallItems<T: ListableItem>(of type: T.Type, criterion: GroupingCriterion?) -> Int {
+	private class func countallItems<T: ListableItem>(of type: T.Type, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest<T>(entityName: String(describing: type))
 		f.includesSubentities = false
 		let p = Settings.hideUncommentedItems
 			? NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, type.includeInUnreadPredicate])
 			: Section.nonZeroPredicate
-		DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: DataManager.main)
-		return try! DataManager.main.count(for: f)
+		DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc)
+		return try! moc.count(for: f)
 	}
 
-	private func countItems<T: ListableItem>(of type: T.Type, in section: Section, criterion: GroupingCriterion?) -> Int {
+	private class func countItems<T: ListableItem>(of type: T.Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest<T>(entityName: String(describing: type))
 		f.includesSubentities = false
 		let p = Settings.hideUncommentedItems
 			? NSCompoundPredicate(type: .and, subpredicates: [section.matchingPredicate, type.includeInUnreadPredicate])
 			: section.matchingPredicate
-		DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: DataManager.main)
-		return try! DataManager.main.count(for: f)
+		DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc)
+		return try! moc.count(for: f)
 	}
 
-	private func badgeCount<T: ListableItem>(for type: T.Type, in section: Section, criterion: GroupingCriterion?) -> Int {
+	private class func badgeCount<T: ListableItem>(for type: T.Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest<T>(entityName: String(describing: type))
 		f.includesSubentities = false
 		let p = NSCompoundPredicate(type: .and, subpredicates: [section.matchingPredicate, type.includeInUnreadPredicate])
-		DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: DataManager.main)
-		return ListableItem.badgeCount(from: f, in: DataManager.main)
+		DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc)
+		return ListableItem.badgeCount(from: f, in: moc)
 	}
 
-	private func countOpenAndVisible<T: ListableItem>(of type: T.Type, criterion: GroupingCriterion?) -> Int {
+	private class func countOpenAndVisible<T: ListableItem>(of type: T.Type, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest<T>(entityName: String(describing: type))
 		f.includesSubentities = false
 		let p = Settings.hideUncommentedItems
 			? NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, ItemCondition.isOpenPredicate, type.includeInUnreadPredicate])
 			: NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, ItemCondition.isOpenPredicate])
-		DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: DataManager.main)
-		return try! DataManager.main.count(for: f)
+		DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc)
+		return try! moc.count(for: f)
 	}
 
 }

@@ -326,8 +326,6 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 		settingsChangedTimer = PopTimer(timeInterval: 1.0) {
 			DataManager.postProcessAllItems()
-			DataManager.saveDB()
-			popupManager.masterController.updateStatus()
 		}
 
 		importExport = ImportExport(parent: self)

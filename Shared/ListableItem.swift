@@ -919,7 +919,7 @@ class ListableItem: DataItem {
 
 		let f = NSFetchRequest<T>(entityName: String(describing: itemType))
 		f.fetchBatchSize = 50
-		f.relationshipKeyPathsForPrefetching = (itemType == PullRequest.self) ? ["labels", "statuses"] : ["labels"]
+		f.relationshipKeyPathsForPrefetching = (itemType == PullRequest.self) ? ["labels", "statuses", "reviews"] : ["labels"]
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false
 		let p = NSCompoundPredicate(andPredicateWithSubpredicates: andPredicates)

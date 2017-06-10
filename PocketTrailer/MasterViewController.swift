@@ -91,11 +91,11 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		if API.hasNetworkConnection {
 			if !app.startRefresh() {
-				updateStatus()
+				updateStatus(becauseOfChanges: false)
 			}
 		} else {
 			showMessage("No Network", "There is no network connectivity, please try again later")
-			updateStatus()
+			updateStatus(becauseOfChanges: false)
 		}
 	}
 
@@ -139,7 +139,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 				DataManager.main.delete(p)
 			}
 		}
-		DataManager.saveDB(safeToDefer: true)
 	}
 
 	func removeAllMergedConfirmed() {
@@ -147,7 +146,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			for p in PullRequest.allMerged(in: DataManager.main, criterion: currentTabBarSet?.viewCriterion) {
 				DataManager.main.delete(p)
 			}
-			DataManager.saveDB(safeToDefer: true)
 		}
 	}
 
@@ -155,8 +153,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		for i in fetchedResultsController.fetchedObjects ?? [] {
 			i.catchUpWithComments()
 		}
-		DataManager.saveDB(safeToDefer: true)
-		updateStatus()
 	}
 
 	func refreshControlChanged() {
@@ -216,7 +212,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
-		updateStatus()
+		updateStatus(becauseOfChanges: false)
 
 		if let s = splitViewController, !s.isCollapsed {
 			return
@@ -252,24 +248,18 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		n.addObserver(self, selector: #selector(refreshProcessing), name: RefreshProcessingNotification, object: nil)
 		n.addObserver(self, selector: #selector(refreshEnded), name: RefreshEndedNotification, object: nil)
 
-		updateTabItems(animated: false)
+		updateTabItems(animated: false, rebuildTabs: true)
 		atNextEvent {
 			self.tableView.reloadData() // ensure footers are correct
 		}
 	}
 
-	private var needsUpdateStatus = false
-
 	func refreshStarting() {
-		updateStatus()
-		needsUpdateStatus = true
+		updateStatus(becauseOfChanges: false)
 	}
 
 	func refreshEnded() {
-		if needsUpdateStatus {
-			updateStatus()
-			needsUpdateStatus = false
-		}
+		updateStatus(becauseOfChanges: false)
 	}
 
 	func refreshUpdated() {
@@ -324,8 +314,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			if i.isSnoozing {
 				if canIssueKeyForIndexPath(actionTitle: "Wake", indexPath: ip) {
 					i.wakeUp()
-					DataManager.saveDB(safeToDefer: true)
-					updateStatus()
 				}
 			} else {
 				if canIssueKeyForIndexPath(actionTitle: "Snooze", indexPath: ip) {
@@ -356,8 +344,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			let isMuted = i.muted
 			if (!isMuted && canIssueKeyForIndexPath(actionTitle: "Mute", indexPath: ip)) || (isMuted && canIssueKeyForIndexPath(actionTitle: "Unmute", indexPath: ip)) {
 				i.setMute(to: !isMuted)
-				DataManager.saveDB(safeToDefer: true)
-				updateStatus()
 			}
 		}
 	}
@@ -465,27 +451,19 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	private func requestTabFocus(item: UITabBarItem?) {
-		if let i = item {
-			lastTabIndex = tabs?.items?.index(of: i) ?? 0
-			resetView()
+		if let tabs = tabs, let item = item {
+			tabBar(tabs, didSelect: item)
 		}
 	}
 
 	private func tabBarSetForTabItem(i: UITabBarItem?) -> TabBarSet? {
-
 		guard let i = i else { return tabBarSets.first }
-
-		for s in tabBarSets {
-			if s.prItem === i || s.issuesItem === i {
-				return s
-			}
-		}
-		return nil
+		return tabBarSets.first(where: { $0.prItem === i || $0.issuesItem === i })
 	}
 
 	func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
 		lastTabIndex = tabs?.items?.index(of: item) ?? 0
-		resetView()
+		updateTabItems(animated: true, rebuildTabs: false)
 	}
 
 	override func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -547,52 +525,57 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 	}
 
-	private func updateTabItems(animated: Bool) {
+	private func updateTabItems(animated: Bool, rebuildTabs: Bool) {
 
-		tabBarSets.removeAll()
+		if rebuildTabs {
 
-		for groupLabel in Repo.allGroupLabels {
-			let c = GroupingCriterion(repoGroup: groupLabel)
-			let s = TabBarSet(viewCriterion: c)
-			tabBarSets.append(s)
-		}
+			tabBarSets.removeAll()
 
-		if Settings.showSeparateApiServersInMenu {
-			for a in ApiServer.allApiServers(in: DataManager.main) {
-				if a.goodToGo {
-					let c = GroupingCriterion(apiServerId: a.objectID)
-					let s = TabBarSet(viewCriterion: c)
-					tabBarSets.append(s)
+			for groupLabel in Repo.allGroupLabels {
+				let c = GroupingCriterion(repoGroup: groupLabel)
+				let s = TabBarSet(viewCriterion: c)
+				tabBarSets.append(s)
+			}
+
+			if Settings.showSeparateApiServersInMenu {
+				for a in ApiServer.allApiServers(in: DataManager.main) {
+					if a.goodToGo {
+						let c = GroupingCriterion(apiServerId: a.objectID)
+						let s = TabBarSet(viewCriterion: c)
+						tabBarSets.append(s)
+					}
 				}
-			}
-		} else {
-			let s = TabBarSet(viewCriterion: nil)
-			tabBarSets.append(s)
-		}
-
-		var items = [UITabBarItem]()
-		for d in tabBarSets {
-			items.append(contentsOf: d.tabItems)
-		}
-
-		if items.count > 1 {
-			showEmpty = false
-			showTabBar(show: true, animated: animated)
-
-			tabs?.items = items
-			tabs?.superview?.setNeedsLayout()
-
-			if items.count > lastTabIndex {
-				tabs?.selectedItem = items[lastTabIndex]
-				currentTabBarSet = tabBarSetForTabItem(i: items[lastTabIndex])
 			} else {
-				tabs?.selectedItem = items.last
-				currentTabBarSet = tabBarSetForTabItem(i: items.last!)
+				let s = TabBarSet(viewCriterion: nil)
+				tabBarSets.append(s)
 			}
-		} else {
-			showEmpty = items.count == 0
-			currentTabBarSet = tabBarSetForTabItem(i: items.first)
-			showTabBar(show: false, animated: animated)
+
+			var items = [UITabBarItem]()
+			for d in tabBarSets {
+				items.append(contentsOf: d.tabItems)
+			}
+
+			if items.count > 1 {
+				showEmpty = false
+				showTabBar(show: true, animated: animated)
+
+				tabs?.items = items
+				tabs?.superview?.setNeedsLayout()
+
+				if items.count > lastTabIndex {
+					tabs?.selectedItem = items[lastTabIndex]
+					currentTabBarSet = tabBarSetForTabItem(i: items[lastTabIndex])
+				} else {
+					tabs?.selectedItem = items.last
+					currentTabBarSet = tabBarSetForTabItem(i: items.last!)
+				}
+			} else {
+				showEmpty = items.count == 0
+				currentTabBarSet = tabBarSetForTabItem(i: items.first)
+				showTabBar(show: false, animated: animated)
+			}
+		} else if let i = tabs?.selectedItem {
+			currentTabBarSet = tabBarSetForTabItem(i: i)
 		}
 
 		if let i = tabs?.selectedItem?.image {
@@ -605,27 +588,32 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			viewingPrs = true
 		}
 
-		if fetchedResultsController == nil {
+		if rebuildTabs {
+			if fetchedResultsController == nil {
+				updateQuery(newFetchRequest: itemFetchRequest)
+				tableView.reloadData()
+			} else {
+				let latestFetchRequest = fetchedResultsController.fetchRequest
+				let newFetchRequest = itemFetchRequest
+				let newCount = tabs?.items?.count ?? 0
+				if newCount != lastTabCount || latestFetchRequest != newFetchRequest {
+					updateQuery(newFetchRequest: newFetchRequest)
+					tableView.reloadData()
+				}
+			}
+
+			if let ts = tabScroll, let t = tabs, let i = t.selectedItem, let ind = t.items?.index(of: i) {
+				let w = t.bounds.size.width / CGFloat(t.items?.count ?? 1)
+				let x = w*CGFloat(ind)
+				let f = CGRect(x: x, y: 0, width: w, height: t.bounds.size.height)
+				ts.scrollRectToVisible(f, animated: true)
+			}
+			lastTabCount = tabs?.items?.count ?? 0
+		} else {
 			updateQuery(newFetchRequest: itemFetchRequest)
 			tableView.reloadData()
-		} else {
-			let latestFetchRequest = fetchedResultsController.fetchRequest
-			let newFetchRequest = itemFetchRequest
-			let newCount = tabs?.items?.count ?? 0
-			if newCount != lastTabCount || latestFetchRequest != newFetchRequest {
-				updateQuery(newFetchRequest: newFetchRequest)
-				tableView.reloadData()
-			}
 		}
 
-		if let ts = tabScroll, let t = tabs, let i = t.selectedItem, let ind = t.items?.index(of: i) {
-			let w = t.bounds.size.width / CGFloat(t.items?.count ?? 1)
-			let x = w*CGFloat(ind)
-			let f = CGRect(x: x, y: 0, width: w, height: t.bounds.size.height)
-			ts.scrollRectToVisible(f, animated: true)
-		}
-
-		lastTabCount = tabs?.items?.count ?? 0
 		if let i = tabs?.selectedItem, let ind = tabs?.items?.index(of: i) {
 			lastTabIndex = ind
 		} else {
@@ -735,13 +723,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		if let a = action, let i = relatedItem {
 			if a == "mute" {
 				i.setMute(to: true)
-				DataManager.saveDB(safeToDefer: true)
-				updateStatus()
 				return
 			} else if a == "read" {
 				i.catchUpWithComments()
-				DataManager.saveDB(safeToDefer: true)
-				updateStatus()
 				return
 			}
 		}
@@ -749,7 +733,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		if urlToOpen != nil && !S(searchBar.text).isEmpty {
 			searchBar.text = nil
 			searchBar.resignFirstResponder()
-			resetView()
+			resetView(becauseOfChanges: false)
 		}
 
 		var oid: NSManagedObjectID?
@@ -912,8 +896,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			let oid = DataManager.id(for: i),
 			let o = existingObject(with: oid) as? ListableItem {
 			o.catchUpWithComments()
-			DataManager.saveDB(safeToDefer: true)
-			updateStatus()
 		}
 	}
 
@@ -924,8 +906,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			let o = existingObject(with: oid) as? ListableItem {
 			o.latestReadCommentDate = .distantPast
 			o.postProcess()
-			DataManager.saveDB(safeToDefer: true)
-			updateStatus()
 		}
 	}
 
@@ -960,13 +940,11 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 				m = UITableViewRowAction(style: .normal, title: "Unmute") { action, indexPath in
 					tableView.setEditing(false, animated: true)
 					i.setMute(to: false)
-					DataManager.saveDB(safeToDefer: true)
 				}
 			} else {
 				m = UITableViewRowAction(style: .normal, title: "Mute") { action, indexPath in
 					tableView.setEditing(false, animated: true)
 					i.setMute(to: true)
-					DataManager.saveDB(safeToDefer: true)
 				}
 			}
 			actions.append(m)
@@ -980,7 +958,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 				appendReadUnread(i: i)
 				let d = UITableViewRowAction(style: .destructive, title: "Remove") { action, indexPath in
 					DataManager.main.delete(i)
-					DataManager.saveDB(safeToDefer: true)
 				}
 				actions.append(d)
 
@@ -988,7 +965,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 				let w = UITableViewRowAction(style: .normal, title: "Wake") { action, indexPath in
 					i.wakeUp()
-					DataManager.saveDB(safeToDefer: true)
 				}
 				w.backgroundColor = .darkGray
 				actions.append(w)
@@ -1019,7 +995,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		for preset in snoozePresets {
 			a.addAction(UIAlertAction(title: preset.listDescription, style: .default) { action in
 				i.snooze(using: preset)
-				DataManager.saveDB(safeToDefer: true)
 			})
 		}
 		a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
@@ -1094,9 +1069,8 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		} else {
 			tableView.reloadData()
 		}
-		needsUpdateStatus = false
 		atNextEvent { [weak self] in
-			self?.updateStatus()
+			self?.updateStatus(becauseOfChanges: true) // TODO check cases where this is called twice
 		}
 	}
 
@@ -1112,9 +1086,11 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	private var viewingPrs = true
 	private var showEmpty = true
 
-	func updateStatus() {
+	private func updateStatus(becauseOfChanges: Bool) {
 
-		updateTabItems(animated: true)
+		if becauseOfChanges {
+			updateTabItems(animated: true, rebuildTabs: true)
+		}
 		updateFooter()
 
 		if appIsRefreshing {
@@ -1137,7 +1113,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			}
 		}
 
-		app.updateBadge()
+		if becauseOfChanges {
+			app.updateBadgeAndSaveDB()
+		}
 
 		if splitViewController?.displayMode != .allVisible {
 			detailViewController.navigationItem.leftBarButtonItem?.title = title
@@ -1254,10 +1232,10 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		searchTimer.push()
 	}
 
-	func resetView() {
+	func resetView(becauseOfChanges: Bool) {
 		safeScrollToTop()
 		updateQuery(newFetchRequest: itemFetchRequest)
-		updateStatus()
+		updateStatus(becauseOfChanges: becauseOfChanges)
 		tableView.reloadData()
 	}
 
