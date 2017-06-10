@@ -340,15 +340,13 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			let i = fetchedResultsController.object(at: ip)
 			if i.hasUnreadCommentsOrAlert {
 				if canIssueKeyForIndexPath(actionTitle: "Read", indexPath: ip) {
-					i.catchUpWithComments()
-					DataManager.saveDB(safeToDefer: true)
+					markItemAsRead(itemUri: i.objectID.uriRepresentation().absoluteString)
 				}
 			} else {
 				if canIssueKeyForIndexPath(actionTitle: "Unread", indexPath: ip) {
 					markItemAsUnRead(itemUri: i.objectID.uriRepresentation().absoluteString)
 				}
 			}
-			updateStatus()
 		}
 	}
 
@@ -908,6 +906,17 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		return 1
 	}
 
+	private func markItemAsRead(itemUri: String?) {
+		if let
+			i = itemUri,
+			let oid = DataManager.id(for: i),
+			let o = existingObject(with: oid) as? ListableItem {
+			o.catchUpWithComments()
+			DataManager.saveDB(safeToDefer: true)
+			updateStatus()
+		}
+	}
+
 	private func markItemAsUnRead(itemUri: String?) {
 		if let
 			i = itemUri,
@@ -924,28 +933,21 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		var actions = [UITableViewRowAction]()
 
-		func markItemAsRead(itemUri: String?) {
-			if let
-				i = itemUri,
-				let oid = DataManager.id(for: i),
-				let o = existingObject(with: oid) as? ListableItem {
-				o.catchUpWithComments()
-				DataManager.saveDB(safeToDefer: true)
-				updateStatus()
-			}
-		}
-
 		func appendReadUnread(i: ListableItem) {
 			let r: UITableViewRowAction
 			if i.hasUnreadCommentsOrAlert {
-				r = UITableViewRowAction(style: .normal, title: "Read") { action, indexPath in
+				r = UITableViewRowAction(style: .normal, title: "Read") { [weak self] action, indexPath in
 					tableView.setEditing(false, animated: true)
-					markItemAsRead(itemUri: i.objectID.uriRepresentation().absoluteString)
+					DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+						self?.markItemAsRead(itemUri: i.objectID.uriRepresentation().absoluteString)
+					}
 				}
 			} else {
 				r = UITableViewRowAction(style: .normal, title: "Unread") { [weak self] action, indexPath in
 					tableView.setEditing(false, animated: true)
-					self?.markItemAsUnRead(itemUri: i.objectID.uriRepresentation().absoluteString)
+					DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+						self?.markItemAsUnRead(itemUri: i.objectID.uriRepresentation().absoluteString)
+					}
 				}
 			}
 			r.backgroundColor = view.tintColor
