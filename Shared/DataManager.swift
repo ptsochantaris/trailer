@@ -227,7 +227,19 @@ final class DataManager {
 		NotificationQueue.commit()
 	}
 
-	class func saveDB() {
+	private static let saveTimer = PopTimer(timeInterval: 0.5) {
+		DataManager.saveDB()
+	}
+
+	class func saveDB(safeToDefer: Bool = false) {
+
+		if safeToDefer {
+			saveTimer.push()
+			return
+		}
+
+		saveTimer.abort()
+
 		if main.hasChanges {
 			DLog("Saving DB")
 			do {

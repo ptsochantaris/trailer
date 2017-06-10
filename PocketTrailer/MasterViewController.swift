@@ -139,7 +139,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 				DataManager.main.delete(p)
 			}
 		}
-		DataManager.saveDB()
+		DataManager.saveDB(safeToDefer: true)
 	}
 
 	func removeAllMergedConfirmed() {
@@ -147,7 +147,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			for p in PullRequest.allMerged(in: DataManager.main, criterion: currentTabBarSet?.viewCriterion) {
 				DataManager.main.delete(p)
 			}
-			DataManager.saveDB()
+			DataManager.saveDB(safeToDefer: true)
 		}
 	}
 
@@ -155,7 +155,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		for i in fetchedResultsController.fetchedObjects ?? [] {
 			i.catchUpWithComments()
 		}
-		DataManager.saveDB()
+		DataManager.saveDB(safeToDefer: true)
 		updateStatus()
 	}
 
@@ -237,7 +237,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		refreshControl?.addTarget(self, action: #selector(refreshControlChanged), for: .valueChanged)
 
 		tableView.rowHeight = UITableViewAutomaticDimension
-		tableView.estimatedRowHeight = 240
+		tableView.estimatedRowHeight = 160
 		tableView.register(UINib(nibName: "SectionHeaderView", bundle: nil), forHeaderFooterViewReuseIdentifier: "SectionHeaderView")
 		tableView.contentOffset = CGPoint(x: 0, y: 44)
 		clearsSelectionOnViewWillAppear = false
@@ -324,7 +324,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			if i.isSnoozing {
 				if canIssueKeyForIndexPath(actionTitle: "Wake", indexPath: ip) {
 					i.wakeUp()
-					DataManager.saveDB()
+					DataManager.saveDB(safeToDefer: true)
 					updateStatus()
 				}
 			} else {
@@ -341,7 +341,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			if i.hasUnreadCommentsOrAlert {
 				if canIssueKeyForIndexPath(actionTitle: "Read", indexPath: ip) {
 					i.catchUpWithComments()
-					DataManager.saveDB()
+					DataManager.saveDB(safeToDefer: true)
 				}
 			} else {
 				if canIssueKeyForIndexPath(actionTitle: "Unread", indexPath: ip) {
@@ -358,7 +358,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			let isMuted = i.muted
 			if (!isMuted && canIssueKeyForIndexPath(actionTitle: "Mute", indexPath: ip)) || (isMuted && canIssueKeyForIndexPath(actionTitle: "Unmute", indexPath: ip)) {
 				i.setMute(to: !isMuted)
-				DataManager.saveDB()
+				DataManager.saveDB(safeToDefer: true)
 				updateStatus()
 			}
 		}
@@ -520,13 +520,13 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		tableView.beginUpdates()
 		if removedIndexes.count > 0 {
-			tableView.deleteSections(IndexSet(removedIndexes), with:.fade)
+			tableView.deleteSections(IndexSet(removedIndexes), with: .fade)
 		}
 		if untouchedIndexes.count > 0 {
-			tableView.reloadSections(IndexSet(untouchedIndexes), with:.fade)
+			tableView.reloadSections(IndexSet(untouchedIndexes), with: .fade)
 		}
 		if addedIndexes.count > 0 {
-			tableView.insertSections(IndexSet(addedIndexes), with:.fade)
+			tableView.insertSections(IndexSet(addedIndexes), with: .fade)
 		}
 		tableView.endUpdates()
 
@@ -737,12 +737,12 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		if let a = action, let i = relatedItem {
 			if a == "mute" {
 				i.setMute(to: true)
-				DataManager.saveDB()
+				DataManager.saveDB(safeToDefer: true)
 				updateStatus()
 				return
 			} else if a == "read" {
 				i.catchUpWithComments()
-				DataManager.saveDB()
+				DataManager.saveDB(safeToDefer: true)
 				updateStatus()
 				return
 			}
@@ -915,8 +915,8 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			let o = existingObject(with: oid) as? ListableItem {
 			o.latestReadCommentDate = .distantPast
 			o.postProcess()
-			DataManager.saveDB()
-			popupManager.masterController.updateStatus()
+			DataManager.saveDB(safeToDefer: true)
+			updateStatus()
 		}
 	}
 
@@ -930,8 +930,8 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 				let oid = DataManager.id(for: i),
 				let o = existingObject(with: oid) as? ListableItem {
 				o.catchUpWithComments()
-				DataManager.saveDB()
-				popupManager.masterController.updateStatus()
+				DataManager.saveDB(safeToDefer: true)
+				updateStatus()
 			}
 		}
 
@@ -939,13 +939,13 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			let r: UITableViewRowAction
 			if i.hasUnreadCommentsOrAlert {
 				r = UITableViewRowAction(style: .normal, title: "Read") { action, indexPath in
-					markItemAsRead(itemUri: i.objectID.uriRepresentation().absoluteString)
 					tableView.setEditing(false, animated: true)
+					markItemAsRead(itemUri: i.objectID.uriRepresentation().absoluteString)
 				}
 			} else {
 				r = UITableViewRowAction(style: .normal, title: "Unread") { [weak self] action, indexPath in
-					self?.markItemAsUnRead(itemUri: i.objectID.uriRepresentation().absoluteString)
 					tableView.setEditing(false, animated: true)
+					self?.markItemAsUnRead(itemUri: i.objectID.uriRepresentation().absoluteString)
 				}
 			}
 			r.backgroundColor = view.tintColor
@@ -956,15 +956,15 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			let m: UITableViewRowAction
 			if i.muted {
 				m = UITableViewRowAction(style: .normal, title: "Unmute") { action, indexPath in
-					i.setMute(to: false)
-					DataManager.saveDB()
 					tableView.setEditing(false, animated: true)
+					i.setMute(to: false)
+					DataManager.saveDB(safeToDefer: true)
 				}
 			} else {
 				m = UITableViewRowAction(style: .normal, title: "Mute") { action, indexPath in
-					i.setMute(to: true)
-					DataManager.saveDB()
 					tableView.setEditing(false, animated: true)
+					i.setMute(to: true)
+					DataManager.saveDB(safeToDefer: true)
 				}
 			}
 			actions.append(m)
@@ -978,7 +978,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 				appendReadUnread(i: i)
 				let d = UITableViewRowAction(style: .destructive, title: "Remove") { action, indexPath in
 					DataManager.main.delete(i)
-					DataManager.saveDB()
+					DataManager.saveDB(safeToDefer: true)
 				}
 				actions.append(d)
 
@@ -986,7 +986,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 				let w = UITableViewRowAction(style: .normal, title: "Wake") { action, indexPath in
 					i.wakeUp()
-					DataManager.saveDB()
+					DataManager.saveDB(safeToDefer: true)
 				}
 				w.backgroundColor = .darkGray
 				actions.append(w)
@@ -1017,7 +1017,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		for preset in snoozePresets {
 			a.addAction(UIAlertAction(title: preset.listDescription, style: .default) { action in
 				i.snooze(using: preset)
-				DataManager.saveDB()
+				DataManager.saveDB(safeToDefer: true)
 			})
 		}
 		a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))

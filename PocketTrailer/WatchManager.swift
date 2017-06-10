@@ -98,14 +98,14 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			case "openItem":
 				if let itemId = message["localId"] as? String {
 					popupManager.masterController.openItemWithUriPath(uriPath: itemId)
-					DataManager.saveDB()
+					DataManager.saveDB(safeToDefer: true)
 				}
 				s.processList(message: message, replyHandler: replyHandler)
 
 			case "opencomment":
 				if let itemId = message["id"] as? String {
 					popupManager.masterController.openCommentWithId(cId: itemId)
-					DataManager.saveDB()
+					DataManager.saveDB(safeToDefer: true)
 				}
 				s.processList(message: message, replyHandler: replyHandler)
 
@@ -141,7 +141,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 						}
 					}
 				}
-				DataManager.saveDB()
+				DataManager.saveDB(safeToDefer: true)
 				app.updateBadge()
 				s.processList(message: message, replyHandler: replyHandler)
 

@@ -159,7 +159,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 		if let oid = catchupWithDataItemWhenLoaded, let dataItem = existingObject(with: oid) as? ListableItem {
 			if dataItem.hasUnreadCommentsOrAlert {
 				dataItem.catchUpWithComments()
-				DataManager.saveDB()
+				DataManager.saveDB(safeToDefer: true)
 			}
 		}
 		catchupWithDataItemWhenLoaded = nil
