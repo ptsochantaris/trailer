@@ -18,6 +18,10 @@ final class PopTimer {
 		popTimer = nil
 	}
 
+	var isRunning: Bool {
+		return popTimer != nil
+	}
+
 	init(timeInterval: TimeInterval, callback: @escaping Completion) {
 		self.timeInterval = timeInterval
 		self.callback = callback

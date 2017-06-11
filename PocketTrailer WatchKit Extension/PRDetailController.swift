@@ -9,6 +9,7 @@ final class PRDetailController: CommonController {
 
 	private var rowControllers = [PopulatableRow]()
 	private var itemId: String!
+	private var loading = false
 
 	override func awake(withContext context: Any?) {
 		_statusLabel = statusLabel
@@ -21,11 +22,14 @@ final class PRDetailController: CommonController {
 	}
 
 	override func requestData(command: String?) {
-		var params = ["list": "item_detail", "localId": itemId!]
-		if let command = command {
-			params["command"] = command
+		if !loading {
+			loading = true
+			var params = ["list": "item_detail", "localId": itemId!]
+			if let command = command {
+				params["command"] = command
+			}
+			send(request: params)
 		}
-		send(request: params)
 	}
 
 	@IBAction func refreshSelected() {
@@ -43,7 +47,7 @@ final class PRDetailController: CommonController {
 
 	override func update(from response: [AnyHashable : Any]) {
 
-		table.removeRows(at: IndexSet(integersIn: Range(uncheckedBounds: (0, table.numberOfRows))))
+		loading = false
 
 		rowControllers.removeAll(keepingCapacity: false)
 		let itemInfo = response["result"] as! [AnyHashable : Any]
@@ -51,8 +55,10 @@ final class PRDetailController: CommonController {
 		var rowCount = 0
 
 		if let statuses = itemInfo["statuses"] as? [[AnyHashable : Any]] {
-			table.insertRows(at: IndexSet(integersIn: Range(uncheckedBounds: (rowCount, statuses.count))), withRowType: "StatusRow")
 			for status in statuses {
+				if !(table.rowController(at: rowCount) is StatusRow) {
+					table.insertRows(at: IndexSet(integer: rowCount), withRowType: "StatusRow")
+				}
 				if let s = table.rowController(at: rowCount) as? StatusRow {
 					s.labelL.setText(status["text"] as? String)
 					let c = colour(from: status["color"] as! String)
@@ -64,7 +70,12 @@ final class PRDetailController: CommonController {
 		}
 
 		if let description = itemInfo["description"] as? String {
-			table.insertRows(at: IndexSet(integer: rowCount), withRowType: "LabelRow")
+			while table.rowController(at: rowCount) is StatusRow {
+				table.removeRows(at: IndexSet(integer: rowCount))
+			}
+			if !(table.rowController(at: rowCount) is LabelRow) {
+				table.insertRows(at: IndexSet(integer: rowCount), withRowType: "LabelRow")
+			}
 			if let r = table.rowController(at: rowCount) as? LabelRow {
 				r.labelL.setText(description)
 			}
@@ -77,10 +88,16 @@ final class PRDetailController: CommonController {
 			} else {
 				setTitle("Details")
 			}
-			table.insertRows(at: IndexSet(integersIn: Range(uncheckedBounds: (rowCount, comments.count))), withRowType: "CommentRow")
+
 			var unreadIndex = 0
 			let unreadCount = itemInfo["unreadCount"] as? Int ?? 0
 			for comment in comments {
+				while table.rowController(at: rowCount) is LabelRow {
+					table.removeRows(at: IndexSet(integer: rowCount))
+				}
+				if !(table.rowController(at: rowCount) is CommentRow) {
+					table.insertRows(at: IndexSet(integer: rowCount), withRowType: "CommentRow")
+				}
 				if let s = table.rowController(at: rowCount) as? CommentRow {
 					s.set(comment: comment, unreadCount: unreadCount, unreadIndex: &unreadIndex)
 				}
@@ -88,6 +105,10 @@ final class PRDetailController: CommonController {
 			}
 		} else {
 			setTitle("Details")
+		}
+
+		while table.numberOfRows > rowCount {
+			table.removeRows(at: IndexSet(integer: rowCount))
 		}
 
 		show(status: "", hideTable: false)

@@ -247,6 +247,17 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		n.addObserver(self, selector: #selector(refreshUpdated), name: SyncProgressUpdateNotification, object: nil)
 		n.addObserver(self, selector: #selector(refreshProcessing), name: RefreshProcessingNotification, object: nil)
 		n.addObserver(self, selector: #selector(refreshEnded), name: RefreshEndedNotification, object: nil)
+		n.addObserver(self, selector: #selector(dataUpdated(_:)), name: .NSManagedObjectContextObjectsDidChange, object: nil)
+
+		dataUpdateTimer = PopTimer(timeInterval: 1) { [weak self] in
+			DLog("Detected possible status update")
+			self?.updateStatus(becauseOfChanges: true)
+		}
+
+		//let prs = DataItem.allItems(of: PullRequest.self, in: DataManager.main)
+		//prs[0].postSyncAction = PostSyncAction.delete.rawValue
+		//prs[1].postSyncAction = PostSyncAction.delete.rawValue
+		//DataItem.nukeDeletedItems(in: DataManager.main)
 
 		updateTabItems(animated: false, rebuildTabs: true)
 		atNextEvent {
@@ -254,19 +265,46 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 	}
 
-	func refreshStarting() {
+	private var dataUpdateTimer: PopTimer!
+	@objc private func dataUpdated(_ notification: Notification) {
+
+		guard let relatedMoc = notification.object as? NSManagedObjectContext, relatedMoc === DataManager.main else { return }
+
+		if let items = notification.userInfo?[NSInsertedObjectsKey] as? Set<NSManagedObject>,
+			items.first(where: { $0 is ListableItem }) != nil {
+			//DLog(">>>>>>>>>>>>>>> detected inserted items")
+			dataUpdateTimer.push()
+			return
+		}
+
+		if let items = notification.userInfo?[NSDeletedObjectsKey] as? Set<NSManagedObject>,
+			items.first(where: { $0 is ListableItem }) != nil {
+			//DLog(">>>>>>>>>>>>>>> detected deleted items")
+			dataUpdateTimer.push()
+			return
+		}
+
+		if let items = notification.userInfo?[NSUpdatedObjectsKey] as? Set<NSManagedObject>,
+			items.first(where: { ($0 as? ListableItem)?.hasPersistentChangedValues ?? false }) != nil {
+			//DLog(">>>>>>>>>>>>>>> detected permanently changed items")
+			dataUpdateTimer.push()
+			return
+		}
+	}
+
+	@objc private func refreshStarting() {
 		updateStatus(becauseOfChanges: false)
 	}
 
-	func refreshEnded() {
+	@objc private func refreshEnded() {
 		updateStatus(becauseOfChanges: false)
 	}
 
-	func refreshUpdated() {
+	@objc private func refreshUpdated() {
 		refreshLabel.text = API.lastUpdateDescription
 	}
 
-	func refreshProcessing() {
+	@objc private func refreshProcessing() {
 		title = "Processing…"
 		refreshLabel.text = "Processing…"
 	}
@@ -512,7 +550,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	private func updateQuery(newFetchRequest: NSFetchRequest<ListableItem>) {
 
 		if fetchedResultsController == nil || fetchedResultsController.fetchRequest.entityName != newFetchRequest.entityName {
-			let c = NSFetchedResultsController(fetchRequest: newFetchRequest, managedObjectContext: DataManager.main, sectionNameKeyPath: "sectionName", cacheName: nil)
+			let c = controllerFor(fetchRequest: newFetchRequest)
 			fetchedResultsController = c
 			try! c.performFetch()
 			c.delegate = self
@@ -523,6 +561,10 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			fr.predicate = newFetchRequest.predicate
 			try! fetchedResultsController.performFetch()
 		}
+	}
+
+	private func controllerFor<T: ListableItem>(fetchRequest: NSFetchRequest<T>) -> NSFetchedResultsController<T> {
+		return NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: DataManager.main, sectionNameKeyPath: "sectionName", cacheName: nil)
 	}
 
 	private func updateTabItems(animated: Bool, rebuildTabs: Bool) {
@@ -1069,9 +1111,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		} else {
 			tableView.reloadData()
 		}
-		atNextEvent { [weak self] in
-			self?.updateStatus(becauseOfChanges: true) // TODO check cases where this is called twice
-		}
 	}
 
 	private func configureCell(cell: UITableViewCell, withObject: ListableItem) {
@@ -1086,7 +1125,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	private var viewingPrs = true
 	private var showEmpty = true
 
-	private func updateStatus(becauseOfChanges: Bool) {
+	func updateStatus(becauseOfChanges: Bool) {
 
 		if becauseOfChanges {
 			updateTabItems(animated: true, rebuildTabs: true)

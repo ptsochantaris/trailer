@@ -18,7 +18,6 @@ final class PRListController: CommonController {
 	private var apiServerUri: String?
 
 	private var onlyUnread = false
-	private var lastCount = 0
 	private var loadingBuffer: [[AnyHashable : Any]]?
 	private var loading = false
 
@@ -107,6 +106,8 @@ final class PRListController: CommonController {
 			return
 		}
 
+		loading = false
+
 		if let l = loadingBuffer {
 			if progressiveLoading {
 				show(status: "Loaded \(l.count) items.\n\nDisplaying…", hideTable: true)
@@ -122,17 +123,16 @@ final class PRListController: CommonController {
 	private func completeLoadingBuffer() {
 
 		if let l = loadingBuffer {
-			let C = l.count
 
-			if lastCount == 0 {
-				table.setNumberOfRows(C, withRowType: "PRRow")
-			} else if lastCount < C {
-				table.removeRows(at: IndexSet(integersIn: Range(uncheckedBounds: (0, C-lastCount))))
-			} else if lastCount > C {
-				table.insertRows(at: IndexSet(integersIn: Range(uncheckedBounds: (0, lastCount-C))), withRowType: "PRRow")
+			let lastRecordcount = table.numberOfRows
+			let newRecordcount = l.count
+			let recordDelta = newRecordcount - lastRecordcount
+
+			if recordDelta < 0 {
+				table.removeRows(at: IndexSet(integersIn: Range(uncheckedBounds: (0, -recordDelta))))
+			} else if recordDelta > 0 {
+				table.insertRows(at: IndexSet(integersIn: Range(uncheckedBounds: (0, recordDelta))), withRowType: "PRRow")
 			}
-
-			lastCount = C
 
 			var index = 0
 			for itemData in l {
@@ -146,11 +146,10 @@ final class PRListController: CommonController {
 				show(status: "There are no items in this section", hideTable: true)
 			} else {
 				show(status: "", hideTable: false)
-			}
-
-			if let s = selectedIndex {
-				table.scrollToRow(at: s)
-				selectedIndex = nil
+				if let s = selectedIndex {
+					table.scrollToRow(at: s)
+					selectedIndex = nil
+				}
 			}
 
 			loadingBuffer = nil
@@ -174,7 +173,7 @@ final class PRListController: CommonController {
 		selectedIndex = rowIndex
 		let row = table.rowController(at: rowIndex) as! PRRow
 		pushController(withName: "DetailController", context: [ ITEM_KEY: row.itemId! ])
-		if lastCount >= PAGE_SIZE {
+		if table.numberOfRows >= PAGE_SIZE {
 			self.show(status: "Loading…", hideTable: true)
 		}
 	}

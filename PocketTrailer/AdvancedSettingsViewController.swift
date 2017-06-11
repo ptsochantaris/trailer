@@ -549,6 +549,9 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				Settings.openItemsDirectlyInSafari = !Settings.openItemsDirectlyInSafari
 			case 5:
 				Settings.showSeparateApiServersInMenu = !Settings.showSeparateApiServersInMenu
+				atNextEvent {
+					popupManager.masterController.updateStatus(becauseOfChanges: true)
+				}
 				settingsChangedTimer.push()
 			case 6:
 				Settings.alwaysRequestDesktopSite = !Settings.alwaysRequestDesktopSite

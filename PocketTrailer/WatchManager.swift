@@ -242,7 +242,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 		let tempMoc = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 		tempMoc.undoManager = nil
-		tempMoc.persistentStoreCoordinator = DataManager.main.persistentStoreCoordinator
+		tempMoc.parent = DataManager.main
 		tempMoc.perform { [weak self] in
 			let items = try! tempMoc.fetch(f).map { self?.baseDataForItem(item: $0, showStatuses: showStatuses, showLabels: showLabels) }
 			DispatchQueue.main.async {
@@ -265,13 +265,8 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		let title = item.title(with: font, labelFont: font, titleColor: .white)
 		itemData["title"] = NSKeyedArchiver.archivedData(withRootObject: title)
 
-		if let i = item as? PullRequest {
-			let subtitle = i.subtitle(with: smallFont, lightColor: .lightGray, darkColor: .gray)
-			itemData["subtitle"] = NSKeyedArchiver.archivedData(withRootObject: subtitle)
-		} else if let i = item as? Issue {
-			let subtitle = i.subtitle(with: smallFont, lightColor: .lightGray, darkColor: .gray)
-			itemData["subtitle"] = NSKeyedArchiver.archivedData(withRootObject: subtitle)
-		}
+		let subtitle = item.subtitle(with: smallFont, lightColor: .lightGray, darkColor: .gray)
+		itemData["subtitle"] = NSKeyedArchiver.archivedData(withRootObject: subtitle)
 
 		if showLabels {
 			itemData["labels"] = labelsForItem(item: item)
@@ -343,7 +338,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	private func buildOverview(completion: @escaping ([String:Any])->Void) {
 
-		DLog("Building remote overview")
+		//DLog("Building remote overview")
 
 		let tempMoc = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 		tempMoc.undoManager = nil
@@ -410,7 +405,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				UIApplication.shared.applicationIconBadgeNumber = totalUnreadPrCount + totalUnreadIssueCount
 			}
 
-			DLog("Remote overview built")
+			DLog("Remote overview updated")
 		}
 	}
 

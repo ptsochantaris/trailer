@@ -180,7 +180,7 @@ final class PullRequest: ListableItem {
 
 		let mode = Settings.statusFilteringMode
 		if mode == StatusFilter.all.rawValue {
-			rawStatuses = statuses.sorted { ($0.createdAt ?? .distantPast) > ($1.createdAt ?? .distantPast) }
+			rawStatuses = statuses.sorted { $1.createdBefore($0) }
 		} else {
 			let terms = Settings.statusFilteringTerms
 			if terms.count > 0 {
@@ -194,10 +194,10 @@ final class PullRequest: ListableItem {
 						}
 					}
 					return !inclusive
-				}.sorted { ($0.createdAt ?? .distantPast) > ($1.createdAt ?? .distantPast) }
+				}.sorted { $1.createdBefore($0) }
 
 			} else {
-				rawStatuses = statuses.sorted { ($0.createdAt ?? .distantPast) > ($1.createdAt ?? .distantPast) }
+				rawStatuses = statuses.sorted { $1.createdBefore($0) }
 			}
 		}
 
@@ -205,14 +205,14 @@ final class PullRequest: ListableItem {
 		for s in rawStatuses {
 			let context = s.context ?? "//NO CONTEXT/-/"
 			if let latestStatusInContext = contexts[context] {
-				if (latestStatusInContext.createdAt ?? .distantPast) < (s.createdAt ?? .distantPast) {
+				if latestStatusInContext.createdBefore(s) {
 					contexts[context] = s
 				}
 			} else {
 				contexts[context] = s
 			}
 		}
-		return contexts.values.sorted { ($0.createdAt ?? .distantPast) < ($1.createdAt ?? .distantPast) }
+		return contexts.values.sorted { $0.createdBefore($1) }
 	}
 
 	var labelsLink: String? {

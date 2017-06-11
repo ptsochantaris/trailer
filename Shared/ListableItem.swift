@@ -502,7 +502,7 @@ class ListableItem: DataItem {
 			var oldestComment: PRComment?
 			for c in othersComments(since: latestReadCommentDate ?? .distantPast) {
 				if let o = oldestComment {
-					if (c.createdAt ?? .distantPast) < (o.createdAt ?? .distantPast) {
+					if c.createdBefore(o) {
 						oldestComment = c
 					}
 				} else {
@@ -597,7 +597,7 @@ class ListableItem: DataItem {
 				for r in p.reviews.filter({ $0.shouldDisplay }) {
 					let user = S(r.username)
 					if let latestReview = latestReviewByUser[user] {
-						if (latestReview.createdAt ?? .distantPast) < (r.createdAt ?? .distantPast) {
+						if latestReview.createdBefore(r) {
 							latestReviewByUser[user] = r
 						}
 					} else {
@@ -607,7 +607,7 @@ class ListableItem: DataItem {
 
 				if latestReviewByUser.count > 0 || !p.reviewers.isEmpty {
 
-					let reviews = latestReviewByUser.values.sorted { ($0.createdAt ?? .distantPast) < ($1.createdAt ?? .distantPast) }
+					let reviews = latestReviewByUser.values.sorted { $0.createdBefore($1) }
 
 					let lp = NSMutableParagraphStyle()
 					#if os(iOS)

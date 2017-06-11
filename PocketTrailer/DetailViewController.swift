@@ -66,7 +66,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 				w.load(URLRequest(url: d))
 			} else {
 				statusLabel.textColor = .lightGray
-				statusLabel.text = "Please select an item from the list, or select 'Settings' to add servers, or show/hide repositories.\n\n(You may have to login to GitHub the first time you visit a private item)"
+				statusLabel.text = "Please select an item from the list, or visit the settings to add servers, or show/hide repositories.\n\n(You may have to login to GitHub the first time you visit a private item)"
 				statusLabel.isHidden = false
 				navigationItem.rightBarButtonItem?.isEnabled = false
 				title = nil

@@ -14,6 +14,10 @@ class DataItem: NSManagedObject {
 		apiServer.resetSyncState()
 	}
 
+	final func createdBefore(_ item: DataItem) -> Bool {
+		return (createdAt ?? .distantPast) < (item.createdAt ?? .distantPast) || serverId < item.serverId
+	}
+
 	final class func allItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext, prefetchRelationships: [String]? = nil) -> [T] {
 		let f = NSFetchRequest<T>(entityName: String(describing: type))
 		f.relationshipKeyPathsForPrefetching = prefetchRelationships

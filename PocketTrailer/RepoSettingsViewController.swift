@@ -24,7 +24,6 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
 		}
 		settingsChangedTimer = PopTimer(timeInterval: 1.0) {
 			DataManager.postProcessAllItems()
-			DataManager.saveDB()
 		}
 	}
 
@@ -133,8 +132,12 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
 			repo?.itemHidingPolicy = Int64(indexPath.row)
 		}
 		tableView.reloadData()
-		preferencesDirty = true
+		commit()
+	}
+
+	private func commit() {
 		DataManager.saveDB()
+		preferencesDirty = true
 		settingsChangedTimer.push()
 	}
 
@@ -143,9 +146,14 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
 		let newText = (groupField.text?.isEmpty ?? true) ? nil : groupField.text
 		if let r = repo, r.groupLabel != newText {
 			r.groupLabel = newText
-			preferencesDirty = true
-			DataManager.saveDB()
-			settingsChangedTimer.push()
+			commit()
+			atNextEvent {
+				popupManager.masterController.updateStatus(becauseOfChanges: true)
+			}
+		}
+		if settingsChangedTimer.isRunning {
+			settingsChangedTimer.abort()
+			DataManager.postProcessAllItems()
 		}
 	}
 
