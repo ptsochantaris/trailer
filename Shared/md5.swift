@@ -35,9 +35,9 @@ struct MD5Hashing {
 
 		let lengthBytes = UnsafeMutableRawPointer.allocate(bytes: 8, alignedTo: 1)
 		lengthBytes.storeBytes(of: messageLenBits.littleEndian, as: UInt64.self)
-		let buffer = UnsafeBufferPointer<UInt8>(start: lengthBytes.assumingMemoryBound(to: UInt8.self), count: 8)
+		let buffer = UnsafeRawBufferPointer(start: lengthBytes, count: 8)
 		message += Array(buffer)
-		
+
 		var a: UInt32 = 0x67452301
 		var b: UInt32 = 0xEFCDAB89
 		var c: UInt32 = 0x98BADCFE
