@@ -7,6 +7,22 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.5.9</title>
+			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Cleanups from the recent iOS update: Improvements to responsiveness and stability, especially on long syncs.</li>
+				<li>Re-enabled beta feature headers when requesting reviews from GitHub Enterprise servers. Please do note that, as long as reviews remains a beta feature on a particular server, it CAN'T be enabled together with reactions. Doing so will cause syncs to fail from that server.</li>
+				</ul></font>]]></description>
+			<pubDate>Sat, 8 Jul 2017 19:00:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer159.zip"
+			sparkle:version="1443"
+			sparkle:shortVersionString="1.5.9"
+			sparkle:dsaSignature="MCwCFCEXMDzPL5G5TiAYHuaYeTQvInz/AhQS0R9+KKRaQp6arh6PdG4Ufd30Hw=="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.5.8</title>
 			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
