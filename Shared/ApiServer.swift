@@ -187,6 +187,10 @@ final class ApiServer: NSManagedObject {
 		lastSyncSucceeded = true
 	}
 
+	var isGitHub: Bool {
+		return apiPath?.hasPrefix("https://api.github.com") ?? true
+	}
+
 	class func server(host: String, moc: NSManagedObjectContext) -> ApiServer? {
 		for s in ApiServer.allApiServers(in: moc) {
 			if let apiBase = s.apiPath,
