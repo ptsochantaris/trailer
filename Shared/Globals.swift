@@ -18,7 +18,7 @@ typealias IMAGE_CLASS = UIImage
 
 #elseif os(OSX)
 
-weak var app: OSX_AppDelegate!
+	weak var app: OSX_AppDelegate!
 
 let AVATAR_SIZE: CGFloat = 26
 let AVATAR_PADDING: CGFloat = 8
@@ -31,13 +31,14 @@ typealias COLOR_CLASS = NSColor
 typealias FONT_CLASS = NSFont
 typealias IMAGE_CLASS = NSImage
 
+let stringDrawingOptions: NSString.DrawingOptions = [.usesLineFragmentOrigin, .usesFontLeading]
+
 #endif
 
 var appIsRefreshing = false
 var preferencesDirty = false
 var lastRepoCheck = Date.distantPast
 let autoSnoozeSentinelDate = Date.distantFuture.addingTimeInterval(-1)
-let stringDrawingOptions: NSStringDrawingOptions = [.usesLineFragmentOrigin, .usesFontLeading]
 let LISTABLE_URI_KEY = "listableUriKey"
 let COMMENT_ID_KEY = "commentIdKey"
 let NOTIFICATION_URL_KEY = "urlKey"
@@ -46,16 +47,18 @@ let NOTIFICATION_URL_KEY = "urlKey"
 
 #if os(iOS)
 
-func showMessage(_ title: String, _ message: String?) {
-	var viewController = app.window?.rootViewController
-	while viewController?.presentedViewController != nil {
-		viewController = viewController?.presentedViewController
-	}
+let stringDrawingOptions: NSStringDrawingOptions = [.usesLineFragmentOrigin, .usesFontLeading]
 
-	let a = UIAlertController(title: title, message: message, preferredStyle: .alert)
-	a.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-	viewController?.present(a, animated: true)
-}
+	func showMessage(_ title: String, _ message: String?) {
+		var viewController = app.window?.rootViewController
+		while viewController?.presentedViewController != nil {
+			viewController = viewController?.presentedViewController
+		}
+
+		let a = UIAlertController(title: title, message: message, preferredStyle: .alert)
+		a.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+		viewController?.present(a, animated: true)
+	}
 
 #endif
 
@@ -83,9 +86,9 @@ func DLog(_ message: String, _ arg1: @autoclosure ()->Any? = nil, _ arg2: @autoc
 }
 
 let itemCountFormatter: NumberFormatter = {
-    let n = NumberFormatter()
-    n.numberStyle = .decimal
-    return n
+	let n = NumberFormatter()
+	n.numberStyle = .decimal
+	return n
 }()
 
 // Single-purpose derivation from the excellent SAMAdditions:
@@ -221,10 +224,10 @@ enum RepoDisplayPolicy: Int64 {
 	case hide, mine, mineAndPaticipated, all
 	static let labels = ["Hide", "Mine", "Participated", "All"]
 	static let policies = [hide, mine, mineAndPaticipated, all]
-	static let colors = [	COLOR_CLASS(red: 0.8, green: 0.8, blue: 0.8, alpha: 1.0),
-							COLOR_CLASS(red: 0.7, green: 0.0, blue: 0.0, alpha: 1.0),
-							COLOR_CLASS(red: 0.8, green: 0.4, blue: 0.0, alpha: 1.0),
-							COLOR_CLASS(red: 0.0, green: 0.5, blue: 0.0, alpha: 1.0)]
+	static let colors = [    COLOR_CLASS(red: 0.8, green: 0.8, blue: 0.8, alpha: 1.0),
+	                         COLOR_CLASS(red: 0.7, green: 0.0, blue: 0.0, alpha: 1.0),
+	                         COLOR_CLASS(red: 0.8, green: 0.4, blue: 0.0, alpha: 1.0),
+	                         COLOR_CLASS(red: 0.0, green: 0.5, blue: 0.0, alpha: 1.0)]
 	var name: String {
 		return RepoDisplayPolicy.labels[Int(rawValue)]
 	}
@@ -245,13 +248,13 @@ enum RepoHidingPolicy: Int64 {
 	case noHiding, hideMyAuthoredPrs, hideMyAuthoredIssues, hideAllMyAuthoredItems, hideOthersPrs, hideOthersIssues, hideAllOthersItems
 	static let labels = ["No Filter", "Hide My PRs", "Hide My Issues", "Hide All Mine", "Hide Others PRs", "Hide Others Issues", "Hide All Others"]
 	static let policies = [noHiding, hideMyAuthoredPrs, hideMyAuthoredIssues, hideAllMyAuthoredItems, hideOthersPrs, hideOthersIssues, hideAllOthersItems]
-	static let colors = [	COLOR_CLASS.lightGray,
-							COLOR_CLASS(red: 0.1, green: 0.1, blue: 0.5, alpha: 1.0),
-							COLOR_CLASS(red: 0.1, green: 0.1, blue: 0.5, alpha: 1.0),
-							COLOR_CLASS(red: 0.1, green: 0.1, blue: 0.5, alpha: 1.0),
-							COLOR_CLASS(red: 0.5, green: 0.1, blue: 0.1, alpha: 1.0),
-							COLOR_CLASS(red: 0.5, green: 0.1, blue: 0.1, alpha: 1.0),
-							COLOR_CLASS(red: 0.5, green: 0.1, blue: 0.1, alpha: 1.0)]
+	static let colors = [    COLOR_CLASS.lightGray,
+	                         COLOR_CLASS(red: 0.1, green: 0.1, blue: 0.5, alpha: 1.0),
+	                         COLOR_CLASS(red: 0.1, green: 0.1, blue: 0.5, alpha: 1.0),
+	                         COLOR_CLASS(red: 0.1, green: 0.1, blue: 0.5, alpha: 1.0),
+	                         COLOR_CLASS(red: 0.5, green: 0.1, blue: 0.1, alpha: 1.0),
+	                         COLOR_CLASS(red: 0.5, green: 0.1, blue: 0.1, alpha: 1.0),
+	                         COLOR_CLASS(red: 0.5, green: 0.1, blue: 0.1, alpha: 1.0)]
 	var name: String {
 		return RepoHidingPolicy.labels[Int(rawValue)]
 	}
@@ -278,8 +281,8 @@ struct ApiRateLimits {
 			date = nil
 		}
 		return ApiRateLimits(requestsRemaining: Int64(S(headers["X-RateLimit-Remaining"] as? String)) ?? 10000,
-							 requestLimit: Int64(S(headers["X-RateLimit-Limit"] as? String)) ?? 10000,
-							 resetDate: date)
+		                     requestLimit: Int64(S(headers["X-RateLimit-Limit"] as? String)) ?? 10000,
+		                     resetDate: date)
 	}
 	static var noLimits: ApiRateLimits {
 		return ApiRateLimits(requestsRemaining: 10000, requestLimit: 10000, resetDate: nil)

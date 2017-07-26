@@ -75,8 +75,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var includeStatusesInFiltering: NSButton!
 	@IBOutlet weak var grayOutWhenRefreshing: NSButton!
 	@IBOutlet weak var assignedPrHandlingPolicy: NSPopUpButton!
-    @IBOutlet weak var includeServersInFiltering: NSButton!
-    @IBOutlet weak var includeUsersInFiltering: NSButton!
+	@IBOutlet weak var includeServersInFiltering: NSButton!
+	@IBOutlet weak var includeUsersInFiltering: NSButton!
 	@IBOutlet weak var includeNumbersInFiltering: NSButton!
 	@IBOutlet weak var refreshItemsLabel: NSTextField!
 	@IBOutlet weak var showCreationDates: NSButton!
@@ -302,7 +302,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		a.beginSheetModal(for: self, completionHandler: nil)
 	}
 
-	func updateApiTable() {
+	@objc private func updateApiTable() {
 		serverList.reloadData()
 	}
 
@@ -605,7 +605,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			alert.messageText = "Warning"
 			#if DEBUG
 				alert.informativeText = "Sorry, logging is always active in development versions"
-				#else
+			#else
 				alert.informativeText = "Logging is a feature meant for error reporting, having it constantly enabled will cause this app to be less responsive, use more power, and constitute a security risk"
 			#endif
 			alert.addButton(withTitle: "OK")
@@ -624,20 +624,20 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
-    @IBAction func includeServersInFilteringSelected(_ sender: NSButton) {
-        Settings.includeServersInFilter = (sender.integerValue==1)
+	@IBAction func includeServersInFilteringSelected(_ sender: NSButton) {
+		Settings.includeServersInFilter = (sender.integerValue==1)
 		deferredUpdateTimer.push()
-    }
+	}
 
 	@IBAction func includeNumbersInFilteringSelected(_ sender: NSButton) {
 		Settings.includeNumbersInFilter = (sender.integerValue==1)
 		deferredUpdateTimer.push()
 	}
 
-    @IBAction func includeUsersInFilteringSelected(_ sender: NSButton) {
-        Settings.includeUsersInFilter = (sender.integerValue==1)
+	@IBAction func includeUsersInFilteringSelected(_ sender: NSButton) {
+		Settings.includeUsersInFilter = (sender.integerValue==1)
 		deferredUpdateTimer.push()
-    }
+	}
 
 	@IBAction func includeLabelsInFilteringSelected(_ sender: NSButton) {
 		Settings.includeLabelsInFilter = (sender.integerValue==1)
@@ -1011,7 +1011,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
-	func updateImportExportSettings() {
+	@objc private func updateImportExportSettings() {
 		repeatLastExportAutomatically.integerValue = Settings.autoRepeatSettingsExport ? 1 : 0
 		if let lastExportDate = Settings.lastExportDate, let fileName = Settings.lastExportUrl?.absoluteString, let unescapedName = fileName.removingPercentEncoding {
 			let time = itemDateFormatter.string(from: lastExportDate)
@@ -1035,7 +1035,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		s.nameFieldStringValue = "Trailer Settings"
 		s.allowedFileTypes = ["trailerSettings"]
 		s.beginSheetModal(for: self) { response in
-			if response == NSFileHandlingPanelOKButton, let url = s.url {
+			if response.rawValue == NSFileHandlingPanelOKButton, let url = s.url {
 				Settings.writeToURL(url)
 				DLog("Exported settings to %@", url.absoluteString)
 			}
@@ -1051,7 +1051,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		o.isExtensionHidden = false
 		o.allowedFileTypes = ["trailerSettings"]
 		o.beginSheetModal(for: self) { response in
-			if response == NSFileHandlingPanelOKButton, let url = o.url {
+			if response.rawValue == NSFileHandlingPanelOKButton, let url = o.url {
 				atNextEvent {
 					app.tryLoadSettings(from: url, skipConfirm: Settings.dontConfirmSettingsImport)
 				}
@@ -1061,7 +1061,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	private func color(button: NSButton, withColor: NSColor) {
 		let title = button.attributedTitle.mutableCopy() as! NSMutableAttributedString
-		title.addAttribute(NSForegroundColorAttributeName, value: withColor, range: NSRange(location: 0, length: title.length))
+		title.addAttribute(NSAttributedStringKey.foregroundColor, value: withColor, range: NSRange(location: 0, length: title.length))
 		button.attributedTitle = title
 	}
 
@@ -1099,7 +1099,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			reportNeedFrontEnd()
 		} else {
 			let address = "\(apiServerWebPath.stringValue)/settings/tokens/new"
-			NSWorkspace.shared().open(URL(string: address)!)
+			NSWorkspace.shared.open(URL(string: address)!)
 		}
 	}
 
@@ -1108,7 +1108,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			reportNeedFrontEnd()
 		} else {
 			let address = "\(apiServerWebPath.stringValue)/settings/tokens"
-			NSWorkspace.shared().open(URL(string: address)!)
+			NSWorkspace.shared.open(URL(string: address)!)
 		}
 	}
 
@@ -1117,7 +1117,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			reportNeedFrontEnd()
 		} else {
 			let address = "\(apiServerWebPath.stringValue)/watching"
-			NSWorkspace.shared().open(URL(string: address)!)
+			NSWorkspace.shared.open(URL(string: address)!)
 		}
 	}
 
@@ -1326,7 +1326,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	func tableView(_ tv: NSTableView, willDisplayCell c: Any, for tableColumn: NSTableColumn?, row: Int) {
 		let cell = c as! NSCell
 		if tv === projectsTable {
-			if tableColumn?.identifier == "repos" {
+			if tableColumn?.identifier.rawValue == "repos" {
 				if tableView(tv, isGroupRow: row) {
 					cell.title = row==0 ? "Parent Repositories" : "Forked Repositories"
 					cell.isEnabled = false
@@ -1336,11 +1336,11 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 					let repoName = S(r.fullName)
 					let title = r.inaccessible ? "\(repoName) (inaccessible)" : repoName
 					let textColor = (row == tv.selectedRow) ? .selectedControlTextColor : (r.shouldSync ? .textColor : NSColor.textColor.withAlphaComponent(0.4))
-					cell.attributedStringValue = NSAttributedString(string: title, attributes: [NSForegroundColorAttributeName: textColor])
+					cell.attributedStringValue = NSAttributedString(string: title, attributes: [NSAttributedStringKey.foregroundColor: textColor])
 				}
 			} else {
 				if let menuCell = cell as? NSTextFieldCell {
-					if tableColumn?.identifier == "group" {
+					if tableColumn?.identifier.rawValue == "group" {
 						if tableView(tv, isGroupRow: row) {
 							menuCell.stringValue = ""
 							menuCell.placeholderString = nil
@@ -1365,12 +1365,12 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 						var count = 0
 						let fontSize = NSFont.systemFontSize(for: .small)
-						if tableColumn?.identifier == "hide" {
+						if tableColumn?.identifier.rawValue == "hide" {
 							for policy in RepoHidingPolicy.policies {
 								let m = NSMenuItem()
 								m.attributedTitle = NSAttributedString(string: policy.name, attributes: [
-									NSFontAttributeName: count==0 ? NSFont.systemFont(ofSize: fontSize) : NSFont.boldSystemFont(ofSize: fontSize),
-									NSForegroundColorAttributeName: policy.color,
+									NSAttributedStringKey.font: count==0 ? NSFont.systemFont(ofSize: fontSize) : NSFont.boldSystemFont(ofSize: fontSize),
+									NSAttributedStringKey.foregroundColor: policy.color,
 									])
 								menuCell.menu?.addItem(m)
 								count += 1
@@ -1380,13 +1380,13 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 							for policy in RepoDisplayPolicy.policies {
 								let m = NSMenuItem()
 								m.attributedTitle = NSAttributedString(string: policy.name, attributes: [
-									NSFontAttributeName: count==0 ? NSFont.systemFont(ofSize: fontSize) : NSFont.boldSystemFont(ofSize: fontSize),
-									NSForegroundColorAttributeName: policy.color,
+									NSAttributedStringKey.font: count==0 ? NSFont.systemFont(ofSize: fontSize) : NSFont.boldSystemFont(ofSize: fontSize),
+									NSAttributedStringKey.foregroundColor: policy.color,
 									])
 								menuCell.menu?.addItem(m)
 								count += 1
 							}
-							let selectedIndex = Int(tableColumn?.identifier == "prs" ? r.displayPolicyForPrs : r.displayPolicyForIssues)
+							let selectedIndex = Int(tableColumn?.identifier.rawValue == "prs" ? r.displayPolicyForPrs : r.displayPolicyForIssues)
 							menuCell.selectItem(at: selectedIndex)
 						}
 					}
@@ -1395,7 +1395,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		} else if tv == serverList {
 			let allServers = ApiServer.allApiServers(in: DataManager.main)
 			let apiServer = allServers[row]
-			if tableColumn?.identifier == "server" {
+			if tableColumn?.identifier.rawValue == "server" {
 				cell.title = S(apiServer.label)
 				let tc = c as! NSTextFieldCell
 				if apiServer.lastSyncSucceeded {
@@ -1448,17 +1448,17 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		if tv === projectsTable {
 			if !tableView(tv, isGroupRow: row) {
 				let r = repo(at: row)
-				if tableColumn?.identifier == "group" {
+				if tableColumn?.identifier.rawValue == "group" {
 					let g = S(object as? String)
 					r.groupLabel = g.isEmpty ? nil : g
 					serversDirty = true
 					deferredUpdateTimer.push()
 				} else if let index = object as? Int64 {
-					if tableColumn?.identifier == "prs" {
+					if tableColumn?.identifier.rawValue == "prs" {
 						r.displayPolicyForPrs = index
-					} else if tableColumn?.identifier == "issues" {
+					} else if tableColumn?.identifier.rawValue == "issues" {
 						r.displayPolicyForIssues = index
-					} else if tableColumn?.identifier == "hide" {
+					} else if tableColumn?.identifier.rawValue == "hide" {
 						r.itemHidingPolicy = index
 					}
 					if index != RepoDisplayPolicy.hide.rawValue {
@@ -1654,12 +1654,12 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 				alert.addButton(withTitle: "Keep Them Snoozed")
 				alert.beginSheetModal(for: self) { response in
 					switch response {
-					case 1000:
+					case .alertFirstButtonReturn:
 						break
-					case 1001:
+					case .alertSecondButtonReturn:
 						selectedPreset.wakeUpAllAssociatedItems()
 						fallthrough
-					case 1002:
+					case .alertThirdButtonReturn:
 						self.completeSnoozeDelete(for: selectedPreset, index)
 					default: break
 					}
@@ -1730,11 +1730,11 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	private var advancedReposWindow: AdvancedReposWindow?
 	@IBAction func advancedSelected(_ sender: NSButton) {
 		if advancedReposWindowController == nil {
-			advancedReposWindowController = NSWindowController(windowNibName:"AdvancedReposWindow")
+			advancedReposWindowController = NSWindowController(windowNibName:NSNib.Name(rawValue: "AdvancedReposWindow"))
 		}
 		if let w = advancedReposWindowController?.window as? AdvancedReposWindow {
 			w.prefs = self
-			w.level = Int(CGWindowLevelForKey(CGWindowLevelKey.floatingWindow))
+			w.level = .floating
 			w.center()
 			w.makeKeyAndOrderFront(self)
 			advancedReposWindow = w

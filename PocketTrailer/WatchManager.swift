@@ -11,7 +11,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 	override init() {
 		super.init()
 		if WCSession.isSupported() {
-			session = WCSession.default()
+			session = WCSession.default
 			session?.delegate = self
 			session?.activate()
 		}
@@ -135,7 +135,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 					dataItem.hasUnreadCommentsOrAlert {
 
 					dataItem.catchUpWithComments()
-					
+
 				} else if let uris = message["itemUris"] as? [String] {
 					for uri in uris {
 						if let
@@ -257,7 +257,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			"commentCount": item.totalComments,
 			"unreadCount": item.unreadComments,
 			"localId": item.objectID.uriRepresentation().absoluteString,
-		]
+			]
 
 		let font = UIFont.systemFont(ofSize: UIFont.systemFontSize)
 		let smallFont = UIFont.systemFont(ofSize: UIFont.systemFontSize-4)
@@ -340,6 +340,8 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 		//DLog("Building remote overview")
 
+		let allTabSets = popupManager.masterController.allTabSets
+
 		let tempMoc = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 		tempMoc.undoManager = nil
 		tempMoc.persistentStoreCoordinator = DataManager.main.persistentStoreCoordinator
@@ -350,7 +352,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			var totalUnreadPrCount = 0
 			var totalUnreadIssueCount = 0
 
-			for tabSet in popupManager.masterController.allTabSets {
+			for tabSet in allTabSets {
 
 				let c = tabSet.viewCriterion
 

@@ -11,33 +11,33 @@ import WatchConnectivity
 import ClockKit
 
 class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
-
-	private let session = WCSession.default()
+	
+	private let session = WCSession.default
 	private var requestedUpdate = false
 	private var appIsLaunched = false
-
+	
 	override init() {
 		super.init()
 		session.delegate = self
 		session.activate()
 	}
-
+	
 	weak var lastView: CommonController? {
 		didSet {
 			potentialUpdate()
 		}
 	}
-
+	
 	func applicationDidFinishLaunching() {
 		appIsLaunched = true
 	}
-
+	
 	func sessionReachabilityDidChange(_ session: WCSession) {
 		if session.isReachable {
 			potentialUpdate()
 		}
 	}
-
+	
 	func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
 		potentialUpdate()
 		if applicationContext.keys.contains("overview") {
@@ -50,13 +50,13 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 			}
 		}
 	}
-
+	
 	func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
 		if activationState == .activated {
 			potentialUpdate()
 		}
 	}
-
+	
 	private func potentialUpdate() {
 		// Possibly in thread!
 		atNextEvent(self) { S in
@@ -71,11 +71,11 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 			}
 		}
 	}
-
+	
 	func applicationWillResignActive() {
 		lastView = nil
 	}
-
+	
 	func handle(_ backgroundTasks: Set<WKRefreshBackgroundTask>) {
 		for task in backgroundTasks {
 			if let t = task as? WKSnapshotRefreshBackgroundTask {
@@ -89,7 +89,7 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 			}
 		}
 	}
-
+	
 	private func updateComplications() {
 		let complicationServer = CLKComplicationServer.sharedInstance()
 		if let activeComplications = complicationServer.activeComplications {

@@ -7,8 +7,5 @@ extension UINavigationController {
 		get {
 			return topViewController!.disablesAutomaticKeyboardDismissal
 		}
-		set {
-			super.disablesAutomaticKeyboardDismissal = newValue
-		}
 	}
 }

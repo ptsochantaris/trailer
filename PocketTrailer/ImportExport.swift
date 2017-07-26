@@ -12,7 +12,7 @@ final class ImportExport: NSObject, UIDocumentPickerDelegate {
 		super.init()
 	}
 
-	func importSelected(sender: UIBarButtonItem) {
+	@objc func importSelected(sender: UIBarButtonItem) {
 		tempUrl = nil
 
 		let menu = UIDocumentPickerViewController(documentTypes: ["com.housetrip.mobile.trailer.ios.settings"], in: .import)
@@ -20,7 +20,7 @@ final class ImportExport: NSObject, UIDocumentPickerDelegate {
 		popupManager.showPopoverFromViewController(parentViewController: parentVC, fromItem: sender, viewController: menu)
 	}
 
-	func exportSelected(sender: UIBarButtonItem) {
+	@objc func exportSelected(sender: UIBarButtonItem) {
 		let tempFilePath = NSTemporaryDirectory().appending(pathComponent: "Trailer Settings (iOS).trailerSettings")
 		tempUrl = URL(fileURLWithPath: tempFilePath)
 		Settings.writeToURL(tempUrl!)

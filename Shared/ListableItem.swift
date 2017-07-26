@@ -347,12 +347,12 @@ class ListableItem: DataItem {
 		var targetSection: Section
 		let currentCondition = condition
 
-		if currentCondition == ItemCondition.merged.rawValue			{ targetSection = .merged }
-		else if currentCondition == ItemCondition.closed.rawValue		{ targetSection = .closed }
-		else if shouldMoveToSnoozing									{ targetSection = .snoozed }
-		else if isMine || assignedToMySection							{ targetSection = .mine }
-		else if assignedToParticipated || commentedByMe	|| reviewedByMe	{ targetSection = .participated }
-		else															{ targetSection = .all }
+		if currentCondition == ItemCondition.merged.rawValue            	{ targetSection = .merged }
+		else if currentCondition == ItemCondition.closed.rawValue      		{ targetSection = .closed }
+		else if shouldMoveToSnoozing             							{ targetSection = .snoozed }
+		else if isMine || assignedToMySection                        		{ targetSection = .mine }
+		else if assignedToParticipated || commentedByMe    || reviewedByMe  { targetSection = .participated }
+		else                                                           		{ targetSection = .all }
 
 		/////////// Pick out any items that need to move to "mentioned"
 
@@ -377,8 +377,8 @@ class ListableItem: DataItem {
 		if targetSection != .none {
 			switch self is Issue ? repo.displayPolicyForIssues : repo.displayPolicyForPrs {
 			case RepoDisplayPolicy.hide.rawValue,
-				 RepoDisplayPolicy.mine.rawValue where targetSection == .all || targetSection == .participated || targetSection == .mentioned,
-				 RepoDisplayPolicy.mineAndPaticipated.rawValue where targetSection == .all:
+			     RepoDisplayPolicy.mine.rawValue where targetSection == .all || targetSection == .participated || targetSection == .mentioned,
+			     RepoDisplayPolicy.mineAndPaticipated.rawValue where targetSection == .all:
 				targetSection = .none
 			default: break
 			}
@@ -386,12 +386,12 @@ class ListableItem: DataItem {
 
 		if targetSection != .none {
 			switch repo.itemHidingPolicy {
-			case RepoHidingPolicy.hideMyAuthoredPrs.rawValue		where isMine && self is PullRequest,
-				 RepoHidingPolicy.hideMyAuthoredIssues.rawValue		where isMine && self is Issue,
-				 RepoHidingPolicy.hideAllMyAuthoredItems.rawValue	where isMine,
-				 RepoHidingPolicy.hideOthersPrs.rawValue			where !isMine && self is PullRequest,
-				 RepoHidingPolicy.hideOthersIssues.rawValue			where !isMine && self is Issue,
-				 RepoHidingPolicy.hideAllOthersItems.rawValue		where !isMine:
+			case RepoHidingPolicy.hideMyAuthoredPrs.rawValue        	where isMine && self is PullRequest,
+			     RepoHidingPolicy.hideMyAuthoredIssues.rawValue        	where isMine && self is Issue,
+			     RepoHidingPolicy.hideAllMyAuthoredItems.rawValue    	where isMine,
+			     RepoHidingPolicy.hideOthersPrs.rawValue            	where !isMine && self is PullRequest,
+			     RepoHidingPolicy.hideOthersIssues.rawValue            	where !isMine && self is Issue,
+			     RepoHidingPolicy.hideAllOthersItems.rawValue        	where !isMine:
 
 				targetSection = .none
 			default: break
@@ -467,7 +467,7 @@ class ListableItem: DataItem {
 	private final func myComments(since: Date) -> [PRComment] {
 		return comments.filter { $0.isMine && ($0.createdAt ?? .distantPast) > since }
 	}
-	
+
 	private final func othersComments(since: Date) -> [PRComment] {
 		return comments.filter { !$0.isMine && ($0.createdAt ?? .distantPast) > since }
 	}
@@ -541,7 +541,9 @@ class ListableItem: DataItem {
 
 		let p = NSMutableParagraphStyle()
 		p.paragraphSpacing = 1.0
-		let titleAttributes = [NSFontAttributeName: font, NSForegroundColorAttributeName: titleColor, NSParagraphStyleAttributeName: p]
+		let titleAttributes = [NSAttributedStringKey.font: font,
+		                       NSAttributedStringKey.foregroundColor: titleColor,
+		                       NSAttributedStringKey.paragraphStyle: p]
 
 		let _title = NSMutableAttributedString()
 		if let t = title {
@@ -556,14 +558,14 @@ class ListableItem: DataItem {
 					let lp = NSMutableParagraphStyle()
 					#if os(iOS)
 						lp.lineHeightMultiple = 1.15
-						let labelAttributes = [NSFontAttributeName: labelFont,
-						                       NSBaselineOffsetAttributeName: 2.0,
-						                       NSParagraphStyleAttributeName: lp] as [String : Any]
+						let labelAttributes: [NSAttributedStringKey: Any] = [NSAttributedStringKey.font: labelFont,
+						                                                     NSAttributedStringKey.baselineOffset: 2.0,
+						                                                     NSAttributedStringKey.paragraphStyle: lp]
 					#elseif os(OSX)
 						lp.minimumLineHeight = labelFont.pointSize + 4
-						let labelAttributes = [NSFontAttributeName: labelFont,
-						                       NSBaselineOffsetAttributeName: 2.0,
-						                       NSParagraphStyleAttributeName: lp] as [String : Any]
+						let labelAttributes: [NSAttributedStringKey: Any] = [NSAttributedStringKey.font: labelFont,
+						                                                     NSAttributedStringKey.baselineOffset: 2.0,
+						                                                     NSAttributedStringKey.paragraphStyle: lp]
 					#endif
 
 					func isDark(color: COLOR_CLASS) -> Bool {
@@ -579,8 +581,8 @@ class ListableItem: DataItem {
 					for l in sorted {
 						var a = labelAttributes
 						let color = l.colorForDisplay
-						a[NSBackgroundColorAttributeName] = color
-						a[NSForegroundColorAttributeName] = isDark(color: color) ? COLOR_CLASS.white : COLOR_CLASS.black
+						a[NSAttributedStringKey.backgroundColor] = color
+						a[NSAttributedStringKey.foregroundColor] = isDark(color: color) ? COLOR_CLASS.white : COLOR_CLASS.black
 						let name = l.name!.replacingOccurrences(of: " ", with: "\u{a0}")
 						_title.append(NSAttributedString(string: "\u{a0}\(name)\u{a0}", attributes: a))
 						if count < labelCount-1 {
@@ -619,9 +621,9 @@ class ListableItem: DataItem {
 					let approvers = reviews.filter { $0.state == Review.State.APPROVED.rawValue }
 					if approvers.count > 0 {
 
-						let a = [NSFontAttributeName: labelFont,
-								 NSForegroundColorAttributeName: COLOR_CLASS(red: 0, green: 0.5, blue: 0, alpha: 1.0),
-								 NSParagraphStyleAttributeName: lp] as [String : Any]
+						let a = [NSAttributedStringKey.font: labelFont,
+						         NSAttributedStringKey.foregroundColor: COLOR_CLASS(red: 0, green: 0.5, blue: 0, alpha: 1.0),
+						         NSAttributedStringKey.paragraphStyle: lp]
 
 						_title.append(NSAttributedString(string: "\n", attributes: a))
 
@@ -639,9 +641,9 @@ class ListableItem: DataItem {
 					let requesters = reviews.filter { $0.state == Review.State.CHANGES_REQUESTED.rawValue }
 					if requesters.count > 0 {
 
-						let a = [NSFontAttributeName: labelFont,
-								 NSForegroundColorAttributeName: COLOR_CLASS(red: 0.7, green: 0, blue: 0, alpha: 1.0),
-								 NSParagraphStyleAttributeName: lp] as [String : Any]
+						let a = [NSAttributedStringKey.font: labelFont,
+						         NSAttributedStringKey.foregroundColor: COLOR_CLASS(red: 0.7, green: 0, blue: 0, alpha: 1.0),
+						         NSAttributedStringKey.paragraphStyle: lp]
 
 						_title.append(NSAttributedString(string: "\n", attributes: a))
 
@@ -661,9 +663,9 @@ class ListableItem: DataItem {
 					let otherReviewers = p.reviewers.components(separatedBy: ",").filter({ !($0.isEmpty || approverNames.contains($0) || requesterNames.contains($0)) })
 					if otherReviewers.count > 0 {
 
-						let a = [NSFontAttributeName: labelFont,
-								 NSForegroundColorAttributeName: COLOR_CLASS(red: 0.7, green: 0.7, blue: 0, alpha: 1.0),
-								 NSParagraphStyleAttributeName: lp] as [String : Any]
+						let a = [NSAttributedStringKey.font: labelFont,
+						         NSAttributedStringKey.foregroundColor: COLOR_CLASS(red: 0.7, green: 0.7, blue: 0, alpha: 1.0),
+						         NSAttributedStringKey.paragraphStyle: lp]
 
 						_title.append(NSAttributedString(string: "\n", attributes: a))
 
@@ -690,7 +692,9 @@ class ListableItem: DataItem {
 			p.lineHeightMultiple = 1.3
 		#endif
 
-		let lightSubtitle = [NSForegroundColorAttributeName: lightColor, NSFontAttributeName: font, NSParagraphStyleAttributeName: p]
+		let lightSubtitle = [NSAttributedStringKey.foregroundColor: lightColor,
+		                     NSAttributedStringKey.font: font,
+		                     NSAttributedStringKey.paragraphStyle: p]
 
 		#if os(iOS)
 			let separator = NSAttributedString(string:"\n", attributes: lightSubtitle)
@@ -701,7 +705,7 @@ class ListableItem: DataItem {
 		if Settings.showReposInName {
 			if let n = repo.fullName {
 				var darkSubtitle = lightSubtitle
-				darkSubtitle[NSForegroundColorAttributeName] = darkColor
+				darkSubtitle[NSAttributedStringKey.foregroundColor] = darkColor
 				_subtitle.append(NSAttributedString(string: n, attributes: darkSubtitle))
 				_subtitle.append(separator)
 			}
@@ -745,14 +749,14 @@ class ListableItem: DataItem {
 		p.alignment = .center
 		#if os(OSX)
 			return NSAttributedString(string: message, attributes: [
-				NSForegroundColorAttributeName: color,
-				NSParagraphStyleAttributeName: p
-			])
+				NSAttributedStringKey.foregroundColor: color,
+				NSAttributedStringKey.paragraphStyle: p
+				])
 		#elseif os(iOS)
 			return NSAttributedString(string: message, attributes: [
-				NSForegroundColorAttributeName: color,
-				NSParagraphStyleAttributeName: p,
-				NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)])
+				NSAttributedStringKey.foregroundColor: color,
+				NSAttributedStringKey.paragraphStyle: p,
+				NSAttributedStringKey.font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)])
 		#endif
 	}
 
@@ -839,7 +843,7 @@ class ListableItem: DataItem {
 
 		if var fi = withFilter, !fi.isEmpty {
 
-            func check(forTag tag: String, process: (String, Int) -> NSPredicate?) {
+			func check(forTag tag: String, process: (String, Int) -> NSPredicate?) {
 				var foundOne: Bool
 				repeat {
 					foundOne = false
@@ -856,17 +860,17 @@ class ListableItem: DataItem {
 						}
 					}
 				} while(foundOne)
-            }
+			}
 
-			check(forTag: "title")		{ predicate(from: $0, termAt: $1, format: filterTitlePredicate, numeric: false) }
-			check(forTag: "repo")		{ predicate(from: $0, termAt: $1, format: filterRepoPredicate, numeric: false) }
-			check(forTag: "server")		{ predicate(from: $0, termAt: $1, format: filterServerPredicate, numeric: false) }
-			check(forTag: "user")		{ predicate(from: $0, termAt: $1, format: filterUserPredicate, numeric: false) }
-			check(forTag: "number")		{ predicate(from: $0, termAt: $1, format: filterNumberPredicate, numeric: true) }
-			check(forTag: "milestone")	{ predicate(from: $0, termAt: $1, format: filterMilestonePredicate, numeric: false) }
-			check(forTag: "assignee")	{ predicate(from: $0, termAt: $1, format: filterAssigneePredicate, numeric: false) }
-			check(forTag: "label")		{ predicate(from: $0, termAt: $1, format: filterLabelPredicate, numeric: false) }
-			check(forTag: "status")		{ predicate(from: $0, termAt: $1, format: filterStatusPredicate, numeric: false) }
+			check(forTag: "title")       	{ predicate(from: $0, termAt: $1, format: filterTitlePredicate, numeric: false) }
+			check(forTag: "repo")        	{ predicate(from: $0, termAt: $1, format: filterRepoPredicate, numeric: false) }
+			check(forTag: "server")        	{ predicate(from: $0, termAt: $1, format: filterServerPredicate, numeric: false) }
+			check(forTag: "user")        	{ predicate(from: $0, termAt: $1, format: filterUserPredicate, numeric: false) }
+			check(forTag: "number")        	{ predicate(from: $0, termAt: $1, format: filterNumberPredicate, numeric: true) }
+			check(forTag: "milestone")    	{ predicate(from: $0, termAt: $1, format: filterMilestonePredicate, numeric: false) }
+			check(forTag: "assignee")    	{ predicate(from: $0, termAt: $1, format: filterAssigneePredicate, numeric: false) }
+			check(forTag: "label")        	{ predicate(from: $0, termAt: $1, format: filterLabelPredicate, numeric: false) }
+			check(forTag: "status")        	{ predicate(from: $0, termAt: $1, format: filterStatusPredicate, numeric: false) }
 
 			if !fi.isEmpty {
 				var predicates = [NSPredicate]()
@@ -878,16 +882,16 @@ class ListableItem: DataItem {
 					}
 				}
 
-				if Settings.includeTitlesInFilter {			appendPredicate(format: filterTitlePredicate, numeric: false) }
-				if Settings.includeReposInFilter {			appendPredicate(format: filterRepoPredicate, numeric: false) }
-                if Settings.includeServersInFilter {		appendPredicate(format: filterServerPredicate, numeric: false) }
-                if Settings.includeUsersInFilter {			appendPredicate(format: filterUserPredicate, numeric: false) }
-				if Settings.includeNumbersInFilter {		appendPredicate(format: filterNumberPredicate, numeric: true) }
-				if Settings.includeMilestonesInFilter {		appendPredicate(format: filterMilestonePredicate, numeric: false) }
-				if Settings.includeAssigneeNamesInFilter {	appendPredicate(format: filterAssigneePredicate, numeric: false) }
-				if Settings.includeLabelsInFilter {			appendPredicate(format: filterLabelPredicate, numeric: false) }
+				if Settings.includeTitlesInFilter {            	appendPredicate(format: filterTitlePredicate, numeric: false) }
+				if Settings.includeReposInFilter {            	appendPredicate(format: filterRepoPredicate, numeric: false) }
+				if Settings.includeServersInFilter {        	appendPredicate(format: filterServerPredicate, numeric: false) }
+				if Settings.includeUsersInFilter {            	appendPredicate(format: filterUserPredicate, numeric: false) }
+				if Settings.includeNumbersInFilter {        	appendPredicate(format: filterNumberPredicate, numeric: true) }
+				if Settings.includeMilestonesInFilter {        	appendPredicate(format: filterMilestonePredicate, numeric: false) }
+				if Settings.includeAssigneeNamesInFilter {    	appendPredicate(format: filterAssigneePredicate, numeric: false) }
+				if Settings.includeLabelsInFilter {            	appendPredicate(format: filterLabelPredicate, numeric: false) }
 				if itemType == PullRequest.self
-					&& Settings.includeStatusesInFilter {	appendPredicate(format: filterStatusPredicate, numeric: false) }
+					&& Settings.includeStatusesInFilter {    	appendPredicate(format: filterStatusPredicate, numeric: false) }
 
 				if negative {
 					andPredicates.append(NSCompoundPredicate(andPredicateWithSubpredicates: predicates))
@@ -1000,23 +1004,23 @@ class ListableItem: DataItem {
 		return "#\(number) - \(t)\(suffix)"
 	}
 	final func indexForSpotlight() {
-
+		
 		guard CSSearchableIndex.isIndexingAvailable() else { return }
-
+		
 		let s = CSSearchableItemAttributeSet(itemContentType: kUTTypeText as String)
 		s.title = searchTitle
 		s.contentCreationDate = createdAt
 		s.contentModificationDate = updatedAt
 		s.keywords = searchKeywords
 		s.creator = userLogin
-
+		
 		s.contentDescription = "\(S(repo.fullName)) @\(S(userLogin)) - \(S(body?.trim))"
-
+		
 		func completeIndex(withSet s: CSSearchableItemAttributeSet) {
 			let i = CSSearchableItem(uniqueIdentifier: objectID.uriRepresentation().absoluteString, domainIdentifier: nil, attributeSet: s)
 			CSSearchableIndex.default().indexSearchableItems([i], completionHandler: nil)
 		}
-
+		
 		if let i = userAvatarUrl, !Settings.hideAvatars {
 			API.haveCachedAvatar(from: i) { _, cachePath in
 				s.thumbnailURL = URL(string: "file://\(cachePath)")

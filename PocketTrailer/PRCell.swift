@@ -1,15 +1,15 @@
 
 import UIKit
 
-let statusAttributes: [String : Any] = {
+let statusAttributes: [NSAttributedStringKey : Any] = {
 	let paragraphStyle = NSMutableParagraphStyle()
 	paragraphStyle.paragraphSpacing = 6.0
 	paragraphStyle.lineSpacing = 1
 	paragraphStyle.headIndent = 19
 
 	return [
-		NSFontAttributeName: UIFont(name: "Menlo-Regular", size: 10)!,
-		NSParagraphStyleAttributeName: paragraphStyle
+		NSAttributedStringKey.font: UIFont(name: "Menlo-Regular", size: 10)!,
+		NSAttributedStringKey.paragraphStyle: paragraphStyle
 	]
 }()
 
@@ -46,42 +46,42 @@ final class PRCell: UITableViewCell {
 		contentView.addConstraints([
 
 			NSLayoutConstraint(item: _image,
-				attribute: .leading,
-				relatedBy: .equal,
-				toItem: readCount,
-				attribute: .leading,
-				multiplier: 1,
-				constant: 3),
+			                   attribute: .leading,
+			                   relatedBy: .equal,
+			                   toItem: readCount,
+			                   attribute: .leading,
+			                   multiplier: 1,
+			                   constant: 3),
 
 			NSLayoutConstraint(item: _image,
-				attribute: .centerY,
-				relatedBy: .equal,
-				toItem: readCount,
-				attribute: .centerY,
-				multiplier: 1,
-				constant: -21),
+			                   attribute: .centerY,
+			                   relatedBy: .equal,
+			                   toItem: readCount,
+			                   attribute: .centerY,
+			                   multiplier: 1,
+			                   constant: -21),
 
 			NSLayoutConstraint(item: _image,
-				attribute: .leading,
-				relatedBy: .equal,
-				toItem: unreadCount,
-				attribute: .leading,
-				multiplier: 1,
-				constant: 3),
+			                   attribute: .leading,
+			                   relatedBy: .equal,
+			                   toItem: unreadCount,
+			                   attribute: .leading,
+			                   multiplier: 1,
+			                   constant: 3),
 
 			NSLayoutConstraint(item: _image,
-				attribute: .centerY,
-				relatedBy: .equal,
-				toItem: unreadCount,
-				attribute: .centerY,
-				multiplier: 1,
-				constant: 21)
+			                   attribute: .centerY,
+			                   relatedBy: .equal,
+			                   toItem: unreadCount,
+			                   attribute: .centerY,
+			                   multiplier: 1,
+			                   constant: 21)
 			])
 
 		NotificationCenter.default.addObserver(self, selector: #selector(networkStateChanged), name: ReachabilityChangedNotification, object: nil)
 	}
 
-	func networkStateChanged() {
+	@objc private func networkStateChanged() {
 		atNextEvent(self) { S in
 			if let f = S.failedToLoadImage, API.currentNetworkStatus != .NotReachable {
 				S.loadImageAtPath(imagePath: f)
@@ -112,7 +112,7 @@ final class PRCell: UITableViewCell {
 				statusText = NSMutableAttributedString()
 				for status in statusItems {
 					var lineAttributes = statusAttributes
-					lineAttributes[NSForegroundColorAttributeName] = status.colorForDisplay
+					lineAttributes[NSAttributedStringKey.foregroundColor] = status.colorForDisplay
 					statusText?.append(NSAttributedString(string: status.displayText, attributes: lineAttributes))
 					statusCount -= 1
 					if statusCount > 0 {

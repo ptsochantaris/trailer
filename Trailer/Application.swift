@@ -1,18 +1,18 @@
 
 extension NSTextField {
-	final func trailerUndo() {
+	@objc final func trailerUndo() {
 		currentEditor()?.undoManager?.undo()
 	}
-	final func trailerRedo() {
+	@objc final func trailerRedo() {
 		currentEditor()?.undoManager?.redo()
 	}
-	final func trailerCopy() {
+	@objc final func trailerCopy() {
 		currentEditor()?.copy(nil)
 	}
-	final func trailerPaste() {
+	@objc final func trailerPaste() {
 		currentEditor()?.paste(nil)
 	}
-	final func trailerCut() {
+	@objc final func trailerCut() {
 		currentEditor()?.cut(nil)
 	}
 }
@@ -29,9 +29,9 @@ final class Application: NSApplication {
 					case "z": if sendAction(#selector(NSTextField.trailerUndo), to: nil, from: self) { return }
 					case "c":
 						if let url = app.focusedItem(blink: true)?.webUrl {
-							let p = NSPasteboard.general()
+							let p = NSPasteboard.general
 							p.clearContents()
-							p.setString(url, forType: NSStringPboardType)
+							p.setString(url, forType: NSPasteboard.PasteboardType.string)
 							return
 
 						} else {

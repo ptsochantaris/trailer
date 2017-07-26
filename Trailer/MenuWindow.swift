@@ -48,10 +48,10 @@ final class MenuWindow: NSWindow {
 
 		if Settings.useVibrancy {
 
-			appearance = NSAppearance(named: app.darkMode ? NSAppearanceNameVibrantDark : NSAppearanceNameVibrantLight)
+			appearance = NSAppearance(named: app.darkMode ? .vibrantDark : .vibrantLight)
 			if windowVibrancy == nil {
 				let w = NSVisualEffectView(frame: header.bounds)
-				w.autoresizingMask = [.viewHeightSizable, .viewWidthSizable]
+				w.autoresizingMask = [.height, .width]
 				w.blendingMode = .behindWindow
 				w.state = .active
 				header.addSubview(w, positioned: .below, relativeTo: filter)
@@ -62,7 +62,7 @@ final class MenuWindow: NSWindow {
 
 		} else if let w = windowVibrancy {
 
-			appearance = NSAppearance(named: NSAppearanceNameAqua)
+			appearance = NSAppearance(named: NSAppearance.Name.aqua)
 			w.removeFromSuperview()
 			windowVibrancy = nil
 
@@ -72,7 +72,7 @@ final class MenuWindow: NSWindow {
 
 	var showStatusItem: StatusItemView {
 		if statusItem == nil {
-			statusItem = NSStatusBar.system().statusItem(withLength: NSVariableStatusItemLength)
+			statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
 			statusItem!.view = StatusItemView { [weak self] in
 				guard let s = self else { return }
 				if s.isVisible { s.closeMenu() } else { app.show(menu: s) }
@@ -83,16 +83,16 @@ final class MenuWindow: NSWindow {
 
 	func hideStatusItem() {
 		if let s = statusItem {
-			s.statusBar.removeStatusItem(s)
+			s.statusBar?.removeStatusItem(s)
 			statusItem = nil
 		}
 	}
 
-    override var canBecomeKey: Bool {
+	override var canBecomeKey: Bool {
 		return true
 	}
 
-	func menuWillOpen(_ menu: NSMenu) {
+	@objc func menuWillOpen(_ menu: NSMenu) {
 		if appIsRefreshing {
 			refreshUpdate()
 		} else {
@@ -100,7 +100,7 @@ final class MenuWindow: NSWindow {
 		}
 	}
 
-	func refreshUpdate() {
+	@objc private func refreshUpdate() {
 		refreshMenuItem.title = " \(API.lastUpdateDescription)"
 	}
 
@@ -138,7 +138,7 @@ final class MenuWindow: NSWindow {
 		guard let windowFrame = siv.window?.frame else { return }
 
 		var S: NSScreen?
-		for s in NSScreen.screens() ?? [] {
+		for s in NSScreen.screens {
 			if s.frame.contains(windowFrame) {
 				S = s
 				break
@@ -183,7 +183,7 @@ final class MenuWindow: NSWindow {
 			siv.highlighted = true
 			table.deselectAll(nil)
 			app.openingWindow = true
-			level = Int(CGWindowLevelForKey(CGWindowLevelKey.floatingWindow))
+			level = .floating
 			makeKeyAndOrderFront(self)
 			NSApp.activate(ignoringOtherApps: true)
 			app.openingWindow = false

@@ -212,7 +212,7 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 		let repo = fetchedResultsController.object(at: atIndexPath)
 
 		let titleColor: UIColor = repo.shouldSync ? .black : .lightGray
-		let titleAttributes = [ NSForegroundColorAttributeName: titleColor ]
+		let titleAttributes = [ NSAttributedStringKey.foregroundColor: titleColor ]
 
 		let title = NSMutableAttributedString(attributedString: NSAttributedString(string: S(repo.fullName), attributes: titleAttributes))
 		title.append(NSAttributedString(string: "\n", attributes: titleAttributes))
@@ -241,8 +241,8 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 		}
 		configureCell(sizer!, atIndexPath: indexPath)
 		let h = sizer!.systemLayoutSizeFitting(CGSize(width: tableView.bounds.width, height: UILayoutFittingCompressedSize.height),
-			withHorizontalFittingPriority: UILayoutPriorityRequired,
-			verticalFittingPriority: UILayoutPriorityFittingSizeLevel).height
+		                                       withHorizontalFittingPriority: .required,
+		                                       verticalFittingPriority: .fittingSizeLevel).height
 		heightCache[indexPath] = h
 		return h
 	}
@@ -252,7 +252,7 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 		let fullName = S(repo.fullName)
 		let text = repo.inaccessible ? "\(fullName) (inaccessible)" : fullName
 		let color: UIColor = repo.shouldSync ? .darkText : .lightGray
-		return NSAttributedString(string: text, attributes: [ NSForegroundColorAttributeName: color ])
+		return NSAttributedString(string: text, attributes: [ NSAttributedStringKey.foregroundColor: color ])
 	}
 
 	private func prTitleForRepo(repo: Repo) -> NSAttributedString {
@@ -270,13 +270,13 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 	private func groupTitleForRepo(repo: Repo) -> NSAttributedString {
 		if let l = repo.groupLabel {
 			return NSAttributedString(string: "Group: \(l)", attributes: [
-				NSForegroundColorAttributeName : UIColor.darkGray,
-				NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)
+				NSAttributedStringKey.foregroundColor : UIColor.darkGray,
+				NSAttributedStringKey.font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)
 				])
 		} else {
 			return NSAttributedString(string: "Ungrouped", attributes: [
-				NSForegroundColorAttributeName : UIColor.lightGray,
-				NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)
+				NSAttributedStringKey.foregroundColor : UIColor.lightGray,
+				NSAttributedStringKey.font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)
 				])
 		}
 	}
@@ -287,17 +287,17 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 		return NSAttributedString(string: policy.name, attributes: attributes(for: policy))
 	}
 
-	private func attributes(for policy: RepoDisplayPolicy) -> [String : Any] {
+	private func attributes(for policy: RepoDisplayPolicy) -> [NSAttributedStringKey : Any] {
 		return [
-			NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize-1.0),
-			NSForegroundColorAttributeName: policy.color
+			NSAttributedStringKey.font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize-1.0),
+			NSAttributedStringKey.foregroundColor: policy.color
 		]
 	}
 
-	private func attributes(for policy: RepoHidingPolicy) -> [String : Any] {
+	private func attributes(for policy: RepoHidingPolicy) -> [NSAttributedStringKey : Any] {
 		return [
-			NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize-1.0),
-			NSForegroundColorAttributeName: policy.color
+			NSAttributedStringKey.font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize-1.0),
+			NSAttributedStringKey.foregroundColor: policy.color
 		]
 	}
 

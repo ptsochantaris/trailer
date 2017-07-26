@@ -114,7 +114,7 @@ final class PRDetailController: CommonController {
 		show(status: "", hideTable: false)
 	}
 
-	func colour(from hex: String) -> UIColor {
+	private func colour(from hex: String) -> UIColor {
 
 		let safe = hex
 			.trimmingCharacters(in: .whitespacesAndNewlines)

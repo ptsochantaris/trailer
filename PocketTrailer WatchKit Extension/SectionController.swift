@@ -45,7 +45,7 @@ final class SectionController: CommonController {
 	override func requestData(command: String?) {
 		if let c = command {
 			send(request: ["command": c])
-		} else if WCSession.default().receivedApplicationContext.keys.contains("overview") {
+		} else if WCSession.default.receivedApplicationContext.keys.contains("overview") {
 			updateUI()
 		} else {
 			requestData(command: "needsOverview")
@@ -126,7 +126,7 @@ final class SectionController: CommonController {
 			}
 		}
 
-		let session = WCSession.default()
+		let session = WCSession.default
 		guard let result = session.receivedApplicationContext["overview"] as? [AnyHashable : Any] else {
 			if session.iOSDeviceNeedsUnlockAfterRebootForReachability {
 				show(status: "Can't connect: To re-establish your secure connection, please unlock your iOS device.", hideTable: true)
@@ -147,7 +147,7 @@ final class SectionController: CommonController {
 			show(status: "There is no data from Trailer on your iOS device yet. Please launch it once and configure your settings.", hideTable: true)
 			return
 		}
-
+		
 		let showEmptyDescriptions = views.count == 1
 
 		let s = SummaryRow()

@@ -7,14 +7,14 @@ protocol PopulatableRow {
 }
 
 final class SectionRow: NSObject, PopulatableRow {
-
+	
 	var section: Section?
 	var totalCount: Int?
 	var unreadCount: Int?
 	var type: String?
 	var groupLabel: String?
 	var apiServerUri: String?
-
+	
 	func populate(from other: Any) {
 		if let other = other as? SectionRow {
 			if let sectionName = other.section?.watchMenuName {
@@ -29,11 +29,11 @@ final class SectionRow: NSObject, PopulatableRow {
 		}
 	}
 	var rowType: String {
-		return String(describing: type(of: self))
+		return String(describing: Swift.type(of: self))
 	}
-
-    @IBOutlet weak var titleL: WKInterfaceLabel!
-    @IBOutlet weak var countL: WKInterfaceLabel!
-    @IBOutlet weak var countHolder: WKInterfaceGroup!
+	
+	@IBOutlet weak var titleL: WKInterfaceLabel!
+	@IBOutlet weak var countL: WKInterfaceLabel!
+	@IBOutlet weak var countHolder: WKInterfaceGroup!
 	@IBOutlet weak var group: WKInterfaceGroup!
 }

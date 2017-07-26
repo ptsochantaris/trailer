@@ -85,7 +85,7 @@ final class Issue: ListableItem {
 		return try! moc.count(for: f)
 	}
 
-	var sectionName: String {
+	@objc var sectionName: String {
 		return Section.issueMenuTitles[Int(sectionIndex)]
 	}
 

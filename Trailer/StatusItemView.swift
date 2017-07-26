@@ -4,7 +4,7 @@ final class StatusItemView: NSView {
 	private let tappedCallback: Completion
 
 	var icon: NSImage!
-	var textAttributes = [String : Any]()
+	var textAttributes = [NSAttributedStringKey : Any]()
 	var statusLabel = ""
 	var labelOffset: CGFloat = 0
 	var title: String?
@@ -31,7 +31,7 @@ final class StatusItemView: NSView {
 	}
 
 	required init?(coder: NSCoder) {
-	    fatalError("init(coder:) has not been implemented")
+		fatalError("init(coder:) has not been implemented")
 	}
 
 	override func mouseDown(with theEvent: NSEvent) {
@@ -42,7 +42,7 @@ final class StatusItemView: NSView {
 
 	func sizeToFit() {
 		let width = Settings.hideMenubarCounts ? (title == nil ? 0 : 4) : statusLabel.size(withAttributes: textAttributes).width
-		let H = NSStatusBar.system().thickness
+		let H = NSStatusBar.system.thickness
 		let itemWidth = (H + width + StatusItemView.padding*3) + labelOffset
 		frame = CGRect(x: 0, y: 0, width: itemWidth, height: H)
 		needsDisplay = true
@@ -57,18 +57,18 @@ final class StatusItemView: NSView {
 
 		if highlighted {
 			foreground = .selectedMenuItemTextColor
-			countAttributes[NSForegroundColorAttributeName] = foreground
+			countAttributes[NSAttributedStringKey.foregroundColor] = foreground
 		} else if app.darkMode {
 			foreground = .selectedMenuItemTextColor
-			if countAttributes[NSForegroundColorAttributeName] as! NSColor == NSColor.controlTextColor {
-				countAttributes[NSForegroundColorAttributeName] = foreground
+			if countAttributes[NSAttributedStringKey.foregroundColor] as! NSColor == NSColor.controlTextColor {
+				countAttributes[NSAttributedStringKey.foregroundColor] = foreground
 			}
 		} else {
 			foreground = .controlTextColor
 		}
 
 		if grayOut {
-			countAttributes[NSForegroundColorAttributeName] = NSColor.disabledControlTextColor
+			countAttributes[NSAttributedStringKey.foregroundColor] = NSColor.disabledControlTextColor
 		}
 
 		if(Settings.hideMenubarCounts) {
@@ -78,7 +78,7 @@ final class StatusItemView: NSView {
 		}
 	}
 
-	private func drawStandard(titleColor: NSColor, countAttributes: [String : Any], inRect: NSRect) {
+	private func drawStandard(titleColor: NSColor, countAttributes: [NSAttributedStringKey : Any], inRect: NSRect) {
 
 		let imagePoint = CGPoint(x: StatusItemView.padding, y: 0)
 		var labelRect = CGRect(x: bounds.size.height + labelOffset, y: -5, width: bounds.size.width, height: bounds.size.height)
@@ -93,9 +93,9 @@ final class StatusItemView: NSView {
 			p.alignment = .center
 			p.lineBreakMode = .byTruncatingMiddle
 			t.draw(in: r, withAttributes: [
-				NSForegroundColorAttributeName: titleColor,
-				NSFontAttributeName: NSFont.menuFont(ofSize: 6),
-				NSParagraphStyleAttributeName: p
+				NSAttributedStringKey.foregroundColor: titleColor,
+				NSAttributedStringKey.font: NSFont.menuFont(ofSize: 6),
+				NSAttributedStringKey.paragraphStyle: p
 				])
 
 			img.draw(in: CGRect(x: imagePoint.x+3, y: imagePoint.y, width: img.size.width-6, height: img.size.height-6))
@@ -106,9 +106,9 @@ final class StatusItemView: NSView {
 		statusLabel.draw(in: labelRect, withAttributes: countAttributes)
 	}
 
-	private func drawIconOnly(titleColor: NSColor, countAttributes: [String : Any], inRect: NSRect) {
+	private func drawIconOnly(titleColor: NSColor, countAttributes: [NSAttributedStringKey : Any], inRect: NSRect) {
 
-		let foreground = countAttributes[NSForegroundColorAttributeName] as! NSColor
+		let foreground = countAttributes[NSAttributedStringKey.foregroundColor] as! NSColor
 
 		if let t = title {
 
@@ -117,11 +117,11 @@ final class StatusItemView: NSView {
 			p.alignment = .center
 			p.lineBreakMode = .byTruncatingMiddle
 			t.draw(in: r, withAttributes: [
-				NSForegroundColorAttributeName: titleColor,
-				NSFontAttributeName: NSFont.menuFont(ofSize: 6),
-				NSParagraphStyleAttributeName: p
+				NSAttributedStringKey.foregroundColor: titleColor,
+				NSAttributedStringKey.font: NSFont.menuFont(ofSize: 6),
+				NSAttributedStringKey.paragraphStyle: p
 				])
-
+			
 			if statusLabel == "X" {
 				let w = statusLabel.size(withAttributes: countAttributes).width
 				let rect = CGRect(x: (inRect.width - w)*0.5, y: -4, width: w, height: inRect.size.height - 4)
@@ -153,7 +153,7 @@ final class StatusItemView: NSView {
 		tint.set()
 
 		let imageRect = NSRect(origin: NSZeroPoint, size: image.size)
-		NSRectFillUsingOperation(imageRect, .sourceAtop)
+		imageRect.fill(using: .sourceAtop)
 
 		tinted.unlockFocus()
 		return tinted

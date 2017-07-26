@@ -64,7 +64,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	func applicationWillFinishLaunching(_ notification: Notification) {
 		app = self
 		bootUp()
-		NSTextField.setCellClass(CenterTextFieldCell.self)
+		NSTextField.cellClass = CenterTextFieldCell.self
 	}
 
 	func applicationDidFinishLaunching(_ notification: Notification) {
@@ -88,7 +88,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 		let nc = NSUserNotificationCenter.default
 		nc.delegate = self
-		if let launchNotification = notification.userInfo?[NSApplicationLaunchUserNotificationKey] as? NSUserNotification {
+		if let launchNotification = notification.userInfo?[NSApplication.launchUserNotificationUserInfoKey] as? NSUserNotification {
 			delay(0.5, self) { S in
 				S.userNotificationCenter(nc, didActivate: launchNotification)
 			}
@@ -105,7 +105,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 
 		let n = NotificationCenter.default
-		n.addObserver(self, selector: #selector(updateScrollBarWidth), name: .NSPreferredScrollerStyleDidChange, object: nil)
+		n.addObserver(self, selector: #selector(updateScrollBarWidth), name: NSScroller.preferredScrollerStyleDidChangeNotification, object: nil)
 
 		addHotKeySupport()
 
@@ -115,17 +115,17 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			s?.checkForUpdatesInBackground()
 		}
 
-		let wn = NSWorkspace.shared().notificationCenter
-		wn.addObserver(self, selector: #selector(systemWillSleep), name: .NSWorkspaceWillSleep, object: nil)
-		wn.addObserver(self, selector: #selector(systemDidWake), name: .NSWorkspaceDidWake, object: nil)
+		let wn = NSWorkspace.shared.notificationCenter
+		wn.addObserver(self, selector: #selector(systemWillSleep), name: NSWorkspace.willSleepNotification, object: nil)
+		wn.addObserver(self, selector: #selector(systemDidWake), name: NSWorkspace.didWakeNotification, object: nil)
 	}
 
-	func systemWillSleep() {
+	@objc private func systemWillSleep() {
 		systemSleeping = true
 		DLog("System is going to sleep")
 	}
 
-	func systemDidWake() {
+	@objc private func systemDidWake() {
 		DLog("System woke up")
 		systemSleeping = false
 		delay(1, self) { S in
@@ -183,7 +183,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					}
 				}
 				if let up = urlToOpen, let u = URL(string: up) {
-					NSWorkspace.shared().open(u)
+					NSWorkspace.shared.open(u)
 				}
 			default: break
 			}
@@ -212,7 +212,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			notification.subtitle = c.notificationSubtitle
 			notification.informativeText = c.body
 			addPotentialExtraActions()
-			
+
 		case .newComment:
 			guard let c = item as? PRComment, let parent = c.parent, !parent.shouldSkipNotifications else { return }
 			notification.title = "@\(S(c.userName)) Commented:"
@@ -388,7 +388,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 
 		if let u = urlToOpen {
-			NSWorkspace.shared().open(URL(string: u)!)
+			NSWorkspace.shared.open(URL(string: u)!)
 		}
 	}
 
@@ -421,9 +421,9 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					alert.addButton(withTitle: "Yes")
 					alert.showsSuppressionButton = true
 
-					if alert.runModal() == NSAlertSecondButtonReturn {
+					if alert.runModal() == .alertSecondButtonReturn {
 						removeAllMergedRequests(under: menuBarSet)
-						if alert.suppressionButton!.state == NSOnState {
+						if alert.suppressionButton!.state == .onState {
 							Settings.dontAskBeforeWipingMerged = true
 						}
 					}
@@ -441,9 +441,9 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					alert.addButton(withTitle: "Yes")
 					alert.showsSuppressionButton = true
 
-					if alert.runModal() == NSAlertSecondButtonReturn {
+					if alert.runModal() == .alertSecondButtonReturn {
 						removeAllClosedRequests(under: menuBarSet)
-						if alert.suppressionButton!.state == NSOnState {
+						if alert.suppressionButton!.state == .onState {
 							Settings.dontAskBeforeWipingClosed = true
 						}
 					}
@@ -466,9 +466,9 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					alert.addButton(withTitle: "Yes")
 					alert.showsSuppressionButton = true
 
-					if alert.runModal() == NSAlertSecondButtonReturn {
+					if alert.runModal() == .alertSecondButtonReturn {
 						removeAllClosedIssues(under: menuBarSet)
-						if alert.suppressionButton!.state == NSOnState {
+						if alert.suppressionButton!.state == .onState {
 							Settings.dontAskBeforeWipingClosed = true
 						}
 					}
@@ -572,8 +572,8 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			alert.addButton(withTitle: "No")
 			alert.addButton(withTitle: "Yes")
 			alert.showsSuppressionButton = true
-			if alert.runModal() == NSAlertSecondButtonReturn {
-				if alert.suppressionButton!.state == NSOnState {
+			if alert.runModal() == .alertSecondButtonReturn {
+				if alert.suppressionButton!.state == .onState {
 					Settings.dontConfirmSettingsImport = true
 				}
 			} else {
@@ -598,7 +598,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		return true
 	}
 
-	func applicationShouldTerminate(_ sender: NSApplication) -> NSApplicationTerminateReply {
+	func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
 		DataManager.saveDB()
 		return .terminateNow
 	}
@@ -623,7 +623,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			}
 		}
 	}
-	
+
 	func startRefreshIfItIsDue() {
 
 		if let l = Settings.lastSuccessfulRefresh {
@@ -676,7 +676,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		DataManager.postMigrationTasks()
 
 		appIsRefreshing = true
-		
+
 		preferencesWindow?.updateActivity()
 
 		for d in menuBarSets {
@@ -892,7 +892,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					return nil
 
 				case 36: // enter
-					if let c = NSTextInputContext.current(), c.client.hasMarkedText() {
+					if let c = NSTextInputContext.current, c.client.hasMarkedText() {
 						return incomingEvent
 					}
 					if let dataItem = S.focusedItem(blink: true) {
@@ -920,7 +920,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 						return nil
 					case "o":
 						if let w = selectedItem.repo.webUrl, let u = URL(string: w) {
-							NSWorkspace.shared().open(u)
+							NSWorkspace.shared.open(u)
 							return nil
 						}
 					default:
@@ -1045,10 +1045,10 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	////////////// scrollbars
-	
-	func updateScrollBarWidth() {
+
+	@objc private func updateScrollBarWidth() {
 		if let s = menuBarSets.first!.prMenu.scrollView.verticalScroller {
-			if s.scrollerStyle == NSScrollerStyle.legacy {
+			if s.scrollerStyle == .legacy {
 				scrollBarWidth = s.frame.size.width
 			} else {
 				scrollBarWidth = 0
@@ -1062,9 +1062,9 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	private var startupAssistantController: NSWindowController?
 	private func startupAssistant() {
 		if startupAssistantController == nil {
-			startupAssistantController = NSWindowController(windowNibName:"SetupAssistant")
+			startupAssistantController = NSWindowController(windowNibName:NSNib.Name(rawValue: "SetupAssistant"))
 			if let w = startupAssistantController!.window as? SetupAssistant {
-				w.level = Int(CGWindowLevelForKey(CGWindowLevelKey.floatingWindow))
+				w.level = .floating
 				w.center()
 				w.makeKeyAndOrderFront(self)
 			}
@@ -1077,10 +1077,10 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	private var aboutWindowController: NSWindowController?
 	func showAboutWindow() {
 		if aboutWindowController == nil {
-			aboutWindowController = NSWindowController(windowNibName:"AboutWindow")
+			aboutWindowController = NSWindowController(windowNibName:NSNib.Name(rawValue: "AboutWindow"))
 		}
 		if let w = aboutWindowController!.window as? AboutWindow {
-			w.level = Int(CGWindowLevelForKey(CGWindowLevelKey.floatingWindow))
+			w.level = .floating
 			w.version.stringValue = versionString
 			w.center()
 			w.makeKeyAndOrderFront(self)
@@ -1094,10 +1094,10 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	private var preferencesWindow: PreferencesWindow?
 	func showPreferencesWindow(andSelect selectTab: Int?) {
 		if preferencesWindowController == nil {
-			preferencesWindowController = NSWindowController(windowNibName:"PreferencesWindow")
+			preferencesWindowController = NSWindowController(windowNibName:NSNib.Name(rawValue: "PreferencesWindow"))
 		}
 		if let w = preferencesWindowController!.window as? PreferencesWindow {
-			w.level = Int(CGWindowLevelForKey(CGWindowLevelKey.floatingWindow))
+			w.level = .floating
 			w.center()
 			w.makeKeyAndOrderFront(self)
 			preferencesWindow = w
@@ -1143,7 +1143,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		alert.addButton(withTitle: "Quit")
 		alert.addButton(withTitle: "Reset Trailer")
 
-		if alert.runModal() == NSAlertSecondButtonReturn {
+		if alert.runModal() == .alertSecondButtonReturn {
 			DataManager.removeDatabaseFiles()
 			restartApp()
 		}
@@ -1161,7 +1161,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	//////////////////////// Dark mode
 
 	var darkMode = false
-	func updateDarkModeDelayed() {
+	@objc private func updateDarkModeDelayed() {
 		delay(0.1, self) { S in
 			S.updateDarkMode()
 		}
@@ -1173,7 +1173,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			}
 		}
 	}
-
+	
 	private var currentSystemDarkMode: Bool {
 		if let appearance = UserDefaults.standard.string(forKey: "AppleInterfaceStyle") {
 			return appearance == "Dark"

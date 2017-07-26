@@ -21,7 +21,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 		Settings.displayPolicyForNewIssues = Int(RepoDisplayPolicy.all.rawValue)
 	}
 
-	override init(contentRect: NSRect, styleMask style: NSWindowStyleMask, backing bufferingType: NSBackingStoreType, defer flag: Bool) {
+	override init(contentRect: NSRect, styleMask style: NSWindow.StyleMask, backing bufferingType: NSWindow.BackingStoreType, defer flag: Bool) {
 		super.init(contentRect: contentRect, styleMask: style, backing: bufferingType, defer: flag)
 		delegate = self
 	}
@@ -30,13 +30,13 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 		app.closedSetupAssistant()
 	}
 
-	func windowShouldClose(_ sender: Any) -> Bool {
+	func windowShouldClose(_ sender: NSWindow) -> Bool {
 		return spinner.isHidden
 	}
 
 	@IBAction func createTokenSelected(_ sender: NSButton) {
 		let address = "https://github.com/settings/tokens/new"
-		NSWorkspace.shared().open(URL(string: address)!)
+		NSWorkspace.shared.open(URL(string: address)!)
 	}
 
 	override func controlTextDidChange(_ obj: Notification) {
@@ -137,7 +137,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 		newServer.authToken = tokenHolder.stringValue.trim
 		newServer.lastSyncSucceeded = true
 	}
-
+	
 	@IBAction func importSettingsSelected(_ sender: NSButton) {
 		let o = NSOpenPanel()
 		o.title = "Import Settings From File…"
@@ -147,7 +147,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 		o.isExtensionHidden = false
 		o.allowedFileTypes = ["trailerSettings"]
 		o.beginSheetModal(for: self) { response in
-			if response == NSFileHandlingPanelOKButton, let url = o.url {
+			if response.rawValue == NSFileHandlingPanelOKButton, let url = o.url {
 				atNextEvent { [weak self] in
 					if app.tryLoadSettings(from: url, skipConfirm: Settings.dontConfirmSettingsImport) {
 						self?.close()

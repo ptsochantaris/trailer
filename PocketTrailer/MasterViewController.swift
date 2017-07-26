@@ -155,7 +155,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 	}
 
-	func refreshControlChanged() {
+	@objc private func refreshControlChanged() {
 		refreshOnRelease = !appIsRefreshing
 	}
 
@@ -346,7 +346,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		return false
 	}
 
-	func keyToggleSnooze() {
+	@objc private func keyToggleSnooze() {
 		if let ip = tableView.indexPathForSelectedRow {
 			let i = fetchedResultsController.object(at: ip)
 			if i.isSnoozing {
@@ -361,7 +361,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 	}
 
-	func keyToggleRead() {
+	@objc private func keyToggleRead() {
 		if let ip = tableView.indexPathForSelectedRow {
 			let i = fetchedResultsController.object(at: ip)
 			if i.hasUnreadCommentsOrAlert {
@@ -376,7 +376,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 	}
 
-	func keyToggleMute() {
+	@objc private func keyToggleMute() {
 		if let ip = tableView.indexPathForSelectedRow {
 			let i = fetchedResultsController.object(at: ip)
 			let isMuted = i.muted
@@ -386,31 +386,31 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 	}
 
-	func keyForceRefresh() {
+	@objc private func keyForceRefresh() {
 		if !appIsRefreshing {
 			tryRefresh()
 		}
 	}
 
-	func keyFocusDetailView() {
+	@objc private func keyFocusDetailView() {
 		showDetailViewController(detailViewController.navigationController ?? detailViewController, sender: self)
 		detailViewController.becomeFirstResponder()
 	}
 
-	func keyOpenInSafari() {
+	@objc private func keyOpenInSafari() {
 		if let ip = tableView.indexPathForSelectedRow {
 			forceSafari = true
 			tableView(tableView, didSelectRowAt: ip)
 		}
 	}
 
-	func keyShowSelectedItem() {
+	@objc private func keyShowSelectedItem() {
 		if let ip = tableView.indexPathForSelectedRow {
 			tableView(tableView, didSelectRowAt: ip)
 		}
 	}
 
-	func keyMoveToNextItem() {
+	@objc private func keyMoveToNextItem() {
 		if let ip = tableView.indexPathForSelectedRow {
 			var newRow = ip.row+1
 			var newSection = ip.section
@@ -427,7 +427,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 	}
 
-	func keyMoveToPreviousItem() {
+	@objc private func keyMoveToPreviousItem() {
 		if let ip = tableView.indexPathForSelectedRow {
 			var newRow = ip.row-1
 			var newSection = ip.section
@@ -444,7 +444,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 	}
 
-	func keyMoveToPreviousSection() {
+	@objc private func keyMoveToPreviousSection() {
 		if let ip = tableView.indexPathForSelectedRow {
 			let newSection = ip.section-1
 			if newSection < 0 {
@@ -456,7 +456,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 	}
 
-	func keyMoveToNextSection() {
+	@objc private func keyMoveToNextSection() {
 		if let ip = tableView.indexPathForSelectedRow {
 			let newSection = ip.section+1
 			if newSection >= tableView.numberOfSections {
@@ -468,7 +468,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 	}
 
-	func moveToNextTab() {
+	@objc private func moveToNextTab() {
 		if let t = tabs, let i = t.selectedItem, let items = t.items, let ind = items.index(of: i), items.count > 1 {
 			var nextIndex = ind+1
 			if nextIndex >= items.count {
@@ -478,7 +478,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 	}
 
-	func moveToPreviousTab() {
+	@objc private func moveToPreviousTab() {
 		if let t = tabs, let i = t.selectedItem, let items = t.items, let ind = items.index(of: i), items.count > 1 {
 			var nextIndex = ind-1
 			if nextIndex < 0 {
@@ -704,12 +704,12 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 					ts.transform = CGAffineTransform(translationX: 0, y: 49)
 					b.transform = CGAffineTransform(translationX: 0, y: 49)
 					UIView.animate(withDuration: 0.2,
-						delay: 0.0,
-						options: .curveEaseInOut,
-						animations: {
-							ts.transform = .identity
-							b.transform = .identity
-						}, completion: nil)
+					               delay: 0.0,
+					               options: .curveEaseInOut,
+					               animations: {
+									ts.transform = .identity
+									b.transform = .identity
+					}, completion: nil)
 				}
 			}
 
@@ -727,15 +727,15 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 				if animated {
 					UIView.animate(withDuration: 0.2,
-						delay: 0.0,
-						options: .curveEaseInOut,
-						animations: {
-							t.transform = CGAffineTransform(translationX: 0, y: 49)
-							b.transform = CGAffineTransform(translationX: 0, y: 49)
-						}, completion: { finished in
-							t.removeFromSuperview()
-							b.removeFromSuperview()
-						})
+					               delay: 0.0,
+					               options: .curveEaseInOut,
+					               animations: {
+									t.transform = CGAffineTransform(translationX: 0, y: 49)
+									b.transform = CGAffineTransform(translationX: 0, y: 49)
+					}, completion: { finished in
+						t.removeFromSuperview()
+						b.removeFromSuperview()
+					})
 				} else {
 					t.removeFromSuperview()
 					b.removeFromSuperview()
@@ -1264,7 +1264,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 	}
 
-	func focusFilter(terms: String?) {
+	@objc func focusFilter(terms: String?) {
 		tableView.contentOffset = CGPoint(x: 0, y: -tableView.contentInset.top)
 		searchBar.becomeFirstResponder()
 		searchBar.text = terms
@@ -1300,5 +1300,5 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
 		Settings.lastPreferencesTabSelected = tabBarController.viewControllers?.index(of: viewController) ?? 0
 	}
-	
+
 }

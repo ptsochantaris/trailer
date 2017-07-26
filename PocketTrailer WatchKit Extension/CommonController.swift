@@ -49,7 +49,7 @@ class CommonController: WKInterfaceController {
 
 		loading += 1
 
-		WCSession.default().sendMessage(request, replyHandler: { response in
+		WCSession.default.sendMessage(request, replyHandler: { response in
 			atNextEvent(self) { S in
 				if let errorIndicator = response["error"] as? Bool, errorIndicator == true {
 					S.showTemporaryError(response["status"] as! String)

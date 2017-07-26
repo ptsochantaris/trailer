@@ -14,39 +14,39 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 	private var linkButton = UIButton(type: UIButtonType.custom)
 	private let paragraph = NSMutableParagraphStyle()
 
-	private var titleAttributes: [String : Any] {
+	private var titleAttributes: [NSAttributedStringKey : Any] {
 		return [
-			NSForegroundColorAttributeName: UIColor.black,
-			NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.systemFontSize+2.0),
-			NSParagraphStyleAttributeName: paragraph ]
+			NSAttributedStringKey.foregroundColor: UIColor.black,
+			NSAttributedStringKey.font: UIFont.systemFont(ofSize: UIFont.systemFontSize+2.0),
+			NSAttributedStringKey.paragraphStyle: paragraph ]
 	}
 
-	private var normalAttributes: [String : Any] {
+	private var normalAttributes: [NSAttributedStringKey : Any] {
 		return [
-			NSForegroundColorAttributeName: UIColor.darkGray,
-			NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.systemFontSize+2.0),
-			NSParagraphStyleAttributeName: paragraph ]
+			NSAttributedStringKey.foregroundColor: UIColor.darkGray,
+			NSAttributedStringKey.font: UIFont.systemFont(ofSize: UIFont.systemFontSize+2.0),
+			NSAttributedStringKey.paragraphStyle: paragraph ]
 	}
 
-	private var dimAttributes: [String : Any] {
+	private var dimAttributes: [NSAttributedStringKey : Any] {
 		return [
-			NSForegroundColorAttributeName: UIColor.gray,
-			NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.systemFontSize+2.0),
-			NSParagraphStyleAttributeName: paragraph ]
+			NSAttributedStringKey.foregroundColor: UIColor.gray,
+			NSAttributedStringKey.font: UIFont.systemFont(ofSize: UIFont.systemFontSize+2.0),
+			NSAttributedStringKey.paragraphStyle: paragraph ]
 	}
 
-	private var redAttributes: [String : Any] {
+	private var redAttributes: [NSAttributedStringKey : Any] {
 		return [
-			NSForegroundColorAttributeName: UIColor.red,
-			NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.systemFontSize+2.0),
-			NSParagraphStyleAttributeName: paragraph ]
+			NSAttributedStringKey.foregroundColor: UIColor.red,
+			NSAttributedStringKey.font: UIFont.systemFont(ofSize: UIFont.systemFontSize+2.0),
+			NSAttributedStringKey.paragraphStyle: paragraph ]
 	}
 
-	private var smallAttributes: [String : Any] {
+	private var smallAttributes: [NSAttributedStringKey : Any] {
 		return [
-			NSForegroundColorAttributeName: UIColor.gray,
-			NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize),
-			NSParagraphStyleAttributeName: paragraph ]
+			NSAttributedStringKey.foregroundColor: UIColor.gray,
+			NSAttributedStringKey.font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize),
+			NSAttributedStringKey.paragraphStyle: paragraph ]
 	}
 
 	override func viewDidLoad() {
@@ -75,7 +75,7 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 		update()
 	}
 
-	func widgetTapped() {
+	@objc private func widgetTapped() {
 		extensionContext?.open(URL(string: "pockettrailer://")!, completionHandler: nil)
 	}
 
@@ -145,11 +145,11 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 						appendCommentCount(a, number: totalUnread)
 					}
 				} else {
-					a.append(NSAttributedString(string: result["error"] as! String, attributes: [NSParagraphStyleAttributeName: paragraph]))
+					a.append(NSAttributedString(string: result["error"] as! String, attributes: [NSAttributedStringKey.paragraphStyle: paragraph]))
 				}
 				return a.copy() as! NSAttributedString
 			}
-
+			
 			prLabel.attributedText = writeOutSection("prs")
 			issuesLabel.attributedText = writeOutSection("issues")
 

@@ -2,16 +2,16 @@ import WebKit
 import CoreData
 
 final class DetailViewController: UIViewController, WKNavigationDelegate {
-
+	
 	@IBOutlet weak var spinner: UIActivityIndicatorView!
 	@IBOutlet weak var statusLabel: UILabel!
-
+	
 	private var webView: WKWebView?
 	private var alwaysRequestDesktopSite = false
-
+	
 	var isVisible = false
 	var catchupWithDataItemWhenLoaded: NSManagedObjectID?
-
+	
 	var detailItem: URL? {
 		didSet {
 			if detailItem != oldValue {
@@ -19,12 +19,12 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 			}
 		}
 	}
-
+	
 	override func viewDidLoad() {
 		super.viewDidLoad()
-
+		
 		title = "Loading…"
-
+		
 		let webConfiguration = WKWebViewConfiguration()
 		let w = WKWebView(frame: view.bounds, configuration: webConfiguration)
 		w.navigationDelegate = self
@@ -33,18 +33,18 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 		w.autoresizingMask = [.flexibleWidth, .flexibleHeight]
 		w.isHidden = true
 		view.addSubview(w)
-
+		
 		webView = w
-
+		
 		configureView()
 	}
-
+	
 	override func viewDidLayoutSubviews() {
 		super.viewDidLayoutSubviews()
 		popupManager.masterController.layoutTabs()
 	}
-
-	func configureView() {
+	
+	@objc private func configureView() {
 		if let w = webView {
 			if let d = detailItem {
 				if !alwaysRequestDesktopSite && Settings.alwaysRequestDesktopSite {
@@ -74,12 +74,12 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 			}
 		}
 	}
-
+	
 	override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
 		super.traitCollectionDidChange(previousTraitCollection)
 		navigationItem.leftBarButtonItem = (traitCollection.horizontalSizeClass == .compact) ? nil : splitViewController?.displayModeButtonItem
 	}
-
+	
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
 		if let w = webView, w.isLoading {
@@ -90,12 +90,12 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 		}
 		isVisible = true
 	}
-
+	
 	override func viewDidDisappear(_ animated: Bool) {
 		isVisible = false
 		super.viewDidDisappear(animated)
 	}
-
+	
 	func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
 		spinner.startAnimating()
 		statusLabel.isHidden = true
@@ -104,14 +104,14 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 		title = "Loading…"
 		navigationItem.rightBarButtonItem = nil
 	}
-
+	
 	func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
 		if let res = navigationResponse.response as? HTTPURLResponse, res.statusCode == 404 {
 			showMessage("Not Found", "\nPlease ensure you are logged in with the correct account on GitHub\n\nIf you are using two-factor auth: There is a bug between GitHub and iOS which may cause your login to fail.  If it happens, temporarily disable two-factor auth and log in from here, then re-enable it afterwards.  You will only need to do this once.")
 		}
 		decisionHandler(.allow)
 	}
-
+	
 	func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
 		spinner.stopAnimating()
 		statusLabel.isHidden = true
@@ -119,25 +119,25 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 		navigationItem.rightBarButtonItem?.isEnabled = true
 		title = webView.title
 		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(shareSelected))
-
+		
 		catchupWithComments()
 		if splitViewController?.isCollapsed ?? true {
 			becomeFirstResponder()
 		}
 	}
-
+	
 	override var keyCommands: [UIKeyCommand]? {
 		let ff = UIKeyCommand(input: UIKeyInputLeftArrow, modifierFlags: .command, action: #selector(focusOnMaster), discoverabilityTitle: "Focus keyboard on item list")
 		let s = UIKeyCommand(input: "o", modifierFlags: .command, action: #selector(keyOpenInSafari), discoverabilityTitle: "Open in Safari")
 		return [ff,s]
 	}
-
-	func keyOpenInSafari() {
+	
+	@objc private func keyOpenInSafari() {
 		if let u = webView?.url {
 			UIApplication.shared.open(u, options: [:], completionHandler: nil)
 		}
 	}
-
+	
 	@discardableResult
 	override func becomeFirstResponder() -> Bool {
 		if detailItem != nil {
@@ -146,15 +146,15 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 			return false
 		}
 	}
-
-	func focusOnMaster() {
+	
+	@objc private func focusOnMaster() {
 		let m = popupManager.masterController
 		if splitViewController?.isCollapsed ?? true {
 			_ = m.navigationController?.popViewController(animated: true)
 		}
 		m.becomeFirstResponder()
 	}
-
+	
 	private func catchupWithComments() {
 		if let oid = catchupWithDataItemWhenLoaded, let dataItem = existingObject(with: oid) as? ListableItem {
 			if dataItem.hasUnreadCommentsOrAlert {
@@ -163,15 +163,15 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 		}
 		catchupWithDataItemWhenLoaded = nil
 	}
-
+	
 	func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
 		loadFailed(error: error)
 	}
-
+	
 	func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
 		loadFailed(error: error)
 	}
-
+	
 	private func loadFailed(error: Error) {
 		spinner.stopAnimating()
 		statusLabel.textColor = .red
@@ -181,8 +181,8 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 		title = "Error"
 		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(configureView))
 	}
-
-	func shareSelected() {
+	
+	@objc private func shareSelected() {
 		if let u = webView?.url {
 			popupManager.shareFromView(view: self, buttonItem: navigationItem.rightBarButtonItem!, url: u)
 		}

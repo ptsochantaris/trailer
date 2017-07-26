@@ -187,14 +187,15 @@ final class PullRequest: ListableItem {
 
 				let inclusive = mode == StatusFilter.include.rawValue
 				// contains(a) or contains(b) or contains(c)  -vs-  not(contains(a) or contains(b) or contains(c))
-				rawStatuses = statuses.filter { s in
+				let rawUnsorted = statuses.filter {
 					for t in terms {
-						if let d = s.descriptionText, d.localizedCaseInsensitiveContains(t) {
+						if let d = $0.descriptionText, d.localizedCaseInsensitiveContains(t) {
 							return inclusive
 						}
 					}
 					return !inclusive
-				}.sorted { $1.createdBefore($0) }
+				}
+				rawStatuses = rawUnsorted.sorted { $1.createdBefore($0) }
 
 			} else {
 				rawStatuses = statuses.sorted { $1.createdBefore($0) }
@@ -219,7 +220,7 @@ final class PullRequest: ListableItem {
 		return issueUrl?.appending(pathComponent: "labels")
 	}
 
-	var sectionName: String {
+	@objc var sectionName: String {
 		return Section.prMenuTitles[Int(sectionIndex)]
 	}
 }

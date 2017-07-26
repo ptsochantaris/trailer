@@ -3,10 +3,6 @@ import WatchConnectivity
 
 final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
 
-	func getNextRequestedUpdateDate(handler: @escaping (Date?) -> Void) {
-		handler(nil)
-	}
-
 	func getPlaceholderTemplate(for complication: CLKComplication, withHandler handler: @escaping (CLKComplicationTemplate?) -> Void) {
 		let emptyTemplate = constructTemplate(for: complication, issues: false, prCount: nil, issueCount: nil, commentCount: 0)
 		handler(emptyTemplate)
@@ -23,7 +19,7 @@ final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
 	}
 
 	private func entriesFor(_ complication: CLKComplication, _ handler: @escaping ([CLKComplicationTimelineEntry]?) -> Void) {
-		if let overview = WCSession.default().receivedApplicationContext["overview"] as? [AnyHashable : Any] {
+		if let overview = WCSession.default.receivedApplicationContext["overview"] as? [AnyHashable : Any] {
 			processOverview(for: complication, overview, handler)
 		} else {
 			handler(nil)
@@ -77,7 +73,7 @@ final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
 			}
 		}
 	}
-
+	
 	private func constructTemplate(for complication: CLKComplication, issues: Bool, prCount: Int?, issueCount: Int?, commentCount: Int) -> CLKComplicationTemplate {
 
 		switch complication.family {
@@ -102,7 +98,7 @@ final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
 			t.column2Alignment = .trailing
 			t.highlightColumn2 = commentCount > 0
 			return t
- 		case .utilitarianSmallFlat, .utilitarianSmall:
+		case .utilitarianSmallFlat, .utilitarianSmall:
 			let t = CLKComplicationTemplateUtilitarianSmallFlat()
 			t.imageProvider = CLKImageProvider(onePieceImage: UIImage(named: issues ? "ComplicationIssues" : "ComplicationPrs")!)
 			t.textProvider = CLKSimpleTextProvider(text: count(issues ? issueCount : prCount, unit: nil))

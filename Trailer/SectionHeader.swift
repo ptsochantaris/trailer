@@ -25,16 +25,16 @@ final class SectionHeader: NSTableRowView {
 		let x = W-120-AVATAR_SIZE-LEFTPADDING
 		titleView = CenterTextField(frame: CGRect(x: 12, y: 4, width: x, height: titleHeight))
 		titleView.attributedStringValue = NSAttributedString(string: title, attributes: [
-				NSFontAttributeName: NSFont.boldSystemFont(ofSize: 14),
-				NSForegroundColorAttributeName: NSColor.controlShadowColor.withAlphaComponent(0.7)])
+			NSAttributedStringKey.font: NSFont.boldSystemFont(ofSize: 14),
+			NSAttributedStringKey.foregroundColor: NSColor.controlShadowColor.withAlphaComponent(0.7)])
 		addSubview(titleView)
 	}
 
-	func unPinSelected() {
+	@objc private func unPinSelected() {
 		app.removeSelected(on: titleView.attributedStringValue.string)
 	}
 
 	required init?(coder: NSCoder) {
-	    fatalError("init(coder:) has not been implemented")
+		fatalError("init(coder:) has not been implemented")
 	}
 }

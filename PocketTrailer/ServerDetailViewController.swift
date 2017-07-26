@@ -149,8 +149,8 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 
 	@IBAction func deleteSelected(_ sender: UIBarButtonItem) {
 		let a = UIAlertController(title: "Delete API Server",
-			message: "Are you sure you want to remove this API server from your list?",
-			preferredStyle: .alert)
+		                          message: "Are you sure you want to remove this API server from your list?",
+		                          preferredStyle: .alert)
 
 		a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
 		a.addAction(UIAlertAction(title: "Delete", style: .destructive) { action in
@@ -170,8 +170,8 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 	}
 
 	///////////////////////// keyboard
-
-	func keyboardWillShow(notification: NSNotification) {
+	
+	@objc private func keyboardWillShow(notification: NSNotification) {
 		if focusedField?.superview == nil { return }
 
 		if let info = notification.userInfo, let keyboardFrameValue = info[UIKeyboardFrameEndUserInfoKey] as? NSValue {
@@ -188,7 +188,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 		}
 	}
 
-	func keyboardWillHide(notification: NSNotification) {
+	@objc private func keyboardWillHide(notification: NSNotification) {
 		if !scrollView.isDragging {
 			scrollView.scrollRectToVisible(CGRect(x: 0,
 			                                      y: min(scrollView.contentOffset.y, scrollView.contentSize.height - scrollView.bounds.size.height),

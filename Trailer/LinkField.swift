@@ -9,13 +9,12 @@ final class LinkField: CenterTextField {
 
 	override func viewDidMoveToWindow() {
 		super.viewDidMoveToWindow()
-		let check = attributedStringValue .boundingRect(with: bounds.size,
-			options: stringDrawingOptions)
+		let check = attributedStringValue .boundingRect(with: bounds.size, options: stringDrawingOptions)
 
 		let newArea = NSTrackingArea(rect: check,
-			options: [.mouseEnteredAndExited, .mouseMoved, .activeInKeyWindow],
-			owner: self,
-			userInfo: nil)
+		                             options: [.mouseEnteredAndExited, .mouseMoved, .activeInKeyWindow],
+		                             owner: self,
+		                             userInfo: nil)
 
 		addTrackingArea(newArea)
 
@@ -28,9 +27,8 @@ final class LinkField: CenterTextField {
 		super.resetCursorRects()
 		if highlight {
 
-			let check = attributedStringValue.boundingRect(with: bounds.size,
-				options: stringDrawingOptions)
-			addCursorRect(check, cursor: NSCursor.pointingHand())
+			let check = attributedStringValue.boundingRect(with: bounds.size, options: stringDrawingOptions)
+			addCursorRect(check, cursor: NSCursor.pointingHand)
 		}
 	}
 
@@ -73,7 +71,7 @@ final class LinkField: CenterTextField {
 
 	override func mouseUp(with theEvent: NSEvent) {
 		if targetUrl == nil {
-            selectParentPr(from: theEvent)
+			selectParentPr(from: theEvent)
 		} else {
 			if needsCommand {
 				if theEvent.modifierFlags.contains(.command) {
@@ -81,22 +79,22 @@ final class LinkField: CenterTextField {
 						app.ignoreNextFocusLoss = true
 					}
 					mouseExited(with: theEvent)
-					NSWorkspace.shared().open(URL(string: targetUrl!)!)
+					NSWorkspace.shared.open(URL(string: targetUrl!)!)
 				} else {
-                    selectParentPr(from: theEvent)
+					selectParentPr(from: theEvent)
 				}
 			} else {
 				mouseExited(with: theEvent)
-				NSWorkspace.shared().open(URL(string: targetUrl!)!)
+				NSWorkspace.shared.open(URL(string: targetUrl!)!)
 			}
 		}
 	}
-
-    private func selectParentPr(from theEvent: NSEvent) {
-        if let parentView = nextResponder as? TrailerCell, let pr = parentView.associatedDataItem {
-            let isAlternative = theEvent.modifierFlags.contains(.option)
+	
+	private func selectParentPr(from theEvent: NSEvent) {
+		if let parentView = nextResponder as? TrailerCell, let pr = parentView.associatedDataItem {
+			let isAlternative = theEvent.modifierFlags.contains(.option)
 			app.selected(pr, alternativeSelect: isAlternative, window: window)
-        }
-    }
+		}
+	}
 
 }

@@ -368,7 +368,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		}
 	}
 
-	func toggleHelp(button: UIBarButtonItem) {
+	@objc private func toggleHelp(button: UIBarButtonItem) {
 		showHelp = !showHelp
 		if let s = searchBar.text, !s.isEmpty {
 			reload()
@@ -389,9 +389,9 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		l.attributedText = NSAttributedString(
 			string: message,
 			attributes: [
-				NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize),
-				NSForegroundColorAttributeName: UIColor.lightGray,
-				NSParagraphStyleAttributeName: p,
+				NSAttributedStringKey.font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize),
+				NSAttributedStringKey.foregroundColor: UIColor.lightGray,
+				NSAttributedStringKey.paragraphStyle: p,
 				])
 		l.numberOfLines = 0
 		return l
@@ -447,7 +447,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			cell.valueLabel.text = v ?? " "
 		}
 
-		cell.detailsBottomAnchor.priority = 750
+		cell.detailsBottomAnchor.priority = UILayoutPriority(rawValue: 750)
 		if showHelp {
 			cell.detailsBottomAnchor.constant = 6
 			cell.detailsTopAnchor.constant = 6
@@ -867,8 +867,8 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		}
 		configureCell(cell: sizer!, indexPath: indexPath)
 		let h = sizer!.systemLayoutSizeFitting(CGSize(width: tableView.bounds.width, height: UILayoutFittingCompressedSize.height),
-			withHorizontalFittingPriority: UILayoutPriorityRequired,
-			verticalFittingPriority: UILayoutPriorityFittingSizeLevel).height
+			withHorizontalFittingPriority: .required,
+			verticalFittingPriority: .fittingSizeLevel).height
 		heightCache[indexPath] = h
 		return h
 	}

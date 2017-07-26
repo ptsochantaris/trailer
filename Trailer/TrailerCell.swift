@@ -1,15 +1,15 @@
 
 class TrailerCell: NSTableCellView {
 
-	private static let statusAttributes: [String : Any] = {
+	private static let statusAttributes: [NSAttributedStringKey : Any] = {
 
 		let paragraphStyle = NSMutableParagraphStyle()
 		paragraphStyle.headIndent = 17
 
 		return [
-			NSFontAttributeName: NSFont(name: "Monaco", size: 9)!,
-			NSParagraphStyleAttributeName: paragraphStyle
-			] as [String:Any]
+			NSAttributedStringKey.font: NSFont(name: "Monaco", size: 9)!,
+			NSAttributedStringKey.paragraphStyle: paragraphStyle
+		]
 	}()
 
 
@@ -120,7 +120,7 @@ class TrailerCell: NSTableCellView {
 		fatalError("init(coder:) has not been implemented")
 	}
 
-	func unPinSelected() {
+	@objc private func unPinSelected() {
 		if let i = associatedDataItem {
 			app.unPinSelected(for: i)
 		}
@@ -153,27 +153,27 @@ class TrailerCell: NSTableCellView {
 		}
 	}
 
-	func openRepo() {
+	@objc private func openRepo() {
 		if let u = associatedDataItem?.repo.webUrl, let url = URL(string: u) {
-			NSWorkspace.shared().open(url)
+			NSWorkspace.shared.open(url)
 		}
 	}
 
-	func copyToClipboard() {
+	@objc private func copyToClipboard() {
 		if let s = associatedDataItem?.webUrl {
-			let p = NSPasteboard.general()
+			let p = NSPasteboard.general
 			p.clearContents()
-			p.declareTypes([NSStringPboardType], owner: self)
-			p.setString(s, forType: NSStringPboardType)
+			p.declareTypes([NSPasteboard.PasteboardType.string], owner: self)
+			p.setString(s, forType: NSPasteboard.PasteboardType.string)
 		}
 	}
 
-	func copyNumberToClipboard() {
+	@objc private func copyNumberToClipboard() {
 		if let s = associatedDataItem?.number {
-			let p = NSPasteboard.general()
+			let p = NSPasteboard.general
 			p.clearContents()
-			p.declareTypes([NSStringPboardType], owner: self)
-			p.setString("#\(s)", forType: NSStringPboardType)
+			p.declareTypes([NSPasteboard.PasteboardType.string], owner: self)
+			p.setString("#\(s)", forType: NSPasteboard.PasteboardType.string)
 		}
 	}
 
@@ -257,32 +257,32 @@ class TrailerCell: NSTableCellView {
 		return m
 	}
 
-	func snoozeConfigSelected() {
+	@objc private func snoozeConfigSelected() {
 		app.showPreferencesWindow(andSelect: 6)
 	}
 
-	func snoozeSelected(_ sender: NSMenuItem) {
+	@objc private func snoozeSelected(_ sender: NSMenuItem) {
 		if let item = associatedDataItem, let oid = sender.representedObject as? NSManagedObjectID, let snoozeItem = existingObject(with: oid) as? SnoozePreset {
 			item.snooze(using: snoozeItem)
 			saveAndRequestMenuUpdate(item)
 		}
 	}
 
-	func wakeUpSelected() {
+	@objc private func wakeUpSelected() {
 		if let item = associatedDataItem {
 			item.wakeUp()
 			saveAndRequestMenuUpdate(item)
 		}
 	}
 
-	func markReadSelected() {
+	@objc private func markReadSelected() {
 		if let item = associatedDataItem {
 			item.catchUpWithComments()
 			saveAndRequestMenuUpdate(item)
 		}
 	}
 
-	func markUnreadSelected() {
+	@objc private func markUnreadSelected() {
 		if let item = associatedDataItem {
 			item.latestReadCommentDate = .distantPast
 			item.postProcess()
@@ -290,14 +290,14 @@ class TrailerCell: NSTableCellView {
 		}
 	}
 
-	func muteSelected() {
+	@objc private func muteSelected() {
 		if let item = associatedDataItem {
 			item.setMute(to: true)
 			saveAndRequestMenuUpdate(item)
 		}
 	}
 
-	func unMuteSelected() {
+	@objc private func unMuteSelected() {
 		if let item = associatedDataItem {
 			item.setMute(to: false)
 			saveAndRequestMenuUpdate(item)
@@ -318,7 +318,7 @@ class TrailerCell: NSTableCellView {
 			removeTrackingArea(t)
 		}
 
-		let t = NSTrackingArea(rect: bounds, options: [.mouseEnteredAndExited, .activeInKeyWindow], owner: self, userInfo: nil)
+		let t = NSTrackingArea(rect: bounds, options: [NSTrackingArea.Options.mouseEnteredAndExited, NSTrackingArea.Options.activeInKeyWindow], owner: self, userInfo: nil)
 		addTrackingArea(t)
 		trackingArea = t
 
@@ -348,9 +348,9 @@ class TrailerCell: NSTableCellView {
 		pCenter.alignment = .center
 
 		let countString = NSAttributedString(string: itemCountFormatter.string(for: total)!, attributes: [
-			NSFontAttributeName: NSFont.menuFont(ofSize: 11),
-			NSForegroundColorAttributeName: isDark ? NSColor.controlLightHighlightColor : NSColor.controlTextColor,
-			NSParagraphStyleAttributeName: pCenter])
+			NSAttributedStringKey.font: NSFont.menuFont(ofSize: 11),
+			NSAttributedStringKey.foregroundColor: isDark ? NSColor.controlLightHighlightColor : NSColor.controlTextColor,
+			NSAttributedStringKey.paragraphStyle: pCenter])
 
 		var height: CGFloat = 20
 		var width = max(height, countString.size().width+10)
@@ -373,9 +373,9 @@ class TrailerCell: NSTableCellView {
 
 			let alertText = unread==0 ? "!" : itemCountFormatter.string(for: unread)!
 			let alertString = NSAttributedString(string: alertText, attributes: [
-				NSFontAttributeName: NSFont.menuFont(ofSize: 8),
-				NSForegroundColorAttributeName: NSColor.white,
-				NSParagraphStyleAttributeName: pCenter])
+				NSAttributedStringKey.font: NSFont.menuFont(ofSize: 8),
+				NSAttributedStringKey.foregroundColor: NSColor.white,
+				NSAttributedStringKey.paragraphStyle: pCenter])
 
 			bottom += height
 			height = 14
@@ -412,7 +412,7 @@ class TrailerCell: NSTableCellView {
 				newBackground?.backgroundColor = NSColor(red: 1.0, green: 0.4, blue: 0.4, alpha: 1.0)
 			}
 			if let a = countView?.attributedStringValue.mutableCopy() as? NSMutableAttributedString {
-				a.addAttribute(NSForegroundColorAttributeName, value: color, range: NSRange(location: 0, length: a.length))
+				a.addAttribute(NSAttributedStringKey.foregroundColor, value: color, range: NSRange(location: 0, length: a.length))
 				countView?.attributedStringValue = a
 			}
 		}
