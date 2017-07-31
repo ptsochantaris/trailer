@@ -36,7 +36,7 @@ final class TabBarSet {
 	}
 }
 
-final class MasterViewController: UITableViewController, NSFetchedResultsControllerDelegate, UISearchBarDelegate, UITabBarControllerDelegate, UITabBarDelegate {
+final class MasterViewController: UITableViewController, NSFetchedResultsControllerDelegate, UITabBarControllerDelegate, UITabBarDelegate, UISearchControllerDelegate, UISearchResultsUpdating {
 
 	private var detailViewController: DetailViewController!
 	private var fetchedResultsController: NSFetchedResultsController<ListableItem>!
@@ -51,11 +51,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	private var currentTabBarSet: TabBarSet?
 
 	// Filtering
-	@IBOutlet weak var searchBar: UISearchBar!
 	private var searchTimer: PopTimer!
 
 	// Refreshing
-	@IBOutlet var refreshLabel: UILabel!
 	private var refreshOnRelease = false
 
 	private var forceSafari = false
@@ -173,7 +171,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	override func viewDidLayoutSubviews() {
 		super.viewDidLayoutSubviews()
-		refreshLabel.center = CGPoint(x: view.bounds.midX, y: refreshControl!.center.y+36)
 		layoutTabs()
 	}
 
@@ -212,7 +209,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
-		updateStatus(becauseOfChanges: false)
+		updateStatus(becauseOfChanges: false, updateItems: true)
 
 		if let s = splitViewController, !s.isCollapsed {
 			return
@@ -224,7 +221,14 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	override func viewDidLoad() {
 		super.viewDidLoad()
 
-		view.addSubview(refreshLabel)
+		let searchController = UISearchController(searchResultsController: nil)
+		searchController.dimsBackgroundDuringPresentation = false
+		searchController.obscuresBackgroundDuringPresentation = false
+		searchController.delegate = self
+		searchController.searchResultsUpdater = self
+		searchController.searchBar.tintColor = view.tintColor
+		searchController.searchBar.placeholder = "Filter"
+		navigationItem.searchController = searchController
 
 		searchTimer = PopTimer(timeInterval: 0.5) { [weak self] in
 			self?.applyFilter()
@@ -235,7 +239,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		tableView.rowHeight = UITableViewAutomaticDimension
 		tableView.estimatedRowHeight = 160
 		tableView.register(UINib(nibName: "SectionHeaderView", bundle: nil), forHeaderFooterViewReuseIdentifier: "SectionHeaderView")
-		tableView.contentOffset = CGPoint(x: 0, y: 44)
 		clearsSelectionOnViewWillAppear = false
 
 		if let detailNav = splitViewController?.viewControllers.last as? UINavigationController {
@@ -300,13 +303,17 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		updateStatus(becauseOfChanges: false)
 	}
 
+	private lazy var refreshAttributes = [
+		NSAttributedStringKey.font: UIFont.preferredFont(forTextStyle: .caption2),
+		NSAttributedStringKey.foregroundColor: self.refreshControl!.tintColor
+	]
+
 	@objc private func refreshUpdated() {
-		refreshLabel.text = API.lastUpdateDescription
+		refreshControl?.attributedTitle = NSAttributedString(string: API.lastUpdateDescription, attributes: refreshAttributes)
 	}
 
 	@objc private func refreshProcessing() {
-		title = "Processing…"
-		refreshLabel.text = "Processing…"
+		refreshControl?.attributedTitle = NSAttributedString(string: "Processing…", attributes: refreshAttributes)
 	}
 
 	override var canBecomeFirstResponder: Bool {
@@ -501,21 +508,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
 		lastTabIndex = tabs?.items?.index(of: item) ?? 0
-		updateTabItems(animated: true, rebuildTabs: false)
-	}
-
-	override func scrollViewDidScroll(_ scrollView: UIScrollView) {
-		updateRefreshControls()
-	}
-
-	private func updateRefreshControls() {
-		let ra = min(1.0, max(0, (-84-tableView.contentOffset.y)/32.0))
-		if ra > 0.0 && refreshLabel.alpha == 0 {
-			refreshUpdated()
-		}
-		refreshLabel.alpha = ra
-		refreshControl?.alpha = ra
-		searchBar.alpha = min(1.0, max(0, ((116+tableView.contentOffset.y)/32.0)))
+		updateStatus(becauseOfChanges: false, updateItems: true)
 	}
 
 	private func applyFilter() {
@@ -598,7 +591,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			}
 
 			if items.count > 1 {
-				showEmpty = false
 				showTabBar(show: true, animated: animated)
 
 				tabs?.items = items
@@ -612,7 +604,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 					currentTabBarSet = tabBarSetForTabItem(i: items.last!)
 				}
 			} else {
-				showEmpty = items.count == 0
 				currentTabBarSet = tabBarSetForTabItem(i: items.first)
 				showTabBar(show: false, animated: animated)
 			}
@@ -772,9 +763,10 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			}
 		}
 
-		if urlToOpen != nil && !S(searchBar.text).isEmpty {
-			searchBar.text = nil
-			searchBar.resignFirstResponder()
+		let sc = navigationItem.searchController!
+		if urlToOpen != nil && sc.isActive {
+			sc.searchBar.text = nil
+			sc.isActive = false
 			resetView(becauseOfChanges: false)
 		}
 
@@ -1045,6 +1037,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	private var itemFetchRequest: NSFetchRequest<ListableItem> {
 		let type: ListableItem.Type = viewingPrs ? PullRequest.self : Issue.self
+		let searchBar = navigationItem.searchController!.searchBar
 		return ListableItem.requestForItems(of: type, withFilter: searchBar.text, sectionIndex: -1, criterion: currentTabBarSet?.viewCriterion)
 	}
 
@@ -1123,11 +1116,10 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	private var viewingPrs = true
-	private var showEmpty = true
 
-	func updateStatus(becauseOfChanges: Bool) {
+	func updateStatus(becauseOfChanges: Bool, updateItems: Bool = false) {
 
-		if becauseOfChanges {
+		if becauseOfChanges || updateItems {
 			updateTabItems(animated: true, rebuildTabs: true)
 		}
 		updateFooter()
@@ -1136,18 +1128,14 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			title = "Refreshing…"
 			if let r = refreshControl {
 				refreshUpdated()
-				updateRefreshControls()
 				r.beginRefreshing()
 			}
 		} else {
 
-			title = showEmpty ? "No Items"
-				: viewingPrs ? pullRequestsTitle(long: true)
-				: issuesTitle
+			title = viewingPrs ? pullRequestsTitle : issuesTitle
 
 			if let r = refreshControl {
 				refreshUpdated()
-				updateRefreshControls()
 				r.endRefreshing()
 			}
 		}
@@ -1162,12 +1150,13 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	private func updateFooter() {
-		if fetchedResultsController.fetchedObjects?.count ?? 0 == 0 {
+		if (fetchedResultsController.fetchedObjects?.count ?? 0) == 0 {
 			let reasonForEmpty: NSAttributedString
+			let searchBarText = navigationItem.searchController!.searchBar.text
 			if viewingPrs {
-				reasonForEmpty = PullRequest.reasonForEmpty(with: searchBar.text, criterion: currentTabBarSet?.viewCriterion)
+				reasonForEmpty = PullRequest.reasonForEmpty(with: searchBarText, criterion: currentTabBarSet?.viewCriterion)
 			} else {
-				reasonForEmpty = Issue.reasonForEmpty(with: searchBar.text, criterion: currentTabBarSet?.viewCriterion)
+				reasonForEmpty = Issue.reasonForEmpty(with: searchBarText, criterion: currentTabBarSet?.viewCriterion)
 			}
 			tableView.tableFooterView = EmptyView(message: reasonForEmpty, parentWidth: view.bounds.size.width)
 		} else {
@@ -1179,38 +1168,25 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		return count == 0 ? "" : count == 1 ? " (1 update)" : " (\(count) updates)"
 	}
 
-	private func pullRequestsTitle(long: Bool) -> String {
-
-		let f = ListableItem.requestForItems(of: PullRequest.self, withFilter: nil, sectionIndex: -1, criterion: currentTabBarSet?.viewCriterion)
-		let count = try! DataManager.main.count(for: f)
-		let unreadCount = Int(currentTabBarSet?.prItem?.badgeValue ?? "0")!
-
-		let pr = long ? "Pull Request" : "PR"
-		if count == 0 {
-			return "No \(pr)s"
-		} else if count == 1 {
-			let suffix = unreadCount > 0 ? "PR\(unreadCommentCount(count: unreadCount))" : pr
-			return "1 \(suffix)"
+	private var pullRequestsTitle: String {
+		let item = currentTabBarSet?.prItem
+		let unreadCount = Int(item?.badgeValue ?? "0")!
+		let title = item?.title ?? "Pull Requests"
+		if unreadCount > 0 {
+			return title.appending(" (\(unreadCount))")
 		} else {
-			let suffix = unreadCount > 0 ? "PRs\(unreadCommentCount(count: unreadCount))" : "\(pr)s"
-			return "\(count) \(suffix)"
+			return title
 		}
 	}
 
 	private var issuesTitle: String {
-
-		let f = ListableItem.requestForItems(of: Issue.self, withFilter: nil, sectionIndex: -1, criterion: currentTabBarSet?.viewCriterion)
-		let count = try! DataManager.main.count(for: f)
-		let unreadCount = Int(currentTabBarSet?.issuesItem?.badgeValue ?? "0")!
-
-		if count == 0 {
-			return "No Issues"
-		} else if count == 1 {
-			let commentCount = unreadCommentCount(count: unreadCount)
-			return "1 Issue\(commentCount)"
+		let item = currentTabBarSet?.issuesItem
+		let unreadCount = Int(item?.badgeValue ?? "0")!
+		let title = item?.title ?? "Issues"
+		if unreadCount > 0 {
+			return title.appending(" (\(unreadCount))")
 		} else {
-			let commentCount = unreadCommentCount(count: unreadCount)
-			return "\(count) Issues\(commentCount)"
+			return title
 		}
 	}
 
@@ -1220,34 +1196,8 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		becomeFirstResponder()
 	}
 
-	func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
-		if let r = refreshControl, r.isRefreshing {
-			r.endRefreshing()
-		}
-		searchBar.setShowsCancelButton(true, animated: true)
-	}
-
-	func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
-		searchBar.setShowsCancelButton(false, animated: true)
-	}
-
-	func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+	func updateSearchResults(for searchController: UISearchController) {
 		searchTimer.push()
-	}
-
-	func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-		searchBar.text = nil
-		searchTimer.push()
-		view.endEditing(false)
-	}
-
-	func searchBar(_ searchBar: UISearchBar, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-		if text == "\n" {
-			view.endEditing(false)
-			return false
-		} else {
-			return true
-		}
 	}
 
 	private func safeScrollToTop() {
@@ -1255,17 +1205,13 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		atNextEvent(self) { S in
 			if S.tableView.numberOfSections > 0 {
 				S.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
-				if !(S.searchBar.text?.isEmpty ?? true) {
-					atNextEvent {
-						S.tableView.contentOffset = CGPoint(x: 0, y: -S.tableView.contentInset.top)
-					}
-				}
 			}
 		}
 	}
 
 	@objc func focusFilter(terms: String?) {
 		tableView.contentOffset = CGPoint(x: 0, y: -tableView.contentInset.top)
+		let searchBar = navigationItem.searchController!.searchBar
 		searchBar.becomeFirstResponder()
 		searchBar.text = terms
 		searchTimer.push()
