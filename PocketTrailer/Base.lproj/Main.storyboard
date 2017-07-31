@@ -4,7 +4,6 @@
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
-        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13147.4"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
@@ -239,17 +238,9 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                        <searchBar key="tableHeaderView" contentMode="redraw" searchBarStyle="minimal" placeholder="Filter…" id="oYa-39-0HF">
-                            <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
-                            <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" returnKeyType="done"/>
-                            <connections>
-                                <outlet property="delegate" destination="qen-v7-82i" id="Brf-Ci-Fkj"/>
-                            </connections>
-                        </searchBar>
                         <prototypes>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="Cell" rowHeight="103" id="iKr-zg-lam" customClass="RepoCell" customModule="Trailer" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="66" width="414" height="103"/>
+                                <rect key="frame" x="0.0" y="22" width="414" height="103"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="iKr-zg-lam" id="bgw-3g-6tl">
                                     <rect key="frame" x="0.0" y="0.0" width="381" height="102.66666666666667"/>
@@ -336,7 +327,6 @@
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="actionsButton" destination="kBh-JC-HZv" id="Niq-mx-ZmL"/>
-                        <outlet property="searchBar" destination="oYa-39-0HF" id="ruo-eo-Goa"/>
                         <segue destination="QN8-91-ety" kind="show" identifier="showCustomRepos" id="lz3-Tl-bKF"/>
                         <segue destination="8c3-Pk-1x6" kind="show" identifier="showWatchlistSettings" id="WoP-FJ-xoT"/>
                     </connections>
@@ -821,17 +811,9 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="0.93725490196078431" green="0.93725490196078431" blue="0.95686274509803926" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <inset key="separatorInset" minX="15" minY="0.0" maxX="0.0" maxY="0.0"/>
-                        <searchBar key="tableHeaderView" contentMode="redraw" searchBarStyle="minimal" placeholder="Filter…" id="Rhe-8X-F8V">
-                            <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
-                            <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" returnKeyType="done"/>
-                            <connections>
-                                <outlet property="delegate" destination="ls6-NX-hye" id="PFp-BH-Zoz"/>
-                            </connections>
-                        </searchBar>
                         <prototypes>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="default" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" rowHeight="134" id="0IG-O1-8fc" customClass="AdvancedSettingsCell" customModule="Trailer" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="99.333333333333343" width="414" height="134"/>
+                                <rect key="frame" x="0.0" y="55.333333333333336" width="414" height="134"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="0IG-O1-8fc" id="Cde-Zq-FvG">
                                     <rect key="frame" x="0.0" y="0.0" width="414" height="133.66666666666666"/>
@@ -890,7 +872,6 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
-                        <outlet property="searchBar" destination="Rhe-8X-F8V" id="reC-GC-8ys"/>
                         <segue destination="UM1-Tl-R50" kind="show" identifier="showPicker" id="jwG-rd-TEN"/>
                         <segue destination="QXf-Ap-v0o" kind="show" identifier="showBlacklist" id="V4L-hY-j8o"/>
                     </connections>
@@ -1628,7 +1609,7 @@ You need at least the 'repo', 'repo:status', 'repo_deployment', 'public_repo' an
         <image name="snoozing" width="28" height="28"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="BCG-Sc-dRs"/>
+        <segue reference="jwG-rd-TEN"/>
     </inferredMetricsTieBreakers>
     <color key="tintColor" red="0.20270904898643494" green="0.43045499920845032" blue="0.71786797046661377" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
 </document>

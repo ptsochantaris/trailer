@@ -2,10 +2,9 @@
 import UIKit
 import CoreData
 
-final class RespositoriesViewController: UITableViewController, UISearchBarDelegate, NSFetchedResultsControllerDelegate {
+final class RespositoriesViewController: UITableViewController, UISearchResultsUpdating, NSFetchedResultsControllerDelegate {
 
 	// Filtering
-	@IBOutlet weak var searchBar: UISearchBar!
 	private var searchTimer: PopTimer!
 	private var _fetchedResultsController: NSFetchedResultsController<Repo>?
 
@@ -20,6 +19,16 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
+
+		let searchController = UISearchController(searchResultsController: nil)
+		searchController.dimsBackgroundDuringPresentation = false
+		searchController.obscuresBackgroundDuringPresentation = false
+		searchController.searchResultsUpdater = self
+		searchController.searchBar.tintColor = view.tintColor
+		searchController.searchBar.placeholder = "Filter"
+		navigationItem.searchController = searchController
+
+		navigationItem.hidesSearchBarWhenScrolling = false
 
 		searchTimer = PopTimer(timeInterval: 0.5) { [weak self] in
 			self?.reloadData()
@@ -38,12 +47,12 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
-		self.navigationController?.setToolbarHidden(false, animated: animated)
+		navigationController?.setToolbarHidden(false, animated: animated)
 	}
 
 	override func viewWillDisappear(_ animated: Bool) {
 		super.viewWillDisappear(animated)
-		self.navigationController?.setToolbarHidden(true, animated: animated)
+		navigationController?.setToolbarHidden(true, animated: animated)
 	}
 
 	@IBAction func actionSelected(_ sender: UIBarButtonItem) {
@@ -147,7 +156,7 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 		}
 
 		let fetchRequest = NSFetchRequest<Repo>(entityName: "Repo")
-		if let text = searchBar.text, !text.isEmpty {
+		if let text = navigationItem.searchController!.searchBar.text, !text.isEmpty {
 			fetchRequest.predicate = NSPredicate(format: "fullName contains [cd] %@", text)
 		}
 		fetchRequest.returnsObjectsAsFaults = false
@@ -331,35 +340,13 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 	}
 
 	override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-		if searchBar!.isFirstResponder {
-			searchBar!.resignFirstResponder()
+		let searchBar = navigationItem.searchController!.searchBar
+		if searchBar.isFirstResponder {
+			searchBar.resignFirstResponder()
 		}
 	}
 
-	func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+	func updateSearchResults(for searchController: UISearchController) {
 		searchTimer.push()
-	}
-
-	func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
-		searchBar.setShowsCancelButton(true, animated: true)
-	}
-
-	func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
-		searchBar.setShowsCancelButton(false, animated: true)
-	}
-
-	func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-		searchBar.text = nil
-		searchTimer.push()
-		view.endEditing(false)
-	}
-
-	func searchBar(_ searchBar: UISearchBar, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-		if text == "\n" {
-			view.endEditing(false)
-			return false
-		} else {
-			return true
-		}
 	}
 }

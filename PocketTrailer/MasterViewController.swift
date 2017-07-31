@@ -36,7 +36,7 @@ final class TabBarSet {
 	}
 }
 
-final class MasterViewController: UITableViewController, NSFetchedResultsControllerDelegate, UITabBarControllerDelegate, UITabBarDelegate, UISearchControllerDelegate, UISearchResultsUpdating {
+final class MasterViewController: UITableViewController, NSFetchedResultsControllerDelegate, UITabBarControllerDelegate, UITabBarDelegate, UISearchResultsUpdating {
 
 	private var detailViewController: DetailViewController!
 	private var fetchedResultsController: NSFetchedResultsController<ListableItem>!
@@ -224,7 +224,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		let searchController = UISearchController(searchResultsController: nil)
 		searchController.dimsBackgroundDuringPresentation = false
 		searchController.obscuresBackgroundDuringPresentation = false
-		searchController.delegate = self
 		searchController.searchResultsUpdater = self
 		searchController.searchBar.tintColor = view.tintColor
 		searchController.searchBar.placeholder = "Filter"

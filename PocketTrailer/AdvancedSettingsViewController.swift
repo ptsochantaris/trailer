@@ -1,7 +1,7 @@
 
 import UIKit
 
-final class AdvancedSettingsViewController: UITableViewController, PickerViewControllerDelegate, UISearchBarDelegate {
+final class AdvancedSettingsViewController: UITableViewController, PickerViewControllerDelegate, UISearchResultsUpdating {
 
 	private enum SettingsSection: Int {
 		case Refresh, Display, Filtering, AppleWatch, Comments, Watchlist, Reviews, Reactions, Stauses, History, Confirm, Sort, Misc
@@ -296,9 +296,6 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	private var settingsChangedTimer: PopTimer!
 	private var searchTimer: PopTimer!
 
-	// Search
-	@IBOutlet weak var searchBar: UISearchBar!
-
 	// for the picker
 	private var valuesToPush: [String]?
 	private var pickerName: String?
@@ -320,6 +317,16 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	override func viewDidLoad() {
 		super.viewDidLoad()
 
+		let searchController = UISearchController(searchResultsController: nil)
+		searchController.dimsBackgroundDuringPresentation = false
+		searchController.obscuresBackgroundDuringPresentation = false
+		searchController.searchResultsUpdater = self
+		searchController.searchBar.tintColor = view.tintColor
+		searchController.searchBar.placeholder = "Filter"
+		navigationItem.searchController = searchController
+
+		navigationItem.hidesSearchBarWhenScrolling = false
+		
 		searchTimer = PopTimer(timeInterval: 0.2) { [weak self] in
 			self?.reload()
 		}
@@ -341,36 +348,20 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		view.endEditing(false)
 	}
 
-	func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+	func updateSearchResults(for searchController: UISearchController) {
 		searchTimer.push()
 	}
 
-	func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
-		searchBar.setShowsCancelButton(true, animated: true)
-	}
-
-	func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
-		searchBar.setShowsCancelButton(false, animated: true)
-	}
-	
-	func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-		searchBar.text = nil
-		searchTimer.push()
-		view.endEditing(false)
-	}
-
-	func searchBar(_ searchBar: UISearchBar, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-		if text == "\n" {
-			view.endEditing(false)
-			return false
-		} else {
-			return true
+	override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+		let searchBar = navigationItem.searchController!.searchBar
+		if searchBar.isFirstResponder {
+			searchBar.resignFirstResponder()
 		}
 	}
 
 	@objc private func toggleHelp(button: UIBarButtonItem) {
 		showHelp = !showHelp
-		if let s = searchBar.text, !s.isEmpty {
+		if let s = navigationItem.searchController?.searchBar.text, !s.isEmpty {
 			reload()
 		} else {
 			heightCache.removeAll()
@@ -839,12 +830,12 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 	private func filteredItemsForTableSection(section: Int) -> [Setting] {
 		let sec = filteredSections[section]
-		let searchText = searchBar.text?.trim
+		let searchText = navigationItem.searchController?.searchBar.text?.trim
 		return settings.filter{ $0.section == sec && $0.isRelevantTo(s: searchText, showingHelp: showHelp) }
 	}
 
 	private var filteredSections: [SettingsSection] {
-		let searchText = searchBar.text?.trim
+		let searchText = navigationItem.searchController?.searchBar.text?.trim
 		let matchingSettings = settings.filter{ $0.isRelevantTo(s: searchText, showingHelp: showHelp) }
 		var matchingSections = [SettingsSection]()
 		matchingSettings.forEach {
