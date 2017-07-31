@@ -16,6 +16,8 @@ typealias COLOR_CLASS = UIColor
 typealias FONT_CLASS = UIFont
 typealias IMAGE_CLASS = UIImage
 
+let stringDrawingOptions: NSStringDrawingOptions = [.usesLineFragmentOrigin, .usesFontLeading]
+
 #elseif os(OSX)
 
 	weak var app: OSX_AppDelegate!
@@ -46,8 +48,6 @@ let NOTIFICATION_URL_KEY = "urlKey"
 ////////////////////////// Utilities
 
 #if os(iOS)
-
-let stringDrawingOptions: NSStringDrawingOptions = [.usesLineFragmentOrigin, .usesFontLeading]
 
 	func showMessage(_ title: String, _ message: String?) {
 		var viewController = app.window?.rootViewController
@@ -90,23 +90,6 @@ let itemCountFormatter: NumberFormatter = {
 	n.numberStyle = .decimal
 	return n
 }()
-
-// Single-purpose derivation from the excellent SAMAdditions:
-// https://github.com/soffes/SAMCategories/blob/master/SAMCategories/NSDate%2BSAMAdditions.m
-private let dateParserHolder = "                   +0000".cString(using: String.Encoding.ascii)!
-func parseGH8601(_ iso8601: String?) -> Date? {
-
-	guard let i = iso8601, i.characters.count >= 19 else { return nil }
-
-	var fullString = dateParserHolder
-	memcpy(&fullString, i, 19)
-
-	var tt = tm()
-	strptime(fullString, "%FT%T%z", &tt)
-
-	let t = mktime(&tt)
-	return Date(timeIntervalSince1970: TimeInterval(t))
-}
 
 func bootUp() {
 	Settings.checkMigration()
@@ -316,17 +299,8 @@ extension String {
 			return appending(pathComponent)
 		}
 	}
-	func replacingCharacters(in range: NSRange, with string: String) -> String {
-		let l = index(startIndex, offsetBy: range.location)
-		let u = index(l, offsetBy: range.length)
-		let r = Range(uncheckedBounds: (lower: l, upper: u))
-		return replacingCharacters(in: r, with: string)
-	}
 	var trim: String {
 		return trimmingCharacters(in: .whitespacesAndNewlines)
-	}
-	var md5hashed: String {
-		return MD5Hashing.md5(str: self)
 	}
 }
 

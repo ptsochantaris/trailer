@@ -242,8 +242,8 @@ final class API {
 		#else
 			let absolutePath = "\(path)\(connector)s=104"
 		#endif
-		let imageKey = "\(absolutePath) \(currentAppVersion)"
-		let cachePath = cacheDirectory.appending(pathComponent: "imgcache-\(imageKey.md5hashed)")
+		let md5 = MD5Hashing.md5(str: "\(absolutePath) \(currentAppVersion)")
+		let cachePath = cacheDirectory.appending(pathComponent: "imgcache-\(md5)")
 
 		let fileManager = FileManager.default
 		if fileManager.fileExists(atPath: cachePath) {

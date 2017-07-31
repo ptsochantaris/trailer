@@ -68,7 +68,7 @@ class DataItem: NSManagedObject {
 			let serverId = i.serverId
 			if let idx = idsOfItems.index(of: serverId), let info = idsToInfo[serverId] {
 				idsOfItems.remove(at: idx)
-				let updatedDate = parseGH8601(info["updated_at"] as? String) ?? i.createdAt ?? now
+				let updatedDate = DataItem.parseGH8601(info["updated_at"] as? String) ?? i.createdAt ?? now
 				if updatedDate != i.updatedAt {
 					DLog("Updating %@: %@", entityName, serverId)
 					i.postSyncAction = PostSyncAction.isUpdated.rawValue
@@ -92,8 +92,8 @@ class DataItem: NSManagedObject {
 				i.postSyncAction = PostSyncAction.isNew.rawValue
 				i.apiServer = server
 
-				i.createdAt = parseGH8601(info["created_at"] as? String) ?? now
-				i.updatedAt = parseGH8601(info["updated_at"] as? String) ?? i.createdAt
+				i.createdAt = DataItem.parseGH8601(info["created_at"] as? String) ?? now
+				i.updatedAt = DataItem.parseGH8601(info["updated_at"] as? String) ?? i.createdAt
 
 				postProcessCallback(i, info, true)
 			}
@@ -188,5 +188,21 @@ class DataItem: NSManagedObject {
 		} else {
 			toFetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: andPredicates)
 		}
+	}
+
+	// Single-purpose derivation from the excellent SAMAdditions:
+	// https://github.com/soffes/SAMCategories/blob/master/SAMCategories/NSDate%2BSAMAdditions.m
+	// Main thread only
+	private static var timeData = tm()
+	private static var dateParserHolder = "                   +0000".cString(using: String.Encoding.ascii)!
+	private static func parseGH8601(_ iso8601: String?) -> Date? {
+
+		guard let i = iso8601, i.count > 18 else { return nil }
+
+		memcpy(&dateParserHolder, i, 19)
+		strptime(dateParserHolder, "%FT%T%z", &timeData)
+
+		let t = mktime(&timeData)
+		return Date(timeIntervalSince1970: TimeInterval(t))
 	}
 }

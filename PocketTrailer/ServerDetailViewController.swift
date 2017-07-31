@@ -111,9 +111,12 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 			textField.resignFirstResponder()
 			return false
 		}
-		if textField == authToken {
-			let newToken = textField.text?.replacingCharacters(in: range, with: string)
-			processTokenState(from: newToken)
+		if textField === authToken {
+			let toReplace = S(textField.text)
+			if let r = Range(range, in: toReplace) {
+				let newToken = toReplace.replacingCharacters(in: r, with: string)
+				processTokenState(from: newToken)
+			}
 		}
 		return true
 	}
