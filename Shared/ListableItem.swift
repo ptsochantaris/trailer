@@ -1075,4 +1075,15 @@ class ListableItem: DataItem {
 
 		return styleForEmpty(message: message, color: color)
 	}
+
+	#if os(iOS)
+	var dragItemForUrl: UIDragItem {
+		let url = URL(string: urlForOpening ?? repo.webUrl ?? "") ?? URL(string: "https://github.com")!
+		let text = "#\(number) - \(S(title))"
+		let provider = NSItemProvider(object: url as NSURL)
+		provider.registerObject(text as NSString, visibility: .all)
+		provider.suggestedName = text
+		return UIDragItem(itemProvider: provider)
+	}
+	#endif
 }

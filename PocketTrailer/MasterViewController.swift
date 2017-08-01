@@ -36,7 +36,9 @@ final class TabBarSet {
 	}
 }
 
-final class MasterViewController: UITableViewController, NSFetchedResultsControllerDelegate, UITabBarControllerDelegate, UITabBarDelegate, UISearchResultsUpdating {
+final class MasterViewController: UITableViewController, NSFetchedResultsControllerDelegate,
+UITabBarControllerDelegate, UITabBarDelegate, UISearchResultsUpdating,
+UITableViewDragDelegate {
 
 	private var detailViewController: DetailViewController!
 	private var fetchedResultsController: NSFetchedResultsController<ListableItem>!
@@ -239,6 +241,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		tableView.estimatedRowHeight = 160
 		tableView.register(UINib(nibName: "SectionHeaderView", bundle: nil), forHeaderFooterViewReuseIdentifier: "SectionHeaderView")
 		clearsSelectionOnViewWillAppear = false
+		tableView.dragDelegate = self
 
 		if let detailNav = splitViewController?.viewControllers.last as? UINavigationController {
 			detailViewController = detailNav.topViewController as? DetailViewController
@@ -265,6 +268,17 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		atNextEvent {
 			self.tableView.reloadData() // ensure footers are correct
 		}
+	}
+
+	func tableView(_ tableView: UITableView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
+		let p = fetchedResultsController.object(at: indexPath)
+		return [p.dragItemForUrl]
+	}
+
+	func tableView(_ tableView: UITableView, itemsForAddingTo session: UIDragSession, at indexPath: IndexPath, point: CGPoint) -> [UIDragItem] {
+		let p = fetchedResultsController.object(at: indexPath)
+		let dragItem = p.dragItemForUrl
+		return session.items.contains(dragItem) ? [] : [dragItem]
 	}
 
 	private var dataUpdateTimer: PopTimer!
