@@ -28,8 +28,6 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 		let webConfiguration = WKWebViewConfiguration()
 		let w = WKWebView(frame: view.bounds, configuration: webConfiguration)
 		w.navigationDelegate = self
-		w.scrollView.contentInset = UIEdgeInsetsMake(64, 0, 0, 0)
-		w.scrollView.scrollIndicatorInsets = w.scrollView.contentInset
 		w.autoresizingMask = [.flexibleWidth, .flexibleHeight]
 		w.isHidden = true
 		view.addSubview(w)
