@@ -212,7 +212,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
-		updateStatus(becauseOfChanges: false)
+		updateStatus(becauseOfChanges: false, updateItems: true)
 
 		if let s = splitViewController, !s.isCollapsed {
 			return
@@ -501,7 +501,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
 		lastTabIndex = tabs?.items?.index(of: item) ?? 0
-		updateTabItems(animated: true, rebuildTabs: false)
+		updateStatus(becauseOfChanges: false, updateItems: true)
 	}
 
 	override func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -1125,9 +1125,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	private var viewingPrs = true
 	private var showEmpty = true
 
-	func updateStatus(becauseOfChanges: Bool) {
+	func updateStatus(becauseOfChanges: Bool, updateItems: Bool = false) {
 
-		if becauseOfChanges {
+		if becauseOfChanges || updateItems {
 			updateTabItems(animated: true, rebuildTabs: true)
 		}
 		updateFooter()
