@@ -24,7 +24,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		menuBarSets.removeAll()
 
 		var newSets = [MenuBarSet]()
-		for groupLabel in Repo.allGroupLabels {
+		for groupLabel in Repo.allGroupLabels(in: DataManager.main) {
 			let c = GroupingCriterion(repoGroup: groupLabel)
 			let s = MenuBarSet(viewCriterion: c, delegate: self)
 			s.setTimers()

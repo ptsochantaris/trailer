@@ -144,8 +144,8 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 						append(a, count: totalSnoozed, section: .snoozed)
 						appendCommentCount(a, number: totalUnread)
 					}
-				} else {
-					a.append(NSAttributedString(string: result["error"] as! String, attributes: [NSParagraphStyleAttributeName: paragraph]))
+				} else if let e = result["error"] as? String {
+					a.append(NSAttributedString(string: e, attributes: [NSParagraphStyleAttributeName: paragraph]))
 				}
 				return a.copy() as! NSAttributedString
 			}

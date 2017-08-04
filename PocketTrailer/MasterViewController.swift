@@ -573,7 +573,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 			tabBarSets.removeAll()
 
-			for groupLabel in Repo.allGroupLabels {
+			for groupLabel in Repo.allGroupLabels(in: DataManager.main) {
 				let c = GroupingCriterion(repoGroup: groupLabel)
 				let s = TabBarSet(viewCriterion: c)
 				tabBarSets.append(s)

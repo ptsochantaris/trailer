@@ -340,6 +340,8 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 		//DLog("Building remote overview")
 
+		let allTabSets = popupManager.masterController.allTabSets
+
 		let tempMoc = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 		tempMoc.undoManager = nil
 		tempMoc.persistentStoreCoordinator = DataManager.main.persistentStoreCoordinator
@@ -350,7 +352,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			var totalUnreadPrCount = 0
 			var totalUnreadIssueCount = 0
 
-			for tabSet in popupManager.masterController.allTabSets {
+			for tabSet in allTabSets {
 
 				let c = tabSet.viewCriterion
 

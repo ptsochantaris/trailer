@@ -178,7 +178,7 @@ class DataItem: NSManagedObject {
 			andPredicates.append(originalPredicate)
 		}
 		if !includeAllGroups && criterion?.repoGroup == nil {
-			for otherGroup in Repo.allGroupLabels {
+			for otherGroup in Repo.allGroupLabels(in: moc) {
 				let p = NSPredicate(format: "repo.groupLabel == nil or repo.groupLabel != %@", otherGroup)
 				andPredicates.append(p)
 			}
