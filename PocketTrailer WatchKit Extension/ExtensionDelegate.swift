@@ -79,13 +79,14 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 	func handle(_ backgroundTasks: Set<WKRefreshBackgroundTask>) {
 		for task in backgroundTasks {
 			if let t = task as? WKSnapshotRefreshBackgroundTask {
-				if t.returnToDefaultState {
+				let wantDefault = t.reasonForSnapshot == .returnToDefaultState
+				if wantDefault {
 					lastView?.popToRootController()
 					(lastView as? SectionController)?.resetUI()
 				}
-				t.setTaskCompleted(restoredDefaultState: t.returnToDefaultState, estimatedSnapshotExpiration: .distantFuture, userInfo: nil)
+				t.setTaskCompleted(restoredDefaultState: wantDefault, estimatedSnapshotExpiration: .distantFuture, userInfo: nil)
 			} else {
-				task.setTaskCompleted()
+				task.setTaskCompletedWithSnapshot(false)
 			}
 		}
 	}
