@@ -137,8 +137,8 @@ final class Repo: DataItem {
 		return false
 	}
 
-	class var allGroupLabels: [String] {
-		let allRepos = allItems(of: Repo.self, in: DataManager.main)
+	class func allGroupLabels(in moc: NSManagedObjectContext) -> [String] {
+		let allRepos = allItems(of: Repo.self, in: moc)
 		let labels = allRepos.flatMap { $0.shouldSync ? $0.groupLabel : nil }
 		return Set<String>(labels).sorted()
 	}
