@@ -225,7 +225,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 		let tempMoc = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 		tempMoc.undoManager = nil
-		tempMoc.parent = DataManager.main
+		tempMoc.persistentStoreCoordinator = DataManager.main.persistentStoreCoordinator
 		tempMoc.perform { [weak self] in
 			let items = try! tempMoc.fetch(f).map { self?.baseDataForItem(item: $0, showStatuses: showStatuses, showLabels: showLabels) }
 			DispatchQueue.main.async {

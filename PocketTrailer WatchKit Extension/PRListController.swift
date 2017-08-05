@@ -18,7 +18,7 @@ final class PRListController: CommonController {
 	private var apiServerUri: String?
 
 	private var onlyUnread = false
-	private var loadingBuffer: [[AnyHashable : Any]]?
+	private var loadingBuffer = [[AnyHashable : Any]]()
 	private var loading = false
 
 	override func awake(withContext context: Any?) {
@@ -47,6 +47,8 @@ final class PRListController: CommonController {
 
 	override func requestData(command: String?) {
 		if !loading {
+			loadingBuffer.removeAll(keepingCapacity: false)
+			progressiveLoading = false
 			_requestData(command)
 			loading = true
 		}
@@ -75,19 +77,19 @@ final class PRListController: CommonController {
 				params["itemUris"] = itemIds
 			}
 		}
-		if let l = loadingBuffer {
-			params["from"] = l.count
-		} else {
-			loadingBuffer = [[AnyHashable : Any]]()
-			params["from"] = 0
-		}
+
+		params["from"] = loadingBuffer.count
 
 		send(request: params)
 	}
 
 	override func loadingFailed(with error: Error) {
 		super.loadingFailed(with: error)
-		loadingBuffer = nil
+		loadingBuffer.removeAll(keepingCapacity: false)
+	}
+
+	override var showLoadingFeedback: Bool {
+		return !progressiveLoading
 	}
 
 	private var progressiveLoading = false
@@ -96,24 +98,25 @@ final class PRListController: CommonController {
 
 		let page = response["result"] as! [[AnyHashable : Any]]
 
-		loadingBuffer?.append(contentsOf: page)
+		loadingBuffer.append(contentsOf: page)
+
 		if page.count == PAGE_SIZE {
+			show(status: "Loaded \(loadingBuffer.count) items…", hideTable: true)
+			progressiveLoading = true
 			atNextEvent(self) { S in
 				S._requestData(nil)
-				S.show(status: "Loaded \(S.loadingBuffer?.count ?? 0) items…", hideTable: true)
-				S.progressiveLoading = true
 			}
-			return
-		}
 
-		loading = false
+		} else {
 
-		if let l = loadingBuffer {
+			loading = false
+
 			if progressiveLoading {
-				show(status: "Loaded \(l.count) items.\n\nDisplaying…", hideTable: true)
+				show(status: "Loaded \(loadingBuffer.count) items.\n\nDisplaying…", hideTable: true)
 				atNextEvent(self) { S in
 					S.completeLoadingBuffer()
 				}
+
 			} else {
 				completeLoadingBuffer()
 			}
@@ -122,38 +125,36 @@ final class PRListController: CommonController {
 
 	private func completeLoadingBuffer() {
 
-		if let l = loadingBuffer {
+		let recordDelta = loadingBuffer.count - table.numberOfRows
 
-			let lastRecordcount = table.numberOfRows
-			let newRecordcount = l.count
-			let recordDelta = newRecordcount - lastRecordcount
+		if recordDelta < 0 {
+			table.removeRows(at: IndexSet(integersIn: Range(uncheckedBounds: (0, -recordDelta))))
+		} else if recordDelta > 0 {
+			table.insertRows(at: IndexSet(integersIn: Range(uncheckedBounds: (0, recordDelta))), withRowType: "PRRow")
+		}
 
-			if recordDelta < 0 {
-				table.removeRows(at: IndexSet(integersIn: Range(uncheckedBounds: (0, -recordDelta))))
-			} else if recordDelta > 0 {
-				table.insertRows(at: IndexSet(integersIn: Range(uncheckedBounds: (0, recordDelta))), withRowType: "PRRow")
-			}
+		if loadingBuffer.count == 0 {
+			show(status: "There are no items in this section", hideTable: true)
+
+		} else {
 
 			var index = 0
-			for itemData in l {
+			for itemData in loadingBuffer {
 				if let c = table.rowController(at: index) as? PRRow {
 					c.populate(from: itemData)
 				}
 				index += 1
 			}
 
-			if l.count == 0 {
-				show(status: "There are no items in this section", hideTable: true)
-			} else {
-				show(status: "", hideTable: false)
-				if let s = selectedIndex {
-					table.scrollToRow(at: s)
-					selectedIndex = nil
-				}
-			}
+			show(status: "", hideTable: false)
 
-			loadingBuffer = nil
+			if let s = selectedIndex {
+				table.scrollToRow(at: s)
+				selectedIndex = nil
+			}
 		}
+
+		loadingBuffer.removeAll(keepingCapacity: false)
 	}
 
 	@IBAction func markAllReadSelected() {
