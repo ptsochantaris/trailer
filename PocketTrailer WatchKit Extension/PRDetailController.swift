@@ -46,11 +46,19 @@ final class PRDetailController: CommonController {
 	}
 
 	override func update(from response: [AnyHashable : Any]) {
+		let compressedData = response["result"] as! Data
+		let uncompressedData = compressedData.data(operation: .decompress)!
+		let itemInfo = NSKeyedUnarchiver.unarchiveObject(with: uncompressedData) as! [AnyHashable : Any]
+		DispatchQueue.main.async { [weak self] in
+			self?.completeUpdate(from: itemInfo)
+		}
+	}
+
+	private func completeUpdate(from itemInfo: [AnyHashable : Any]) {
 
 		loading = false
 
 		rowControllers.removeAll(keepingCapacity: false)
-		let itemInfo = response["result"] as! [AnyHashable : Any]
 
 		var rowCount = 0
 
@@ -61,7 +69,7 @@ final class PRDetailController: CommonController {
 				}
 				if let s = table.rowController(at: rowCount) as? StatusRow {
 					s.labelL.setText(status["text"] as? String)
-					let c = colour(from: status["color"] as! String)
+					let c = status["color"] as! UIColor
 					s.labelL.setTextColor(c)
 					s.margin.setBackgroundColor(c)
 				}

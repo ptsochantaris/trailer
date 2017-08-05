@@ -64,8 +64,9 @@ final class SectionController: CommonController {
 	}
 
 	override func update(from response: [AnyHashable : Any]) {
-		super.update(from: response)
-		updateUI()
+		DispatchQueue.main.async { [weak self] in
+			self?.updateUI()
+		}
 	}
 
 	private func sectionFrom(apiName: String) -> Section {

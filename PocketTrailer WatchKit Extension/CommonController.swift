@@ -49,14 +49,18 @@ class CommonController: WKInterfaceController {
 
 		loading += 1
 
-		WCSession.default.sendMessage(request, replyHandler: { response in
-			atNextEvent(self) { S in
-				if let errorIndicator = response["error"] as? Bool, errorIndicator == true {
+		WCSession.default.sendMessage(request, replyHandler: { [weak self] response in
+			guard let S = self else { return }
+			if let errorIndicator = response["error"] as? Bool, errorIndicator == true {
+				DispatchQueue.main.async {
+					S.loading = 0
 					S.showTemporaryError(response["status"] as! String)
-				} else {
-					S.update(from: response)
 				}
-				S.loading = 0
+			} else {
+				DispatchQueue.main.async {
+					S.loading = 0
+				}
+				S.update(from: response)
 			}
 		}) { error in
 			atNextEvent(self) { S in
@@ -71,8 +75,8 @@ class CommonController: WKInterfaceController {
 		}
 	}
 
-	private func showTemporaryError(_ mesage: String, colorString: String = "FF2020") {
-		_statusLabel.setTextColor(colour(from: colorString))
+	private func showTemporaryError(_ mesage: String) {
+		_statusLabel.setTextColor(UIColor(red: 1, green: 0.2, blue: 0.2, alpha: 1))
 		show(status: mesage, hideTable: true)
 		delay(4, self) { S in
 			S._statusLabel.setTextColor(.white)
@@ -87,24 +91,5 @@ class CommonController: WKInterfaceController {
 	func loadingFailed(with error: Error) {
 		showTemporaryError("Error: \(error.localizedDescription)")
 		loading = 0
-	}
-
-	func colour(from hex: String) -> UIColor {
-
-		let safe = hex
-			.trimmingCharacters(in: .whitespacesAndNewlines)
-			.trimmingCharacters(in: .symbols)
-		let s = Scanner(string: safe)
-		var c: UInt32 = 0
-		s.scanHexInt32(&c)
-
-		let red: UInt32 = (c & 0xFF0000)>>16
-		let green: UInt32 = (c & 0x00FF00)>>8
-		let blue: UInt32 = c & 0x0000FF
-		let r = CGFloat(red)/255.0
-		let g = CGFloat(green)/255.0
-		let b = CGFloat(blue)/255.0
-
-		return UIColor(red: r, green: g, blue: b, alpha: 1.0)
 	}
 }

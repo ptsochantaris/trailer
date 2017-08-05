@@ -19,12 +19,10 @@ final class PRRow: NSObject {
 
 	func populate(from itemData: [AnyHashable : Any]) {
 
-		let titleData = itemData["title"] as! Data
-		let title = NSKeyedUnarchiver.unarchiveObject(with: titleData) as! NSAttributedString
+		let title =  itemData["title"] as! NSAttributedString
 		titleL.setAttributedText(title)
 
-		let subtitleData = itemData["subtitle"] as! Data
-		let subtitle = NSKeyedUnarchiver.unarchiveObject(with: subtitleData) as! NSAttributedString
+		let subtitle = itemData["subtitle"] as! NSAttributedString
 		detailsL.setAttributedText(subtitle)
 
 		itemId = itemData["localId"] as? String

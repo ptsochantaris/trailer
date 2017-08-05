@@ -103,6 +103,8 @@
 		16A505E21A3889B9005DD3B7 /* Sparkle.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 16A505DF1A3888D6005DD3B7 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		16A69EDA1AC83020008231F9 /* ListableItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A69ED91AC83020008231F9 /* ListableItem.swift */; };
 		16A69EDB1AC83020008231F9 /* ListableItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A69ED91AC83020008231F9 /* ListableItem.swift */; };
+		16B3B1501F3670680060A394 /* compression.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B14E1F366F790060A394 /* compression.swift */; };
+		16B3B1511F36706A0060A394 /* compression.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B14E1F366F790060A394 /* compression.swift */; };
 		16B3B3171A34E8E2000BE6CC /* ApiServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3101A34E8E2000BE6CC /* ApiServer.swift */; };
 		16B3B3181A34E8E2000BE6CC /* ApiServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3101A34E8E2000BE6CC /* ApiServer.swift */; };
 		16B3B3191A34E8E2000BE6CC /* DataItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3111A34E8E2000BE6CC /* DataItem.swift */; };
@@ -338,6 +340,7 @@
 		16A505DF1A3888D6005DD3B7 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = Trailer/Sparkle.framework; sourceTree = "<group>"; };
 		16A69ED91AC83020008231F9 /* ListableItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = ListableItem.swift; path = ../Shared/ListableItem.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16AE7CED1C92304300CB304B /* Trailer 24.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 24.xcdatamodel"; sourceTree = "<group>"; };
+		16B3B14E1F366F790060A394 /* compression.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = compression.swift; sourceTree = "<group>"; };
 		16B3B3101A34E8E2000BE6CC /* ApiServer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = ApiServer.swift; path = Shared/ApiServer.swift; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16B3B3111A34E8E2000BE6CC /* DataItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = DataItem.swift; path = Shared/DataItem.swift; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16B3B3121A34E8E2000BE6CC /* PRComment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = PRComment.swift; path = Shared/PRComment.swift; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -793,6 +796,7 @@
 			isa = PBXGroup;
 			children = (
 				16F70CC01EDC99A000B17E9F /* md5.swift */,
+				16B3B14E1F366F790060A394 /* compression.swift */,
 			);
 			name = External;
 			sourceTree = "<group>";
@@ -1115,6 +1119,7 @@
 				16EE871B1A446BFE00A1D16F /* EmptyView.swift in Sources */,
 				169205681E34EB4D00FB9547 /* CustomRepoCell.swift in Sources */,
 				1615045E1A464656001CF50C /* PRCell.swift in Sources */,
+				16B3B1501F3670680060A394 /* compression.swift in Sources */,
 				164840C51AD04C3C009E6383 /* QuickStartViewController.swift in Sources */,
 				166A84BE1A457CA700A3B292 /* ServersViewController.swift in Sources */,
 				161504601A4651CB001CF50C /* MasterViewController.swift in Sources */,
@@ -1148,6 +1153,7 @@
 				162530511B7AAE49000E3F3B /* ExtensionDelegate.swift in Sources */,
 				1664CBCD1B7796840006BDE7 /* Enums.swift in Sources */,
 				16EDAB1A1AB4C2D4009B38DD /* CommentRow.swift in Sources */,
+				16B3B1511F36706A0060A394 /* compression.swift in Sources */,
 				16E93D121AB467DA00CA967E /* PRListController.swift in Sources */,
 				16E93D191AB46CEE00CA967E /* PRRow.swift in Sources */,
 				16B6B7C11BA3B94C006A509F /* ComplicationDataSource.swift in Sources */,

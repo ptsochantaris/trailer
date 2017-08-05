@@ -183,14 +183,12 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		var r = result
 		r["error"] = true
 		r["status"] = reason
-		r["color"] = "FF2020"
 		replyHandler(r)
 	}
 
 	private func reportSuccess(result: [String : Any], replyHandler: ([String : Any]) -> Void) {
 		var r = result
 		r["status"] = "Success"
-		r["color"] = "20FF20"
 		replyHandler(r)
 	}
 
@@ -228,28 +226,23 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		tempMoc.persistentStoreCoordinator = DataManager.main.persistentStoreCoordinator
 		tempMoc.perform { [weak self] in
 			let items = try! tempMoc.fetch(f).map { self?.baseDataForItem(item: $0, showStatuses: showStatuses, showLabels: showLabels) }
-			DispatchQueue.main.async {
-				replyHandler(["result" : items])
-			}
+			let compressedData = NSKeyedArchiver.archivedData(withRootObject: items).data(operation: .compress)!
+			replyHandler(["result" : compressedData])
 		}
 	}
 
 	private func baseDataForItem(item: ListableItem, showStatuses: Bool, showLabels: Bool) -> [String : Any] {
 
+		let font = UIFont.systemFont(ofSize: UIFont.systemFontSize)
+		let smallFont = UIFont.systemFont(ofSize: UIFont.systemFontSize-4)
+
 		var itemData: [String : Any] = [
 			"commentCount": item.totalComments,
 			"unreadCount": item.unreadComments,
 			"localId": item.objectID.uriRepresentation().absoluteString,
+			"title" : item.title(with: font, labelFont: font, titleColor: .white),
+			"subtitle" : item.subtitle(with: smallFont, lightColor: .lightGray, darkColor: .gray),
 			]
-
-		let font = UIFont.systemFont(ofSize: UIFont.systemFontSize)
-		let smallFont = UIFont.systemFont(ofSize: UIFont.systemFontSize-4)
-
-		let title = item.title(with: font, labelFont: font, titleColor: .white)
-		itemData["title"] = NSKeyedArchiver.archivedData(withRootObject: title)
-
-		let subtitle = item.subtitle(with: smallFont, lightColor: .lightGray, darkColor: .gray)
-		itemData["subtitle"] = NSKeyedArchiver.archivedData(withRootObject: subtitle)
 
 		if showLabels {
 			itemData["labels"] = labelsForItem(item: item)
@@ -264,7 +257,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		var labels = [[String : Any]]()
 		for l in item.labels {
 			labels.append([
-				"color": colorToHex(c: l.colorForDisplay),
+				"color": l.colorForDisplay,
 				"text": S(l.name)
 				])
 		}
@@ -275,31 +268,23 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		var statusLines = [[String : Any]]()
 		for status in pr.displayedStatuses {
 			statusLines.append([
-				"color": colorToHex(c: status.colorForDarkDisplay),
+				"color": status.colorForDarkDisplay,
 				"text": S(status.descriptionText)
 				])
 		}
 		return statusLines
 	}
 
-	private func colorToHex(c: UIColor) -> String {
-		var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
-		c.getRed(&r, green: &g, blue: &b, alpha: &a)
-		r *= 255.0
-		g *= 255.0
-		b *= 255.0
-		return String(format: "%02X%02X%02X", Int(r), Int(g), Int(b))
-	}
-
 	/////////////////////////////
 
-	private func buildItemDetail(localId: String) -> [String : Any]? {
+	private func buildItemDetail(localId: String) -> Data? {
 		if let oid = DataManager.id(for: localId), let item = existingObject(with: oid) as? ListableItem {
 			let showStatuses = (item is PullRequest) ? Settings.showStatusItems : false
 			var result = baseDataForItem(item: item, showStatuses: showStatuses, showLabels: Settings.showLabels)
 			result["description"] = item.body
 			result["comments"] = commentsForItem(item: item)
-			return result
+
+			return NSKeyedArchiver.archivedData(withRootObject: result).data(operation: .compress)!
 		}
 		return nil
 	}

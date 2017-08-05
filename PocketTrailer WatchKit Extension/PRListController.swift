@@ -11,7 +11,7 @@ final class PRListController: CommonController {
 	private var type: String!
 	private var selectedIndex: Int?
 
-	private let PAGE_SIZE = 50
+	private let PAGE_SIZE = 200
 
 	// View criterion
 	private var groupLabel: String?
@@ -20,6 +20,7 @@ final class PRListController: CommonController {
 	private var onlyUnread = false
 	private var loadingBuffer = [[AnyHashable : Any]]()
 	private var loading = false
+	private var sleeping = false
 
 	override func awake(withContext context: Any?) {
 
@@ -45,8 +46,22 @@ final class PRListController: CommonController {
 		}
 	}
 
+	override func didDeactivate() {
+		if selectedIndex == nil {
+			sleeping = true
+		}
+		super.didDeactivate()
+	}
+
+	override func didAppear() {
+		super.didAppear()
+		atNextEvent (self) { S in
+			S.sleeping = false
+		}
+	}
+
 	override func requestData(command: String?) {
-		if !loading {
+		if !loading && !sleeping {
 			loadingBuffer.removeAll(keepingCapacity: false)
 			progressiveLoading = false
 			_requestData(command)
@@ -88,15 +103,18 @@ final class PRListController: CommonController {
 		loadingBuffer.removeAll(keepingCapacity: false)
 	}
 
-	override var showLoadingFeedback: Bool {
-		return !progressiveLoading
-	}
-
 	private var progressiveLoading = false
 
 	override func update(from response: [AnyHashable : Any]) {
+		let compressedData = response["result"] as! Data
+		let uncompressedData = compressedData.data(operation: .decompress)!
+		let page = NSKeyedUnarchiver.unarchiveObject(with: uncompressedData) as! [[AnyHashable : Any]]
+		DispatchQueue.main.async { [weak self] in
+			self?.completeUpdate(from: page)
+		}
+	}
 
-		let page = response["result"] as! [[AnyHashable : Any]]
+	private func completeUpdate(from page: [[AnyHashable : Any]]) {
 
 		loadingBuffer.append(contentsOf: page)
 
@@ -175,7 +193,7 @@ final class PRListController: CommonController {
 		let row = table.rowController(at: rowIndex) as! PRRow
 		pushController(withName: "DetailController", context: [ ITEM_KEY: row.itemId! ])
 		if table.numberOfRows >= PAGE_SIZE {
-			self.show(status: "Loading…", hideTable: true)
+			show(status: "Loading…", hideTable: true)
 		}
 	}
 }
