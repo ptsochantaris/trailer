@@ -164,7 +164,7 @@ final class PRListController: CommonController {
 
 	@IBAction func refreshSelected() {
 		loading = false
-		show(status: "Refreshing…", hideTable: true)
+		show(status: "Starting refresh", hideTable: true)
 		requestData(command: "refresh")
 	}
 

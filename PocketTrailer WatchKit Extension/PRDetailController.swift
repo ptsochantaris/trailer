@@ -33,7 +33,7 @@ final class PRDetailController: CommonController {
 	}
 
 	@IBAction func refreshSelected() {
-		show(status: "Refreshing…", hideTable: true)
+		show(status: "Starting refresh", hideTable: true)
 		requestData(command: "refresh")
 	}
 
@@ -112,24 +112,5 @@ final class PRDetailController: CommonController {
 		}
 
 		show(status: "", hideTable: false)
-	}
-
-	private func colour(from hex: String) -> UIColor {
-
-		let safe = hex
-			.trimmingCharacters(in: .whitespacesAndNewlines)
-			.trimmingCharacters(in: .symbols)
-		let s = Scanner(string: safe)
-		var c: UInt32 = 0
-		s.scanHexInt32(&c)
-
-		let red: UInt32 = (c & 0xFF0000)>>16
-		let green: UInt32 = (c & 0x00FF00)>>8
-		let blue: UInt32 = c & 0x0000FF
-		let r = CGFloat(red)/255.0
-		let g = CGFloat(green)/255.0
-		let b = CGFloat(blue)/255.0
-
-		return UIColor(red: r, green: g, blue: b, alpha: 1.0)
 	}
 }

@@ -179,11 +179,23 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 		DLog("Starting refresh")
 	}
 
-	@discardableResult
-	func startRefresh() -> Bool {
+	enum RefreshStartResult {
+		case started, noNetwork, noConfiguredServers, alreadyRefreshing
+	}
 
-		if appIsRefreshing || !API.hasNetworkConnection || !ApiServer.someServersHaveAuthTokens(in: DataManager.main) {
-			return false
+	@discardableResult
+	func startRefresh() -> RefreshStartResult {
+
+		if appIsRefreshing {
+			return .alreadyRefreshing
+		}
+
+		if !API.hasNetworkConnection {
+			return .noNetwork
+		}
+
+		if !ApiServer.someServersHaveAuthTokens(in: DataManager.main) {
+			return .noConfiguredServers
 		}
 
 		prepareForRefresh()
@@ -192,7 +204,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 			self?.processRefresh()
 		}
 
-		return true
+		return .started
 	}
 
 	private func processRefresh() {

@@ -38,7 +38,7 @@ final class SectionController: CommonController {
 	}
 
 	@IBAction func refreshSelected() {
-		show(status: "Refreshing", hideTable: true)
+		show(status: "Starting refresh", hideTable: true)
 		requestData(command: "refresh")
 	}
 

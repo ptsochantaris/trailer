@@ -52,12 +52,7 @@ UITableViewDragDelegate {
 	private var tabBarSets = [TabBarSet]()
 	private var currentTabBarSet: TabBarSet?
 
-	// Filtering
 	private var searchTimer: PopTimer!
-
-	// Refreshing
-	private var refreshOnRelease = false
-
 	private var forceSafari = false
 
 	private var pluralNameForItems: String {
@@ -84,19 +79,6 @@ UITableViewDragDelegate {
 			self.markAllAsRead()
 		})
 		present(a, animated: true)
-	}
-
-	private func tryRefresh() {
-		refreshOnRelease = false
-
-		if API.hasNetworkConnection {
-			if !app.startRefresh() {
-				updateStatus(becauseOfChanges: false)
-			}
-		} else {
-			showMessage("No Network", "There is no network connectivity, please try again later")
-			updateStatus(becauseOfChanges: false)
-		}
 	}
 
 	func removeAllMerged() {
@@ -155,19 +137,9 @@ UITableViewDragDelegate {
 		}
 	}
 
-	@objc private func refreshControlChanged() {
-		refreshOnRelease = !appIsRefreshing
-	}
-
-	override func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-		if refreshOnRelease {
-			tryRefresh()
-		}
-	}
-
-	override func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-		if refreshOnRelease {
-			tryRefresh()
+	@objc private func refreshControlChanged(_ sender: UIRefreshControl) {
+		if sender.isRefreshing {
+			keyForceRefresh()
 		}
 	}
 
@@ -235,7 +207,7 @@ UITableViewDragDelegate {
 			self?.applyFilter()
 		}
 
-		refreshControl?.addTarget(self, action: #selector(refreshControlChanged), for: .valueChanged)
+		refreshControl?.addTarget(self, action: #selector(refreshControlChanged(_:)), for: .valueChanged)
 
 		tableView.rowHeight = UITableViewAutomaticDimension
 		tableView.estimatedRowHeight = 160
@@ -316,17 +288,12 @@ UITableViewDragDelegate {
 		updateStatus(becauseOfChanges: false)
 	}
 
-	private lazy var refreshAttributes = [
-		NSAttributedStringKey.font: UIFont.preferredFont(forTextStyle: .caption2),
-		NSAttributedStringKey.foregroundColor: self.refreshControl!.tintColor
-	]
-
 	@objc private func refreshUpdated() {
-		refreshControl?.attributedTitle = NSAttributedString(string: API.lastUpdateDescription, attributes: refreshAttributes)
+		refreshControl?.attributedTitle = NSAttributedString(string: API.lastUpdateDescription, attributes: nil)
 	}
 
 	@objc private func refreshProcessing() {
-		refreshControl?.attributedTitle = NSAttributedString(string: "Processing…", attributes: refreshAttributes)
+		refreshControl?.attributedTitle = NSAttributedString(string: "Processing…", attributes: nil)
 	}
 
 	override var canBecomeFirstResponder: Bool {
@@ -407,9 +374,15 @@ UITableViewDragDelegate {
 	}
 
 	@objc private func keyForceRefresh() {
-		if !appIsRefreshing {
-			tryRefresh()
+		switch app.startRefresh() {
+		case .alreadyRefreshing, .started:
+			break
+		case .noConfiguredServers:
+			showMessage("No Configured Servers", "There are no configured servers to sync from, please check your settings")
+		case .noNetwork:
+			showMessage("No Network", "There is no network connectivity, please try again later")
 		}
+		updateStatus(becauseOfChanges: false)
 	}
 
 	@objc private func keyFocusDetailView() {
@@ -1139,19 +1112,12 @@ UITableViewDragDelegate {
 
 		if appIsRefreshing {
 			title = "Refreshing…"
-			if let r = refreshControl {
-				refreshUpdated()
-				r.beginRefreshing()
-			}
+			refreshControl?.beginRefreshing()
 		} else {
-
 			title = viewingPrs ? pullRequestsTitle : issuesTitle
-
-			if let r = refreshControl {
-				refreshUpdated()
-				r.endRefreshing()
-			}
+			refreshControl?.endRefreshing()
 		}
+		refreshUpdated()
 
 		if becauseOfChanges {
 			app.updateBadgeAndSaveDB()

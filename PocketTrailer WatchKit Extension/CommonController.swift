@@ -71,10 +71,10 @@ class CommonController: WKInterfaceController {
 		}
 	}
 
-	private func showTemporaryError(_ mesage: String) {
-		_statusLabel.setTextColor(.red)
+	private func showTemporaryError(_ mesage: String, colorString: String = "FF2020") {
+		_statusLabel.setTextColor(colour(from: colorString))
 		show(status: mesage, hideTable: true)
-		delay(3, self) { S in
+		delay(4, self) { S in
 			S._statusLabel.setTextColor(.white)
 			S.show(status: "", hideTable: false)
 		}
@@ -87,5 +87,24 @@ class CommonController: WKInterfaceController {
 	func loadingFailed(with error: Error) {
 		showTemporaryError("Error: \(error.localizedDescription)")
 		loading = 0
+	}
+
+	func colour(from hex: String) -> UIColor {
+
+		let safe = hex
+			.trimmingCharacters(in: .whitespacesAndNewlines)
+			.trimmingCharacters(in: .symbols)
+		let s = Scanner(string: safe)
+		var c: UInt32 = 0
+		s.scanHexInt32(&c)
+
+		let red: UInt32 = (c & 0xFF0000)>>16
+		let green: UInt32 = (c & 0x00FF00)>>8
+		let blue: UInt32 = c & 0x0000FF
+		let r = CGFloat(red)/255.0
+		let g = CGFloat(green)/255.0
+		let b = CGFloat(blue)/255.0
+
+		return UIColor(red: r, green: g, blue: b, alpha: 1.0)
 	}
 }

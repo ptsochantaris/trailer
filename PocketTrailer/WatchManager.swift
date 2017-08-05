@@ -5,7 +5,6 @@ import WatchConnectivity
 
 final class WatchManager : NSObject, WCSessionDelegate {
 
-	private var backgroundTask = UIBackgroundTaskInvalid
 	private var session: WCSession?
 
 	override init() {
@@ -67,95 +66,81 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		return DataManager.dataFilesDirectory.appendingPathComponent("overview.plist")
 	}
 
-	private func startBGTask() {
-		backgroundTask = UIApplication.shared.beginBackgroundTask(withName: "com.housetrip.Trailer.watchrequest") { [weak self] in
-			self?.endBGTask()
-		}
-	}
-
-	private func endBGTask() {
-		if backgroundTask != UIBackgroundTaskInvalid {
-			UIApplication.shared.endBackgroundTask(backgroundTask)
-			backgroundTask = UIBackgroundTaskInvalid
-		}
-	}
-
 	func session(_ session: WCSession, didReceiveMessage message: [String : Any], replyHandler: @escaping ([String : Any]) -> Void) {
-
 		atNextEvent(self) { s in
+			s.handle(message: message, replyHandler: replyHandler)
+		}
+	}
 
-			s.startBGTask()
+	private func handle(message: [String : Any], replyHandler: @escaping ([String : Any]) -> Void) {
 
-			switch(S(message["command"] as? String)) {
+		switch(S(message["command"] as? String)) {
 
-			case "refresh":
-				let lastSuccessfulSync = Settings.lastSuccessfulRefresh ?? Date()
-				app.startRefresh()
-				DispatchQueue.global().async {
-					while appIsRefreshing { Thread.sleep(forTimeInterval: 0.1) }
-					atNextEvent {
-						let l = Settings.lastSuccessfulRefresh
-						if l == nil || lastSuccessfulSync == l! {
-							s.reportFailure(reason: "Refresh Failed", result: message, replyHandler: replyHandler)
-						} else {
-							s.processList(message: message, replyHandler: replyHandler)
-						}
-					}
-				}
-
-			case "openItem":
-				if let itemId = message["localId"] as? String {
-					popupManager.masterController.openItemWithUriPath(uriPath: itemId)
-				}
-				s.processList(message: message, replyHandler: replyHandler)
-
-			case "opencomment":
-				if let itemId = message["id"] as? String {
-					popupManager.masterController.openCommentWithId(cId: itemId)
-				}
-				s.processList(message: message, replyHandler: replyHandler)
-
-			case "clearAllMerged":
-				app.clearAllMerged()
-				s.processList(message: message, replyHandler: replyHandler)
-
-			case "clearAllClosed":
-				app.clearAllClosed()
-				s.processList(message: message, replyHandler: replyHandler)
-
-			case "markEverythingRead":
-				app.markEverythingRead()
-				s.processList(message: message, replyHandler: replyHandler)
-
-			case "markItemsRead":
-				if let
-					uri = message["localId"] as? String,
-					let oid = DataManager.id(for: uri),
-					let dataItem = existingObject(with: oid) as? ListableItem,
-					dataItem.hasUnreadCommentsOrAlert {
-
-					dataItem.catchUpWithComments()
-
-				} else if let uris = message["itemUris"] as? [String] {
-					for uri in uris {
-						if let
-							oid = DataManager.id(for: uri),
-							let dataItem = existingObject(with: oid) as? ListableItem,
-							dataItem.hasUnreadCommentsOrAlert {
-
-							dataItem.catchUpWithComments()
-						}
-					}
-				}
-				s.processList(message: message, replyHandler: replyHandler)
-
-			case "needsOverview":
-				s.sendOverview()
-				s.reportSuccess(result: [:], replyHandler: replyHandler)
-
-			default:
-				s.processList(message: message, replyHandler: replyHandler)
+		case "refresh":
+			let status = app.startRefresh()
+			switch status {
+			case .started:
+				reportSuccess(result: [:], replyHandler: replyHandler)
+			case .noNetwork:
+				reportFailure(reason: "Can't refresh, check your Internet connection.", result: [:], replyHandler: replyHandler)
+			case .alreadyRefreshing:
+				reportFailure(reason: "Already refreshing, please wait.", result: [:], replyHandler: replyHandler)
+			case .noConfiguredServers:
+				reportFailure(reason: "Can't refresh, there are no configured servers.", result: [:], replyHandler: replyHandler)
 			}
+
+		case "openItem":
+			if let itemId = message["localId"] as? String {
+				popupManager.masterController.openItemWithUriPath(uriPath: itemId)
+			}
+			processList(message: message, replyHandler: replyHandler)
+
+		case "opencomment":
+			if let itemId = message["id"] as? String {
+				popupManager.masterController.openCommentWithId(cId: itemId)
+			}
+			processList(message: message, replyHandler: replyHandler)
+
+		case "clearAllMerged":
+			app.clearAllMerged()
+			processList(message: message, replyHandler: replyHandler)
+
+		case "clearAllClosed":
+			app.clearAllClosed()
+			processList(message: message, replyHandler: replyHandler)
+
+		case "markEverythingRead":
+			app.markEverythingRead()
+			processList(message: message, replyHandler: replyHandler)
+
+		case "markItemsRead":
+			if let
+				uri = message["localId"] as? String,
+				let oid = DataManager.id(for: uri),
+				let dataItem = existingObject(with: oid) as? ListableItem,
+				dataItem.hasUnreadCommentsOrAlert {
+
+				dataItem.catchUpWithComments()
+
+			} else if let uris = message["itemUris"] as? [String] {
+				for uri in uris {
+					if let
+						oid = DataManager.id(for: uri),
+						let dataItem = existingObject(with: oid) as? ListableItem,
+						dataItem.hasUnreadCommentsOrAlert {
+
+						dataItem.catchUpWithComments()
+					}
+				}
+			}
+			processList(message: message, replyHandler: replyHandler)
+
+		case "needsOverview":
+			sendOverview()
+			reportSuccess(result: [:], replyHandler: replyHandler)
+
+		default:
+			processList(message: message, replyHandler: replyHandler)
 		}
 	}
 
@@ -198,17 +183,15 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		var r = result
 		r["error"] = true
 		r["status"] = reason
-		r["color"] = "FF0000"
+		r["color"] = "FF2020"
 		replyHandler(r)
-		endBGTask()
 	}
 
 	private func reportSuccess(result: [String : Any], replyHandler: ([String : Any]) -> Void) {
 		var r = result
 		r["status"] = "Success"
-		r["color"] = "00FF00"
+		r["color"] = "20FF20"
 		replyHandler(r)
-		endBGTask()
 	}
 
 	////////////////////////////
