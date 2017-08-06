@@ -467,7 +467,7 @@ UITableViewDragDelegate {
 			if nextIndex >= items.count {
 				nextIndex = 0
 			}
-			requestTabFocus(item: items[nextIndex])
+			requestTabFocus(tabItem: items[nextIndex])
 		}
 	}
 
@@ -477,13 +477,26 @@ UITableViewDragDelegate {
 			if nextIndex < 0 {
 				nextIndex = items.count-1
 			}
-			requestTabFocus(item: items[nextIndex])
+			requestTabFocus(tabItem: items[nextIndex])
 		}
 	}
 
-	private func requestTabFocus(item: UITabBarItem?) {
-		if let tabs = tabs, let item = item {
-			tabBar(tabs, didSelect: item)
+	private func requestTabFocus(tabItem: UITabBarItem?, andOpen: ListableItem? = nil, overrideUrl: String? = nil) {
+		guard let tabs = tabs, let tabItem = tabItem else { return }
+
+		tabbing(tabs, didSelect: tabItem) { [weak self] in
+			guard let S = self, let item = andOpen, let ip = S.fetchedResultsController.indexPath(forObject: item) else { return }
+
+			S.tableView.selectRow(at: ip, animated: false, scrollPosition: .middle)
+			S.tableView(S.tableView, didSelectRowAt: ip)
+
+			atNextEvent {
+				if let u = overrideUrl, let url = URL(string: u) {
+					S.showDetail(url: url, objectId: item.objectID)
+				} else if let u = item.webUrl, let url = URL(string: u) {
+					S.showDetail(url: url, objectId: item.objectID)
+				}
+			}
 		}
 	}
 
@@ -493,8 +506,16 @@ UITableViewDragDelegate {
 	}
 
 	func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
-		lastTabIndex = tabs?.items?.index(of: item) ?? 0
-		updateStatus(becauseOfChanges: false, updateItems: true)
+		tabbing(tabBar, didSelect: item, completion: nil)
+	}
+
+	private func tabbing(_ tabBar: UITabBar, didSelect item: UITabBarItem, completion: Completion?) {
+		safeScrollToTop { [weak self] in
+			guard let S = self else { return }
+			S.lastTabIndex = S.tabs?.items?.index(of: item) ?? 0
+			S.updateStatus(becauseOfChanges: false, updateItems: true)
+			completion?()
+		}
 	}
 
 	private func applyFilter() {
@@ -732,90 +753,52 @@ UITableViewDragDelegate {
 			}
 		} else if let uri = userInfo[LISTABLE_URI_KEY] as? String, let itemId = DataManager.id(for: uri) {
 			relatedItem = existingObject(with: itemId) as? ListableItem
-			if relatedItem == nil {
-				showMessage("Item not found", "Could not locate the item related to this notification")
-			} else if urlToOpen == nil {
-				urlToOpen = relatedItem!.webUrl
-			}
 		}
 
-		if let a = action, let i = relatedItem {
-			if a == "mute" {
-				i.setMute(to: true)
-				return
-			} else if a == "read" {
-				i.catchUpWithComments()
-				return
-			}
-		}
-
-		let sc = navigationItem.searchController!
-		if urlToOpen != nil && sc.isActive {
-			sc.searchBar.text = nil
-			sc.isActive = false
-			resetView(becauseOfChanges: false)
-		}
-
-		var oid: NSManagedObjectID?
-
-		if let i = relatedItem {
-			selectTabFor(i: i)
-			oid = i.objectID
-			atNextEvent(self) { S in
-				if let ip = S.fetchedResultsController.indexPath(forObject: i) {
-					S.tableView.selectRow(at: ip, animated: false, scrollPosition: .middle)
+		if let item = relatedItem {
+			if let a = action {
+				if a == "mute" {
+					item.setMute(to: true)
+				} else if a == "read" {
+					item.catchUpWithComments()
 				}
+			} else {
+				if let sc = navigationItem.searchController, sc.isActive {
+					sc.searchBar.text = nil
+					sc.isActive = false
+				}
+				selectTabAndOpen(item, overrideUrl: urlToOpen)
 			}
-		}
-
-		if let u = urlToOpen, let url = URL(string: u) {
-			showDetail(url: url, objectId: oid)
 		} else {
-			showDetail(url: nil, objectId: nil)
+			showMessage("Item not found", "Could not locate the item related to this notification")
 		}
 	}
 
-	private func selectTabFor(i: ListableItem) {
+	private func selectTabAndOpen(_ item: ListableItem, overrideUrl: String?) {
 		for d in tabBarSets {
-			if d.viewCriterion == nil || d.viewCriterion?.isRelated(to: i) ?? false {
-				if i is PullRequest {
-					requestTabFocus(item: d.prItem)
-				} else {
-					requestTabFocus(item: d.issuesItem)
-				}
+			if d.viewCriterion == nil || d.viewCriterion?.isRelated(to: item) ?? false {
+				requestTabFocus(tabItem: item is PullRequest ? d.prItem : d.issuesItem,
+				                andOpen: item,
+				                overrideUrl: overrideUrl)
+				return
 			}
 		}
 	}
 
 	func openItemWithUriPath(uriPath: String) {
-		if let itemId = DataManager.id(for: uriPath),
-			let item = existingObject(with: itemId) as? ListableItem,
-			let ip = fetchedResultsController.indexPath(forObject: item) {
-
-			selectTabFor(i: item)
-			item.catchUpWithComments()
-			tableView.selectRow(at: ip, animated: false, scrollPosition: .middle)
-			tableView(tableView, didSelectRowAt: ip)
+		if
+			let itemId = DataManager.id(for: uriPath),
+			let item = existingObject(with: itemId) as? ListableItem {
+			selectTabAndOpen(item, overrideUrl: nil)
 		}
 	}
 
 	func openCommentWithId(cId: String) {
 		if let
 			itemId = DataManager.id(for: cId),
-			let comment = existingObject(with: itemId) as? PRComment
-		{
-			if let url = comment.webUrl {
-				var ip: IndexPath?
-				if let item = comment.parent {
-					selectTabFor(i: item)
-					ip = fetchedResultsController.indexPath(forObject: item)
-					item.catchUpWithComments()
-				}
-				if let i = ip {
-					tableView.selectRow(at: i, animated: false, scrollPosition: .middle)
-					showDetail(url: URL(string: url), objectId: nil)
-				}
-			}
+			let comment = existingObject(with: itemId) as? PRComment,
+			let item = comment.parent {
+			selectTabAndOpen(item, overrideUrl: nil)
 		}
 	}
 
@@ -845,26 +828,26 @@ UITableViewDragDelegate {
 		}
 
 		let p = fetchedResultsController.object(at: indexPath)
-		if let u = p.urlForOpening, let url = URL(string: u)
-		{
-			if forceSafari || (Settings.openItemsDirectlyInSafari && !detailViewController.isVisible) {
-				UIApplication.shared.open(url, options: [:]) { success in
-					p.catchUpWithComments()
-				}
-			} else {
-				showDetail(url: url, objectId: p.objectID)
-			}
+		if let u = p.urlForOpening, let url = URL(string: u) {
+			showDetail(url: url, objectId: p.objectID)
 		}
-
-		forceSafari = false
 	}
 
-	private func showDetail(url: URL?, objectId: NSManagedObjectID?) {
-		detailViewController.catchupWithDataItemWhenLoaded = objectId
-		detailViewController.detailItem = url
-		if !detailViewController.isVisible {
-			showTabBar(show: false, animated: true)
-			showDetailViewController(detailViewController.navigationController ?? detailViewController, sender: self)
+	private func showDetail(url: URL, objectId: NSManagedObjectID) {
+
+		if forceSafari || (Settings.openItemsDirectlyInSafari && !detailViewController.isVisible) {
+			forceSafari = false
+			if let item = existingObject(with: objectId) as? ListableItem {
+				item.catchUpWithComments()
+			}
+			UIApplication.shared.open(url, options: [:])
+		} else {
+			detailViewController.catchupWithDataItemWhenLoaded = objectId
+			detailViewController.detailItem = url
+			if !detailViewController.isVisible {
+				showTabBar(show: false, animated: true)
+				keyFocusDetailView()
+			}
 		}
 	}
 
@@ -1179,11 +1162,14 @@ UITableViewDragDelegate {
 		searchTimer.push()
 	}
 
-	private func safeScrollToTop() {
+	private func safeScrollToTop(completion: Completion?) {
 		tableView.contentOffset = tableView.contentOffset // halt any inertial scrolling
 		atNextEvent(self) { S in
 			if S.tableView.numberOfSections > 0 {
 				S.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+			}
+			atNextEvent {
+				completion?()
 			}
 		}
 	}
@@ -1197,10 +1183,12 @@ UITableViewDragDelegate {
 	}
 
 	func resetView(becauseOfChanges: Bool) {
-		safeScrollToTop()
-		updateQuery(newFetchRequest: itemFetchRequest)
-		updateStatus(becauseOfChanges: becauseOfChanges)
-		tableView.reloadData()
+		safeScrollToTop { [weak self] in
+			guard let S = self else { return }
+			S.updateQuery(newFetchRequest: S.itemFetchRequest)
+			S.updateStatus(becauseOfChanges: becauseOfChanges)
+			S.tableView.reloadData()
+		}
 	}
 
 	////////////////// opening prefs

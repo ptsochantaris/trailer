@@ -104,7 +104,7 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 
 		if let result = NSDictionary(contentsOf: FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.Trailer")!.appendingPathComponent("overview.plist")) {
 
-			func writeOutSection(_ type: String) -> NSAttributedString {
+			func writeOutSection(_ type: String) -> NSAttributedString? {
 				var totalOpen = 0
 				var totalUnread = 0
 				var totalMine = 0
@@ -130,8 +130,9 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 				}
 
 				let totalCount = totalMerged+totalMine+totalParticipated+totalClosed+totalMentioned+totalSnoozed+totalOther
-				let a = NSMutableAttributedString(string: "\(totalCount): ", attributes: titleAttributes)
+				let a = NSMutableAttributedString()
 				if totalCount > 0 {
+					a.append(NSAttributedString(string: "\(totalCount): ", attributes: titleAttributes))
 					if extensionContext?.widgetActiveDisplayMode == .compact {
 						appendCommentCount(a, number: totalUnread)
 					} else {
@@ -144,10 +145,11 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 						append(a, count: totalSnoozed, section: .snoozed)
 						appendCommentCount(a, number: totalUnread)
 					}
-				} else if let e = result["error"] as? String {
-					a.append(NSAttributedString(string: e, attributes: [NSAttributedStringKey.paragraphStyle: paragraph]))
+				} else {
+					let e = result["error"] as? String ?? "No items"
+					a.append(NSAttributedString(string: e, attributes: titleAttributes))
 				}
-				return a.copy() as! NSAttributedString
+				return a.copy() as? NSAttributedString
 			}
 			
 			prLabel.attributedText = writeOutSection("prs")
