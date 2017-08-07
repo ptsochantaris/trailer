@@ -44,6 +44,7 @@
 		1628A6D618789E73005EDA69 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1628A6D518789E73005EDA69 /* Images.xcassets */; };
 		162A29D91A4085FD008F41A9 /* GroupingCriterion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162A29D81A4085FD008F41A9 /* GroupingCriterion.swift */; };
 		162A29DA1A4085FD008F41A9 /* GroupingCriterion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162A29D81A4085FD008F41A9 /* GroupingCriterion.swift */; };
+		162C44291F37BC6500FD95E2 /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1664CBC91B7796840006BDE7 /* Enums.swift */; };
 		163341381D579A3F005F6BF2 /* SummaryRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 163341361D579A39005F6BF2 /* SummaryRow.swift */; };
 		1633C1921ABCEC4A0086C692 /* Issue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1633C1911ABCEC4A0086C692 /* Issue.swift */; };
 		1633C1931ABCEC4A0086C692 /* Issue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1633C1911ABCEC4A0086C692 /* Issue.swift */; };
@@ -68,7 +69,6 @@
 		165C49101BA63B45006BBCF5 /* AdvancedSettingsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165C490F1BA63B45006BBCF5 /* AdvancedSettingsCell.swift */; };
 		1664CBCA1B7796840006BDE7 /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1664CBC91B7796840006BDE7 /* Enums.swift */; };
 		1664CBCB1B7796840006BDE7 /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1664CBC91B7796840006BDE7 /* Enums.swift */; };
-		1664CBCC1B7796840006BDE7 /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1664CBC91B7796840006BDE7 /* Enums.swift */; };
 		1664CBCD1B7796840006BDE7 /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1664CBC91B7796840006BDE7 /* Enums.swift */; };
 		1668CFE81D5E16B70021CDC5 /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1668CFE71D5E16B70021CDC5 /* Reachability.swift */; };
 		1668CFE91D5E16B70021CDC5 /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1668CFE71D5E16B70021CDC5 /* Reachability.swift */; };
@@ -1070,8 +1070,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				162C44291F37BC6500FD95E2 /* Enums.swift in Sources */,
 				161852821AB2CB9000526D81 /* TodayViewController.swift in Sources */,
-				1664CBCC1B7796840006BDE7 /* Enums.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

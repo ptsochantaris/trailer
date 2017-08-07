@@ -97,10 +97,6 @@ class SummaryRow: NSObject, PopulatableRow {
 			unreadGroup.setAlpha(1.0)
 		}
 
-		if let lastRefresh = result["lastUpdated"] as? Date, lastRefresh != .distantPast {
-			lastUpdate.setText(shortDateFormatter.string(from: lastRefresh))
-		} else {
-			lastUpdate.setText("Not refreshed yet")
-		}
+		lastUpdate.setText(agoFormat(since: result["lastUpdated"] as? Date))
 	}
 }

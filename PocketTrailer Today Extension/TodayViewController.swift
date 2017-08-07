@@ -52,6 +52,8 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 
+		extensionContext?.widgetLargestAvailableDisplayMode = .expanded
+
 		func image(from color: UIColor) -> UIImage {
 			let rect = CGRect(x: 0, y: 0, width: 1, height: 1)
 			UIGraphicsBeginImageContext(rect.size)
@@ -154,22 +156,18 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 			
 			prLabel.attributedText = writeOutSection("prs")
 			issuesLabel.attributedText = writeOutSection("issues")
-
-			let lastRefresh = result["lastUpdated"] as! Date
-			if lastRefresh == .distantPast {
-				updatedLabel.attributedText = NSAttributedString(string: "Not updated yet", attributes: smallAttributes)
-			} else {
-				updatedLabel.attributedText = NSAttributedString(string: "Updated \(shortDateFormatter.string(from: lastRefresh))", attributes: smallAttributes)
-			}
+			updatedLabel.attributedText = NSAttributedString(string: agoFormat(since: result["lastUpdated"] as? Date), attributes: smallAttributes)
 		} else {
 			issuesLabel.attributedText = nil
 			prLabel.attributedText = NSAttributedString(string: "--", attributes: dimAttributes)
 			issuesLabel.attributedText = NSAttributedString(string: "--", attributes: dimAttributes)
 			updatedLabel.attributedText = NSAttributedString(string: "Not updated yet", attributes: smallAttributes)
 		}
+
 	}
 
 	override func viewDidLayoutSubviews() {
+		super.viewDidLayoutSubviews()
 		linkButton.frame = prLabel.frame.union(updatedLabel.frame)
 		let H = linkButton.frame.origin.y + linkButton.frame.size.height
 		preferredContentSize = CGSize(width: view.frame.size.width, height: H + 23)

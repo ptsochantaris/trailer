@@ -45,8 +45,6 @@ UITableViewDragDelegate {
 
 	// Tabs
 	private var tabs: UITabBar?
-	private var tabSide1: UIView?
-	private var tabSide2: UIView?
 	private var tabScroll: UIScrollView?
 	private var tabBorder: UIView?
 	private var tabBarSets = [TabBarSet]()
@@ -143,44 +141,6 @@ UITableViewDragDelegate {
 		}
 	}
 
-	override func viewDidLayoutSubviews() {
-		super.viewDidLayoutSubviews()
-		layoutTabs()
-	}
-
-	func layoutTabs() {
-		if let v = navigationController?.view, let t = tabs, let ts = tabScroll, let tb = tabBorder, let ts1 = tabSide1, let ts2 = tabSide2 {
-			let boundsSize = v.bounds.size
-			let viewWidth = boundsSize.width
-			let viewHeight = boundsSize.height
-			let tabScrollTransform = ts.transform
-			let tabBorderTransform = tb.transform
-
-			let preferredTabWidth = 64*CGFloat(t.items?.count ?? 1)
-			let tabFrame = CGRect(x: 0, y: 0, width: max(viewWidth, preferredTabWidth), height: 49)
-			t.frame = tabFrame
-			ts.contentSize = tabFrame.size
-
-			ts.frame = CGRect(x: 0, y: viewHeight-49, width: viewWidth, height: 49)
-			ts.transform = tabScrollTransform
-
-			tb.frame = CGRect(x: 0, y: viewHeight-49.5, width: viewWidth, height: 0.5)
-			tb.transform = tabBorderTransform
-
-			let halfWidth = viewWidth*0.5
-			ts1.frame = CGRect(x: -halfWidth, y: 0, width: halfWidth, height: 49)
-			ts2.frame = CGRect(x: tabFrame.size.width, y: 0, width: halfWidth, height: 49)
-
-			if navigationController?.visibleViewController == self || navigationController?.visibleViewController?.presentingViewController != nil {
-				v.bringSubview(toFront: tb)
-				v.bringSubview(toFront: ts)
-			} else {
-				v.sendSubview(toBack: tb)
-				v.sendSubview(toBack: ts)
-			}
-		}
-	}
-
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
 		updateStatus(becauseOfChanges: false, updateItems: true)
@@ -236,7 +196,7 @@ UITableViewDragDelegate {
 		//prs[1].postSyncAction = PostSyncAction.delete.rawValue
 		//DataItem.nukeDeletedItems(in: DataManager.main)
 
-		updateTabItems(animated: false, rebuildTabs: true)
+		updateTabItems()
 		atNextEvent {
 			self.tableView.reloadData() // ensure footers are correct
 		}
@@ -285,7 +245,7 @@ UITableViewDragDelegate {
 	}
 
 	@objc private func refreshEnded() {
-		updateStatus(becauseOfChanges: false)
+		dataUpdateTimer.push()
 	}
 
 	@objc private func refreshUpdated() {
@@ -567,55 +527,53 @@ UITableViewDragDelegate {
 		return NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: DataManager.main, sectionNameKeyPath: "sectionName", cacheName: nil)
 	}
 
-	private func updateTabItems(animated: Bool, rebuildTabs: Bool) {
+	private func updateTabItems() {
 
-		if rebuildTabs {
+		tabBarSets.removeAll()
 
-			tabBarSets.removeAll()
+		for groupLabel in Repo.allGroupLabels(in: DataManager.main) {
+			let c = GroupingCriterion(repoGroup: groupLabel)
+			let s = TabBarSet(viewCriterion: c)
+			tabBarSets.append(s)
+		}
 
-			for groupLabel in Repo.allGroupLabels(in: DataManager.main) {
-				let c = GroupingCriterion(repoGroup: groupLabel)
-				let s = TabBarSet(viewCriterion: c)
-				tabBarSets.append(s)
-			}
-
-			if Settings.showSeparateApiServersInMenu {
-				for a in ApiServer.allApiServers(in: DataManager.main) {
-					if a.goodToGo {
-						let c = GroupingCriterion(apiServerId: a.objectID)
-						let s = TabBarSet(viewCriterion: c)
-						tabBarSets.append(s)
-					}
+		if Settings.showSeparateApiServersInMenu {
+			for a in ApiServer.allApiServers(in: DataManager.main) {
+				if a.goodToGo {
+					let c = GroupingCriterion(apiServerId: a.objectID)
+					let s = TabBarSet(viewCriterion: c)
+					tabBarSets.append(s)
 				}
+			}
+		} else {
+			let s = TabBarSet(viewCriterion: nil)
+			tabBarSets.append(s)
+		}
+
+		var items = [UITabBarItem]()
+		for d in tabBarSets {
+			items.append(contentsOf: d.tabItems)
+		}
+
+		let tabsAlreadyWereVisible = tabs != nil
+
+		if items.count > 1 {
+			showTabBar(show: true, animated: true)
+
+			tabs?.items = items
+			if items.count > lastTabIndex {
+				tabs?.selectedItem = items[lastTabIndex]
+				currentTabBarSet = tabBarSetForTabItem(i: items[lastTabIndex])
 			} else {
-				let s = TabBarSet(viewCriterion: nil)
-				tabBarSets.append(s)
+				tabs?.selectedItem = items.last
+				currentTabBarSet = tabBarSetForTabItem(i: items.last!)
 			}
+			tabsWidth?.constant = CGFloat(items.count * 64)
+			tabs?.superview?.layoutIfNeeded()
 
-			var items = [UITabBarItem]()
-			for d in tabBarSets {
-				items.append(contentsOf: d.tabItems)
-			}
-
-			if items.count > 1 {
-				showTabBar(show: true, animated: animated)
-
-				tabs?.items = items
-				tabs?.superview?.setNeedsLayout()
-
-				if items.count > lastTabIndex {
-					tabs?.selectedItem = items[lastTabIndex]
-					currentTabBarSet = tabBarSetForTabItem(i: items[lastTabIndex])
-				} else {
-					tabs?.selectedItem = items.last
-					currentTabBarSet = tabBarSetForTabItem(i: items.last!)
-				}
-			} else {
-				currentTabBarSet = tabBarSetForTabItem(i: items.first)
-				showTabBar(show: false, animated: animated)
-			}
-		} else if let i = tabs?.selectedItem {
-			currentTabBarSet = tabBarSetForTabItem(i: i)
+		} else {
+			currentTabBarSet = tabBarSetForTabItem(i: items.first)
+			showTabBar(show: false, animated: true)
 		}
 
 		if let i = tabs?.selectedItem?.image {
@@ -628,31 +586,26 @@ UITableViewDragDelegate {
 			viewingPrs = true
 		}
 
-		if rebuildTabs {
-			if fetchedResultsController == nil {
-				updateQuery(newFetchRequest: itemFetchRequest)
-				tableView.reloadData()
-			} else {
-				let latestFetchRequest = fetchedResultsController.fetchRequest
-				let newFetchRequest = itemFetchRequest
-				let newCount = tabs?.items?.count ?? 0
-				if newCount != lastTabCount || latestFetchRequest != newFetchRequest {
-					updateQuery(newFetchRequest: newFetchRequest)
-					tableView.reloadData()
-				}
-			}
-
-			if let ts = tabScroll, let t = tabs, let i = t.selectedItem, let ind = t.items?.index(of: i) {
-				let w = t.bounds.size.width / CGFloat(t.items?.count ?? 1)
-				let x = w*CGFloat(ind)
-				let f = CGRect(x: x, y: 0, width: w, height: t.bounds.size.height)
-				ts.scrollRectToVisible(f, animated: true)
-			}
-			lastTabCount = tabs?.items?.count ?? 0
-		} else {
+		if fetchedResultsController == nil {
 			updateQuery(newFetchRequest: itemFetchRequest)
 			tableView.reloadData()
+		} else {
+			let latestFetchRequest = fetchedResultsController.fetchRequest
+			let newFetchRequest = itemFetchRequest
+			let newCount = tabs?.items?.count ?? 0
+			if newCount != lastTabCount || latestFetchRequest != newFetchRequest {
+				updateQuery(newFetchRequest: newFetchRequest)
+				tableView.reloadData()
+			}
 		}
+
+		if let ts = tabScroll, let t = tabs, let i = t.selectedItem, let ind = t.items?.index(of: i) {
+			let w = t.bounds.size.width / CGFloat(t.items?.count ?? 1)
+			let x = w * CGFloat(ind)
+			let f = CGRect(x: x, y: 0, width: w, height: t.bounds.size.height)
+			ts.scrollRectToVisible(f, animated: tabsAlreadyWereVisible)
+		}
+		lastTabCount = tabs?.items?.count ?? 0
 
 		if let i = tabs?.selectedItem, let ind = tabs?.items?.index(of: i) {
 			lastTabIndex = ind
@@ -663,40 +616,73 @@ UITableViewDragDelegate {
 
 	private var lastTabIndex = 0
 	private var lastTabCount = 0
+	private var tabsWidth: NSLayoutConstraint?
 	private func showTabBar(show: Bool, animated: Bool) {
 		if show {
 
-			if tabScroll == nil, let s = navigationController?.view {
+			if tabScroll == nil, let v = navigationController?.view {
 
 				tableView.scrollIndicatorInsets = UIEdgeInsets(top: tableView.scrollIndicatorInsets.top, left: 0, bottom: 49, right: 0)
 
 				let t = UITabBar()
+				t.translatesAutoresizingMaskIntoConstraints = false
 				t.delegate = self
-				t.itemPositioning = .fill
 				tabs = t
 
 				let ts = UIScrollView()
+				ts.translatesAutoresizingMaskIntoConstraints = false
 				ts.showsHorizontalScrollIndicator = false
 				ts.alwaysBounceHorizontal = true
 				ts.scrollsToTop = false
 				ts.addSubview(t)
 
 				let s1 = UIVisualEffectView(effect: UIBlurEffect(style: .extraLight))
-				tabSide1 = s1
+				s1.translatesAutoresizingMaskIntoConstraints = false
 				ts.addSubview(s1)
 
 				let s2 = UIVisualEffectView(effect: UIBlurEffect(style: .extraLight))
-				tabSide2 = s2
+				s2.translatesAutoresizingMaskIntoConstraints = false
 				ts.addSubview(s2)
 
 				let b = UIView()
+				b.translatesAutoresizingMaskIntoConstraints = false
 				b.backgroundColor = UIColor.black.withAlphaComponent(DISABLED_FADE)
 				b.isUserInteractionEnabled = false
-				s.addSubview(b)
+				v.addSubview(b)
 				tabBorder = b
 
-				s.addSubview(ts)
+				v.addSubview(ts)
 				tabScroll = ts
+
+				t.heightAnchor.constraint(equalToConstant: 49).isActive = true
+				t.widthAnchor.constraint(greaterThanOrEqualTo: v.widthAnchor).isActive = true
+				tabsWidth = t.widthAnchor.constraint(greaterThanOrEqualToConstant: 0)
+				tabsWidth!.isActive = true
+
+				t.topAnchor.constraint(equalTo: ts.contentLayoutGuide.topAnchor).isActive = true
+				t.leadingAnchor.constraint(equalTo: ts.contentLayoutGuide.leadingAnchor).isActive = true
+				t.trailingAnchor.constraint(equalTo: ts.contentLayoutGuide.trailingAnchor).isActive = true
+				t.bottomAnchor.constraint(equalTo: ts.contentLayoutGuide.bottomAnchor).isActive = true
+
+				ts.bottomAnchor.constraint(equalTo: v.bottomAnchor).isActive = true
+				ts.leadingAnchor.constraint(equalTo: v.leadingAnchor).isActive = true
+				ts.trailingAnchor.constraint(equalTo: v.trailingAnchor).isActive = true
+				ts.heightAnchor.constraint(equalToConstant: 49).isActive = true
+
+				b.heightAnchor.constraint(equalToConstant: 0.5).isActive = true
+				b.bottomAnchor.constraint(equalTo: ts.topAnchor).isActive = true
+				b.leadingAnchor.constraint(equalTo: ts.leadingAnchor).isActive = true
+				b.trailingAnchor.constraint(equalTo: ts.trailingAnchor).isActive = true
+
+				s2.trailingAnchor.constraint(equalTo: t.leadingAnchor).isActive = true
+				s2.widthAnchor.constraint(equalToConstant: 320).isActive = true
+				s2.topAnchor.constraint(equalTo: ts.contentLayoutGuide.topAnchor).isActive = true
+				s2.bottomAnchor.constraint(equalTo: ts.contentLayoutGuide.bottomAnchor).isActive = true
+
+				s1.leadingAnchor.constraint(equalTo: t.trailingAnchor).isActive = true
+				s1.widthAnchor.constraint(equalToConstant: 320).isActive = true
+				s1.topAnchor.constraint(equalTo: ts.contentLayoutGuide.topAnchor).isActive = true
+				s1.bottomAnchor.constraint(equalTo: ts.contentLayoutGuide.bottomAnchor).isActive = true
 
 				if animated {
 					ts.transform = CGAffineTransform(translationX: 0, y: 49)
@@ -720,8 +706,7 @@ UITableViewDragDelegate {
 				tabs = nil
 				tabScroll = nil
 				tabBorder = nil
-				tabSide1 = nil
-				tabSide2 = nil
+				tabsWidth = nil
 
 				if animated {
 					UIView.animate(withDuration: 0.2,
@@ -1088,26 +1073,31 @@ UITableViewDragDelegate {
 
 	func updateStatus(becauseOfChanges: Bool, updateItems: Bool = false) {
 
-		if becauseOfChanges || updateItems {
-			updateTabItems(animated: true, rebuildTabs: true)
-		}
-		updateFooter()
-
-		if appIsRefreshing {
-			title = "Refreshing…"
-			refreshControl?.beginRefreshing()
-		} else {
-			title = viewingPrs ? pullRequestsTitle : issuesTitle
-			refreshControl?.endRefreshing()
-		}
-		refreshUpdated()
-
 		if becauseOfChanges {
 			app.updateBadgeAndSaveDB()
 		}
 
+		if becauseOfChanges || updateItems {
+			updateTabItems()
+		}
+
+		updateFooter()
+		refreshUpdated()
+
+		if appIsRefreshing {
+			title = "Refreshing…"
+		} else {
+			title = viewingPrs ? pullRequestsTitle : issuesTitle
+		}
+
 		if splitViewController?.displayMode != .allVisible {
 			detailViewController.navigationItem.leftBarButtonItem?.title = title
+		}
+
+		if appIsRefreshing {
+			refreshControl?.beginRefreshing()
+		} else {
+			refreshControl?.endRefreshing()
 		}
 	}
 

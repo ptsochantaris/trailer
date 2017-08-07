@@ -63,6 +63,28 @@ let shortDateFormatter: DateFormatter = {
 	return d
 }()
 
+private let agoFormatter: DateComponentsFormatter = {
+	let f = DateComponentsFormatter()
+	f.allowedUnits = [.day, .hour, .minute]
+	f.unitsStyle = .short
+	return f
+}()
+
+func agoFormat(since: Date?) -> String {
+
+	guard let since = since, since != .distantPast else {
+		return "Not updated yet"
+	}
+
+	let interval = -since.timeIntervalSinceNow
+	if interval < 60.0 {
+		return "Updated just now"
+	} else {
+		let duration = agoFormatter.string(from: since, to: Date()) ?? "unknown time"
+		return "Updated \(duration) ago"
+	}
+}
+
 ////
 
 func atNextEvent(_ completion: @escaping Completion) {

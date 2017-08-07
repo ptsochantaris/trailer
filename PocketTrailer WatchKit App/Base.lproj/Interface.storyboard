@@ -4,6 +4,7 @@
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
+        <deployment identifier="watchOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13147.4"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="13042.2"/>
     </dependencies>
@@ -44,7 +45,7 @@
                                                                 <color key="backgroundColor" red="0.20784313730000001" green="0.4823529412" blue="0.82352941180000006" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                 <edgeInsets key="margins" left="6" right="6" top="0.0" bottom="0.0"/>
                                                             </group>
-                                                            <label alignment="center" verticalAlignment="center" alpha="0.89999999999999991" text="Refreshed" numberOfLines="0" id="ahH-0N-rUo">
+                                                            <label alignment="center" verticalAlignment="center" alpha="0.89999999999999991" text="Refreshed" textAlignment="center" numberOfLines="0" id="ahH-0N-rUo">
                                                                 <color key="textColor" red="0.24918844709999999" green="0.58109372510000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                 <fontDescription key="font" type="system" weight="thin" pointSize="7"/>
                                                                 <variation key="device=watch42mm">
