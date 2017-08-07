@@ -48,10 +48,7 @@ final class CommentBlacklistViewController: UITableViewController {
 
 			if let tf = a.textFields?.first, let n = tf.text?.trim {
 
-				var name: String = n
-				if name.hasPrefix("@") {
-					name = name.substring(from: name.index(name.startIndex, offsetBy: 1))
-				}
+				let name = n.hasPrefix("@") ? String(n.dropFirst()) : n
 
 				atNextEvent(self) { S in
 					if !name.isEmpty && !Settings.commentAuthorBlacklist.contains(name) {

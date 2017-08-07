@@ -364,7 +364,7 @@ final class DataManager {
 		let sqlStorePath = dataDir.appendingPathComponent("Trailer.sqlite")
 
 		let modelPath = Bundle.main.url(forResource: "Trailer", withExtension: "momd")!
-		let mom = NSManagedObjectModel(contentsOf: modelPath)!
+		let mom = NSManagedObjectModel(contentsOf: modelPath)
 
 		let fileManager = FileManager.default
 		if fileManager.fileExists(atPath: sqlStorePath.path) {

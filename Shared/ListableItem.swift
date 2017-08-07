@@ -770,21 +770,14 @@ class ListableItem: DataItem {
 	}
 
 	private final class func predicate(from token: String, termAt: Int, format: String, numeric: Bool) -> NSPredicate? {
-		if token.characters.count > termAt {
-			let items = token.substring(from: token.index(token.startIndex, offsetBy: termAt))
+		if token.count > termAt {
+			let items = token.dropFirst(termAt)
 			if !items.isEmpty {
 				var orTerms = [NSPredicate]()
 				var notTerms = [NSPredicate]()
 				for term in items.components(separatedBy: ",") {
-					let T: String
-					let negative: Bool
-					if term.hasPrefix("!") {
-						T = term.substring(from: term.index(term.startIndex, offsetBy: 1))
-						negative = true
-					} else {
-						T = term
-						negative = false
-					}
+					let negative = term.hasPrefix("!")
+					let T = negative ? String(term.dropFirst()) : term
 					let P: NSPredicate
 					if numeric, let n = UInt64(T) {
 						P = NSPredicate(format: format, n)
@@ -797,14 +790,14 @@ class ListableItem: DataItem {
 						orTerms.append(P)
 					}
 				}
-				let n = NSCompoundPredicate(andPredicateWithSubpredicates: notTerms)
-				let o = NSCompoundPredicate(orPredicateWithSubpredicates: orTerms)
 				if notTerms.count > 0 && orTerms.count > 0 {
+					let n = NSCompoundPredicate(andPredicateWithSubpredicates: notTerms)
+					let o = NSCompoundPredicate(orPredicateWithSubpredicates: orTerms)
 					return NSCompoundPredicate(andPredicateWithSubpredicates: [n,o])
 				} else if notTerms.count > 0 {
-					return n
+					return NSCompoundPredicate(andPredicateWithSubpredicates: notTerms)
 				} else if orTerms.count > 0 {
-					return o
+					return NSCompoundPredicate(orPredicateWithSubpredicates: orTerms)
 				} else {
 					return nil
 				}
@@ -850,7 +843,7 @@ class ListableItem: DataItem {
 					for token in fi.components(separatedBy: " ") {
 						let prefix = "\(tag):"
 						if token.hasPrefix(prefix) {
-							if let p = process(token, prefix.characters.count) {
+							if let p = process(token, prefix.count) {
 								andPredicates.append(p)
 							}
 							fi = fi.replacingOccurrences(of: token, with: "")

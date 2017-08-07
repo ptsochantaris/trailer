@@ -291,8 +291,7 @@ extension String {
 		let endSlash = hasSuffix("/")
 		let firstSlash = pathComponent.hasPrefix("/")
 		if endSlash && firstSlash {
-			let firstChar = pathComponent.index(pathComponent.startIndex, offsetBy: 1)
-			return appending(pathComponent.substring(from: firstChar))
+			return appending(pathComponent.dropFirst())
 		} else if (!endSlash && !firstSlash) {
 			return appending("/\(pathComponent)")
 		} else {
