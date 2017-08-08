@@ -156,7 +156,7 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 			
 			prLabel.attributedText = writeOutSection("prs")
 			issuesLabel.attributedText = writeOutSection("issues")
-			updatedLabel.attributedText = NSAttributedString(string: agoFormat(since: result["lastUpdated"] as? Date), attributes: smallAttributes)
+			updatedLabel.attributedText = NSAttributedString(string: agoFormat(prefix: "updated", since: result["lastUpdated"] as? Date).capitalized, attributes: smallAttributes)
 		} else {
 			issuesLabel.attributedText = nil
 			prLabel.attributedText = NSAttributedString(string: "--", attributes: dimAttributes)

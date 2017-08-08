@@ -516,15 +516,12 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	override func controlTextDidChange(_ n: Notification) {
-		if let obj = n.object as? NSSearchField {
+		guard let obj = n.object as? NSSearchField, let w = obj.window as? MenuWindow, let menuBarSet = menuBarSet(for: w) else { return }
 
-			guard let w = obj.window as? MenuWindow, let menuBarSet = menuBarSet(for: w) else { return }
-
-			if obj === menuBarSet.prMenu.filter {
-				menuBarSet.prFilterTimer.push()
-			} else if obj === menuBarSet.issuesMenu.filter {
-				menuBarSet.issuesFilterTimer.push()
-			}
+		if obj === menuBarSet.prMenu.filter {
+			menuBarSet.prFilterTimer.push()
+		} else if obj === menuBarSet.issuesMenu.filter {
+			menuBarSet.issuesFilterTimer.push()
 		}
 	}
 
@@ -1125,13 +1122,6 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			if d.issuesMenu.isVisible { return d.issuesMenu }
 		}
 		return nil
-	}
-
-	func updateVibrancies() {
-		for d in menuBarSets {
-			d.prMenu.updateVibrancy()
-			d.issuesMenu.updateVibrancy()
-		}
 	}
 
 	//////////////////////// Database error on startup

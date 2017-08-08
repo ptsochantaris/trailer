@@ -67,7 +67,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var highlightItemsWithNewCommits: NSButton!
 
 	// Display
-	@IBOutlet weak var useVibrancy: NSButton!
 	@IBOutlet weak var includeLabelsInFiltering: NSButton!
 	@IBOutlet weak var includeTitlesInFiltering: NSButton!
 	@IBOutlet weak var includeMilestonesInFiltering: NSButton!
@@ -85,6 +84,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var displayRepositoryNames: NSButton!
 	@IBOutlet weak var hideCountsOnMenubar: NSButton!
 	@IBOutlet weak var showLabels: NSButton!
+	@IBOutlet weak var showRelativeDates: NSButton!
 
 	// Servers
 	@IBOutlet weak var serverList: NSTableView!
@@ -331,7 +331,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		highlightItemsWithNewCommits.toolTip = Settings.markPrsAsUnreadOnNewCommitsHelp
 		countOnlyListedItems.toolTip = Settings.countOnlyListedItemsHelp
 		displayRepositoryNames.toolTip = Settings.showReposInNameHelp
-		useVibrancy.toolTip = Settings.useVibrancyHelp
 		hideAvatars.toolTip = Settings.hideAvatarsHelp
 		showSeparateApiServersInMenu.toolTip = Settings.showSeparateApiServersInMenuHelp
 		hideCountsOnMenubar.toolTip = Settings.hideMenubarCountsHelp
@@ -398,6 +397,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		showLabels.toolTip = Settings.showLabelsHelp
 		reactionIntervalLabel.toolTip = Settings.reactionScanningIntervalHelp
 		reactionIntervalStepper.toolTip = Settings.reactionScanningIntervalHelp
+		showRelativeDates.toolTip = Settings.showRelativeDatesHelp
 	}
 
 	private func updateAllItemSettingButtons() {
@@ -476,12 +476,12 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		openPrAtFirstUnreadComment.integerValue = Settings.openPrAtFirstUnreadComment ? 1 : 0
 		logActivityToConsole.integerValue = Settings.logActivityToConsole ? 1 : 0
 		dumpApiResponsesToConsole.integerValue = Settings.dumpAPIResponsesInConsole ? 1 : 0
-		useVibrancy.integerValue = Settings.useVibrancy ? 1 : 0
 		hidePrsThatDontPass.integerValue = Settings.hidePrsThatArentPassing ? 1 : 0
 		hidePrsThatDontPassOnlyInAll.integerValue = Settings.hidePrsThatDontPassOnlyInAll ? 1 : 0
 		highlightItemsWithNewCommits.integerValue = Settings.markPrsAsUnreadOnNewCommits ? 1 : 0
 		hideSnoozedItems.integerValue = Settings.hideSnoozedItems ? 1 : 0
 		showLabels.integerValue = Settings.showLabels ? 1 : 0
+		showRelativeDates.integerValue = Settings.showRelativeDates ? 1 : 0
 
 		notifyOnItemReactions.integerValue = Settings.notifyOnItemReactions ? 1 : 0
 		notifyOnCommentReactions.integerValue = Settings.notifyOnCommentReactions ? 1 : 0
@@ -540,6 +540,11 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		advancedReposWindow?.updateActivity()
 	}
 
+	@IBAction func showRelativeDatesSelected(_ sender: NSButton) {
+		Settings.showRelativeDates = sender.integerValue == 1
+		deferredUpdateTimer.push()
+	}
+
 	@IBAction func notifyOnItemReactionsSelected(_ sender: NSButton) {
 		Settings.notifyOnItemReactions = sender.integerValue == 1
 		API.refreshesSinceLastReactionsCheck.removeAll()
@@ -579,11 +584,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBAction func displayRepositoryNameSelected(_ sender: NSButton) {
 		Settings.showReposInName = (sender.integerValue==1)
 		deferredUpdateTimer.push()
-	}
-
-	@IBAction func useVibrancySelected(_ sender: NSButton) {
-		Settings.useVibrancy = (sender.integerValue==1)
-		app.updateVibrancies()
 	}
 
 	@IBAction func showLabelsSelected(_ sender: NSButton) {

@@ -10,7 +10,7 @@ class DataItem: NSManagedObject {
 	@NSManaged var apiServer: ApiServer
 
 	func resetSyncState() {
-		updatedAt = .distantPast
+		updatedAt = updatedAt?.addingTimeInterval(-1) ?? .distantPast
 		apiServer.resetSyncState()
 	}
 

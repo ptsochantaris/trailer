@@ -65,23 +65,23 @@ let shortDateFormatter: DateFormatter = {
 
 private let agoFormatter: DateComponentsFormatter = {
 	let f = DateComponentsFormatter()
-	f.allowedUnits = [.day, .hour, .minute]
-	f.unitsStyle = .short
+	f.allowedUnits = [.year, .month, .day, .hour, .minute]
+	f.unitsStyle = .abbreviated
 	return f
 }()
 
-func agoFormat(since: Date?) -> String {
+func agoFormat(prefix: String, since: Date?) -> String {
 
 	guard let since = since, since != .distantPast else {
-		return "Not updated yet"
+		return "not \(prefix) yet"
 	}
 
 	let interval = -since.timeIntervalSinceNow
 	if interval < 60.0 {
-		return "Updated just now"
+		return "\(prefix) just now"
 	} else {
 		let duration = agoFormatter.string(from: since, to: Date()) ?? "unknown time"
-		return "Updated \(duration) ago"
+		return "\(prefix) \(duration) ago"
 	}
 }
 

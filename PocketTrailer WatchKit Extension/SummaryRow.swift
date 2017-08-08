@@ -97,6 +97,6 @@ class SummaryRow: NSObject, PopulatableRow {
 			unreadGroup.setAlpha(1.0)
 		}
 
-		lastUpdate.setText(agoFormat(since: result["lastUpdated"] as? Date))
+		lastUpdate.setText(agoFormat(prefix: "updated", since: result["lastUpdated"] as? Date).capitalized)
 	}
 }

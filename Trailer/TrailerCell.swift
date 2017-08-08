@@ -17,7 +17,6 @@ class TrailerCell: NSTableCellView {
 	private let titleFont = NSFont.menuFont(ofSize: 13.0)
 
 	private let dataItemId: NSManagedObjectID!
-	private let isDark = Settings.useVibrancy && app.darkMode
 	private let unselectedTitleColor: NSColor
 
 	private var title: CenterTextField!
@@ -27,7 +26,7 @@ class TrailerCell: NSTableCellView {
 
 		dataItemId = item.objectID
 
-		unselectedTitleColor = isDark ? .controlHighlightColor : .controlTextColor
+		unselectedTitleColor = app.darkMode ? .controlHighlightColor : .controlTextColor
 
 		super.init(frame: .zero)
 
@@ -139,7 +138,7 @@ class TrailerCell: NSTableCellView {
 			guard let table = app.visibleWindow?.table else { return }
 
 			if let item = associatedDataItem {
-				let titleColor = (selected && isDark) ? .darkGray : unselectedTitleColor
+				let titleColor = (selected && app.darkMode) ? .darkGray : unselectedTitleColor
 				title.attributedStringValue = item.title(with: titleFont, labelFont: detailFont, titleColor: titleColor)
 			}
 
@@ -349,7 +348,7 @@ class TrailerCell: NSTableCellView {
 
 		let countString = NSAttributedString(string: itemCountFormatter.string(for: total)!, attributes: [
 			NSAttributedStringKey.font: NSFont.menuFont(ofSize: 11),
-			NSAttributedStringKey.foregroundColor: isDark ? NSColor.controlLightHighlightColor : NSColor.controlTextColor,
+			NSAttributedStringKey.foregroundColor: app.darkMode ? NSColor.controlLightHighlightColor : NSColor.controlTextColor,
 			NSAttributedStringKey.paragraphStyle: pCenter])
 
 		var height: CGFloat = 20
@@ -402,7 +401,7 @@ class TrailerCell: NSTableCellView {
 	private func highlight(_ on: Bool) {
 		if let c = countBackground {
 			var color: NSColor
-			if isDark {
+			if app.darkMode {
 				color = on ? .black : NSColor(red: 0.94, green: 0.94, blue: 0.94, alpha: 1.0)
 				c.backgroundColor = on ? NSColor.white.withAlphaComponent(DISABLED_FADE) : NSColor.black.withAlphaComponent(0.2)
 				newBackground?.backgroundColor = NSColor(red: 1.0, green: 0.1, blue: 0.1, alpha: 1.0)

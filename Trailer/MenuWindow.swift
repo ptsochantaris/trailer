@@ -27,15 +27,17 @@ final class MenuWindow: NSWindow {
 		}
 	}
 
-	private var windowVibrancy: NSView?
-
 	override func awakeFromNib() {
 
 		super.awakeFromNib()
 
-		backgroundColor = .white
-
 		scrollView.contentView.wantsLayer = true
+
+		let w = NSVisualEffectView(frame: header.bounds)
+		w.autoresizingMask = [.height, .width]
+		w.blendingMode = .behindWindow
+		w.state = .active
+		header.addSubview(w, positioned: .below, relativeTo: filter)
 
 		NotificationCenter.default.addObserver(self, selector: #selector(refreshUpdate), name: SyncProgressUpdateNotification, object: nil)
 	}
@@ -45,29 +47,7 @@ final class MenuWindow: NSWindow {
 	}
 
 	func updateVibrancy() {
-
-		if Settings.useVibrancy {
-
-			appearance = NSAppearance(named: app.darkMode ? .vibrantDark : .vibrantLight)
-			if windowVibrancy == nil {
-				let w = NSVisualEffectView(frame: header.bounds)
-				w.autoresizingMask = [.height, .width]
-				w.blendingMode = .behindWindow
-				w.state = .active
-				header.addSubview(w, positioned: .below, relativeTo: filter)
-				windowVibrancy = w
-
-				table.selectionHighlightStyle = .sourceList
-			}
-
-		} else if let w = windowVibrancy {
-
-			appearance = NSAppearance(named: NSAppearance.Name.aqua)
-			w.removeFromSuperview()
-			windowVibrancy = nil
-
-			table.selectionHighlightStyle = .regular
-		}
+		appearance = NSAppearance(named: app.darkMode ? .vibrantDark : .vibrantLight)
 	}
 
 	var showStatusItem: StatusItemView {

@@ -716,11 +716,7 @@ class ListableItem: DataItem {
 			_subtitle.append(separator)
 		}
 
-		if Settings.showCreatedInsteadOfUpdated {
-			_subtitle.append(NSAttributedString(string: itemDateFormatter.string(from: createdAt!), attributes: lightSubtitle))
-		} else {
-			_subtitle.append(NSAttributedString(string: itemDateFormatter.string(from: updatedAt!), attributes: lightSubtitle))
-		}
+		_subtitle.append(NSAttributedString(string: displayDate, attributes: lightSubtitle))
 
 		return _subtitle
 	}
@@ -732,15 +728,29 @@ class ListableItem: DataItem {
 			components.append("Repository: \(S(repo.fullName))")
 		}
 
-		if let l = userLogin { components.append("Author: \(l)") }
-
-		if Settings.showCreatedInsteadOfUpdated {
-			components.append("Created \(itemDateFormatter.string(from: createdAt!))")
-		} else {
-			components.append("Updated \(itemDateFormatter.string(from: updatedAt!))")
+		if let l = userLogin {
+			components.append("Author: \(l)")
 		}
 
+		components.append(displayDate)
+
 		return components.joined(separator: ",")
+	}
+
+	var displayDate: String {
+		if Settings.showRelativeDates {
+			if Settings.showCreatedInsteadOfUpdated {
+				return agoFormat(prefix: "created", since: createdAt)
+			} else {
+				return agoFormat(prefix: "updated", since: updatedAt)
+			}
+		} else {
+			if Settings.showCreatedInsteadOfUpdated {
+				return "created " + itemDateFormatter.string(from: createdAt!)
+			} else {
+				return "updated " + itemDateFormatter.string(from: updatedAt!)
+			}
+		}
 	}
 
 	class final func styleForEmpty(message: String, color: COLOR_CLASS) -> NSAttributedString {

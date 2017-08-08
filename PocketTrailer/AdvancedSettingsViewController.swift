@@ -47,6 +47,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		        description: Settings.showCreatedInsteadOfUpdatedHelp,
 		        valueDisplayed: { Settings.showCreatedInsteadOfUpdated ? "✓" : " " }),
 		Setting(section: .Display,
+		        title: "Display relative times and dates",
+		        description: Settings.showRelativeDatesHelp,
+		        valueDisplayed: { Settings.showRelativeDates ? "✓" : " " }),
+		Setting(section: .Display,
 		        title: "Assigned items",
 		        description: "How to handle items that have been detected as assigned to you.",
 		        valueDisplayed: { AssignmentPolicy(Settings.assignedPrHandlingPolicy)?.name }),
@@ -528,23 +532,26 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				Settings.showCreatedInsteadOfUpdated = !Settings.showCreatedInsteadOfUpdated
 				settingsChangedTimer.push()
 			case 2:
+				Settings.showRelativeDates = !Settings.showRelativeDates
+				settingsChangedTimer.push()
+			case 3:
 				pickerName = setting.title
 				selectedIndexPath = IndexPath(row: originalIndex, section: section.rawValue)
 				valuesToPush = AssignmentPolicy.labels
 				previousValue = Settings.assignedPrHandlingPolicy
 				performSegue(withIdentifier: "showPicker", sender: self)
-			case 3:
+			case 4:
 				Settings.showReposInName = !Settings.showReposInName
 				settingsChangedTimer.push()
-			case 4:
-				Settings.openItemsDirectlyInSafari = !Settings.openItemsDirectlyInSafari
 			case 5:
+				Settings.openItemsDirectlyInSafari = !Settings.openItemsDirectlyInSafari
+			case 6:
 				Settings.showSeparateApiServersInMenu = !Settings.showSeparateApiServersInMenu
 				atNextEvent {
 					popupManager.masterController.updateStatus(becauseOfChanges: true)
 				}
 				settingsChangedTimer.push()
-			case 6:
+			case 7:
 				Settings.alwaysRequestDesktopSite = !Settings.alwaysRequestDesktopSite
 			default: break
 			}

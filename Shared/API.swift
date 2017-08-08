@@ -337,7 +337,7 @@ final class API {
 				let refreshes = refreshesSinceLastReactionsCheck[oid]
 				if refreshes == nil || refreshes! >= Settings.reactionScanningInterval {
 					//DLog("Will check reactions for item: '%@'", item.title)
-					item.updatedAt = .distantPast
+					item.updatedAt = item.updatedAt?.addingTimeInterval(-1) ?? .distantPast
 					item.postSyncAction = PostSyncAction.isUpdated.rawValue
 				} else {
 					//DLog("No need to get reactions for item: '%@' (%@ refreshes since last check)", item.title, refreshes)
