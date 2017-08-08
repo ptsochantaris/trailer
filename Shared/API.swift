@@ -85,7 +85,7 @@ final class API {
 
 	private static let sessionCallbackQueue: OperationQueue = {
 		let o = OperationQueue()
-		o.maxConcurrentOperationCount = 1
+		o.maxConcurrentOperationCount = 2
 		return o
 	}()
 	private static let urlSession: URLSession = {
@@ -375,7 +375,7 @@ final class API {
 			}
 		}
 
-		apiQueue.maxConcurrentOperationCount = API.sustainedConcurrency
+		apiQueue.maxConcurrentOperationCount = API.burstConcurrency
 
 		if shouldSyncReactions {
 			markItemsForPeriodicReactionsCheck(in: moc)
@@ -390,6 +390,8 @@ final class API {
 
 			let reposWithSomeItems = repos.filter { $0.issues.count > 0 || $0.pullRequests.count > 0 }
 			markExtraUpdatedItems(from: reposWithSomeItems, to: moc) {
+
+				apiQueue.maxConcurrentOperationCount = API.sustainedConcurrency
 
 				if willSyncItemReactions {
 					fetchIssueReactionsIfNeeded(to: moc, callback: completionCallback)
@@ -424,14 +426,11 @@ final class API {
 
 	private class func markExtraUpdatedItems(from repos: [Repo], to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
-		apiQueue.maxConcurrentOperationCount = API.burstConcurrency
-
 		var completionCount = 0
 		let totalOperations = repos.count
 		let completionCallback = {
 			completionCount += 1
 			if completionCount == totalOperations {
-				apiQueue.maxConcurrentOperationCount = API.sustainedConcurrency
 				callback()
 			}
 		}
