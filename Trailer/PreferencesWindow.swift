@@ -57,6 +57,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var statusTermsField: NSTokenField!
 	@IBOutlet weak var hidePrsThatDontPass: NSButton!
 	@IBOutlet weak var hidePrsThatDontPassOnlyInAll: NSButton!
+	@IBOutlet weak var showStatusesForAll: NSButton!
 
 	// Comments
 	@IBOutlet weak var disableAllCommentNotifications: NSButton!
@@ -369,6 +370,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		notifyOnStatusUpdatesForAllPrs.toolTip = Settings.notifyOnStatusUpdatesForAllPrsHelp
 		hidePrsThatDontPass.toolTip = Settings.hidePrsThatArentPassingHelp
 		hidePrsThatDontPassOnlyInAll.toolTip = Settings.hidePrsThatDontPassOnlyInAllHelp
+		showStatusesForAll.toolTip = Settings.showStatusesOnAllItemsHelp
 		statusTermMenu.toolTip = Settings.statusFilteringTermsHelp
 		logActivityToConsole.toolTip = Settings.logActivityToConsoleHelp
 		dumpApiResponsesToConsole.toolTip = Settings.dumpAPIResponsesInConsoleHelp
@@ -478,6 +480,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		dumpApiResponsesToConsole.integerValue = Settings.dumpAPIResponsesInConsole ? 1 : 0
 		hidePrsThatDontPass.integerValue = Settings.hidePrsThatArentPassing ? 1 : 0
 		hidePrsThatDontPassOnlyInAll.integerValue = Settings.hidePrsThatDontPassOnlyInAll ? 1 : 0
+		showStatusesForAll.integerValue = Settings.showStatusesOnAllItems ? 1 : 0
 		highlightItemsWithNewCommits.integerValue = Settings.markPrsAsUnreadOnNewCommits ? 1 : 0
 		hideSnoozedItems.integerValue = Settings.hideSnoozedItems ? 1 : 0
 		showLabels.integerValue = Settings.showLabels ? 1 : 0
@@ -719,6 +722,15 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		deferredUpdateTimer.push()
 	}
 
+	@IBAction func showStatusesForAllSelected(_ sender: NSButton) {
+		Settings.showStatusesOnAllItems = (sender.integerValue==1)
+		deferredUpdateTimer.push()
+		if Settings.showStatusItems {
+			API.refreshesSinceLastStatusCheck.removeAll()
+			preferencesDirty = true
+		}
+	}
+
 	@IBAction func hidePrsThatDontPassSelected(_ sender: NSButton) {
 		Settings.hidePrsThatArentPassing = (sender.integerValue==1)
 		updateStatusItemsOptions()
@@ -846,7 +858,10 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		deferredUpdateTimer.push()
 		updateStatusItemsOptions()
 
-		API.refreshesSinceLastStatusCheck.removeAll()
+		if Settings.showStatusItems {
+			API.refreshesSinceLastStatusCheck.removeAll()
+			preferencesDirty = true
+		}
 	}
 
 	private func setupSortMethodMenu() {
@@ -869,6 +884,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		statusItemsRefreshNote.alphaValue = enable ? 1.0 : 0.5
 		hidePrsThatDontPass.alphaValue = enable ? 1.0 : 0.5
 		hidePrsThatDontPass.isEnabled = enable
+		showStatusesForAll.isEnabled = enable
 		hidePrsThatDontPassOnlyInAll.isEnabled = enable && Settings.hidePrsThatArentPassing
 		notifyOnStatusUpdatesForAllPrs.isEnabled = enable && Settings.notifyOnStatusUpdates
 

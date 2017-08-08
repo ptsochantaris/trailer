@@ -222,6 +222,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		        description: Settings.showStatusItemsHelp,
 		        valueDisplayed: { Settings.showStatusItems ? "✓" : " " }),
 		Setting(section: .Stauses,
+		        title: "...for all PRs",
+		        description: Settings.showStatusesOnAllItemsHelp,
+		        valueDisplayed: { Settings.showStatusesOnAllItems ? "✓" : " " }),
+		Setting(section: .Stauses,
 		        title: "Re-query statuses",
 		        description: Settings.statusItemRefreshIntervalHelp,
 		        valueDisplayed: { Settings.statusItemRefreshInterval == 1 ? "Every refresh" : "Every \(Settings.statusItemRefreshInterval) refreshes" }),
@@ -725,13 +729,19 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			switch originalIndex {
 			case 0:
 				Settings.showStatusItems = !Settings.showStatusItems
-				API.refreshesSinceLastStatusCheck.removeAll()
-				if Settings.showStatusItems {
-					ApiServer.resetSyncOfEverything()
-				}
 				settingsChangedTimer.push()
-				preferencesDirty = true
+				if Settings.showStatusItems {
+					API.refreshesSinceLastStatusCheck.removeAll()
+					preferencesDirty = true
+				}
 			case 1:
+				Settings.showStatusesOnAllItems = !Settings.showStatusesOnAllItems
+				settingsChangedTimer.push()
+				if Settings.showStatusesOnAllItems {
+					API.refreshesSinceLastStatusCheck.removeAll()
+					preferencesDirty = true
+				}
+			case 2:
 				selectedIndexPath = IndexPath(row: originalIndex, section: section.rawValue)
 				pickerName = setting.title
 				var values = [String]()
@@ -745,14 +755,14 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				}
 				valuesToPush = values
 				performSegue(withIdentifier: "showPicker", sender: self)
-			case 2:
-				Settings.notifyOnStatusUpdates = !Settings.notifyOnStatusUpdates
 			case 3:
-				Settings.notifyOnStatusUpdatesForAllPrs = !Settings.notifyOnStatusUpdatesForAllPrs
+				Settings.notifyOnStatusUpdates = !Settings.notifyOnStatusUpdates
 			case 4:
+				Settings.notifyOnStatusUpdatesForAllPrs = !Settings.notifyOnStatusUpdatesForAllPrs
+			case 5:
 				Settings.hidePrsThatArentPassing = !Settings.hidePrsThatArentPassing
 				settingsChangedTimer.push()
-			case 5:
+			case 6:
 				Settings.hidePrsThatDontPassOnlyInAll = !Settings.hidePrsThatDontPassOnlyInAll
 				settingsChangedTimer.push()
 			default: break

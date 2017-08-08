@@ -409,8 +409,7 @@ class ListableItem: DataItem {
 
 		/////////// Comment counting
 
-		let inLoudSection = targetSection != .all && targetSection != .snoozed && targetSection != .none
-		let showComments = !muted && (inLoudSection || Settings.showCommentsEverywhere)
+		let showComments = !muted && (targetSection.isLoud || Settings.showCommentsEverywhere)
 		if showComments {
 
 			var latestDate = latestReadCommentDate ?? .distantPast

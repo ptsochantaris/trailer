@@ -1055,7 +1055,7 @@ final class API {
 	private class func fetchStatusesForCurrentPullRequests(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		let prs = PullRequest.active(of: PullRequest.self, in: moc, visibleOnly: !Settings.hidePrsThatArentPassing).filter { pr in
-			guard pr.apiServer.lastSyncSucceeded else { return false }
+			guard pr.apiServer.lastSyncSucceeded, pr.shouldShowStatuses else { return false }
 
 			let oid = pr.objectID
 			let refreshes = refreshesSinceLastStatusCheck[oid]

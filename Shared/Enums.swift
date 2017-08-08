@@ -18,6 +18,10 @@ enum Section: Int64 {
 	static let movePolicyNames = ["Don't Move", "Mine", "Participated", "Mentioned"]
 	var movePolicyName: String { return Section.movePolicyNames[Int(rawValue)] }
 
+	var isLoud: Bool {
+		return self != .all && self != .snoozed && self != .none
+	}
+
 	var intValue: Int { return Int(rawValue) }
 
 	init?(_ rawValue: Int) {

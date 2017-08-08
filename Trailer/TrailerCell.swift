@@ -46,7 +46,7 @@ class TrailerCell: NSTableCellView {
 		var statusBottom: CGFloat = 0
 		let widthLimit = CGSize(width: W, height: .greatestFiniteMagnitude)
 
-		if let pullRequest = item as? PullRequest, Settings.showStatusItems {
+		if let pullRequest = item as? PullRequest, pullRequest.shouldShowStatuses {
 			cellPadding = 10
 			bottom = 5
 

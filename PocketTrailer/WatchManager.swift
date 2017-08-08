@@ -197,14 +197,11 @@ final class WatchManager : NSObject, WCSessionDelegate {
 	private func buildItemList(type: String, sectionIndex: Int64, from: Int, apiServerUri: String, group: String, count: Int, onlyUnread: Bool, replyHandler: @escaping ([String : Any]) -> Void) {
 
 		let showLabels = Settings.showLabels
-		let showStatuses: Bool
 		let entity: ListableItem.Type
 		if type == "prs" {
 			entity = PullRequest.self
-			showStatuses = Settings.showStatusItems
 		} else {
 			entity = Issue.self
-			showStatuses = false
 		}
 
 		let f: NSFetchRequest<ListableItem>
@@ -225,13 +222,13 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		tempMoc.undoManager = nil
 		tempMoc.persistentStoreCoordinator = DataManager.main.persistentStoreCoordinator
 		tempMoc.perform { [weak self] in
-			let items = try! tempMoc.fetch(f).map { self?.baseDataForItem(item: $0, showStatuses: showStatuses, showLabels: showLabels) }
+			let items = try! tempMoc.fetch(f).map { self?.baseDataForItem(item: $0, showLabels: showLabels) }
 			let compressedData = NSKeyedArchiver.archivedData(withRootObject: items).data(operation: .compress)!
 			replyHandler(["result" : compressedData])
 		}
 	}
 
-	private func baseDataForItem(item: ListableItem, showStatuses: Bool, showLabels: Bool) -> [String : Any] {
+	private func baseDataForItem(item: ListableItem, showLabels: Bool) -> [String : Any] {
 
 		let font = UIFont.systemFont(ofSize: UIFont.systemFontSize)
 		let smallFont = UIFont.systemFont(ofSize: UIFont.systemFontSize-4)
@@ -247,8 +244,8 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		if showLabels {
 			itemData["labels"] = labelsForItem(item: item)
 		}
-		if showStatuses {
-			itemData["statuses"] = statusLinesForPr(pr: item as! PullRequest)
+		if let item = item as? PullRequest, item.shouldShowStatuses {
+			itemData["statuses"] = statusLinesForPr(pr: item)
 		}
 		return itemData
 	}
@@ -279,8 +276,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	private func buildItemDetail(localId: String) -> Data? {
 		if let oid = DataManager.id(for: localId), let item = existingObject(with: oid) as? ListableItem {
-			let showStatuses = (item is PullRequest) ? Settings.showStatusItems : false
-			var result = baseDataForItem(item: item, showStatuses: showStatuses, showLabels: Settings.showLabels)
+			var result = baseDataForItem(item: item, showLabels: Settings.showLabels)
 			result["description"] = item.body
 			result["comments"] = commentsForItem(item: item)
 

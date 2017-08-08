@@ -105,7 +105,7 @@ final class PRCell: UITableViewCell {
 
 		var statusText : NSMutableAttributedString?
 		var statusCount = 0
-		if Settings.showStatusItems {
+		if pullRequest.shouldShowStatuses {
 			let statusItems = pullRequest.displayedStatuses
 			statusCount = statusItems.count
 			while statusCount > 0 {

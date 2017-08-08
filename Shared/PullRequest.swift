@@ -66,6 +66,10 @@ final class PullRequest: ListableItem {
 		return false
 	}
 
+	var shouldShowStatuses: Bool {
+		return Settings.showStatusItems && (Settings.showStatusesOnAllItems || (Section(rawValue: sectionIndex)?.isLoud ?? false))
+	}
+
 	func checkAndStoreReviewAssignments(_ reviewerNames: Set<String>) -> Bool {
 		reviewers = reviewerNames.joined(separator: ",")
 		let assigned = reviewerNames.contains(S(apiServer.userName))
