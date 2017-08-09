@@ -927,9 +927,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				}
 
 			} else if sip.section == SettingsSection.Stauses.rawValue {
-				if sip.row == 1 {
-					Settings.statusItemRefreshInterval = didSelectIndexPath.row+1
-				}
+				Settings.statusItemRefreshInterval = didSelectIndexPath.row+1
 
 			} else if sip.section == SettingsSection.Comments.rawValue {
 				if sip.row == 2 {
