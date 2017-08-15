@@ -63,7 +63,6 @@ final class PRListController: CommonController {
 	override func requestData(command: String?) {
 		if !loading && !sleeping {
 			loadingBuffer.removeAll(keepingCapacity: false)
-			progressiveLoading = false
 			_requestData(command)
 			loading = true
 		}
@@ -103,8 +102,6 @@ final class PRListController: CommonController {
 		loadingBuffer.removeAll(keepingCapacity: false)
 	}
 
-	private var progressiveLoading = false
-
 	override func update(from response: [AnyHashable : Any]) {
 		let compressedData = response["result"] as! Data
 		let uncompressedData = compressedData.data(operation: .decompress)!
@@ -119,8 +116,6 @@ final class PRListController: CommonController {
 		loadingBuffer.append(contentsOf: page)
 
 		if page.count == PAGE_SIZE {
-			show(status: "Loaded \(loadingBuffer.count) items…", hideTable: true)
-			progressiveLoading = true
 			atNextEvent(self) { S in
 				S._requestData(nil)
 			}
@@ -129,50 +124,37 @@ final class PRListController: CommonController {
 
 			loading = false
 
-			if progressiveLoading {
-				show(status: "Loaded \(loadingBuffer.count) items.\n\nDisplaying…", hideTable: true)
-				atNextEvent(self) { S in
-					S.completeLoadingBuffer()
-				}
+			let recordDelta = loadingBuffer.count - table.numberOfRows
+
+			if recordDelta < 0 {
+				table.removeRows(at: IndexSet(integersIn: Range(uncheckedBounds: (0, -recordDelta))))
+			} else if recordDelta > 0 {
+				table.insertRows(at: IndexSet(integersIn: Range(uncheckedBounds: (0, recordDelta))), withRowType: "PRRow")
+			}
+
+			if loadingBuffer.count == 0 {
+				show(status: "There are no items in this section", hideTable: true)
 
 			} else {
-				completeLoadingBuffer()
-			}
-		}
-	}
 
-	private func completeLoadingBuffer() {
-
-		let recordDelta = loadingBuffer.count - table.numberOfRows
-
-		if recordDelta < 0 {
-			table.removeRows(at: IndexSet(integersIn: Range(uncheckedBounds: (0, -recordDelta))))
-		} else if recordDelta > 0 {
-			table.insertRows(at: IndexSet(integersIn: Range(uncheckedBounds: (0, recordDelta))), withRowType: "PRRow")
-		}
-
-		if loadingBuffer.count == 0 {
-			show(status: "There are no items in this section", hideTable: true)
-
-		} else {
-
-			var index = 0
-			for itemData in loadingBuffer {
-				if let c = table.rowController(at: index) as? PRRow {
-					c.populate(from: itemData)
+				var index = 0
+				for itemData in loadingBuffer {
+					if let c = table.rowController(at: index) as? PRRow {
+						c.populate(from: itemData)
+					}
+					index += 1
 				}
-				index += 1
+
+				show(status: "", hideTable: false)
+
+				if let s = selectedIndex {
+					table.scrollToRow(at: s)
+					selectedIndex = nil
+				}
 			}
 
-			show(status: "", hideTable: false)
-
-			if let s = selectedIndex {
-				table.scrollToRow(at: s)
-				selectedIndex = nil
-			}
+			loadingBuffer.removeAll(keepingCapacity: false)
 		}
-
-		loadingBuffer.removeAll(keepingCapacity: false)
 	}
 
 	@IBAction func markAllReadSelected() {
