@@ -426,6 +426,11 @@ final class API {
 
 	private class func markExtraUpdatedItems(from repos: [Repo], to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
+		if repos.count == 0 {
+			callback()
+			return
+		}
+
 		var completionCount = 0
 		let totalOperations = repos.count
 		let completionCallback = {
