@@ -423,7 +423,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 					if alert.runModal() == .alertSecondButtonReturn {
 						removeAllMergedRequests(under: menuBarSet)
-						if alert.suppressionButton!.state == .onState {
+						if alert.suppressionButton!.state == .on {
 							Settings.dontAskBeforeWipingMerged = true
 						}
 					}
@@ -443,7 +443,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 					if alert.runModal() == .alertSecondButtonReturn {
 						removeAllClosedRequests(under: menuBarSet)
-						if alert.suppressionButton!.state == .onState {
+						if alert.suppressionButton!.state == .on {
 							Settings.dontAskBeforeWipingClosed = true
 						}
 					}
@@ -468,7 +468,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 					if alert.runModal() == .alertSecondButtonReturn {
 						removeAllClosedIssues(under: menuBarSet)
-						if alert.suppressionButton!.state == .onState {
+						if alert.suppressionButton!.state == .on {
 							Settings.dontAskBeforeWipingClosed = true
 						}
 					}
@@ -570,7 +570,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			alert.addButton(withTitle: "Yes")
 			alert.showsSuppressionButton = true
 			if alert.runModal() == .alertSecondButtonReturn {
-				if alert.suppressionButton!.state == .onState {
+				if alert.suppressionButton!.state == .on {
 					Settings.dontConfirmSettingsImport = true
 				}
 			} else {
