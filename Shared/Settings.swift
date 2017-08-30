@@ -38,8 +38,12 @@ final class Settings {
 			sharedDefaults.removeObject(forKey: "SNOOZE_WAKEUP_ON_STATUS_UPDATE")
 		}
 
-		if let showStats = sharedDefaults.object(forKey: "SHOW_STATUS_ITEMS") as? Bool, showStats, sharedDefaults.object(forKey: "SHOW_STATUSES_EVERYWHERE") as? Bool == nil {
-			sharedDefaults.set(true, forKey: "SHOW_STATUSES_EVERYWHERE")
+		if
+            sharedDefaults.object(forKey: "SHOW_STATUSES_EVERYWHERE") as? Bool == nil,
+            let showStats = sharedDefaults.object(forKey: "SHOW_STATUS_ITEMS") as? Bool, showStats,
+            let notifyAll = sharedDefaults.object(forKey: "NOTIFY_ON_STATUS_UPDATES_ALL") as? Bool, notifyAll {
+
+            sharedDefaults.set(true, forKey: "SHOW_STATUSES_EVERYWHERE")
 		}
 
 		if let moveAssignedPrs = sharedDefaults.object(forKey: "MOVE_ASSIGNED_PRS_TO_MY_SECTION") as? Bool {
