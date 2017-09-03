@@ -24,6 +24,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 		super.viewDidLoad()
 		
 		title = "Loading…"
+		navigationItem.largeTitleDisplayMode = .automatic
 		
 		let webConfiguration = WKWebViewConfiguration()
 		let w = WKWebView(frame: view.bounds, configuration: webConfiguration)

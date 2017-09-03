@@ -15,6 +15,8 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
+		navigationItem.largeTitleDisplayMode = .automatic
+
 		if repo == nil {
 			repoNameTitle.text = "All Repositories (You don't need to pick values for each setting below, you can set only a specific setting if you prefer)"
 			groupField.isHidden = true

@@ -14,6 +14,7 @@ final class WatchlistSettingsViewController: UITableViewController, PickerViewCo
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
+		navigationItem.largeTitleDisplayMode = .automatic
 		rescanCell.detailTextLabel?.text = Settings.newRepoCheckPeriodHelp
 		autoAddCell.detailTextLabel?.text = Settings.automaticallyAddNewReposFromWatchlistHelp
 		autoRemoveCell.detailTextLabel?.text = Settings.automaticallyRemoveDeletedReposFromWatchlistHelp

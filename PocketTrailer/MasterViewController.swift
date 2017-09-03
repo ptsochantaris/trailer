@@ -196,6 +196,8 @@ UITableViewDragDelegate {
 		//prs[1].postSyncAction = PostSyncAction.delete.rawValue
 		//DataItem.nukeDeletedItems(in: DataManager.main)
 
+		navigationItem.largeTitleDisplayMode = .automatic
+
 		updateTabItems()
 		atNextEvent {
 			self.tableView.reloadData() // ensure footers are correct

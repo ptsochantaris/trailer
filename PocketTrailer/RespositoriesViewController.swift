@@ -29,6 +29,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 		navigationItem.searchController = searchController
 
 		navigationItem.hidesSearchBarWhenScrolling = false
+		navigationItem.largeTitleDisplayMode = .automatic
 
 		searchTimer = PopTimer(timeInterval: 0.5) { [weak self] in
 			self?.reloadData()

@@ -334,7 +334,8 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		navigationItem.searchController = searchController
 
 		navigationItem.hidesSearchBarWhenScrolling = false
-		
+		navigationItem.largeTitleDisplayMode = .automatic
+
 		searchTimer = PopTimer(timeInterval: 0.2) { [weak self] in
 			self?.reload()
 		}

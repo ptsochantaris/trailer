@@ -92,6 +92,7 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		title = isNew ? "New" : "Edit"
+		navigationItem.largeTitleDisplayMode = .automatic
 		typeSelector.selectedSegmentIndex = (snoozeItem?.duration ?? false) ? 0 : 1
 		updateView()
 		hidePickerAnimated(animate: false)
