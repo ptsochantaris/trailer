@@ -5,8 +5,8 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 	
 	@IBOutlet weak var spinner: UIActivityIndicatorView!
 	@IBOutlet weak var statusLabel: UILabel!
-	
-	private var webView: WKWebView?
+	@IBOutlet weak var webView: WKWebView!
+
 	private var alwaysRequestDesktopSite = false
 	
 	var isVisible = false
@@ -22,50 +22,38 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		
 		title = "Loading…"
-		navigationItem.largeTitleDisplayMode = .automatic
-		
-		let webConfiguration = WKWebViewConfiguration()
-		let w = WKWebView(frame: view.bounds, configuration: webConfiguration)
-		w.navigationDelegate = self
-		w.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-		w.isHidden = true
-		view.addSubview(w)
-		
-		webView = w
-		
+		webView.navigationDelegate = self
 		configureView()
 	}
 		
 	@objc private func configureView() {
-		if let w = webView {
-			if let d = detailItem {
-				if !alwaysRequestDesktopSite && Settings.alwaysRequestDesktopSite {
-					DLog("Activating iPad webview user-agent")
-					alwaysRequestDesktopSite = true
-					w.evaluateJavaScript("navigator.userAgent") { result, error in
-						if let r = result as? String {
-							w.customUserAgent = r.replacingOccurrences(of: "iPhone", with: "iPad")
-						}
-						self.configureView()
+		guard let webView = webView else { return }
+		if let d = detailItem {
+			if !alwaysRequestDesktopSite && Settings.alwaysRequestDesktopSite {
+				DLog("Activating iPad webview user-agent")
+				alwaysRequestDesktopSite = true
+				webView.evaluateJavaScript("navigator.userAgent") { result, error in
+					if let r = result as? String {
+						self.webView.customUserAgent = r.replacingOccurrences(of: "iPhone", with: "iPad")
 					}
-					return
-				} else if alwaysRequestDesktopSite && !Settings.alwaysRequestDesktopSite {
-					DLog("Deactivating iPad webview user-agent")
-					w.customUserAgent = nil
-					alwaysRequestDesktopSite = false
+					self.configureView()
 				}
-				DLog("Will load: %@", d.absoluteString)
-				w.load(URLRequest(url: d))
-			} else {
-				statusLabel.textColor = .lightGray
-				statusLabel.text = "Please select an item from the list, or visit the settings to add servers, or show/hide repositories.\n\n(You may have to login to GitHub the first time you visit a private item)"
-				statusLabel.isHidden = false
-				navigationItem.rightBarButtonItem?.isEnabled = false
-				title = nil
-				w.isHidden = true
+				return
+			} else if alwaysRequestDesktopSite && !Settings.alwaysRequestDesktopSite {
+				DLog("Deactivating iPad webview user-agent")
+				webView.customUserAgent = nil
+				alwaysRequestDesktopSite = false
 			}
+			DLog("Will load: %@", d.absoluteString)
+			webView.load(URLRequest(url: d))
+		} else {
+			statusLabel.textColor = .lightGray
+			statusLabel.text = "Please select an item from the list, or visit the settings to add servers, or show/hide repositories.\n\n(You may have to login to GitHub the first time you visit a private item)"
+			statusLabel.isHidden = false
+			navigationItem.rightBarButtonItem?.isEnabled = false
+			title = nil
+			webView.isHidden = true
 		}
 	}
 	
