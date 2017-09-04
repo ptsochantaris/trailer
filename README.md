@@ -13,6 +13,8 @@ For maintained binaries and/or more info:
 
 - [Latest iOS version](https://itunes.apple.com/app/id806104975?mt=8)
 
+- [Trailer for the command-line and Linux](https://github.com/ptsochantaris/trailer-cli)
+
 - [Trailer for Android](https://github.com/amencarini/droidtrailer)
 
-Note: Trailer lists all your [watched repositories](http://github.com/watching). To reduce notification noise (and speed up your sync) visit the Preferences and change the display settings of each repository. To change the settings for all visible repositories use "Set all PRs…" and "Set all issues…". Filter first to only modify a subset.
+Note: Trailer lists all your [watched repositories](http://github.com/watching). To reduce notification noise (and speed up your sync) visit the Preferences and change the display settings of each repository. To change the settings for all visible repositories use "Set all PRs…" and "Set all issues…". Use a filter first if you only want modify a subset.
