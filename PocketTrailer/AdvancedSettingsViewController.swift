@@ -331,6 +331,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		searchController.searchResultsUpdater = self
 		searchController.searchBar.tintColor = view.tintColor
 		searchController.searchBar.placeholder = "Filter"
+		searchController.hidesNavigationBarDuringPresentation = false
 		navigationItem.searchController = searchController
 
 		navigationItem.hidesSearchBarWhenScrolling = false
