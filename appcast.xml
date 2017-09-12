@@ -7,6 +7,25 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.6.0</title>
+			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Option to display relative instead of absolute dates</li>
+				<li>Using Swift 4 and Xcode 9 toolchain, as well as various optimisations and stability improvements.</li>
+				<li>Fix: Sync will no longer hang if user has an empty watchlist.</li>
+				<li>Option to only show/sync statuses in mine/participated sections. Greatly improves sync times, especially on large or busy repositories.</li>
+				<li>Updated token permission description.</li>
+				</ul></font>]]></description>
+			<pubDate>Tue, 12 Sep 2017 20:00:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer160.zip"
+			sparkle:version="1460"
+			sparkle:shortVersionString="1.6.0"
+			sparkle:dsaSignature="MC0CFEDVPLFXTwHVPE5mrRG2j0jc+jZcAhUA08+k39SeF9rIXonkLVHAxLpNlAA="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.5.9</title>
 			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
@@ -140,141 +159,6 @@
 			sparkle:version="1395"
 			sparkle:shortVersionString="1.5.2"
 			sparkle:dsaSignature="MC0CFGmE1V4HDybstLfbn9+vfl2192yLAhUAi1llN9N+PlbLlabGUV7EvduSstI="
-			type="application/octet-stream"/>
-		</item>
-
-		<item>
-			<title>Version 1.5.1</title>
-			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
-			<description><![CDATA[<font face="sans-serif" size="3"><ul>
-				<li>This is a bugfix release that corrects a scrolling issue on macOS Sierra</li>
-				<li>From 1.5.0:</li>
-				<li>Support for multiple assignees when searching or detecting if an item has been assigned.</li>
-				<li>Mentions, team mentions, and new items in owned repos can now be routed to any section.</li>
-				<li>Snoozing logic and options improvements.</li>
-				<li>Improved keyboard support for navigating.</li>
-				<li>In case launch fails because of a database incompatibility (or corruption), Trailer will no longer auto-wipe the database but will display a warning, offering the options to wipe the database or quit.</li>
-				<li>Preferences layout fixes for Yosemite.</li>
-				<li>"X" mode will no longer cause group status bar items to disappear.</li>
-				<li>Under the hood: Updated for the latest Swift 3 / Xcode 8 toolchain, Sparkle updater now at v14.</li>
-				<li>Database access settings updated to improve store robustness.</li>
-				<li>Important performance, syncing logic, and stability improvements.</li>
-				</ul></font>]]></description>
-			<pubDate>Wed, 19 Oct 2016 16:00:00 +0000</pubDate>
-			<enclosure
-			url="http://ptsochantaris.github.io/trailer/trailer151.zip"
-			sparkle:version="1387"
-			sparkle:shortVersionString="1.5.1"
-			sparkle:dsaSignature="MC0CFHBhh1d/5cyPpXhW+NRhSm08jWQlAhUAzl4kdYHtG4+6+Ya6kvri0tXB5QI="
-			type="application/octet-stream"/>
-		</item>
-
-		<item>
-			<title>Version 1.5.0</title>
-			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
-			<description><![CDATA[<font face="sans-serif" size="3"><ul>
-				<li>Support for multiple assignees when searching or detecting if an item has been assigned.</li>
-				<li>Mentions, team mentions, and new items in owned repos can now be routed to any section.</li>
-				<li>Snoozing logic and options improvements.</li>
-				<li>Improved keyboard support for navigating.</li>
-				<li>In case launch fails because of a database incompatibility (or corruption), Trailer will no longer auto-wipe the database but will display a warning, offering the options to wipe the database or quit.</li>
-				<li>Preferences layout fixes for Yosemite.</li>
-				<li>"X" mode will no longer cause group status bar items to disappear.</li>
-				<li>Under the hood: Updated for the latest Swift 3 / Xcode 8 toolchain, Sparkle updater now at v14.</li>
-				<li>Database access settings updated to improve store robustness.</li>
-				<li>Important performance, syncing logic, and stability improvements.</li>
-				</ul></font>]]></description>
-			<pubDate>Wed, 14 Sep 2016 10:00:00 +0000</pubDate>
-			<enclosure
-			url="http://ptsochantaris.github.io/trailer/trailer150.zip"
-			sparkle:version="1385"
-			sparkle:shortVersionString="1.5.0"
-			sparkle:dsaSignature="MC0CFQDPkYNwYw0xGP+Yz7p0vvyTiG2g0gIUVRVNjpfjnRJG1k0Vhi/pWxJd6vg="
-			type="application/octet-stream"/>
-		</item>
-
-		<item>
-			<title>Version 1.4.3</title>
-			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
-			<description><![CDATA[<font face="sans-serif" size="3"><ul>
-				<li>New option to automatically snooze items after a specific number of days of inactivity.</li>
-				<li>Fix: Avoiding menu window recreation after system wake, if dark mode hasn’t changed.</li>
-				<li>Fix: If all menu bar items are groups, and there are no items to display on any of them, will ensure at least one stays visible to allow access to preferences.</li>
-				</ul></font>]]></description>
-			<pubDate>Thu, 8 Jul 2016 10:00:00 +0000</pubDate>
-			<enclosure
-			url="http://ptsochantaris.github.io/trailer/trailer143.zip"
-			sparkle:version="1342"
-			sparkle:shortVersionString="1.4.3"
-			sparkle:dsaSignature="MC4CFQDQjX8be/miNWEUhfzteIc4UtveDwIVANjJ+zq5bD2SWLSIzZVow6kn6tXW"
-			type="application/octet-stream"/>
-		</item>
-
-		<item>
-			<title>Version 1.4.2</title>
-			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
-			<description><![CDATA[<font face="sans-serif" size="3"><ul>
-				<li>This update corrects an issue on OS X 10.9 and 10.10 which could lead to a crash when updating menus, and improves menu update performance.</li>
-				<li>Additionally from the recent 1.4.1:</li>
-				<li>Corrects counts shown during the confirmation of removing all merged or closed items from a list</li>
-				<li>New “group” field in the watchlist allows grouping or extracting one or more repositories into their own menu item(s).</li>
-				<li>New option to split API servers into separate menu-bar items.</li>
-				<li>New option to mark an item’s comments as read if you have just posted a new comment.</li>
-				<li>Refresh indicator will now give a rough estimate of how many API calls are left for a refresh to complete.</li>
-				<li>More info on notifications, including the repository name that a notification refers to.</li>
-				<li>Various dark mode detection issues corrected.</li>
-				<li>Significant internal cleanups and optimisations, as well as improved tracking of read/unread comments.</li>
-				</ul></font>]]></description>
-			<pubDate>Thu, 16 Jun 2016 20:00:00 +0000</pubDate>
-			<enclosure
-			url="http://ptsochantaris.github.io/trailer/trailer142.zip"
-			sparkle:version="1338"
-			sparkle:shortVersionString="1.4.2"
-			sparkle:dsaSignature="MC4CFQCQFsnOAq7Zl4aTYkdzEho/WsMfBwIVAOFKHqqv4tH0nF9vmEUDU5gKb1DF"
-			type="application/octet-stream"/>
-		</item>
-
-		<item>
-			<title>Version 1.4.1</title>
-			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
-			<description><![CDATA[<font face="sans-serif" size="3"><ul>
-				<li>This update corrects counts shown during the confirmation of removing all merged or closed items from a list</li>
-				<li>Additionally from the recent 1.4.0:</li>
-				<li>New “group” field in the watchlist allows grouping or extracting one or more repositories into their own menu item(s).</li>
-				<li>New option to split API servers into separate menu-bar items.</li>
-				<li>New option to mark an item’s comments as read if you have just posted a new comment.</li>
-				<li>Refresh indicator will now give a rough estimate of how many API calls are left for a refresh to complete.</li>
-				<li>More info on notifications, including the repository name that a notification refers to.</li>
-				<li>Various dark mode detection issues corrected.</li>
-				<li>Significant internal cleanups and optimisations, as well as improved tracking of read/unread comments.</li>
-				</ul></font>]]></description>
-			<pubDate>Mon, 6 Jun 2016 21:00:00 +0000</pubDate>
-			<enclosure
-			url="http://ptsochantaris.github.io/trailer/trailer141.zip"
-			sparkle:version="1335"
-			sparkle:shortVersionString="1.4.1"
-			sparkle:dsaSignature="MC0CFEhYFoeFUAuAg1wBjtk+5f82vKIaAhUAsse+5mgb30G/vgUTkaPeRDvD40Q="
-			type="application/octet-stream"/>
-		</item>
-
-		<item>
-			<title>Version 1.4.0</title>
-			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
-			<description><![CDATA[<font face="sans-serif" size="3"><ul>
-				<li>New “group” field in the watchlist allows grouping or extracting one or more repositories into their own menu item(s).</li>
-				<li>New option to split API servers into separate menu-bar items.</li>
-				<li>New option to mark an item’s comments as read if you have just posted a new comment.</li>
-				<li>Refresh indicator will now give a rough estimate of how many API calls are left for a refresh to complete.</li>
-				<li>More info on notifications, including the repository name that a notification refers to.</li>
-				<li>Various dark mode detection issues corrected.</li>
-				<li>Significant internal cleanups and optimisations, as well as improved tracking of read/unread comments.</li>
-				</ul></font>]]></description>
-			<pubDate>Sat, 4 Jun 2016 21:00:00 +0000</pubDate>
-			<enclosure
-			url="http://ptsochantaris.github.io/trailer/trailer140.zip"
-			sparkle:version="1332"
-			sparkle:shortVersionString="1.4.0"
-			sparkle:dsaSignature="MC0CFQDbfcTA6JD+gsHEAh1ApKS5i9q4owIUIbQdLa3OTr3/nzaR5/9UWlGWI8U="
 			type="application/octet-stream"/>
 		</item>
 		
