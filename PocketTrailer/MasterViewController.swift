@@ -1,6 +1,7 @@
 
 import UIKit
 import CoreData
+import UserNotifications
 
 final class TabBarSet {
 	var prItem: UITabBarItem?
@@ -144,6 +145,7 @@ UITableViewDragDelegate {
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
 		updateStatus(becauseOfChanges: false, updateItems: true)
+		tabs?.setNeedsLayout() // iPhone X bug?
 
 		if let s = splitViewController, !s.isCollapsed {
 			return
@@ -656,7 +658,7 @@ UITableViewDragDelegate {
 				v.addSubview(ts)
 				tabScroll = ts
 
-				t.heightAnchor.constraint(equalToConstant: 49).isActive = true
+				t.heightAnchor.constraint(equalTo: ts.heightAnchor).isActive = true
 				t.widthAnchor.constraint(greaterThanOrEqualTo: v.widthAnchor).isActive = true
 				tabsWidth = t.widthAnchor.constraint(greaterThanOrEqualToConstant: 0)
 				tabsWidth!.isActive = true
@@ -669,7 +671,7 @@ UITableViewDragDelegate {
 				ts.bottomAnchor.constraint(equalTo: v.bottomAnchor).isActive = true
 				ts.leadingAnchor.constraint(equalTo: v.leadingAnchor).isActive = true
 				ts.trailingAnchor.constraint(equalTo: v.trailingAnchor).isActive = true
-				ts.heightAnchor.constraint(equalToConstant: 49).isActive = true
+				ts.topAnchor.constraint(equalTo: v.safeAreaLayoutGuide.bottomAnchor, constant: -49).isActive = true
 
 				b.heightAnchor.constraint(equalToConstant: 0.5).isActive = true
 				b.bottomAnchor.constraint(equalTo: ts.topAnchor).isActive = true
@@ -729,7 +731,7 @@ UITableViewDragDelegate {
 		}
 	}
 
-	func localNotification(userInfo: [AnyHashable : Any], action: String?) {
+	func localNotification(userInfo: [AnyHashable : Any], action: String) {
 		var urlToOpen = userInfo[NOTIFICATION_URL_KEY] as? String
 		var relatedItem: ListableItem?
 
@@ -743,13 +745,14 @@ UITableViewDragDelegate {
 		}
 
 		if let item = relatedItem {
-			if let a = action {
-				if a == "mute" {
-					item.setMute(to: true)
-				} else if a == "read" {
-					item.catchUpWithComments()
-				}
-			} else {
+			switch action {
+			case "mute":
+				item.setMute(to: true)
+
+			case "read":
+				item.catchUpWithComments()
+
+			default:
 				if let sc = navigationItem.searchController, sc.isActive {
 					sc.searchBar.text = nil
 					sc.isActive = false

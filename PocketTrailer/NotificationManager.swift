@@ -5,7 +5,7 @@ import CoreSpotlight
 
 final class NotificationManager {
 
-	class func handleLocalNotification(notification: UNNotificationContent, action: String?) {
+	class func handleLocalNotification(notification: UNNotificationContent, action: String) {
 		if notification.userInfo.count > 0 {
 			DLog("Received local notification: %@", notification.userInfo)
 			popupManager.masterController.localNotification(userInfo: notification.userInfo, action: action)

@@ -14,9 +14,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 	
 	var detailItem: URL? {
 		didSet {
-			if detailItem != oldValue {
-				configureView()
-			}
+			configureView()
 		}
 	}
 	

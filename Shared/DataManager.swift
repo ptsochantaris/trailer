@@ -329,7 +329,7 @@ final class DataManager {
 			let appSupportURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).last!
 			let finalURL = appSupportURL.appendingPathComponent("com.housetrip.Trailer")
 		#endif
-		DLog("Files in %@", finalURL.absoluteString)
+		DLog("Files in \(finalURL.path)")
 		return finalURL
 	}()
 
@@ -360,12 +360,12 @@ final class DataManager {
 			NSSQLitePragmasOption: ["synchronous":"NORMAL"]
 		]
 
-		let dataDir = dataFilesDirectory
-		let sqlStorePath = dataDir.appendingPathComponent("Trailer.sqlite")
-
 		let modelPath = Bundle.main.url(forResource: "Trailer", withExtension: "momd")!
 		let mom = NSManagedObjectModel(contentsOf: modelPath)!
 
+		let dataDir = dataFilesDirectory
+		let sqlStorePath = dataDir.appendingPathComponent("Trailer.sqlite")
+		DLog("DB: \(sqlStorePath.path)")
 		let fileManager = FileManager.default
 		if fileManager.fileExists(atPath: sqlStorePath.path) {
 			if let m = try? NSPersistentStoreCoordinator.metadataForPersistentStore(ofType: NSSQLiteStoreType, at: sqlStorePath, options: nil) {
