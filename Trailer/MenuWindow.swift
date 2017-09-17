@@ -72,7 +72,7 @@ final class MenuWindow: NSWindow {
 		return true
 	}
 
-	@objc func menuWillOpen(_ menu: NSMenu) {
+	@objc private func menuWillOpen(_ menu: NSMenu) {
 		if appIsRefreshing {
 			refreshUpdate()
 		} else {
