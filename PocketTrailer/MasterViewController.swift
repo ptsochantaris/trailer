@@ -165,8 +165,8 @@ UITableViewDragDelegate {
 		searchController.searchBar.placeholder = "Filter"
 		navigationItem.searchController = searchController
 
-		searchTimer = PopTimer(timeInterval: 0.5) { [weak self] in
-			self?.applyFilter()
+		searchTimer = PopTimer(timeInterval: 0.3) { [weak self] in
+			self?.updateSearch()
 		}
 
 		refreshControl?.addTarget(self, action: #selector(refreshControlChanged(_:)), for: .valueChanged)
@@ -482,7 +482,7 @@ UITableViewDragDelegate {
 		}
 	}
 
-	private func applyFilter() {
+	private func updateSearch() {
 
 		let r = Range(uncheckedBounds: (lower: 0, upper: fetchedResultsController.sections?.count ?? 0))
 		let currentIndexes = IndexSet(integersIn: r)
@@ -514,7 +514,7 @@ UITableViewDragDelegate {
 	private func updateQuery(newFetchRequest: NSFetchRequest<ListableItem>) {
 
 		if fetchedResultsController == nil || fetchedResultsController.fetchRequest.entityName != newFetchRequest.entityName {
-			let c = controllerFor(fetchRequest: newFetchRequest)
+			let c = NSFetchedResultsController(fetchRequest: newFetchRequest, managedObjectContext: DataManager.main, sectionNameKeyPath: "sectionName", cacheName: nil)
 			fetchedResultsController = c
 			try! c.performFetch()
 			c.delegate = self
@@ -525,10 +525,6 @@ UITableViewDragDelegate {
 			fr.predicate = newFetchRequest.predicate
 			try! fetchedResultsController.performFetch()
 		}
-	}
-
-	private func controllerFor<T: ListableItem>(fetchRequest: NSFetchRequest<T>) -> NSFetchedResultsController<T> {
-		return NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: DataManager.main, sectionNameKeyPath: "sectionName", cacheName: nil)
 	}
 
 	private func updateTabItems() {
@@ -878,9 +874,9 @@ UITableViewDragDelegate {
 
 	override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
 		if section == numberOfSections(in: tableView)-1 {
-			return tabs == nil ? 20 : 20+49
+			return 20 + (tabs == nil ? 0 : 49)
 		}
-		return 1
+		return CGFloat.leastNonzeroMagnitude
 	}
 
 	private func markItemAsRead(itemUri: String?) {
