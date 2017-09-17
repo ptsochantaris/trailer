@@ -15,8 +15,8 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		let description: String
 		var valueDisplayed: ()->String?
 
-		func isRelevantTo(s: String?, showingHelp: Bool) -> Bool {
-			if let s = s?.trim, !s.isEmpty {
+		func isRelevant(to searchText: String?, showingHelp: Bool) -> Bool {
+			if let s = searchText, !s.isEmpty {
 				return title.localizedCaseInsensitiveContains(s) || (showingHelp && description.localizedCaseInsensitiveContains(s))
 			} else {
 				return true
@@ -317,13 +317,26 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		dismiss(animated: true)
 	}
 
-	private func reload() {
-		heightCache.removeAll()
+	private var searchText: String?
+
+	private func reload(searchChanged: Bool = false) {
+		let previousSearchText = searchText
+		if searchChanged {
+			searchText = navigationItem.searchController?.searchBar.text?.trim
+		}
 		tableView.reloadData()
+		if previousSearchText != searchText {
+			atNextEvent(self) { S in
+				S.tableView.scrollRectToVisible(CGRect(origin: .zero, size: CGSize(width: 1, height: 1)), animated: false)
+			}
+		}
 	}
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
+
+		tableView.rowHeight = UITableViewAutomaticDimension
+		tableView.estimatedRowHeight = 120
 
 		let searchController = UISearchController(searchResultsController: nil)
 		searchController.dimsBackgroundDuringPresentation = false
@@ -338,7 +351,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		navigationItem.largeTitleDisplayMode = .automatic
 
 		searchTimer = PopTimer(timeInterval: 0.2) { [weak self] in
-			self?.reload()
+			self?.reload(searchChanged: true)
 		}
 
 		settingsChangedTimer = PopTimer(timeInterval: 1.0) {
@@ -374,7 +387,6 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		if let s = navigationItem.searchController?.searchBar.text, !s.isEmpty {
 			reload()
 		} else {
-			heightCache.removeAll()
 			let r = Range(uncheckedBounds: (lower: 0, upper: tableView.numberOfSections))
 			tableView.reloadSections(IndexSet(integersIn: r), with: .fade)
 		}
@@ -417,7 +429,9 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 	override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
 		if let footer = self.tableView(tableView, viewForFooterInSection: section) {
-			return footer.sizeThatFits(CGSize(width: tableView.bounds.size.width, height: 500.0)).height + 15.0
+			return footer.systemLayoutSizeFitting(CGSize(width: tableView.bounds.size.width, height: 0),
+			                                      withHorizontalFittingPriority: UILayoutPriority.required,
+			                                      verticalFittingPriority: UILayoutPriority.fittingSizeLevel).height + 15.0
 		} else {
 			return 0
 		}
@@ -849,38 +863,14 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 	private func filteredItemsForTableSection(section: Int) -> [Setting] {
 		let sec = filteredSections[section]
-		let searchText = navigationItem.searchController?.searchBar.text?.trim
-		return settings.filter{ $0.section == sec && $0.isRelevantTo(s: searchText, showingHelp: showHelp) }
+		return settings.filter{ $0.section == sec && $0.isRelevant(to: searchText, showingHelp: showHelp) }
 	}
 
 	private var filteredSections: [SettingsSection] {
-		let searchText = navigationItem.searchController?.searchBar.text?.trim
-		let matchingSettings = settings.filter{ $0.isRelevantTo(s: searchText, showingHelp: showHelp) }
-		var matchingSections = [SettingsSection]()
-		matchingSettings.forEach {
-			let s = $0.section
-			if !matchingSections.contains(s) {
-				matchingSections.append(s)
-			}
-		}
-		return matchingSections
-	}
-
-	private var sizer: AdvancedSettingsCell?
-	private var heightCache = [IndexPath : CGFloat]()
-	override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-		if sizer == nil {
-			sizer = tableView.dequeueReusableCell(withIdentifier: "Cell") as? AdvancedSettingsCell
-		} else if let h = heightCache[indexPath] {
-			//DLog("using cached height for %@ - %@", indexPath.section, indexPath.row)
-			return h
-		}
-		configureCell(cell: sizer!, indexPath: indexPath)
-		let h = sizer!.systemLayoutSizeFitting(CGSize(width: tableView.bounds.width, height: UILayoutFittingCompressedSize.height),
-			withHorizontalFittingPriority: .required,
-			verticalFittingPriority: .fittingSizeLevel).height
-		heightCache[indexPath] = h
-		return h
+		let matchingSettings = settings.filter{ $0.isRelevant(to: searchText, showingHelp: showHelp) }
+		var matchingSections = Set<SettingsSection>()
+		matchingSettings.forEach { matchingSections.insert($0.section) }
+		return matchingSections.sorted { $0.rawValue < $1.rawValue }
 	}
 
 	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
