@@ -11,8 +11,9 @@ $('.js-5').attr('src', (dpi>1) ? ((dpi>2) ? 'images/iphoneoutline-117.png' : 'im
 $('.js-6').attr('src', (dpi>1) ? ((dpi>2) ? 'images/watchoutline-99.png' : 'images/watchoutline-66.png') : 'images/watchoutline-33.png');
 $('.js-7').attr('src', (dpi>1) ? ((dpi>2) ? 'images/ipadscreenshot-1227.png' : 'images/ipadscreenshot-818.png') : 'images/ipadscreenshot-409.png');
 $('.js-8').attr('src', (dpi>1) ? ((dpi>2) ? 'images/iphonescreenshot-426.png' : 'images/iphonescreenshot-284.png') : 'images/iphonescreenshot-142.png');
-$('.js-9').attr('src', (dpi>1) ? ((dpi>2) ? 'images/watchscreenshot-300.png' : 'images/watchscreenshot-200.png') : 'images/watchscreenshot-100.png');};
+$('.js-9').attr('src', (dpi>1) ? ((dpi>2) ? 'images/iu-240.png' : 'images/iu-160.png') : 'images/iu-80.png');
+$('.js-10').attr('src', (dpi>1) ? ((dpi>2) ? 'images/watchscreenshot-300.png' : 'images/watchscreenshot-200.png') : 'images/watchscreenshot-100.png');};
 if(!window.HTMLPictureElement){r();}
-(function(){$('a[href^="#"]').each(function(){$(this).click(function(){var t=this.hash.length>1?$('[name="'+this.hash.slice(1)+'"]').offset().top:0;return $("html, body").animate({scrollTop:t},400),!1})})})();
+(function(){$('a[href^="#"]:not(.allowConsent,.noConsent,.denyConsent,.removeConsent)').each(function(){$(this).click(function(){var t=this.hash.length>1?$('[name="'+this.hash.slice(1)+'"]').offset().top:0;return $("html, body").animate({scrollTop:t},400),!1})})})();
 
 });
