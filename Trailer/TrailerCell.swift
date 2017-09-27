@@ -27,6 +27,7 @@ class TrailerCell: NSTableCellView {
 		dataItemId = item.objectID
 
 		unselectedTitleColor = app.darkMode ? .controlHighlightColor : .controlTextColor
+        let repoColor: NSColor = app.darkMode ? .lightGray : .darkGray
 
 		super.init(frame: .zero)
 
@@ -73,7 +74,7 @@ class TrailerCell: NSTableCellView {
 		let _title = item.title(with: titleFont, labelFont: detailFont, titleColor: unselectedTitleColor)
 		let titleHeight = _title.boundingRect(with: widthLimit, options: stringDrawingOptions).integral.size.height
 
-		let _subtitle = item.subtitle(with: detailFont, lightColor: .gray, darkColor: .darkGray)
+		let _subtitle = item.subtitle(with: detailFont, lightColor: .gray, darkColor: repoColor)
 		let subtitleHeight = _subtitle.boundingRect(with: widthLimit, options: stringDrawingOptions).integral.size.height + 4
 
 		frame = CGRect(x: 0, y: 0, width: MENU_WIDTH, height: titleHeight + subtitleHeight + statusBottom + cellPadding)

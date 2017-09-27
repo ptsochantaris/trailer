@@ -70,6 +70,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		        title: "Try requesting desktop GitHub pages",
 		        description: Settings.alwaysRequestDesktopSiteHelp,
 		        valueDisplayed: { Settings.alwaysRequestDesktopSite ? "✓" : " " }),
+        Setting(section: .Display,
+                title: "Highlight PRs with new commits",
+                description: Settings.markPrsAsUnreadOnNewCommitsHelp,
+                valueDisplayed: { Settings.markPrsAsUnreadOnNewCommits ? "✓" : " " }),
 
 		Setting(section: .Filtering,
 		        title: "Include item titles",
@@ -153,10 +157,6 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		        title: "Mark any comments before my own as read",
 		        description: Settings.assumeReadItemIfUserHasNewerCommentsHelp,
 		        valueDisplayed: { Settings.assumeReadItemIfUserHasNewerComments ? "✓" : " " }),
-		Setting(section: .Comments,
-		        title: "Highlight PRs with new commits",
-		        description: Settings.markPrsAsUnreadOnNewCommitsHelp,
-		        valueDisplayed: { Settings.markPrsAsUnreadOnNewCommits ? "✓" : " " }),
 
 		Setting(section: .Watchlist,
 		        title: "PR visibility for new repos",
@@ -573,6 +573,9 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				settingsChangedTimer.push()
 			case 7:
 				Settings.alwaysRequestDesktopSite = !Settings.alwaysRequestDesktopSite
+            case 8:
+                Settings.markPrsAsUnreadOnNewCommits = !Settings.markPrsAsUnreadOnNewCommits
+                settingsChangedTimer.push()
 			default: break
 			}
 
@@ -634,9 +637,6 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				Settings.disableAllCommentNotifications = !Settings.disableAllCommentNotifications
 			case 8:
 				Settings.assumeReadItemIfUserHasNewerComments = !Settings.assumeReadItemIfUserHasNewerComments
-			case 9:
-				Settings.markPrsAsUnreadOnNewCommits = !Settings.markPrsAsUnreadOnNewCommits
-				settingsChangedTimer.push()
 			default: break
 			}
 
