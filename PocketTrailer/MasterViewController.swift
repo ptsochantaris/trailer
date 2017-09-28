@@ -193,10 +193,11 @@ UITableViewDragDelegate {
 			self?.updateStatus(becauseOfChanges: true)
 		}
 
-		//let prs = DataItem.allItems(of: PullRequest.self, in: DataManager.main)
-		//prs[0].postSyncAction = PostSyncAction.delete.rawValue
-		//prs[1].postSyncAction = PostSyncAction.delete.rawValue
-		//DataItem.nukeDeletedItems(in: DataManager.main)
+		/*let prs = DataItem.allItems(of: PullRequest.self, in: DataManager.main)
+		if prs.count > 0 {
+			prs[0].postSyncAction = PostSyncAction.delete.rawValue
+			DataItem.nukeDeletedItems(in: DataManager.main)
+		}*/
 
 		navigationItem.largeTitleDisplayMode = .automatic
 
@@ -446,20 +447,28 @@ UITableViewDragDelegate {
 	}
 
 	private func requestTabFocus(tabItem: UITabBarItem?, andOpen: ListableItem? = nil, overrideUrl: String? = nil) {
-		guard let tabs = tabs, let tabItem = tabItem else { return }
-
-		tabbing(tabs, didSelect: tabItem) { [weak self] in
-			guard let S = self, let item = andOpen, let ip = S.fetchedResultsController.indexPath(forObject: item) else { return }
-
-			S.tableView.selectRow(at: ip, animated: false, scrollPosition: .middle)
-			S.tableView(S.tableView, didSelectRowAt: ip)
-
-			atNextEvent {
-				if let u = overrideUrl, let url = URL(string: u) {
-					S.showDetail(url: url, objectId: item.objectID)
-				} else if let u = item.webUrl, let url = URL(string: u) {
-					S.showDetail(url: url, objectId: item.objectID)
+		if let tabs = tabs, let tabItem = tabItem {
+			tabbing(tabs, didSelect: tabItem) { [weak self] in
+				if let andOpen = andOpen {
+					self?.openInCurrentTab(item: andOpen, overrideUrl: overrideUrl)
 				}
+			}
+		} else if let andOpen = andOpen { // no tabs
+			openInCurrentTab(item: andOpen, overrideUrl: overrideUrl)
+		}
+	}
+
+	private func openInCurrentTab(item: ListableItem, overrideUrl: String?) {
+		guard let ip = fetchedResultsController.indexPath(forObject: item) else { return }
+
+		tableView.selectRow(at: ip, animated: false, scrollPosition: .middle)
+		tableView(tableView, didSelectRowAt: ip)
+
+		atNextEvent(self) { S in
+			if let u = overrideUrl, let url = URL(string: u) {
+				S.showDetail(url: url, objectId: item.objectID)
+			} else if let u = item.webUrl, let url = URL(string: u) {
+				S.showDetail(url: url, objectId: item.objectID)
 			}
 		}
 	}
