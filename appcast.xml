@@ -7,6 +7,25 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.6.2</title>
+			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Option to display milestones of items.</li>
+				<li>"Highlight PRs with new comments" moved from Comments to Display section in preferences.</li>
+				<li>Corrected scrollbar artefacts.</li>
+				<li>Corrected certain High Sierra scrolling bugs in dark mode.</li>
+				<li>Corrected intensity of repository names in dark mode.</li>
+				</ul></font>]]></description>
+			<pubDate>Tue, 28 Sep 2017 18:00:00 +0000</pubDate>
+			<enclosure
+			url="https://github.com/ptsochantaris/trailer/releases/download/1.6.2/trailer162.zip"
+			sparkle:version="1462"
+			sparkle:shortVersionString="1.6.2"
+			sparkle:dsaSignature="MC0CFQCBgDnkrI/8h8xkG8IITEjw6ywPpAIUcYVbhEFU1z2B5RyYS6JBYYnlhRA="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.6.0</title>
 			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
@@ -18,7 +37,7 @@
 				</ul></font>]]></description>
 			<pubDate>Tue, 12 Sep 2017 20:00:00 +0000</pubDate>
 			<enclosure
-			url="http://ptsochantaris.github.io/trailer/trailer160.zip"
+			url="https://github.com/ptsochantaris/trailer/releases/download/1.6.0/trailer160.zip"
 			sparkle:version="1460"
 			sparkle:shortVersionString="1.6.0"
 			sparkle:dsaSignature="MC0CFEDVPLFXTwHVPE5mrRG2j0jc+jZcAhUA08+k39SeF9rIXonkLVHAxLpNlAA="
@@ -34,7 +53,7 @@
 				</ul></font>]]></description>
 			<pubDate>Sat, 8 Jul 2017 19:00:00 +0000</pubDate>
 			<enclosure
-			url="http://ptsochantaris.github.io/trailer/trailer159.zip"
+			url="https://github.com/ptsochantaris/trailer/releases/download/1.5.9/trailer159.zip"
 			sparkle:version="1443"
 			sparkle:shortVersionString="1.5.9"
 			sparkle:dsaSignature="MCwCFCEXMDzPL5G5TiAYHuaYeTQvInz/AhQS0R9+KKRaQp6arh6PdG4Ufd30Hw=="
@@ -53,7 +72,7 @@
 				</ul></font>]]></description>
 			<pubDate>Thu, 1 Jun 2017 21:00:00 +0000</pubDate>
 			<enclosure
-			url="http://ptsochantaris.github.io/trailer/trailer158.zip"
+			url="https://github.com/ptsochantaris/trailer/releases/download/1.5.8/trailer158.zip"
 			sparkle:version="1436"
 			sparkle:shortVersionString="1.5.8"
 			sparkle:dsaSignature="MC4CFQDDA3OxvwoThMcuL3Qdo7PnhmdYugIVAKAlISIQrGn5u8xy1B94N8Tac613"
@@ -69,7 +88,7 @@
 				</ul></font>]]></description>
 			<pubDate>Mon, 15 May 2017 11:00:00 +0000</pubDate>
 			<enclosure
-			url="http://ptsochantaris.github.io/trailer/trailer157.zip"
+			url="https://github.com/ptsochantaris/trailer/releases/download/v1.5.7/trailer157.zip"
 			sparkle:version="1431"
 			sparkle:shortVersionString="1.5.7"
 			sparkle:dsaSignature="MC0CFQC/M3cIG6ePvt2tdW/V5jnOvCwAMQIUPxFXK+7tKoGT0EfG1HeRoJa44Y0="
@@ -87,7 +106,7 @@
 				</ul></font>]]></description>
 			<pubDate>Sun, 20 Apr 2017 13:00:00 +0000</pubDate>
 			<enclosure
-			url="http://ptsochantaris.github.io/trailer/trailer156.zip"
+			url="https://github.com/ptsochantaris/trailer/releases/download/1.5.6/trailer156.zip"
 			sparkle:version="1429"
 			sparkle:shortVersionString="1.5.6"
 			sparkle:dsaSignature="MC4CFQDJkupuZZ5KgOHtzhXmb/XYoNFjuAIVAJd6M7pCEbPE7D/Qsk2gscXk4zyI"
@@ -104,63 +123,12 @@
 				</ul></font>]]></description>
 			<pubDate>Wed, 1 Feb 2017 20:00:00 +0000</pubDate>
 			<enclosure
-			url="http://ptsochantaris.github.io/trailer/trailer155.zip"
+			url="https://github.com/ptsochantaris/trailer/releases/download/v1.5.5/trailer155.zip"
 			sparkle:version="1406"
 			sparkle:shortVersionString="1.5.5"
 			sparkle:dsaSignature="MCwCFH3xqbBnnYwnt5SzFYGRrtiVZTcwAhRa0TxngE2Vz3TpK+vmQY4/f5ZJjA=="
 			type="application/octet-stream"/>
 		</item>
 
-		<item>
-			<title>Version 1.5.4</title>
-			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
-			<description><![CDATA[<font face="sans-serif" size="3"><ul>
-				<li>Expanded watchlist handing: Options to turn off auto-adding and auto-removing of repositories</li>
-				<li>Manage a list of additional custom repositories outside of your server-side watchlist</li>
-				<li>Performance improvements for syncing large numbers of items</li>
-				</ul></font>]]></description>
-			<pubDate>Thu, 26 Jan 2017 19:00:00 +0000</pubDate>
-			<enclosure
-			url="http://ptsochantaris.github.io/trailer/trailer154.zip"
-			sparkle:version="1402"
-			sparkle:shortVersionString="1.5.4"
-			sparkle:dsaSignature="MC0CFQDSVE8NQgXsdY/fuQ6J6sXQaB7NtQIUZQXKvn/zwSwPWJzFsRBASJn68jY="
-			type="application/octet-stream"/>
-		</item>
-
-		<item>
-			<title>Version 1.5.3</title>
-			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
-			<description><![CDATA[<font face="sans-serif" size="3"><ul>
-				<li>Have a happy 2017!</li>
-				<li>Various optimisations and fixes, including a slow but consistent memory leak.</li>
-				</ul></font>]]></description>
-			<pubDate>Sun, 1 Jan 2017 13:00:00 +0000</pubDate>
-			<enclosure
-			url="http://ptsochantaris.github.io/trailer/trailer153.zip"
-			sparkle:version="1398"
-			sparkle:shortVersionString="1.5.3"
-			sparkle:dsaSignature="MC0CFC1eb3y7Rr/0UUpvIpwnXRMD5yDtAhUAgIb7MF1zxLLiFpvT5MAmRUFi+50="
-			type="application/octet-stream"/>
-		</item>
-
-		<item>
-			<title>Version 1.5.2</title>
-			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
-			<description><![CDATA[<font face="sans-serif" size="3"><ul>
-				<li>New option to hide menubar counts and only show icons</li>
-				<li>New option to immediately import old settings on welcome screen</li>
-				<li>Corrected menu header labels for pull requests</li>
-				<li>Performance and stability improvements in caching</li>
-				</ul></font>]]></description>
-			<pubDate>Fri, 2 Dec 2016 14:00:00 +0000</pubDate>
-			<enclosure
-			url="http://ptsochantaris.github.io/trailer/trailer152.zip"
-			sparkle:version="1395"
-			sparkle:shortVersionString="1.5.2"
-			sparkle:dsaSignature="MC0CFGmE1V4HDybstLfbn9+vfl2192yLAhUAi1llN9N+PlbLlabGUV7EvduSstI="
-			type="application/octet-stream"/>
-		</item>
-		
 	</channel>
 </rss>
