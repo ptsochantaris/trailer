@@ -1,6 +1,10 @@
 
 final class PrTable: NSTableView, NSPasteboardItemDataProvider {
 
+    override var allowsVibrancy: Bool {
+        return true
+    }
+
 	func cell(at theEvent: NSEvent) -> NSView? {
 		let globalLocation = theEvent.locationInWindow
 		let localLocation = convert(globalLocation, from: nil)

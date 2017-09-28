@@ -3,7 +3,7 @@ final class MenuWindow: NSWindow {
 
 	@IBOutlet weak var scrollView: NSScrollView!
 	@IBOutlet weak var header: ViewAllowsVibrancy!
-	@IBOutlet weak var table: NSTableView!
+	@IBOutlet weak var table: PrTable!
 	@IBOutlet weak var filter: NSSearchField!
 	@IBOutlet weak var refreshMenuItem: NSMenuItem!
 
@@ -31,7 +31,7 @@ final class MenuWindow: NSWindow {
 
 		super.awakeFromNib()
 
-		scrollView.contentView.wantsLayer = true
+		contentView?.wantsLayer = true
 
 		let w = NSVisualEffectView(frame: header.bounds)
 		w.autoresizingMask = [.height, .width]
