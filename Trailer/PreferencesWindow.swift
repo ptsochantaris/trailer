@@ -86,6 +86,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var hideCountsOnMenubar: NSButton!
 	@IBOutlet weak var showLabels: NSButton!
 	@IBOutlet weak var showRelativeDates: NSButton!
+	@IBOutlet weak var displayMilestones: NSButton!
 
 	// Servers
 	@IBOutlet weak var serverList: NSTableView!
@@ -400,6 +401,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		reactionIntervalLabel.toolTip = Settings.reactionScanningIntervalHelp
 		reactionIntervalStepper.toolTip = Settings.reactionScanningIntervalHelp
 		showRelativeDates.toolTip = Settings.showRelativeDatesHelp
+		displayMilestones.toolTip = Settings.showMilestonesHelp
 	}
 
 	private func updateAllItemSettingButtons() {
@@ -485,6 +487,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		hideSnoozedItems.integerValue = Settings.hideSnoozedItems ? 1 : 0
 		showLabels.integerValue = Settings.showLabels ? 1 : 0
 		showRelativeDates.integerValue = Settings.showRelativeDates ? 1 : 0
+		displayMilestones.integerValue = Settings.showMilestones ? 1 : 0
 
 		notifyOnItemReactions.integerValue = Settings.notifyOnItemReactions ? 1 : 0
 		notifyOnCommentReactions.integerValue = Settings.notifyOnCommentReactions ? 1 : 0
@@ -541,6 +544,12 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			projectsTable.reloadData()
 		}
 		advancedReposWindow?.updateActivity()
+	}
+
+
+	@IBAction func displayMilestonesSelected(_ sender: NSButton) {
+		Settings.showMilestones = sender.integerValue == 1
+		deferredUpdateTimer.push()
 	}
 
 	@IBAction func showRelativeDatesSelected(_ sender: NSButton) {

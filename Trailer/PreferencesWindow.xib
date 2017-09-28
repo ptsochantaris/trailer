@@ -767,7 +767,7 @@ Token</string>
                                             </view>
                                         </box>
                                         <button misplaced="YES" id="rEz-q1-QZq">
-                                            <rect key="frame" x="15" y="309" width="366" height="18"/>
+                                            <rect key="frame" x="15" y="315" width="366" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Count all open items of synced repos in the menubar" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="23T-vx-oJZ">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -778,7 +778,7 @@ Token</string>
                                             </connections>
                                         </button>
                                         <button misplaced="YES" id="yK4-xL-QRu">
-                                            <rect key="frame" x="15" y="283" width="366" height="18"/>
+                                            <rect key="frame" x="15" y="291" width="366" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Show repository names" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="oZY-hH-Udu">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -789,7 +789,7 @@ Token</string>
                                             </connections>
                                         </button>
                                         <button misplaced="YES" id="onl-1T-RTg">
-                                            <rect key="frame" x="15" y="257" width="366" height="18"/>
+                                            <rect key="frame" x="15" y="267" width="366" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Display relative instead of absolute dates" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="Mtr-gs-YsM">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -800,7 +800,7 @@ Token</string>
                                             </connections>
                                         </button>
                                         <button misplaced="YES" id="3CV-9S-gLw">
-                                            <rect key="frame" x="15" y="231" width="366" height="18"/>
+                                            <rect key="frame" x="15" y="243" width="366" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Hide author avatars" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="UOs-3D-XyL">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -811,7 +811,7 @@ Token</string>
                                             </connections>
                                         </button>
                                         <button misplaced="YES" id="Efg-Id-lOP">
-                                            <rect key="frame" x="15" y="335" width="366" height="18"/>
+                                            <rect key="frame" x="15" y="339" width="366" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Display item creation times instead of update times" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="yUS-qR-eV4">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -822,7 +822,7 @@ Token</string>
                                             </connections>
                                         </button>
                                         <button misplaced="YES" id="VrU-mc-Czw">
-                                            <rect key="frame" x="15" y="205" width="366" height="18"/>
+                                            <rect key="frame" x="15" y="219" width="366" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Separate each API server in its own menu bar item" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="C7K-xS-315">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -833,7 +833,7 @@ Token</string>
                                             </connections>
                                         </button>
                                         <button misplaced="YES" id="9fQ-lN-76c">
-                                            <rect key="frame" x="15" y="179" width="366" height="18"/>
+                                            <rect key="frame" x="15" y="195" width="366" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Hide item count in menubar items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="mAZ-e8-NLS">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -844,7 +844,7 @@ Token</string>
                                             </connections>
                                         </button>
                                         <button misplaced="YES" id="TdQ-hP-A3t">
-                                            <rect key="frame" x="15" y="153" width="366" height="18"/>
+                                            <rect key="frame" x="15" y="171" width="366" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Sync and display labels for items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="5sv-cq-odI">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -855,7 +855,7 @@ Token</string>
                                             </connections>
                                         </button>
                                         <button misplaced="YES" id="fsA-E5-SRy">
-                                            <rect key="frame" x="15" y="127" width="366" height="18"/>
+                                            <rect key="frame" x="15" y="147" width="366" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Highlight PRs that have new commits" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="T2C-n7-dIU">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -863,6 +863,17 @@ Token</string>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="highlightItemsWithNewCommitsSelected:" target="vQH-WF-vh2" id="ccI-te-cRo"/>
+                                            </connections>
+                                        </button>
+                                        <button misplaced="YES" id="GMt-gT-i3d">
+                                            <rect key="frame" x="15" y="122" width="366" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Display item milestones" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="fnW-oB-nHX">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="displayMilestonesSelected:" target="vQH-WF-vh2" id="sId-Th-WpZ"/>
                                             </connections>
                                         </button>
                                     </subviews>
@@ -2228,6 +2239,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="commentAuthorBlacklist" destination="DTL-cq-VaA" id="xWf-YT-bda"/>
                 <outlet property="countOnlyListedItems" destination="rEz-q1-QZq" id="wAM-fd-WAq"/>
                 <outlet property="disableAllCommentNotifications" destination="xXn-f2-021" id="OJl-UW-ZWi"/>
+                <outlet property="displayMilestones" destination="GMt-gT-i3d" id="1OP-FJ-d3m"/>
                 <outlet property="displayRepositoryNames" destination="yK4-xL-QRu" id="yVB-df-7TT"/>
                 <outlet property="dontConfirmRemoveAllClosed" destination="w0K-BS-Gti" id="jaB-In-zbi"/>
                 <outlet property="dontConfirmRemoveAllMerged" destination="ptr-tf-eNM" id="KHp-pR-L6T"/>

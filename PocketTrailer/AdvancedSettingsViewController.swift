@@ -74,6 +74,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
                 title: "Highlight PRs with new commits",
                 description: Settings.markPrsAsUnreadOnNewCommitsHelp,
                 valueDisplayed: { Settings.markPrsAsUnreadOnNewCommits ? "✓" : " " }),
+        Setting(section: .Display,
+                title: "Display milestones",
+                description: Settings.showMilestonesHelp,
+                valueDisplayed: { Settings.showMilestones ? "✓" : " " }),
 
 		Setting(section: .Filtering,
 		        title: "Include item titles",
@@ -104,7 +108,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		        description: Settings.includeNumbersInFilterHelp,
 		        valueDisplayed: { Settings.includeNumbersInFilter ? "✓" : " " }),
 		Setting(section: .Filtering,
-		        title: "Include milestone titles",
+		        title: "Include milestones",
 		        description: Settings.includeMilestonesInFilterHelp,
 		        valueDisplayed: { Settings.includeMilestonesInFilter ? "✓" : " " }),
 		Setting(section: .Filtering,
@@ -576,6 +580,9 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
             case 8:
                 Settings.markPrsAsUnreadOnNewCommits = !Settings.markPrsAsUnreadOnNewCommits
                 settingsChangedTimer.push()
+			case 9:
+				Settings.showMilestones = !Settings.showMilestones
+				settingsChangedTimer.push()
 			default: break
 			}
 

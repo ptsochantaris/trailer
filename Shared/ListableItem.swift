@@ -701,13 +701,17 @@ class ListableItem: DataItem {
 			let separator = NSAttributedString(string:"   ", attributes: lightSubtitle)
 		#endif
 
-		if Settings.showReposInName {
-			if let n = repo.fullName {
-				var darkSubtitle = lightSubtitle
-				darkSubtitle[NSAttributedStringKey.foregroundColor] = darkColor
-				_subtitle.append(NSAttributedString(string: n, attributes: darkSubtitle))
-				_subtitle.append(separator)
-			}
+		var darkSubtitle = lightSubtitle
+		darkSubtitle[NSAttributedStringKey.foregroundColor] = darkColor
+
+		if Settings.showReposInName, let n = repo.fullName {
+			_subtitle.append(NSAttributedString(string: n, attributes: darkSubtitle))
+			_subtitle.append(separator)
+		}
+
+		if Settings.showMilestones, let m = milestone, !m.isEmpty {
+			_subtitle.append(NSAttributedString(string: m, attributes: darkSubtitle))
+			_subtitle.append(separator)
 		}
 
 		if let l = userLogin {
