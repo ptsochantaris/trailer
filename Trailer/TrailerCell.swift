@@ -16,18 +16,15 @@ class TrailerCell: NSTableCellView {
 	private let detailFont = NSFont.menuFont(ofSize: 10.0)
 	private let titleFont = NSFont.menuFont(ofSize: 13.0)
 
-	private let dataItemId: NSManagedObjectID!
-	private let unselectedTitleColor: NSColor
+	private let dataItemId: NSManagedObjectID
 
-	private var title: CenterTextField!
+    private let title = CenterTextField(frame: .zero)
+    private let subtitle = CenterTextField(frame: .zero)
 	private var trackingArea: NSTrackingArea?
 
 	init(item: ListableItem) {
 
 		dataItemId = item.objectID
-
-		unselectedTitleColor = app.darkMode ? .controlHighlightColor : .controlTextColor
-        let repoColor: NSColor = app.darkMode ? .lightGray : .darkGray
 
 		super.init(frame: .zero)
 
@@ -71,13 +68,18 @@ class TrailerCell: NSTableCellView {
 			bottom = 3
 		}
 
-		let _title = item.title(with: titleFont, labelFont: detailFont, titleColor: unselectedTitleColor)
-		let titleHeight = _title.boundingRect(with: widthLimit, options: stringDrawingOptions).integral.size.height
+        updateText(for: item)
 
-		let _subtitle = item.subtitle(with: detailFont, lightColor: .gray, darkColor: repoColor)
-		let subtitleHeight = _subtitle.boundingRect(with: widthLimit, options: stringDrawingOptions).integral.size.height + 4
+		let titleHeight = title.attributedStringValue.boundingRect(with: widthLimit, options: stringDrawingOptions).integral.size.height
+		let subtitleHeight = subtitle.attributedStringValue.boundingRect(with: widthLimit, options: stringDrawingOptions).integral.size.height + 4
 
+        title.frame = CGRect(x: LEFTPADDING + shift, y: subtitleHeight + bottom + statusBottom, width: W, height: titleHeight)
+        subtitle.frame = CGRect(x: LEFTPADDING + shift, y: statusBottom + bottom, width: W, height: subtitleHeight)
 		frame = CGRect(x: 0, y: 0, width: MENU_WIDTH, height: titleHeight + subtitleHeight + statusBottom + cellPadding)
+
+        addSubview(title)
+        addSubview(subtitle)
+
 		let hasNewCommits = (item as? PullRequest)?.hasNewCommits ?? false
 		addCounts(total: item.totalComments, unread: item.unreadComments, alert: hasNewCommits, faded: faded)
 
@@ -99,16 +101,6 @@ class TrailerCell: NSTableCellView {
 			unpin.font = NSFont.systemFont(ofSize: 10.0)
 			addSubview(unpin)
 		}
-
-		let titleRect = CGRect(x: LEFTPADDING + shift, y: subtitleHeight + bottom + statusBottom, width: W, height: titleHeight)
-		title = CenterTextField(frame: titleRect)
-		title.attributedStringValue = _title
-		addSubview(title)
-
-		let subtitleRect = CGRect(x: LEFTPADDING + shift, y: statusBottom + bottom, width: W, height: subtitleHeight)
-		let subtitle = CenterTextField(frame: subtitleRect)
-		subtitle.attributedStringValue = _subtitle
-		addSubview(subtitle)
 
 		if faded {
 			title.alphaValue = DISABLED_FADE
@@ -134,14 +126,25 @@ class TrailerCell: NSTableCellView {
 		selected = false
 	}
 
+    private func updateText(for item: ListableItem) {
+
+        let dark = app.darkMode
+        let unselectedTitleColor: NSColor = dark ? .controlHighlightColor : .controlTextColor
+        let titleColor = (selected && dark) ? .darkGray : unselectedTitleColor
+        title.attributedStringValue = item.title(with: titleFont, labelFont: detailFont, titleColor: titleColor)
+
+        let unselectedRepoColor: NSColor = dark ? .lightGray : .darkGray
+        let repoColor = (selected && dark) ? .darkGray: unselectedRepoColor
+        subtitle.attributedStringValue = item.subtitle(with: detailFont, lightColor: .gray, darkColor: repoColor)
+    }
+
 	var selected = false {
 		didSet {
 			guard let table = app.visibleWindow?.table else { return }
 
-			if let item = associatedDataItem {
-				let titleColor = (selected && app.darkMode) ? .darkGray : unselectedTitleColor
-				title.attributedStringValue = item.title(with: titleFont, labelFont: detailFont, titleColor: titleColor)
-			}
+            if let item = associatedDataItem {
+                updateText(for: item)
+            }
 
 			if selected {
 				table.selectRowIndexes(IndexSet(integer: table.row(for: self)), byExtendingSelection: false)
