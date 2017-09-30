@@ -4,7 +4,7 @@ final class AboutWindow: NSWindow, NSWindowDelegate {
 	@IBOutlet weak var version: NSTextField!
 
 	@IBAction func gitHubLinkSelected(_ sender: NSButton) {
-		NSWorkspace.shared.open(URL(string: "https://github.com/ptsochantaris/trailer")!)
+		openLink(URL(string: "https://github.com/ptsochantaris/trailer")!)
 	}
 
 	override init(contentRect: NSRect, styleMask style: NSWindow.StyleMask, backing bufferingType: NSWindow.BackingStoreType, defer flag: Bool) {

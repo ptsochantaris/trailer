@@ -125,6 +125,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var repeatLastExportAutomatically: NSButton!
 	@IBOutlet weak var lastExportReport: NSTextField!
 	@IBOutlet weak var dumpApiResponsesToConsole: NSButton!
+	@IBOutlet weak var defaultOpenApp: NSTextField!
+	@IBOutlet weak var defaultOpenLinks: NSTextField!
 
 	// Keyboard
 	@IBOutlet weak var hotkeyEnable: NSButton!
@@ -489,6 +491,9 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		showRelativeDates.integerValue = Settings.showRelativeDates ? 1 : 0
 		displayMilestones.integerValue = Settings.showMilestones ? 1 : 0
 
+		defaultOpenApp.stringValue = Settings.defaultAppForOpeningItems
+		defaultOpenLinks.stringValue = Settings.defaultAppForOpeningWeb
+
 		notifyOnItemReactions.integerValue = Settings.notifyOnItemReactions ? 1 : 0
 		notifyOnCommentReactions.integerValue = Settings.notifyOnCommentReactions ? 1 : 0
 
@@ -624,6 +629,39 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			alert.beginSheetModal(for: self, completionHandler: nil)
 		}
 	}
+
+	@IBAction func selectDefaultAppSelected(_ sender: NSButton) {
+		let o = NSOpenPanel()
+		o.title = "Select Application…"
+		o.prompt = "Select"
+		o.nameFieldLabel = "Application"
+		o.message = "Select Application For Opening Items…"
+		o.isExtensionHidden = true
+		o.allowedFileTypes = ["app"]
+		o.beginSheetModal(for: self) { [weak self] response in
+			if response.rawValue == NSFileHandlingPanelOKButton, let url = o.url {
+				Settings.defaultAppForOpeningItems = url.path
+				self?.defaultOpenApp.stringValue = url.path
+			}
+		}
+	}
+
+	@IBAction func selectDefaultLinkSelected(_ sender: NSButton) {
+		let o = NSOpenPanel()
+		o.title = "Select Application…"
+		o.prompt = "Select"
+		o.nameFieldLabel = "Application"
+		o.message = "Select Application For Opening Web Links…"
+		o.isExtensionHidden = true
+		o.allowedFileTypes = ["app"]
+		o.beginSheetModal(for: self) { [weak self] response in
+			if response.rawValue == NSFileHandlingPanelOKButton, let url = o.url {
+				Settings.defaultAppForOpeningWeb = url.path
+				self?.defaultOpenLinks.stringValue = url.path
+			}
+		}
+	}
+
 
 	@IBAction func dumpApiResponsesToConsoleSelected(_ sender: NSButton) {
 		Settings.dumpAPIResponsesInConsole = (sender.integerValue==1)
@@ -1124,7 +1162,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			reportNeedFrontEnd()
 		} else {
 			let address = "\(apiServerWebPath.stringValue)/settings/tokens/new"
-			NSWorkspace.shared.open(URL(string: address)!)
+			openLink(URL(string: address)!)
 		}
 	}
 
@@ -1133,7 +1171,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			reportNeedFrontEnd()
 		} else {
 			let address = "\(apiServerWebPath.stringValue)/settings/tokens"
-			NSWorkspace.shared.open(URL(string: address)!)
+			openLink(URL(string: address)!)
 		}
 	}
 
@@ -1142,7 +1180,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			reportNeedFrontEnd()
 		} else {
 			let address = "\(apiServerWebPath.stringValue)/watching"
-			NSWorkspace.shared.open(URL(string: address)!)
+			openLink(URL(string: address)!)
 		}
 	}
 
@@ -1262,7 +1300,13 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	override func controlTextDidChange(_ n: Notification) {
 		if let obj = n.object as? NSTextField {
 
-			if obj===apiServerName {
+			if obj===defaultOpenLinks {
+				Settings.defaultAppForOpeningWeb = defaultOpenLinks.stringValue.trim
+
+			} else if obj===defaultOpenApp {
+				Settings.defaultAppForOpeningItems = defaultOpenApp.stringValue.trim
+
+			} else if obj===apiServerName {
 				if let apiServer = selectedServer {
 					apiServer.label = apiServerName.stringValue
 					storeApiFormToSelectedServer()

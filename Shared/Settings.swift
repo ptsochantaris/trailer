@@ -21,7 +21,7 @@ final class Settings {
 			"INCLUDE_SERVERS_IN_FILTER", "INCLUDE_USERS_IN_FILTER", "INCLUDE_TITLES_IN_FILTER", "INCLUDE_NUMBERS_IN_FILTER", "DUMP_API_RESPONSES_IN_CONSOLE", "OPEN_ITEMS_DIRECTLY_IN_SAFARI", "HIDE_PRS_THAT_ARENT_PASSING",
 			"REMOVE_RELATED_NOTIFICATIONS_ON_ITEM_REMOVE", "HIDE_SNOOZED_ITEMS", "INCLUDE_MILESTONES_IN_FILTER", "INCLUDE_ASSIGNEE_NAMES_IN_FILTER", "API_SERVERS_IN_SEPARATE_MENUS", "ASSUME_READ_ITEM_IF_USER_HAS_NEWER_COMMENTS",
 			"AUTO_SNOOZE_DAYS", "HIDE_MENUBAR_COUNTS", "AUTO_ADD_NEW_REPOS", "AUTO_REMOVE_DELETED_REPOS", "MARK_PRS_AS_UNREAD_ON_NEW_COMMITS", "SHOW_LABELS", "DISPLAY_REVIEW_CHANGE_REQUESTS", "SHOW_RELATIVE_DATES",
-			"DISPLAY_MILESTONES"]
+			"DISPLAY_MILESTONES", "DEFAULT_APP_FOR_OPENING_WEB", "DEFAULT_APP_FOR_OPENING_ITEMS"]
 	}
 
     class func checkMigration() {
@@ -315,6 +315,16 @@ final class Settings {
 	}
 
 	/////////////////////////// STRINGS
+
+	class var defaultAppForOpeningItems: String {
+		get { return get("DEFAULT_APP_FOR_OPENING_ITEMS") as? String ?? "" }
+		set { set("DEFAULT_APP_FOR_OPENING_ITEMS", newValue) }
+	}
+
+	class var defaultAppForOpeningWeb: String {
+		get { return get("DEFAULT_APP_FOR_OPENING_WEB") as? String ?? "" }
+		set { set("DEFAULT_APP_FOR_OPENING_WEB", newValue) }
+	}
 
 	static let statusFilteringTermsHelp = "You can specify specific terms which can then be matched against status items, in order to hide or show them."
 	class var statusFilteringTerms: [String] {

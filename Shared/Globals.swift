@@ -284,6 +284,31 @@ var versionString: String {
 	return "Version \(currentAppVersion) (\(buildNumber))"
 }
 
+func openItem(_ url: URL) {
+	openURL(url, using: Settings.defaultAppForOpeningItems.trim)
+}
+
+func openLink(_ url: URL) {
+	openURL(url, using: Settings.defaultAppForOpeningWeb.trim)
+}
+
+func openURL(_ url: URL, using path: String) {
+	if path.isEmpty {
+		NSWorkspace.shared.open(url)
+	} else {
+		let appURL = URL(fileURLWithPath: path)
+		do {
+			try NSWorkspace.shared.open([url], withApplicationAt: appURL, options: [], configuration: [:])
+		} catch {
+			let a = NSAlert()
+			a.alertStyle = .warning
+			a.messageText = "Could not open this URL using '\(path)'"
+			a.informativeText = error.localizedDescription
+			a.runModal()
+		}
+	}
+}
+
 //////////////////////// Originally from tieferbegabt's post on https://forums.developer.apple.com/message/37935, with thanks!
 
 extension String {

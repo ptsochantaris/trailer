@@ -36,7 +36,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 
 	@IBAction func createTokenSelected(_ sender: NSButton) {
 		let address = "https://github.com/settings/tokens/new"
-		NSWorkspace.shared.open(URL(string: address)!)
+		openLink(URL(string: address)!)
 	}
 
 	override func controlTextDidChange(_ obj: Notification) {

@@ -158,7 +158,7 @@ class TrailerCell: NSTableCellView {
 
 	@objc private func openRepo() {
 		if let u = associatedDataItem?.repo.webUrl, let url = URL(string: u) {
-			NSWorkspace.shared.open(url)
+			openLink(url)
 		}
 	}
 

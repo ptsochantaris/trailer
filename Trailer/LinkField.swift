@@ -79,13 +79,13 @@ final class LinkField: CenterTextField {
 						app.ignoreNextFocusLoss = true
 					}
 					mouseExited(with: theEvent)
-					NSWorkspace.shared.open(URL(string: targetUrl!)!)
+					openLink(URL(string: targetUrl!)!)
 				} else {
 					selectParentPr(from: theEvent)
 				}
 			} else {
 				mouseExited(with: theEvent)
-				NSWorkspace.shared.open(URL(string: targetUrl!)!)
+				openLink(URL(string: targetUrl!)!)
 			}
 		}
 	}

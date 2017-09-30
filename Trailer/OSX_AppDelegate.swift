@@ -183,7 +183,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					}
 				}
 				if let up = urlToOpen, let u = URL(string: up) {
-					NSWorkspace.shared.open(u)
+					openItem(u)
 				}
 			default: break
 			}
@@ -388,7 +388,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 
 		if let u = urlToOpen {
-			NSWorkspace.shared.open(URL(string: u)!)
+			openItem(URL(string: u)!)
 		}
 	}
 
@@ -917,7 +917,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 						return nil
 					case "o":
 						if let w = selectedItem.repo.webUrl, let u = URL(string: w) {
-							NSWorkspace.shared.open(u)
+							openItem(u)
 							return nil
 						}
 					default:
