@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="13168.3" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="AgC-eL-Hgc">
+<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="13196" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="AgC-eL-Hgc">
     <device id="watch38" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="watchOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13147.4"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="13042.2"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13174"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="13051"/>
     </dependencies>
     <scenes>
         <!--Summary-->
@@ -416,7 +416,7 @@
                                                         <color key="backgroundColor" red="0.85520006613756616" green="0.85520006613756616" blue="0.85520006613756616" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                         <edgeInsets key="margins" left="2" right="3" top="0.0" bottom="1"/>
                                                     </group>
-                                                    <label width="0.0" alignment="left" text="Comment" numberOfLines="0" id="wh3-Fx-D4A">
+                                                    <label width="0.0" alignment="left" text="Comment" numberOfLines="120" id="wh3-Fx-D4A">
                                                         <fontDescription key="font" type="system" pointSize="12"/>
                                                     </label>
                                                 </items>

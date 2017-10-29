@@ -37,6 +37,12 @@ final class TabBarSet {
 	}
 }
 
+final class CustomTabBar: UITabBar {
+	override var traitCollection: UITraitCollection {
+		return UITraitCollection(horizontalSizeClass: .compact)
+	}
+}
+
 final class MasterViewController: UITableViewController, NSFetchedResultsControllerDelegate,
 UITabBarControllerDelegate, UITabBarDelegate, UISearchResultsUpdating,
 UITableViewDragDelegate {
@@ -45,7 +51,7 @@ UITableViewDragDelegate {
 	private var fetchedResultsController: NSFetchedResultsController<ListableItem>!
 
 	// Tabs
-	private var tabs: UITabBar?
+	private var tabs: CustomTabBar?
 	private var tabScroll: UIScrollView?
 	private var tabBorder: UIView?
 	private var tabBarSets = [TabBarSet]()
@@ -633,7 +639,7 @@ UITableViewDragDelegate {
 
 				tableView.scrollIndicatorInsets = UIEdgeInsets(top: tableView.scrollIndicatorInsets.top, left: 0, bottom: 49, right: 0)
 
-				let t = UITabBar()
+				let t = CustomTabBar()
 				t.translatesAutoresizingMaskIntoConstraints = false
 				t.delegate = self
 				tabs = t
@@ -1104,9 +1110,7 @@ UITableViewDragDelegate {
 			detailViewController.navigationItem.leftBarButtonItem?.title = title
 		}
 
-		if appIsRefreshing {
-			refreshControl?.beginRefreshing()
-		} else {
+		if !appIsRefreshing {
 			refreshControl?.endRefreshing()
 		}
 	}

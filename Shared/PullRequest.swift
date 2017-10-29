@@ -73,8 +73,9 @@ final class PullRequest: ListableItem {
 	func checkAndStoreReviewAssignments(_ reviewerNames: Set<String>) -> Bool {
 		reviewers = reviewerNames.joined(separator: ",")
 		let assigned = reviewerNames.contains(S(apiServer.userName))
+		let shouldNotify = assigned && !assignedForReview
 		assignedForReview = assigned
-		return assigned
+		return shouldNotify
 	}
 
 	class func pullRequestsThatNeedReactionsToBeRefreshed(in moc: NSManagedObjectContext) -> [PullRequest] {
