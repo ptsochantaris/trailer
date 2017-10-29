@@ -33,6 +33,13 @@ final class MenuWindow: NSWindow {
 
 		contentView?.wantsLayer = true
 
+		if #available(OSX 10.13, *) {
+			isOpaque = false
+			backgroundColor = .clear
+			contentView?.layer?.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMinYCorner]
+			contentView?.layer?.cornerRadius = 5
+		}
+
 		let w = NSVisualEffectView(frame: header.bounds)
 		w.autoresizingMask = [.height, .width]
 		w.blendingMode = .behindWindow
