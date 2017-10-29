@@ -12,7 +12,7 @@
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
 				<li>Clicking on item number in the context menu will now copy the repo name as well, to help create cross-repository references in comments.</li>
 				<li>Option to provide a custom app for opening item links and generic web links.</li>
-				<li>Nicer bottom corners to match system appearance (on Sierra and newer)</li>
+				<li>Nicer bottom corners to match system appearance (on High Sierra and newer)</li>
 				<li>Correction for cases where "PR assigned for review" notification would repeat.</li>
 				</ul></font>]]></description>
 			<pubDate>Sun, 29 Oct 2017 12:00:00 +0000</pubDate>
