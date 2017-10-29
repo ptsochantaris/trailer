@@ -172,11 +172,11 @@ class TrailerCell: NSTableCellView {
 	}
 
 	@objc private func copyNumberToClipboard() {
-		if let s = associatedDataItem?.number {
+		if let a = associatedDataItem, let name = a.repo.fullName {
 			let p = NSPasteboard.general
 			p.clearContents()
 			p.declareTypes([NSPasteboard.PasteboardType.string], owner: self)
-			p.setString("#\(s)", forType: NSPasteboard.PasteboardType.string)
+			p.setString("\(name)#\(a.number)", forType: NSPasteboard.PasteboardType.string)
 		}
 	}
 
