@@ -7,6 +7,24 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.6.3</title>
+			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Clicking on item number in the context menu will now copy the repo name as well, to help create cross-repository references in comments.</li>
+				<li>Option to provide a custom app for opening item links and generic web links.</li>
+				<li>Nicer bottom corners to match system appearance (on Sierra and newer)</li>
+				<li>Correction for cases where "PR assigned for review" notification would repeat.</li>
+				</ul></font>]]></description>
+			<pubDate>Sun, 29 Oct 2017 12:00:00 +0000</pubDate>
+			<enclosure
+			url="https://github.com/ptsochantaris/trailer/releases/download/1.6.3/trailer163.zip"
+			sparkle:version="1464"
+			sparkle:shortVersionString="1.6.3"
+			sparkle:dsaSignature="MCwCFFuLoX6OG5jvL0a+UtkHb6AduDICAhQYKut9NTlyOMm0J3EZlLGyvywXaQ=="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.6.2</title>
 			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
@@ -92,41 +110,6 @@
 			sparkle:version="1431"
 			sparkle:shortVersionString="1.5.7"
 			sparkle:dsaSignature="MC0CFQC/M3cIG6ePvt2tdW/V5jnOvCwAMQIUPxFXK+7tKoGT0EfG1HeRoJa44Y0="
-			type="application/octet-stream"/>
-		</item>
-
-		<item>
-			<title>Version 1.5.6</title>
-			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
-			<description><![CDATA[<font face="sans-serif" size="3"><ul>
-				<li>Introducing BETA support for Reviews: View and be notified of review statuses for PRs, requested reviewers, approvals or requests for changes, or being assigned to a review. Review comments are now included in the comment count and handled as new comments.</li>
-				<li>Introducing BETA support for Responses: Be notified of responses to an issue, PR, or comment, as a comment itself. Get notifications of people posting responses to items. (Please note that due to API limitations this feature can be 'costly' in terms of number of calls made to the server.)</li>
-				<li>IMPORTANT: Due to GitHub beta API limitations, both of these features cannot currently be enabled at the same time, as long as they are marked as beta by GitHub. Additionally, these APIs may change and syncs may fail if that occurs. If syncs start failing, try disabling these features before trying to debug anything else. (And if you’re feeling adventurous, log the API calls that are failing and open an issue at Trailer’s GitHub site.)</li>
-				<li>Minor improvements to memory usage.</li>
-				</ul></font>]]></description>
-			<pubDate>Sun, 20 Apr 2017 13:00:00 +0000</pubDate>
-			<enclosure
-			url="https://github.com/ptsochantaris/trailer/releases/download/1.5.6/trailer156.zip"
-			sparkle:version="1429"
-			sparkle:shortVersionString="1.5.6"
-			sparkle:dsaSignature="MC4CFQDJkupuZZ5KgOHtzhXmb/XYoNFjuAIVAJd6M7pCEbPE7D/Qsk2gscXk4zyI"
-			type="application/octet-stream"/>
-		</item>
-
-		<item>
-			<title>Version 1.5.5</title>
-			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
-			<description><![CDATA[<font face="sans-serif" size="3"><ul>
-				<li>New option to mark PRs with a badge (and even wake snoozing items up) if new commits have occurred.</li>
-				<li>Correction to default visibility settings applied when a custom repository is added.</li>
-				<li>Further performance and stability improvements under the hood.</li>
-				</ul></font>]]></description>
-			<pubDate>Wed, 1 Feb 2017 20:00:00 +0000</pubDate>
-			<enclosure
-			url="https://github.com/ptsochantaris/trailer/releases/download/v1.5.5/trailer155.zip"
-			sparkle:version="1406"
-			sparkle:shortVersionString="1.5.5"
-			sparkle:dsaSignature="MCwCFH3xqbBnnYwnt5SzFYGRrtiVZTcwAhRa0TxngE2Vz3TpK+vmQY4/f5ZJjA=="
 			type="application/octet-stream"/>
 		</item>
 
