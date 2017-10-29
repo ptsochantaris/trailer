@@ -284,6 +284,8 @@ var versionString: String {
 	return "Version \(currentAppVersion) (\(buildNumber))"
 }
 
+#if os(OSX)
+
 func openItem(_ url: URL) {
 	openURL(url, using: Settings.defaultAppForOpeningItems.trim)
 }
@@ -308,6 +310,8 @@ func openURL(_ url: URL, using path: String) {
 		}
 	}
 }
+
+#endif
 
 //////////////////////// Originally from tieferbegabt's post on https://forums.developer.apple.com/message/37935, with thanks!
 
