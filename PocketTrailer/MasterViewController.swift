@@ -742,7 +742,7 @@ UITableViewDragDelegate {
 		}
 	}
 
-	func localNotification(userInfo: [AnyHashable : Any], action: String) {
+	func localNotificationSelected(userInfo: [AnyHashable : Any], action: String) {
 		var urlToOpen = userInfo[NOTIFICATION_URL_KEY] as? String
 		var relatedItem: ListableItem?
 
@@ -768,7 +768,9 @@ UITableViewDragDelegate {
 					sc.searchBar.text = nil
 					sc.isActive = false
 				}
-				selectTabAndOpen(item, overrideUrl: urlToOpen)
+				DispatchQueue.main.asyncAfter(deadline: .now()+0.1) {
+					self.selectTabAndOpen(item, overrideUrl: urlToOpen)
+				}
 			}
 		} else {
 			showMessage("Item not found", "Could not locate the item related to this notification")
@@ -778,11 +780,12 @@ UITableViewDragDelegate {
 	private func selectTabAndOpen(_ item: ListableItem, overrideUrl: String?) {
 		for d in tabBarSets {
 			if d.viewCriterion == nil || d.viewCriterion?.isRelated(to: item) ?? false {
-				requestTabFocus(tabItem: item is PullRequest ? d.prItem : d.issuesItem,
-				                andOpen: item,
-				                overrideUrl: overrideUrl)
+				requestTabFocus(tabItem: item is PullRequest ? d.prItem : d.issuesItem, andOpen: item, overrideUrl: overrideUrl)
 				return
 			}
+		}
+		if tabBarSets.count == 0 {
+			requestTabFocus(tabItem: nil, andOpen: item, overrideUrl: overrideUrl)
 		}
 	}
 
