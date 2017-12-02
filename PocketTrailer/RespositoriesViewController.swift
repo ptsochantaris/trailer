@@ -174,49 +174,8 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 		return fc
 	}
 
-	func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-		tableView.beginUpdates()
-	}
-
-	func controller(controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeSection sectionInfo: NSFetchedResultsSectionInfo, atIndex sectionIndex: Int, forChangeType type: NSFetchedResultsChangeType) {
-
-		heightCache.removeAll()
-
-		switch(type) {
-		case .insert:
-			tableView.insertSections(IndexSet(integer: sectionIndex), with: .fade)
-		case .delete:
-			tableView.deleteSections(IndexSet(integer: sectionIndex), with: .fade)
-		case .update:
-			tableView.reloadSections(IndexSet(integer: sectionIndex), with: .fade)
-		default:
-			break
-		}
-	}
-
-	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-
-		heightCache.removeAll()
-
-		switch(type) {
-		case .insert:
-			tableView.insertRows(at: [(newIndexPath ?? indexPath!)], with: .fade)
-		case .delete:
-			tableView.deleteRows(at: [indexPath!], with: .fade)
-		case .update:
-			if let cell = tableView.cellForRow(at: (newIndexPath ?? indexPath!)) as? RepoCell {
-				configureCell(cell, atIndexPath: newIndexPath ?? indexPath!)
-			}
-		case .move:
-			tableView.deleteRows(at: [indexPath!], with: .fade)
-			if let n = newIndexPath {
-				tableView.insertRows(at: [n], with: .fade)
-			}
-		}
-	}
-
 	func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-		tableView.endUpdates()
+		tableView.reloadData()
 	}
 
 	private func configureCell(_ cell: RepoCell, atIndexPath: IndexPath) {

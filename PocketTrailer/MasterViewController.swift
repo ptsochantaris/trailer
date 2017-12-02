@@ -51,7 +51,7 @@ UITableViewDragDelegate {
 	private var fetchedResultsController: NSFetchedResultsController<ListableItem>!
 
 	// Tabs
-	private var tabs: CustomTabBar?
+	private var tabs = CustomTabBar()
 	private var tabScroll: UIScrollView?
 	private var tabBorder: UIView?
 	private var tabBarSets = [TabBarSet]()
@@ -151,7 +151,7 @@ UITableViewDragDelegate {
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
 		updateStatus(becauseOfChanges: false, updateItems: true)
-		tabs?.setNeedsLayout() // iPhone X bug?
+		tabs.setNeedsLayout() // iPhone X bug?
 
 		if let s = splitViewController, !s.isCollapsed {
 			return
@@ -433,7 +433,7 @@ UITableViewDragDelegate {
 	}
 
 	@objc private func moveToNextTab() {
-		if let t = tabs, let i = t.selectedItem, let items = t.items, let ind = items.index(of: i), items.count > 1 {
+		if let i = tabs.selectedItem, let items = tabs.items, let ind = items.index(of: i), items.count > 1 {
 			var nextIndex = ind+1
 			if nextIndex >= items.count {
 				nextIndex = 0
@@ -443,7 +443,7 @@ UITableViewDragDelegate {
 	}
 
 	@objc private func moveToPreviousTab() {
-		if let t = tabs, let i = t.selectedItem, let items = t.items, let ind = items.index(of: i), items.count > 1 {
+		if let i = tabs.selectedItem, let items = tabs.items, let ind = items.index(of: i), items.count > 1 {
 			var nextIndex = ind-1
 			if nextIndex < 0 {
 				nextIndex = items.count-1
@@ -453,7 +453,7 @@ UITableViewDragDelegate {
 	}
 
 	private func requestTabFocus(tabItem: UITabBarItem?, andOpen: ListableItem? = nil, overrideUrl: String? = nil) {
-		if let tabs = tabs, let tabItem = tabItem {
+		if let tabItem = tabItem {
 			tabbing(tabs, didSelect: tabItem) { [weak self] in
 				if let andOpen = andOpen {
 					self?.openInCurrentTab(item: andOpen, overrideUrl: overrideUrl)
@@ -491,7 +491,7 @@ UITableViewDragDelegate {
 	private func tabbing(_ tabBar: UITabBar, didSelect item: UITabBarItem, completion: Completion?) {
 		safeScrollToTop { [weak self] in
 			guard let S = self else { return }
-			S.lastTabIndex = S.tabs?.items?.index(of: item) ?? 0
+			S.lastTabIndex = tabBar.items?.index(of: item) ?? 0
 			S.updateStatus(becauseOfChanges: false, updateItems: true)
 			completion?()
 		}
@@ -570,28 +570,32 @@ UITableViewDragDelegate {
 			items.append(contentsOf: d.tabItems)
 		}
 
-		let tabsAlreadyWereVisible = tabs != nil
+		let tabsAlreadyWereVisible = tabScroll != nil
 
 		if items.count > 1 {
-			showTabBar(show: true, animated: true)
+			if splitViewController?.isCollapsed ?? false && (splitViewController?.viewControllers.first as? UINavigationController)?.viewControllers.count == 2 {
+				// collapsed split view, and detail view is showing
+			} else {
+				showTabBar(show: true, animated: true)
+			}
 
-			tabs?.items = items
+			tabs.items = items
 			if items.count > lastTabIndex {
-				tabs?.selectedItem = items[lastTabIndex]
+				tabs.selectedItem = items[lastTabIndex]
 				currentTabBarSet = tabBarSetForTabItem(i: items[lastTabIndex])
 			} else {
-				tabs?.selectedItem = items.last
+				tabs.selectedItem = items.last
 				currentTabBarSet = tabBarSetForTabItem(i: items.last!)
 			}
 			tabsWidth?.constant = CGFloat(items.count * 64)
-			tabs?.superview?.layoutIfNeeded()
+			tabs.superview?.layoutIfNeeded()
 
 		} else {
 			currentTabBarSet = tabBarSetForTabItem(i: items.first)
 			showTabBar(show: false, animated: true)
 		}
 
-		if let i = tabs?.selectedItem?.image {
+		if let i = tabs.selectedItem?.image {
 			viewingPrs = i == UIImage(named: "prsTab") // not proud of this :(
 		} else if let c = currentTabBarSet {
 			viewingPrs = c.tabItems.first?.image == UIImage(named: "prsTab") // or this :(
@@ -607,22 +611,22 @@ UITableViewDragDelegate {
 		} else {
 			let latestFetchRequest = fetchedResultsController.fetchRequest
 			let newFetchRequest = itemFetchRequest
-			let newCount = tabs?.items?.count ?? 0
+			let newCount = tabs.items?.count ?? 0
 			if newCount != lastTabCount || latestFetchRequest != newFetchRequest {
 				updateQuery(newFetchRequest: newFetchRequest)
 				tableView.reloadData()
 			}
 		}
 
-		if let ts = tabScroll, let t = tabs, let i = t.selectedItem, let ind = t.items?.index(of: i) {
-			let w = t.bounds.size.width / CGFloat(t.items?.count ?? 1)
+		if let ts = tabScroll, let i = tabs.selectedItem, let ind = tabs.items?.index(of: i) {
+			let w = tabs.bounds.size.width / CGFloat(tabs.items?.count ?? 1)
 			let x = w * CGFloat(ind)
-			let f = CGRect(x: x, y: 0, width: w, height: t.bounds.size.height)
+			let f = CGRect(x: x, y: 0, width: w, height: tabs.bounds.size.height)
 			ts.scrollRectToVisible(f, animated: tabsAlreadyWereVisible)
 		}
-		lastTabCount = tabs?.items?.count ?? 0
+		lastTabCount = tabs.items?.count ?? 0
 
-		if let i = tabs?.selectedItem, let ind = tabs?.items?.index(of: i) {
+		if let i = tabs.selectedItem, let ind = tabs.items?.index(of: i) {
 			lastTabIndex = ind
 		} else {
 			lastTabIndex = 0
@@ -639,17 +643,15 @@ UITableViewDragDelegate {
 
 				tableView.scrollIndicatorInsets = UIEdgeInsets(top: tableView.scrollIndicatorInsets.top, left: 0, bottom: 49, right: 0)
 
-				let t = CustomTabBar()
-				t.translatesAutoresizingMaskIntoConstraints = false
-				t.delegate = self
-				tabs = t
+				tabs.translatesAutoresizingMaskIntoConstraints = false
+				tabs.delegate = self
 
 				let ts = UIScrollView()
 				ts.translatesAutoresizingMaskIntoConstraints = false
 				ts.showsHorizontalScrollIndicator = false
 				ts.alwaysBounceHorizontal = true
 				ts.scrollsToTop = false
-				ts.addSubview(t)
+				ts.addSubview(tabs)
 
 				let s1 = UIVisualEffectView(effect: UIBlurEffect(style: .extraLight))
 				s1.translatesAutoresizingMaskIntoConstraints = false
@@ -669,15 +671,15 @@ UITableViewDragDelegate {
 				v.addSubview(ts)
 				tabScroll = ts
 
-				t.heightAnchor.constraint(equalTo: ts.heightAnchor).isActive = true
-				t.widthAnchor.constraint(greaterThanOrEqualTo: v.widthAnchor).isActive = true
-				tabsWidth = t.widthAnchor.constraint(greaterThanOrEqualToConstant: 0)
+				tabs.heightAnchor.constraint(equalTo: ts.heightAnchor).isActive = true
+				tabs.widthAnchor.constraint(greaterThanOrEqualTo: v.widthAnchor).isActive = true
+				tabsWidth = tabs.widthAnchor.constraint(greaterThanOrEqualToConstant: 0)
 				tabsWidth!.isActive = true
 
-				t.topAnchor.constraint(equalTo: ts.contentLayoutGuide.topAnchor).isActive = true
-				t.leadingAnchor.constraint(equalTo: ts.contentLayoutGuide.leadingAnchor).isActive = true
-				t.trailingAnchor.constraint(equalTo: ts.contentLayoutGuide.trailingAnchor).isActive = true
-				t.bottomAnchor.constraint(equalTo: ts.contentLayoutGuide.bottomAnchor).isActive = true
+				tabs.topAnchor.constraint(equalTo: ts.contentLayoutGuide.topAnchor).isActive = true
+				tabs.leadingAnchor.constraint(equalTo: ts.contentLayoutGuide.leadingAnchor).isActive = true
+				tabs.trailingAnchor.constraint(equalTo: ts.contentLayoutGuide.trailingAnchor).isActive = true
+				tabs.bottomAnchor.constraint(equalTo: ts.contentLayoutGuide.bottomAnchor).isActive = true
 
 				ts.bottomAnchor.constraint(equalTo: v.bottomAnchor).isActive = true
 				ts.leadingAnchor.constraint(equalTo: v.leadingAnchor).isActive = true
@@ -689,12 +691,12 @@ UITableViewDragDelegate {
 				b.leadingAnchor.constraint(equalTo: ts.leadingAnchor).isActive = true
 				b.trailingAnchor.constraint(equalTo: ts.trailingAnchor).isActive = true
 
-				s2.trailingAnchor.constraint(equalTo: t.leadingAnchor).isActive = true
+				s2.trailingAnchor.constraint(equalTo: tabs.leadingAnchor).isActive = true
 				s2.widthAnchor.constraint(equalToConstant: 320).isActive = true
 				s2.topAnchor.constraint(equalTo: ts.contentLayoutGuide.topAnchor).isActive = true
 				s2.bottomAnchor.constraint(equalTo: ts.contentLayoutGuide.bottomAnchor).isActive = true
 
-				s1.leadingAnchor.constraint(equalTo: t.trailingAnchor).isActive = true
+				s1.leadingAnchor.constraint(equalTo: tabs.trailingAnchor).isActive = true
 				s1.widthAnchor.constraint(equalToConstant: 320).isActive = true
 				s1.topAnchor.constraint(equalTo: ts.contentLayoutGuide.topAnchor).isActive = true
 				s1.bottomAnchor.constraint(equalTo: ts.contentLayoutGuide.bottomAnchor).isActive = true
@@ -718,7 +720,6 @@ UITableViewDragDelegate {
 
 			if let t = tabScroll, let b = tabBorder {
 
-				tabs = nil
 				tabScroll = nil
 				tabBorder = nil
 				tabsWidth = nil
@@ -733,10 +734,12 @@ UITableViewDragDelegate {
 					}, completion: { finished in
 						t.removeFromSuperview()
 						b.removeFromSuperview()
+						self.tabs.removeFromSuperview()
 					})
 				} else {
 					t.removeFromSuperview()
 					b.removeFromSuperview()
+					self.tabs.removeFromSuperview()
 				}
 			}
 		}
@@ -778,15 +781,14 @@ UITableViewDragDelegate {
 	}
 
 	private func selectTabAndOpen(_ item: ListableItem, overrideUrl: String?) {
+		var tabItem: UITabBarItem?
 		for d in tabBarSets {
 			if d.viewCriterion == nil || d.viewCriterion?.isRelated(to: item) ?? false {
-				requestTabFocus(tabItem: item is PullRequest ? d.prItem : d.issuesItem, andOpen: item, overrideUrl: overrideUrl)
-				return
+				tabItem = item is PullRequest ? d.prItem : d.issuesItem
+				break
 			}
 		}
-		if tabBarSets.count == 0 {
-			requestTabFocus(tabItem: nil, andOpen: item, overrideUrl: overrideUrl)
-		}
+		requestTabFocus(tabItem: tabItem, andOpen: item, overrideUrl: overrideUrl)
 	}
 
 	func openItemWithUriPath(uriPath: String) {
@@ -892,7 +894,7 @@ UITableViewDragDelegate {
 
 	override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
 		if section == numberOfSections(in: tableView)-1 {
-			return 20 + (tabs == nil ? 0 : 49)
+			return 20 + (tabScroll == nil ? 0 : 49)
 		}
 		return CGFloat.leastNonzeroMagnitude
 	}
