@@ -702,9 +702,10 @@ UITableViewDragDelegate {
 				s1.bottomAnchor.constraint(equalTo: ts.contentLayoutGuide.bottomAnchor).isActive = true
 
 				if animated {
-					ts.transform = CGAffineTransform(translationX: 0, y: 49)
-					b.transform = CGAffineTransform(translationX: 0, y: 49)
-					UIView.animate(withDuration: 0.2,
+					let h = 49 + view.safeAreaInsets.bottom
+					ts.transform = CGAffineTransform(translationX: 0, y: h)
+					b.transform = CGAffineTransform(translationX: 0, y: h)
+					UIView.animate(withDuration: 0.25,
 					               delay: 0.0,
 					               options: .curveEaseInOut,
 					               animations: {
@@ -725,12 +726,13 @@ UITableViewDragDelegate {
 				tabsWidth = nil
 
 				if animated {
-					UIView.animate(withDuration: 0.2,
+					let h = 49 + view.safeAreaInsets.bottom
+					UIView.animate(withDuration: 0.25,
 					               delay: 0.0,
 					               options: .curveEaseInOut,
 					               animations: {
-									t.transform = CGAffineTransform(translationX: 0, y: 49)
-									b.transform = CGAffineTransform(translationX: 0, y: 49)
+									t.transform = CGAffineTransform(translationX: 0, y: h)
+									b.transform = CGAffineTransform(translationX: 0, y: h)
 					}, completion: { finished in
 						t.removeFromSuperview()
 						b.removeFromSuperview()
