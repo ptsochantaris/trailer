@@ -1330,7 +1330,7 @@ Token</string>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" id="PC0-Di-dZ3">
                                                         <rect key="frame" x="-2" y="2" width="554" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="To disble usage of the Reviews API, uncheck all options here &amp; set the drop-down option to &quot;Don't Move It&quot;" id="bis-lC-jvI">
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="To disable usage of the Reviews API, uncheck all options here &amp; set the drop-down option to &quot;Don't Move It&quot;" id="bis-lC-jvI">
                                                             <font key="font" metaFont="miniSystem"/>
                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1367,7 +1367,7 @@ Token</string>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" id="hYX-l4-6Qc">
                                                         <rect key="frame" x="108" y="94" width="564" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="To completely disble all usage of the Reactions API, uncheck all options." id="zca-XG-6Sh">
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="To completely disable all usage of the Reactions API, uncheck all options." id="zca-XG-6Sh">
                                                             <font key="font" metaFont="miniSystem"/>
                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>

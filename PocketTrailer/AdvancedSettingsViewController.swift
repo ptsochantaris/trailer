@@ -419,9 +419,9 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		case SettingsSection.Filtering.title:
 			return buildFooter("You can also use title: server: label: repo: user: number: milestone: assignee: and status: to filter specific properties, e.g. \"label:bug,suggestion\". Prefix with '!' to exclude some terms.")
 		case SettingsSection.Reviews.title:
-			return buildFooter("To disble usage of the Reviews API, uncheck all options above and set the moving option to \"Don't Move It\".")
+			return buildFooter("To disable usage of the Reviews API, uncheck all options above and set the moving option to \"Don't Move It\".")
 		case SettingsSection.Reactions.title:
-			return buildFooter("To completely disble all usage of the Reactions API, uncheck all above options.")
+			return buildFooter("To completely disable all usage of the Reactions API, uncheck all above options.")
 		default:
 			return nil
 		}
