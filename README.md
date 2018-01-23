@@ -16,3 +16,9 @@ Note: Trailer lists all your [watched repositories](http://github.com/watching).
 ## License
 
 Released under the terms of the MIT license, see the [LICENSE](LICENSE.txt) file for license rights and limitations (MIT).
+
+## Copyright
+
+Copyright (c) 2014-2017 Paul Tsochantaris
+
+Parts copyright (c) 2013-2014 HouseTrip Ltd.
