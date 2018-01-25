@@ -15,6 +15,7 @@ final class PullRequest: ListableItem {
 	@NSManaged var hasNewCommits: Bool
 	@NSManaged var assignedForReview: Bool
 	@NSManaged var reviewers: String
+	@NSManaged var teamReviewers: String
 
 	@NSManaged var statuses: Set<PRStatus>
 	@NSManaged var reviews: Set<Review>
@@ -70,9 +71,18 @@ final class PullRequest: ListableItem {
 		return Settings.showStatusItems && (Settings.showStatusesOnAllItems || (Section(rawValue: sectionIndex)?.isLoud ?? false))
 	}
 
-	func checkAndStoreReviewAssignments(_ reviewerNames: Set<String>) -> Bool {
+	func checkAndStoreReviewAssignments(_ reviewerNames: Set<String>, _ reviewerTeams: Set<String>) -> Bool {
 		reviewers = reviewerNames.joined(separator: ",")
-		let assigned = reviewerNames.contains(S(apiServer.userName))
+		teamReviewers = reviewerTeams.joined(separator: ",")
+		var assigned = reviewerNames.contains(S(apiServer.userName))
+		if !assigned {
+			for myTeamName in apiServer.teams.flatMap({ $0.slug }) {
+				if reviewerTeams.contains(myTeamName) {
+					assigned = true // TODO: have a separate notification for this
+					break
+				}
+			}
+		}
 		let shouldNotify = assigned && !assignedForReview
 		assignedForReview = assigned
 		return shouldNotify

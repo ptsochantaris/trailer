@@ -989,18 +989,19 @@ final class API {
 
 		for p in prs {
 
-			var reviewers = Set<String>()
+			var reviewUsers = Set<String>()
+			var reviewTeams = Set<String>()
 			let repoFullName = S(p.repo.fullName)
-			getPagedData(at: "/repos/\(repoFullName)/pulls/\(p.number)/requested_reviewers", from: p.apiServer, perPageCallback: { data, lastPage in
-				guard let data = data else { return true }
-				for userName in data.flatMap({ $0["login"] as? String }) {
-					reviewers.insert(userName)
-				}
-				return false
-			}) { success, resultCode in
-				completionCount += 1
-				if success {
-					if p.checkAndStoreReviewAssignments(reviewers) && Settings.notifyOnReviewAssignments {
+			getHashedData(at: "/repos/\(repoFullName)/pulls/\(p.number)/requested_reviewers", from: p.apiServer) { data, resultCode in
+				if let data = data, let userList = data["users"] as? [[AnyHashable: Any]], let teamList = data["teams"] as? [[AnyHashable: Any]] {
+					for userName in userList.flatMap({ $0["login"] as? String }) {
+						reviewUsers.insert(userName)
+					}
+					for teamName in teamList.flatMap({ $0["slug"] as? String }) {
+						reviewTeams.insert(teamName)
+					}
+					completionCount += 1
+					if p.checkAndStoreReviewAssignments(reviewUsers, reviewTeams) && Settings.notifyOnReviewAssignments {
 						NotificationQueue.add(type: .assignedForReview, for: p)
 					}
 				} else {
@@ -1440,6 +1441,26 @@ final class API {
 				}
 			} else {
 				finalCallback(false, resultCode)
+			}
+		}
+	}
+
+	private class func getHashedData(
+		at path: String,
+		from server: ApiServer,
+		callback: @escaping (_ data: [AnyHashable : Any]?, _ resultCode: Int64) -> Void) {
+
+		if path.isEmpty {
+			// handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
+			callback(nil, -1)
+			return
+		}
+
+		getData(in: "\(path)?per_page=100", from: server) { data, lastPage, resultCode in
+			if let d = data as? [AnyHashable : Any] {
+				callback(d, resultCode)
+			} else {
+				callback(nil, resultCode)
 			}
 		}
 	}
