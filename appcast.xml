@@ -7,6 +7,22 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.6.5</title>
+			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Works around API change by GitHub related to team assignments that broke sync.</li>
+				<li>Includes teams in checks for review assignments.</li>
+				</ul></font>]]></description>
+			<pubDate>Thu, 25 Jan 2017 08:00:00 +0000</pubDate>
+			<enclosure
+			url="https://github.com/ptsochantaris/trailer/releases/download/1.6.5/trailer165.zip"
+			sparkle:version="1469"
+			sparkle:shortVersionString="1.6.5"
+			sparkle:dsaSignature="MC4CFQDEyrgGUTj3ROtAbco7yt0EgNG3OgIVALCs9ZqXHygga7hkYb1T2fxshbff"
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.6.3</title>
 			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
