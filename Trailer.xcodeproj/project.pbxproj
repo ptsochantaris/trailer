@@ -323,7 +323,7 @@
 		168BC6B517EC2DF000BC4584 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		168BC6C317EC2DF000BC4584 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		168BC6C817EC2DF000BC4584 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		168C6ECC18B2104100E41D85 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		168C6ECC18B2104100E41D85 /* LICENSE.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 		168C6ECD18B2104100E41D85 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
 		168FD00D1A2A7AD1005929CB /* MessageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageView.swift; sourceTree = "<group>"; };
 		16901A441D659E9500141595 /* NotificationQueue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NotificationQueue.swift; path = Shared/NotificationQueue.swift; sourceTree = "<group>"; };
@@ -511,7 +511,7 @@
 		1628A6F218789EA3005EDA69 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
-				168C6ECC18B2104100E41D85 /* LICENSE */,
+				168C6ECC18B2104100E41D85 /* LICENSE.txt */,
 				16F51FA019DE8C78007B0BB1 /* PRIVACY */,
 				168C6ECD18B2104100E41D85 /* README.md */,
 				16B3B35C1A34F859000BE6CC /* Globals */,
