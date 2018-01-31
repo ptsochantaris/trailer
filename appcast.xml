@@ -7,6 +7,23 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.6.6</title>
+			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li><i>Fix for item below: Corrects behaviour under GE servers that do not have this API change yet</i></li>
+				<li>Works around API change by GitHub related to team assignments that broke sync.</li>
+				<li>Includes teams in checks for review assignments.</li>
+				</ul></font>]]></description>
+			<pubDate>Thu, 31 Jan 2017 07:00:00 +0000</pubDate>
+			<enclosure
+			url="https://github.com/ptsochantaris/trailer/releases/download/1.6.6/trailer166.zip"
+			sparkle:version="1470"
+			sparkle:shortVersionString="1.6.6"
+			sparkle:dsaSignature="MC0CFHj01K8Nn2xfV6BpG0NyjZ79htjBAhUA5et47N+du9JYkQdr9+8b+ynIEe0="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.6.5</title>
 			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
