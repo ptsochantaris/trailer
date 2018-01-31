@@ -992,8 +992,20 @@ final class API {
 			var reviewUsers = Set<String>()
 			var reviewTeams = Set<String>()
 			let repoFullName = S(p.repo.fullName)
-			getHashedData(at: "/repos/\(repoFullName)/pulls/\(p.number)/requested_reviewers", from: p.apiServer) { data, resultCode in
-				if let data = data, let userList = data["users"] as? [[AnyHashable: Any]], let teamList = data["teams"] as? [[AnyHashable: Any]] {
+			getRawData(at: "/repos/\(repoFullName)/pulls/\(p.number)/requested_reviewers", from: p.apiServer) { data, resultCode in
+
+				if let userList = data as? [[AnyHashable: Any]] {
+					// Legacy API results
+					for userName in userList.flatMap({ $0["login"] as? String }) {
+						reviewUsers.insert(userName)
+					}
+					completionCount += 1
+					if p.checkAndStoreReviewAssignments(reviewUsers, reviewTeams) && Settings.notifyOnReviewAssignments {
+						NotificationQueue.add(type: .assignedForReview, for: p)
+					}
+
+				} else if let data = data as? [AnyHashable: Any], let userList = data["users"] as? [[AnyHashable: Any]], let teamList = data["teams"] as? [[AnyHashable: Any]] {
+					// New API results
 					for userName in userList.flatMap({ $0["login"] as? String }) {
 						reviewUsers.insert(userName)
 					}
@@ -1445,10 +1457,10 @@ final class API {
 		}
 	}
 
-	private class func getHashedData(
+	private class func getRawData(
 		at path: String,
 		from server: ApiServer,
-		callback: @escaping (_ data: [AnyHashable : Any]?, _ resultCode: Int64) -> Void) {
+		callback: @escaping (_ data: Any?, _ resultCode: Int64) -> Void) {
 
 		if path.isEmpty {
 			// handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
@@ -1457,11 +1469,7 @@ final class API {
 		}
 
 		getData(in: "\(path)?per_page=100", from: server) { data, lastPage, resultCode in
-			if let d = data as? [AnyHashable : Any] {
-				callback(d, resultCode)
-			} else {
-				callback(nil, resultCode)
-			}
+			callback(data, resultCode)
 		}
 	}
 
