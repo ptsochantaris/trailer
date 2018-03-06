@@ -9,7 +9,7 @@ $('.js-3').attr('src', (dpi>1) ? ((dpi>2) ? 'images/macbookoutline-180.png' : 'i
 $('.js-4').attr('src', (dpi>1) ? ((dpi>2) ? 'images/ipadoutline-177.png' : 'images/ipadoutline-118.png') : 'images/ipadoutline-59.png');
 $('.js-5').attr('src', (dpi>1) ? ((dpi>2) ? 'images/iphoneoutline-117.png' : 'images/iphoneoutline-78.png') : 'images/iphoneoutline-39.png');
 $('.js-6').attr('src', (dpi>1) ? ((dpi>2) ? 'images/watchoutline-99.png' : 'images/watchoutline-66.png') : 'images/watchoutline-33.png');
-$('.js-7').attr('src', (dpi>1) ? ((dpi>2) ? 'images/ipadscreenshot-1227.png' : 'images/ipadscreenshot-818.png') : 'images/ipadscreenshot-409.png');
+$('.js-7').attr('src', (dpi>1) ? ((dpi>2) ? 'images/ipadscreenshot-1230.png' : 'images/ipadscreenshot-820.png') : 'images/ipadscreenshot-410.png');
 $('.js-8').attr('src', (dpi>1) ? ((dpi>2) ? 'images/iphonescreenshot-426.png' : 'images/iphonescreenshot-284.png') : 'images/iphonescreenshot-142.png');
 $('.js-9').attr('src', (dpi>1) ? ((dpi>2) ? 'images/iu-240.png' : 'images/iu-160.png') : 'images/iu-80.png');
 $('.js-10').attr('src', (dpi>1) ? ((dpi>2) ? 'images/watchscreenshot-300.png' : 'images/watchscreenshot-200.png') : 'images/watchscreenshot-100.png');};

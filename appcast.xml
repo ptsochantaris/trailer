@@ -7,14 +7,27 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.6.7</title>
+			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Corrects an issue where a failed fetch of review assignments could lead to sync hanging indefinitely</li>
+				</ul></font>]]></description>
+			<pubDate>Tue, 6 Mar 2018 07:00:00 +0000</pubDate>
+			<enclosure
+			url="https://github.com/ptsochantaris/trailer/releases/download/1.6.7/trailer167.zip"
+			sparkle:version="1471"
+			sparkle:shortVersionString="1.6.7"
+			sparkle:dsaSignature="MC4CFQCRiE1eNQrsDEk5oFnKv8/hzDY0LAIVAJsVaZBdjXBAIu0iz+4j168MJKm5"
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.6.6</title>
 			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
-				<li><i>Fix for item below: Corrects behaviour under GE servers that do not have this API change yet</i></li>
-				<li>Works around API change by GitHub related to team assignments that broke sync.</li>
-				<li>Includes teams in checks for review assignments.</li>
+				<li>Corrects backward-compatible behaviour with review APIs on GitHub Enterprise servers, which was introduced on the previous release</li>
 				</ul></font>]]></description>
-			<pubDate>Thu, 31 Jan 2017 07:00:00 +0000</pubDate>
+			<pubDate>Thu, 31 Jan 2018 07:00:00 +0000</pubDate>
 			<enclosure
 			url="https://github.com/ptsochantaris/trailer/releases/download/1.6.6/trailer166.zip"
 			sparkle:version="1470"
@@ -30,7 +43,7 @@
 				<li>Works around API change by GitHub related to team assignments that broke sync.</li>
 				<li>Includes teams in checks for review assignments.</li>
 				</ul></font>]]></description>
-			<pubDate>Thu, 25 Jan 2017 08:00:00 +0000</pubDate>
+			<pubDate>Thu, 25 Jan 2018 08:00:00 +0000</pubDate>
 			<enclosure
 			url="https://github.com/ptsochantaris/trailer/releases/download/1.6.5/trailer165.zip"
 			sparkle:version="1469"
