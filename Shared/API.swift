@@ -999,7 +999,6 @@ final class API {
 					for userName in userList.flatMap({ $0["login"] as? String }) {
 						reviewUsers.insert(userName)
 					}
-					completionCount += 1
 					if p.checkAndStoreReviewAssignments(reviewUsers, reviewTeams) && Settings.notifyOnReviewAssignments {
 						NotificationQueue.add(type: .assignedForReview, for: p)
 					}
@@ -1012,13 +1011,14 @@ final class API {
 					for teamName in teamList.flatMap({ $0["slug"] as? String }) {
 						reviewTeams.insert(teamName)
 					}
-					completionCount += 1
 					if p.checkAndStoreReviewAssignments(reviewUsers, reviewTeams) && Settings.notifyOnReviewAssignments {
 						NotificationQueue.add(type: .assignedForReview, for: p)
 					}
 				} else {
 					p.apiServer.lastSyncSucceeded = false
 				}
+
+				completionCount += 1
 				if completionCount == totalOperations {
 					callback()
 				}
@@ -1631,17 +1631,14 @@ final class API {
 				}
 			} else if code > 299 {
 				error = apiError("Server responded with error \(code)")
-				parsedData = nil
 				shouldRetry = (code == 502 || code == 503) // retry in case GH is deploying
 				done()
 			} else if code == 0 {
 				error = apiError("Server did not repond")
-				parsedData = nil
 				shouldRetry = (e as NSError?)?.code == -1001 // retry if it was a timeout
 				done()
 			} else if Int64(data?.count ?? 0) < (response?.expectedContentLength ?? 0) {
 				error = apiError("Server data was truncated")
-				parsedData = nil
 				shouldRetry = true // transfer truncation, try again
 				done()
 			} else {
@@ -1655,8 +1652,6 @@ final class API {
 							CacheEntry.setEntry(key: cacheKey, code: code, etag: etag, data: d, headers: headers)
 						}
 					}
-				} else {
-					parsedData = nil
 				}
 				done()
 			}
