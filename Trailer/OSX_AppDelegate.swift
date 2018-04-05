@@ -707,7 +707,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	private func relatedMenus(for i: ListableItem) -> [MenuBarSet] {
-		return menuBarSets.flatMap{ ($0.viewCriterion?.isRelated(to: i) ?? true) ? $0 : nil }
+		return menuBarSets.compactMap{ ($0.viewCriterion?.isRelated(to: i) ?? true) ? $0 : nil }
 	}
 
 	func updateAllMenus() {

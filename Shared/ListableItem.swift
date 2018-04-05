@@ -364,7 +364,7 @@ class ListableItem: DataItem {
 			} else if Int64(Settings.newMentionMovePolicy) > Section.none.rawValue && contains(terms: ["@\(S(apiServer.userName))"]) {
 				targetSection = Section(Settings.newMentionMovePolicy)!
 
-			} else if Int64(Settings.teamMentionMovePolicy) > Section.none.rawValue && contains(terms: apiServer.teams.flatMap { $0.calculatedReferral }) {
+			} else if Int64(Settings.teamMentionMovePolicy) > Section.none.rawValue && contains(terms: apiServer.teams.compactMap { $0.calculatedReferral }) {
 				targetSection = Section(Settings.teamMentionMovePolicy)!
 
 			} else if Int64(Settings.newItemInOwnedRepoMovePolicy) > Section.none.rawValue && repo.isMine {
@@ -657,8 +657,8 @@ class ListableItem: DataItem {
 						}
 					}
 
-					let approverNames = approvers.flatMap { $0.username }
-					let requesterNames = requesters.flatMap { $0.username }
+					let approverNames = approvers.compactMap { $0.username }
+					let requesterNames = requesters.compactMap { $0.username }
 					let otherReviewers = p.reviewers.components(separatedBy: ",").filter({ !($0.isEmpty || approverNames.contains($0) || requesterNames.contains($0)) })
 					if otherReviewers.count > 0 {
 
@@ -994,12 +994,12 @@ class ListableItem: DataItem {
 
 	#if os(iOS)
 	var searchKeywords: [String] {
-		let labelNames = labels.flatMap { $0.name }
+		let labelNames = labels.compactMap { $0.name }
 		let orgAndRepo = repo.fullName?.components(separatedBy: "/") ?? []
 		return [(userLogin ?? "NO_USERNAME"), "Trailer", "PocketTrailer", "Pocket Trailer"] + labelNames + orgAndRepo
 	}
 	final var searchTitle: String {
-		let labelNames = labels.flatMap { $0.name }
+		let labelNames = labels.compactMap { $0.name }
 		var suffix = ""
 		if labelNames.count > 0 {
 			for l in labelNames {

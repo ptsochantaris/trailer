@@ -76,7 +76,7 @@ final class PullRequest: ListableItem {
 		teamReviewers = reviewerTeams.joined(separator: ",")
 		var assigned = reviewerNames.contains(S(apiServer.userName))
 		if !assigned {
-			for myTeamName in apiServer.teams.flatMap({ $0.slug }) {
+			for myTeamName in apiServer.teams.compactMap({ $0.slug }) {
 				if reviewerTeams.contains(myTeamName) {
 					assigned = true // TODO: have a separate notification for this
 					break

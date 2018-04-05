@@ -996,7 +996,7 @@ final class API {
 
 				if let userList = data as? [[AnyHashable: Any]] {
 					// Legacy API results
-					for userName in userList.flatMap({ $0["login"] as? String }) {
+					for userName in userList.compactMap({ $0["login"] as? String }) {
 						reviewUsers.insert(userName)
 					}
 					if p.checkAndStoreReviewAssignments(reviewUsers, reviewTeams) && Settings.notifyOnReviewAssignments {
@@ -1005,10 +1005,10 @@ final class API {
 
 				} else if let data = data as? [AnyHashable: Any], let userList = data["users"] as? [[AnyHashable: Any]], let teamList = data["teams"] as? [[AnyHashable: Any]] {
 					// New API results
-					for userName in userList.flatMap({ $0["login"] as? String }) {
+					for userName in userList.compactMap({ $0["login"] as? String }) {
 						reviewUsers.insert(userName)
 					}
-					for teamName in teamList.flatMap({ $0["slug"] as? String }) {
+					for teamName in teamList.compactMap({ $0["slug"] as? String }) {
 						reviewTeams.insert(teamName)
 					}
 					if p.checkAndStoreReviewAssignments(reviewUsers, reviewTeams) && Settings.notifyOnReviewAssignments {

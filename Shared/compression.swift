@@ -20,7 +20,7 @@ extension Data {
 
 		let streamPtr = UnsafeMutablePointer<compression_stream>.allocate(capacity: 1)
 		defer {
-			streamPtr.deallocate(capacity: 1)
+			streamPtr.deallocate()
 		}
 
 		var stream = streamPtr.pointee
@@ -56,7 +56,7 @@ extension Data {
 			let dstBufferSize : size_t = 4096
 			let dstBufferPtr = UnsafeMutablePointer<UInt8>.allocate(capacity: dstBufferSize)
 			defer {
-				dstBufferPtr.deallocate(capacity: dstBufferSize)
+				dstBufferPtr.deallocate()
 			}
 			stream.dst_ptr = dstBufferPtr
 			stream.dst_size = dstBufferSize
