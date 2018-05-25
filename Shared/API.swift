@@ -1634,7 +1634,7 @@ final class API {
 				shouldRetry = (code == 502 || code == 503) // retry in case GH is deploying
 				done()
 			} else if code == 0 {
-				error = apiError("Server did not repond")
+				error = apiError("Server did not respond")
 				shouldRetry = (e as NSError?)?.code == -1001 // retry if it was a timeout
 				done()
 			} else if Int64(data?.count ?? 0) < (response?.expectedContentLength ?? 0) {
