@@ -1,0 +1,34 @@
+.vis{display:inline-block;vertical-align:top;}
+.pos{position:relative;margin-left:61px;margin-top:83px;}
+.size{min-width:80px;width:80px;min-height:154px;height:154px;}
+.cont{z-index:17;pointer-events:auto;}
+.img{position:absolute;left:0;width:80px;height:81px;top:36px;border:0;}
+.img-2{left:0;width:80px;height:81px;top:36px;display:inline-block;}
+.pos-2{position:relative;margin-left:0;margin-top:64px;}
+.size-2{min-width:462px;width:462px;min-height:154px;}
+.pos-3{position:relative;margin-left:0;margin-top:0;}
+.colwrapper{line-height:0;}
+.cont-3{z-index:22;pointer-events:auto;}
+.font{padding-top:77px;padding-bottom:77px;margin-top:0;margin-bottom:0;line-height:0;}
+.button{border:0;-webkit-border-radius:8px;-moz-border-radius:8px;border-radius:8px;background-color:transparent;}
+.button:hover{background-color:transparent;border-color:rgb(0,0,0);color:rgb(0,0,0);}
+.button:active{background-color:transparent;border-color:rgb(0,0,0);color:rgb(255,255,255);}
+.vis-2{display:inline-block;overflow:hidden;outline:0;}
+.size-3{width:462px;height:0;}
+.pos-4{position:relative;margin-left:110px;margin-top:-125px;}
+.size-4{min-width:352px;width:352px;min-height:117px;}
+.cont-4{z-index:18;pointer-events:auto;}
+.para{padding-top:0;text-indent:-11px;padding-bottom:4px;padding-right:0;text-align:left;}
+.font-2{font-family:"Helvetica Neue", sans-serif;font-size:18px;font-weight:700;font-style:normal;text-decoration:none;text-transform:none;color:rgb(0,0,0);background-color:initial;line-height:23px;letter-spacing:normal;text-shadow:none;}
+.pos-5{margin-left:30px;}
+.para-2{padding-top:0;text-indent:-11px;padding-right:0;text-align:left;}
+.font-3{font-family:"Helvetica Neue", sans-serif;font-size:18px;font-weight:400;font-style:normal;text-decoration:none;text-transform:none;color:rgb(0,0,0);background-color:initial;line-height:22px;letter-spacing:normal;text-shadow:none;}
+.pos-6{position:relative;margin-left:0;margin-top:-154px;}
+.cont-5{z-index:21;pointer-events:auto;}
+.button-2{border:0;-webkit-border-radius:8px;-moz-border-radius:8px;border-radius:8px;background-color:transparent;}
+.button-2:hover{background-color:transparent;border-color:rgb(0,0,0);color:rgb(0,0,0);}
+.button-2:active{background-color:rgb(240,240,240);border-color:rgb(0,0,0);color:rgb(255,255,255);}
+.cont-6{z-index:16;pointer-events:auto;}
+.button-3{border:0;-webkit-border-radius:8px;-moz-border-radius:8px;border-radius:8px;background-color:rgba(255,255,255,0.8);}
+.button-3:hover{background-color:rgb(130,147,158);border-color:rgb(0,0,0);color:rgb(0,0,0);}
+.button-3:active{background-color:rgb(82,100,111);border-color:rgb(0,0,0);color:rgb(255,255,255);}

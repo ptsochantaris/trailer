@@ -1,0 +1,4 @@
+User-agent: *
+Disallow:
+
+Sitemap: http://ptsochantaris.github.io/trailer/sitemap.xml
