@@ -63,8 +63,8 @@ final class Review: DataItem {
 		return username == apiServer.userName
 	}
 
-	var shouldDisplay: Bool {
-		return state == State.CHANGES_REQUESTED.rawValue || state == State.APPROVED.rawValue
+	var affectsBottomLine: Bool {
+		return state == State.CHANGES_REQUESTED.rawValue || state == State.APPROVED.rawValue || state == State.DISMISSED.rawValue
 	}
 }
 

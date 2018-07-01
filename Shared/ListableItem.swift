@@ -595,15 +595,8 @@ class ListableItem: DataItem {
 			if Settings.displayReviewsOnItems, let p = self as? PullRequest {
 
 				var latestReviewByUser = [String:Review]()
-				for r in p.reviews.filter({ $0.shouldDisplay }) {
-					let user = S(r.username)
-					if let latestReview = latestReviewByUser[user] {
-						if latestReview.createdBefore(r) {
-							latestReviewByUser[user] = r
-						}
-					} else {
-						latestReviewByUser[user] = r
-					}
+				for r in p.reviews.filter({ $0.affectsBottomLine }).sorted(by: { $0.createdBefore($1) }) {
+					latestReviewByUser[S(r.username)] = r
 				}
 
 				if latestReviewByUser.count > 0 || !p.reviewers.isEmpty {
