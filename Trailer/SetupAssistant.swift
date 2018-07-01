@@ -9,7 +9,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 	@IBOutlet weak var completeSetup: NSButton!
 	@IBOutlet weak var spinner: NSProgressIndicator!
 	@IBOutlet weak var welcomeLabel: NSTextField!
-	@IBOutlet weak var trackIssues: NSButton!
+	@IBOutlet weak var importButton: NSButton!
 
 	private let newServer = ApiServer.allApiServers(in: DataManager.main).first!
 	private var checkTimer: Timer?
@@ -17,8 +17,6 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 	override func awakeFromNib() {
 		StartupLaunch.setLaunchOnLogin(true)
 		startAtLogin.integerValue = 1
-		trackIssues.integerValue = 1
-		Settings.displayPolicyForNewIssues = Int(RepoDisplayPolicy.all.rawValue)
 	}
 
 	override init(contentRect: NSRect, styleMask style: NSWindow.StyleMask, backing bufferingType: NSWindow.BackingStoreType, defer flag: Bool) {
@@ -49,10 +47,6 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 		StartupLaunch.setLaunchOnLogin(startAtLogin.integerValue==1)
 	}
 
-	@IBAction func trackIssuesSelected(_ sender: NSButton) {
-		Settings.displayPolicyForNewIssues = Int(sender.integerValue==1 ? RepoDisplayPolicy.all.rawValue : RepoDisplayPolicy.hide.rawValue)
-	}
-
 	@IBAction func testAndCompleteSelected(_ sender: NSButton) {
 
 		let token = tokenHolder.stringValue.trim
@@ -76,7 +70,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 						s.normalState()
 					}
 				} else {
-					s.quickstart.stringValue = "\nSyncing GitHub data for the first time.\n\nThis could take a little while, please wait…"
+					s.quickstart.stringValue = "\nFetching your watchlist. This will take a moment…"
 					Settings.lastSuccessfulRefresh = nil
 					app.startRefreshIfItIsDue()
 					s.checkTimer = Timer(repeats: true, interval: 0.5) {
@@ -96,7 +90,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 				close()
 				let alert = NSAlert()
 				alert.messageText = "Setup complete!"
-				alert.informativeText = "You can tweak settings & behaviour from the preferences window.\n\nTrailer only has read-only access to your GitHub data, so feel free to experiment, you can't damage your data or settings on GitHub."
+				alert.informativeText = "You can now visit Trailer's settings and un-hide the repositories you wish to view. Be sure to enable only those you need, in order to keep API usage low.\n\nYou can tweak options & behaviour from the settings.\n\nTrailer has read-only access to your GitHub data, so feel free to experiment, you can't damage your data or settings on GitHub."
 				alert.addButton(withTitle: "OK")
 				alert.runModal()
 			} else {
@@ -119,8 +113,8 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 		startAtLogin.isHidden = false
 		completeSetup.isHidden = false
 		welcomeLabel.isHidden = false
-		trackIssues.isHidden = false
 		spinner.isHidden = true
+		importButton.isHidden = false
 	}
 
 	private func testingState() {
@@ -133,7 +127,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 		startAtLogin.isHidden = true
 		completeSetup.isHidden = true
 		welcomeLabel.isHidden = true
-		trackIssues.isHidden = true
+		importButton.isHidden = true
 		newServer.authToken = tokenHolder.stringValue.trim
 		newServer.lastSyncSucceeded = true
 	}

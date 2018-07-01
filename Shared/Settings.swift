@@ -21,7 +21,7 @@ final class Settings {
 			"INCLUDE_SERVERS_IN_FILTER", "INCLUDE_USERS_IN_FILTER", "INCLUDE_TITLES_IN_FILTER", "INCLUDE_NUMBERS_IN_FILTER", "DUMP_API_RESPONSES_IN_CONSOLE", "OPEN_ITEMS_DIRECTLY_IN_SAFARI", "HIDE_PRS_THAT_ARENT_PASSING",
 			"REMOVE_RELATED_NOTIFICATIONS_ON_ITEM_REMOVE", "HIDE_SNOOZED_ITEMS", "INCLUDE_MILESTONES_IN_FILTER", "INCLUDE_ASSIGNEE_NAMES_IN_FILTER", "API_SERVERS_IN_SEPARATE_MENUS", "ASSUME_READ_ITEM_IF_USER_HAS_NEWER_COMMENTS",
 			"AUTO_SNOOZE_DAYS", "HIDE_MENUBAR_COUNTS", "AUTO_ADD_NEW_REPOS", "AUTO_REMOVE_DELETED_REPOS", "MARK_PRS_AS_UNREAD_ON_NEW_COMMITS", "SHOW_LABELS", "DISPLAY_REVIEW_CHANGE_REQUESTS", "SHOW_RELATIVE_DATES",
-			"DISPLAY_MILESTONES", "DEFAULT_APP_FOR_OPENING_WEB", "DEFAULT_APP_FOR_OPENING_ITEMS"]
+			"DISPLAY_MILESTONES", "DEFAULT_APP_FOR_OPENING_WEB", "DEFAULT_APP_FOR_OPENING_ITEMS", "HIDE_ARCHIVED_REPOS"]
 	}
 
     class func checkMigration() {
@@ -111,6 +111,11 @@ final class Settings {
 				}
 			}
 			sharedDefaults.removeObject(forKey: "HIDE_ALL_SECTION")
+		}
+
+		for repo in Repo.allItems(of: Repo.self, in: DataManager.main) where repo.value(forKey: "archived") == nil {
+			repo.archived = false
+			repo.updatedAt = .distantPast
 		}
 
 		sharedDefaults.synchronize()
@@ -286,7 +291,7 @@ final class Settings {
 
 	static let displayPolicyForNewPrsHelp = "When a new repository is detected in your watchlist, this display policy will be applied by default to pull requests that come from it. You can further customize the display policy for any individual repository from the 'Repositories' tab."
 	class var displayPolicyForNewPrs: Int {
-		get { return get("NEW_PR_DISPLAY_POLICY_INDEX") as? Int ?? RepoDisplayPolicy.all.intValue }
+		get { return get("NEW_PR_DISPLAY_POLICY_INDEX") as? Int ?? RepoDisplayPolicy.hide.intValue }
 		set { set("NEW_PR_DISPLAY_POLICY_INDEX", newValue) }
 	}
 
@@ -398,6 +403,12 @@ final class Settings {
 	}
 
     /////////////////////////// SWITCHES
+
+	static let hideArchivedReposHelp = "Automatically hide repositories which have been marked as archived"
+	class var hideArchivedRepos: Bool {
+		get { return get("HIDE_ARCHIVED_REPOS") as? Bool ?? false }
+		set { set("HIDE_ARCHIVED_REPOS", newValue) }
+	}
 
 	static let hideMenubarCountsHelp = "Hide the counts of items in each status item in the menubar"
 	class var hideMenubarCounts: Bool {

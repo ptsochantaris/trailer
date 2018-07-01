@@ -372,6 +372,7 @@
 		16B6B7C01BA3B94C006A509F /* ComplicationDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ComplicationDataSource.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16B74E471A3B4AC800410EF6 /* PrTable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PrTable.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16B94070182D136700F32061 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
+		16C2378420E923780045A548 /* Trailer 38.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 38.xcdatamodel"; sourceTree = "<group>"; };
 		16C3048B1CF4EC590017D79F /* SectionHeaderView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SectionHeaderView.xib; sourceTree = "<group>"; };
 		16C3048D1CF4ECEF0017D79F /* SectionHeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SectionHeaderView.swift; sourceTree = "<group>"; };
 		16C4ACF51EB553E20022C33B /* requestsChangesIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = requestsChangesIcon.png; sourceTree = "<group>"; };
@@ -1642,6 +1643,7 @@
 		16B3B33B1A34E990000BE6CC /* Trailer.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				16C2378420E923780045A548 /* Trailer 38.xcdatamodel */,
 				1693CC882019CAA500E3B66E /* Trailer 37.xcdatamodel */,
 				161983301ECD3FFB007ABF9E /* Trailer 36.xcdatamodel */,
 				1694008A1E7AAADF002C5DAD /* Trailer 35.xcdatamodel */,
@@ -1680,7 +1682,7 @@
 				16B3B34D1A34E990000BE6CC /* Trailer 9.xcdatamodel */,
 				16B3B34E1A34E990000BE6CC /* Trailer.xcdatamodel */,
 			);
-			currentVersion = 1693CC882019CAA500E3B66E /* Trailer 37.xcdatamodel */;
+			currentVersion = 16C2378420E923780045A548 /* Trailer 38.xcdatamodel */;
 			name = Trailer.xcdatamodeld;
 			path = ../Shared/Trailer.xcdatamodeld;
 			sourceTree = "<group>";

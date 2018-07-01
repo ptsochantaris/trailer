@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13189.4" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14113" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13189.4"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14113"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -77,17 +77,6 @@
                         <rect key="frame" x="232" y="282" width="16" height="16"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                     </progressIndicator>
-                    <button misplaced="YES" id="gVR-Cj-NL0">
-                        <rect key="frame" x="184" y="18" width="158" height="18"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                        <buttonCell key="cell" type="check" title="Track issues as well" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="prl-WF-01U">
-                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="trackIssuesSelected:" target="T32-8h-vwO" id="x4p-ad-Dna"/>
-                        </connections>
-                    </button>
                     <button verticalHuggingPriority="750" id="P8Y-rN-1UW">
                         <rect key="frame" x="129" y="53" width="222" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -125,11 +114,11 @@
                 <outlet property="buttonDescription" destination="7n1-Ex-S8r" id="J9M-9q-sPL"/>
                 <outlet property="buttonLink" destination="Mdg-0x-lIa" id="fGZ-kP-WL7"/>
                 <outlet property="completeSetup" destination="P8Y-rN-1UW" id="zzI-Ch-4Lf"/>
+                <outlet property="importButton" destination="nd0-7x-BCE" id="44Z-Cr-9T0"/>
                 <outlet property="quickstart" destination="E8e-ZD-qaj" id="LZY-6C-wLe"/>
                 <outlet property="spinner" destination="m5h-st-VqY" id="cJy-6D-8L7"/>
                 <outlet property="startAtLogin" destination="0TI-Qw-Fgk" id="1ZL-Ru-G5j"/>
                 <outlet property="tokenHolder" destination="sQa-yE-iku" id="tfM-5x-wgT"/>
-                <outlet property="trackIssues" destination="gVR-Cj-NL0" id="r97-Xx-IpL"/>
                 <outlet property="welcomeLabel" destination="i2D-aI-LRD" id="ls3-L0-oFL"/>
             </connections>
             <point key="canvasLocation" x="260" y="-358.5"/>

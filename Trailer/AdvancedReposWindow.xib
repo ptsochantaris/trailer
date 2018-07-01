@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14113" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14113"/>
         <capability name="box content view" minToolsVersion="7.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -16,21 +17,21 @@
         <window title="Advanced Repository Settings" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="QvC-M9-y7g" userLabel="Window" customClass="AdvancedReposWindow" customModule="Trailer" customModuleProvider="target">
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="196" y="240" width="638" height="341"/>
+            <rect key="contentRect" x="196" y="240" width="638" height="366"/>
             <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <view key="contentView" wantsLayer="YES" id="EiT-Mj-1SZ">
-                <rect key="frame" x="0.0" y="0.0" width="638" height="341"/>
+                <rect key="frame" x="0.0" y="0.0" width="638" height="366"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <box fixedFrame="YES" title="Watchlists and teams" translatesAutoresizingMaskIntoConstraints="NO" id="5Cb-9o-n6I">
-                        <rect key="frame" x="17" y="180" width="604" height="146"/>
+                        <rect key="frame" x="17" y="180" width="604" height="171"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <view key="contentView" id="VxC-k3-DWi">
-                            <rect key="frame" x="2" y="2" width="600" height="129"/>
+                            <rect key="frame" x="2" y="2" width="600" height="154"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WSa-Vr-bmX">
-                                    <rect key="frame" x="14" y="81" width="119" height="32"/>
+                                    <rect key="frame" x="14" y="106" width="119" height="32"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="push" title="Re-scan now" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="LYM-iR-irV">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -41,15 +42,15 @@
                                     </connections>
                                 </button>
                                 <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5ZD-lq-6Qf">
-                                    <rect key="frame" x="564" y="84" width="19" height="27"/>
+                                    <rect key="frame" x="564" y="109" width="19" height="27"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                     <stepperCell key="cell" continuous="YES" alignment="left" minValue="2" maxValue="99999" doubleValue="2" id="XP3-EO-76e"/>
                                     <connections>
                                         <action selector="newRepoCheckChanged:" target="QvC-M9-y7g" id="Y61-fd-8Xc"/>
                                     </connections>
                                 </stepper>
-                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BAK-gw-nC7">
-                                    <rect key="frame" x="354" y="89" width="207" height="17"/>
+                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BAK-gw-nC7">
+                                    <rect key="frame" x="354" y="114" width="207" height="17"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Re-scan every 2 hours" id="QBp-Kd-qzu">
                                         <font key="font" metaFont="system"/>
@@ -58,11 +59,11 @@
                                     </textFieldCell>
                                 </textField>
                                 <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="X9I-OD-5UZ">
-                                    <rect key="frame" x="135" y="91" width="16" height="16"/>
+                                    <rect key="frame" x="135" y="116" width="16" height="16"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 </progressIndicator>
                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KtQ-HN-5dD">
-                                    <rect key="frame" x="18" y="50" width="543" height="18"/>
+                                    <rect key="frame" x="18" y="75" width="543" height="18"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="check" title="Automatically add any new repos which were added to a remote watchlist" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Exf-EV-5GR">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -73,7 +74,7 @@
                                     </connections>
                                 </button>
                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jfq-yy-XJ6">
-                                    <rect key="frame" x="18" y="22" width="543" height="18"/>
+                                    <rect key="frame" x="18" y="47" width="543" height="18"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="check" title="Automatically remove any repos which were removed from a remote watchlist" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="APA-D6-Apr">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -81,6 +82,17 @@
                                     </buttonCell>
                                     <connections>
                                         <action selector="automaticallyRemoveReposSelected:" target="QvC-M9-y7g" id="gQ0-s2-tvT"/>
+                                    </connections>
+                                </button>
+                                <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Fxz-mG-rT8">
+                                    <rect key="frame" x="18" y="20" width="543" height="18"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <buttonCell key="cell" type="check" title="Automatically hide repositories that have been archived" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="6t1-GG-1BZ">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="autoHideArchivedReposSelected:" target="QvC-M9-y7g" id="amJ-0d-kTI"/>
                                     </connections>
                                 </button>
                             </subviews>
@@ -93,7 +105,7 @@
                             <rect key="frame" x="2" y="2" width="600" height="63"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Vvh-bj-1RH">
+                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Vvh-bj-1RH">
                                     <rect key="frame" x="320" y="25" width="34" height="17"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="/" id="tPb-hC-IgX">
@@ -102,7 +114,7 @@
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Erw-bZ-KSm">
+                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Erw-bZ-KSm">
                                     <rect key="frame" x="151" y="25" width="34" height="17"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="/" id="Pu3-18-CCU">
@@ -111,7 +123,7 @@
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Yzx-Ii-QaS">
+                                <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Yzx-Ii-QaS">
                                     <rect key="frame" x="346" y="21" width="150" height="22"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="repo name" drawsBackground="YES" id="ZRp-Dg-Lan">
@@ -120,7 +132,7 @@
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sDw-ab-qeW">
+                                <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sDw-ab-qeW">
                                     <rect key="frame" x="177" y="21" width="150" height="22"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="org or owner" drawsBackground="YES" id="Te1-gJ-pPh">
@@ -193,6 +205,7 @@
                 <outlet property="addButton" destination="Q1h-uY-gOT" id="ylP-jt-9vA"/>
                 <outlet property="autoAddRepos" destination="KtQ-HN-5dD" id="Ath-at-Ecb"/>
                 <outlet property="autoRemoveRepos" destination="jfq-yy-XJ6" id="jsc-zx-d8e"/>
+                <outlet property="hideArchivedRepos" destination="Fxz-mG-rT8" id="3Qe-bq-71M"/>
                 <outlet property="newRepoName" destination="Yzx-Ii-QaS" id="6bs-lq-wt6"/>
                 <outlet property="newRepoOwner" destination="sDw-ab-qeW" id="fIU-yP-LDG"/>
                 <outlet property="newRepoSpinner" destination="FkL-l2-tI4" id="T1R-IF-w8L"/>
@@ -203,7 +216,7 @@
                 <outlet property="repoCheckStepper" destination="5ZD-lq-6Qf" id="VqU-i5-E1y"/>
                 <outlet property="serverPicker" destination="2yd-xG-C2i" id="Tgu-Qe-cSk"/>
             </connections>
-            <point key="canvasLocation" x="218" y="196.5"/>
+            <point key="canvasLocation" x="218" y="209"/>
         </window>
     </objects>
 </document>

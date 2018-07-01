@@ -10,40 +10,20 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 	@IBOutlet weak var skip: UIBarButtonItem!
 	@IBOutlet weak var importer: UIBarButtonItem!
 	@IBOutlet weak var link: UIButton!
-	@IBOutlet weak var trackIssues: UIBarButtonItem!
 
 	private let newServer = ApiServer.allApiServers(in: DataManager.main).first!
 	private var token = ""
 	private var checkTimer: Timer?
-	private var showIssues = true
 	private var importExport: ImportExport!
 
     override func viewDidLoad() {
         super.viewDidLoad()
 		importExport = ImportExport(parent: self)
 		normalMode()
-		updateSettings()
     }
 
 	@IBAction func importSelected(_ sender: UIBarButtonItem) {
 		importExport.importSelected(sender: sender)
-	}
-
-	private func updateSettings() {
-		if showIssues {
-			trackIssues.title = "Should track issues as well: Yes"
-			trackIssues.tintColor = GLOBAL_TINT
-			Settings.displayPolicyForNewIssues = RepoDisplayPolicy.all.intValue
-		} else {
-			trackIssues.title = "Should track issues as well: No"
-			trackIssues.tintColor = .lightGray
-			Settings.displayPolicyForNewIssues = RepoDisplayPolicy.hide.intValue
-		}
-	}
-
-	@IBAction func willAlsoTrackSelected(_ sender: UIBarButtonItem) {
-		showIssues = !showIssues
-		updateSettings()
 	}
 
 	@IBAction func skipSelected(_ sender: UIBarButtonItem) {
@@ -64,7 +44,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 				showMessage("Testing the token failed - please check that you have pasted your token correctly", e.localizedDescription)
 				s.normalMode()
 			} else {
-				s.feedback.text = "Syncing GitHub data for the first time.\n\nThis could take a little while, please wait…"
+				s.feedback.text = "\nFetching your watchlist. This will take a moment…"
 				Settings.lastSuccessfulRefresh = nil
 				app.startRefreshIfItIsDue()
 				s.checkTimer = Timer(repeats: true, interval: 1) {
@@ -76,13 +56,13 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 
 	private func checkRefreshDone() {
 		if appIsRefreshing {
-			feedback.text = "\nSyncing GitHub data for the first time. This could take a little while, please wait…\n\n(\(API.pendingCallCount) calls remaining)"
+			feedback.text = "\nFetching your watchlist. This will take a moment…"
 		} else {
 			checkTimer = nil
 			if newServer.lastSyncSucceeded {
 				dismiss(animated: true) {
 					popupManager.masterController.resetView(becauseOfChanges: true)
-					showMessage("Setup complete!", "You can tweak options & behaviour from the settings.\n\nTrailer has read-only access to your GitHub data, so feel free to experiment, you can't damage your data or settings on GitHub.")
+					showMessage("Setup complete!", "You can now visit Trailer's settings and un-hide the repositories you wish to view. Be sure to enable only those you need, in order to keep API usage low.\n\nYou can tweak options & behaviour from the settings.\n\nTrailer has read-only access to your GitHub data, so feel free to experiment, you can't damage your data or settings on GitHub.")
 				}
 			} else {
 				showMessage("Syncing with this server failed - please check that your network connection is working and that you have pasted your token correctly", nil)
@@ -117,8 +97,6 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 		spinner.startAnimating()
 		feedback.text = "\nTesting the token…"
 
-		navigationController?.setToolbarHidden(true, animated: true)
-
 		newServer.authToken = token
 		newServer.lastSyncSucceeded = true
 	}
@@ -131,7 +109,5 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 			v.isHidden = false
 		}
 		spinner.stopAnimating()
-
-		navigationController?.setToolbarHidden(false, animated: true)
 	}
 }

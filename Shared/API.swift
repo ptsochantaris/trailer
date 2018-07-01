@@ -617,12 +617,13 @@ final class API {
 			}
 
 			let allApiServers = ApiServer.allApiServers(in: moc)
-			let totalOperations = allApiServers.count*2
+			let totalOperations = allApiServers.count * 3
 			var completionCount = 0
 
 			let completionCallback = {
 				completionCount += 1
 				if completionCount == totalOperations {
+					if Settings.hideArchivedRepos { Repo.hideArchivedRepos(in: moc) }
 					for r in DataItem.newItems(of: Repo.self, in: moc) {
 						if r.shouldSync {
 							NotificationQueue.add(type: .newRepoAnnouncement, for: r)
@@ -636,6 +637,7 @@ final class API {
 			for apiServer in allApiServers {
 				if apiServer.goodToGo {
 					syncWatchedRepos(from: apiServer, callback: completionCallback)
+					syncManuallyAddedRepos(from: apiServer, callback: completionCallback)
 					fetchUserTeams(from: apiServer, callback: completionCallback)
 				} else {
 					completionCallback()
@@ -1331,6 +1333,33 @@ final class API {
 		}
 	}
 
+	private class func syncManuallyAddedRepos(from server: ApiServer, callback: @escaping Completion) {
+		if !server.lastSyncSucceeded {
+			callback()
+			return
+		}
+
+		let repos = server.repos.filter { $0.manuallyAdded && $0.shouldSync }
+		var count = 0
+		let stepDone = { (error: Error?) in
+			if error != nil {
+				server.lastSyncSucceeded = false
+			}
+			count += 1
+			if count == repos.count {
+				callback()
+			}
+		}
+
+		if repos.count == 0 {
+			callback()
+		}
+
+		for repo in repos {
+			fetchRepo(fullName: repo.fullName ?? "", from: server, completion: stepDone)
+		}
+	}
+
 	private class func syncWatchedRepos(from server: ApiServer, callback: @escaping Completion) {
 
 		if !server.lastSyncSucceeded {
@@ -1355,8 +1384,8 @@ final class API {
 		}
 	}
 
-	class func fetchRepo(named: String, owner: String, from server: ApiServer, completion: @escaping (Error?) -> Void) {
-		let path = "\(server.apiPath ?? "")/repos/\(owner)/\(named)"
+	class func fetchRepo(fullName: String, from server: ApiServer, completion: @escaping (Error?) -> Void) {
+		let path = "\(server.apiPath ?? "")/repos/\(fullName)"
 		getData(in: path, from: server) { data, lastPage, resultCode in
 			if let repoData = data as? [AnyHashable : Any] {
 				Repo.syncRepos(from: [repoData], server: server, addNewRepos: true, manuallyAdded: true)
@@ -1366,6 +1395,10 @@ final class API {
 				completion(error)
 			}
 		}
+	}
+
+	class func fetchRepo(named: String, owner: String, from server: ApiServer, completion: @escaping (Error?) -> Void) {
+		fetchRepo(fullName: "\(owner)/\(named)", from: server, completion: completion)
 	}
 
 	private class func syncUserDetails(in moc: NSManagedObjectContext, callback: @escaping Completion) {

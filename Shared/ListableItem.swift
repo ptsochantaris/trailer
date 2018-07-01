@@ -1066,7 +1066,7 @@ class ListableItem: DataItem {
 				message = "There are no repositories that are currently visible in this category."
 			} else {
 				color = COLOR_CLASS(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)
-				message = "You have no watched repositories, please add some to your watchlist and refresh after a little while."
+				message = "You have no repositories in your watchlist, or they are all currently marked as hidden.\n\nYou can change their status from the repositories section in your settings."
 			}
 		} else if !Repo.interestedInPrs(fromServerWithId: criterion?.apiServerId) && !Repo.interestedInIssues(fromServerWithId: criterion?.apiServerId) {
 			color = COLOR_CLASS(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)

@@ -15,6 +15,7 @@ final class Repo: DataItem {
 	@NSManaged var issues: Set<Issue>
 	@NSManaged var ownerId: Int64
 	@NSManaged var manuallyAdded: Bool
+	@NSManaged var archived: Bool
 	@NSManaged var lastScannedIssueEventId: Int64
 
 	override func resetSyncState() {
@@ -49,6 +50,7 @@ final class Repo: DataItem {
 				item.fork = info["fork"] as? Bool ?? false
 				item.webUrl = info["html_url"] as? String
 				item.inaccessible = false
+				item.archived = info["archived"] as? Bool ?? false
 				item.ownerId = (info["owner"] as? [AnyHashable : Any])?["id"] as? Int64 ?? 0
 				item.manuallyAdded = manuallyAdded
 				if item.postSyncAction == PostSyncAction.isNew.rawValue {
@@ -57,6 +59,18 @@ final class Repo: DataItem {
 				}
 			}
 		}
+	}
+
+	@discardableResult
+	static func hideArchivedRepos(in moc: NSManagedObjectContext) -> Bool {
+		var madeChanges = false
+		for repo in Repo.allItems(of: Repo.self, in: moc) where repo.archived && repo.shouldSync {
+			DLog("Auto-hiding archived repo \(repo.serverId)")
+			repo.displayPolicyForPrs = RepoDisplayPolicy.hide.rawValue
+			repo.displayPolicyForIssues = RepoDisplayPolicy.hide.rawValue
+			madeChanges = true
+		}
+		return madeChanges
 	}
 
 	var isMine: Bool {

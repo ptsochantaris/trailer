@@ -185,6 +185,7 @@
         <relationship name="pullRequest" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="PullRequest" inverseName="reactions" inverseEntity="PullRequest" syncable="YES"/>
     </entity>
     <entity name="Repo" representedClassName=".Repo" syncable="YES">
+        <attribute name="archived" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="displayPolicyForIssues" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="displayPolicyForPrs" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
@@ -251,7 +252,7 @@
         <element name="PRStatus" positionX="0" positionY="0" width="128" height="195"/>
         <element name="PullRequest" positionX="0" positionY="0" width="128" height="735"/>
         <element name="Reaction" positionX="9" positionY="153" width="128" height="225"/>
-        <element name="Repo" positionX="0" positionY="0" width="128" height="345"/>
+        <element name="Repo" positionX="0" positionY="0" width="128" height="360"/>
         <element name="Review" positionX="9" positionY="153" width="128" height="195"/>
         <element name="SnoozePreset" positionX="9" positionY="153" width="128" height="225"/>
         <element name="Team" positionX="9" positionY="153" width="128" height="165"/>

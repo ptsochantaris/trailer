@@ -11,6 +11,7 @@ final class WatchlistSettingsViewController: UITableViewController, PickerViewCo
 	@IBOutlet weak var rescanCell: UITableViewCell!
 	@IBOutlet weak var autoAddCell: UITableViewCell!
 	@IBOutlet weak var autoRemoveCell: UITableViewCell!
+	@IBOutlet weak var hideArchivedCell: UITableViewCell!
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
@@ -20,12 +21,14 @@ final class WatchlistSettingsViewController: UITableViewController, PickerViewCo
 		rescanCell.detailTextLabel?.text = Settings.newRepoCheckPeriodHelp
 		autoAddCell.detailTextLabel?.text = Settings.automaticallyAddNewReposFromWatchlistHelp
 		autoRemoveCell.detailTextLabel?.text = Settings.automaticallyRemoveDeletedReposFromWatchlistHelp
+		hideArchivedCell.detailTextLabel?.text = Settings.hideArchivedReposHelp
 	}
 
 	private func updateState() {
 		rescanCell.textLabel?.text = "Re-scan every \(Int(Settings.newRepoCheckPeriod)) hours"
 		autoAddCell.accessoryType = Settings.automaticallyAddNewReposFromWatchlist ? .checkmark : .none
 		autoRemoveCell.accessoryType = Settings.automaticallyRemoveDeletedReposFromWatchlist ? .checkmark : .none
+		hideArchivedCell.accessoryType = Settings.hideArchivedRepos ? .checkmark : .none
 	}
 
 	func pickerViewController(picker: PickerViewController, didSelectIndexPath: IndexPath) {
@@ -38,8 +41,14 @@ final class WatchlistSettingsViewController: UITableViewController, PickerViewCo
 		} else {
 			if indexPath.row == 0 {
 				Settings.automaticallyAddNewReposFromWatchlist = !Settings.automaticallyAddNewReposFromWatchlist
-			} else {
+			} else if indexPath.row == 1 {
 				Settings.automaticallyRemoveDeletedReposFromWatchlist = !Settings.automaticallyRemoveDeletedReposFromWatchlist
+			} else {
+				Settings.hideArchivedRepos = !Settings.hideArchivedRepos
+				if Settings.hideArchivedRepos && Repo.hideArchivedRepos(in: DataManager.main) {
+					DataManager.saveDB()
+					DataManager.postProcessAllItems()
+				}
 			}
 			updateState()
 		}

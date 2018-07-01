@@ -1,21 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="H1p-Uh-vWS">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="H1p-Uh-vWS">
     <device id="retina5_9" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="Navigation items with more than one left or right bar item" minToolsVersion="7.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
-    <customFonts key="customFonts">
-        <array key="HelveticaNeue.ttc">
-            <string>HelveticaNeue</string>
-        </array>
-    </customFonts>
     <scenes>
         <!--Navigation Controller-->
         <scene sceneID="pY4-Hu-kfo">
@@ -109,7 +104,7 @@
                         <color key="backgroundColor" red="0.93725490196078431" green="0.93725490196078431" blue="0.95686274509803926" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <prototypes>
                             <tableViewCell contentMode="scaleToFill" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" selectionStyle="default" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" rowHeight="308" id="WCw-Qf-5nD" customClass="PRCell" customModule="Trailer" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="55.333333333333336" width="375" height="308"/>
+                                <rect key="frame" x="0.0" y="55.333333333333343" width="375" height="308"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" tableViewCell="WCw-Qf-5nD" id="Ccv-UH-bok">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="307.66666666666669"/>
@@ -425,13 +420,13 @@
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Fiy-jI-pC7">
-                                    <rect key="frame" x="18" y="61.999999999999993" width="339" height="14.666666666666664"/>
+                                    <rect key="frame" x="18" y="62.000000000000007" width="339" height="14.333333333333336"/>
                                     <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
                                     <color key="textColor" red="0.33333333333333331" green="0.33333333333333331" blue="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                     <nil key="highlightedColor"/>
                                 </label>
                                 <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" verticalCompressionResistancePriority="751" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Group for this repo's items (blank = default)" textAlignment="natural" minimumFontSize="17" clearButtonMode="always" translatesAutoresizingMaskIntoConstraints="NO" id="GRw-1p-Bu5">
-                                    <rect key="frame" x="8" y="86.666666666666671" width="359" height="30"/>
+                                    <rect key="frame" x="8" y="86.333333333333329" width="359" height="30"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                     <textInputTraits key="textInputTraits"/>
                                     <connections>
@@ -519,7 +514,7 @@
                                 </view>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="SnoozePresetElementCell" textLabel="Rgb-G7-wnE" detailTextLabel="cyj-uH-F8S" style="IBUITableViewCellStyleValue1" id="fAb-46-OYL">
-                                        <rect key="frame" x="0.0" y="55.333333333333336" width="375" height="60"/>
+                                        <rect key="frame" x="0.0" y="55.333333333333343" width="375" height="60"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="fAb-46-OYL" id="VWy-fd-6oC">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="59.666666666666664"/>
@@ -661,7 +656,7 @@
             </objects>
             <point key="canvasLocation" x="4406" y="747"/>
         </scene>
-        <!--Watchlists & Teams-->
+        <!--Advanced Repo Settings-->
         <scene sceneID="Ddp-tq-86K">
             <objects>
                 <tableViewController id="8c3-Pk-1x6" customClass="WatchlistSettingsViewController" customModule="Trailer" customModuleProvider="target" sceneMemberID="viewController">
@@ -673,7 +668,7 @@
                             <tableViewSection headerTitle="Watchlists &amp; Teams" id="vWX-Ch-PIa">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" textLabel="OVt-so-Jse" detailTextLabel="zQo-8Z-w4h" style="IBUITableViewCellStyleSubtitle" id="pVc-nc-ZeK">
-                                        <rect key="frame" x="0.0" y="55.333333333333336" width="375" height="50"/>
+                                        <rect key="frame" x="0.0" y="55.333333333333343" width="375" height="50"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="pVc-nc-ZeK" id="vja-3f-cYu">
                                             <rect key="frame" x="0.0" y="0.0" width="341" height="49.666666666666664"/>
@@ -725,7 +720,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="checkmark" indentationWidth="10" textLabel="pdq-J7-iBk" detailTextLabel="Mfh-ye-RJL" style="IBUITableViewCellStyleSubtitle" id="who-aQ-2rP">
-                                        <rect key="frame" x="0.0" y="211.33333333333334" width="375" height="50"/>
+                                        <rect key="frame" x="0.0" y="211.33333333333334" width="375" height="50.000000000000028"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="who-aQ-2rP" id="9Xg-Oc-RFT">
                                             <rect key="frame" x="0.0" y="0.0" width="335" height="49.666666666666664"/>
@@ -748,6 +743,30 @@
                                             </subviews>
                                         </tableViewCellContentView>
                                     </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="checkmark" indentationWidth="10" textLabel="tlK-MW-ZIV" detailTextLabel="Siw-3B-qy5" style="IBUITableViewCellStyleSubtitle" id="N6n-y3-0fF">
+                                        <rect key="frame" x="0.0" y="261.33333333333337" width="375" height="50"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="N6n-y3-0fF" id="vbf-95-K5G">
+                                            <rect key="frame" x="0.0" y="0.0" width="335" height="49.666666666666664"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Auto-hide archived repos" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="tlK-MW-ZIV">
+                                                    <rect key="frame" x="16" y="7.9999999999999982" width="193.66666666666666" height="20.333333333333332"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Subtitle" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Siw-3B-qy5">
+                                                    <rect key="frame" x="15.999999999999996" y="28.333333333333332" width="43.666666666666664" height="14.333333333333334"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                                    <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="calibratedWhite"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
                                 </cells>
                             </tableViewSection>
                         </sections>
@@ -756,10 +775,11 @@
                             <outlet property="delegate" destination="8c3-Pk-1x6" id="UXJ-tF-Fab"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Watchlists &amp; Teams" largeTitleDisplayMode="never" id="WOE-Nq-a7K"/>
+                    <navigationItem key="navigationItem" title="Advanced Repo Settings" largeTitleDisplayMode="never" id="WOE-Nq-a7K"/>
                     <connections>
                         <outlet property="autoAddCell" destination="Vn6-eI-MkB" id="MZT-fo-j0j"/>
                         <outlet property="autoRemoveCell" destination="who-aQ-2rP" id="JNJ-H0-Up5"/>
+                        <outlet property="hideArchivedCell" destination="N6n-y3-0fF" id="eDU-Gr-Lco"/>
                         <outlet property="rescanCell" destination="pVc-nc-ZeK" id="7Z5-vf-32s"/>
                         <segue destination="UM1-Tl-R50" kind="show" identifier="showPicker" id="BCG-Sc-dRs"/>
                     </connections>
@@ -815,14 +835,14 @@
                         <inset key="separatorInset" minX="15" minY="0.0" maxX="0.0" maxY="0.0"/>
                         <prototypes>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="default" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" rowHeight="134" id="0IG-O1-8fc" customClass="AdvancedSettingsCell" customModule="Trailer" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="55.333333333333336" width="375" height="134"/>
+                                <rect key="frame" x="0.0" y="55.333333333333343" width="375" height="134"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="0IG-O1-8fc" id="Cde-Zq-FvG">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="133.66666666666666"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="252" text="Option Title" textAlignment="natural" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ar9-3E-qS5">
-                                            <rect key="frame" x="23" y="15.000000000000002" width="278" height="20.666666666666671"/>
+                                            <rect key="frame" x="23" y="14.999999999999998" width="278" height="20.333333333333329"/>
                                             <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <nil key="highlightedColor"/>
@@ -834,7 +854,7 @@
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="naL-Ei-MIR">
-                                            <rect key="frame" x="23" y="41.666666666666664" width="328" height="75.333333333333343"/>
+                                            <rect key="frame" x="23" y="41.333333333333336" width="328" height="75.666666666666657"/>
                                             <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
                                             <color key="textColor" red="0.66666666666666663" green="0.66666666666666663" blue="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <nil key="highlightedColor"/>
@@ -1003,13 +1023,13 @@
                                         </connections>
                                     </textField>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Report syncing problems with this server" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rgY-HF-p2c">
-                                        <rect key="frame" x="11" y="438.33333333333337" width="296" height="20.666666666666686"/>
+                                        <rect key="frame" x="11" y="438.33333333333337" width="296" height="42.333333333333314"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                         <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="P3I-BS-Gwz">
-                                        <rect key="frame" x="315" y="433" width="51" height="31"/>
+                                        <rect key="frame" x="315" y="444" width="51" height="31"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="49" id="Afs-i7-6GS"/>
                                         </constraints>
@@ -1148,7 +1168,7 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
                         <color key="backgroundColor" red="0.93725490196078431" green="0.93725490196078431" blue="0.95686274509803926" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <prototypes>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" id="RgZ-W8-AF8">
-                                <rect key="frame" x="0.0" y="55.333333333333336" width="375" height="44"/>
+                                <rect key="frame" x="0.0" y="55.333333333333343" width="375" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="RgZ-W8-AF8" id="dyt-lc-eEA">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
@@ -1202,7 +1222,7 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="top" showsHorizontalScrollIndicator="NO" editable="NO" textAlignment="center" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cun-Cw-EIG">
                                 <rect key="frame" x="0.0" y="259.66666666666674" width="375" height="469.33333333333326"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <mutableString key="text">Copyright (c) 2014-2018 Paul Tsochantaris
+                                <string key="text">Copyright (c) 2014-2018 Paul Tsochantaris
 Parts copyright (c) 2013-2014 HouseTrip Ltd.
 
 Released under the terms of the MIT licence:
@@ -1212,7 +1232,7 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</mutableString>
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</string>
                                 <color key="textColor" red="0.33333333333333331" green="0.33333333333333331" blue="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="13"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
@@ -1335,13 +1355,7 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="jAS-Fw-Cfy"/>
                     </view>
-                    <toolbarItems>
-                        <barButtonItem title="Should track issues as well: Yes" id="Pyo-9m-17L">
-                            <connections>
-                                <action selector="willAlsoTrackSelected:" destination="ZQR-qN-jZ1" id="TOU-aS-vMC"/>
-                            </connections>
-                        </barButtonItem>
-                    </toolbarItems>
+                    <toolbarItems/>
                     <navigationItem key="navigationItem" title="Welcome!" id="cOg-SY-AQN">
                         <barButtonItem key="leftBarButtonItem" title="Skip" id="TOi-p0-I4W">
                             <connections>
@@ -1354,7 +1368,6 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
                             </connections>
                         </barButtonItem>
                     </navigationItem>
-                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="feedback" destination="wfK-es-Q2m" id="Wiw-fn-QpE"/>
                         <outlet property="importer" destination="1Y7-oO-3ta" id="Qq5-fx-kU5"/>
@@ -1362,7 +1375,6 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
                         <outlet property="skip" destination="TOi-p0-I4W" id="nI2-ml-HQT"/>
                         <outlet property="spinner" destination="5rH-Zj-pcO" id="o2t-tw-WNl"/>
                         <outlet property="testButton" destination="51v-nc-Xtf" id="emm-LZ-CaT"/>
-                        <outlet property="trackIssues" destination="Pyo-9m-17L" id="5P8-PR-mOP"/>
                         <outletCollection property="otherViews" destination="kTk-WK-GaF" collectionClass="NSMutableArray" id="0wu-hQ-SRt"/>
                         <outletCollection property="otherViews" destination="EED-i1-JTF" collectionClass="NSMutableArray" id="xJM-ot-hfL"/>
                         <outletCollection property="otherViews" destination="v1a-vB-r8u" collectionClass="NSMutableArray" id="VLf-up-I0J"/>
@@ -1404,6 +1416,7 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
                     <tabBarItem key="tabBarItem" title="Repos" image="repos" id="GbY-BF-5eA"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="zTJ-3E-UPj">
+                        <rect key="frame" x="0.0" y="44" width="375" height="96"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
@@ -1426,6 +1439,7 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
                     <tabBarItem key="tabBarItem" title="About" image="about" id="21w-d1-k6l"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="TL4-K7-73x">
+                        <rect key="frame" x="0.0" y="44" width="375" height="96"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
@@ -1450,7 +1464,7 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
                                 <color key="backgroundColor" red="0.93725490199999995" green="0.93725490199999995" blue="0.95686274510000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="SnoozeOptionCell" textLabel="YJ6-rr-HXe" style="IBUITableViewCellStyleDefault" id="HIG-LR-lK8">
-                                        <rect key="frame" x="0.0" y="55.333333333333336" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="55.333333333333343" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="HIG-LR-lK8" id="5Uu-zi-AHz">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
@@ -1513,6 +1527,7 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
                     <tabBarItem key="tabBarItem" title="Advanced" image="advanced" id="byu-eU-4PM"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="DjA-kY-8aC">
+                        <rect key="frame" x="0.0" y="44" width="375" height="96"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
@@ -1531,6 +1546,7 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
                     <tabBarItem key="tabBarItem" title="Servers" image="servers" id="4P2-5Y-Yda"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="uZE-n9-f8D">
+                        <rect key="frame" x="0.0" y="44" width="375" height="96"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
@@ -1552,6 +1568,9 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
+                    <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="L1I-vk-Oec">
+                        <autoresizingMask key="autoresizingMask"/>
+                    </toolbar>
                     <connections>
                         <segue destination="ZQR-qN-jZ1" kind="relationship" relationship="rootViewController" id="Dh6-6j-cjp"/>
                     </connections>
@@ -1567,6 +1586,7 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
                     <tabBarItem key="tabBarItem" title="Snoozing" image="snoozing" id="UzS-WF-WqY"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="IIN-0r-xoJ">
+                        <rect key="frame" x="0.0" y="44" width="375" height="96"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
@@ -1596,7 +1616,7 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
         <image name="snoozing" width="28" height="28"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="jwG-rd-TEN"/>
+        <segue reference="BCG-Sc-dRs"/>
     </inferredMetricsTieBreakers>
     <color key="tintColor" red="0.20270904898643494" green="0.43045499920845032" blue="0.71786797046661377" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
 </document>

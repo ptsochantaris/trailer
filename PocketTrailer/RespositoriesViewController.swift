@@ -61,7 +61,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 		let r = UIAlertAction(title: "Refresh teams & watchlists", style: .destructive) { a in
 			self.refreshList()
 		}
-		let w = UIAlertAction(title: "Watchlist & team options…", style: .default) { a in
+		let w = UIAlertAction(title: "Advanced repo settings…", style: .default) { a in
 			self.performSegue(withIdentifier: "showWatchlistSettings", sender: self)
 		}
 		let c = UIAlertAction(title: "Custom repos…", style: .default) { a in

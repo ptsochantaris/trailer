@@ -8,6 +8,7 @@ final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 
 	@IBOutlet weak var autoAddRepos: NSButton!
 	@IBOutlet weak var autoRemoveRepos: NSButton!
+	@IBOutlet weak var hideArchivedRepos: NSButton!
 
 	weak var prefs: PreferencesWindow?
 
@@ -21,6 +22,7 @@ final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 		repoCheckStepper.floatValue = Settings.newRepoCheckPeriod
 		autoAddRepos.integerValue = Settings.automaticallyAddNewReposFromWatchlist ? 1 : 0
 		autoRemoveRepos.integerValue = Settings.automaticallyRemoveDeletedReposFromWatchlist ? 1 : 0
+		hideArchivedRepos.integerValue = Settings.hideArchivedRepos ? 1 : 0
 
 		newRepoCheckChanged(nil)
 
@@ -88,6 +90,16 @@ final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 
 	@IBAction func refreshReposSelected(_ sender: NSButton?) {
 		prefs?.refreshRepos()
+	}
+
+	@IBAction func autoHideArchivedReposSelected(_ sender: NSButton) {
+		Settings.hideArchivedRepos = sender.integerValue == 1
+		if Settings.hideArchivedRepos && Repo.hideArchivedRepos(in: DataManager.main) {
+			prefs?.projectsTable.reloadData()
+			updateRemovableRepos()
+			app.updateAllMenus()
+			DataManager.saveDB()
+		}
 	}
 
 	@IBAction func automaticallyAddNewReposSelected(_ sender: NSButton) {
