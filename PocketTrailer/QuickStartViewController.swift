@@ -62,7 +62,9 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 			if newServer.lastSyncSucceeded {
 				dismiss(animated: true) {
 					popupManager.masterController.resetView(becauseOfChanges: true)
-					showMessage("Setup complete!", "You can now visit Trailer's settings and un-hide the repositories you wish to view. Be sure to enable only those you need, in order to keep API usage low.\n\nYou can tweak options & behaviour from the settings.\n\nTrailer has read-only access to your GitHub data, so feel free to experiment, you can't damage your data or settings on GitHub.")
+					Settings.lastPreferencesTabSelected = 1 // repos
+					popupManager.masterController.performSegue(withIdentifier: "showPreferences", sender: self)
+					showMessage("Setup complete!", "This is the 'Repos' tab that displays your current GitHub watchlist. By default everything is hidden. Be sure to enable only the repos you need, in order to keep API (and data & battery) usage low.\n\nYou can tweak options & behaviour from the 'Advanced' tab. When you're done, just close this settings view from the top-left.\n\nTrailer has read-only access to your GitHub data, so feel free to experiment, you can't damage your data or settings on GitHub.")
 				}
 			} else {
 				showMessage("Syncing with this server failed - please check that your network connection is working and that you have pasted your token correctly", nil)

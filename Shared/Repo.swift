@@ -177,28 +177,12 @@ final class Repo: DataItem {
 
 	class func reposFiltered(by filter: String?) -> [Repo] {
 		let f = NSFetchRequest<Repo>(entityName: "Repo")
-		f.returnsObjectsAsFaults = true
+		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false
 		if let filterText = filter, !filterText.isEmpty {
 			f.predicate = NSPredicate(format: "fullName contains [cd] %@", filterText)
 		}
-		f.sortDescriptors = [
-			NSSortDescriptor(key: "fork", ascending: true),
-			NSSortDescriptor(key: "fullName", ascending: true)
-		]
 		return try! DataManager.main.fetch(f)
-	}
-
-	class func countParentRepos(filter: String?) -> Int {
-		let f = NSFetchRequest<Repo>(entityName: "Repo")
-		f.includesSubentities = false
-		
-		if let fi = filter, !fi.isEmpty {
-			f.predicate = NSPredicate(format: "fork == NO and fullName contains [cd] %@", fi)
-		} else {
-			f.predicate = NSPredicate(format: "fork == NO")
-		}
-		return try! DataManager.main.count(for: f)
 	}
 
 	func markItemsAsUpdated(with numbers: Set<Int64>, reasons: Set<String>) {

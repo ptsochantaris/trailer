@@ -17,26 +17,17 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	private var repoCache: [Repo]?
-	private var parentCountCache: Int?
-
-	private var parentCount: Int {
-		if let parentCountCache = parentCountCache {
-			return parentCountCache
-		}
-		parentCountCache = Repo.countParentRepos(filter: repoFilter.stringValue)
-		return parentCountCache!
-	}
 
 	private var repos: [Repo] {
 		if let repoCache = repoCache {
 			return repoCache
 		}
-		repoCache = Repo.reposFiltered(by: repoFilter.stringValue)
+		repoCache = ((Repo.reposFiltered(by: repoFilter.stringValue) as NSArray)
+			.sortedArray(using: projectsTable.sortDescriptors) as! [Repo])
 		return repoCache!
 	}
 
 	func reloadRepositories() {
-		parentCountCache = nil
 		repoCache = nil
 		projectsTable.reloadData()
 	}
@@ -207,6 +198,10 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 		let selectedIndex = min(tabs.numberOfTabViewItems-1, Settings.lastPreferencesTabSelectedOSX)
 		tabs.selectTabViewItem(tabs.tabViewItem(at: selectedIndex))
+
+		if projectsTable.sortDescriptors.count == 0, let firstSortDescriptor = projectsTable.tableColumns.first?.sortDescriptorPrototype {
+			projectsTable.sortDescriptors = [firstSortDescriptor]
+		}
 
 		let n = NotificationCenter.default
 		n.addObserver(self, selector: #selector(updateApiTable), name: ApiUsageUpdateNotification, object: nil)
@@ -827,9 +822,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		var affectedRepos = [Repo]()
 		if selectedRows.count > 1 {
 			for row in selectedRows {
-				if !tableView(projectsTable, isGroupRow: row) {
-					affectedRepos.append(repo(at: row))
-				}
+				affectedRepos.append(repos[row])
 			}
 		} else {
 			affectedRepos = repos
@@ -1358,6 +1351,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			} else if obj===repoFilter {
 				reloadRepositories()
 				updateAllItemSettingButtons()
+
 			} else if obj===statusTermsField {
 				let existingTokens = Settings.statusFilteringTerms
 				let newTokens = statusTermsField.objectValue as! [String]
@@ -1403,92 +1397,66 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
-	private func repo(at row: Int) -> Repo {
-
-		var r = row
-		if r > parentCount {
-			r -= 1
-		}
-		return repos[r-1]
-	}
-
-	func tableView(_ tv: NSTableView, shouldSelectRow row: Int) -> Bool {
-		return !tableView(tv, isGroupRow: row)
-	}
-
 	func tableView(_ tv: NSTableView, willDisplayCell c: Any, for tableColumn: NSTableColumn?, row: Int) {
+		guard let tid = tableColumn?.identifier.rawValue else { return }
 		let cell = c as! NSCell
 		if tv === projectsTable {
-			if tableColumn?.identifier.rawValue == "repos" {
-				if tableView(tv, isGroupRow: row) {
-					cell.title = row==0 ? "Parent Repositories" : "Forked Repositories"
-					cell.isEnabled = false
-				} else {
-					cell.isEnabled = true
-					let r = repo(at: row)
-					let repoName = S(r.fullName)
-					let title = r.inaccessible ? "\(repoName) (inaccessible)" : repoName
-					let textColor = (row == tv.selectedRow) ? .selectedControlTextColor : (r.shouldSync ? .textColor : NSColor.textColor.withAlphaComponent(0.4))
-					cell.attributedStringValue = NSAttributedString(string: title, attributes: [NSAttributedStringKey.foregroundColor: textColor])
+			if tid == "repos" {
+				cell.isEnabled = true
+				let r = repos[row]
+				let repoName = S(r.fullName)
+				let title = r.inaccessible ? "\(repoName) (inaccessible)" : repoName
+				let textColor = (row == tv.selectedRow) ? .selectedControlTextColor : (r.shouldSync ? .textColor : NSColor.textColor.withAlphaComponent(0.4))
+				cell.attributedStringValue = NSAttributedString(string: title, attributes: [NSAttributedStringKey.foregroundColor: textColor])
+			} else if let menuCell = cell as? NSTextFieldCell {
+				if tableColumn?.identifier.rawValue == "group" {
+					let r = repos[row]
+					menuCell.isEnabled = true
+					menuCell.placeholderString = "None"
+					menuCell.stringValue = S(r.groupLabel)
 				}
-			} else {
-				if let menuCell = cell as? NSTextFieldCell {
-					if tableColumn?.identifier.rawValue == "group" {
-						if tableView(tv, isGroupRow: row) {
-							menuCell.stringValue = ""
-							menuCell.placeholderString = nil
-							menuCell.isEnabled = false
-						} else {
-							let r = repo(at: row)
-							menuCell.isEnabled = true
-							menuCell.placeholderString = "None"
-							menuCell.stringValue = S(r.groupLabel)
-						}
-					}
-				} else if let menuCell = cell as? NSPopUpButtonCell {
-					menuCell.removeAllItems()
-					if tableView(tv, isGroupRow: row) {
-						menuCell.selectItem(at: -1)
-						menuCell.isEnabled = false
-						menuCell.arrowPosition = .noArrow
-					} else {
-						let r = repo(at: row)
-						menuCell.isEnabled = true
-						menuCell.arrowPosition = .arrowAtBottom
+			} else if let menuCell = cell as? NSPopUpButtonCell {
+				menuCell.removeAllItems()
+				let r = repos[row]
+				menuCell.isEnabled = true
+				menuCell.arrowPosition = .arrowAtBottom
 
-						var count = 0
-						let fontSize = NSFont.systemFontSize(for: .small)
-						if tableColumn?.identifier.rawValue == "hide" {
-							for policy in RepoHidingPolicy.policies {
-								let m = NSMenuItem()
-								m.attributedTitle = NSAttributedString(string: policy.name, attributes: [
-									NSAttributedStringKey.font: count==0 ? NSFont.systemFont(ofSize: fontSize) : NSFont.boldSystemFont(ofSize: fontSize),
-									NSAttributedStringKey.foregroundColor: policy.color,
-									])
-								menuCell.menu?.addItem(m)
-								count += 1
-							}
-							menuCell.selectItem(at: Int(r.itemHidingPolicy))
-						} else {
-							for policy in RepoDisplayPolicy.policies {
-								let m = NSMenuItem()
-								m.attributedTitle = NSAttributedString(string: policy.name, attributes: [
-									NSAttributedStringKey.font: count==0 ? NSFont.systemFont(ofSize: fontSize) : NSFont.boldSystemFont(ofSize: fontSize),
-									NSAttributedStringKey.foregroundColor: policy.color,
-									])
-								menuCell.menu?.addItem(m)
-								count += 1
-							}
-							let selectedIndex = Int(tableColumn?.identifier.rawValue == "prs" ? r.displayPolicyForPrs : r.displayPolicyForIssues)
-							menuCell.selectItem(at: selectedIndex)
-						}
+				var count = 0
+				let fontSize = NSFont.systemFontSize(for: .small)
+				if tid == "hide" {
+					for policy in RepoHidingPolicy.policies {
+						let m = NSMenuItem()
+						m.attributedTitle = NSAttributedString(string: policy.name, attributes: [
+							NSAttributedStringKey.font: count==0 ? NSFont.systemFont(ofSize: fontSize) : NSFont.boldSystemFont(ofSize: fontSize),
+							NSAttributedStringKey.foregroundColor: policy.color,
+							])
+						menuCell.menu?.addItem(m)
+						count += 1
 					}
+					menuCell.selectItem(at: Int(r.itemHidingPolicy))
+				} else {
+					for policy in RepoDisplayPolicy.policies {
+						let m = NSMenuItem()
+						m.attributedTitle = NSAttributedString(string: policy.name, attributes: [
+							NSAttributedStringKey.font: count==0 ? NSFont.systemFont(ofSize: fontSize) : NSFont.boldSystemFont(ofSize: fontSize),
+							NSAttributedStringKey.foregroundColor: policy.color,
+							])
+						menuCell.menu?.addItem(m)
+						count += 1
+					}
+					let selectedIndex = Int(tableColumn?.identifier.rawValue == "prs" ? r.displayPolicyForPrs : r.displayPolicyForIssues)
+					menuCell.selectItem(at: selectedIndex)
+				}
+			} else if let forkButton = cell as? NSButtonCell {
+				if tid == "fork" {
+					let r = repos[row]
+					forkButton.integerValue = r.fork ? 1 : 0
 				}
 			}
 		} else if tv == serverList {
 			let allServers = ApiServer.allApiServers(in: DataManager.main)
 			let apiServer = allServers[row]
-			if tableColumn?.identifier.rawValue == "server" {
+			if tid == "server" {
 				cell.title = S(apiServer.label)
 				let tc = c as! NSTextFieldCell
 				if apiServer.lastSyncSucceeded {
@@ -1514,17 +1482,13 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
-	func tableView(_ tableView: NSTableView, isGroupRow row: Int) -> Bool {
-		if tableView === projectsTable {
-			return (row == 0 || row == parentCount + 1)
-		} else {
-			return false
-		}
+	func tableView(_ tableView: NSTableView, sortDescriptorsDidChange oldDescriptors: [NSSortDescriptor]) {
+		reloadRepositories()
 	}
 
 	func numberOfRows(in tableView: NSTableView) -> Int {
 		if tableView === projectsTable {
-			return repos.count + 2
+			return repos.count
 		} else if tableView === serverList {
 			return ApiServer.countApiServers(in: DataManager.main)
 		} else if tableView === snoozePresetsList {
@@ -1539,26 +1503,24 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	func tableView(_ tv: NSTableView, setObjectValue object: Any?, for tableColumn: NSTableColumn?, row: Int) {
 		if tv === projectsTable {
-			if !tableView(tv, isGroupRow: row) {
-				let r = repo(at: row)
-				if tableColumn?.identifier.rawValue == "group" {
-					let g = S(object as? String)
-					r.groupLabel = g.isEmpty ? nil : g
-					serversDirty = true
-					deferredUpdateTimer.push()
-				} else if let index = object as? Int64 {
-					if tableColumn?.identifier.rawValue == "prs" {
-						r.displayPolicyForPrs = index
-					} else if tableColumn?.identifier.rawValue == "issues" {
-						r.displayPolicyForIssues = index
-					} else if tableColumn?.identifier.rawValue == "hide" {
-						r.itemHidingPolicy = index
-					}
-					if index != RepoDisplayPolicy.hide.rawValue {
-						r.resetSyncState()
-					}
-					updateDisplayIssuesSetting()
+			let r = repos[row]
+			if tableColumn?.identifier.rawValue == "group" {
+				let g = S(object as? String)
+				r.groupLabel = g.isEmpty ? nil : g
+				serversDirty = true
+				deferredUpdateTimer.push()
+			} else if let index = object as? Int64 {
+				if tableColumn?.identifier.rawValue == "prs" {
+					r.displayPolicyForPrs = index
+				} else if tableColumn?.identifier.rawValue == "issues" {
+					r.displayPolicyForIssues = index
+				} else if tableColumn?.identifier.rawValue == "hide" {
+					r.itemHidingPolicy = index
 				}
+				if index != RepoDisplayPolicy.hide.rawValue {
+					r.resetSyncState()
+				}
+				updateDisplayIssuesSetting()
 			}
 		}
 	}

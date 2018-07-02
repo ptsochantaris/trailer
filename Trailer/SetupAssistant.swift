@@ -88,9 +88,12 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 
 			if newServer.lastSyncSucceeded {
 				close()
+
+				app.showPreferencesWindow(andSelect: 1)
+
 				let alert = NSAlert()
 				alert.messageText = "Setup complete!"
-				alert.informativeText = "You can now visit Trailer's settings and un-hide the repositories you wish to view. Be sure to enable only those you need, in order to keep API usage low.\n\nYou can tweak options & behaviour from the settings.\n\nTrailer has read-only access to your GitHub data, so feel free to experiment, you can't damage your data or settings on GitHub."
+				alert.informativeText = "This tab contains your watchlist, with view settings for each repository. Be sure to enable only the repos you need, in order to keep API usage low. Trailer will load data from the active repositories once you close the preferences window.\n\nYou can tweak options & behaviour from the other tabs.\n\nTrailer has read-only access to your GitHub data, so feel free to experiment, you can't damage your data or settings on GitHub."
 				alert.addButton(withTitle: "OK")
 				alert.runModal()
 			} else {
