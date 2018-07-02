@@ -63,7 +63,7 @@ final class CustomReposViewController: UIViewController, UITableViewDelegate, UI
 	@IBOutlet weak var addButton: UIBarButtonItem!
 	@IBAction func addSelected(_ sender: Any) {
 		
-		let v = UIAlertController(title: "Add Custom Repository", message: "Please paste the full URL of the repository you wish to add", preferredStyle: .alert)
+		let v = UIAlertController(title: "Add Custom Repository", message: "Please paste the full URL of the repository you wish to add.\n\nTo add all repos for a given user or org, user a star (*) as the name of the repo instead.", preferredStyle: .alert)
 		v.addTextField { field in
 			field.placeholder = "http://github.com/owner_or_org/repo_name"
 		}
@@ -102,31 +102,54 @@ final class CustomReposViewController: UIViewController, UITableViewDelegate, UI
 		let ownerName = segments[count-2]
 		let repoName = segments[count-1]
 		if ownerName.isEmpty || repoName.isEmpty {
-			showMessage("Path not found", "We can't locate a valid repo path in the URL provided. Please ensure it ends with the owner and repo name components (…/owner/repo)")
+			showMessage("Path not found", "We can't locate a valid repo path in the URL provided. Please ensure it ends with the owner and repo name components (…/owner/repo) or a star for all repos from this org or user.")
 			return
 		}
 		
 		let a = UIActivityIndicatorView(activityIndicatorStyle: .gray)
 		a.startAnimating()
 		addButton.customView = a
-		
-		API.fetchRepo(named: repoName, owner: ownerName, from: server) { error in
-			a.stopAnimating()
-			self.addButton.customView = nil
-			
-			if let e = error {
-				showMessage("Fetching Repository Information Failed", e.localizedDescription)
-			} else {
-				if Settings.displayPolicyForNewPrs == Int(RepoDisplayPolicy.hide.rawValue) && Settings.displayPolicyForNewIssues == Int(RepoDisplayPolicy.hide.rawValue) {
-					showMessage("Repository added", "WARNING: While the repository has been added successfully to your list, your default settings specify that it should be hidden. You probably want to change its visibility in the main repositories list.")
+
+		if repoName == "*" {
+			API.fetchAllRepos(owner: ownerName, from: server) { error in
+				a.stopAnimating()
+				self.addButton.customView = nil
+
+				if let e = error {
+					showMessage("Fetching Repository Information Failed", e.localizedDescription)
 				} else {
-					showMessage("Repository added", "The new repository has been added to your local list. Trailer will refresh after you close preferences to fetch any items from it.")
+					let addedCount = Repo.newItems(of: Repo.self, in: DataManager.main).count
+					if Settings.displayPolicyForNewPrs == Int(RepoDisplayPolicy.hide.rawValue) && Settings.displayPolicyForNewIssues == Int(RepoDisplayPolicy.hide.rawValue) {
+						showMessage("Repositories added", "WARNING: While \(addedCount) repositories have been added successfully to your list, your default settings specify that they should be hidden. You probably want to change their visibility in the main repositories list.")
+					} else {
+						showMessage("Repositories added", "\(addedCount) new repositories have been added to your local list. Trailer will refresh after you close preferences to fetch any items from them.")
+					}
+					DataManager.saveDB()
+					atNextEvent {
+						popupManager.masterController.updateStatus(becauseOfChanges: true)
+					}
+					self.updateRepos()
 				}
-				DataManager.saveDB()
-				atNextEvent {
-					popupManager.masterController.updateStatus(becauseOfChanges: true)
+			}
+		} else {
+			API.fetchRepo(named: repoName, owner: ownerName, from: server) { error in
+				a.stopAnimating()
+				self.addButton.customView = nil
+
+				if let e = error {
+					showMessage("Fetching Repository Information Failed", e.localizedDescription)
+				} else {
+					if Settings.displayPolicyForNewPrs == Int(RepoDisplayPolicy.hide.rawValue) && Settings.displayPolicyForNewIssues == Int(RepoDisplayPolicy.hide.rawValue) {
+						showMessage("Repository added", "WARNING: While the repository has been added successfully to your list, your default settings specify that it should be hidden. You probably want to change its visibility in the main repositories list.")
+					} else {
+						showMessage("Repository added", "The new repository has been added to your local list. Trailer will refresh after you close preferences to fetch any items from it.")
+					}
+					DataManager.saveDB()
+					atNextEvent {
+						popupManager.masterController.updateStatus(becauseOfChanges: true)
+					}
+					self.updateRepos()
 				}
-				self.updateRepos()
 			}
 		}
 	}

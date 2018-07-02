@@ -17,14 +17,14 @@
         <window title="Advanced Repository Settings" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="QvC-M9-y7g" userLabel="Window" customClass="AdvancedReposWindow" customModule="Trailer" customModuleProvider="target">
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="196" y="240" width="638" height="366"/>
+            <rect key="contentRect" x="196" y="240" width="638" height="387"/>
             <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <view key="contentView" wantsLayer="YES" id="EiT-Mj-1SZ">
-                <rect key="frame" x="0.0" y="0.0" width="638" height="366"/>
+                <rect key="frame" x="0.0" y="0.0" width="638" height="387"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <box fixedFrame="YES" title="Watchlists and teams" translatesAutoresizingMaskIntoConstraints="NO" id="5Cb-9o-n6I">
-                        <rect key="frame" x="17" y="180" width="604" height="171"/>
+                        <rect key="frame" x="17" y="201" width="604" height="171"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <view key="contentView" id="VxC-k3-DWi">
                             <rect key="frame" x="2" y="2" width="600" height="154"/>
@@ -99,14 +99,14 @@
                         </view>
                     </box>
                     <box fixedFrame="YES" title="Add a custom repository" translatesAutoresizingMaskIntoConstraints="NO" id="R0A-lE-VTt">
-                        <rect key="frame" x="17" y="96" width="604" height="80"/>
+                        <rect key="frame" x="17" y="96" width="604" height="101"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <view key="contentView" id="zZ4-Xe-BBh">
-                            <rect key="frame" x="2" y="2" width="600" height="63"/>
+                            <rect key="frame" x="2" y="2" width="600" height="84"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Vvh-bj-1RH">
-                                    <rect key="frame" x="320" y="25" width="34" height="17"/>
+                                    <rect key="frame" x="320" y="46" width="34" height="17"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="/" id="tPb-hC-IgX">
                                         <font key="font" metaFont="system"/>
@@ -115,7 +115,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Erw-bZ-KSm">
-                                    <rect key="frame" x="151" y="25" width="34" height="17"/>
+                                    <rect key="frame" x="151" y="46" width="34" height="17"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="/" id="Pu3-18-CCU">
                                         <font key="font" metaFont="system"/>
@@ -124,7 +124,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Yzx-Ii-QaS">
-                                    <rect key="frame" x="346" y="21" width="150" height="22"/>
+                                    <rect key="frame" x="346" y="41" width="150" height="22"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="repo name" drawsBackground="YES" id="ZRp-Dg-Lan">
                                         <font key="font" metaFont="system"/>
@@ -133,7 +133,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sDw-ab-qeW">
-                                    <rect key="frame" x="177" y="21" width="150" height="22"/>
+                                    <rect key="frame" x="177" y="41" width="150" height="22"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="org or owner" drawsBackground="YES" id="Te1-gJ-pPh">
                                         <font key="font" metaFont="system"/>
@@ -142,7 +142,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2yd-xG-C2i">
-                                    <rect key="frame" x="18" y="18" width="143" height="26"/>
+                                    <rect key="frame" x="18" y="38" width="143" height="26"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                     <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="fp7-RG-tJa">
                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -151,7 +151,7 @@
                                     </popUpButtonCell>
                                 </popUpButton>
                                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Q1h-uY-gOT">
-                                    <rect key="frame" x="498" y="14" width="65" height="32"/>
+                                    <rect key="frame" x="498" y="35" width="65" height="32"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="push" title="Add" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="9qw-Qv-ckX">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -162,9 +162,18 @@
                                     </connections>
                                 </button>
                                 <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="FkL-l2-tI4">
-                                    <rect key="frame" x="569" y="24" width="16" height="16"/>
+                                    <rect key="frame" x="569" y="45" width="16" height="16"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 </progressIndicator>
+                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eTz-ld-cu0">
+                                    <rect key="frame" x="168" y="19" width="391" height="14"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Enter a star (*) as a repo name to add all repositories from this org/owner." id="f2i-oz-ksw">
+                                        <font key="font" metaFont="smallSystem"/>
+                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                    </textFieldCell>
+                                </textField>
                             </subviews>
                         </view>
                     </box>
@@ -216,7 +225,7 @@
                 <outlet property="repoCheckStepper" destination="5ZD-lq-6Qf" id="VqU-i5-E1y"/>
                 <outlet property="serverPicker" destination="2yd-xG-C2i" id="Tgu-Qe-cSk"/>
             </connections>
-            <point key="canvasLocation" x="218" y="209"/>
+            <point key="canvasLocation" x="218" y="219.5"/>
         </window>
     </objects>
 </document>
