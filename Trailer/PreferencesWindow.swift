@@ -12,12 +12,37 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		API.refreshesSinceLastReactionsCheck.removeAll()
 		Settings.lastSuccessfulRefresh = nil
 		lastRepoCheck = .distantPast
-		projectsTable.reloadData()
+		reloadRepositories()
 		deferredUpdateTimer.push()
 	}
 
+	private var repoCache: [Repo]?
+	private var parentCountCache: Int?
+
+	private var parentCount: Int {
+		if let parentCountCache = parentCountCache {
+			return parentCountCache
+		}
+		parentCountCache = Repo.countParentRepos(filter: repoFilter.stringValue)
+		return parentCountCache!
+	}
+
+	private var repos: [Repo] {
+		if let repoCache = repoCache {
+			return repoCache
+		}
+		repoCache = Repo.reposFiltered(by: repoFilter.stringValue)
+		return repoCache!
+	}
+
+	func reloadRepositories() {
+		parentCountCache = nil
+		repoCache = nil
+		projectsTable.reloadData()
+	}
+
 	// Preferences window
-	@IBOutlet weak var projectsTable: NSTableView!
+	@IBOutlet private weak var projectsTable: NSTableView!
 	@IBOutlet weak var versionNumber: NSTextField!
 	@IBOutlet weak var launchAtStartup: NSButton!
 	@IBOutlet weak var refreshDurationLabel: NSTextField!
@@ -546,7 +571,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			projectsTable.isEnabled = true
 			allPrsSetting.isEnabled = true
 			allIssuesSetting.isEnabled = true
-			projectsTable.reloadData()
+			reloadRepositories()
 		}
 		advancedReposWindow?.updateActivity()
 	}
@@ -807,7 +832,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 				}
 			}
 		} else {
-			affectedRepos = Repo.reposFiltered(by: repoFilter.stringValue)
+			affectedRepos = repos
 		}
 		return affectedRepos
 	}
@@ -820,7 +845,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			r.displayPolicyForPrs = index
 			if index != RepoDisplayPolicy.hide.rawValue { r.resetSyncState() }
 		}
-		projectsTable.reloadData()
+		reloadRepositories()
 		sender.selectItem(at: 0)
 		updateDisplayIssuesSetting()
 	}
@@ -833,7 +858,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			r.displayPolicyForIssues = index
 			if index != RepoDisplayPolicy.hide.rawValue { r.resetSyncState() }
 		}
-		projectsTable.reloadData()
+		reloadRepositories()
 		sender.selectItem(at: 0)
 		updateDisplayIssuesSetting()
 	}
@@ -845,7 +870,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		for r in affectedReposFromSelection {
 			r.itemHidingPolicy = index
 		}
-		projectsTable.reloadData()
+		reloadRepositories()
 		sender.selectItem(at: 0)
 		updateDisplayIssuesSetting()
 	}
@@ -1331,7 +1356,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 					reset()
 				}
 			} else if obj===repoFilter {
-				projectsTable.reloadData()
+				reloadRepositories()
 				updateAllItemSettingButtons()
 			} else if obj===statusTermsField {
 				let existingTokens = Settings.statusFilteringTerms
@@ -1379,13 +1404,12 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	private func repo(at row: Int) -> Repo {
-		let parentCount = Repo.countParentRepos(filter: repoFilter.stringValue)
+
 		var r = row
 		if r > parentCount {
 			r -= 1
 		}
-		let filteredRepos = Repo.reposFiltered(by: repoFilter.stringValue)
-		return filteredRepos[r-1]
+		return repos[r-1]
 	}
 
 	func tableView(_ tv: NSTableView, shouldSelectRow row: Int) -> Bool {
@@ -1492,7 +1516,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	func tableView(_ tableView: NSTableView, isGroupRow row: Int) -> Bool {
 		if tableView === projectsTable {
-			return (row == 0 || row == Repo.countParentRepos(filter: repoFilter.stringValue) + 1)
+			return (row == 0 || row == parentCount + 1)
 		} else {
 			return false
 		}
@@ -1500,7 +1524,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	func numberOfRows(in tableView: NSTableView) -> Int {
 		if tableView === projectsTable {
-			return Repo.reposFiltered(by: repoFilter.stringValue).count + 2
+			return repos.count + 2
 		} else if tableView === serverList {
 			return ApiServer.countApiServers(in: DataManager.main)
 		} else if tableView === snoozePresetsList {

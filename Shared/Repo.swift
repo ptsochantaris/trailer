@@ -177,7 +177,7 @@ final class Repo: DataItem {
 
 	class func reposFiltered(by filter: String?) -> [Repo] {
 		let f = NSFetchRequest<Repo>(entityName: "Repo")
-		f.returnsObjectsAsFaults = false
+		f.returnsObjectsAsFaults = true
 		f.includesSubentities = false
 		if let filterText = filter, !filterText.isEmpty {
 			f.predicate = NSPredicate(format: "fullName contains [cd] %@", filterText)

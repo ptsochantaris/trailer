@@ -690,7 +690,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		preferencesDirty = false
 		preferencesWindow?.updateActivity()
 		DataManager.saveDB()
-		preferencesWindow?.projectsTable.reloadData()
+		preferencesWindow?.reloadRepositories()
 		checkApiUsage()
 		DataManager.sendNotificationsIndexAndSave()
 		DLog("Refresh done")

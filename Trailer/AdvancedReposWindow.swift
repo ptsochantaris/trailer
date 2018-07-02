@@ -95,7 +95,7 @@ final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 	@IBAction func autoHideArchivedReposSelected(_ sender: NSButton) {
 		Settings.hideArchivedRepos = sender.integerValue == 1
 		if Settings.hideArchivedRepos && Repo.hideArchivedRepos(in: DataManager.main) {
-			prefs?.projectsTable.reloadData()
+			prefs?.reloadRepositories()
 			updateRemovableRepos()
 			app.updateAllMenus()
 			DataManager.saveDB()
@@ -173,7 +173,7 @@ final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 						alert.informativeText = "The new repositories have been added to your local list. Trailer will refresh after you close preferences to fetch any items from them."
 					}
 					DataManager.saveDB()
-					self.prefs?.projectsTable.reloadData()
+					self.prefs?.reloadRepositories()
 					self.updateRemovableRepos()
 					app.updateAllMenus()
 				}
@@ -200,7 +200,7 @@ final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 						alert.informativeText = "The new repository has been added to your local list. Trailer will refresh after you close preferences to fetch any items from it."
 					}
 					DataManager.saveDB()
-					self.prefs?.projectsTable.reloadData()
+					self.prefs?.reloadRepositories()
 					self.updateRemovableRepos()
 					app.updateAllMenus()
 				}
@@ -216,7 +216,7 @@ final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 		guard let repo = removeRepoList.selectedItem?.representedObject as? Repo else { return }
 		DataManager.main.delete(repo)
 		DataManager.saveDB()
-		prefs?.projectsTable.reloadData()
+		prefs?.reloadRepositories()
 		updateRemovableRepos()
 		app.updateAllMenus()
 	}
