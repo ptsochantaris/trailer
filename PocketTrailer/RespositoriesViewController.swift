@@ -8,9 +8,9 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 	private var searchTimer: PopTimer!
 	private var _fetchedResultsController: NSFetchedResultsController<Repo>?
 
-	@IBOutlet weak var actionsButton: UIBarButtonItem!
+	@IBOutlet private weak var actionsButton: UIBarButtonItem!
 
-	@IBAction func done(_ sender: UIBarButtonItem) {
+	@IBAction private func done(_ sender: UIBarButtonItem) {
 		if preferencesDirty {
 			app.startRefresh()
 		}
@@ -57,7 +57,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 		navigationController?.setToolbarHidden(true, animated: animated)
 	}
 
-	@IBAction func actionSelected(_ sender: UIBarButtonItem) {
+	@IBAction private func actionSelected(_ sender: UIBarButtonItem) {
 		let r = UIAlertAction(title: "Refresh teams & watchlists", style: .destructive) { a in
 			self.refreshList()
 		}
@@ -77,7 +77,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 		present(v, animated: true)
 	}
 
-	@IBAction func setAllPrsSelected(_ sender: UIBarButtonItem) {
+	@IBAction private func setAllPrsSelected(_ sender: UIBarButtonItem) {
 		if let ip = tableView.indexPathForSelectedRow {
 			tableView.deselectRow(at: ip, animated: false)
 		}

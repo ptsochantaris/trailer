@@ -3,15 +3,15 @@ import UIKit
 
 final class SnoozingEditorViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIPickerViewDataSource, UIPickerViewDelegate {
 
-	@IBOutlet weak var table: UITableView!
-	@IBOutlet weak var descriptionLabel: UILabel!
+	@IBOutlet private weak var table: UITableView!
+	@IBOutlet private weak var descriptionLabel: UILabel!
 
 	var snoozeItem: SnoozePreset?
 	var isNew = false
 
-	@IBOutlet weak var typeSelector: UISegmentedControl!
+	@IBOutlet private weak var typeSelector: UISegmentedControl!
 
-	@IBAction func deleteSelected(_ sender: UIBarButtonItem) {
+	@IBAction private func deleteSelected(_ sender: UIBarButtonItem) {
 
 		if let s = snoozeItem {
 			let appliedCount = s.appliedToIssues.count + s.appliedToPullRequests.count
@@ -56,7 +56,7 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 		_ = navigationController?.popViewController(animated: true)
 	}
 
-	@IBAction func upSelected(_ sender: UIBarButtonItem) {
+	@IBAction private func upSelected(_ sender: UIBarButtonItem) {
 		if let this = snoozeItem {
 			let all = SnoozePreset.allSnoozePresets(in: DataManager.main)
 			if let index = all.index(of: this), index > 0 {
@@ -73,7 +73,7 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 		DataManager.saveDB()
 	}
 
-	@IBAction func downSelected(_ sender: UIBarButtonItem) {
+	@IBAction private func downSelected(_ sender: UIBarButtonItem) {
 		if let this = snoozeItem {
 			let all = SnoozePreset.allSnoozePresets(in: DataManager.main)
 			if let index = all.index(of: this), index < all.count-1 {
@@ -85,7 +85,7 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 		}
 	}
 
-	@IBAction func typeSelectorChanged(_ sender: UISegmentedControl) {
+	@IBAction private func typeSelectorChanged(_ sender: UISegmentedControl) {
 		updateView()
 	}
 
@@ -271,10 +271,10 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 
 	////////////////////////// Picker
 
-	@IBOutlet weak var pickerBottom: NSLayoutConstraint!
-	@IBOutlet weak var pickerShield: UIView!
-	@IBOutlet weak var pickerNavBar: UINavigationBar!
-	@IBOutlet weak var picker: UIPickerView!
+	@IBOutlet private weak var pickerBottom: NSLayoutConstraint!
+	@IBOutlet private weak var pickerShield: UIView!
+	@IBOutlet private weak var pickerNavBar: UINavigationBar!
+	@IBOutlet private weak var picker: UIPickerView!
 
 	private enum SnoozePickerMode {
 		case Day
@@ -298,11 +298,11 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 		showPicker()
 	}
 
-	@IBAction func pickerCancelSelected(_ sender: UIBarButtonItem) {
+	@IBAction private func pickerCancelSelected(_ sender: UIBarButtonItem) {
 		hidePickerAnimated(animate: true)
 	}
 
-	@IBAction func pickerDoneSelected(_ sender: UIBarButtonItem) {
+	@IBAction private func pickerDoneSelected(_ sender: UIBarButtonItem) {
 		if let p = pickerMode {
 			let s = picker.selectedRow(inComponent: 0)
 			switch p {

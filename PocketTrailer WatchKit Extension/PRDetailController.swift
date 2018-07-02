@@ -4,8 +4,8 @@ import Foundation
 
 final class PRDetailController: CommonController {
 
-	@IBOutlet weak var table: WKInterfaceTable!
-	@IBOutlet var statusLabel: WKInterfaceLabel!
+	@IBOutlet private weak var table: WKInterfaceTable!
+	@IBOutlet private weak var statusLabel: WKInterfaceLabel!
 
 	private var rowControllers = [PopulatableRow]()
 	private var itemId: String!
@@ -32,16 +32,16 @@ final class PRDetailController: CommonController {
 		}
 	}
 
-	@IBAction func refreshSelected() {
+	@IBAction private func refreshSelected() {
 		show(status: "Starting refresh", hideTable: true)
 		requestData(command: "refresh")
 	}
 
-	@IBAction func markAllReadSelected() {
+	@IBAction private func markAllReadSelected() {
 		requestData(command: "markItemsRead")
 	}
 
-	@IBAction func openOnDeviceSelected() {
+	@IBAction private func openOnDeviceSelected() {
 		requestData(command: "openItem")
 	}
 

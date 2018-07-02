@@ -4,8 +4,8 @@ import WatchConnectivity
 
 final class PRListController: CommonController {
 
-	@IBOutlet weak var table: WKInterfaceTable!
-	@IBOutlet var statusLabel: WKInterfaceLabel!
+	@IBOutlet private weak var table: WKInterfaceTable!
+	@IBOutlet private weak var statusLabel: WKInterfaceLabel!
 
 	private var sectionIndex: Int64!
 	private var type: String!
@@ -157,13 +157,13 @@ final class PRListController: CommonController {
 		}
 	}
 
-	@IBAction func markAllReadSelected() {
+	@IBAction private func markAllReadSelected() {
 		loading = false
 		show(status: "Marking items as read", hideTable: true)
 		requestData(command: "markItemsRead")
 	}
 
-	@IBAction func refreshSelected() {
+	@IBAction private func refreshSelected() {
 		loading = false
 		show(status: "Starting refresh", hideTable: true)
 		requestData(command: "refresh")

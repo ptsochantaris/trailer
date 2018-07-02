@@ -3,13 +3,13 @@ import SafariServices
 
 final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 
-	@IBOutlet weak var testButton: UIButton!
-	@IBOutlet var otherViews: [UIView]!
-	@IBOutlet weak var spinner: UIActivityIndicatorView!
-	@IBOutlet weak var feedback: UILabel!
-	@IBOutlet weak var skip: UIBarButtonItem!
-	@IBOutlet weak var importer: UIBarButtonItem!
-	@IBOutlet weak var link: UIButton!
+	@IBOutlet private weak var testButton: UIButton!
+	@IBOutlet private var otherViews: [UIView]!
+	@IBOutlet private weak var spinner: UIActivityIndicatorView!
+	@IBOutlet private weak var feedback: UILabel!
+	@IBOutlet private weak var skip: UIBarButtonItem!
+	@IBOutlet private weak var importer: UIBarButtonItem!
+	@IBOutlet private weak var link: UIButton!
 
 	private let newServer = ApiServer.allApiServers(in: DataManager.main).first!
 	private var token = ""
@@ -22,21 +22,21 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 		normalMode()
     }
 
-	@IBAction func importSelected(_ sender: UIBarButtonItem) {
+	@IBAction private func importSelected(_ sender: UIBarButtonItem) {
 		importExport.importSelected(sender: sender)
 	}
 
-	@IBAction func skipSelected(_ sender: UIBarButtonItem) {
+	@IBAction private func skipSelected(_ sender: UIBarButtonItem) {
 		dismiss(animated: true)
 	}
 
-	@IBAction func openGitHubSelected(_ sender: UIButton) {
+	@IBAction private func openGitHubSelected(_ sender: UIButton) {
 		let s = SFSafariViewController(url: URL(string: "https://github.com/settings/tokens/new")!)
 		s.view.tintColor = self.view.tintColor
 		self.present(s, animated: true)
 	}
 
-	@IBAction func testSelected(_ sender: UIButton) {
+	@IBAction private func testSelected(_ sender: UIButton) {
 		testMode()
 		API.testApi(to: newServer) { [weak self] error in
 			guard let s = self else { return }

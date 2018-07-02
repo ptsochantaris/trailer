@@ -3,7 +3,7 @@ import UIKit
 
 final class SnoozingViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, PickerViewControllerDelegate {
 
-	@IBOutlet weak var table: UITableView!
+	@IBOutlet private weak var table: UITableView!
 
 	private var settingsChangedTimer: PopTimer!
 
@@ -16,12 +16,12 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 		}
 	}
 
-	@IBAction func done(_ sender: UIBarButtonItem) {
+	@IBAction private func done(_ sender: UIBarButtonItem) {
 		if preferencesDirty { app.startRefresh() }
 		dismiss(animated: true)
 	}
 
-	@IBAction func addNew(_ sender: UIBarButtonItem) {
+	@IBAction private func addNew(_ sender: UIBarButtonItem) {
 		performSegue(withIdentifier: "showSnoozeEditor", sender: nil)
 	}
 

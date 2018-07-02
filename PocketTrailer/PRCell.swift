@@ -20,13 +20,13 @@ final class PRCell: UITableViewCell {
 	private var failedToLoadImage: String?
 	private var waitingForImageInPath: String?
 
-	@IBOutlet weak var _image: UIImageView!
-	@IBOutlet weak var _title: UILabel!
-	@IBOutlet weak var _description: UILabel!
-	@IBOutlet weak var _statuses: UILabel!
-	@IBOutlet weak var statusToAvatarDistance: NSLayoutConstraint!
-	@IBOutlet weak var statusToDescriptionDistance: NSLayoutConstraint!
-	@IBOutlet weak var statusToBottomDistance: NSLayoutConstraint!
+	@IBOutlet private weak var _image: UIImageView!
+	@IBOutlet private weak var _title: UILabel!
+	@IBOutlet private weak var _description: UILabel!
+	@IBOutlet private weak var _statuses: UILabel!
+	@IBOutlet private weak var statusToAvatarDistance: NSLayoutConstraint!
+	@IBOutlet private weak var statusToDescriptionDistance: NSLayoutConstraint!
+	@IBOutlet private weak var statusToBottomDistance: NSLayoutConstraint!
 
 	override func awakeFromNib() {
 

@@ -1,15 +1,15 @@
 
 final class SetupAssistant: NSWindow, NSWindowDelegate {
 
-	@IBOutlet weak var quickstart: NSTextField!
-	@IBOutlet weak var buttonLink: NSButton!
-	@IBOutlet weak var buttonDescription: NSTextField!
-	@IBOutlet weak var tokenHolder: NSTextField!
-	@IBOutlet weak var startAtLogin: NSButton!
-	@IBOutlet weak var completeSetup: NSButton!
-	@IBOutlet weak var spinner: NSProgressIndicator!
-	@IBOutlet weak var welcomeLabel: NSTextField!
-	@IBOutlet weak var importButton: NSButton!
+	@IBOutlet private weak var quickstart: NSTextField!
+	@IBOutlet private weak var buttonLink: NSButton!
+	@IBOutlet private weak var buttonDescription: NSTextField!
+	@IBOutlet private weak var tokenHolder: NSTextField!
+	@IBOutlet private weak var startAtLogin: NSButton!
+	@IBOutlet private weak var completeSetup: NSButton!
+	@IBOutlet private weak var spinner: NSProgressIndicator!
+	@IBOutlet private weak var welcomeLabel: NSTextField!
+	@IBOutlet private weak var importButton: NSButton!
 
 	private let newServer = ApiServer.allApiServers(in: DataManager.main).first!
 	private var checkTimer: Timer?
@@ -32,7 +32,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 		return spinner.isHidden
 	}
 
-	@IBAction func createTokenSelected(_ sender: NSButton) {
+	@IBAction private func createTokenSelected(_ sender: NSButton) {
 		let address = "https://github.com/settings/tokens/new"
 		openLink(URL(string: address)!)
 	}
@@ -43,11 +43,11 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 		}
 	}
 
-	@IBAction func startAtLoginSelected(_ sender: NSButton) {
+	@IBAction private func startAtLoginSelected(_ sender: NSButton) {
 		StartupLaunch.setLaunchOnLogin(startAtLogin.integerValue==1)
 	}
 
-	@IBAction func testAndCompleteSelected(_ sender: NSButton) {
+	@IBAction private func testAndCompleteSelected(_ sender: NSButton) {
 
 		let token = tokenHolder.stringValue.trim
 		if token.isEmpty {
@@ -132,7 +132,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 		newServer.lastSyncSucceeded = true
 	}
 	
-	@IBAction func importSettingsSelected(_ sender: NSButton) {
+	@IBAction private func importSettingsSelected(_ sender: NSButton) {
 		let o = NSOpenPanel()
 		o.title = "Import Settings From File…"
 		o.prompt = "Import"

@@ -3,31 +3,31 @@ import WatchKit
 
 class SummaryRow: NSObject, PopulatableRow {
 
-	@IBOutlet weak var totalCount: WKInterfaceLabel!
-	@IBOutlet var totalGroup: WKInterfaceGroup!
+	@IBOutlet private weak var totalCount: WKInterfaceLabel!
+	@IBOutlet private weak var totalGroup: WKInterfaceGroup!
 
-	@IBOutlet weak var myCount: WKInterfaceLabel!
-	@IBOutlet weak var myGroup: WKInterfaceGroup!
+	@IBOutlet private weak var myCount: WKInterfaceLabel!
+	@IBOutlet private weak var myGroup: WKInterfaceGroup!
 
-	@IBOutlet weak var mentionedCount: WKInterfaceLabel!
-	@IBOutlet weak var mentionedGroup: WKInterfaceGroup!
+	@IBOutlet private weak var mentionedCount: WKInterfaceLabel!
+	@IBOutlet private weak var mentionedGroup: WKInterfaceGroup!
 
-	@IBOutlet weak var participatedCount: WKInterfaceLabel!
-	@IBOutlet weak var participatedGroup: WKInterfaceGroup!
+	@IBOutlet private weak var participatedCount: WKInterfaceLabel!
+	@IBOutlet private weak var participatedGroup: WKInterfaceGroup!
 
-	@IBOutlet weak var otherCount: WKInterfaceLabel!
-	@IBOutlet weak var otherGroup: WKInterfaceGroup!
+	@IBOutlet private weak var otherCount: WKInterfaceLabel!
+	@IBOutlet private weak var otherGroup: WKInterfaceGroup!
 
-	@IBOutlet weak var snoozingCount: WKInterfaceLabel!
-	@IBOutlet weak var snoozingGroup: WKInterfaceGroup!
+	@IBOutlet private weak var snoozingCount: WKInterfaceLabel!
+	@IBOutlet private weak var snoozingGroup: WKInterfaceGroup!
 
-	@IBOutlet weak var unreadCount: WKInterfaceLabel!
-	@IBOutlet weak var unreadGroup: WKInterfaceGroup!
+	@IBOutlet private weak var unreadCount: WKInterfaceLabel!
+	@IBOutlet private weak var unreadGroup: WKInterfaceGroup!
 
-	@IBOutlet weak var lastUpdate: WKInterfaceLabel!
+	@IBOutlet private weak var lastUpdate: WKInterfaceLabel!
 
-	@IBOutlet weak var prIcon: WKInterfaceImage!
-	@IBOutlet weak var issueIcon: WKInterfaceImage!
+	@IBOutlet private weak var prIcon: WKInterfaceImage!
+	@IBOutlet private weak var issueIcon: WKInterfaceImage!
 
 	var rowType: String {
 		return String(describing: type(of: self))

@@ -316,7 +316,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	private var showHelp = true
 	private var importExport: ImportExport!
 
-	@IBAction func done(_ sender: UIBarButtonItem) {
+	@IBAction private func done(_ sender: UIBarButtonItem) {
 		if preferencesDirty { app.startRefresh() }
 		dismiss(animated: true)
 	}

@@ -6,8 +6,8 @@ final class SectionController: CommonController {
 
 	////////////////////// List
 
-	@IBOutlet weak var table: WKInterfaceTable!
-	@IBOutlet weak var statusLabel: WKInterfaceLabel!
+	@IBOutlet private weak var table: WKInterfaceTable!
+	@IBOutlet private weak var statusLabel: WKInterfaceLabel!
 
 	private var rowControllers = [PopulatableRow]()
 
@@ -22,22 +22,22 @@ final class SectionController: CommonController {
 		return false
 	}
 
-	@IBAction func clearMergedSelected() {
+	@IBAction private func clearMergedSelected() {
 		show(status: "Clearing merged", hideTable: true)
 		requestData(command: "clearAllMerged")
 	}
 
-	@IBAction func clearClosedSelected() {
+	@IBAction private func clearClosedSelected() {
 		show(status: "Clearing closed", hideTable: true)
 		requestData(command: "clearAllClosed")
 	}
 
-	@IBAction func markAllReadSelected() {
+	@IBAction private func markAllReadSelected() {
 		show(status: "Marking all as read", hideTable: true)
 		requestData(command: "markEverythingRead")
 	}
 
-	@IBAction func refreshSelected() {
+	@IBAction private func refreshSelected() {
 		show(status: "Starting refresh", hideTable: true)
 		requestData(command: "refresh")
 	}

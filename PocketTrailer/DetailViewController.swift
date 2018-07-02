@@ -3,9 +3,9 @@ import CoreData
 
 final class DetailViewController: UIViewController, WKNavigationDelegate {
 	
-	@IBOutlet weak var spinner: UIActivityIndicatorView!
-	@IBOutlet weak var statusLabel: UILabel!
-	@IBOutlet weak var webView: WKWebView!
+	@IBOutlet private weak var spinner: UIActivityIndicatorView!
+	@IBOutlet private weak var statusLabel: UILabel!
+	@IBOutlet private weak var webView: WKWebView!
 
 	private var alwaysRequestDesktopSite = false
 	

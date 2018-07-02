@@ -8,8 +8,8 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
 	private var allIssuesIndex = -1
 	private var allHidingIndex = -1
 
-	@IBOutlet weak var groupField: UITextField!
-	@IBOutlet weak var repoNameTitle: UILabel!
+	@IBOutlet private weak var groupField: UITextField!
+	@IBOutlet private weak var repoNameTitle: UILabel!
 
 	private var settingsChangedTimer: PopTimer!
 

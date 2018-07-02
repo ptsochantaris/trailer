@@ -43,149 +43,149 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	// Preferences window
 	@IBOutlet private weak var projectsTable: NSTableView!
-	@IBOutlet weak var versionNumber: NSTextField!
-	@IBOutlet weak var launchAtStartup: NSButton!
-	@IBOutlet weak var refreshDurationLabel: NSTextField!
-	@IBOutlet weak var refreshDurationStepper: NSStepper!
-	@IBOutlet weak var hideUncommentedPrs: NSButton!
-	@IBOutlet weak var repoFilter: NSTextField!
-	@IBOutlet weak var showAllComments: NSButton!
-	@IBOutlet weak var sortingOrder: NSButton!
-	@IBOutlet weak var sortModeSelect: NSPopUpButton!
-	@IBOutlet weak var includeRepositoriesInFiltering: NSButton!
-	@IBOutlet weak var groupByRepo: NSButton!
-	@IBOutlet weak var countOnlyListedItems: NSButton!
-	@IBOutlet weak var checkForUpdatesAutomatically: NSButton!
-	@IBOutlet weak var checkForUpdatesLabel: NSTextField!
-	@IBOutlet weak var checkForUpdatesSelector: NSStepper!
-	@IBOutlet weak var openPrAtFirstUnreadComment: NSButton!
-	@IBOutlet weak var logActivityToConsole: NSButton!
-	@IBOutlet weak var commentAuthorBlacklist: NSTokenField!
+	@IBOutlet private weak var versionNumber: NSTextField!
+	@IBOutlet private weak var launchAtStartup: NSButton!
+	@IBOutlet private weak var refreshDurationLabel: NSTextField!
+	@IBOutlet private weak var refreshDurationStepper: NSStepper!
+	@IBOutlet private weak var hideUncommentedPrs: NSButton!
+	@IBOutlet private weak var repoFilter: NSTextField!
+	@IBOutlet private weak var showAllComments: NSButton!
+	@IBOutlet private weak var sortingOrder: NSButton!
+	@IBOutlet private weak var sortModeSelect: NSPopUpButton!
+	@IBOutlet private weak var includeRepositoriesInFiltering: NSButton!
+	@IBOutlet private weak var groupByRepo: NSButton!
+	@IBOutlet private weak var countOnlyListedItems: NSButton!
+	@IBOutlet private weak var checkForUpdatesAutomatically: NSButton!
+	@IBOutlet private weak var checkForUpdatesLabel: NSTextField!
+	@IBOutlet private weak var checkForUpdatesSelector: NSStepper!
+	@IBOutlet private weak var openPrAtFirstUnreadComment: NSButton!
+	@IBOutlet private weak var logActivityToConsole: NSButton!
+	@IBOutlet private weak var commentAuthorBlacklist: NSTokenField!
 
 	// History
-	@IBOutlet weak var prMergedPolicy: NSPopUpButton!
-	@IBOutlet weak var prClosedPolicy: NSPopUpButton!
-	@IBOutlet weak var dontKeepPrsMergedByMe: NSButton!
-	@IBOutlet weak var dontConfirmRemoveAllMerged: NSButton!
-	@IBOutlet weak var dontConfirmRemoveAllClosed: NSButton!
-	@IBOutlet weak var removeNotificationsWhenItemIsRemoved: NSButton!
+	@IBOutlet private weak var prMergedPolicy: NSPopUpButton!
+	@IBOutlet private weak var prClosedPolicy: NSPopUpButton!
+	@IBOutlet private weak var dontKeepPrsMergedByMe: NSButton!
+	@IBOutlet private weak var dontConfirmRemoveAllMerged: NSButton!
+	@IBOutlet private weak var dontConfirmRemoveAllClosed: NSButton!
+	@IBOutlet private weak var removeNotificationsWhenItemIsRemoved: NSButton!
 
 	// Statuses
-	@IBOutlet weak var showStatusItems: NSButton!
-	@IBOutlet weak var makeStatusItemsSelectable: NSButton!
-	@IBOutlet weak var statusItemRescanLabel: NSTextField!
-	@IBOutlet weak var statusItemRefreshCounter: NSStepper!
-	@IBOutlet weak var statusItemsRefreshNote: NSTextField!
-	@IBOutlet weak var notifyOnStatusUpdates: NSButton!
-	@IBOutlet weak var notifyOnStatusUpdatesForAllPrs: NSButton!
-	@IBOutlet weak var statusTermMenu: NSPopUpButton!
-	@IBOutlet weak var statusTermsField: NSTokenField!
-	@IBOutlet weak var hidePrsThatDontPass: NSButton!
-	@IBOutlet weak var hidePrsThatDontPassOnlyInAll: NSButton!
-	@IBOutlet weak var showStatusesForAll: NSButton!
+	@IBOutlet private weak var showStatusItems: NSButton!
+	@IBOutlet private weak var makeStatusItemsSelectable: NSButton!
+	@IBOutlet private weak var statusItemRescanLabel: NSTextField!
+	@IBOutlet private weak var statusItemRefreshCounter: NSStepper!
+	@IBOutlet private weak var statusItemsRefreshNote: NSTextField!
+	@IBOutlet private weak var notifyOnStatusUpdates: NSButton!
+	@IBOutlet private weak var notifyOnStatusUpdatesForAllPrs: NSButton!
+	@IBOutlet private weak var statusTermMenu: NSPopUpButton!
+	@IBOutlet private weak var statusTermsField: NSTokenField!
+	@IBOutlet private weak var hidePrsThatDontPass: NSButton!
+	@IBOutlet private weak var hidePrsThatDontPassOnlyInAll: NSButton!
+	@IBOutlet private weak var showStatusesForAll: NSButton!
 
 	// Comments
-	@IBOutlet weak var disableAllCommentNotifications: NSButton!
-	@IBOutlet weak var assumeCommentsBeforeMineAreRead: NSButton!
-	@IBOutlet weak var newMentionMovePolicy: NSPopUpButton!
-	@IBOutlet weak var teamMentionMovePolicy: NSPopUpButton!
-	@IBOutlet weak var newItemInOwnedRepoMovePolicy: NSPopUpButton!
-	@IBOutlet weak var highlightItemsWithNewCommits: NSButton!
+	@IBOutlet private weak var disableAllCommentNotifications: NSButton!
+	@IBOutlet private weak var assumeCommentsBeforeMineAreRead: NSButton!
+	@IBOutlet private weak var newMentionMovePolicy: NSPopUpButton!
+	@IBOutlet private weak var teamMentionMovePolicy: NSPopUpButton!
+	@IBOutlet private weak var newItemInOwnedRepoMovePolicy: NSPopUpButton!
+	@IBOutlet private weak var highlightItemsWithNewCommits: NSButton!
 
 	// Display
-	@IBOutlet weak var includeLabelsInFiltering: NSButton!
-	@IBOutlet weak var includeTitlesInFiltering: NSButton!
-	@IBOutlet weak var includeMilestonesInFiltering: NSButton!
-	@IBOutlet weak var includeAssigneeNamesInFiltering: NSButton!
-	@IBOutlet weak var includeStatusesInFiltering: NSButton!
-	@IBOutlet weak var grayOutWhenRefreshing: NSButton!
-	@IBOutlet weak var assignedPrHandlingPolicy: NSPopUpButton!
-	@IBOutlet weak var includeServersInFiltering: NSButton!
-	@IBOutlet weak var includeUsersInFiltering: NSButton!
-	@IBOutlet weak var includeNumbersInFiltering: NSButton!
-	@IBOutlet weak var refreshItemsLabel: NSTextField!
-	@IBOutlet weak var showCreationDates: NSButton!
-	@IBOutlet weak var hideAvatars: NSButton!
-	@IBOutlet weak var showSeparateApiServersInMenu: NSButton!
-	@IBOutlet weak var displayRepositoryNames: NSButton!
-	@IBOutlet weak var hideCountsOnMenubar: NSButton!
-	@IBOutlet weak var showLabels: NSButton!
-	@IBOutlet weak var showRelativeDates: NSButton!
-	@IBOutlet weak var displayMilestones: NSButton!
+	@IBOutlet private weak var includeLabelsInFiltering: NSButton!
+	@IBOutlet private weak var includeTitlesInFiltering: NSButton!
+	@IBOutlet private weak var includeMilestonesInFiltering: NSButton!
+	@IBOutlet private weak var includeAssigneeNamesInFiltering: NSButton!
+	@IBOutlet private weak var includeStatusesInFiltering: NSButton!
+	@IBOutlet private weak var grayOutWhenRefreshing: NSButton!
+	@IBOutlet private weak var assignedPrHandlingPolicy: NSPopUpButton!
+	@IBOutlet private weak var includeServersInFiltering: NSButton!
+	@IBOutlet private weak var includeUsersInFiltering: NSButton!
+	@IBOutlet private weak var includeNumbersInFiltering: NSButton!
+	@IBOutlet private weak var refreshItemsLabel: NSTextField!
+	@IBOutlet private weak var showCreationDates: NSButton!
+	@IBOutlet private weak var hideAvatars: NSButton!
+	@IBOutlet private weak var showSeparateApiServersInMenu: NSButton!
+	@IBOutlet private weak var displayRepositoryNames: NSButton!
+	@IBOutlet private weak var hideCountsOnMenubar: NSButton!
+	@IBOutlet private weak var showLabels: NSButton!
+	@IBOutlet private weak var showRelativeDates: NSButton!
+	@IBOutlet private weak var displayMilestones: NSButton!
 
 	// Servers
-	@IBOutlet weak var serverList: NSTableView!
-	@IBOutlet weak var apiServerName: NSTextField!
-	@IBOutlet weak var apiServerApiPath: NSTextField!
-	@IBOutlet weak var apiServerWebPath: NSTextField!
-	@IBOutlet weak var apiServerAuthToken: NSTextField!
-	@IBOutlet weak var apiServerSelectedBox: NSBox!
-	@IBOutlet weak var apiServerTestButton: NSButton!
-	@IBOutlet weak var apiServerDeleteButton: NSButton!
-	@IBOutlet weak var apiServerReportError: NSButton!
+	@IBOutlet private weak var serverList: NSTableView!
+	@IBOutlet private weak var apiServerName: NSTextField!
+	@IBOutlet private weak var apiServerApiPath: NSTextField!
+	@IBOutlet private weak var apiServerWebPath: NSTextField!
+	@IBOutlet private weak var apiServerAuthToken: NSTextField!
+	@IBOutlet private weak var apiServerSelectedBox: NSBox!
+	@IBOutlet private weak var apiServerTestButton: NSButton!
+	@IBOutlet private weak var apiServerDeleteButton: NSButton!
+	@IBOutlet private weak var apiServerReportError: NSButton!
 
 	// Snoozing
-	@IBOutlet weak var snoozePresetsList: NSTableView!
-	@IBOutlet weak var snoozeTypeDuration: NSButton!
-	@IBOutlet weak var snoozeTypeDateTime: NSButton!
-	@IBOutlet weak var snoozeDurationDays: NSPopUpButton!
-	@IBOutlet weak var snoozeDurationHours: NSPopUpButton!
-	@IBOutlet weak var snoozeDurationMinutes: NSPopUpButton!
-	@IBOutlet weak var snoozeDateTimeDay: NSPopUpButton!
-	@IBOutlet weak var snoozeDateTimeHour: NSPopUpButton!
-	@IBOutlet weak var snoozeDateTimeMinute: NSPopUpButton!
-	@IBOutlet weak var snoozeDeletePreset: NSButton!
-	@IBOutlet weak var snoozeUp: NSButton!
-	@IBOutlet weak var snoozeDown: NSButton!
-	@IBOutlet weak var snoozeWakeOnComment: NSButton!
-	@IBOutlet weak var snoozeWakeOnMention: NSButton!
-	@IBOutlet weak var snoozeWakeOnStatusUpdate: NSButton!
-	@IBOutlet weak var hideSnoozedItems: NSButton!
-	@IBOutlet weak var snoozeWakeLabel: NSTextField!
+	@IBOutlet private weak var snoozePresetsList: NSTableView!
+	@IBOutlet private weak var snoozeTypeDuration: NSButton!
+	@IBOutlet private weak var snoozeTypeDateTime: NSButton!
+	@IBOutlet private weak var snoozeDurationDays: NSPopUpButton!
+	@IBOutlet private weak var snoozeDurationHours: NSPopUpButton!
+	@IBOutlet private weak var snoozeDurationMinutes: NSPopUpButton!
+	@IBOutlet private weak var snoozeDateTimeDay: NSPopUpButton!
+	@IBOutlet private weak var snoozeDateTimeHour: NSPopUpButton!
+	@IBOutlet private weak var snoozeDateTimeMinute: NSPopUpButton!
+	@IBOutlet private weak var snoozeDeletePreset: NSButton!
+	@IBOutlet private weak var snoozeUp: NSButton!
+	@IBOutlet private weak var snoozeDown: NSButton!
+	@IBOutlet private weak var snoozeWakeOnComment: NSButton!
+	@IBOutlet private weak var snoozeWakeOnMention: NSButton!
+	@IBOutlet private weak var snoozeWakeOnStatusUpdate: NSButton!
+	@IBOutlet private weak var hideSnoozedItems: NSButton!
+	@IBOutlet private weak var snoozeWakeLabel: NSTextField!
 
-	@IBOutlet weak var autoSnoozeSelector: NSStepper!
-	@IBOutlet weak var autoSnoozeLabel: NSTextField!
+	@IBOutlet private weak var autoSnoozeSelector: NSStepper!
+	@IBOutlet private weak var autoSnoozeLabel: NSTextField!
 
 	// Misc
-	@IBOutlet weak var repeatLastExportAutomatically: NSButton!
-	@IBOutlet weak var lastExportReport: NSTextField!
-	@IBOutlet weak var dumpApiResponsesToConsole: NSButton!
-	@IBOutlet weak var defaultOpenApp: NSTextField!
-	@IBOutlet weak var defaultOpenLinks: NSTextField!
+	@IBOutlet private weak var repeatLastExportAutomatically: NSButton!
+	@IBOutlet private weak var lastExportReport: NSTextField!
+	@IBOutlet private weak var dumpApiResponsesToConsole: NSButton!
+	@IBOutlet private weak var defaultOpenApp: NSTextField!
+	@IBOutlet private weak var defaultOpenLinks: NSTextField!
 
 	// Keyboard
-	@IBOutlet weak var hotkeyEnable: NSButton!
-	@IBOutlet weak var hotkeyCommandModifier: NSButton!
-	@IBOutlet weak var hotkeyOptionModifier: NSButton!
-	@IBOutlet weak var hotkeyShiftModifier: NSButton!
-	@IBOutlet weak var hotkeyLetter: NSPopUpButton!
-	@IBOutlet weak var hotKeyHelp: NSTextField!
-	@IBOutlet weak var hotKeyContainer: NSBox!
-	@IBOutlet weak var hotkeyControlModifier: NSButton!
+	@IBOutlet private weak var hotkeyEnable: NSButton!
+	@IBOutlet private weak var hotkeyCommandModifier: NSButton!
+	@IBOutlet private weak var hotkeyOptionModifier: NSButton!
+	@IBOutlet private weak var hotkeyShiftModifier: NSButton!
+	@IBOutlet private weak var hotkeyLetter: NSPopUpButton!
+	@IBOutlet private weak var hotKeyHelp: NSTextField!
+	@IBOutlet private weak var hotKeyContainer: NSBox!
+	@IBOutlet private weak var hotkeyControlModifier: NSButton!
 
 	// Watchlist
-	@IBOutlet weak var allPrsSetting: NSPopUpButton!
-	@IBOutlet weak var allIssuesSetting: NSPopUpButton!
-	@IBOutlet weak var allHidingSetting: NSPopUpButton!
-	@IBOutlet weak var allNewPrsSetting: NSPopUpButton!
-	@IBOutlet weak var allNewIssuesSetting: NSPopUpButton!
+	@IBOutlet private weak var allPrsSetting: NSPopUpButton!
+	@IBOutlet private weak var allIssuesSetting: NSPopUpButton!
+	@IBOutlet private weak var allHidingSetting: NSPopUpButton!
+	@IBOutlet private weak var allNewPrsSetting: NSPopUpButton!
+	@IBOutlet private weak var allNewIssuesSetting: NSPopUpButton!
 
 	// Reviews
-	@IBOutlet weak var assignedReviewHandlingPolicy: NSPopUpButton!
-	@IBOutlet weak var notifyOnChangeRequests: NSButton!
-	@IBOutlet weak var notifyOnAcceptances: NSButton!
-	@IBOutlet weak var notifyOnReviewDismissals: NSButton!
-	@IBOutlet weak var notifyOnReviewAssignments: NSButton!
-	@IBOutlet weak var notifyOnAllChangeRequests: NSButton!
-	@IBOutlet weak var notifyOnAllAcceptances: NSButton!
-	@IBOutlet weak var notifyOnAllReviewDismissals: NSButton!
-	@IBOutlet weak var supportReviews: NSButton!
+	@IBOutlet private weak var assignedReviewHandlingPolicy: NSPopUpButton!
+	@IBOutlet private weak var notifyOnChangeRequests: NSButton!
+	@IBOutlet private weak var notifyOnAcceptances: NSButton!
+	@IBOutlet private weak var notifyOnReviewDismissals: NSButton!
+	@IBOutlet private weak var notifyOnReviewAssignments: NSButton!
+	@IBOutlet private weak var notifyOnAllChangeRequests: NSButton!
+	@IBOutlet private weak var notifyOnAllAcceptances: NSButton!
+	@IBOutlet private weak var notifyOnAllReviewDismissals: NSButton!
+	@IBOutlet private weak var supportReviews: NSButton!
 
 	// Reactions
-	@IBOutlet weak var notifyOnItemReactions: NSButton!
-	@IBOutlet weak var notifyOnCommentReactions: NSButton!
-	@IBOutlet weak var reactionIntervalLabel: NSTextField!
-	@IBOutlet weak var reactionIntervalStepper: NSStepper!
+	@IBOutlet private weak var notifyOnItemReactions: NSButton!
+	@IBOutlet private weak var notifyOnCommentReactions: NSButton!
+	@IBOutlet private weak var reactionIntervalLabel: NSTextField!
+	@IBOutlet private weak var reactionIntervalStepper: NSStepper!
 
 	// Tabs
 	@IBOutlet weak var tabs: NSTabView!
@@ -264,36 +264,36 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
-	@IBAction func supportReviewsSelected(_ sender: NSButton) {
+	@IBAction private func supportReviewsSelected(_ sender: NSButton) {
 		let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
 		Settings.displayReviewsOnItems = sender.integerValue == 1
 		showOptionalReviewWarning(previousSync: previousShouldSync)
 	}
 
-	@IBAction func notifyOnChangeRequestsSelected(_ sender: NSButton) {
+	@IBAction private func notifyOnChangeRequestsSelected(_ sender: NSButton) {
 		let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
 		Settings.notifyOnReviewChangeRequests = sender.integerValue == 1
 		showOptionalReviewWarning(previousSync: previousShouldSync)
 	}
-	@IBAction func notifyOnAllChangeRequestsSelected(_ sender: NSButton) {
+	@IBAction private func notifyOnAllChangeRequestsSelected(_ sender: NSButton) {
 		Settings.notifyOnAllReviewChangeRequests = sender.integerValue == 1
 	}
 
-	@IBAction func notifyOnAcceptancesSelected(_ sender: NSButton) {
+	@IBAction private func notifyOnAcceptancesSelected(_ sender: NSButton) {
 		let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
 		Settings.notifyOnReviewAcceptances = sender.integerValue == 1
 		showOptionalReviewWarning(previousSync: previousShouldSync)
 	}
-	@IBAction func notifyOnAllAcceptancesSelected(_ sender: NSButton) {
+	@IBAction private func notifyOnAllAcceptancesSelected(_ sender: NSButton) {
 		Settings.notifyOnAllReviewAcceptances = sender.integerValue == 1
 	}
 
-	@IBAction func notifyOnReviewDismissalsSelected(_ sender: NSButton) {
+	@IBAction private func notifyOnReviewDismissalsSelected(_ sender: NSButton) {
 		let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
 		Settings.notifyOnReviewDismissals = sender.integerValue == 1
 		showOptionalReviewWarning(previousSync: previousShouldSync)
 	}
-	@IBAction func notifyOnAllReviewDismissalsSelected(_ sender: NSButton) {
+	@IBAction private func notifyOnAllReviewDismissalsSelected(_ sender: NSButton) {
 		Settings.notifyOnAllReviewDismissals = sender.integerValue == 1
 	}
 
@@ -311,13 +311,13 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
-	@IBAction func notifyOnReviewAssignmentsSelected(_ sender: NSButton) {
+	@IBAction private func notifyOnReviewAssignmentsSelected(_ sender: NSButton) {
 		let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
 		Settings.notifyOnReviewAssignments = sender.integerValue == 1
 		showOptionalReviewAssignmentWarning(previousSync: previousShouldSync)
 	}
 
-	@IBAction func assignedReviewHandlingPolicySelected(_ sender: NSPopUpButton) {
+	@IBAction private func assignedReviewHandlingPolicySelected(_ sender: NSPopUpButton) {
 		let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
 		Settings.assignedReviewHandlingPolicy = sender.index(of: sender.selectedItem!)
 		DataManager.postProcessAllItems()
@@ -577,17 +577,17 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 
-	@IBAction func displayMilestonesSelected(_ sender: NSButton) {
+	@IBAction private func displayMilestonesSelected(_ sender: NSButton) {
 		Settings.showMilestones = sender.integerValue == 1
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func showRelativeDatesSelected(_ sender: NSButton) {
+	@IBAction private func showRelativeDatesSelected(_ sender: NSButton) {
 		Settings.showRelativeDates = sender.integerValue == 1
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func notifyOnItemReactionsSelected(_ sender: NSButton) {
+	@IBAction private func notifyOnItemReactionsSelected(_ sender: NSButton) {
 		Settings.notifyOnItemReactions = sender.integerValue == 1
 		API.refreshesSinceLastReactionsCheck.removeAll()
 		updateReactionItemOptions()
@@ -595,7 +595,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func notifyOnCommentReactionsSelected(_ sender: NSButton) {
+	@IBAction private func notifyOnCommentReactionsSelected(_ sender: NSButton) {
 		Settings.notifyOnCommentReactions = sender.integerValue == 1
 		API.refreshesSinceLastReactionsCheck.removeAll()
 		updateReactionItemOptions()
@@ -603,32 +603,32 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func newMentionMovePolicySelected(_ sender: NSPopUpButton) {
+	@IBAction private func newMentionMovePolicySelected(_ sender: NSPopUpButton) {
 		Settings.newMentionMovePolicy = sender.indexOfSelectedItem
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
-	@IBAction func teamMentionMovePolicySelected(_ sender: NSPopUpButton) {
+	@IBAction private func teamMentionMovePolicySelected(_ sender: NSPopUpButton) {
 		Settings.teamMentionMovePolicy = sender.indexOfSelectedItem
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
-	@IBAction func newItemInOwnedRepoMovePolicySelected(_ sender: NSPopUpButton) {
+	@IBAction private func newItemInOwnedRepoMovePolicySelected(_ sender: NSPopUpButton) {
 		Settings.newItemInOwnedRepoMovePolicy = sender.indexOfSelectedItem
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func dontConfirmRemoveAllMergedSelected(_ sender: NSButton) {
+	@IBAction private func dontConfirmRemoveAllMergedSelected(_ sender: NSButton) {
 		Settings.dontAskBeforeWipingMerged = (sender.integerValue==1)
 	}
 
-	@IBAction func displayRepositoryNameSelected(_ sender: NSButton) {
+	@IBAction private func displayRepositoryNameSelected(_ sender: NSButton) {
 		Settings.showReposInName = (sender.integerValue==1)
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func showLabelsSelected(_ sender: NSButton) {
+	@IBAction private func showLabelsSelected(_ sender: NSButton) {
 		let wasOff = Settings.showLabels
 		Settings.showLabels = sender.integerValue == 1
 		if wasOff && Settings.showLabels {
@@ -639,7 +639,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func logActivityToConsoleSelected(_ sender: NSButton) {
+	@IBAction private func logActivityToConsoleSelected(_ sender: NSButton) {
 		Settings.logActivityToConsole = (sender.integerValue==1)
 		logActivityToConsole.integerValue = Settings.logActivityToConsole ? 1 : 0
 		if Settings.logActivityToConsole {
@@ -655,7 +655,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
-	@IBAction func selectDefaultAppSelected(_ sender: NSButton) {
+	@IBAction private func selectDefaultAppSelected(_ sender: NSButton) {
 		let o = NSOpenPanel()
 		o.title = "Select Application…"
 		o.prompt = "Select"
@@ -671,7 +671,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
-	@IBAction func selectDefaultLinkSelected(_ sender: NSButton) {
+	@IBAction private func selectDefaultLinkSelected(_ sender: NSButton) {
 		let o = NSOpenPanel()
 		o.title = "Select Application…"
 		o.prompt = "Select"
@@ -688,7 +688,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 
-	@IBAction func dumpApiResponsesToConsoleSelected(_ sender: NSButton) {
+	@IBAction private func dumpApiResponsesToConsoleSelected(_ sender: NSButton) {
 		Settings.dumpAPIResponsesInConsole = (sender.integerValue==1)
 		if Settings.dumpAPIResponsesInConsole {
 			let alert = NSAlert()
@@ -699,66 +699,66 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
-	@IBAction func includeServersInFilteringSelected(_ sender: NSButton) {
+	@IBAction private func includeServersInFilteringSelected(_ sender: NSButton) {
 		Settings.includeServersInFilter = (sender.integerValue==1)
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func includeNumbersInFilteringSelected(_ sender: NSButton) {
+	@IBAction private func includeNumbersInFilteringSelected(_ sender: NSButton) {
 		Settings.includeNumbersInFilter = (sender.integerValue==1)
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func includeUsersInFilteringSelected(_ sender: NSButton) {
+	@IBAction private func includeUsersInFilteringSelected(_ sender: NSButton) {
 		Settings.includeUsersInFilter = (sender.integerValue==1)
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func includeLabelsInFilteringSelected(_ sender: NSButton) {
+	@IBAction private func includeLabelsInFilteringSelected(_ sender: NSButton) {
 		Settings.includeLabelsInFilter = (sender.integerValue==1)
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func includeStatusesInFilteringSelected(_ sender: NSButton) {
+	@IBAction private func includeStatusesInFilteringSelected(_ sender: NSButton) {
 		Settings.includeStatusesInFilter = (sender.integerValue==1)
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func includeTitlesInFilteringSelected(_ sender: NSButton) {
+	@IBAction private func includeTitlesInFilteringSelected(_ sender: NSButton) {
 		Settings.includeTitlesInFilter = (sender.integerValue==1)
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func includeMilestonesInFilteringSelected(_ sender: NSButton) {
+	@IBAction private func includeMilestonesInFilteringSelected(_ sender: NSButton) {
 		Settings.includeMilestonesInFilter = (sender.integerValue==1)
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func includeAssigneeNamesInFilteringSelected(_ sender: NSButton) {
+	@IBAction private func includeAssigneeNamesInFilteringSelected(_ sender: NSButton) {
 		Settings.includeAssigneeNamesInFilter = (sender.integerValue==1)
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func includeRepositoriesInfilterSelected(_ sender: NSButton) {
+	@IBAction private func includeRepositoriesInfilterSelected(_ sender: NSButton) {
 		Settings.includeReposInFilter = (sender.integerValue==1)
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func dontConfirmRemoveAllClosedSelected(_ sender: NSButton) {
+	@IBAction private func dontConfirmRemoveAllClosedSelected(_ sender: NSButton) {
 		Settings.dontAskBeforeWipingClosed = (sender.integerValue==1)
 	}
 
-	@IBAction func assumeAllCommentsBeforeMineAreReadSelected(_ sender: NSButton) {
+	@IBAction private func assumeAllCommentsBeforeMineAreReadSelected(_ sender: NSButton) {
 		Settings.assumeReadItemIfUserHasNewerComments = (sender.integerValue==1)
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func removeNotificationsWhenItemIsRemovedSelected(_ sender: NSButton) {
+	@IBAction private func removeNotificationsWhenItemIsRemovedSelected(_ sender: NSButton) {
 		Settings.removeNotificationsWhenItemIsRemoved = (sender.integerValue==1)
 	}
 
-	@IBAction func dontKeepMyPrsSelected(_ sender: NSButton) {
+	@IBAction private func dontKeepMyPrsSelected(_ sender: NSButton) {
 		Settings.dontKeepPrsMergedByMe = (sender.integerValue==1)
 		updateHistoryOptions()
 	}
@@ -767,34 +767,34 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		dontKeepPrsMergedByMe.isEnabled = Settings.mergeHandlingPolicy != HandlingPolicy.keepNone.rawValue
 	}
 
-	@IBAction func highlightItemsWithNewCommitsSelected(_ sender: NSButton) {
+	@IBAction private func highlightItemsWithNewCommitsSelected(_ sender: NSButton) {
 		Settings.markPrsAsUnreadOnNewCommits = (sender.integerValue==1)
 	}
 
-	@IBAction func grayOutWhenRefreshingSelected(_ sender: NSButton) {
+	@IBAction private func grayOutWhenRefreshingSelected(_ sender: NSButton) {
 		Settings.grayOutWhenRefreshing = (sender.integerValue==1)
 	}
 
-	@IBAction func disableAllCommentNotificationsSelected(_ sender: NSButton) {
+	@IBAction private func disableAllCommentNotificationsSelected(_ sender: NSButton) {
 		Settings.disableAllCommentNotifications = (sender.integerValue==1)
 	}
 
-	@IBAction func notifyOnStatusUpdatesSelected(_ sender: NSButton) {
+	@IBAction private func notifyOnStatusUpdatesSelected(_ sender: NSButton) {
 		Settings.notifyOnStatusUpdates = (sender.integerValue==1)
 		updateStatusItemsOptions()
 	}
 
-	@IBAction func notifyOnStatusUpdatesOnAllPrsSelected(_ sender: NSButton) {
+	@IBAction private func notifyOnStatusUpdatesOnAllPrsSelected(_ sender: NSButton) {
 		Settings.notifyOnStatusUpdatesForAllPrs = (sender.integerValue==1)
 	}
 
-	@IBAction func hidePrsThatDontPassOnlyInAllSelected(_ sender: NSButton) {
+	@IBAction private func hidePrsThatDontPassOnlyInAllSelected(_ sender: NSButton) {
 		Settings.hidePrsThatDontPassOnlyInAll = (sender.integerValue==1)
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func showStatusesForAllSelected(_ sender: NSButton) {
+	@IBAction private func showStatusesForAllSelected(_ sender: NSButton) {
 		Settings.showStatusesOnAllItems = (sender.integerValue==1)
 		deferredUpdateTimer.push()
 		if Settings.showStatusItems {
@@ -803,20 +803,20 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
-	@IBAction func hidePrsThatDontPassSelected(_ sender: NSButton) {
+	@IBAction private func hidePrsThatDontPassSelected(_ sender: NSButton) {
 		Settings.hidePrsThatArentPassing = (sender.integerValue==1)
 		updateStatusItemsOptions()
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func hideAvatarsSelected(_ sender: NSButton) {
+	@IBAction private func hideAvatarsSelected(_ sender: NSButton) {
 		Settings.hideAvatars = (sender.integerValue==1)
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func showSeparateApiServersInMenuSelected(_ sender: NSButton) {
+	@IBAction private func showSeparateApiServersInMenuSelected(_ sender: NSButton) {
 		Settings.showSeparateApiServersInMenu = (sender.integerValue==1)
 		serversDirty = true
 		deferredUpdateTimer.push()
@@ -837,7 +837,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		return affectedRepos
 	}
 
-	@IBAction func allPrsPolicySelected(_ sender: NSPopUpButton) {
+	@IBAction private func allPrsPolicySelected(_ sender: NSPopUpButton) {
 		let index = Int64(sender.indexOfSelectedItem - 1)
 		if index < 0 { return }
 
@@ -850,7 +850,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		updateDisplayIssuesSetting()
 	}
 
-	@IBAction func allIssuesPolicySelected(_ sender: NSPopUpButton) {
+	@IBAction private func allIssuesPolicySelected(_ sender: NSPopUpButton) {
 		let index = Int64(sender.indexOfSelectedItem - 1)
 		if index < 0 { return }
 
@@ -863,7 +863,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		updateDisplayIssuesSetting()
 	}
 
-	@IBAction func allHidingPolicySelected(_ sender: NSPopUpButton) {
+	@IBAction private func allHidingPolicySelected(_ sender: NSPopUpButton) {
 		let index = Int64(sender.indexOfSelectedItem - 1)
 		if index < 0 { return }
 
@@ -882,50 +882,50 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func allNewPrsPolicySelected(_ sender: NSPopUpButton) {
+	@IBAction private func allNewPrsPolicySelected(_ sender: NSPopUpButton) {
 		Settings.displayPolicyForNewPrs = sender.indexOfSelectedItem
 	}
 
-	@IBAction func allNewIssuesPolicySelected(_ sender: NSPopUpButton) {
+	@IBAction private func allNewIssuesPolicySelected(_ sender: NSPopUpButton) {
 		Settings.displayPolicyForNewIssues = sender.indexOfSelectedItem
 	}
 
-	@IBAction func hideUncommentedRequestsSelected(_ sender: NSButton) {
+	@IBAction private func hideUncommentedRequestsSelected(_ sender: NSButton) {
 		Settings.hideUncommentedItems = (sender.integerValue==1)
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func showAllCommentsSelected(_ sender: NSButton) {
+	@IBAction private func showAllCommentsSelected(_ sender: NSButton) {
 		Settings.showCommentsEverywhere = (sender.integerValue==1)
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func sortOrderSelected(_ sender: NSButton) {
+	@IBAction private func sortOrderSelected(_ sender: NSButton) {
 		Settings.sortDescending = (sender.integerValue==1)
 		setupSortMethodMenu()
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func countOnlyListedItemsSelected(_ sender: NSButton) {
+	@IBAction private func countOnlyListedItemsSelected(_ sender: NSButton) {
 		Settings.countOnlyListedItems = (sender.integerValue==0)
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func openPrAtFirstUnreadCommentSelected(_ sender: NSButton) {
+	@IBAction private func openPrAtFirstUnreadCommentSelected(_ sender: NSButton) {
 		Settings.openPrAtFirstUnreadComment = (sender.integerValue==1)
 	}
 
-	@IBAction func sortMethodChanged(_ sender: NSMenuItem) {
+	@IBAction private func sortMethodChanged(_ sender: NSMenuItem) {
 		Settings.sortMethod = sortModeSelect.indexOfSelectedItem
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func showStatusItemsSelected(_ sender: NSButton) {
+	@IBAction private func showStatusItemsSelected(_ sender: NSButton) {
 		Settings.showStatusItems = (sender.integerValue==1)
 		deferredUpdateTimer.push()
 		updateStatusItemsOptions()
@@ -977,45 +977,45 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		reactionIntervalLabel.textColor = enabled ? NSColor.labelColor : NSColor.disabledControlTextColor
 	}
 
-	@IBAction func reactionIntervalCountChanged(_ sender: NSStepper) {
+	@IBAction private func reactionIntervalCountChanged(_ sender: NSStepper) {
 		Settings.reactionScanningInterval = sender.integerValue
 		updateReactionItemOptions()
 	}
 
-	@IBAction func statusItemRefreshCountChanged(_ sender: NSStepper) {
+	@IBAction private func statusItemRefreshCountChanged(_ sender: NSStepper) {
 		Settings.statusItemRefreshInterval = sender.integerValue
 		updateStatusItemsOptions()
 	}
 
-	@IBAction func makeStatusItemsSelectableSelected(_ sender: NSButton) {
+	@IBAction private func makeStatusItemsSelectableSelected(_ sender: NSButton) {
 		Settings.makeStatusItemsSelectable = (sender.integerValue==1)
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func hideCountsOnMenubarSelected(_ sender: NSButton) {
+	@IBAction private func hideCountsOnMenubarSelected(_ sender: NSButton) {
 		Settings.hideMenubarCounts = (sender.integerValue==1)
 		serversDirty = true
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func showCreationSelected(_ sender: NSButton) {
+	@IBAction private func showCreationSelected(_ sender: NSButton) {
 		Settings.showCreatedInsteadOfUpdated = (sender.integerValue==1)
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func groupbyRepoSelected(_ sender: NSButton) {
+	@IBAction private func groupbyRepoSelected(_ sender: NSButton) {
 		Settings.groupByRepo = (sender.integerValue==1)
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func assignedPrHandlingPolicySelected(_ sender: NSPopUpButton) {
+	@IBAction private func assignedPrHandlingPolicySelected(_ sender: NSPopUpButton) {
 		Settings.assignedPrHandlingPolicy = sender.indexOfSelectedItem
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func checkForUpdatesAutomaticallySelected(_ sender: NSButton) {
+	@IBAction private func checkForUpdatesAutomaticallySelected(_ sender: NSButton) {
 		Settings.checkForUpdatesAutomatically = (sender.integerValue==1)
 		refreshUpdatePreferences()
 	}
@@ -1032,12 +1032,12 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		checkForUpdatesLabel.stringValue = interval<2 ? "Check every hour" : "Check every \(interval) hours"
 	}
 
-	@IBAction func checkForUpdatesIntervalChanged(_ sender: NSStepper) {
+	@IBAction private func checkForUpdatesIntervalChanged(_ sender: NSStepper) {
 		Settings.checkForUpdatesInterval = sender.integerValue
 		refreshUpdatePreferences()
 	}
 
-	@IBAction func launchAtStartSelected(_ sender: NSButton) {
+	@IBAction private func launchAtStartSelected(_ sender: NSButton) {
 		StartupLaunch.setLaunchOnLogin(sender.integerValue==1)
 	}
 
@@ -1081,7 +1081,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		return nil
 	}
 
-	@IBAction func deleteSelectedServerSelected(_ sender: NSButton) {
+	@IBAction private func deleteSelectedServerSelected(_ sender: NSButton) {
 		if let selectedServer = selectedServer, let index = ApiServer.allApiServers(in: DataManager.main).index(of: selectedServer) {
 			DataManager.main.delete(selectedServer)
 			serverList.reloadData()
@@ -1092,7 +1092,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
-	@IBAction func apiServerReportErrorSelected(_ sender: NSButton) {
+	@IBAction private func apiServerReportErrorSelected(_ sender: NSButton) {
 		if let apiServer = selectedServer {
 			apiServer.reportRefreshFailures = (sender.integerValue != 0)
 			storeApiFormToSelectedServer()
@@ -1109,11 +1109,11 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
-	@IBAction func repeatLastExportSelected(_ sender: NSButton) {
+	@IBAction private func repeatLastExportSelected(_ sender: NSButton) {
 		Settings.autoRepeatSettingsExport = (repeatLastExportAutomatically.integerValue==1)
 	}
 
-	@IBAction func exportCurrentSettingsSelected(_ sender: NSButton) {
+	@IBAction private func exportCurrentSettingsSelected(_ sender: NSButton) {
 		let s = NSSavePanel()
 		s.title = "Export Current Settings…"
 		s.prompt = "Export"
@@ -1130,7 +1130,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
-	@IBAction func importSettingsSelected(_ sender: NSButton) {
+	@IBAction private func importSettingsSelected(_ sender: NSButton) {
 		let o = NSOpenPanel()
 		o.title = "Import Settings From File…"
 		o.prompt = "Import"
@@ -1164,7 +1164,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		hotKeyHelp.isHidden = Settings.hotkeyEnable
 	}
 
-	@IBAction func enableHotkeySelected(_ sender: NSButton) {
+	@IBAction private func enableHotkeySelected(_ sender: NSButton) {
 		Settings.hotkeyEnable = hotkeyEnable.integerValue != 0
 		Settings.hotkeyLetter = hotkeyLetter.titleOfSelectedItem ?? "T"
 		Settings.hotkeyControlModifier = hotkeyControlModifier.integerValue != 0
@@ -1182,7 +1182,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		alert.runModal()
 	}
 
-	@IBAction func createTokenSelected(_ sender: NSButton) {
+	@IBAction private func createTokenSelected(_ sender: NSButton) {
 		if apiServerWebPath.stringValue.isEmpty {
 			reportNeedFrontEnd()
 		} else {
@@ -1191,7 +1191,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
-	@IBAction func viewExistingTokensSelected(_ sender: NSButton) {
+	@IBAction private func viewExistingTokensSelected(_ sender: NSButton) {
 		if apiServerWebPath.stringValue.isEmpty {
 			reportNeedFrontEnd()
 		} else {
@@ -1200,7 +1200,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
-	@IBAction func viewWatchlistSelected(_ sender: NSButton) {
+	@IBAction private func viewWatchlistSelected(_ sender: NSButton) {
 		if apiServerWebPath.stringValue.isEmpty {
 			reportNeedFrontEnd()
 		} else {
@@ -1209,12 +1209,12 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
-	@IBAction func prMergePolicySelected(_ sender: NSPopUpButton) {
+	@IBAction private func prMergePolicySelected(_ sender: NSPopUpButton) {
 		Settings.mergeHandlingPolicy = sender.indexOfSelectedItem
 		updateHistoryOptions()
 	}
 
-	@IBAction func prClosePolicySelected(_ sender: NSPopUpButton) {
+	@IBAction private func prClosePolicySelected(_ sender: NSPopUpButton) {
 		Settings.closeHandlingPolicy = sender.indexOfSelectedItem
 	}
 
@@ -1233,14 +1233,14 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		statusTermsField.objectValue = Settings.statusFilteringTerms
 	}
 
-	@IBAction func statusFilterMenuChanged(_ sender: NSPopUpButton) {
+	@IBAction private func statusFilterMenuChanged(_ sender: NSPopUpButton) {
 		Settings.statusFilteringMode = sender.indexOfSelectedItem
 		Settings.statusFilteringTerms = statusTermsField.objectValue as! [String]
 		updateStatusTermPreferenceControls()
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func testApiServerSelected(_ sender: NSButton) {
+	@IBAction private func testApiServerSelected(_ sender: NSButton) {
 		sender.isEnabled = false
 		let apiServer = selectedServer!
 		API.testApi(to: apiServer) { error in
@@ -1257,7 +1257,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
-	@IBAction func apiRestoreDefaultsSelected(_ sender: NSButton)
+	@IBAction private func apiRestoreDefaultsSelected(_ sender: NSButton)
 	{
 		if let apiServer = selectedServer {
 			apiServer.resetToGithub()
@@ -1292,7 +1292,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
-	@IBAction func addNewApiServerSelected(_ sender: NSButton) {
+	@IBAction private func addNewApiServerSelected(_ sender: NSButton) {
 		let a = ApiServer.insertNewServer(in: DataManager.main)
 		a.label = "New API Server"
 		serverList.reloadData()
@@ -1304,7 +1304,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func refreshDurationChanged(_ sender: NSStepper?) {
+	@IBAction private func refreshDurationChanged(_ sender: NSStepper?) {
 		Settings.refreshPeriod = refreshDurationStepper.floatValue
 		refreshDurationLabel.stringValue = "Refresh items every \(refreshDurationStepper.integerValue) seconds"
 	}
@@ -1565,7 +1565,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	/////////////////////////////// snoozing
 
-	@IBAction func snoozeWakeChanged(_ sender: NSButton) {
+	@IBAction private func snoozeWakeChanged(_ sender: NSButton) {
 		if let preset = selectedSnoozePreset {
 			preset.wakeOnComment = snoozeWakeOnComment.integerValue == 1
 			preset.wakeOnMention = snoozeWakeOnMention.integerValue == 1
@@ -1575,7 +1575,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
-	@IBAction func hideSnoozedItemsChanged(_ sender: NSButton) {
+	@IBAction private func hideSnoozedItemsChanged(_ sender: NSButton) {
 		Settings.hideSnoozedItems = hideSnoozedItems.integerValue == 1
 		deferredUpdateTimer.push()
 	}
@@ -1631,7 +1631,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		autoSnoozeSelector.integerValue = Settings.autoSnoozeDuration
 	}
 
-	@IBAction func autoSnoozeDurationChanged(_ sender: NSStepper) {
+	@IBAction private func autoSnoozeDurationChanged(_ sender: NSStepper) {
 		Settings.autoSnoozeDuration = sender.integerValue
 		fillSnoozingDropdowns()
 		for p in DataItem.allItems(of: PullRequest.self, in: DataManager.main) {
@@ -1725,7 +1725,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		Settings.possibleExport(nil)
 	}
 
-	@IBAction func createNewSnoozePresetSelected(_ sender: NSButton) {
+	@IBAction private func createNewSnoozePresetSelected(_ sender: NSButton) {
 		let s = SnoozePreset.newSnoozePreset(in: DataManager.main)
 		commitSnoozeSettings()
 		if let index = SnoozePreset.allSnoozePresets(in: DataManager.main).index(of: s) {
@@ -1734,7 +1734,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
-	@IBAction func deleteSnoozePresetSelected(_ sender: NSButton) {
+	@IBAction private func deleteSnoozePresetSelected(_ sender: NSButton) {
 		if let selectedPreset = selectedSnoozePreset, let index = SnoozePreset.allSnoozePresets(in: DataManager.main).index(of: selectedPreset) {
 
 			let appliedCount = selectedPreset.appliedToIssues.count + selectedPreset.appliedToPullRequests.count
@@ -1770,7 +1770,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		fillSnoozeFormFromSelectedPreset()
 	}
 
-	@IBAction func snoozeTypeChanged(_ sender: NSButton) {
+	@IBAction private func snoozeTypeChanged(_ sender: NSButton) {
 		if let s = selectedSnoozePreset {
 			s.duration = sender == snoozeTypeDuration
 			fillSnoozeFormFromSelectedPreset()
@@ -1778,7 +1778,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
-	@IBAction func snoozeOptionsChanged(_ sender: NSPopUpButton) {
+	@IBAction private func snoozeOptionsChanged(_ sender: NSPopUpButton) {
 		if let s = selectedSnoozePreset {
 			if s.duration {
 				s.day = Int64(snoozeDurationDays.indexOfSelectedItem)
@@ -1793,7 +1793,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
-	@IBAction func snoozeUpSelected(_ sender: NSButton) {
+	@IBAction private func snoozeUpSelected(_ sender: NSButton) {
 		if let this = selectedSnoozePreset {
 			let all = SnoozePreset.allSnoozePresets(in: DataManager.main)
 			if let index = all.index(of: this), index > 0 {
@@ -1806,7 +1806,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
-	@IBAction func snoozeDownSelected(_ sender: NSButton) {
+	@IBAction private func snoozeDownSelected(_ sender: NSButton) {
 		if let this = selectedSnoozePreset {
 			let all = SnoozePreset.allSnoozePresets(in: DataManager.main)
 			if let index = all.index(of: this), index < all.count-1 {
@@ -1821,7 +1821,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	private var advancedReposWindowController: NSWindowController?
 	private var advancedReposWindow: AdvancedReposWindow?
-	@IBAction func advancedSelected(_ sender: NSButton) {
+	@IBAction private func advancedSelected(_ sender: NSButton) {
 		if advancedReposWindowController == nil {
 			advancedReposWindowController = NSWindowController(windowNibName:NSNib.Name(rawValue: "AdvancedReposWindow"))
 		}

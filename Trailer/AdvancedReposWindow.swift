@@ -1,14 +1,14 @@
 
 final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 
-	@IBOutlet weak var refreshReposLabel: NSTextField!
-	@IBOutlet weak var refreshButton: NSButton!
-	@IBOutlet weak var activityDisplay: NSProgressIndicator!
-	@IBOutlet weak var repoCheckStepper: NSStepper!
+	@IBOutlet private weak var refreshReposLabel: NSTextField!
+	@IBOutlet private weak var refreshButton: NSButton!
+	@IBOutlet private weak var activityDisplay: NSProgressIndicator!
+	@IBOutlet private weak var repoCheckStepper: NSStepper!
 
-	@IBOutlet weak var autoAddRepos: NSButton!
-	@IBOutlet weak var autoRemoveRepos: NSButton!
-	@IBOutlet weak var hideArchivedRepos: NSButton!
+	@IBOutlet private weak var autoAddRepos: NSButton!
+	@IBOutlet private weak var autoRemoveRepos: NSButton!
+	@IBOutlet private weak var hideArchivedRepos: NSButton!
 
 	weak var prefs: PreferencesWindow?
 
@@ -83,16 +83,16 @@ final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 		}
 	}
 
-	@IBAction func newRepoCheckChanged(_ sender: NSStepper?) {
+	@IBAction private func newRepoCheckChanged(_ sender: NSStepper?) {
 		Settings.newRepoCheckPeriod = repoCheckStepper.floatValue
 		refreshReposLabel.stringValue = "Re-scan every \(repoCheckStepper.integerValue) hours"
 	}
 
-	@IBAction func refreshReposSelected(_ sender: NSButton?) {
+	@IBAction private func refreshReposSelected(_ sender: NSButton?) {
 		prefs?.refreshRepos()
 	}
 
-	@IBAction func autoHideArchivedReposSelected(_ sender: NSButton) {
+	@IBAction private func autoHideArchivedReposSelected(_ sender: NSButton) {
 		Settings.hideArchivedRepos = sender.integerValue == 1
 		if Settings.hideArchivedRepos && Repo.hideArchivedRepos(in: DataManager.main) {
 			prefs?.reloadRepositories()
@@ -102,7 +102,7 @@ final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 		}
 	}
 
-	@IBAction func automaticallyAddNewReposSelected(_ sender: NSButton) {
+	@IBAction private func automaticallyAddNewReposSelected(_ sender: NSButton) {
 		let set = sender.integerValue == 1
 		Settings.automaticallyAddNewReposFromWatchlist = set
 		if set {
@@ -120,7 +120,7 @@ final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 		DataManager.saveDB()
 	}
 
-	@IBAction func automaticallyRemoveReposSelected(_ sender: NSButton) {
+	@IBAction private func automaticallyRemoveReposSelected(_ sender: NSButton) {
 		let set = sender.integerValue == 1
 		Settings.automaticallyRemoveDeletedReposFromWatchlist = set
 		if set {
@@ -129,13 +129,13 @@ final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 		DataManager.saveDB()
 	}
 
-	@IBOutlet weak var serverPicker: NSPopUpButton!
-	@IBOutlet weak var newRepoOwner: NSTextField!
-	@IBOutlet weak var newRepoName: NSTextField!
-	@IBOutlet weak var newRepoSpinner: NSProgressIndicator!
-	@IBOutlet weak var addButton: NSButton!
+	@IBOutlet private weak var serverPicker: NSPopUpButton!
+	@IBOutlet private weak var newRepoOwner: NSTextField!
+	@IBOutlet private weak var newRepoName: NSTextField!
+	@IBOutlet private weak var newRepoSpinner: NSProgressIndicator!
+	@IBOutlet private weak var addButton: NSButton!
 
-	@IBAction func addSelected(_ sender: NSButton) {
+	@IBAction private func addSelected(_ sender: NSButton) {
 		let name = newRepoName.stringValue.trim
 		let owner = newRepoOwner.stringValue.trim
 		guard
@@ -210,9 +210,9 @@ final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 		}
 	}
 
-	@IBOutlet weak var removeRepoList: NSPopUpButtonCell!
-	@IBOutlet weak var removeButton: NSButton!
-	@IBAction func removeSelected(_ sender: NSButton) {
+	@IBOutlet private weak var removeRepoList: NSPopUpButtonCell!
+	@IBOutlet private weak var removeButton: NSButton!
+	@IBAction private func removeSelected(_ sender: NSButton) {
 		guard let repo = removeRepoList.selectedItem?.representedObject as? Repo else { return }
 		DataManager.main.delete(repo)
 		DataManager.saveDB()

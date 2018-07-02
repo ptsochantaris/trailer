@@ -32,8 +32,8 @@ final class SectionRow: NSObject, PopulatableRow {
 		return String(describing: Swift.type(of: self))
 	}
 	
-	@IBOutlet weak var titleL: WKInterfaceLabel!
-	@IBOutlet weak var countL: WKInterfaceLabel!
-	@IBOutlet weak var countHolder: WKInterfaceGroup!
-	@IBOutlet weak var group: WKInterfaceGroup!
+	@IBOutlet private weak var titleL: WKInterfaceLabel!
+	@IBOutlet private weak var countL: WKInterfaceLabel!
+	@IBOutlet private weak var countHolder: WKInterfaceGroup!
+	@IBOutlet private weak var group: WKInterfaceGroup!
 }

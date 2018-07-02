@@ -4,14 +4,14 @@ import CoreData
 
 final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 
-	@IBOutlet weak var name: UITextField!
-	@IBOutlet weak var apiPath: UITextField!
-	@IBOutlet weak var webFrontEnd: UITextField!
-	@IBOutlet weak var authToken: UITextField!
-	@IBOutlet weak var reportErrors: UISwitch!
-	@IBOutlet weak var scrollView: UIScrollView!
-	@IBOutlet weak var authTokenLabel: UILabel!
-	@IBOutlet weak var testButton: UIButton!
+	@IBOutlet private weak var name: UITextField!
+	@IBOutlet private weak var apiPath: UITextField!
+	@IBOutlet private weak var webFrontEnd: UITextField!
+	@IBOutlet private weak var authToken: UITextField!
+	@IBOutlet private weak var reportErrors: UISwitch!
+	@IBOutlet private weak var scrollView: UIScrollView!
+	@IBOutlet private weak var authTokenLabel: UILabel!
+	@IBOutlet private weak var testButton: UIButton!
 
 	var serverId: NSManagedObjectID?
 
@@ -53,7 +53,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 		navigationController?.setToolbarHidden(true, animated: true)
 	}
 
-	@IBAction func testConnectionSelected(_ sender: UIButton) {
+	@IBAction private func testConnectionSelected(_ sender: UIButton) {
 		if let a = updateServerFromForm() {
 			sender.isEnabled = false
 			API.testApi(to: a) { error in
@@ -94,7 +94,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 		}
 	}
 
-	@IBAction func reportChanged(_ sender: UISwitch) {
+	@IBAction private func reportChanged(_ sender: UISwitch) {
 		updateServerFromForm()
 	}
 
@@ -123,15 +123,15 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 		return true
 	}
 
-	@IBAction func watchListSelected(_ sender: UIBarButtonItem) {
+	@IBAction private func watchListSelected(_ sender: UIBarButtonItem) {
 		openGitHub(url: "/watching")
 	}
 
-	@IBAction func createTokenSelected(_ sender: UIBarButtonItem) {
+	@IBAction private func createTokenSelected(_ sender: UIBarButtonItem) {
 		openGitHub(url: "/settings/tokens/new")
 	}
 
-	@IBAction func existingTokensSelected(_ sender: UIBarButtonItem) {
+	@IBAction private func existingTokensSelected(_ sender: UIBarButtonItem) {
 		openGitHub(url: "/settings/tokens")
 	}
 
@@ -152,7 +152,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 		}
 	}
 
-	@IBAction func deleteSelected(_ sender: UIBarButtonItem) {
+	@IBAction private func deleteSelected(_ sender: UIBarButtonItem) {
 		let a = UIAlertController(title: "Delete API Server",
 		                          message: "Are you sure you want to remove this API server from your list?",
 		                          preferredStyle: .alert)

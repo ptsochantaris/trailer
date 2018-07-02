@@ -8,7 +8,7 @@ class SectionHeaderView: UITableViewHeaderFooterView {
 
 	var callback: Completion?
 
-	@IBAction func buttonSelected(_ sender: UIButton) {
+	@IBAction private func buttonSelected(_ sender: UIButton) {
 		callback?()
 	}
 

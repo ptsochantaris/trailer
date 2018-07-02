@@ -12,5 +12,5 @@ final class TitleRow: NSObject, PopulatableRow {
 		return String(describing: type(of: self))
 	}
 	
-	@IBOutlet weak var titleL: WKInterfaceLabel!
+	@IBOutlet private weak var titleL: WKInterfaceLabel!
 }

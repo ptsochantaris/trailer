@@ -3,16 +3,16 @@ import WatchKit
 
 final class PRRow: NSObject {
 
-    @IBOutlet weak var titleL: WKInterfaceLabel!
-    @IBOutlet weak var detailsL: WKInterfaceLabel!
+    @IBOutlet private weak var titleL: WKInterfaceLabel!
+    @IBOutlet private weak var detailsL: WKInterfaceLabel!
 
-    @IBOutlet weak var totalCommentsL: WKInterfaceLabel!
-    @IBOutlet weak var totalCommentsGroup: WKInterfaceGroup!
+    @IBOutlet private weak var totalCommentsL: WKInterfaceLabel!
+    @IBOutlet private weak var totalCommentsGroup: WKInterfaceGroup!
 
-    @IBOutlet weak var unreadCommentsL: WKInterfaceLabel!
-    @IBOutlet weak var unreadCommentsGroup: WKInterfaceGroup!
+    @IBOutlet private weak var unreadCommentsL: WKInterfaceLabel!
+    @IBOutlet private weak var unreadCommentsGroup: WKInterfaceGroup!
 
-    @IBOutlet weak var counterGroup: WKInterfaceGroup!
+    @IBOutlet private weak var counterGroup: WKInterfaceGroup!
 
 	var itemId: String?
 	var hasUnread: Bool!

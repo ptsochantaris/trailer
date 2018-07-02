@@ -3,7 +3,7 @@ final class AboutWindow: NSWindow, NSWindowDelegate {
 
 	@IBOutlet weak var version: NSTextField!
 
-	@IBAction func gitHubLinkSelected(_ sender: NSButton) {
+	@IBAction private func gitHubLinkSelected(_ sender: NSButton) {
 		openLink(URL(string: "https://github.com/ptsochantaris/trailer")!)
 	}
 

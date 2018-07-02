@@ -39,7 +39,7 @@ final class CommentBlacklistViewController: UITableViewController {
 		}
 	}
 
-	@IBAction func addSelected() {
+	@IBAction private func addSelected() {
 
 		let a = UIAlertController(title: "Block commenter",
 			message: "Enter the username of the poster whose comments you don't want to be notified about",

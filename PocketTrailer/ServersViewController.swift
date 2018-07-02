@@ -7,7 +7,7 @@ final class ServersViewController: UITableViewController {
 	private var selectedServerId: NSManagedObjectID?
 	private var allServers: [ApiServer]!
 
-	@IBAction func doneSelected() {
+	@IBAction private func doneSelected() {
 		if preferencesDirty {
 			app.startRefresh()
 		}
@@ -86,7 +86,7 @@ final class ServersViewController: UITableViewController {
 		performSegue(withIdentifier: "editServer", sender: self)
 	}
 
-	@IBAction func newServer() {
+	@IBAction private func newServer() {
 		performSegue(withIdentifier: "editServer", sender: self)
 	}
 

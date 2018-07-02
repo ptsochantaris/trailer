@@ -68,7 +68,7 @@ UITableViewDragDelegate {
 		return tabBarSets
 	}
 
-	@IBAction func editSelected(_ sender: UIBarButtonItem ) {
+	@IBAction private func editSelected(_ sender: UIBarButtonItem ) {
 
 		let promptTitle: String
 		if let l = currentTabBarSet?.viewCriterion?.label {

@@ -2,7 +2,7 @@
 final class MenuWindow: NSWindow {
 
 	@IBOutlet weak var scrollView: NSScrollView!
-	@IBOutlet weak var header: ViewAllowsVibrancy!
+	@IBOutlet private weak var header: ViewAllowsVibrancy!
 	@IBOutlet weak var table: PrTable!
 	@IBOutlet weak var filter: NSSearchField!
 	@IBOutlet weak var refreshMenuItem: NSMenuItem!
@@ -99,11 +99,11 @@ final class MenuWindow: NSWindow {
 		NotificationCenter.default.removeObserver(self)
 	}
 
-	@IBAction func markAllReadSelected(_ sender: NSMenuItem) {
+	@IBAction private func markAllReadSelected(_ sender: NSMenuItem) {
 		app.markAllReadSelected(from: self)
 	}
 
-	@IBAction func preferencesSelected(_ sender: NSMenuItem) {
+	@IBAction private func preferencesSelected(_ sender: NSMenuItem) {
 		app.preferencesSelected()
 	}
 
@@ -115,7 +115,7 @@ final class MenuWindow: NSWindow {
 		app.startRefresh()
 	}
 
-	@IBAction func aboutSelected(_ sender: NSMenuItem) {
+	@IBAction private func aboutSelected(_ sender: NSMenuItem) {
 		app.showAboutWindow()
 	}
 

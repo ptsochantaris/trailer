@@ -2,8 +2,8 @@
 import SafariServices
 
 final class AboutTrailerViewController: UIViewController {
-	@IBOutlet weak var versionNumber: UILabel!
-	@IBOutlet weak var licenseText: UITextView!
+	@IBOutlet private weak var versionNumber: UILabel!
+	@IBOutlet private weak var licenseText: UITextView!
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
@@ -17,13 +17,13 @@ final class AboutTrailerViewController: UIViewController {
 		licenseText.textContainerInset = UIEdgeInsetsMake(0, 10, 10, 10)
 	}
 
-	@IBAction func linkSelected() {
+	@IBAction private func linkSelected() {
 		let s = SFSafariViewController(url: URL(string: "https://github.com/ptsochantaris/trailer")!)
 		s.view.tintColor = self.view.tintColor
 		present(s, animated: true)
 	}
 
-	@IBAction func doneSelected() {
+	@IBAction private func doneSelected() {
 		if preferencesDirty { app.startRefresh() }
 		dismiss(animated: true)
 	}
