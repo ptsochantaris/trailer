@@ -355,7 +355,7 @@ Token</string>
                                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                 </textFieldCell>
-                                                                <sortDescriptor key="sortDescriptorPrototype" selector="compare:" sortKey="localizedCaseInsensitiveCompare:"/>
+                                                                <sortDescriptor key="sortDescriptorPrototype" selector="localizedCaseInsensitiveCompare:" sortKey="groupLabel" ascending="NO"/>
                                                             </tableColumn>
                                                             <tableColumn identifier="hide" width="136" minWidth="10" maxWidth="1000" id="pRg-vg-7bD" userLabel="Hide">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Author Based Hiding">
@@ -368,7 +368,7 @@ Token</string>
                                                                     <font key="font" metaFont="smallSystemBold"/>
                                                                     <menu key="menu" id="oIy-Kg-Sr2"/>
                                                                 </popUpButtonCell>
-                                                                <sortDescriptor key="sortDescriptorPrototype" selector="compare:" sortKey="itemHidingPolicy"/>
+                                                                <sortDescriptor key="sortDescriptorPrototype" selector="compare:" sortKey="itemHidingPolicy" ascending="NO"/>
                                                             </tableColumn>
                                                             <tableColumn identifier="prs" editable="NO" width="110" minWidth="40" maxWidth="1000" id="FAL-Ui-K4b" userLabel="Pull Requests">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Pull Requests">
@@ -381,7 +381,7 @@ Token</string>
                                                                     <font key="font" metaFont="smallSystemBold"/>
                                                                     <menu key="menu" id="CG1-r3-Pok"/>
                                                                 </popUpButtonCell>
-                                                                <sortDescriptor key="sortDescriptorPrototype" selector="compare:" sortKey="displayPolicyForPrs"/>
+                                                                <sortDescriptor key="sortDescriptorPrototype" selector="compare:" sortKey="displayPolicyForPrs" ascending="NO"/>
                                                             </tableColumn>
                                                             <tableColumn identifier="issues" editable="NO" width="110" minWidth="40" maxWidth="1000" id="P1T-D7-Rnp" userLabel="Issues">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Issues">
@@ -394,9 +394,9 @@ Token</string>
                                                                     <font key="font" metaFont="smallSystemBold"/>
                                                                     <menu key="menu" id="e03-gm-C3c"/>
                                                                 </popUpButtonCell>
-                                                                <sortDescriptor key="sortDescriptorPrototype" selector="compare:" sortKey="displayPolicyForIssues"/>
+                                                                <sortDescriptor key="sortDescriptorPrototype" selector="compare:" sortKey="displayPolicyForIssues" ascending="NO"/>
                                                             </tableColumn>
-                                                            <tableColumn identifier="fork" width="24" minWidth="10" maxWidth="3.4028234663852886e+38" id="RB5-FQ-ycS" userLabel="Forked">
+                                                            <tableColumn identifier="fork" editable="NO" width="24" minWidth="10" maxWidth="3.4028234663852886e+38" id="RB5-FQ-ycS" userLabel="Forked">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Fork">
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -407,7 +407,6 @@ Token</string>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
                                                                 <sortDescriptor key="sortDescriptorPrototype" selector="compare:" sortKey="fork"/>
-                                                                <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                             </tableColumn>
                                                         </tableColumns>
                                                         <connections>
