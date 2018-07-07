@@ -10,7 +10,7 @@
 			<title>Version 1.6.8</title>
 			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
-				<li><b>Important: If you have not tweaked the default options for visibility of items in new repos, the new default is now "hidden". If you wish to change that back to the old default, you can change the appropriate setting from the "Repositories" preference panel. Please see the end of these notes for more info.</b><li>
+				<li><b>Important: If you have not tweaked the default options for visibility of items in new repos, the new default is now "hidden". If you wish to change that back to the old default, you can change the appropriate setting from the "Repositories" preference panel. Please see the end of these notes for more info.</b></li>
 				<li>Option to auto-hide archived repos.</li>
 				<li>Periodically updates manually added repos along with the rest of the watchlist.</li>
 				<li>Takes dismissed reviews into account when displaying review statuses.</li>
