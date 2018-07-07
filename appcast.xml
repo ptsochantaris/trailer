@@ -7,6 +7,27 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.6.8</title>
+			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li><b>Important: If you have not tweaked the default options for visibility of items in new repos, the new default is now "hidden". If you wish to change that back to the old default, you can change the appropriate setting from the "Repositories" preference panel. Please see the end of these notes for more info.</b><li>
+				<li>Option to auto-hide archived repos.</li>
+				<li>Periodically updates manually added repos along with the rest of the watchlist.</li>
+				<li>Takes dismissed reviews into account when displaying review statuses.</li>
+				<li>Batch adding of custom repos from an org is now possible: Simply use "*" as the name of the custom repo.</li>
+				<li>Repository list is now sortable by its columns. It’s also FAR more responsive.</li>
+				<li>Changes in quick-start and default repo visibility: GitHub use has grown a lot since Trailer was first created. Users no longer follow or watch just a few repositories and orgs can have hundreds or thousands of repositories. This means that the default quick-start behaviour of Trailer can and does end up being very wasteful in API, data, and battery use over time. For this reason, quick-start no longer activates every repository from the watchlist. Instead, once the account is verified the repo list is fetched and displayed, and a user can chose which repositories they want visible and to what extent. Additionally, settings for visibility of new repos are set to be hidden by default. Users must now explicitly opt into adding new repos, or explicitly set the options that automatically do that.</li>
+				</ul></font>]]></description>
+			<pubDate>Sat, 7 Jul 2018 14:00:00 +0000</pubDate>
+			<enclosure
+			url="https://github.com/ptsochantaris/trailer/releases/download/1.6.8/trailer168.zip"
+			sparkle:version="1474"
+			sparkle:shortVersionString="1.6.8"
+			sparkle:dsaSignature="MC0CFQDLsb1kBeM9qq3vs4TlJQ5nF/uLRAIUd8f0uR2TDqNvQa3f0qAfRSpXMnE="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.6.7</title>
 			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
