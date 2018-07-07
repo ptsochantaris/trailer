@@ -4,15 +4,34 @@ import CoreData
 
 final class RespositoriesViewController: UITableViewController, UISearchResultsUpdating, NSFetchedResultsControllerDelegate {
 
+	enum SortOption {
+		case name, prVisibility, issueVisibility, hidingSetting, isFork
+
+		var descriptor: NSSortDescriptor {
+			switch self {
+			case .name: return NSSortDescriptor(key: "fullName", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
+			case .prVisibility: return NSSortDescriptor(key: "displayPolicyForPrs", ascending: false)
+			case .issueVisibility: return NSSortDescriptor(key: "displayPolicyForIssues", ascending: false)
+			case .hidingSetting: return NSSortDescriptor(key: "itemHidingPolicy", ascending: false)
+			case .isFork: return NSSortDescriptor(key: "fork", ascending: false)
+			}
+		}
+	}
+
 	// Filtering
 	private var searchTimer: PopTimer!
+	private var currentSortOptions = [SortOption.name]
 	private var _fetchedResultsController: NSFetchedResultsController<Repo>?
 
 	@IBOutlet private weak var actionsButton: UIBarButtonItem!
+	@IBOutlet weak var setAllPrsItem: UIBarButtonItem!
 
 	@IBAction private func done(_ sender: UIBarButtonItem) {
 		if preferencesDirty {
 			app.startRefresh()
+		}
+		if presentedViewController != nil {
+			dismiss(animated: false)
 		}
 		dismiss(animated: true)
 	}
@@ -32,7 +51,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 		navigationItem.hidesSearchBarWhenScrolling = false
 		navigationItem.largeTitleDisplayMode = .automatic
 
-		searchTimer = PopTimer(timeInterval: 0.5) { [weak self] in
+		searchTimer = PopTimer(timeInterval: 0.4) { [weak self] in
 			self?.reloadData()
 		}
 	}
@@ -58,13 +77,13 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 	}
 
 	@IBAction private func actionSelected(_ sender: UIBarButtonItem) {
-		let r = UIAlertAction(title: "Refresh teams & watchlists", style: .destructive) { a in
+		let r = UIAlertAction(title: "Refresh teams & watchlists", style: .destructive) { _ in
 			self.refreshList()
 		}
-		let w = UIAlertAction(title: "Advanced repo settings…", style: .default) { a in
+		let w = UIAlertAction(title: "Advanced repo settings…", style: .default) { _ in
 			self.performSegue(withIdentifier: "showWatchlistSettings", sender: self)
 		}
-		let c = UIAlertAction(title: "Custom repos…", style: .default) { a in
+		let c = UIAlertAction(title: "Custom repos…", style: .default) { _ in
 			self.performSegue(withIdentifier: "showCustomRepos", sender: self)
 		}
 		let cancel = UIAlertAction(title: "Cancel", style: .cancel)
@@ -82,6 +101,35 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 			tableView.deselectRow(at: ip, animated: false)
 		}
 		performSegue(withIdentifier: "showRepoSelection", sender: self)
+	}
+
+	private func setSort(by option: SortOption) {
+		if let i = currentSortOptions.index(of: option) {
+			currentSortOptions.remove(at: i)
+		}
+		currentSortOptions.insert(option, at: 0)
+		reloadData()
+	}
+
+	@IBAction private func sortSelected(_ sender: UIBarButtonItem) {
+		let a = UIAlertController(title: "Sort by...", message: nil, preferredStyle: .actionSheet)
+		a.addAction(UIAlertAction(title: "Name", style: .default, handler: { _ in
+			self.setSort(by: .name)
+		}))
+		a.addAction(UIAlertAction(title: "PR Visibility", style: .default, handler: { _ in
+			self.setSort(by: .prVisibility)
+		}))
+		a.addAction(UIAlertAction(title: "Issue Visibility", style: .default, handler: { _ in
+			self.setSort(by: .issueVisibility)
+		}))
+		a.addAction(UIAlertAction(title: "Item Hiding", style: .default, handler: { _ in
+			self.setSort(by: .hidingSetting)
+		}))
+		a.addAction(UIAlertAction(title: "Repo Is Fork", style: .default, handler: { _ in
+			self.setSort(by: .isFork)
+		}))
+		a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+		present(a, animated: true)
 	}
 
 	private func refreshList() {
@@ -121,10 +169,6 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 		}
 	}
 
-	override func numberOfSections(in tableView: UITableView) -> Int {
-		return fetchedResultsController.sections?.count ?? 0
-	}
-
 	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		return fetchedResultsController.sections?[section].numberOfObjects ?? 0
 	}
@@ -136,20 +180,19 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 	}
 
 	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-		if let indexPath = tableView.indexPathForSelectedRow,
-			let vc = segue.destination as? RepoSettingsViewController {
-
-			vc.repo = fetchedResultsController.object(at: indexPath)
+		if let vc = segue.destination as? RepoSettingsViewController {
+			if let indexPath = tableView.indexPathForSelectedRow {
+				vc.repo = fetchedResultsController.object(at: indexPath)
+			}
+			vc.filter = searchText
 		}
 	}
 
-	override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-		if section==1 {
-			return "Forked Repos"
-		} else {
-			let repo = fetchedResultsController.object(at: IndexPath(row: 0, section: section))
-			return repo.fork ? "Forked Repos" : "Parent Repos"
+	private var searchText: String? {
+		if let text = navigationItem.searchController!.searchBar.text?.trim, !text.isEmpty {
+			return text
 		}
+		return nil
 	}
 
 	private var fetchedResultsController: NSFetchedResultsController<Repo> {
@@ -158,19 +201,29 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 		}
 
 		let fetchRequest = NSFetchRequest<Repo>(entityName: "Repo")
-		if let text = navigationItem.searchController!.searchBar.text, !text.isEmpty {
+		if let text = searchText {
 			fetchRequest.predicate = NSPredicate(format: "fullName contains [cd] %@", text)
+			setAllPrsItem.title = "Options for visible repos"
+		} else {
+			setAllPrsItem.title = "Options for all repos"
 		}
 		fetchRequest.returnsObjectsAsFaults = false
 		fetchRequest.includesSubentities = false
 		fetchRequest.fetchBatchSize = 20
-		fetchRequest.sortDescriptors = [NSSortDescriptor(key: "fork", ascending: true), NSSortDescriptor(key: "fullName", ascending: true)]
+		fetchRequest.sortDescriptors = currentSortOptions.map { $0.descriptor }
 
-		let fc = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: DataManager.main, sectionNameKeyPath: "fork", cacheName: nil)
+		let fc = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: DataManager.main, sectionNameKeyPath: nil, cacheName: nil)
 		fc.delegate = self
 		_fetchedResultsController = fc
 
 		try! fc.performFetch()
+
+		if (fc.fetchedObjects?.count ?? 0) == 0 {
+			navigationController?.setToolbarHidden(true, animated: true)
+		} else {
+			navigationController?.setToolbarHidden(false, animated: true)
+		}
+
 		return fc
 	}
 
@@ -197,6 +250,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 		cell.prLabel.attributedText = prTitle
 		cell.issuesLabel.attributedText = issuesTitle
 		cell.hidingLabel.attributedText = hidingTitle
+		cell.forkLabel.text = repo.fork ? "Fork" : nil
 		cell.accessibilityLabel = "\(title), \(prTitle.string), \(issuesTitle.string), \(hidingTitle.string), \(groupTitle.string)"
 	}
 
@@ -298,6 +352,8 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 			tableView.insertSections(IndexSet(addedIndexes), with: .fade)
 		}
 		tableView.endUpdates()
+
+
 	}
 
 	override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {

@@ -318,6 +318,9 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 	@IBAction private func done(_ sender: UIBarButtonItem) {
 		if preferencesDirty { app.startRefresh() }
+		if presentedViewController != nil {
+			dismiss(animated: false)
+		}
 		dismiss(animated: true)
 	}
 
