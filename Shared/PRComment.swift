@@ -16,7 +16,7 @@ final class PRComment: DataItem {
 
 	@NSManaged var reactions: Set<Reaction>
 
-	class func syncComments(from data: [[AnyHashable : Any]]?, pullRequest: PullRequest) {
+	static func syncComments(from data: [[AnyHashable : Any]]?, pullRequest: PullRequest) {
 		items(with: data, type: PRComment.self, server: pullRequest.apiServer) { item, info, newOrUpdated in
 			if newOrUpdated {
 				item.pullRequest = pullRequest
@@ -27,7 +27,7 @@ final class PRComment: DataItem {
 		}
 	}
 
-	class func syncComments(from data: [[AnyHashable : Any]]?, issue: Issue) {
+	static func syncComments(from data: [[AnyHashable : Any]]?, issue: Issue) {
 		items(with: data, type: PRComment.self, server: issue.apiServer) { item, info, newOrUpdated in
 			if newOrUpdated {
 				item.issue = issue
@@ -117,7 +117,7 @@ final class PRComment: DataItem {
 		}
 	}
 
-	class func commentsThatNeedReactionsToBeRefreshed(in moc: NSManagedObjectContext) -> [PRComment] {
+	static func commentsThatNeedReactionsToBeRefreshed(in moc: NSManagedObjectContext) -> [PRComment] {
 		let f = NSFetchRequest<PRComment>(entityName: "PRComment")
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "requiresReactionRefreshFromUrl != nil")

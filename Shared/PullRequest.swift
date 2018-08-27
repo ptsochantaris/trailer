@@ -20,7 +20,7 @@ final class PullRequest: ListableItem {
 	@NSManaged var statuses: Set<PRStatus>
 	@NSManaged var reviews: Set<Review>
 
-	class func syncPullRequests(from data: [[AnyHashable : Any]]?, in repo: Repo) {
+	static func syncPullRequests(from data: [[AnyHashable : Any]]?, in repo: Repo) {
 		items(with: data, type: PullRequest.self, server: repo.apiServer) { item, info, isNewOrUpdated in
 			if isNewOrUpdated {
 
@@ -88,14 +88,14 @@ final class PullRequest: ListableItem {
 		return shouldNotify
 	}
 
-	class func pullRequestsThatNeedReactionsToBeRefreshed(in moc: NSManagedObjectContext) -> [PullRequest] {
+	static func pullRequestsThatNeedReactionsToBeRefreshed(in moc: NSManagedObjectContext) -> [PullRequest] {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "requiresReactionRefreshFromUrl != nil")
 		return try! moc.fetch(f)
 	}
 
-	class func allMerged(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, includeAllGroups: Bool = false) -> [PullRequest] {
+	static func allMerged(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, includeAllGroups: Bool = false) -> [PullRequest] {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false
@@ -104,7 +104,7 @@ final class PullRequest: ListableItem {
 		return try! moc.fetch(f)
 	}
 
-	class func allClosed(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, includeAllGroups: Bool = false) -> [PullRequest] {
+	static func allClosed(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, includeAllGroups: Bool = false) -> [PullRequest] {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false
@@ -113,14 +113,14 @@ final class PullRequest: ListableItem {
 		return try! moc.fetch(f)
 	}
 
-	class func countOpen(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
+	static func countOpen(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.includesSubentities = false
 		add(criterion: criterion, toFetchRequest: f, originalPredicate: ItemCondition.isOpenPredicate, in: moc)
 		return try! moc.count(for: f)
 	}
 
-	class func markEverythingRead(in section: Section, in moc: NSManagedObjectContext) {
+	static func markEverythingRead(in section: Section, in moc: NSManagedObjectContext) {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false
@@ -149,21 +149,21 @@ final class PullRequest: ListableItem {
 		return badgeCount
 	}
 
-	class func badgeCount(in section: Section, in moc: NSManagedObjectContext) -> Int {
+	static func badgeCount(in section: Section, in moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.includesSubentities = false
 		f.predicate = NSCompoundPredicate(type: .and, subpredicates: [section.matchingPredicate, includeInUnreadPredicate])
 		return badgeCount(from: f, in: moc)
 	}
 
-	class func badgeCount(in moc: NSManagedObjectContext) -> Int {
+	static func badgeCount(in moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.includesSubentities = false
 		f.predicate = NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, includeInUnreadPredicate])
 		return badgeCount(from: f, in: moc)
 	}
 
-	class func badgeCount(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
+	static func badgeCount(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
 		let f = requestForItems(of: PullRequest.self, withFilter: nil, sectionIndex: -1, criterion: criterion)
 		return badgeCount(from: f, in: moc)
 	}
@@ -173,7 +173,7 @@ final class PullRequest: ListableItem {
 		return Settings.markPrsAsUnreadOnNewCommits ? _unreadOrNewCommitsPredicate : super.includeInUnreadPredicate
 	}
 
-	class func reasonForEmpty(with filterValue: String?, criterion: GroupingCriterion?) -> NSAttributedString {
+	static func reasonForEmpty(with filterValue: String?, criterion: GroupingCriterion?) -> NSAttributedString {
 		let openRequestCount = PullRequest.countOpen(in: DataManager.main, criterion: criterion)
 		return reasonForEmpty(with: filterValue, criterion: criterion, openItemCount: openRequestCount)
 	}

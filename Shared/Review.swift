@@ -16,7 +16,7 @@ final class Review: DataItem {
 		case DISMISSED
 	}
 
-	class func syncReviews(from data: [[AnyHashable : Any]]?, withParent: PullRequest) {
+	static func syncReviews(from data: [[AnyHashable : Any]]?, withParent: PullRequest) {
 
 		items(with: data, type: Review.self, server: withParent.apiServer) { item, info, isNewOrUpdated in
 			if isNewOrUpdated {
@@ -51,7 +51,7 @@ final class Review: DataItem {
 		}
 	}
 
-	class func review(with id: Int64, in moc: NSManagedObjectContext) -> Review? {
+	static func review(with id: Int64, in moc: NSManagedObjectContext) -> Review? {
 		let f = NSFetchRequest<Review>(entityName: "Review")
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false

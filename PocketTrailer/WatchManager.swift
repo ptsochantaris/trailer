@@ -375,12 +375,12 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		}
 	}
 
-	private class func counts<T: ListableItem>(for type: T.Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> [String : Int] {
+	private static func counts<T: ListableItem>(for type: T.Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> [String : Int] {
 		return ["total": countItems(of: type, in: section, criterion: criterion, moc: moc),
 		        "unread": badgeCount(for: type, in: section, criterion: criterion, moc: moc)]
 	}
 
-	private class func countallItems<T: ListableItem>(of type: T.Type, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> Int {
+	private static func countallItems<T: ListableItem>(of type: T.Type, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest<T>(entityName: String(describing: type))
 		f.includesSubentities = false
 		let p = Settings.hideUncommentedItems
@@ -390,7 +390,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		return try! moc.count(for: f)
 	}
 
-	private class func countItems<T: ListableItem>(of type: T.Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> Int {
+	private static func countItems<T: ListableItem>(of type: T.Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest<T>(entityName: String(describing: type))
 		f.includesSubentities = false
 		let p = Settings.hideUncommentedItems
@@ -400,7 +400,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		return try! moc.count(for: f)
 	}
 
-	private class func badgeCount<T: ListableItem>(for type: T.Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> Int {
+	private static func badgeCount<T: ListableItem>(for type: T.Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest<T>(entityName: String(describing: type))
 		f.includesSubentities = false
 		let p = NSCompoundPredicate(type: .and, subpredicates: [section.matchingPredicate, type.includeInUnreadPredicate])
@@ -408,7 +408,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		return ListableItem.badgeCount(from: f, in: moc)
 	}
 
-	private class func countOpenAndVisible<T: ListableItem>(of type: T.Type, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> Int {
+	private static func countOpenAndVisible<T: ListableItem>(of type: T.Type, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest<T>(entityName: String(describing: type))
 		f.includesSubentities = false
 		let p = Settings.hideUncommentedItems

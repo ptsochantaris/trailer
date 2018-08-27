@@ -29,7 +29,7 @@ final class StartupLaunch: NSObject {
 		return (nil, nil)
 	}
 
-	class func setLaunchOnLogin(_ launch: Bool) {
+	static func setLaunchOnLogin(_ launch: Bool) {
 
 		let itemReferences = itemReferencesInLoginItems
 		let isSet = itemReferences.existingReference != nil

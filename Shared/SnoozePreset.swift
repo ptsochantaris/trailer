@@ -73,7 +73,7 @@ final class SnoozePreset: NSManagedObject {
 		}
 	}
 
-	class func allSnoozePresets(in moc: NSManagedObjectContext) -> [SnoozePreset] {
+	static func allSnoozePresets(in moc: NSManagedObjectContext) -> [SnoozePreset] {
 		let f = NSFetchRequest<SnoozePreset>(entityName: "SnoozePreset")
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false
@@ -81,7 +81,7 @@ final class SnoozePreset: NSManagedObject {
 		return try! moc.fetch(f)
 	}
 
-	class func newSnoozePreset(in moc: NSManagedObjectContext) -> SnoozePreset {
+	static func newSnoozePreset(in moc: NSManagedObjectContext) -> SnoozePreset {
 		let s = NSEntityDescription.insertNewObject(forEntityName: "SnoozePreset", into: moc) as! SnoozePreset
 		s.duration = true
 		s.sortOrder = Int64.max
@@ -89,7 +89,7 @@ final class SnoozePreset: NSManagedObject {
 		return s
 	}
 
-	class func setSortOrders(in moc: NSManagedObjectContext) {
+	static func setSortOrders(in moc: NSManagedObjectContext) {
 		// Sanity to prevent sorting confusion later
 		var c: Int64 = 0
 		for i in allSnoozePresets(in: moc) {
@@ -138,7 +138,7 @@ final class SnoozePreset: NSManagedObject {
 		return archivedData
 	}
 
-	class func configure(from archive: [[String : NSObject]]) -> Bool {
+	static func configure(from archive: [[String : NSObject]]) -> Bool {
 
 		let tempMoc = DataManager.buildChildContext()
 

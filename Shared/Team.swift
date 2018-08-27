@@ -7,7 +7,7 @@ final class Team: DataItem {
     @NSManaged var organisationLogin: String?
 	@NSManaged var calculatedReferral: String?
 
-	class func syncTeams(from data: [[AnyHashable : Any]]?, server: ApiServer) {
+	static func syncTeams(from data: [[AnyHashable : Any]]?, server: ApiServer) {
 
 		items(with: data, type: Team.self, server: server) { item, info, isNewOrUpdated in
 			let slug = S(info["slug"] as? String)

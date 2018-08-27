@@ -5,14 +5,14 @@ import CoreSpotlight
 
 final class NotificationManager {
 
-	class func handleLocalNotification(notification: UNNotificationContent, action: String) {
+	static func handleLocalNotification(notification: UNNotificationContent, action: String) {
 		if notification.userInfo.count > 0 {
 			DLog("Received local notification: %@", notification.userInfo)
 			popupManager.masterController.localNotificationSelected(userInfo: notification.userInfo, action: action)
 		}
 	}
 
-	class func handleUserActivity(activity: NSUserActivity) -> Bool {
+	static func handleUserActivity(activity: NSUserActivity) -> Bool {
 
 		if let info = activity.userInfo {
 			if activity.activityType == CSSearchableItemActionType, let uid = info[CSSearchableItemActivityIdentifier] as? String {
@@ -27,7 +27,7 @@ final class NotificationManager {
 		return false
 	}
 
-	class func setup(delegate: UNUserNotificationCenterDelegate) {
+	static func setup(delegate: UNUserNotificationCenterDelegate) {
 		let readAction = UNNotificationAction(identifier: "read", title: "Mark as read", options: [])
 		let muteAction = UNNotificationAction(identifier: "mute", title: "Mute this item", options: [.destructive])
 		let itemCategory = UNNotificationCategory(identifier: "mutable", actions: [readAction, muteAction], intentIdentifiers: [], options: [])
@@ -45,7 +45,7 @@ final class NotificationManager {
 		n.delegate = delegate
 	}
 
-	class func postNotification(type: NotificationType, for item: DataItem) {
+	static func postNotification(type: NotificationType, for item: DataItem) {
 		if preferencesDirty {
 			return
 		}

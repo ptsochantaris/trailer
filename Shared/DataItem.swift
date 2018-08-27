@@ -18,7 +18,7 @@ class DataItem: NSManagedObject {
 		return (createdAt ?? .distantPast) < (item.createdAt ?? .distantPast) || serverId < item.serverId
 	}
 
-	final class func allItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext, prefetchRelationships: [String]? = nil) -> [T] {
+	static func allItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext, prefetchRelationships: [String]? = nil) -> [T] {
 		let f = NSFetchRequest<T>(entityName: String(describing: type))
 		f.relationshipKeyPathsForPrefetching = prefetchRelationships
 		f.returnsObjectsAsFaults = false
@@ -26,14 +26,14 @@ class DataItem: NSManagedObject {
 		return try! moc.fetch(f)
 	}
 
-	final class func allItems<T: DataItem>(of type: T.Type, in server: ApiServer) -> [T] {
+	static func allItems<T: DataItem>(of type: T.Type, in server: ApiServer) -> [T] {
 		let f = NSFetchRequest<T>(entityName: String(describing: type))
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "apiServer == %@", server)
 		return try! server.managedObjectContext!.fetch(f)
 	}
 
-	final class func items<T: DataItem>(with data: [[AnyHashable : Any]]?,
+	static func items<T: DataItem>(with data: [[AnyHashable : Any]]?,
 	                       type: T.Type,
 	                       server: ApiServer,
 	                       prefetchRelationships: [String]? = nil,
@@ -100,7 +100,7 @@ class DataItem: NSManagedObject {
 		}
 	}
 
-	final class func items<T: DataItem>(of type: T.Type, surviving: Bool, in moc: NSManagedObjectContext, prefetchRelationships: [String]? = nil) -> [T] {
+	static func items<T: DataItem>(of type: T.Type, surviving: Bool, in moc: NSManagedObjectContext, prefetchRelationships: [String]? = nil) -> [T] {
 		let f = NSFetchRequest<T>(entityName: String(describing: type))
 		f.relationshipKeyPathsForPrefetching = prefetchRelationships
 		f.includesSubentities = false
@@ -114,7 +114,7 @@ class DataItem: NSManagedObject {
 		return try! moc.fetch(f)
 	}
 
-	final class func newOrUpdatedItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext) -> [T] {
+	static func newOrUpdatedItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext) -> [T] {
 		let f = NSFetchRequest<T>(entityName: String(describing: type))
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false
@@ -122,7 +122,7 @@ class DataItem: NSManagedObject {
 		return try! moc.fetch(f)
 	}
 
-	final class func updatedItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext) -> [T] {
+	static func updatedItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext) -> [T] {
 		let f = NSFetchRequest<T>(entityName: String(describing: type))
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false
@@ -130,7 +130,7 @@ class DataItem: NSManagedObject {
 		return try! moc.fetch(f)
 	}
 
-	final class func newItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext) -> [T] {
+	static func newItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext) -> [T] {
 		let f = NSFetchRequest<T>(entityName: String(describing: type))
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false
@@ -138,7 +138,7 @@ class DataItem: NSManagedObject {
 		return try! moc.fetch(f)
 	}
 
-	final class func nukeDeletedItems(in moc: NSManagedObjectContext) {
+	static func nukeDeletedItems(in moc: NSManagedObjectContext) {
 
 		func nukeDeletedItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext) -> Int {
 			let discarded = items(of: type, surviving: false, in: moc)
@@ -164,13 +164,13 @@ class DataItem: NSManagedObject {
 		DLog("Nuked total %@ items marked for deletion", count)
 	}
 
-	final class func countItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext) -> Int {
+	static func countItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest<T>(entityName: String(describing: type))
 		f.includesSubentities = false
 		return try! moc.count(for: f)
 	}
 
-	class func add<T: ListableItem>(criterion: GroupingCriterion?, toFetchRequest: NSFetchRequest<T>, originalPredicate: NSPredicate, in moc: NSManagedObjectContext, includeAllGroups: Bool = false) {
+	static func add<T: ListableItem>(criterion: GroupingCriterion?, toFetchRequest: NSFetchRequest<T>, originalPredicate: NSPredicate, in moc: NSManagedObjectContext, includeAllGroups: Bool = false) {
 		var andPredicates = [NSPredicate]()
 		if let c = criterion {
 			andPredicates.append(c.addCriterion(to: originalPredicate, in: moc))

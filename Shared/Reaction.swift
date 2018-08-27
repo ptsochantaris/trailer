@@ -10,7 +10,7 @@ final class Reaction: DataItem {
 	@NSManaged var issue: Issue?
 	@NSManaged var comment: PRComment?
 
-	class func syncReactions(from data: [[AnyHashable : Any]]?, comment: PRComment) {
+	static func syncReactions(from data: [[AnyHashable : Any]]?, comment: PRComment) {
 		items(with: data, type: Reaction.self, server: comment.apiServer) { item, info, isNewOrUpdated in
 			if isNewOrUpdated {
 				item.comment = comment
@@ -19,7 +19,7 @@ final class Reaction: DataItem {
 		}
 	}
 
-	class func syncReactions(from data: [[AnyHashable : Any]]?, parent: ListableItem) {
+	static func syncReactions(from data: [[AnyHashable : Any]]?, parent: ListableItem) {
 		items(with: data, type: Reaction.self, server: parent.apiServer) { item, info, isNewOrUpdated in
 			if isNewOrUpdated {
 				item.pullRequest = parent as? PullRequest
@@ -56,7 +56,7 @@ final class Reaction: DataItem {
 		return userId == apiServer.userId
 	}
 
-	class func changesDetected(in reactions: Set<Reaction>, from info: [AnyHashable : Any]) -> String? {
+	static func changesDetected(in reactions: Set<Reaction>, from info: [AnyHashable : Any]) -> String? {
 		var counts = [String:Int]()
 		for r in reactions {
 			if let c = r.content {

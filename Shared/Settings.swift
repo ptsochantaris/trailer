@@ -24,7 +24,7 @@ final class Settings {
 			"DISPLAY_MILESTONES", "DEFAULT_APP_FOR_OPENING_WEB", "DEFAULT_APP_FOR_OPENING_ITEMS", "HIDE_ARCHIVED_REPOS"]
 	}
 
-    class func checkMigration() {
+    static func checkMigration() {
 
 		if let snoozeWakeOnComment = sharedDefaults.object(forKey: "SNOOZE_WAKEUP_ON_COMMENT") as? Bool {
 			DataManager.postMigrationSnoozeWakeOnComment = snoozeWakeOnComment
@@ -121,7 +121,7 @@ final class Settings {
 		sharedDefaults.synchronize()
 	}
 
-	private class func set(_ key: String, _ value: Any?) {
+	private static func set(_ key: String, _ value: Any?) {
 
 		let previousValue = sharedDefaults.object(forKey: key)
 
@@ -158,7 +158,7 @@ final class Settings {
 		}
 	}
 
-	class func possibleExport(_ key: String?) {
+	static func possibleExport(_ key: String?) {
 		#if os(OSX)
 		let keyIsGood: Bool
 		if let k = key {
@@ -172,14 +172,14 @@ final class Settings {
 		#endif
 	}
 
-	private class func get(_ key: String) -> Any? {
+	private static func get(_ key: String) -> Any? {
 		return sharedDefaults.object(forKey: key)
 	}
 
 	///////////////////////////////// IMPORT / EXPORT
 
 	@discardableResult
-	class func writeToURL(_ url: URL) -> Bool {
+	static func writeToURL(_ url: URL) -> Bool {
 
 		saveTimer.abort()
 
@@ -202,7 +202,7 @@ final class Settings {
 		return true
 	}
 
-	class func readFromURL(_ url: URL) -> Bool {
+	static func readFromURL(_ url: URL) -> Bool {
 		if let settings = NSDictionary(contentsOf: url) {
 			DLog("Reading settings from %@", url.absoluteString)
 			resetAllSettings()
@@ -218,7 +218,7 @@ final class Settings {
 		return false
 	}
 
-	class func resetAllSettings() {
+	static func resetAllSettings() {
 		for k in allFields {
 			sharedDefaults.removeObject(forKey: k)
 		}

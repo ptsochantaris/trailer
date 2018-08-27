@@ -17,7 +17,7 @@ final class DataManager {
 		return m
 	}()
 
-	class func checkMigration() {
+	static func checkMigration() {
 
 		guard let count = main.persistentStoreCoordinator?.persistentStores.count, count > 0 else { return }
 
@@ -29,7 +29,7 @@ final class DataManager {
 		ApiServer.ensureAtLeastGithub(in: main)
 	}
 
-	private class func performVersionChangedTasks() {
+	private static func performVersionChangedTasks() {
 
 		#if os(OSX)
 		let nc = NSUserNotificationCenter.default
@@ -131,7 +131,7 @@ final class DataManager {
 		}
 	}
 
-	class func sendNotificationsIndexAndSave() {
+	static func sendNotificationsIndexAndSave() {
 
 		func processItems<T: ListableItem>(of type: T.Type, newNotification: NotificationType, reopenedNotification: NotificationType, assignmentNotification: NotificationType) -> [T] {
 			let allItems = DataItem.allItems(of: type, in: main)
@@ -227,7 +227,7 @@ final class DataManager {
 		NotificationQueue.commit()
 	}
 
-	class func saveDB() {
+	static func saveDB() {
 		if main.hasChanges {
 			DLog("Saving DB")
 			do {
@@ -238,7 +238,7 @@ final class DataManager {
 		}
 	}
 
-	class func buildChildContext() -> NSManagedObjectContext {
+	static func buildChildContext() -> NSManagedObjectContext {
 		let c = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
 		c.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
 		c.undoManager = nil
@@ -246,7 +246,7 @@ final class DataManager {
 		return c
 	}
 
-	class func buildParallelContext() -> NSManagedObjectContext {
+	static func buildParallelContext() -> NSManagedObjectContext {
 		let c = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 		c.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
 		c.undoManager = nil
@@ -254,7 +254,7 @@ final class DataManager {
 		return c
 	}
 
-	class func info(for item: DataItem) -> [String : Any] {
+	static func info(for item: DataItem) -> [String : Any] {
 
 		if let item = item as? PRComment {
 			let uri = item.objectID.uriRepresentation().absoluteString
@@ -298,14 +298,14 @@ final class DataManager {
 		}
 	}
 
-	class func postMigrationTasks() {
+	static func postMigrationTasks() {
 		if _justMigrated {
 			ApiServer.resetSyncOfEverything()
 			_justMigrated = false
 		}
 	}
 
-	class func postProcessAllItems(in moc: NSManagedObjectContext? = nil) {
+	static func postProcessAllItems(in moc: NSManagedObjectContext? = nil) {
 		let context = moc ?? main
 		for p in DataItem.allItems(of: PullRequest.self, in: context, prefetchRelationships: ["comments", "reactions", "reviews"]) {
 			p.postProcess()
@@ -315,7 +315,7 @@ final class DataManager {
 		}
 	}
 
-	class func id(for uriPath: String?) -> NSManagedObjectID? {
+	static func id(for uriPath: String?) -> NSManagedObjectID? {
 		if let up = uriPath, let u = URL(string: up), let p = main.persistentStoreCoordinator {
 			return p.managedObjectID(forURIRepresentation: u)
 		}
@@ -333,7 +333,7 @@ final class DataManager {
 		return finalURL
 	}()
 
-	class func removeDatabaseFiles() {
+	static func removeDatabaseFiles() {
 		let fm = FileManager.default
 		let documentsDirectory = dataFilesDirectory.path
 		do {

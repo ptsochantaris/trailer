@@ -114,7 +114,7 @@ final class API {
 	private static let reachability = Reachability()
 	private static let backOffIncrement: TimeInterval = 120
 
-	class func setup() {
+	static func setup() {
 
 		reachability.startNotifier()
 
@@ -137,7 +137,7 @@ final class API {
 		}
 	}
 
-	private class func checkNetworkAvailability() {
+	private static func checkNetworkAvailability() {
 		let newStatus = reachability.status
 		if newStatus != currentNetworkStatus {
 			currentNetworkStatus = newStatus
@@ -187,7 +187,7 @@ final class API {
 
 	///////////////////////////////////////////////////////// Images
 
-	private class func expireOldImageCacheEntries() {
+	private static func expireOldImageCacheEntries() {
 
 		let now = Date()
 		let fileManager = FileManager.default
@@ -208,7 +208,7 @@ final class API {
 	}
 
 	@discardableResult
-	class func haveCachedAvatar(from path: String, callback: @escaping (IMAGE_CLASS?, String) -> Void) -> Bool {
+	static func haveCachedAvatar(from path: String, callback: @escaping (IMAGE_CLASS?, String) -> Void) -> Bool {
 
 		func getImage(at imagePath: String, completion: @escaping (Data?) -> Void) {
 
@@ -306,7 +306,7 @@ final class API {
 		return n
 	}()
 
-	class func syncItemsForActiveReposAndCallback(callback: @escaping Completion) {
+	static func syncItemsForActiveReposAndCallback(callback: @escaping Completion) {
 
 		let syncContext = DataManager.buildChildContext()
 
@@ -326,7 +326,7 @@ final class API {
 		}
 	}
 
-	private class func markItemsForPeriodicReactionsCheck(in moc: NSManagedObjectContext) {
+	private static func markItemsForPeriodicReactionsCheck(in moc: NSManagedObjectContext) {
 
 		func markItemsNeedingReactionsCheck(items: [ListableItem]) {
 
@@ -353,7 +353,7 @@ final class API {
 		markItemsNeedingReactionsCheck(items: issueItems)
 	}
 
-	private class func sync(to moc: NSManagedObjectContext, callback: @escaping Completion) {
+	private static func sync(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		let repos = Repo.syncableRepos(in: moc)
 
@@ -409,7 +409,7 @@ final class API {
 		}
 	}
 
-	private class func fetchItems(from repos: [Repo], to moc: NSManagedObjectContext, callback: @escaping Completion) {
+	private static func fetchItems(from repos: [Repo], to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		var completionCount = 0
 		let totalOperations = 2
@@ -424,7 +424,7 @@ final class API {
 		fetchPullRequests(for: repos, to: moc, callback: completionCallback)
 	}
 
-	private class func markExtraUpdatedItems(from repos: [Repo], to moc: NSManagedObjectContext, callback: @escaping Completion) {
+	private static func markExtraUpdatedItems(from repos: [Repo], to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		if repos.count == 0 {
 			callback()
@@ -497,7 +497,7 @@ final class API {
 		}
 	}
 
-	private class func completeSync(in moc: NSManagedObjectContext, andCallback: @escaping Completion) {
+	private static func completeSync(in moc: NSManagedObjectContext, andCallback: @escaping Completion) {
 
 		DLog("Wrapping up sync")
 
@@ -517,12 +517,13 @@ final class API {
 			DataItem.nukeDeletedItems(in: moc)
 		}
 
-		CacheEntry.cacheMoc.perform {
-			CacheEntry.cleanAndCheckpoint()
+		mainQueue.addOperation {
+			DataManager.postProcessAllItems(in: moc)
 		}
 
 		mainQueue.addOperation {
-			DataManager.postProcessAllItems(in: moc)
+			DLog("Caching \(URLCache.shared.currentMemoryUsage) bytes in memory")
+			DLog("Caching \(URLCache.shared.currentDiskUsage) bytes on disk")
 		}
 		
 		mainQueue.addOperation {
@@ -537,7 +538,7 @@ final class API {
 		}
 	}
 
-	private class func updatePullRequests(in moc: NSManagedObjectContext, callback: @escaping Completion) {
+	private static func updatePullRequests(in moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		let totalOperations = 3
 			+ (Settings.showStatusItems ? 1 : 0)
@@ -589,7 +590,7 @@ final class API {
 		}
 	}
 
-	private class func fetchUserTeams(from server: ApiServer, callback: @escaping Completion) {
+	private static func fetchUserTeams(from server: ApiServer, callback: @escaping Completion) {
 
 		for t in server.teams {
 			t.postSyncAction = PostSyncAction.delete.rawValue
@@ -606,7 +607,7 @@ final class API {
 		}
 	}
 
-	class func fetchRepositories(to moc: NSManagedObjectContext, callback: @escaping Completion) {
+	static func fetchRepositories(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		ApiServer.resetSyncSuccess(in: moc)
 		clearAllBadLinks() // otherwise inaccessible repos may get a cached error response, even if they have become available
@@ -647,7 +648,7 @@ final class API {
 		}
 	}
 
-	private class func fetchPullRequests(for repos: [Repo], to moc: NSManagedObjectContext, callback: @escaping Completion) {
+	private static func fetchPullRequests(for repos: [Repo], to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		for r in Repo.unsyncableRepos(in: moc) {
 			for p in r.pullRequests {
@@ -695,7 +696,7 @@ final class API {
 		}
 	}
 
-	private class func handleRepoSyncFailure(repo: Repo, resultCode: Int64) {
+	private static func handleRepoSyncFailure(repo: Repo, resultCode: Int64) {
 		if resultCode == 404 { // repo disabled
 			repo.inaccessible = true
 			repo.postSyncAction = PostSyncAction.doNothing.rawValue
@@ -712,7 +713,7 @@ final class API {
 		}
 	}
 
-	private class func fetchIssues(for repos: [Repo], to moc: NSManagedObjectContext, callback: @escaping Completion) {
+	private static func fetchIssues(for repos: [Repo], to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		for r in Repo.unsyncableRepos(in: moc) {
 			for i in r.issues {
@@ -760,7 +761,7 @@ final class API {
 		}
 	}
 
-	private class func fetchCommentReactionsIfNeeded(to moc: NSManagedObjectContext, callback: @escaping Completion) {
+	private static func fetchCommentReactionsIfNeeded(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 		let comments = PRComment.commentsThatNeedReactionsToBeRefreshed(in: moc).filter { $0.apiServer.lastSyncSucceeded }
 		let totalOperations = comments.count
 		guard totalOperations > 0 else { callback(); return }
@@ -790,7 +791,7 @@ final class API {
 		}
 	}
 
-	private class func _fetchItemReactionsIfNeeded(to moc: NSManagedObjectContext, items: [ListableItem], callback: @escaping Completion) {
+	private static func _fetchItemReactionsIfNeeded(to moc: NSManagedObjectContext, items: [ListableItem], callback: @escaping Completion) {
 		let totalOperations = items.count
 		guard totalOperations > 0 else { callback(); return }
 
@@ -819,17 +820,17 @@ final class API {
 		}
 	}
 
-	private class func fetchIssueReactionsIfNeeded(to moc: NSManagedObjectContext, callback: @escaping Completion) {
+	private static func fetchIssueReactionsIfNeeded(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 		let items = Issue.issuesThatNeedReactionsToBeRefreshed(in: moc).filter { $0.apiServer.lastSyncSucceeded }
 		_fetchItemReactionsIfNeeded(to: moc, items: items, callback: callback)
 	}
 
-	private class func fetchPullRequestReactionsIfNeeded(to moc: NSManagedObjectContext, callback: @escaping Completion) {
+	private static func fetchPullRequestReactionsIfNeeded(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 		let items = PullRequest.pullRequestsThatNeedReactionsToBeRefreshed(in: moc).filter { $0.apiServer.lastSyncSucceeded }
 		_fetchItemReactionsIfNeeded(to: moc, items: items, callback: callback)
 	}
 
-	private class func fetchCommentsForCurrentPullRequests(to moc: NSManagedObjectContext, callback: @escaping Completion) {
+	private static func fetchCommentsForCurrentPullRequests(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		let prs = DataItem.newOrUpdatedItems(of: PullRequest.self, in: moc).filter { $0.apiServer.lastSyncSucceeded }
 		if prs.count == 0 {
@@ -891,7 +892,7 @@ final class API {
 		_fetchComments(for: prs, issues: false, in: moc, callback: completionCallback)
 	}
 
-	private class func fetchCommentsForCurrentIssues(to moc: NSManagedObjectContext, callback: @escaping Completion) {
+	private static func fetchCommentsForCurrentIssues(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		let issues = DataItem.newOrUpdatedItems(of: Issue.self, in: moc).filter { $0.apiServer.lastSyncSucceeded }
 
@@ -934,7 +935,7 @@ final class API {
 		}
 	}
 
-	private class func fetchReviewsForForCurrentPullRequests(to moc: NSManagedObjectContext, callback: @escaping Completion) {
+	private static func fetchReviewsForForCurrentPullRequests(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		let prs = DataItem.newOrUpdatedItems(of: PullRequest.self, in: moc).filter { $0.apiServer.lastSyncSucceeded }
 
@@ -977,7 +978,7 @@ final class API {
 		return Settings.displayReviewsOnItems || Settings.notifyOnReviewAssignments || (Int64(Settings.assignedReviewHandlingPolicy) != Section.none.rawValue)
 	}
 
-	private class func fetchReviewAssignmentsForCurrentPullRequests(to moc: NSManagedObjectContext, callback: @escaping Completion) {
+	private static func fetchReviewAssignmentsForCurrentPullRequests(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		let prs = DataItem.newOrUpdatedItems(of: PullRequest.self, in: moc).filter { $0.apiServer.lastSyncSucceeded }
 
@@ -1028,7 +1029,7 @@ final class API {
 		}
 	}
 
-	private class func fetchLabelsForForCurrentPullRequests(to moc: NSManagedObjectContext, callback: @escaping Completion) {
+	private static func fetchLabelsForForCurrentPullRequests(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		let prs = DataItem.newOrUpdatedItems(of: PullRequest.self, in: moc).filter { $0.apiServer.lastSyncSucceeded }
 
@@ -1072,7 +1073,7 @@ final class API {
 		}
 	}
 
-	private class func fetchStatusesForCurrentPullRequests(to moc: NSManagedObjectContext, callback: @escaping Completion) {
+	private static func fetchStatusesForCurrentPullRequests(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		let prs = PullRequest.active(of: PullRequest.self, in: moc, visibleOnly: !Settings.hidePrsThatArentPassing).filter { pr in
 			guard pr.apiServer.lastSyncSucceeded, pr.shouldShowStatuses else { return false }
@@ -1136,7 +1137,7 @@ final class API {
 		}
 	}
 
-	private class func checkPrClosures(in moc: NSManagedObjectContext, callback: @escaping Completion) {
+	private static func checkPrClosures(in moc: NSManagedObjectContext, callback: @escaping Completion) {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.predicate = NSCompoundPredicate(type: .and, subpredicates: [PostSyncAction.delete.matchingPredicate, ItemCondition.open.matchingPredicate])
 		f.returnsObjectsAsFaults = false
@@ -1163,7 +1164,7 @@ final class API {
 		}
 	}
 
-	private class func checkIssueClosures(in moc: NSManagedObjectContext) {
+	private static func checkIssueClosures(in moc: NSManagedObjectContext) {
 		let f = NSFetchRequest<Issue>(entityName: "Issue")
 		f.predicate = NSCompoundPredicate(type: .and, subpredicates: [PostSyncAction.delete.matchingPredicate, ItemCondition.open.matchingPredicate])
 		f.returnsObjectsAsFaults = false
@@ -1174,7 +1175,7 @@ final class API {
 		}
 	}
 
-	private class func detectAssignedPullRequests(in moc: NSManagedObjectContext, callback: @escaping Completion) {
+	private static func detectAssignedPullRequests(in moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		let prs = DataItem.newOrUpdatedItems(of: PullRequest.self, in: moc).filter { $0.apiServer.lastSyncSucceeded }
 
@@ -1213,7 +1214,7 @@ final class API {
 		}
 	}
 
-	private class func ensureApiServersHaveUserIds(in moc: NSManagedObjectContext, callback: @escaping Completion) {
+	private static func ensureApiServersHaveUserIds(in moc: NSManagedObjectContext, callback: @escaping Completion) {
 		var needToCheck = false
 		for apiServer in ApiServer.allApiServers(in: moc) {
 			if apiServer.userId == 0 || (apiServer.userName?.isEmpty ?? true) {
@@ -1230,7 +1231,7 @@ final class API {
 		}
 	}
 
-	private class func investigatePrClosure(for pullRequest: PullRequest, callback: @escaping Completion) {
+	private static func investigatePrClosure(for pullRequest: PullRequest, callback: @escaping Completion) {
 		DLog("Checking closed PR to see if it was merged: %@", pullRequest.title)
 
 		let repoFullName = S(pullRequest.repo.fullName)
@@ -1254,7 +1255,7 @@ final class API {
 		}
 	}
 
-	private class func handleMerging(of pullRequest: PullRequest, byUserId: Int64) {
+	private static func handleMerging(of pullRequest: PullRequest, byUserId: Int64) {
 
 		let myUserId = pullRequest.apiServer.userId
 		DLog("Detected merged PR: %@ by user %@, local user id is: %@, handling policy is %@, coming from section %@",
@@ -1281,7 +1282,7 @@ final class API {
 		DLog("Will not keep merged PR")
 	}
 
-	private class func handleClosing(of item: ListableItem) {
+	private static func handleClosing(of item: ListableItem) {
 		DLog("Detected closed item: %@, handling policy is %@, coming from section %@",
 		     item.title,
 		     Settings.closeHandlingPolicy,
@@ -1300,7 +1301,7 @@ final class API {
 		}
 	}
 
-	private class func getRateLimit(from server: ApiServer, callback: @escaping (_ limits: ApiRateLimits?)->Void) {
+	private static func getRateLimit(from server: ApiServer, callback: @escaping (_ limits: ApiRateLimits?)->Void) {
 
 		apiQueue.addOperation(ApiOperation(call: "/rate_limit", on: server, ignoreLastSync: true) { code, headers, data, error, shouldRetry in
 
@@ -1314,7 +1315,7 @@ final class API {
 		})
 	}
 
-	class func updateLimitsFromServer() {
+	static func updateLimitsFromServer() {
 		let allApiServers = ApiServer.allApiServers(in: DataManager.main)
 		let totalOperations = allApiServers.count
 		var completionCount = 0
@@ -1333,7 +1334,7 @@ final class API {
 		}
 	}
 
-	private class func syncManuallyAddedRepos(from server: ApiServer, callback: @escaping Completion) {
+	private static func syncManuallyAddedRepos(from server: ApiServer, callback: @escaping Completion) {
 		if !server.lastSyncSucceeded {
 			callback()
 			return
@@ -1360,7 +1361,7 @@ final class API {
 		}
 	}
 
-	private class func syncWatchedRepos(from server: ApiServer, callback: @escaping Completion) {
+	private static func syncWatchedRepos(from server: ApiServer, callback: @escaping Completion) {
 
 		if !server.lastSyncSucceeded {
 			callback()
@@ -1384,7 +1385,7 @@ final class API {
 		}
 	}
 
-	class func fetchRepo(fullName: String, from server: ApiServer, completion: @escaping (Error?) -> Void) {
+	static func fetchRepo(fullName: String, from server: ApiServer, completion: @escaping (Error?) -> Void) {
 		let path = "\(server.apiPath ?? "")/repos/\(fullName)"
 		getData(in: path, from: server) { data, lastPage, resultCode in
 			if let repoData = data as? [AnyHashable : Any] {
@@ -1397,7 +1398,7 @@ final class API {
 		}
 	}
 
-	class func fetchAllRepos(owner: String, from server: ApiServer, completion: @escaping (Error?) -> Void) {
+	static func fetchAllRepos(owner: String, from server: ApiServer, completion: @escaping (Error?) -> Void) {
 		var userError, orgError: Error?
 		let group = DispatchGroup()
 		group.enter()
@@ -1431,11 +1432,11 @@ final class API {
 		}
 	}
 
-	class func fetchRepo(named: String, owner: String, from server: ApiServer, completion: @escaping (Error?) -> Void) {
+	static func fetchRepo(named: String, owner: String, from server: ApiServer, completion: @escaping (Error?) -> Void) {
 		fetchRepo(fullName: "\(owner)/\(named)", from: server, completion: completion)
 	}
 
-	private class func syncUserDetails(in moc: NSManagedObjectContext, callback: @escaping Completion) {
+	private static func syncUserDetails(in moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		let allApiServers = ApiServer.allApiServers(in: moc)
 		let totalOperations = allApiServers.count
@@ -1467,11 +1468,11 @@ final class API {
 
 	}
 
-	class func clearAllBadLinks() {
+	static func clearAllBadLinks() {
 		badLinks.removeAll(keepingCapacity: false)
 	}
 
-	class func testApi(to apiServer: ApiServer, callback: @escaping (Error?) -> Void) {
+	static func testApi(to apiServer: ApiServer, callback: @escaping (Error?) -> Void) {
 
 		clearAllBadLinks()
 
@@ -1490,13 +1491,13 @@ final class API {
 		})
 	}
 
-	private class func apiError(_ message: String) -> Error {
+	private static func apiError(_ message: String) -> Error {
 		return NSError(domain: "API Error", code: -1, userInfo: [NSLocalizedDescriptionKey: message])
 	}
 
 	//////////////////////////////////////////////////////////// low level
 
-	private class func getPagedData(
+	private static func getPagedData(
 		at path: String,
 		from server: ApiServer,
 		startingFrom page: Int = 1,
@@ -1524,7 +1525,7 @@ final class API {
 		}
 	}
 
-	private class func getRawData(
+	private static func getRawData(
 		at path: String,
 		from server: ApiServer,
 		callback: @escaping (_ data: Any?, _ resultCode: Int64) -> Void) {
@@ -1540,7 +1541,7 @@ final class API {
 		}
 	}
 
-	private class func getData(
+	private static func getData(
 		in path: String,
 		from server: ApiServer,
 		attemptCount: Int = 0,
@@ -1579,7 +1580,7 @@ final class API {
 		})
 	}
 
-	private class func start(call path: String, on server: ApiServer, ignoreLastSync: Bool, completion: @escaping ApiCompletion) {
+	private static func start(call path: String, on server: ApiServer, ignoreLastSync: Bool, completion: @escaping ApiCompletion) {
 
 		let apiServerLabel: String
 		if server.lastSyncSucceeded || ignoreLastSync {
@@ -1595,7 +1596,7 @@ final class API {
 		let expandedPath = path.hasPrefix("/") ? S(server.apiPath).appending(pathComponent: path) : path
 		let url = URL(string: expandedPath)!
 
-		var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 60.0)
+		var request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 60.0)
 		var acceptTypes = [String]()
 		if shouldSyncReactions {
 			acceptTypes.append("application/vnd.github.squirrel-girl-preview")
@@ -1626,39 +1627,10 @@ final class API {
 			}
 		}
 
-		let cacheKey = "\(server.objectID.uriRepresentation().absoluteString) \(expandedPath)"
-		var previousCacheEntry: CacheEntry?
-		CacheEntry.cacheMoc.perform {
-			previousCacheEntry = CacheEntry.entry(for: cacheKey)
-			if let p = previousCacheEntry {
-				/////////////////////// 60 second dumb-caching
-				if p.lastFetched > Date(timeIntervalSinceNow: -60), let parsedData = p.parsedData {
-					DLog("(%@) GET %@ - CACHED", apiServerLabel, expandedPath)
-					DispatchQueue.global(qos: .background).asyncAfter(deadline: .now()+0.1) { // avoid overloading the UI with callbacks in case of cached entries
-						handleResponse(with: p.data,
-									   parsedData: parsedData,
-									   serverLabel: apiServerLabel,
-									   urlPath: expandedPath,
-									   code: p.code,
-									   error: nil,
-									   shouldRetry: false,
-									   existingBackOff: nil,
-									   headers: p.actualHeaders,
-									   completion: completion)
-					}
-				} else {
-					request.setValue(p.etag, forHTTPHeaderField: "If-None-Match")
-					proceedWithNetworkRequest(request, previousCacheEntry: p, cacheKey: cacheKey, urlPath: expandedPath, apiServerLabel: apiServerLabel, existingBackOff: existingBackOff, completion: completion)
-				}
-			} else {
-				proceedWithNetworkRequest(request, previousCacheEntry: nil, cacheKey: cacheKey, urlPath: expandedPath, apiServerLabel: apiServerLabel, existingBackOff: existingBackOff, completion: completion)
-			}
-		}
+		proceedWithNetworkRequest(request, urlPath: expandedPath, apiServerLabel: apiServerLabel, existingBackOff: existingBackOff, completion: completion)
 	}
 
-	private class func proceedWithNetworkRequest(_ request: URLRequest,
-	                                             previousCacheEntry: CacheEntry?,
-	                                             cacheKey: String,
+	private static func proceedWithNetworkRequest(_ request: URLRequest,
 	                                             urlPath: String,
 	                                             apiServerLabel: String,
 	                                             existingBackOff: UrlBackOffEntry?,
@@ -1669,64 +1641,42 @@ final class API {
 			let error: Error?
 			let shouldRetry: Bool
 			var parsedData: Any?
-			var code = Int64(response?.statusCode ?? 0)
-			var headers = response?.allHeaderFields
+			let code = Int64(response?.statusCode ?? 0)
+			let headers = response?.allHeaderFields
 
-			func done() {
-				handleResponse(with: data,
-							   parsedData: parsedData,
-							   serverLabel: apiServerLabel,
-							   urlPath: urlPath,
-							   code: code,
-							   error: error,
-							   shouldRetry: shouldRetry,
-							   existingBackOff: existingBackOff,
-							   headers: headers,
-							   completion: completion)
-			}
-
-			if code == 304, let previousCacheEntry = previousCacheEntry {
-				error = nil
-				shouldRetry = false
-				CacheEntry.cacheMoc.perform {
-					parsedData = previousCacheEntry.parsedData
-					code = previousCacheEntry.code
-					headers = previousCacheEntry.actualHeaders
-					CacheEntry.markFetched(for: cacheKey)
-					DLog("(%@) GET %@ - NO CHANGE (304): %@", apiServerLabel, urlPath, code)
-					done()
-				}
-			} else if code > 299 {
+			if code > 299 {
 				error = apiError("Server responded with error \(code)")
 				shouldRetry = (code == 502 || code == 503) // retry in case GH is deploying
-				done()
 			} else if code == 0 {
 				error = apiError("Server did not respond")
 				shouldRetry = (e as NSError?)?.code == -1001 // retry if it was a timeout
-				done()
 			} else if Int64(data?.count ?? 0) < (response?.expectedContentLength ?? 0) {
 				error = apiError("Server data was truncated")
 				shouldRetry = true // transfer truncation, try again
-				done()
 			} else {
 				DLog("(%@) GET %@ - RESULT: %@", apiServerLabel, urlPath, code)
 				error = e as NSError?
 				shouldRetry = false
 				if let d = data {
 					parsedData = try? JSONSerialization.jsonObject(with: d, options: [])
-					if let headers = headers, let etag = headers["Etag"] as? String {
-						CacheEntry.cacheMoc.perform {
-							CacheEntry.setEntry(key: cacheKey, code: code, etag: etag, data: d, headers: headers)
-						}
-					}
 				}
-				done()
 			}
+
+			handleResponse(with: data,
+						   parsedData: parsedData,
+						   serverLabel: apiServerLabel,
+						   urlPath: urlPath,
+						   code: code,
+						   error: error,
+						   shouldRetry: shouldRetry,
+						   existingBackOff: existingBackOff,
+						   headers: headers,
+						   completion: completion)
 		}
 		task.resume()
 	}
 
-	private class func handleResponse(with data: Data?,
+	private static func handleResponse(with data: Data?,
 	                                  parsedData: Any?,
 	                                  serverLabel: String,
 	                                  urlPath: String,
@@ -1779,7 +1729,7 @@ final class API {
 		}
 	}()
 
-	private class func networkIndicationStart() {
+	private static func networkIndicationStart() {
 		networkIndicationCount += 1
 		if networkIndicationCount == 1 {
 			let a = UIApplication.shared
@@ -1790,7 +1740,7 @@ final class API {
 		}
 	}
 
-	private class func networkIndicationEnd() {
+	private static func networkIndicationEnd() {
 		networkIndicationCount -= 1
 		if networkIndicationCount == 0 {
 			UIApplication.shared.isNetworkActivityIndicatorVisible = false
@@ -1798,7 +1748,7 @@ final class API {
 		}
 	}
 	
-	private class func endNetworkBGTask() {
+	private static func endNetworkBGTask() {
 		if networkBGTask != UIBackgroundTaskInvalid {
 			UIApplication.shared.endBackgroundTask(networkBGTask)
 			networkBGTask = UIBackgroundTaskInvalid

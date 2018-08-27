@@ -5,15 +5,15 @@ final class NotificationQueue {
 
 	private static var queue = [(NotificationType, DataItem)]()
 
-	class func add(type: NotificationType, for item: DataItem) {
+	static func add(type: NotificationType, for item: DataItem) {
 		queue.append((type, item))
 	}
 
-	class func clear() {
+	static func clear() {
 		queue.removeAll()
 	}
 
-	class func commit() {
+	static func commit() {
 		for (type, item) in queue {
 			if !item.isDeleted && item.apiServer.lastSyncSucceeded {
 				#if os(iOS)

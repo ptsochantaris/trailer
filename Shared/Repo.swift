@@ -23,7 +23,7 @@ final class Repo: DataItem {
 		lastScannedIssueEventId = 0
 	}
 
-	class func syncRepos(from data: [[AnyHashable : Any]]?, server: ApiServer, addNewRepos: Bool, manuallyAdded: Bool) {
+	static func syncRepos(from data: [[AnyHashable : Any]]?, server: ApiServer, addNewRepos: Bool, manuallyAdded: Bool) {
 		let filteredData = data?.filter { info -> Bool in
 			if info["private"] as? Bool ?? false {
 				if let permissions = info["permissions"] as? [AnyHashable : Any] {
@@ -81,7 +81,7 @@ final class Repo: DataItem {
 		return displayPolicyForPrs > 0 || displayPolicyForIssues > 0
 	}
 
-	class func repos(for group: String, in moc: NSManagedObjectContext) -> [Repo] {
+	static func repos(for group: String, in moc: NSManagedObjectContext) -> [Repo] {
 		let f = NSFetchRequest<Repo>(entityName: "Repo")
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false
@@ -89,7 +89,7 @@ final class Repo: DataItem {
 		return try! moc.fetch(f)
 	}
 
-	class func anyVisibleRepos(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, excludeGrouped: Bool = false) -> Bool {
+	static func anyVisibleRepos(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, excludeGrouped: Bool = false) -> Bool {
 
 		func excludeGroupedRepos(_ p: NSPredicate) -> NSPredicate {
 			let nilCheck = NSPredicate(format: "groupLabel == nil")
@@ -121,7 +121,7 @@ final class Repo: DataItem {
 		return c > 0
 	}
 
-	class func interestedInIssues(fromServerWithId id: NSManagedObjectID? = nil) -> Bool {
+	static func interestedInIssues(fromServerWithId id: NSManagedObjectID? = nil) -> Bool {
 		let all: [Repo]
 		if let aid = id, let apiServer = existingObject(with: aid) as? ApiServer {
 			all = Repo.allItems(of: Repo.self, in: apiServer)
@@ -136,7 +136,7 @@ final class Repo: DataItem {
 		return false
 	}
 
-	class func interestedInPrs(fromServerWithId id: NSManagedObjectID? = nil) -> Bool {
+	static func interestedInPrs(fromServerWithId id: NSManagedObjectID? = nil) -> Bool {
 		let all: [Repo]
 		if let aid = id, let apiServer = existingObject(with: aid) as? ApiServer {
 			all = Repo.allItems(of: Repo.self, in: apiServer)
@@ -151,13 +151,13 @@ final class Repo: DataItem {
 		return false
 	}
 
-	class func allGroupLabels(in moc: NSManagedObjectContext) -> [String] {
+	static func allGroupLabels(in moc: NSManagedObjectContext) -> [String] {
 		let allRepos = allItems(of: Repo.self, in: moc)
 		let labels = allRepos.compactMap { $0.shouldSync ? $0.groupLabel : nil }
 		return Set<String>(labels).sorted()
 	}
 
-	class func syncableRepos(in moc: NSManagedObjectContext) -> [Repo] {
+	static func syncableRepos(in moc: NSManagedObjectContext) -> [Repo] {
 		let f = NSFetchRequest<Repo>(entityName: "Repo")
 		f.relationshipKeyPathsForPrefetching = ["issues", "pullRequests"]
 		f.returnsObjectsAsFaults = false
@@ -166,7 +166,7 @@ final class Repo: DataItem {
 		return try! moc.fetch(f)
 	}
 
-	class func unsyncableRepos(in moc: NSManagedObjectContext) -> [Repo] {
+	static func unsyncableRepos(in moc: NSManagedObjectContext) -> [Repo] {
 		let f = NSFetchRequest<Repo>(entityName: "Repo")
 		f.relationshipKeyPathsForPrefetching = ["issues", "pullRequests"]
 		f.returnsObjectsAsFaults = false
@@ -175,7 +175,7 @@ final class Repo: DataItem {
 		return try! moc.fetch(f)
 	}
 
-	class func reposFiltered(by filter: String?) -> [Repo] {
+	static func reposFiltered(by filter: String?) -> [Repo] {
 		let f = NSFetchRequest<Repo>(entityName: "Repo")
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false

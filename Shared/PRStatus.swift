@@ -9,7 +9,7 @@ final class PRStatus: DataItem {
 
 	@NSManaged var pullRequest: PullRequest
 
-	class func syncStatuses(from data: [[AnyHashable : Any]]?, pullRequest: PullRequest) {
+	static func syncStatuses(from data: [[AnyHashable : Any]]?, pullRequest: PullRequest) {
 		items(with: data, type: PRStatus.self, server: pullRequest.apiServer) { item, info, isNewOrUpdated in
 			if isNewOrUpdated {
 				item.state = info["state"] as? String

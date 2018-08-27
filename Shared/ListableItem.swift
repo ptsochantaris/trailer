@@ -117,7 +117,7 @@ class ListableItem: DataItem {
 		}
 	}
 
-	class func active<T>(of type: T.Type, in moc: NSManagedObjectContext, visibleOnly: Bool) -> [T] where T : ListableItem {
+	static func active<T>(of type: T.Type, in moc: NSManagedObjectContext, visibleOnly: Bool) -> [T] where T : ListableItem {
 		let f = NSFetchRequest<T>(entityName: String(describing: type))
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false
@@ -775,7 +775,7 @@ class ListableItem: DataItem {
 		return Int(badgeCount)
 	}
 
-	private final class func predicate(from token: String, termAt: Int, format: String, numeric: Bool) -> NSPredicate? {
+	private static func predicate(from token: String, termAt: Int, format: String, numeric: Bool) -> NSPredicate? {
 		if token.count > termAt {
 			let items = token.dropFirst(termAt)
 			if !items.isEmpty {
@@ -822,7 +822,7 @@ class ListableItem: DataItem {
 	private static let filterLabelPredicate = "SUBQUERY(labels, $label, $label.name contains[cd] %@).@count > 0"
 	private static let filterStatusPredicate = "SUBQUERY(statuses, $status, $status.descriptionText contains[cd] %@).@count > 0"
 
-	final class func requestForItems<T: ListableItem>(of itemType: T.Type, withFilter: String?, sectionIndex: Int64, criterion: GroupingCriterion? = nil, onlyUnread: Bool = false) -> NSFetchRequest<T> {
+	static func requestForItems<T: ListableItem>(of itemType: T.Type, withFilter: String?, sectionIndex: Int64, criterion: GroupingCriterion? = nil, onlyUnread: Bool = false) -> NSFetchRequest<T> {
 
 		var andPredicates = [NSPredicate]()
 
@@ -936,7 +936,7 @@ class ListableItem: DataItem {
 		return _unreadPredicate
 	}
 
-	final class func relatedItems(from notificationUserInfo: [AnyHashable : Any]) -> (PRComment?, ListableItem)? {
+	static func relatedItems(from notificationUserInfo: [AnyHashable : Any]) -> (PRComment?, ListableItem)? {
 		var item: ListableItem?
 		var comment: PRComment?
 		if let cid = notificationUserInfo[COMMENT_ID_KEY] as? String, let itemId = DataManager.id(for: cid), let c = existingObject(with: itemId) as? PRComment {
@@ -960,7 +960,7 @@ class ListableItem: DataItem {
 		}
 	}
 
-	final class func removeRelatedNotifications(uri: String) {
+	static func removeRelatedNotifications(uri: String) {
 		#if os(OSX)
 			let nc = NSUserNotificationCenter.default
 			for n in nc.deliveredNotifications {
@@ -1036,7 +1036,7 @@ class ListableItem: DataItem {
 		return repo.shouldSync && repo.postSyncAction != PostSyncAction.delete.rawValue && apiServer.lastSyncSucceeded
 	}
 
-	class func reasonForEmpty(with filterValue: String?, criterion: GroupingCriterion?, openItemCount: Int) -> NSAttributedString {
+	static func reasonForEmpty(with filterValue: String?, criterion: GroupingCriterion?, openItemCount: Int) -> NSAttributedString {
 
 		let color: COLOR_CLASS
 		let message: String

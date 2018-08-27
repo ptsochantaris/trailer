@@ -13,7 +13,7 @@ final class PRLabel: DataItem {
     @NSManaged var pullRequest: PullRequest?
 	@NSManaged var issue: Issue?
 
-	private class func labels(from data: [[AnyHashable : Any]]?, fromParent: ListableItem, postProcessCallback: (PRLabel, [AnyHashable : Any])->Void) {
+	private static func labels(from data: [[AnyHashable : Any]]?, fromParent: ListableItem, postProcessCallback: (PRLabel, [AnyHashable : Any])->Void) {
 
 		guard let infos=data, infos.count > 0 else { return }
 
@@ -65,7 +65,7 @@ final class PRLabel: DataItem {
 		}
 	}
 
-	class func syncLabels(from info: [[AnyHashable : Any]]?, withParent: ListableItem) {
+	static func syncLabels(from info: [[AnyHashable : Any]]?, withParent: ListableItem) {
 		labels(from: info, fromParent: withParent) { label, info in
 			label.url = info["url"] as? String
 			if let c = info["color"] as? String {
@@ -77,7 +77,7 @@ final class PRLabel: DataItem {
 		}
 	}
 
-	private class func parse(from hex: String) -> Int64 {
+	private static func parse(from hex: String) -> Int64 {
 		let safe = hex.trim.trimmingCharacters(in: CharacterSet.symbols)
 		let s = Scanner(string: safe)
 		var result: UInt32 = 0
