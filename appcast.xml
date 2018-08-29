@@ -7,6 +7,21 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.6.9</title>
+			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>This release drops a crufty layer of manual API caching and uses the system network cache instead. This not only improves stability but also corrects issues that Trailer would experience when running on macOS Mojave and iOS 12.</li>
+				</ul></font>]]></description>
+			<pubDate>Wed, 29 Aug 2018 20:00:00 +0000</pubDate>
+			<enclosure
+			url="https://github.com/ptsochantaris/trailer/releases/download/1.6.9/trailer169.zip"
+			sparkle:version="1475"
+			sparkle:shortVersionString="1.6.9"
+			sparkle:dsaSignature="MC4CFQDWT8+ZLe4hiaxiV2XcvktHPho2PgIVAIiNBqOG0M5heh/1dGBRyO3OiXLP"
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.6.8</title>
 			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
