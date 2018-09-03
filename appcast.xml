@@ -7,6 +7,21 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.6.10</title>
+			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Significantly larger API cache to avoid straining GitHub API limits for users who are monitoring very large repos.</li>
+				</ul></font>]]></description>
+			<pubDate>Mon, 3 Sep 2018 08:00:00 +0000</pubDate>
+			<enclosure
+			url="https://github.com/ptsochantaris/trailer/releases/download/1.6.10/trailer1610.zip"
+			sparkle:version="1476"
+			sparkle:shortVersionString="1.6.10"
+			sparkle:dsaSignature="MC0CFB2F3h3IQrr7tA4PYB+CQAzYMeQGAhUApcV/+r014W3ZhTujXpEY+zwEcek="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.6.9</title>
 			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
