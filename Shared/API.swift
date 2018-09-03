@@ -106,6 +106,9 @@ final class API {
 
 		let config = URLSessionConfiguration.default
 		config.httpShouldUsePipelining = true
+		config.requestCachePolicy = .useProtocolCachePolicy
+		config.timeoutIntervalForRequest = 60
+		config.urlCache = URLCache(memoryCapacity: 32 * 1024 * 1024, diskCapacity: 1024 * 1024 * 1024, diskPath: cacheDirectory)
 		config.httpAdditionalHeaders = ["User-Agent" : userAgent]
 		return URLSession(configuration: config, delegate: nil, delegateQueue: sessionCallbackQueue)
 	}()
@@ -1596,7 +1599,7 @@ final class API {
 		let expandedPath = path.hasPrefix("/") ? S(server.apiPath).appending(pathComponent: path) : path
 		let url = URL(string: expandedPath)!
 
-		var request = URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 60.0)
+		var request = URLRequest(url: url)
 		var acceptTypes = [String]()
 		if shouldSyncReactions {
 			acceptTypes.append("application/vnd.github.squirrel-girl-preview")
