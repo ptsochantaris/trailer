@@ -342,7 +342,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	override func viewDidLoad() {
 		super.viewDidLoad()
 
-		tableView.rowHeight = UITableViewAutomaticDimension
+		tableView.rowHeight = UITableView.automaticDimension
 		tableView.estimatedRowHeight = 120
 
 		let searchController = UISearchController(searchResultsController: nil)
@@ -409,9 +409,9 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		l.attributedText = NSAttributedString(
 			string: message,
 			attributes: [
-				NSAttributedStringKey.font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize),
-				NSAttributedStringKey.foregroundColor: UIColor.lightGray,
-				NSAttributedStringKey.paragraphStyle: p,
+				NSAttributedString.Key.font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize),
+				NSAttributedString.Key.foregroundColor: UIColor.lightGray,
+				NSAttributedString.Key.paragraphStyle: p,
 				])
 		l.numberOfLines = 0
 		return l

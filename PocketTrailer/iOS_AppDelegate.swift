@@ -8,7 +8,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 	var window: UIWindow?
 
 	private var lastUpdateFailed = false
-	private var backgroundTask = UIBackgroundTaskInvalid
+	private var backgroundTask = UIBackgroundTaskIdentifier.invalid
 	private var watchManager: WatchManager?
 	private var refreshTimer: Timer?
 	private var backgroundCallback: ((UIBackgroundFetchResult) -> Void)?
@@ -18,7 +18,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 		watchManager?.updateContext()
 	}
 
-	func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
+	func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
 
 		app = self
 		bootUp()
@@ -41,7 +41,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 		completionHandler()
 	}
 
-	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
+	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
 
 		DataManager.postProcessAllItems()
 
@@ -95,7 +95,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 		}
 	}
 
-	func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
+	func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
 		if let c = URLComponents(url: url, resolvingAgainstBaseURL: false) {
 			if let scheme = c.scheme {
 				if scheme == "pockettrailer" {
@@ -108,7 +108,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 		return false
 	}
 
-	func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([Any]?) -> Void) -> Bool {
+	func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
 		return NotificationManager.handleUserActivity(activity: userActivity)
 	}
 
@@ -250,9 +250,9 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 	}
 
 	private func endBGTask() {
-		if backgroundTask != UIBackgroundTaskInvalid {
+		if backgroundTask != .invalid {
 			UIApplication.shared.endBackgroundTask(backgroundTask)
-			backgroundTask = UIBackgroundTaskInvalid
+			backgroundTask = .invalid
 		}
 	}
 

@@ -540,9 +540,9 @@ class ListableItem: DataItem {
 
 		let p = NSMutableParagraphStyle()
 		p.paragraphSpacing = 1.0
-		let titleAttributes = [NSAttributedStringKey.font: font,
-		                       NSAttributedStringKey.foregroundColor: titleColor,
-		                       NSAttributedStringKey.paragraphStyle: p]
+		let titleAttributes = [NSAttributedString.Key.font: font,
+		                       NSAttributedString.Key.foregroundColor: titleColor,
+		                       NSAttributedString.Key.paragraphStyle: p]
 
 		let _title = NSMutableAttributedString()
 		if let t = title {
@@ -557,14 +557,14 @@ class ListableItem: DataItem {
 					let lp = NSMutableParagraphStyle()
 					#if os(iOS)
 						lp.lineHeightMultiple = 1.15
-						let labelAttributes: [NSAttributedStringKey: Any] = [NSAttributedStringKey.font: labelFont,
-						                                                     NSAttributedStringKey.baselineOffset: 2.0,
-						                                                     NSAttributedStringKey.paragraphStyle: lp]
+						let labelAttributes: [NSAttributedString.Key: Any] = [NSAttributedString.Key.font: labelFont,
+						                                                     NSAttributedString.Key.baselineOffset: 2.0,
+						                                                     NSAttributedString.Key.paragraphStyle: lp]
 					#elseif os(OSX)
 						lp.minimumLineHeight = labelFont.pointSize + 4
-						let labelAttributes: [NSAttributedStringKey: Any] = [NSAttributedStringKey.font: labelFont,
-						                                                     NSAttributedStringKey.baselineOffset: 2.0,
-						                                                     NSAttributedStringKey.paragraphStyle: lp]
+						let labelAttributes: [NSAttributedString.Key: Any] = [NSAttributedString.Key.font: labelFont,
+						                                                     NSAttributedString.Key.baselineOffset: 2.0,
+						                                                     NSAttributedString.Key.paragraphStyle: lp]
 					#endif
 
 					func isDark(color: COLOR_CLASS) -> Bool {
@@ -580,8 +580,8 @@ class ListableItem: DataItem {
 					for l in sorted {
 						var a = labelAttributes
 						let color = l.colorForDisplay
-						a[NSAttributedStringKey.backgroundColor] = color
-						a[NSAttributedStringKey.foregroundColor] = isDark(color: color) ? COLOR_CLASS.white : COLOR_CLASS.black
+						a[NSAttributedString.Key.backgroundColor] = color
+						a[NSAttributedString.Key.foregroundColor] = isDark(color: color) ? COLOR_CLASS.white : COLOR_CLASS.black
 						let name = l.name!.replacingOccurrences(of: " ", with: "\u{a0}")
 						_title.append(NSAttributedString(string: "\u{a0}\(name)\u{a0}", attributes: a))
 						if count < labelCount-1 {
@@ -613,9 +613,9 @@ class ListableItem: DataItem {
 					let approvers = reviews.filter { $0.state == Review.State.APPROVED.rawValue }
 					if approvers.count > 0 {
 
-						let a = [NSAttributedStringKey.font: labelFont,
-						         NSAttributedStringKey.foregroundColor: COLOR_CLASS(red: 0, green: 0.5, blue: 0, alpha: 1.0),
-						         NSAttributedStringKey.paragraphStyle: lp]
+						let a = [NSAttributedString.Key.font: labelFont,
+						         NSAttributedString.Key.foregroundColor: COLOR_CLASS(red: 0, green: 0.5, blue: 0, alpha: 1.0),
+						         NSAttributedString.Key.paragraphStyle: lp]
 
 						_title.append(NSAttributedString(string: "\n", attributes: a))
 
@@ -633,9 +633,9 @@ class ListableItem: DataItem {
 					let requesters = reviews.filter { $0.state == Review.State.CHANGES_REQUESTED.rawValue }
 					if requesters.count > 0 {
 
-						let a = [NSAttributedStringKey.font: labelFont,
-						         NSAttributedStringKey.foregroundColor: COLOR_CLASS(red: 0.7, green: 0, blue: 0, alpha: 1.0),
-						         NSAttributedStringKey.paragraphStyle: lp]
+						let a = [NSAttributedString.Key.font: labelFont,
+						         NSAttributedString.Key.foregroundColor: COLOR_CLASS(red: 0.7, green: 0, blue: 0, alpha: 1.0),
+						         NSAttributedString.Key.paragraphStyle: lp]
 
 						_title.append(NSAttributedString(string: "\n", attributes: a))
 
@@ -655,9 +655,9 @@ class ListableItem: DataItem {
 					let otherReviewers = p.reviewers.components(separatedBy: ",").filter({ !($0.isEmpty || approverNames.contains($0) || requesterNames.contains($0)) })
 					if otherReviewers.count > 0 {
 
-						let a = [NSAttributedStringKey.font: labelFont,
-						         NSAttributedStringKey.foregroundColor: COLOR_CLASS(red: 0.7, green: 0.7, blue: 0, alpha: 1.0),
-						         NSAttributedStringKey.paragraphStyle: lp]
+						let a = [NSAttributedString.Key.font: labelFont,
+						         NSAttributedString.Key.foregroundColor: COLOR_CLASS(red: 0.7, green: 0.7, blue: 0, alpha: 1.0),
+						         NSAttributedString.Key.paragraphStyle: lp]
 
 						_title.append(NSAttributedString(string: "\n", attributes: a))
 
@@ -684,9 +684,9 @@ class ListableItem: DataItem {
 			p.lineHeightMultiple = 1.3
 		#endif
 
-		let lightSubtitle = [NSAttributedStringKey.foregroundColor: lightColor,
-		                     NSAttributedStringKey.font: font,
-		                     NSAttributedStringKey.paragraphStyle: p]
+		let lightSubtitle = [NSAttributedString.Key.foregroundColor: lightColor,
+		                     NSAttributedString.Key.font: font,
+		                     NSAttributedString.Key.paragraphStyle: p]
 
 		#if os(iOS)
 			let separator = NSAttributedString(string:"\n", attributes: lightSubtitle)
@@ -695,7 +695,7 @@ class ListableItem: DataItem {
 		#endif
 
 		var darkSubtitle = lightSubtitle
-		darkSubtitle[NSAttributedStringKey.foregroundColor] = darkColor
+		darkSubtitle[NSAttributedString.Key.foregroundColor] = darkColor
 
 		if Settings.showReposInName, let n = repo.fullName {
 			_subtitle.append(NSAttributedString(string: n, attributes: darkSubtitle))
@@ -755,14 +755,14 @@ class ListableItem: DataItem {
 		p.alignment = .center
 		#if os(OSX)
 			return NSAttributedString(string: message, attributes: [
-				NSAttributedStringKey.foregroundColor: color,
-				NSAttributedStringKey.paragraphStyle: p
+				NSAttributedString.Key.foregroundColor: color,
+				NSAttributedString.Key.paragraphStyle: p
 				])
 		#elseif os(iOS)
 			return NSAttributedString(string: message, attributes: [
-				NSAttributedStringKey.foregroundColor: color,
-				NSAttributedStringKey.paragraphStyle: p,
-				NSAttributedStringKey.font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)])
+				NSAttributedString.Key.foregroundColor: color,
+				NSAttributedString.Key.paragraphStyle: p,
+				NSAttributedString.Key.font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)])
 		#endif
 	}
 

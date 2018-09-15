@@ -11,42 +11,42 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 	@IBOutlet private weak var prImage: UIImageView!
 	@IBOutlet private weak var issueImage: UIImageView!
 
-	private var linkButton = UIButton(type: UIButtonType.custom)
+	private var linkButton = UIButton(type: .custom)
 	private let paragraph = NSMutableParagraphStyle()
 
-	private var titleAttributes: [NSAttributedStringKey : Any] {
+	private var titleAttributes: [NSAttributedString.Key : Any] {
 		return [
-			NSAttributedStringKey.foregroundColor: UIColor.black,
-			NSAttributedStringKey.font: UIFont.systemFont(ofSize: UIFont.systemFontSize+2.0),
-			NSAttributedStringKey.paragraphStyle: paragraph ]
+			NSAttributedString.Key.foregroundColor: UIColor.black,
+			NSAttributedString.Key.font: UIFont.systemFont(ofSize: UIFont.systemFontSize+2.0),
+			NSAttributedString.Key.paragraphStyle: paragraph ]
 	}
 
-	private var normalAttributes: [NSAttributedStringKey : Any] {
+	private var normalAttributes: [NSAttributedString.Key : Any] {
 		return [
-			NSAttributedStringKey.foregroundColor: UIColor.darkGray,
-			NSAttributedStringKey.font: UIFont.systemFont(ofSize: UIFont.systemFontSize+2.0),
-			NSAttributedStringKey.paragraphStyle: paragraph ]
+			NSAttributedString.Key.foregroundColor: UIColor.darkGray,
+			NSAttributedString.Key.font: UIFont.systemFont(ofSize: UIFont.systemFontSize+2.0),
+			NSAttributedString.Key.paragraphStyle: paragraph ]
 	}
 
-	private var dimAttributes: [NSAttributedStringKey : Any] {
+	private var dimAttributes: [NSAttributedString.Key : Any] {
 		return [
-			NSAttributedStringKey.foregroundColor: UIColor.gray,
-			NSAttributedStringKey.font: UIFont.systemFont(ofSize: UIFont.systemFontSize+2.0),
-			NSAttributedStringKey.paragraphStyle: paragraph ]
+			NSAttributedString.Key.foregroundColor: UIColor.gray,
+			NSAttributedString.Key.font: UIFont.systemFont(ofSize: UIFont.systemFontSize+2.0),
+			NSAttributedString.Key.paragraphStyle: paragraph ]
 	}
 
-	private var redAttributes: [NSAttributedStringKey : Any] {
+	private var redAttributes: [NSAttributedString.Key : Any] {
 		return [
-			NSAttributedStringKey.foregroundColor: UIColor.red,
-			NSAttributedStringKey.font: UIFont.systemFont(ofSize: UIFont.systemFontSize+2.0),
-			NSAttributedStringKey.paragraphStyle: paragraph ]
+			NSAttributedString.Key.foregroundColor: UIColor.red,
+			NSAttributedString.Key.font: UIFont.systemFont(ofSize: UIFont.systemFontSize+2.0),
+			NSAttributedString.Key.paragraphStyle: paragraph ]
 	}
 
-	private var smallAttributes: [NSAttributedStringKey : Any] {
+	private var smallAttributes: [NSAttributedString.Key : Any] {
 		return [
-			NSAttributedStringKey.foregroundColor: UIColor.gray,
-			NSAttributedStringKey.font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize),
-			NSAttributedStringKey.paragraphStyle: paragraph ]
+			NSAttributedString.Key.foregroundColor: UIColor.gray,
+			NSAttributedString.Key.font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize),
+			NSAttributedString.Key.paragraphStyle: paragraph ]
 	}
 
 	override func viewDidLoad() {

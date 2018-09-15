@@ -1,5 +1,5 @@
 
-final class SetupAssistant: NSWindow, NSWindowDelegate {
+final class SetupAssistant: NSWindow, NSWindowDelegate, NSControlTextEditingDelegate {
 
 	@IBOutlet private weak var quickstart: NSTextField!
 	@IBOutlet private weak var buttonLink: NSButton!
@@ -37,7 +37,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 		openLink(URL(string: address)!)
 	}
 
-	override func controlTextDidChange(_ obj: Notification) {
+	func controlTextDidChange(_ obj: Notification) {
 		if let t = obj.object as? NSTextField {
 			completeSetup.isEnabled = !t.stringValue.isEmpty
 		}

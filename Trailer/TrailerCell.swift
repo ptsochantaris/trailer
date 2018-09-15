@@ -1,20 +1,20 @@
 
 class TrailerCell: NSTableCellView {
 
-	private static let statusAttributes: [NSAttributedStringKey : Any] = {
+	private static let statusAttributes: [NSAttributedString.Key : Any] = {
 
 		let paragraphStyle = NSMutableParagraphStyle()
 		paragraphStyle.headIndent = 17
 
 		return [
-			NSAttributedStringKey.font: NSFont(name: "Monaco", size: 9)!,
-			NSAttributedStringKey.paragraphStyle: paragraphStyle
+			NSAttributedString.Key.font: NSFont(name: "Monaco", size: 9)!,
+			NSAttributedString.Key.paragraphStyle: paragraphStyle
 		]
 	}()
 
 
 	private let detailFont = NSFont.menuFont(ofSize: 10.0)
-	private let titleFont = NSFont.menuFont(ofSize: 13.0)
+	private let titleFont = NSFont.menuBarFont(ofSize: 14.0)
 
 	private let dataItemId: NSManagedObjectID
 
@@ -127,15 +127,10 @@ class TrailerCell: NSTableCellView {
 	}
 
     private func updateText(for item: ListableItem) {
-
-        let dark = app.darkMode
-        let unselectedTitleColor: NSColor = dark ? .controlHighlightColor : .controlTextColor
-        let titleColor = (selected && dark) ? .darkGray : unselectedTitleColor
-        title.attributedStringValue = item.title(with: titleFont, labelFont: detailFont, titleColor: titleColor)
-
-        let unselectedRepoColor: NSColor = dark ? .lightGray : .darkGray
-        let repoColor = (selected && dark) ? .darkGray: unselectedRepoColor
-        subtitle.attributedStringValue = item.subtitle(with: detailFont, lightColor: .gray, darkColor: repoColor)
+		let light: NSColor = .secondaryLabelColor
+		let strong: NSColor = .controlTextColor
+        title.attributedStringValue = item.title(with: titleFont, labelFont: detailFont, titleColor: strong)
+        subtitle.attributedStringValue = item.subtitle(with: detailFont, lightColor: light, darkColor: strong)
     }
 
 	var selected = false {
@@ -351,9 +346,9 @@ class TrailerCell: NSTableCellView {
 		pCenter.alignment = .center
 
 		let countString = NSAttributedString(string: itemCountFormatter.string(for: total)!, attributes: [
-			NSAttributedStringKey.font: NSFont.menuFont(ofSize: 11),
-			NSAttributedStringKey.foregroundColor: app.darkMode ? NSColor.controlLightHighlightColor : NSColor.controlTextColor,
-			NSAttributedStringKey.paragraphStyle: pCenter])
+			NSAttributedString.Key.font: NSFont.menuFont(ofSize: 11),
+			NSAttributedString.Key.foregroundColor: NSColor.controlTextColor,
+			NSAttributedString.Key.paragraphStyle: pCenter])
 
 		var height: CGFloat = 20
 		var width = max(height, countString.size().width+10)
@@ -376,9 +371,9 @@ class TrailerCell: NSTableCellView {
 
 			let alertText = unread==0 ? "!" : itemCountFormatter.string(for: unread)!
 			let alertString = NSAttributedString(string: alertText, attributes: [
-				NSAttributedStringKey.font: NSFont.menuFont(ofSize: 8),
-				NSAttributedStringKey.foregroundColor: NSColor.white,
-				NSAttributedStringKey.paragraphStyle: pCenter])
+				NSAttributedString.Key.font: NSFont.menuFont(ofSize: 8),
+				NSAttributedString.Key.foregroundColor: NSColor.white,
+				NSAttributedString.Key.paragraphStyle: pCenter])
 
 			bottom += height
 			height = 14
@@ -405,17 +400,22 @@ class TrailerCell: NSTableCellView {
 	private func highlight(_ on: Bool) {
 		if let c = countBackground {
 			var color: NSColor
-			if app.darkMode {
-				color = on ? .black : NSColor(red: 0.94, green: 0.94, blue: 0.94, alpha: 1.0)
-				c.backgroundColor = on ? NSColor.white.withAlphaComponent(DISABLED_FADE) : NSColor.black.withAlphaComponent(0.2)
-				newBackground?.backgroundColor = NSColor(red: 1.0, green: 0.1, blue: 0.1, alpha: 1.0)
-			} else {
+			switch app.theme {
+			case .light:
 				color = .controlTextColor
 				c.backgroundColor = NSColor(red: 0.92, green: 0.92, blue: 0.92, alpha: 1.0)
 				newBackground?.backgroundColor = NSColor(red: 1.0, green: 0.4, blue: 0.4, alpha: 1.0)
+			case .dark:
+				color = on ? .black : NSColor(red: 0.94, green: 0.94, blue: 0.94, alpha: 1.0)
+				c.backgroundColor = on ? NSColor.white.withAlphaComponent(DISABLED_FADE) : NSColor.black
+				newBackground?.backgroundColor = NSColor(red: 1.0, green: 0.1, blue: 0.1, alpha: 1.0)
+			case .darkLegacy:
+				color = on ? .black : NSColor(red: 0.94, green: 0.94, blue: 0.94, alpha: 1.0)
+				c.backgroundColor = on ? NSColor.white.withAlphaComponent(DISABLED_FADE) : NSColor.black
+				newBackground?.backgroundColor = NSColor(red: 1.0, green: 0.1, blue: 0.1, alpha: 1.0)
 			}
 			if let a = countView?.attributedStringValue.mutableCopy() as? NSMutableAttributedString {
-				a.addAttribute(NSAttributedStringKey.foregroundColor, value: color, range: NSRange(location: 0, length: a.length))
+				a.addAttribute(NSAttributedString.Key.foregroundColor, value: color, range: NSRange(location: 0, length: a.length))
 				countView?.attributedStringValue = a
 			}
 		}

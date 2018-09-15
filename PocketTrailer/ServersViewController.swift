@@ -70,8 +70,8 @@ final class ServersViewController: UITableViewController {
 		return true
 	}
 
-	override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-		if editingStyle == UITableViewCellEditingStyle.delete {
+	override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+		if editingStyle == UITableViewCell.EditingStyle.delete {
 			let a = allServers[indexPath.row]
 			allServers.remove(at: indexPath.row)
 			DataManager.main.delete(a)

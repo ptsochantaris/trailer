@@ -16,7 +16,7 @@ final class PRDetailController: CommonController {
 		_table = table
 
 		let c = context as! [AnyHashable : Any]
-		itemId = c[ITEM_KEY] as! String
+		itemId = (c[ITEM_KEY] as! String)
 
 		super.awake(withContext: context)
 	}

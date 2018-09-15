@@ -6,8 +6,8 @@ final class OpenInSafariActivity: UIActivity {
 
 	private var _URL: URL?
 
-	override var activityType: UIActivityType {
-		return UIActivityType("OpenInSafariActivity")
+	override var activityType: UIActivity.ActivityType {
+		return UIActivity.ActivityType("OpenInSafariActivity")
 	}
 
 	override var activityTitle: String? {

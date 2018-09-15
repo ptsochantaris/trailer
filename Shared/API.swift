@@ -191,7 +191,6 @@ final class API {
 	///////////////////////////////////////////////////////// Images
 
 	private static func expireOldImageCacheEntries() {
-
 		let now = Date()
 		let fileManager = FileManager.default
 		for f in try! fileManager.contentsOfDirectory(atPath: cacheDirectory) {
@@ -201,7 +200,7 @@ final class API {
 					let attributes = try fileManager.attributesOfItem(atPath: path)
 					let date = attributes[.creationDate] as! Date
 					if now.timeIntervalSince(date) > (3600.0*24.0) {
-						try! fileManager.removeItem(atPath: path)
+						try? fileManager.removeItem(atPath: path)
 					}
 				} catch {
 					DLog("File error when cleaning old cached image: %@", error.localizedDescription)
@@ -277,7 +276,7 @@ final class API {
 			#if os(iOS)
 				if let d = data, let i = UIImage(data: d, scale: GLOBAL_SCREEN_SCALE) {
 					result = i
-					if let imageData = UIImageJPEGRepresentation(i, 1.0) {
+					if let imageData = i.jpegData(compressionQuality: 1) {
 						try? imageData.write(to: URL(fileURLWithPath: cachePath), options: .atomic)
 					}
 				}
@@ -1725,7 +1724,7 @@ final class API {
 	#if os(iOS)
 
 	private static var networkIndicationCount = 0
-	private static var networkBGTask = UIBackgroundTaskInvalid
+	private static var networkBGTask = UIBackgroundTaskIdentifier.invalid
 	private static let networkBGEndPopTimer = { ()->PopTimer in
 		return PopTimer(timeInterval: 1.0) {
 			endNetworkBGTask()
@@ -1752,9 +1751,9 @@ final class API {
 	}
 	
 	private static func endNetworkBGTask() {
-		if networkBGTask != UIBackgroundTaskInvalid {
+		if networkBGTask != UIBackgroundTaskIdentifier.invalid {
 			UIApplication.shared.endBackgroundTask(networkBGTask)
-			networkBGTask = UIBackgroundTaskInvalid
+			networkBGTask = UIBackgroundTaskIdentifier.invalid
 		}
 	}
 	

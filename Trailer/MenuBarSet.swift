@@ -1,8 +1,8 @@
 
 final class MenuBarSet {
 	
-	private let prMenuController = NSWindowController(windowNibName:NSNib.Name(rawValue: "MenuWindow"))
-	private let issuesMenuController = NSWindowController(windowNibName:NSNib.Name(rawValue: "MenuWindow"))
+	private let prMenuController = NSWindowController(windowNibName:NSNib.Name("MenuWindow"))
+	private let issuesMenuController = NSWindowController(windowNibName:NSNib.Name("MenuWindow"))
 	
 	let prMenu: MenuWindow
 	let issuesMenu: MenuWindow
@@ -79,11 +79,11 @@ final class MenuBarSet {
 		}
 	}
 	
-	private static let redText = [ NSAttributedStringKey.font: NSFont.boldSystemFont(ofSize: 10),
-	                               NSAttributedStringKey.foregroundColor: NSColor(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0) ]
+	private static let redText = [ NSAttributedString.Key.font: NSFont.boldSystemFont(ofSize: 10),
+	                               NSAttributedString.Key.foregroundColor: NSColor(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0) ]
 	
-	private static let normalText = [ NSAttributedStringKey.font: NSFont.menuBarFont(ofSize: 10),
-	                                  NSAttributedStringKey.foregroundColor: NSColor.controlTextColor ]
+	private static let normalText = [ NSAttributedString.Key.font: NSFont.menuBarFont(ofSize: 10),
+	                                  NSAttributedString.Key.foregroundColor: NSColor.controlTextColor ]
 	
 	private func updateMenu(of type: ListableItem.Type,
 	                        menu: MenuWindow,
@@ -123,7 +123,7 @@ final class MenuBarSet {
 			if !(compare(dictionary: siv.textAttributes, to: attributes) && siv.statusLabel == countString && siv.grayOut == shouldGray) {
 				// Info has changed, update
 				DLog("Updating \(type) status item")
-				siv.icon = NSImage(named: NSImage.Name(rawValue: "\(type)Icon"))!
+				siv.icon = NSImage(named: NSImage.Name("\(type)Icon"))!
 				siv.textAttributes = attributes
 				siv.labelOffset = lengthOffset
 				siv.highlighted = menu.isVisible

@@ -1,15 +1,15 @@
 
 import UIKit
 
-let statusAttributes: [NSAttributedStringKey : Any] = {
+let statusAttributes: [NSAttributedString.Key : Any] = {
 	let paragraphStyle = NSMutableParagraphStyle()
 	paragraphStyle.paragraphSpacing = 6.0
 	paragraphStyle.lineSpacing = 1
 	paragraphStyle.headIndent = 19
 
 	return [
-		NSAttributedStringKey.font: UIFont(name: "Menlo-Regular", size: 10)!,
-		NSAttributedStringKey.paragraphStyle: paragraphStyle
+		NSAttributedString.Key.font: UIFont(name: "Menlo-Regular", size: 10)!,
+		NSAttributedString.Key.paragraphStyle: paragraphStyle
 	]
 }()
 
@@ -112,7 +112,7 @@ final class PRCell: UITableViewCell {
 				statusText = NSMutableAttributedString()
 				for status in statusItems {
 					var lineAttributes = statusAttributes
-					lineAttributes[NSAttributedStringKey.foregroundColor] = status.colorForDisplay
+					lineAttributes[NSAttributedString.Key.foregroundColor] = status.colorForDisplay
 					statusText?.append(NSAttributedString(string: status.displayText, attributes: lineAttributes))
 					statusCount -= 1
 					if statusCount > 0 {

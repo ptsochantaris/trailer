@@ -1,7 +1,7 @@
 
 import Foundation
 
-final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate, NSTableViewDataSource, NSTabViewDelegate {
+final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate, NSTableViewDataSource, NSTabViewDelegate, NSControlTextEditingDelegate {
 
 	private var deferredUpdateTimer: PopTimer!
 	private var serversDirty = false
@@ -1142,7 +1142,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	private func color(button: NSButton, withColor: NSColor) {
 		let title = button.attributedTitle.mutableCopy() as! NSMutableAttributedString
-		title.addAttribute(NSAttributedStringKey.foregroundColor, value: withColor, range: NSRange(location: 0, length: title.length))
+		title.addAttribute(NSAttributedString.Key.foregroundColor, value: withColor, range: NSRange(location: 0, length: title.length))
 		button.attributedTitle = title
 	}
 
@@ -1315,7 +1315,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		app.closedPreferencesWindow()
 	}
 
-	override func controlTextDidChange(_ n: Notification) {
+	func controlTextDidChange(_ n: Notification) {
 		if let obj = n.object as? NSTextField {
 
 			if obj===defaultOpenLinks {
@@ -1407,7 +1407,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 				let repoName = S(r.fullName)
 				let title = r.inaccessible ? "\(repoName) (inaccessible)" : repoName
 				let textColor = (row == tv.selectedRow) ? .selectedControlTextColor : (r.shouldSync ? .textColor : NSColor.textColor.withAlphaComponent(0.4))
-				cell.attributedStringValue = NSAttributedString(string: title, attributes: [NSAttributedStringKey.foregroundColor: textColor])
+				cell.attributedStringValue = NSAttributedString(string: title, attributes: [NSAttributedString.Key.foregroundColor: textColor])
 			} else if let menuCell = cell as? NSTextFieldCell {
 				if tableColumn?.identifier.rawValue == "group" {
 					let r = repos[row]
@@ -1427,8 +1427,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 					for policy in RepoHidingPolicy.policies {
 						let m = NSMenuItem()
 						m.attributedTitle = NSAttributedString(string: policy.name, attributes: [
-							NSAttributedStringKey.font: count==0 ? NSFont.systemFont(ofSize: fontSize) : NSFont.boldSystemFont(ofSize: fontSize),
-							NSAttributedStringKey.foregroundColor: policy.color,
+							NSAttributedString.Key.font: count==0 ? NSFont.systemFont(ofSize: fontSize) : NSFont.boldSystemFont(ofSize: fontSize),
+							NSAttributedString.Key.foregroundColor: policy.color,
 							])
 						menuCell.menu?.addItem(m)
 						count += 1
@@ -1438,8 +1438,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 					for policy in RepoDisplayPolicy.policies {
 						let m = NSMenuItem()
 						m.attributedTitle = NSAttributedString(string: policy.name, attributes: [
-							NSAttributedStringKey.font: count==0 ? NSFont.systemFont(ofSize: fontSize) : NSFont.boldSystemFont(ofSize: fontSize),
-							NSAttributedStringKey.foregroundColor: policy.color,
+							NSAttributedString.Key.font: count==0 ? NSFont.systemFont(ofSize: fontSize) : NSFont.boldSystemFont(ofSize: fontSize),
+							NSAttributedString.Key.foregroundColor: policy.color,
 							])
 						menuCell.menu?.addItem(m)
 						count += 1
@@ -1785,7 +1785,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	private var advancedReposWindow: AdvancedReposWindow?
 	@IBAction private func advancedSelected(_ sender: NSButton) {
 		if advancedReposWindowController == nil {
-			advancedReposWindowController = NSWindowController(windowNibName:NSNib.Name(rawValue: "AdvancedReposWindow"))
+			advancedReposWindowController = NSWindowController(windowNibName:NSNib.Name("AdvancedReposWindow"))
 		}
 		if let w = advancedReposWindowController?.window as? AdvancedReposWindow {
 			w.prefs = self

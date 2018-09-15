@@ -17,7 +17,7 @@ final class WatchlistSettingsViewController: UITableViewController, PickerViewCo
 		super.viewDidLoad()
 		navigationItem.largeTitleDisplayMode = .automatic
 		tableView.estimatedRowHeight = 100
-		tableView.rowHeight = UITableViewAutomaticDimension
+		tableView.rowHeight = UITableView.automaticDimension
 		rescanCell.detailTextLabel?.text = Settings.newRepoCheckPeriodHelp
 		autoAddCell.detailTextLabel?.text = Settings.automaticallyAddNewReposFromWatchlistHelp
 		autoRemoveCell.detailTextLabel?.text = Settings.automaticallyRemoveDeletedReposFromWatchlistHelp

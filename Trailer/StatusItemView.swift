@@ -4,7 +4,7 @@ final class StatusItemView: NSView {
 	private let tappedCallback: Completion
 
 	var icon: NSImage!
-	var textAttributes = [NSAttributedStringKey : Any]()
+	var textAttributes = [NSAttributedString.Key : Any]()
 	var statusLabel = ""
 	var labelOffset: CGFloat = 0
 	var title: String?
@@ -57,18 +57,22 @@ final class StatusItemView: NSView {
 
 		if highlighted {
 			foreground = .selectedMenuItemTextColor
-			countAttributes[NSAttributedStringKey.foregroundColor] = foreground
-		} else if app.darkMode {
+			countAttributes[NSAttributedString.Key.foregroundColor] = foreground
+		} else if app.theme != .light {
 			foreground = .selectedMenuItemTextColor
-			if countAttributes[NSAttributedStringKey.foregroundColor] as! NSColor == NSColor.controlTextColor {
-				countAttributes[NSAttributedStringKey.foregroundColor] = foreground
+			if countAttributes[NSAttributedString.Key.foregroundColor] as! NSColor == NSColor.controlTextColor {
+				countAttributes[NSAttributedString.Key.foregroundColor] = foreground
 			}
 		} else {
 			foreground = .controlTextColor
 		}
 
 		if grayOut {
-			countAttributes[NSAttributedStringKey.foregroundColor] = NSColor.disabledControlTextColor
+			if app.theme == .dark {
+				countAttributes[NSAttributedString.Key.foregroundColor] = NSColor.secondaryLabelColor
+			} else {
+				countAttributes[NSAttributedString.Key.foregroundColor] = NSColor.disabledControlTextColor
+			}
 		}
 
 		if(Settings.hideMenubarCounts) {
@@ -78,7 +82,7 @@ final class StatusItemView: NSView {
 		}
 	}
 
-	private func drawStandard(titleColor: NSColor, countAttributes: [NSAttributedStringKey : Any], inRect: NSRect) {
+	private func drawStandard(titleColor: NSColor, countAttributes: [NSAttributedString.Key : Any], inRect: NSRect) {
 
 		let imagePoint = CGPoint(x: StatusItemView.padding, y: 0)
 		var labelRect = CGRect(x: bounds.size.height + labelOffset, y: -5, width: bounds.size.width, height: bounds.size.height)
@@ -93,9 +97,9 @@ final class StatusItemView: NSView {
 			p.alignment = .center
 			p.lineBreakMode = .byTruncatingMiddle
 			t.draw(in: r, withAttributes: [
-				NSAttributedStringKey.foregroundColor: titleColor,
-				NSAttributedStringKey.font: NSFont.menuFont(ofSize: 6),
-				NSAttributedStringKey.paragraphStyle: p
+				NSAttributedString.Key.foregroundColor: titleColor,
+				NSAttributedString.Key.font: NSFont.menuFont(ofSize: 6),
+				NSAttributedString.Key.paragraphStyle: p
 				])
 
 			img.draw(in: CGRect(x: imagePoint.x+3, y: imagePoint.y, width: img.size.width-6, height: img.size.height-6))
@@ -106,9 +110,9 @@ final class StatusItemView: NSView {
 		statusLabel.draw(in: labelRect, withAttributes: countAttributes)
 	}
 
-	private func drawIconOnly(titleColor: NSColor, countAttributes: [NSAttributedStringKey : Any], inRect: NSRect) {
+	private func drawIconOnly(titleColor: NSColor, countAttributes: [NSAttributedString.Key : Any], inRect: NSRect) {
 
-		let foreground = countAttributes[NSAttributedStringKey.foregroundColor] as! NSColor
+		let foreground = countAttributes[NSAttributedString.Key.foregroundColor] as! NSColor
 
 		if let t = title {
 
@@ -117,9 +121,9 @@ final class StatusItemView: NSView {
 			p.alignment = .center
 			p.lineBreakMode = .byTruncatingMiddle
 			t.draw(in: r, withAttributes: [
-				NSAttributedStringKey.foregroundColor: titleColor,
-				NSAttributedStringKey.font: NSFont.menuFont(ofSize: 6),
-				NSAttributedStringKey.paragraphStyle: p
+				NSAttributedString.Key.foregroundColor: titleColor,
+				NSAttributedString.Key.font: NSFont.menuFont(ofSize: 6),
+				NSAttributedString.Key.paragraphStyle: p
 				])
 			
 			if statusLabel == "X" {

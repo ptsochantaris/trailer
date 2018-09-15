@@ -25,9 +25,9 @@ final class PRListController: CommonController {
 	override func awake(withContext context: Any?) {
 
 		let c = context as! [AnyHashable : Any]
-		sectionIndex = c[SECTION_KEY] as! Int64
-		type = c[TYPE_KEY] as! String
-		onlyUnread = c[UNREAD_KEY] as! Bool
+		sectionIndex = (c[SECTION_KEY] as! Int64)
+		type = (c[TYPE_KEY] as! String)
+		onlyUnread = (c[UNREAD_KEY] as! Bool)
 
 		let g = c[GROUP_KEY] as! String
 		groupLabel = g

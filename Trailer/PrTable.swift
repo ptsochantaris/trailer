@@ -38,8 +38,8 @@ final class PrTable: NSTableView, NSPasteboardItemDataProvider {
 		if let origin = dragOrigin {
 
 			func fastDistance(_ a: CGFloat, _ b: CGFloat) -> CGFloat {
-				let dx = fabs(a)
-				let dy = fabs(b)
+				let dx = abs(a)
+				let dy = abs(b)
 				return (dx < dy) ? dy + 0.337 * dx : dx + 0.337 * dy
 			}
 

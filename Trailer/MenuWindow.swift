@@ -1,5 +1,5 @@
 
-final class MenuWindow: NSWindow {
+final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
 
 	@IBOutlet weak var scrollView: NSScrollView!
 	@IBOutlet private weak var header: ViewAllowsVibrancy!
@@ -49,12 +49,21 @@ final class MenuWindow: NSWindow {
 		NotificationCenter.default.addObserver(self, selector: #selector(refreshUpdate), name: SyncProgressUpdateNotification, object: nil)
 	}
 
-	override func controlTextDidChange(_ obj: Notification) {
+	func controlTextDidChange(_ obj: Notification) {
 		app.controlTextDidChange(obj)
 	}
 
 	func updateVibrancy() {
-		appearance = NSAppearance(named: app.darkMode ? .vibrantDark : .vibrantLight)
+		switch app.theme {
+		case .light:
+			appearance = NSAppearance(named: .vibrantLight)
+		case .darkLegacy:
+			appearance = NSAppearance(named: .vibrantDark)
+		case .dark:
+			if #available(OSX 10.14, *) {
+				appearance = NSAppearance(named: .darkAqua)
+			}
+		}
 	}
 
 	var showStatusItem: StatusItemView {

@@ -14,7 +14,7 @@ final class AboutTrailerViewController: UIViewController {
 	override func viewDidAppear(_ animated: Bool) {
 		super.viewDidAppear(animated)
 		licenseText.contentOffset = CGPoint.zero
-		licenseText.textContainerInset = UIEdgeInsetsMake(0, 10, 10, 10)
+		licenseText.textContainerInset = UIEdgeInsets(top: 0, left: 10, bottom: 10, right: 10)
 	}
 
 	@IBAction private func linkSelected() {

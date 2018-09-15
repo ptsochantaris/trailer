@@ -1,6 +1,10 @@
 
+enum Theme {
+	case light, darkLegacy, dark
+}
+
 @NSApplicationMain
-final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUserNotificationCenterDelegate, NSOpenSavePanelDelegate {
+final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUserNotificationCenterDelegate, NSOpenSavePanelDelegate, NSControlTextEditingDelegate {
 
 	// Globals
 	var refreshTimer: Timer?
@@ -14,9 +18,11 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	private var keyDownMonitor: Any?
 	private var mouseIgnoreTimer: PopTimer!
 
+	private let themeDetector = NSView()
+
 	func setupWindows() {
 
-		darkMode = currentSystemDarkMode
+		theme = currentTheme
 
 		for d in menuBarSets {
 			d.throwAway()
@@ -67,6 +73,8 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		NSTextField.cellClass = CenterTextFieldCell.self
 	}
 
+	private var themeCheck: Timer!
+
 	func applicationDidFinishLaunching(_ notification: Notification) {
 
 		if DataManager.main.persistentStoreCoordinator == nil {
@@ -74,7 +82,12 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			return
 		}
 
-		DistributedNotificationCenter.default().addObserver(self, selector: #selector(updateDarkModeDelayed), name: AppleInterfaceThemeChangedNotification, object: nil)
+		themeCheck = Timer(repeats: true, interval: 2) { [weak self] in
+			guard let s = self else { return }
+			if s.theme != s.currentTheme {
+				s.applyTheme()
+			}
+		}
 
 		DataManager.postProcessAllItems()
 
@@ -82,7 +95,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			app.isManuallyScrolling = false
 		}
 
-		updateDarkMode() // also sets up windows
+		applyTheme() // also sets up windows
 
 		API.updateLimitsFromServer()
 
@@ -129,7 +142,6 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		DLog("System woke up")
 		systemSleeping = false
 		delay(1, self) { S in
-			S.updateDarkMode()
 			S.startRefreshIfItIsDue()
 		}
 	}
@@ -515,7 +527,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 	}
 
-	override func controlTextDidChange(_ n: Notification) {
+	func controlTextDidChange(_ n: Notification) {
 		guard let obj = n.object as? NSSearchField, let w = obj.window as? MenuWindow, let menuBarSet = menuBarSet(for: w) else { return }
 
 		if obj === menuBarSet.prMenu.filter {
@@ -1059,7 +1071,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	private var startupAssistantController: NSWindowController?
 	private func startupAssistant() {
 		if startupAssistantController == nil {
-			startupAssistantController = NSWindowController(windowNibName:NSNib.Name(rawValue: "SetupAssistant"))
+			startupAssistantController = NSWindowController(windowNibName:NSNib.Name("SetupAssistant"))
 			if let w = startupAssistantController!.window as? SetupAssistant {
 				w.level = .floating
 				w.center()
@@ -1074,7 +1086,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	private var aboutWindowController: NSWindowController?
 	func showAboutWindow() {
 		if aboutWindowController == nil {
-			aboutWindowController = NSWindowController(windowNibName:NSNib.Name(rawValue: "AboutWindow"))
+			aboutWindowController = NSWindowController(windowNibName:NSNib.Name("AboutWindow"))
 		}
 		if let w = aboutWindowController!.window as? AboutWindow {
 			w.level = .floating
@@ -1091,7 +1103,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	private var preferencesWindow: PreferencesWindow?
 	func showPreferencesWindow(andSelect selectTab: Int?) {
 		if preferencesWindowController == nil {
-			preferencesWindowController = NSWindowController(windowNibName:NSNib.Name(rawValue: "PreferencesWindow"))
+			preferencesWindowController = NSWindowController(windowNibName:NSNib.Name("PreferencesWindow"))
 		}
 		if let w = preferencesWindowController!.window as? PreferencesWindow {
 			w.level = .floating
@@ -1150,25 +1162,20 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 	//////////////////////// Dark mode
 
-	var darkMode = false
-	@objc private func updateDarkModeDelayed() {
-		delay(0.1, self) { S in
-			S.updateDarkMode()
-		}
-	}
-	private func updateDarkMode() {
+	var theme = Theme.light
+	private func applyTheme() {
 		if !systemSleeping {
-			if menuBarSets.count == 0 || darkMode != currentSystemDarkMode {
+			if menuBarSets.count == 0 || theme != currentTheme {
 				setupWindows()
 			}
 		}
 	}
 	
-	private var currentSystemDarkMode: Bool {
-		if let appearance = UserDefaults.standard.string(forKey: "AppleInterfaceStyle") {
-			return appearance == "Dark"
+	private var currentTheme: Theme {
+		if #available(OSX 10.14, *) {
+			return UserDefaults.standard.string(forKey: "AppleInterfaceStyle") == "Dark" ? .dark : .light
 		} else {
-			return false
+			return UserDefaults.standard.string(forKey: "AppleInterfaceStyle") == "Dark" ? .darkLegacy : .light
 		}
 	}
 

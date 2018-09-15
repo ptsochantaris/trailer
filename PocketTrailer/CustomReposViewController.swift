@@ -15,7 +15,7 @@ final class CustomReposViewController: UIViewController, UITableViewDelegate, UI
 		super.viewDidLoad()
 		navigationItem.largeTitleDisplayMode = .automatic
 
-		sizer = table.dequeueReusableCell(withIdentifier: "CustomRepoCellId") as! CustomRepoCell
+		sizer = table.dequeueReusableCell(withIdentifier: "CustomRepoCellId") as? CustomRepoCell
 		NotificationCenter.default.addObserver(self, selector: #selector(updateRepos), name: RefreshEndedNotification, object: nil)
 	}
 	
@@ -38,11 +38,11 @@ final class CustomReposViewController: UIViewController, UITableViewDelegate, UI
 		return repos.count
 	}
 	
-	func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCellEditingStyle {
+	func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
 		return .delete
 	}
 	
-	func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+	func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
 		let r = repos[indexPath.row]
 		DataManager.main.delete(r)
 		DataManager.saveDB()
@@ -106,7 +106,7 @@ final class CustomReposViewController: UIViewController, UITableViewDelegate, UI
 			return
 		}
 		
-		let a = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+		let a = UIActivityIndicatorView(style: .gray)
 		a.startAnimating()
 		addButton.customView = a
 

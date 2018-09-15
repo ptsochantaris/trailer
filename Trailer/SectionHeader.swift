@@ -25,8 +25,8 @@ final class SectionHeader: NSTableRowView {
 		let x = W-120-AVATAR_SIZE-LEFTPADDING
 		titleView = CenterTextField(frame: CGRect(x: 12, y: 4, width: x, height: titleHeight))
 		titleView.attributedStringValue = NSAttributedString(string: title, attributes: [
-			NSAttributedStringKey.font: NSFont.boldSystemFont(ofSize: 14),
-			NSAttributedStringKey.foregroundColor: NSColor.controlShadowColor.withAlphaComponent(0.7)])
+			NSAttributedString.Key.font: NSFont.boldSystemFont(ofSize: 14),
+			NSAttributedString.Key.foregroundColor: NSColor.secondaryLabelColor])
 		addSubview(titleView)
 	}
 

@@ -37,8 +37,8 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 
 		if UIDevice.current.userInterfaceIdiom != UIUserInterfaceIdiom.pad {
 			let n = NotificationCenter.default
-			n.addObserver(self, selector: #selector(keyboardWillShow), name: .UIKeyboardWillShow, object: nil)
-			n.addObserver(self, selector: #selector(keyboardWillHide), name: .UIKeyboardWillHide, object: nil)
+			n.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+			n.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
 		}
 	}
 
@@ -179,7 +179,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 	@objc private func keyboardWillShow(notification: NSNotification) {
 		if focusedField?.superview == nil { return }
 
-		if let info = notification.userInfo, let keyboardFrameValue = info[UIKeyboardFrameEndUserInfoKey] as? NSValue {
+		if let info = notification.userInfo, let keyboardFrameValue = info[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
 			let keyboardFrame = keyboardFrameValue.cgRectValue
 			let keyboardHeight = max(0, view.bounds.size.height-keyboardFrame.origin.y)
 			let firstResponderFrame = view.convert(focusedField!.frame, from: focusedField!.superview)
