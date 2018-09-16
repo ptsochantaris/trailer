@@ -7,6 +7,22 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.6.11</title>
+			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Mojave dark mode support</li>
+				<li>Built with the latest toolchain for performance and stability</li>
+				</ul></font>]]></description>
+			<pubDate>Sun, 16 Sep 2018 16:00:00 +0000</pubDate>
+			<enclosure
+			url="https://github.com/ptsochantaris/trailer/releases/download/1.6.11/trailer1611.zip"
+			sparkle:version="1478"
+			sparkle:shortVersionString="1.6.11"
+			sparkle:dsaSignature="MC0CFQDaJ/NeTpoVDJWEyCqYI2L8UVaApwIUIjhyw8hdP5f7nSo45bEHsRiScGw="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.6.10</title>
 			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
