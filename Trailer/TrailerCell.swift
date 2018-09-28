@@ -58,7 +58,7 @@ class TrailerCell: NSTableCellView {
 				statusLabel.targetUrl = status.targetUrl
 				statusLabel.needsCommand = !Settings.makeStatusItemsSelectable
 				statusLabel.attributedStringValue = NSAttributedString(string: text, attributes: TrailerCell.statusAttributes)
-				statusLabel.textColor = status.colorForDisplay
+				statusLabel.textColor = isDark ? status.colorForDarkDisplay : status.colorForDisplay
 				statusLabel.alphaValue = faded ? DISABLED_FADE : 1.0
 				addSubview(statusLabel)
 			}
@@ -126,10 +126,14 @@ class TrailerCell: NSTableCellView {
 		selected = false
 	}
 
+	private var isDark: Bool {
+		return app.theme != .light
+	}
+
     private func updateText(for item: ListableItem) {
 		let light: NSColor = .secondaryLabelColor
 		let strong: NSColor = .controlTextColor
-        title.attributedStringValue = item.title(with: titleFont, labelFont: detailFont, titleColor: strong)
+		title.attributedStringValue = item.title(with: titleFont, labelFont: detailFont, titleColor: strong, darkMode: isDark)
         subtitle.attributedStringValue = item.subtitle(with: detailFont, lightColor: light, darkColor: strong)
     }
 
@@ -407,7 +411,7 @@ class TrailerCell: NSTableCellView {
 				newBackground?.backgroundColor = NSColor(red: 1.0, green: 0.4, blue: 0.4, alpha: 1.0)
 			case .dark:
 				color = on ? .black : NSColor(red: 0.94, green: 0.94, blue: 0.94, alpha: 1.0)
-				c.backgroundColor = on ? NSColor.white.withAlphaComponent(DISABLED_FADE) : NSColor.black
+				c.backgroundColor = on ? NSColor.white.withAlphaComponent(DISABLED_FADE) : NSColor.controlShadowColor
 				newBackground?.backgroundColor = NSColor(red: 1.0, green: 0.1, blue: 0.1, alpha: 1.0)
 			case .darkLegacy:
 				color = on ? .black : NSColor(red: 0.94, green: 0.94, blue: 0.94, alpha: 1.0)

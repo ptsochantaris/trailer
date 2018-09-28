@@ -97,7 +97,7 @@ final class PRCell: UITableViewCell {
 
 
 		let detailFont = UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)
-		_title.attributedText = pullRequest.title(with: _title.font, labelFont: detailFont.withSize(detailFont.pointSize-2), titleColor: .darkText)
+		_title.attributedText = pullRequest.title(with: _title.font, labelFont: detailFont.withSize(detailFont.pointSize-2), titleColor: .darkText, darkMode: false)
 		_description.attributedText = pullRequest.subtitle(with: detailFont, lightColor: .lightGray, darkColor: .darkGray)
 
 		let muted = pullRequest.muted
@@ -143,7 +143,7 @@ final class PRCell: UITableViewCell {
 	func setIssue(issue: Issue) {
 
 		let detailFont = UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)
-		_title.attributedText = issue.title(with: _title.font, labelFont: detailFont.withSize(detailFont.pointSize-2), titleColor: .darkText)
+		_title.attributedText = issue.title(with: _title.font, labelFont: detailFont.withSize(detailFont.pointSize-2), titleColor: .darkText, darkMode: false)
 		_description.attributedText = issue.subtitle(with: detailFont, lightColor: .lightGray, darkColor: .darkGray)
 		_statuses.attributedText = nil
 

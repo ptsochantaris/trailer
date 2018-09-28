@@ -536,7 +536,7 @@ class ListableItem: DataItem {
 		})
 	}
 
-	final func title(with font: FONT_CLASS, labelFont: FONT_CLASS, titleColor: COLOR_CLASS) -> NSMutableAttributedString {
+	final func title(with font: FONT_CLASS, labelFont: FONT_CLASS, titleColor: COLOR_CLASS, darkMode: Bool) -> NSMutableAttributedString {
 
 		let p = NSMutableParagraphStyle()
 		p.paragraphSpacing = 1.0
@@ -614,7 +614,7 @@ class ListableItem: DataItem {
 					if approvers.count > 0 {
 
 						let a = [NSAttributedString.Key.font: labelFont,
-						         NSAttributedString.Key.foregroundColor: COLOR_CLASS(red: 0, green: 0.5, blue: 0, alpha: 1.0),
+								 NSAttributedString.Key.foregroundColor: (darkMode ? darkModeGreen : lightModeGreen),
 						         NSAttributedString.Key.paragraphStyle: lp]
 
 						_title.append(NSAttributedString(string: "\n", attributes: a))
@@ -634,7 +634,7 @@ class ListableItem: DataItem {
 					if requesters.count > 0 {
 
 						let a = [NSAttributedString.Key.font: labelFont,
-						         NSAttributedString.Key.foregroundColor: COLOR_CLASS(red: 0.7, green: 0, blue: 0, alpha: 1.0),
+								 NSAttributedString.Key.foregroundColor: (darkMode ? darkModeRed : lightModeRed),
 						         NSAttributedString.Key.paragraphStyle: lp]
 
 						_title.append(NSAttributedString(string: "\n", attributes: a))
@@ -656,7 +656,7 @@ class ListableItem: DataItem {
 					if otherReviewers.count > 0 {
 
 						let a = [NSAttributedString.Key.font: labelFont,
-						         NSAttributedString.Key.foregroundColor: COLOR_CLASS(red: 0.7, green: 0.7, blue: 0, alpha: 1.0),
+								 NSAttributedString.Key.foregroundColor: (darkMode ? darkModeYellow : lightModeYellow),
 						         NSAttributedString.Key.paragraphStyle: lp]
 
 						_title.append(NSAttributedString(string: "\n", attributes: a))

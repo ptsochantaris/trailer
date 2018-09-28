@@ -237,7 +237,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			"commentCount": item.totalComments,
 			"unreadCount": item.unreadComments,
 			"localId": item.objectID.uriRepresentation().absoluteString,
-			"title" : item.title(with: font, labelFont: font, titleColor: .white),
+			"title" : item.title(with: font, labelFont: font, titleColor: .white, darkMode: true),
 			"subtitle" : item.subtitle(with: smallFont, lightColor: .lightGray, darkColor: .gray),
 			]
 
