@@ -23,27 +23,27 @@ final class Review: DataItem {
 				item.pullRequest = withParent
 				item.body = info["body"] as? String
 				item.username = (info["user"] as? [AnyHashable : Any])?["login"] as? String
+			}
 
-				let previousState = item.state
-				let newState = info["state"] as? String
-				if previousState != newState {
+			let previousState = item.state
+			let newState = info["state"] as? String
+			if previousState != newState { // state change doesn't change API date, so we need to check for this every time
 
-					item.state = newState
+				item.state = newState
 
-					if !item.isMine, let ns = newState, let n = State(rawValue: ns) {
-						switch n {
-						case .CHANGES_REQUESTED:
-							if Settings.notifyOnAllReviewChangeRequests || (Settings.notifyOnReviewChangeRequests && withParent.createdByMe) {
-								NotificationQueue.add(type: .changesRequested, for: item)
-							}
-						case .APPROVED:
-							if Settings.notifyOnAllReviewAcceptances || (Settings.notifyOnReviewAcceptances && withParent.createdByMe) {
-								NotificationQueue.add(type: .changesApproved, for: item)
-							}
-						case .DISMISSED:
-							if Settings.notifyOnAllReviewDismissals || (Settings.notifyOnReviewDismissals && withParent.createdByMe) {
-								NotificationQueue.add(type: .changesDismissed, for: item)
-							}
+				if !item.isMine, let ns = newState, let n = State(rawValue: ns) {
+					switch n {
+					case .CHANGES_REQUESTED:
+						if Settings.notifyOnAllReviewChangeRequests || (Settings.notifyOnReviewChangeRequests && withParent.createdByMe) {
+							NotificationQueue.add(type: .changesRequested, for: item)
+						}
+					case .APPROVED:
+						if Settings.notifyOnAllReviewAcceptances || (Settings.notifyOnReviewAcceptances && withParent.createdByMe) {
+							NotificationQueue.add(type: .changesApproved, for: item)
+						}
+					case .DISMISSED:
+						if Settings.notifyOnAllReviewDismissals || (Settings.notifyOnReviewDismissals && withParent.createdByMe) {
+							NotificationQueue.add(type: .changesDismissed, for: item)
 						}
 					}
 				}
