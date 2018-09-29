@@ -159,7 +159,7 @@ final class SectionController: CommonController {
 		for v in views {
 			let label = v["title"] as! String
 			let apiServerUri = v["apiUri"] as! String
-			addSectionsFor(v, itemType: "prs", label: label, apiServerUri: apiServerUri, header: "Pull Requests", showEmptyDescriptions: showEmptyDescriptions)
+			addSectionsFor(v, itemType: "prs", label: label, apiServerUri: apiServerUri, header: "PRs", showEmptyDescriptions: showEmptyDescriptions)
 			addSectionsFor(v, itemType: "issues", label: label, apiServerUri: apiServerUri, header: "Issues", showEmptyDescriptions: showEmptyDescriptions)
 		}
 

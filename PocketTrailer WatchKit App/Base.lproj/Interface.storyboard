@@ -183,7 +183,7 @@
                                                     </group>
                                                 </items>
                                                 <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                <edgeInsets key="margins" left="2" right="2" top="14" bottom="0.0"/>
+                                                <edgeInsets key="margins" left="2" right="2" top="14" bottom="1"/>
                                             </group>
                                             <connections>
                                                 <outlet property="titleL" destination="dy2-9S-MJp" id="mX0-PC-TAL"/>
