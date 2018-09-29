@@ -13,12 +13,12 @@
 				<li>Improves syncing of reviews when only their status has changed. For instance, when a review is dismissed.</li>
 				<li>Improves colours under Mojave dark mode.</li>
 				</ul></font>]]></description>
-			<pubDate>Sat, 29 Sep 2018 00:00:00 +0000</pubDate>
+			<pubDate>Sat, 29 Sep 2018 01:00:00 +0000</pubDate>
 			<enclosure
 			url="https://github.com/ptsochantaris/trailer/releases/download/1.6.12/trailer1612.zip"
 			sparkle:version="1480"
 			sparkle:shortVersionString="1.6.12"
-			sparkle:dsaSignature="MC4CFQCkxAEIkQeXUv+6T5JM6aOuGqCmvAIVAOWQBKxRZCgWbeyjPAcs2frP0P38"
+			sparkle:dsaSignature="MC0CFCZ6YbetXNDsFa+iz32eF/ak+ZYUAhUAmgFvCCzWCCLqRBPR8muj1qVNytk="
 			type="application/octet-stream"/>
 		</item>
 
