@@ -559,13 +559,17 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	func updateActivity() {
 		if appIsRefreshing {
+			projectsTable.alphaValue = 0.3
 			projectsTable.isEnabled = false
 			allPrsSetting.isEnabled = false
 			allIssuesSetting.isEnabled = false
+			allHidingSetting.isEnabled = false
 		} else {
+			projectsTable.alphaValue = 1.0
 			projectsTable.isEnabled = true
 			allPrsSetting.isEnabled = true
 			allIssuesSetting.isEnabled = true
+			allHidingSetting.isEnabled = true
 			reloadRepositories()
 		}
 		advancedReposWindow?.updateActivity()

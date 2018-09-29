@@ -248,20 +248,18 @@ final class ApiServer: NSManagedObject {
 
 		let tempMoc = DataManager.buildChildContext()
 
-		for apiServer in allApiServers(in: tempMoc)
-		{
+		for apiServer in allApiServers(in: tempMoc) {
 			tempMoc.delete(apiServer)
 		}
 
 		for (_, apiServerData) in archive {
 			let a = insertNewServer(in: tempMoc)
 			for (k,v) in apiServerData {
-				if k=="repos" {
+				if k == "repos" {
 					let archive = v as! [String : [String : NSObject]]
 					a.configureRepos(from: archive)
 				} else {
-					let attributes = Array(a.entity.attributesByName.keys)
-					if attributes.contains(k) {
+					if a.entity.attributesByName.keys.contains(k) {
 						a.setValue(v, forKey: k)
 					}
 				}
@@ -278,16 +276,17 @@ final class ApiServer: NSManagedObject {
 	}
 
 	func configureRepos(from archive: [String : [String : NSObject]]) {
+		guard let moc = managedObjectContext else { return }
 		for (_, repoData) in archive {
-			let r = NSEntityDescription.insertNewObject(forEntityName: "Repo", into: managedObjectContext!) as! Repo
+			let r = NSEntityDescription.insertNewObject(forEntityName: "Repo", into: moc) as! Repo
 			for (k,v) in repoData {
-				let attributes = Array(r.entity.attributesByName.keys)
-				if attributes.contains(k) {
+				if r.entity.attributesByName.keys.contains(k) {
 					r.setValue(v, forKey: k)
 				}
-				r.apiServer = self
 			}
+			r.apiServer = self
 			r.resetSyncState()
+			r.postSyncAction = PostSyncAction.isUpdated.rawValue
 		}
 	}
 

@@ -7,8 +7,9 @@ final class SettingsManager {
 
 	private func loadSettingsFrom(url: URL) {
 		if Settings.readFromURL(url) {
-			atNextEvent {
+			DataManager.saveDB()
 
+			atNextEvent {
 				popupManager.masterController.resetView(becauseOfChanges: true)
 
 				preferencesDirty = true
