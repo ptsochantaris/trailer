@@ -619,13 +619,13 @@ final class API {
 				r.postSyncAction = r.manuallyAdded ? PostSyncAction.doNothing.rawValue : PostSyncAction.delete.rawValue
 			}
 
-			let allApiServers = ApiServer.allApiServers(in: moc)
-			let totalOperations = allApiServers.count * 3
+			let goodToGoServers = ApiServer.allApiServers(in: moc).filter { $0.goodToGo }
+			let totalOperations = goodToGoServers.count * 3
 			var completionCount = 0
 
 			let completionCallback = {
 				completionCount += 1
-				if completionCount == totalOperations {
+				if completionCount >= totalOperations {
 					if Settings.hideArchivedRepos { Repo.hideArchivedRepos(in: moc) }
 					for r in DataItem.newItems(of: Repo.self, in: moc) {
 						if r.shouldSync {
@@ -637,15 +637,15 @@ final class API {
 				}
 			}
 
-			for apiServer in allApiServers {
-				if apiServer.goodToGo {
-					syncWatchedRepos(from: apiServer, callback: completionCallback)
-					syncManuallyAddedRepos(from: apiServer, callback: completionCallback)
-					fetchUserTeams(from: apiServer, callback: completionCallback)
-				} else {
-					completionCallback()
-					completionCallback()
-				}
+			if totalOperations == 0 {
+				completionCallback()
+				return
+			}
+
+			for apiServer in goodToGoServers {
+				syncWatchedRepos(from: apiServer, callback: completionCallback)
+				syncManuallyAddedRepos(from: apiServer, callback: completionCallback)
+				fetchUserTeams(from: apiServer, callback: completionCallback)
 			}
 		}
 	}
@@ -1318,19 +1318,17 @@ final class API {
 	}
 
 	static func updateLimitsFromServer() {
-		let allApiServers = ApiServer.allApiServers(in: DataManager.main)
-		let totalOperations = allApiServers.count
+		let goodToGoServers = ApiServer.allApiServers(in: DataManager.main).filter { $0.goodToGo }
+		let totalOperations = goodToGoServers.count
 		var completionCount = 0
-		for apiServer in allApiServers {
-			if apiServer.goodToGo {
-				getRateLimit(from: apiServer) { limits in
-					if let l = limits {
-						apiServer.updateApiLimits(l)
-					}
-					completionCount += 1
-					if completionCount == totalOperations {
-						NotificationCenter.default.post(name: ApiUsageUpdateNotification, object: apiServer, userInfo: nil)
-					}
+		for apiServer in goodToGoServers {
+			getRateLimit(from: apiServer) { limits in
+				if let l = limits {
+					apiServer.updateApiLimits(l)
+				}
+				completionCount += 1
+				if completionCount == totalOperations {
+					NotificationCenter.default.post(name: ApiUsageUpdateNotification, object: apiServer, userInfo: nil)
 				}
 			}
 		}
@@ -1440,34 +1438,29 @@ final class API {
 
 	private static func syncUserDetails(in moc: NSManagedObjectContext, callback: @escaping Completion) {
 
-		let allApiServers = ApiServer.allApiServers(in: moc)
-		let totalOperations = allApiServers.count
-		if totalOperations==0 {
+		let goodToGoServers = ApiServer.allApiServers(in: moc).filter { $0.goodToGo }
+		let totalOperations = goodToGoServers.count
+
+		if totalOperations == 0 {
 			callback()
 			return
 		}
 
 		var completionCount = 0
 
-		for apiServer in allApiServers {
-			if apiServer.goodToGo {
-				getData(in: "/user", from: apiServer) { data, lastPage, resultCode in
+		for apiServer in goodToGoServers {
+			getData(in: "/user", from: apiServer) { data, lastPage, resultCode in
 
-					if let d = data as? [AnyHashable : Any] {
-						apiServer.userName = d["login"] as? String
-						apiServer.userId = d["id"] as? Int64 ?? 0
-					} else {
-						apiServer.lastSyncSucceeded = false
-					}
-					completionCount += 1
-					if completionCount == totalOperations { callback() }
+				if let d = data as? [AnyHashable : Any] {
+					apiServer.userName = d["login"] as? String
+					apiServer.userId = d["id"] as? Int64 ?? 0
+				} else {
+					apiServer.lastSyncSucceeded = false
 				}
-			} else {
 				completionCount += 1
 				if completionCount == totalOperations { callback() }
 			}
 		}
-
 	}
 
 	static func clearAllBadLinks() {
