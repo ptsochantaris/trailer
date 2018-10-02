@@ -1318,17 +1318,11 @@ final class API {
 	}
 
 	static func updateLimitsFromServer() {
-		let goodToGoServers = ApiServer.allApiServers(in: DataManager.main).filter { $0.goodToGo }
-		let totalOperations = goodToGoServers.count
-		var completionCount = 0
-		for apiServer in goodToGoServers {
+		let configuredServers = ApiServer.allApiServers(in: DataManager.main).filter { $0.goodToGo }
+		for apiServer in configuredServers {
 			getRateLimit(from: apiServer) { limits in
 				if let l = limits {
 					apiServer.updateApiLimits(l)
-				}
-				completionCount += 1
-				if completionCount == totalOperations {
-					NotificationCenter.default.post(name: ApiUsageUpdateNotification, object: apiServer, userInfo: nil)
 				}
 			}
 		}
@@ -1438,8 +1432,8 @@ final class API {
 
 	private static func syncUserDetails(in moc: NSManagedObjectContext, callback: @escaping Completion) {
 
-		let goodToGoServers = ApiServer.allApiServers(in: moc).filter { $0.goodToGo }
-		let totalOperations = goodToGoServers.count
+		let configuredServers = ApiServer.allApiServers(in: moc).filter { $0.goodToGo }
+		let totalOperations = configuredServers.count
 
 		if totalOperations == 0 {
 			callback()
@@ -1448,7 +1442,7 @@ final class API {
 
 		var completionCount = 0
 
-		for apiServer in goodToGoServers {
+		for apiServer in configuredServers {
 			getData(in: "/user", from: apiServer) { data, lastPage, resultCode in
 
 				if let d = data as? [AnyHashable : Any] {
@@ -1554,8 +1548,6 @@ final class API {
 					if let linkHeader = allHeaders["Link"] as? String {
 						lastPage = !linkHeader.contains("rel=\"next\"")
 					}
-
-					NotificationCenter.default.post(name: ApiUsageUpdateNotification, object: server, userInfo: nil)
 				}
 				callback(data, lastPage, code ?? 0)
 			} else {

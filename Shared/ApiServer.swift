@@ -171,6 +171,7 @@ final class ApiServer: NSManagedObject {
 		requestsRemaining = limits.requestsRemaining
 		requestsLimit = limits.requestLimit
 		resetDate = limits.resetDate
+		NotificationCenter.default.post(name: ApiUsageUpdateNotification, object: self, userInfo: nil)
 	}
 
 	func resetToGithub() {
