@@ -7,6 +7,21 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.6.14</title>
+			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Corrects an issue where having un-configured API servers on the list could cause syncs to hang.</li>
+				</ul></font>]]></description>
+			<pubDate>Tue, 2 Oct 2018 20:00:00 +0000</pubDate>
+			<enclosure
+			url="https://github.com/ptsochantaris/trailer/releases/download/1.6.14/trailer1614.zip"
+			sparkle:version="1484"
+			sparkle:shortVersionString="1.6.14"
+			sparkle:dsaSignature="MC0CFQDInJWe8W6QFzSH4d79mxAVNVr6IQIUdgDJPDgcFlGrunvV2vITHb0wH4I="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.6.13</title>
 			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
@@ -189,57 +204,6 @@
 			sparkle:version="1460"
 			sparkle:shortVersionString="1.6.0"
 			sparkle:dsaSignature="MC0CFEDVPLFXTwHVPE5mrRG2j0jc+jZcAhUA08+k39SeF9rIXonkLVHAxLpNlAA="
-			type="application/octet-stream"/>
-		</item>
-
-		<item>
-			<title>Version 1.5.9</title>
-			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
-			<description><![CDATA[<font face="sans-serif" size="3"><ul>
-				<li>Cleanups from the recent iOS update: Improvements to responsiveness and stability, especially on long syncs.</li>
-				<li>Re-enabled beta feature headers when requesting reviews from GitHub Enterprise servers. Please do note that, as long as reviews remains a beta feature on a particular server, it CAN'T be enabled together with reactions. Doing so will cause syncs to fail from that server.</li>
-				</ul></font>]]></description>
-			<pubDate>Sat, 8 Jul 2017 19:00:00 +0000</pubDate>
-			<enclosure
-			url="https://github.com/ptsochantaris/trailer/releases/download/1.5.9/trailer159.zip"
-			sparkle:version="1443"
-			sparkle:shortVersionString="1.5.9"
-			sparkle:dsaSignature="MCwCFCEXMDzPL5G5TiAYHuaYeTQvInz/AhQS0R9+KKRaQp6arh6PdG4Ufd30Hw=="
-			type="application/octet-stream"/>
-		</item>
-
-		<item>
-			<title>Version 1.5.8</title>
-			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
-			<description><![CDATA[<font face="sans-serif" size="3"><ul>
-				<li>Pull requests for which you have written reviews will be promoted to the Participated section, in the same way that writing comments is done.</li>
-				<li>Options menu changed to be a pulldown rather than a popup to keep menu item positions consistent.</li>
-				<li>Improved syncing of reactions and of items without dates.</li>
-				<li>Item menu performance improvements.</li>
-				<li>API cache stability improvements.</li>
-				</ul></font>]]></description>
-			<pubDate>Thu, 1 Jun 2017 21:00:00 +0000</pubDate>
-			<enclosure
-			url="https://github.com/ptsochantaris/trailer/releases/download/1.5.8/trailer158.zip"
-			sparkle:version="1436"
-			sparkle:shortVersionString="1.5.8"
-			sparkle:dsaSignature="MC4CFQDDA3OxvwoThMcuL3Qdo7PnhmdYugIVAKAlISIQrGn5u8xy1B94N8Tac613"
-			type="application/octet-stream"/>
-		</item>
-
-		<item>
-			<title>Version 1.5.7</title>
-			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
-			<description><![CDATA[<font face="sans-serif" size="3"><ul>
-				<li>Review APIs are out of beta, and can now be used in conjunction with the Reactions feature.</li>
-				<li>Minor improvements to marking new commits on PRs.</li>
-				</ul></font>]]></description>
-			<pubDate>Mon, 15 May 2017 11:00:00 +0000</pubDate>
-			<enclosure
-			url="https://github.com/ptsochantaris/trailer/releases/download/v1.5.7/trailer157.zip"
-			sparkle:version="1431"
-			sparkle:shortVersionString="1.5.7"
-			sparkle:dsaSignature="MC0CFQC/M3cIG6ePvt2tdW/V5jnOvCwAMQIUPxFXK+7tKoGT0EfG1HeRoJa44Y0="
 			type="application/octet-stream"/>
 		</item>
 
