@@ -591,6 +591,8 @@ UITableViewDragDelegate {
 			tabs.superview?.layoutIfNeeded()
 
 		} else {
+			tabs.items = items
+			tabs.selectedItem = items.first
 			currentTabBarSet = tabBarSetForTabItem(i: items.first)
 			showTabBar(show: false, animated: true)
 		}
