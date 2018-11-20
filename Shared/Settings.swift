@@ -809,4 +809,10 @@ final class Settings {
 		get { return get("NOTIFY_ON_COMMENT_REACTIONS") as? Bool ?? false }
 		set { set("NOTIFY_ON_COMMENT_REACTIONS", newValue) }
 	}
+
+	static let displayNumbersForItemsHelp = "Prefix titles of items with the number of the referenced PR or issue."
+	class var displayNumbersForItems: Bool {
+		get { return get("DISPLAY_NUMBERS_FOR_ITEMS") as? Bool ?? false }
+		set { set("DISPLAY_NUMBERS_FOR_ITEMS", newValue) }
+	}
 }

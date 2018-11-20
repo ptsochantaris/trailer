@@ -546,6 +546,11 @@ class ListableItem: DataItem {
 
 		let _title = NSMutableAttributedString()
 		if let t = title {
+
+			if Settings.displayNumbersForItems {
+				_title.append(NSAttributedString(string: "#\(number) - ", attributes: titleAttributes))
+			}
+			
 			_title.append(NSAttributedString(string: t, attributes: titleAttributes))
 
 			if Settings.showLabels {

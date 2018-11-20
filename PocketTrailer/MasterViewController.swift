@@ -169,6 +169,7 @@ UITableViewDragDelegate {
 		searchController.searchResultsUpdater = self
 		searchController.searchBar.tintColor = view.tintColor
 		searchController.searchBar.placeholder = "Filter"
+		searchController.searchBar.autocapitalizationType = .none
 		navigationItem.searchController = searchController
 
 		searchTimer = PopTimer(timeInterval: 0.3) { [weak self] in

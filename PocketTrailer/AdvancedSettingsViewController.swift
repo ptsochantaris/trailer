@@ -78,6 +78,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
                 title: "Display milestones",
                 description: Settings.showMilestonesHelp,
                 valueDisplayed: { Settings.showMilestones ? "✓" : " " }),
+		Setting(section: .Display,
+				title: "Prefix PR/Issue numbers in item titles",
+				description: Settings.displayNumbersForItemsHelp,
+				valueDisplayed: { Settings.displayNumbersForItems ? "✓" : " " }),
 
 		Setting(section: .Filtering,
 		        title: "Include item titles",
@@ -585,6 +589,9 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
                 settingsChangedTimer.push()
 			case 9:
 				Settings.showMilestones = !Settings.showMilestones
+				settingsChangedTimer.push()
+			case 10:
+				Settings.displayNumbersForItems = !Settings.displayNumbersForItems
 				settingsChangedTimer.push()
 			default: break
 			}

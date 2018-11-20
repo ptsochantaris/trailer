@@ -103,6 +103,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet private weak var showLabels: NSButton!
 	@IBOutlet private weak var showRelativeDates: NSButton!
 	@IBOutlet private weak var displayMilestones: NSButton!
+	@IBOutlet private weak var displayNumbersForItems: NSButton!
 
 	// Servers
 	@IBOutlet private weak var serverList: NSTableView!
@@ -424,6 +425,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		reactionIntervalStepper.toolTip = Settings.reactionScanningIntervalHelp
 		showRelativeDates.toolTip = Settings.showRelativeDatesHelp
 		displayMilestones.toolTip = Settings.showMilestonesHelp
+		displayNumbersForItems.toolTip = Settings.displayNumbersForItemsHelp
 	}
 
 	private func updateAllItemSettingButtons() {
@@ -510,6 +512,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		showLabels.integerValue = Settings.showLabels ? 1 : 0
 		showRelativeDates.integerValue = Settings.showRelativeDates ? 1 : 0
 		displayMilestones.integerValue = Settings.showMilestones ? 1 : 0
+		displayNumbersForItems.integerValue = Settings.displayNumbersForItems ? 1 : 0
 
 		defaultOpenApp.stringValue = Settings.defaultAppForOpeningItems
 		defaultOpenLinks.stringValue = Settings.defaultAppForOpeningWeb
@@ -575,6 +578,10 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		advancedReposWindow?.updateActivity()
 	}
 
+	@IBAction func displayNumbersForItemsSelected(_ sender: NSButton) {
+		Settings.displayNumbersForItems = sender.integerValue == 1
+		deferredUpdateTimer.push()
+	}
 
 	@IBAction private func displayMilestonesSelected(_ sender: NSButton) {
 		Settings.showMilestones = sender.integerValue == 1
