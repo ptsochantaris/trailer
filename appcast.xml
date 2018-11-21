@@ -7,6 +7,21 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.6.16</title>
+			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>New option to display item numbers in their titles.</li>
+				</ul></font>]]></description>
+			<pubDate>Wed, 21 Nov 2018 15:00:00 +0000</pubDate>
+			<enclosure
+			url="https://github.com/ptsochantaris/trailer/releases/download/1.6.16/trailer1616.zip"
+			sparkle:version="1487"
+			sparkle:shortVersionString="1.6.16"
+			sparkle:dsaSignature="MCwCFCkow9Bay+9b25AMPwf4b5HZ+QcMAhRI7/it+bsXge4LnFJKWiQEuY45Ww=="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.6.14</title>
 			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
