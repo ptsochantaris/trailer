@@ -548,7 +548,10 @@ class ListableItem: DataItem {
 		if let t = title {
 
 			if Settings.displayNumbersForItems {
-				_title.append(NSAttributedString(string: "#\(number) - ", attributes: titleAttributes))
+				let fadedTitleAttributes = [NSAttributedString.Key.font: font,
+											NSAttributedString.Key.foregroundColor: (darkMode ? COLOR_CLASS.lightGray : COLOR_CLASS.gray),
+											NSAttributedString.Key.paragraphStyle: p]
+				_title.append(NSAttributedString(string: "#\(number) ", attributes: fadedTitleAttributes))
 			}
 			
 			_title.append(NSAttributedString(string: t, attributes: titleAttributes))
