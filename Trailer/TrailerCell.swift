@@ -70,11 +70,12 @@ class TrailerCell: NSTableCellView {
 
         updateText(for: item)
 
-		let titleHeight = title.attributedStringValue.boundingRect(with: widthLimit, options: stringDrawingOptions).integral.size.height
+		let titleHeight = title.attributedStringValue.boundingRect(with: widthLimit, options: stringDrawingOptions).integral.size.height + 2
 		let subtitleHeight = subtitle.attributedStringValue.boundingRect(with: widthLimit, options: stringDrawingOptions).integral.size.height + 4
 
-        title.frame = CGRect(x: LEFTPADDING + shift, y: subtitleHeight + bottom + statusBottom, width: W, height: titleHeight)
-        subtitle.frame = CGRect(x: LEFTPADDING + shift, y: statusBottom + bottom, width: W, height: subtitleHeight)
+		let titlesBottom = statusBottom + bottom + 1
+        title.frame = CGRect(x: LEFTPADDING + shift, y: titlesBottom + subtitleHeight, width: W, height: titleHeight)
+        subtitle.frame = CGRect(x: LEFTPADDING + shift, y: titlesBottom, width: W, height: subtitleHeight)
 		frame = CGRect(x: 0, y: 0, width: MENU_WIDTH, height: titleHeight + subtitleHeight + statusBottom + cellPadding)
 
         addSubview(title)
