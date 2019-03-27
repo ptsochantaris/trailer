@@ -39,7 +39,7 @@ final class PRLabel: DataItem {
 		let existingItems = try! fromParent.managedObjectContext?.fetch(f) ?? []
 
 		for i in existingItems {
-			if let name = i.name, let idx = namesOfItems.index(of: name), let info = namesToInfo[name] {
+			if let name = i.name, let idx = namesOfItems.firstIndex(of: name), let info = namesToInfo[name] {
 				namesOfItems.remove(at: idx)
 				DLog("Updating Label: %@", name)
 				postProcessCallback(i, info)

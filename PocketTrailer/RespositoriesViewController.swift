@@ -104,7 +104,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 	}
 
 	private func setSort(by option: SortOption) {
-		if let i = currentSortOptions.index(of: option) {
+		if let i = currentSortOptions.firstIndex(of: option) {
 			currentSortOptions.remove(at: i)
 		}
 		currentSortOptions.insert(option, at: 0)

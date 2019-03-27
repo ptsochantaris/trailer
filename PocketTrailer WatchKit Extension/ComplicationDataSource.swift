@@ -194,6 +194,9 @@ final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
 			} else {
 				abort()
 			}
+
+		@unknown default:
+			abort()
 		}
 	}
 }

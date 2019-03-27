@@ -70,7 +70,7 @@ final class SectionController: CommonController {
 	}
 
 	private func sectionFrom(apiName: String) -> Section {
-		return Section(Section.apiTitles.index(of: apiName)!)!
+		return Section(Section.apiTitles.firstIndex(of: apiName)!)!
 	}
 
 	func resetUI() {
@@ -139,6 +139,8 @@ final class SectionController: CommonController {
 					show(status: "Connecting…", hideTable: true)
 				case .activated:
 					show(status: "Loading…", hideTable: true)
+				@unknown default:
+					break
 				}
 			}
 			return

@@ -45,7 +45,7 @@ final class PRCell: UITableViewCell {
 
 		contentView.addConstraints([
 
-			NSLayoutConstraint(item: _image,
+			NSLayoutConstraint(item: _image!,
 			                   attribute: .leading,
 			                   relatedBy: .equal,
 			                   toItem: readCount,
@@ -53,7 +53,7 @@ final class PRCell: UITableViewCell {
 			                   multiplier: 1,
 			                   constant: 3),
 
-			NSLayoutConstraint(item: _image,
+			NSLayoutConstraint(item: _image!,
 			                   attribute: .centerY,
 			                   relatedBy: .equal,
 			                   toItem: readCount,
@@ -61,7 +61,7 @@ final class PRCell: UITableViewCell {
 			                   multiplier: 1,
 			                   constant: -21),
 
-			NSLayoutConstraint(item: _image,
+			NSLayoutConstraint(item: _image!,
 			                   attribute: .leading,
 			                   relatedBy: .equal,
 			                   toItem: unreadCount,
@@ -69,7 +69,7 @@ final class PRCell: UITableViewCell {
 			                   multiplier: 1,
 			                   constant: 3),
 
-			NSLayoutConstraint(item: _image,
+			NSLayoutConstraint(item: _image!,
 			                   attribute: .centerY,
 			                   relatedBy: .equal,
 			                   toItem: unreadCount,

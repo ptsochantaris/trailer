@@ -46,14 +46,16 @@ extension Data {
 			compression_stream_destroy(&stream)
 		}
 
-		return withUnsafeBytes { (bytes: UnsafePointer<UInt8>) -> Data? in
+		return withUnsafeBytes { bytes -> Data? in
+			guard let base = bytes.baseAddress else { return nil }
+
 			// setup the stream's source
-			stream.src_ptr = bytes
+			stream.src_ptr = base.assumingMemoryBound(to: UInt8.self)
 			stream.src_size = count
 
 			// setup the stream's output buffer
 			// we use a temporary buffer to store the data as it's compressed
-			let dstBufferSize : size_t = 4096
+			let dstBufferSize: size_t = 4096
 			let dstBufferPtr = UnsafeMutablePointer<UInt8>.allocate(capacity: dstBufferSize)
 			defer {
 				dstBufferPtr.deallocate()

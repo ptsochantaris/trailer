@@ -59,7 +59,7 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 	@IBAction private func upSelected(_ sender: UIBarButtonItem) {
 		if let this = snoozeItem {
 			let all = SnoozePreset.allSnoozePresets(in: DataManager.main)
-			if let index = all.index(of: this), index > 0 {
+			if let index = all.firstIndex(of: this), index > 0 {
 				let other = all[index-1]
 				other.sortOrder = Int64(index)
 				this.sortOrder = Int64(index-1)
@@ -76,7 +76,7 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 	@IBAction private func downSelected(_ sender: UIBarButtonItem) {
 		if let this = snoozeItem {
 			let all = SnoozePreset.allSnoozePresets(in: DataManager.main)
-			if let index = all.index(of: this), index < all.count-1 {
+			if let index = all.firstIndex(of: this), index < all.count-1 {
 				let other = all[index+1]
 				other.sortOrder = Int64(index)
 				this.sortOrder = Int64(index+1)

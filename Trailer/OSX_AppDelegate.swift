@@ -851,7 +851,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					}
 
 					let statusItems = S.statusItemList
-					if let s = w.statusItem, let ind = statusItems.index(of: s) {
+					if let s = w.statusItem, let ind = statusItems.firstIndex(of: s) {
 						var nextIndex = incomingEvent.keyCode==123 ? ind+1 : ind-1
 						if nextIndex < 0 {
 							nextIndex = statusItems.count-1

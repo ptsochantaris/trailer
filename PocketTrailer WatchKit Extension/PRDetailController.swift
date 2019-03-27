@@ -46,9 +46,10 @@ final class PRDetailController: CommonController {
 	}
 
 	override func update(from response: [AnyHashable : Any]) {
-		let compressedData = response["result"] as! Data
-		let uncompressedData = compressedData.data(operation: .decompress)!
-		let itemInfo = NSKeyedUnarchiver.unarchiveObject(with: uncompressedData) as! [AnyHashable : Any]
+		guard let compressedData = response["result"] as? Data,
+			let uncompressedData = compressedData.data(operation: .decompress),
+			let itemInfo = NSKeyedUnarchiver.unarchiveObject(with: uncompressedData) as? [AnyHashable : Any]
+			else { return }
 		DispatchQueue.main.async { [weak self] in
 			self?.completeUpdate(from: itemInfo)
 		}

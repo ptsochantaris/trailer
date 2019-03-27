@@ -434,7 +434,7 @@ UITableViewDragDelegate {
 	}
 
 	@objc private func moveToNextTab() {
-		if let i = tabs.selectedItem, let items = tabs.items, let ind = items.index(of: i), items.count > 1 {
+		if let i = tabs.selectedItem, let items = tabs.items, let ind = items.firstIndex(of: i), items.count > 1 {
 			var nextIndex = ind+1
 			if nextIndex >= items.count {
 				nextIndex = 0
@@ -444,7 +444,7 @@ UITableViewDragDelegate {
 	}
 
 	@objc private func moveToPreviousTab() {
-		if let i = tabs.selectedItem, let items = tabs.items, let ind = items.index(of: i), items.count > 1 {
+		if let i = tabs.selectedItem, let items = tabs.items, let ind = items.firstIndex(of: i), items.count > 1 {
 			var nextIndex = ind-1
 			if nextIndex < 0 {
 				nextIndex = items.count-1
@@ -492,7 +492,7 @@ UITableViewDragDelegate {
 	private func tabbing(_ tabBar: UITabBar, didSelect item: UITabBarItem, completion: Completion?) {
 		safeScrollToTop { [weak self] in
 			guard let S = self else { return }
-			S.lastTabIndex = tabBar.items?.index(of: item) ?? 0
+			S.lastTabIndex = tabBar.items?.firstIndex(of: item) ?? 0
 			S.updateStatus(becauseOfChanges: false, updateItems: true)
 			completion?()
 		}
@@ -621,7 +621,7 @@ UITableViewDragDelegate {
 			}
 		}
 
-		if let ts = tabScroll, let i = tabs.selectedItem, let ind = tabs.items?.index(of: i) {
+		if let ts = tabScroll, let i = tabs.selectedItem, let ind = tabs.items?.firstIndex(of: i) {
 			let w = tabs.bounds.size.width / CGFloat(tabs.items?.count ?? 1)
 			let x = w * CGFloat(ind)
 			let f = CGRect(x: x, y: 0, width: w, height: tabs.bounds.size.height)
@@ -629,7 +629,7 @@ UITableViewDragDelegate {
 		}
 		lastTabCount = tabs.items?.count ?? 0
 
-		if let i = tabs.selectedItem, let ind = tabs.items?.index(of: i) {
+		if let i = tabs.selectedItem, let ind = tabs.items?.firstIndex(of: i) {
 			lastTabIndex = ind
 		} else {
 			lastTabIndex = 0
@@ -1044,6 +1044,8 @@ UITableViewDragDelegate {
 			tableView.deleteSections(IndexSet(integer: sectionIndex), with: .fade)
 		case .update, .move:
 			break
+		@unknown default:
+			break
 		}
 
 		sectionsChanged = true
@@ -1075,6 +1077,8 @@ UITableViewDragDelegate {
 					tableView.moveRow(at: i, to: n)
 				}
 			}
+		@unknown default:
+			break
 		}
 	}
 
@@ -1225,7 +1229,7 @@ UITableViewDragDelegate {
 	}
 
 	func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
-		Settings.lastPreferencesTabSelected = tabBarController.viewControllers?.index(of: viewController) ?? 0
+		Settings.lastPreferencesTabSelected = tabBarController.viewControllers?.firstIndex(of: viewController) ?? 0
 	}
 
 }

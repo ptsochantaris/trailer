@@ -332,9 +332,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	deinit {
-		let n = NotificationCenter.default
-		n.removeObserver(serverList)
-		n.removeObserver(self)
+		NotificationCenter.default.removeObserver(self)
 	}
 
 	private func addTooltips() {
@@ -1086,7 +1084,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	@IBAction private func deleteSelectedServerSelected(_ sender: NSButton) {
-		if let selectedServer = selectedServer, let index = ApiServer.allApiServers(in: DataManager.main).index(of: selectedServer) {
+		if let selectedServer = selectedServer, let index = ApiServer.allApiServers(in: DataManager.main).firstIndex(of: selectedServer) {
 			DataManager.main.delete(selectedServer)
 			serverList.reloadData()
 			serverList.selectRowIndexes(IndexSet(integer: min(index, serverList.numberOfRows-1)), byExtendingSelection: false)
@@ -1300,7 +1298,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		let a = ApiServer.insertNewServer(in: DataManager.main)
 		a.label = "New API Server"
 		serverList.reloadData()
-		if let index = ApiServer.allApiServers(in: DataManager.main).index(of: a) {
+		if let index = ApiServer.allApiServers(in: DataManager.main).firstIndex(of: a) {
 			serverList.selectRowIndexes(IndexSet(integer: index), byExtendingSelection: false)
 			fillServerApiFormFromSelectedServer()
 		}
@@ -1701,14 +1699,14 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBAction private func createNewSnoozePresetSelected(_ sender: NSButton) {
 		let s = SnoozePreset.newSnoozePreset(in: DataManager.main)
 		commitSnoozeSettings()
-		if let index = SnoozePreset.allSnoozePresets(in: DataManager.main).index(of: s) {
+		if let index = SnoozePreset.allSnoozePresets(in: DataManager.main).firstIndex(of: s) {
 			snoozePresetsList.selectRowIndexes(IndexSet(integer: index), byExtendingSelection: false)
 			fillSnoozeFormFromSelectedPreset()
 		}
 	}
 
 	@IBAction private func deleteSnoozePresetSelected(_ sender: NSButton) {
-		if let selectedPreset = selectedSnoozePreset, let index = SnoozePreset.allSnoozePresets(in: DataManager.main).index(of: selectedPreset) {
+		if let selectedPreset = selectedSnoozePreset, let index = SnoozePreset.allSnoozePresets(in: DataManager.main).firstIndex(of: selectedPreset) {
 
 			let appliedCount = selectedPreset.appliedToIssues.count + selectedPreset.appliedToPullRequests.count
 			if appliedCount > 0 {
@@ -1769,7 +1767,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBAction private func snoozeUpSelected(_ sender: NSButton) {
 		if let this = selectedSnoozePreset {
 			let all = SnoozePreset.allSnoozePresets(in: DataManager.main)
-			if let index = all.index(of: this), index > 0 {
+			if let index = all.firstIndex(of: this), index > 0 {
 				let other = all[index-1]
 				other.sortOrder = Int64(index)
 				this.sortOrder = Int64(index-1)
@@ -1782,7 +1780,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBAction private func snoozeDownSelected(_ sender: NSButton) {
 		if let this = selectedSnoozePreset {
 			let all = SnoozePreset.allSnoozePresets(in: DataManager.main)
-			if let index = all.index(of: this), index < all.count-1 {
+			if let index = all.firstIndex(of: this), index < all.count-1 {
 				let other = all[index+1]
 				other.sortOrder = Int64(index)
 				this.sortOrder = Int64(index+1)

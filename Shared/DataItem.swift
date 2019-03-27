@@ -66,7 +66,7 @@ class DataItem: NSManagedObject {
 
 		for i in existingItems {
 			let serverId = i.serverId
-			if let idx = idsOfItems.index(of: serverId), let info = idsToInfo[serverId] {
+			if let idx = idsOfItems.firstIndex(of: serverId), let info = idsToInfo[serverId] {
 				idsOfItems.remove(at: idx)
 				let updatedDate = DataItem.parseGH8601(info["updated_at"] as? String) ?? i.createdAt ?? now
 				if updatedDate != i.updatedAt {

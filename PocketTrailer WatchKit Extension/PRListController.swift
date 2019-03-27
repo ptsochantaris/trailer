@@ -71,10 +71,10 @@ final class PRListController: CommonController {
 	private func _requestData(_ command: String?) {
 
 		var params: [String: Any] = [ "list": "item_list",
-									  "type": type,
+									  "type": type!,
 									  "group": groupLabel!,
 									  "apiUri": apiServerUri!,
-									  "sectionIndex": sectionIndex,
+									  "sectionIndex": sectionIndex!,
 									  "onlyUnread": onlyUnread,
 									  "count": PAGE_SIZE ]
 
@@ -103,9 +103,10 @@ final class PRListController: CommonController {
 	}
 
 	override func update(from response: [AnyHashable : Any]) {
-		let compressedData = response["result"] as! Data
-		let uncompressedData = compressedData.data(operation: .decompress)!
-		let page = NSKeyedUnarchiver.unarchiveObject(with: uncompressedData) as! [[AnyHashable : Any]]
+		guard let compressedData = response["result"] as? Data,
+			let uncompressedData = compressedData.data(operation: .decompress),
+			let page = NSKeyedUnarchiver.unarchiveObject(with: uncompressedData) as? [[AnyHashable : Any]]
+			else { return }
 		DispatchQueue.main.async { [weak self] in
 			self?.completeUpdate(from: page)
 		}
