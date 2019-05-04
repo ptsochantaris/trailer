@@ -429,6 +429,8 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			return buildFooter("To disable usage of the Reviews API, uncheck all options above and set the moving option to \"Don't Move It\".")
 		case SettingsSection.Reactions.title:
 			return buildFooter("To completely disable all usage of the Reactions API, uncheck all above options.")
+		case SettingsSection.Misc.title:
+			return buildFooter("You can open Trailer via the URL scheme \"pockettrailer://\" or run a search using the search query parameter, e.g.: \"pockettrailer://?search=author:john\"")
 		default:
 			return nil
 		}
