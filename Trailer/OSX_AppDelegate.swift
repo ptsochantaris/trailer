@@ -1027,7 +1027,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			"T": 17, "U": 32, "V": 9, "W": 13, "X": 7, "Y": 16, "Z": 6,
 			"1": 18, "2": 19, "3": 20, "4": 21, "5": 23, "6": 22, "7": 26,
 			"8": 28, "9": 25, "0": 29, "=": 24, "-": 27, "]": 30, "[": 33,
-			"'": 39, ";": 41, ",": 43, "/": 44, ".": 47, "`": 50
+			"'": 39, ";": 41, ",": 43, "/": 44, ".": 47, "`": 50, "\\": 42,
 			]
 
 		if check == 4, let n = keyMap[Settings.hotkeyLetter], incomingEvent.keyCode == UInt16(n) {
