@@ -191,34 +191,9 @@ final class PullRequest: ListableItem {
 
 	var displayedStatuses: [PRStatus] {
 
-		let rawStatuses: [PRStatus]
-
-		let mode = Settings.statusFilteringMode
-		if mode == StatusFilter.all.rawValue {
-			rawStatuses = statuses.sorted { $1.createdBefore($0) }
-		} else {
-			let terms = Settings.statusFilteringTerms
-			if terms.count > 0 {
-
-				let inclusive = mode == StatusFilter.include.rawValue
-				// contains(a) or contains(b) or contains(c)  -vs-  not(contains(a) or contains(b) or contains(c))
-				let rawUnsorted = statuses.filter {
-					for t in terms {
-						if let d = $0.descriptionText, d.localizedCaseInsensitiveContains(t) {
-							return inclusive
-						}
-					}
-					return !inclusive
-				}
-				rawStatuses = rawUnsorted.sorted { $1.createdBefore($0) }
-
-			} else {
-				rawStatuses = statuses.sorted { $1.createdBefore($0) }
-			}
-		}
-
 		var contexts = [String : PRStatus]()
-		for s in rawStatuses {
+		let sortedStatuses = statuses.sorted { $1.createdBefore($0) }
+		for s in sortedStatuses {
 			let context = s.context ?? "//NO CONTEXT/-/"
 			if let latestStatusInContext = contexts[context] {
 				if latestStatusInContext.createdBefore(s) {
@@ -228,7 +203,28 @@ final class PullRequest: ListableItem {
 				contexts[context] = s
 			}
 		}
-		return contexts.values.sorted { $0.createdBefore($1) }
+
+		var statusList = Array(contexts.values)
+
+		let mode = Settings.statusFilteringMode
+		if mode != StatusFilter.all.rawValue {
+			let terms = Settings.statusFilteringTerms
+			if terms.count > 0 {
+				let inclusive = mode == StatusFilter.include.rawValue
+				// contains(a) or contains(b) or contains(c)  -vs-  not(contains(a) or contains(b) or contains(c))
+
+				statusList = statusList.filter {
+					for t in terms {
+						if let d = $0.descriptionText, d.localizedCaseInsensitiveContains(t) {
+							return inclusive
+						}
+					}
+					return !inclusive
+				}
+			}
+		}
+
+		return statusList.sorted { $0.createdBefore($1) }
 	}
 
 	var labelsLink: String? {

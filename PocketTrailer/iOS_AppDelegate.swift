@@ -82,8 +82,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 		switch shortcutItem.type {
 
 		case "search-items":
-			let m = popupManager.masterController
-			m.focusFilter(terms: nil)
+			popupManager.masterController.focusFilter(terms: nil)
 			completionHandler(true)
 
 		case "mark-all-read":
@@ -96,16 +95,21 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 	}
 
 	func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-		if let c = URLComponents(url: url, resolvingAgainstBaseURL: false) {
-			if let scheme = c.scheme {
-				if scheme == "pockettrailer" {
-					return true
-				} else {
-					settingsManager.loadSettingsFrom(url: url, confirmFromView: nil, withCompletion: nil)
-				}
-			}
+		guard let c = URLComponents(url: url, resolvingAgainstBaseURL: false), let scheme = c.scheme else {
+			return false
 		}
-		return false
+
+		if scheme == "pockettrailer" {
+			var terms: String?
+			if let items = c.queryItems, let index = items.firstIndex(where: { $0.name == "search" }) {
+				terms = items[index].value
+			}
+			popupManager.masterController.focusFilter(terms: terms)
+		} else {
+			settingsManager.loadSettingsFrom(url: url, confirmFromView: nil, withCompletion: nil)
+		}
+
+		return true
 	}
 
 	func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
