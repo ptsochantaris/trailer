@@ -830,7 +830,7 @@ class ListableItem: DataItem {
 	private static let filterLabelPredicate = "SUBQUERY(labels, $label, $label.name contains[cd] %@).@count > 0"
 	private static let filterStatusPredicate = "SUBQUERY(statuses, $status, $status.descriptionText contains[cd] %@).@count > 0"
 
-	static func requestForItems<T: ListableItem>(of itemType: T.Type, withFilter: String?, sectionIndex: Int64, criterion: GroupingCriterion? = nil, onlyUnread: Bool = false) -> NSFetchRequest<T> {
+	static func requestForItems<T: ListableItem>(of itemType: T.Type, withFilter: String?, sectionIndex: Int64, criterion: GroupingCriterion? = nil, onlyUnread: Bool = false, excludeSnoozed: Bool = false) -> NSFetchRequest<T> {
 
 		var andPredicates = [NSPredicate]()
 
@@ -844,7 +844,7 @@ class ListableItem: DataItem {
 			andPredicates.append(s.matchingPredicate)
 		}
 
-		if Settings.hideSnoozedItems {
+		if excludeSnoozed || Settings.hideSnoozedItems {
 			andPredicates.append(Section.snoozed.excludingPredicate)
 		}
 

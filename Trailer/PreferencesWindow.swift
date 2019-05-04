@@ -45,7 +45,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet private weak var sortModeSelect: NSPopUpButton!
 	@IBOutlet private weak var includeRepositoriesInFiltering: NSButton!
 	@IBOutlet private weak var groupByRepo: NSButton!
-	@IBOutlet private weak var countOnlyListedItems: NSButton!
 	@IBOutlet private weak var checkForUpdatesAutomatically: NSButton!
 	@IBOutlet private weak var checkForUpdatesLabel: NSTextField!
 	@IBOutlet private weak var checkForUpdatesSelector: NSStepper!
@@ -134,6 +133,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet private weak var snoozeWakeOnStatusUpdate: NSButton!
 	@IBOutlet private weak var hideSnoozedItems: NSButton!
 	@IBOutlet private weak var snoozeWakeLabel: NSTextField!
+	@IBOutlet private weak var countSnoozedItems: NSButton!
 
 	@IBOutlet private weak var autoSnoozeSelector: NSStepper!
 	@IBOutlet private weak var autoSnoozeLabel: NSTextField!
@@ -352,7 +352,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		allHidingSetting.toolTip = "Set the any special hiding settings of all (or the currently selected/filtered) repositories"
 		showCreationDates.toolTip = Settings.showCreatedInsteadOfUpdatedHelp
 		highlightItemsWithNewCommits.toolTip = Settings.markPrsAsUnreadOnNewCommitsHelp
-		countOnlyListedItems.toolTip = Settings.countOnlyListedItemsHelp
 		displayRepositoryNames.toolTip = Settings.showReposInNameHelp
 		hideAvatars.toolTip = Settings.hideAvatarsHelp
 		showSeparateApiServersInMenu.toolTip = Settings.showSeparateApiServersInMenuHelp
@@ -401,6 +400,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		snoozeWakeOnMention.toolTip = Settings.snoozeWakeOnMentionHelp
 		snoozeWakeOnComment.toolTip = Settings.snoozeWakeOnCommentHelp
 		hideSnoozedItems.toolTip = Settings.hideSnoozedItemsHelp
+		countSnoozedItems.toolTip = Settings.countVisibleSnoozedItemsHelp
 		autoSnoozeSelector.toolTip = Settings.autoSnoozeDurationHelp
 		autoSnoozeLabel.toolTip = Settings.autoSnoozeDurationHelp
 		newMentionMovePolicy.toolTip = Settings.newMentionMovePolicyHelp
@@ -498,7 +498,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		assignedPrHandlingPolicy.selectItem(at: Settings.assignedPrHandlingPolicy)
 		showStatusItems.integerValue = Settings.showStatusItems ? 1 : 0
 		makeStatusItemsSelectable.integerValue = Settings.makeStatusItemsSelectable ? 1 : 0
-		countOnlyListedItems.integerValue = Settings.countOnlyListedItems ? 0 : 1
 		openPrAtFirstUnreadComment.integerValue = Settings.openPrAtFirstUnreadComment ? 1 : 0
 		logActivityToConsole.integerValue = Settings.logActivityToConsole ? 1 : 0
 		dumpApiResponsesToConsole.integerValue = Settings.dumpAPIResponsesInConsole ? 1 : 0
@@ -507,6 +506,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		showStatusesForAll.integerValue = Settings.showStatusesOnAllItems ? 1 : 0
 		highlightItemsWithNewCommits.integerValue = Settings.markPrsAsUnreadOnNewCommits ? 1 : 0
 		hideSnoozedItems.integerValue = Settings.hideSnoozedItems ? 1 : 0
+		countSnoozedItems.integerValue = Settings.countVisibleSnoozedItems ? 1 : 0
 		showLabels.integerValue = Settings.showLabels ? 1 : 0
 		showRelativeDates.integerValue = Settings.showRelativeDates ? 1 : 0
 		displayMilestones.integerValue = Settings.showMilestones ? 1 : 0
@@ -908,12 +908,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBAction private func sortOrderSelected(_ sender: NSButton) {
 		Settings.sortDescending = (sender.integerValue==1)
 		setupSortMethodMenu()
-		DataManager.postProcessAllItems()
-		deferredUpdateTimer.push()
-	}
-
-	@IBAction private func countOnlyListedItemsSelected(_ sender: NSButton) {
-		Settings.countOnlyListedItems = (sender.integerValue==0)
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
@@ -1549,6 +1543,11 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction private func hideSnoozedItemsChanged(_ sender: NSButton) {
 		Settings.hideSnoozedItems = hideSnoozedItems.integerValue == 1
+		deferredUpdateTimer.push()
+	}
+
+	@IBAction func countSnoozedItemsChanged(_ sender: NSButton) {
+		Settings.countVisibleSnoozedItems = countSnoozedItems.integerValue == 1
 		deferredUpdateTimer.push()
 	}
 

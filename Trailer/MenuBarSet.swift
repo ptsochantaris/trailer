@@ -88,7 +88,6 @@ final class MenuBarSet {
 	private func updateMenu(of type: ListableItem.Type,
 	                        menu: MenuWindow,
 	                        lengthOffset: CGFloat,
-	                        totalCount: () -> Int,
 	                        hasUnread: () -> Bool,
 	                        reasonForEmpty: (String) -> NSAttributedString) {
 		
@@ -96,17 +95,14 @@ final class MenuBarSet {
 		let somethingFailed = ApiServer.shouldReportRefreshFailure(in: DataManager.main) && (viewCriterion?.relatedServerFailed ?? true)
 		let attributes = somethingFailed || hasUnread() ? MenuBarSet.redText : MenuBarSet.normalText
 		let preFilterCount: Int
-		
-		if Settings.countOnlyListedItems {
-			let f = ListableItem.requestForItems(of: type, withFilter: menu.filter.stringValue, sectionIndex: -1, criterion: viewCriterion)
-			countString = somethingFailed ? "X" : String(try! DataManager.main.count(for: f))
-			let fc = ListableItem.requestForItems(of: type, withFilter: nil, sectionIndex: -1, criterion: viewCriterion)
-			preFilterCount = try! DataManager.main.count(for: fc)
-		} else {
-			preFilterCount = totalCount()
-			countString = somethingFailed ? "X" : String(preFilterCount)
-		}
-		
+
+		let excludeSnoozed = !Settings.countVisibleSnoozedItems
+		let f = ListableItem.requestForItems(of: type, withFilter: menu.filter.stringValue, sectionIndex: -1, criterion: viewCriterion, excludeSnoozed: excludeSnoozed)
+		countString = somethingFailed ? "X" : String(try! DataManager.main.count(for: f))
+
+		let fc = ListableItem.requestForItems(of: type, withFilter: nil, sectionIndex: -1, criterion: viewCriterion)
+		preFilterCount = try! DataManager.main.count(for: fc)
+
 		DLog("Updating \(type) menu, \(countString) total items")
 		
 		let itemLabel = viewCriterion?.label
@@ -147,12 +143,10 @@ final class MenuBarSet {
 		
 		if Repo.interestedInIssues(fromServerWithId: viewCriterion?.apiServerId) {
 			
-			updateMenu(of: Issue.self, menu: issuesMenu, lengthOffset: 2, totalCount: { () -> Int in
-				return Issue.countOpen(in: DataManager.main, criterion: self.viewCriterion)
-			}, hasUnread: { () -> Bool in
-				return Issue.badgeCount(in: DataManager.main, criterion: self.viewCriterion) > 0
+			updateMenu(of: Issue.self, menu: issuesMenu, lengthOffset: 2, hasUnread: { () -> Bool in
+				return Issue.badgeCount(in: DataManager.main, criterion: viewCriterion) > 0
 			}, reasonForEmpty: { filter -> NSAttributedString in
-				return Issue.reasonForEmpty(with: filter, criterion: self.viewCriterion)
+				return Issue.reasonForEmpty(with: filter, criterion: viewCriterion)
 			})
 			
 		} else {
@@ -165,12 +159,10 @@ final class MenuBarSet {
 		let sid = viewCriterion?.apiServerId
 		if forceVisible || Repo.interestedInPrs(fromServerWithId: sid) || !Repo.interestedInIssues(fromServerWithId: sid) {
 			
-			updateMenu(of: PullRequest.self, menu: prMenu, lengthOffset: 0, totalCount: { () -> Int in
-				return PullRequest.countOpen(in: DataManager.main, criterion: self.viewCriterion)
-			}, hasUnread: { () -> Bool in
-				return PullRequest.badgeCount(in: DataManager.main, criterion: self.viewCriterion) > 0
+			updateMenu(of: PullRequest.self, menu: prMenu, lengthOffset: 0, hasUnread: { () -> Bool in
+				return PullRequest.badgeCount(in: DataManager.main, criterion: viewCriterion) > 0
 			}, reasonForEmpty: { filter -> NSAttributedString in
-				return PullRequest.reasonForEmpty(with: filter, criterion: self.viewCriterion)
+				return PullRequest.reasonForEmpty(with: filter, criterion: viewCriterion)
 			})
 			
 		} else {

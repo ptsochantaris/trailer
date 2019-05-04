@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14460.31"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -782,19 +782,8 @@ Token</string>
                                                 </subviews>
                                             </view>
                                         </box>
-                                        <button id="rEz-q1-QZq">
-                                            <rect key="frame" x="15" y="366" width="366" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Count all open items of synced repos in the menubar" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="23T-vx-oJZ">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="countOnlyListedItemsSelected:" target="vQH-WF-vh2" id="lwo-3S-huG"/>
-                                            </connections>
-                                        </button>
                                         <button id="yK4-xL-QRu">
-                                            <rect key="frame" x="15" y="339" width="366" height="18"/>
+                                            <rect key="frame" x="15" y="362" width="366" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Show repository names" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="oZY-hH-Udu">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -805,7 +794,7 @@ Token</string>
                                             </connections>
                                         </button>
                                         <button id="onl-1T-RTg">
-                                            <rect key="frame" x="15" y="312" width="366" height="18"/>
+                                            <rect key="frame" x="15" y="333" width="366" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Display relative instead of absolute dates" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="Mtr-gs-YsM">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -816,7 +805,7 @@ Token</string>
                                             </connections>
                                         </button>
                                         <button id="3CV-9S-gLw">
-                                            <rect key="frame" x="15" y="285" width="366" height="18"/>
+                                            <rect key="frame" x="15" y="304" width="366" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Hide author avatars" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="UOs-3D-XyL">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -838,7 +827,7 @@ Token</string>
                                             </connections>
                                         </button>
                                         <button id="VrU-mc-Czw">
-                                            <rect key="frame" x="15" y="258" width="366" height="18"/>
+                                            <rect key="frame" x="15" y="275" width="366" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Separate each API server in its own menu bar item" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="C7K-xS-315">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -849,7 +838,7 @@ Token</string>
                                             </connections>
                                         </button>
                                         <button id="9fQ-lN-76c">
-                                            <rect key="frame" x="15" y="231" width="366" height="18"/>
+                                            <rect key="frame" x="15" y="246" width="366" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Hide item count in menubar items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="mAZ-e8-NLS">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -860,7 +849,7 @@ Token</string>
                                             </connections>
                                         </button>
                                         <button id="TdQ-hP-A3t">
-                                            <rect key="frame" x="15" y="204" width="366" height="18"/>
+                                            <rect key="frame" x="15" y="217" width="366" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Sync and display labels for items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="5sv-cq-odI">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -871,7 +860,7 @@ Token</string>
                                             </connections>
                                         </button>
                                         <button id="fsA-E5-SRy">
-                                            <rect key="frame" x="15" y="177" width="366" height="18"/>
+                                            <rect key="frame" x="15" y="188" width="366" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Highlight PRs that have new commits" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="T2C-n7-dIU">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -882,7 +871,7 @@ Token</string>
                                             </connections>
                                         </button>
                                         <button id="GMt-gT-i3d">
-                                            <rect key="frame" x="15" y="150" width="366" height="18"/>
+                                            <rect key="frame" x="15" y="159" width="366" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Display item milestones" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="fnW-oB-nHX">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -893,7 +882,7 @@ Token</string>
                                             </connections>
                                         </button>
                                         <button id="CjN-R7-2iD">
-                                            <rect key="frame" x="15" y="123" width="366" height="18"/>
+                                            <rect key="frame" x="15" y="130" width="366" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Prefix PR/Issue numbers in item titles" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="A3t-GS-DJr">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1641,7 +1630,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" heightSizable="YES"/>
                                             <clipView key="contentView" id="Fou-QI-zfT">
                                                 <rect key="frame" x="1" y="1" width="311" height="383"/>
-                                                <autoresizingMask key="autoresizingMask"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="20" id="EjH-yo-GqO">
                                                         <rect key="frame" x="0.0" y="0.0" width="311" height="383"/>
@@ -1681,14 +1670,14 @@ to a higher number in order to keep your API usage reasonable</string>
                                             </scroller>
                                         </scrollView>
                                         <box borderType="line" title="Selected preset" id="L7P-yY-kJu">
-                                            <rect key="frame" x="327" y="62" width="501" height="361"/>
+                                            <rect key="frame" x="327" y="81" width="501" height="342"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <view key="contentView" id="brd-Ee-rdq">
-                                                <rect key="frame" x="3" y="3" width="495" height="343"/>
+                                                <rect key="frame" x="3" y="3" width="495" height="324"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button id="Cwe-AT-ISF">
-                                                        <rect key="frame" x="24" y="301" width="363" height="18"/>
+                                                        <rect key="frame" x="24" y="282" width="363" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="radio" title="For a certain amount of time" bezelStyle="regularSquare" imagePosition="left" alignment="left" enabled="NO" inset="2" id="gmO-x6-lxq">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1699,7 +1688,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </connections>
                                                     </button>
                                                     <popUpButton verticalHuggingPriority="750" id="vch-ax-HsD">
-                                                        <rect key="frame" x="23" y="265" width="115" height="26"/>
+                                                        <rect key="frame" x="23" y="246" width="115" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="dH8-z8-RVI">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1711,7 +1700,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </connections>
                                                     </popUpButton>
                                                     <popUpButton verticalHuggingPriority="750" id="c3Y-1q-UD3">
-                                                        <rect key="frame" x="148" y="265" width="115" height="26"/>
+                                                        <rect key="frame" x="148" y="246" width="115" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="gau-PU-aUA">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1723,7 +1712,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </connections>
                                                     </popUpButton>
                                                     <popUpButton verticalHuggingPriority="750" id="Yq0-Of-I1d">
-                                                        <rect key="frame" x="273" y="265" width="115" height="26"/>
+                                                        <rect key="frame" x="273" y="246" width="115" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="1Ge-1e-b8J">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1735,7 +1724,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </connections>
                                                     </popUpButton>
                                                     <popUpButton verticalHuggingPriority="750" id="PLV-LI-rNE">
-                                                        <rect key="frame" x="148" y="186" width="115" height="26"/>
+                                                        <rect key="frame" x="148" y="172" width="115" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="H86-ef-er1">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1758,7 +1747,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </connections>
                                                     </button>
                                                     <popUpButton verticalHuggingPriority="750" id="51F-wD-jRc">
-                                                        <rect key="frame" x="23" y="186" width="115" height="26"/>
+                                                        <rect key="frame" x="23" y="172" width="115" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="gl7-xO-9dz">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1776,7 +1765,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </connections>
                                                     </popUpButton>
                                                     <popUpButton verticalHuggingPriority="750" id="xLn-A0-wrg">
-                                                        <rect key="frame" x="273" y="186" width="115" height="26"/>
+                                                        <rect key="frame" x="273" y="172" width="115" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="vus-t5-ks8">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1788,7 +1777,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </connections>
                                                     </popUpButton>
                                                     <button id="nPv-hg-fBq">
-                                                        <rect key="frame" x="24" y="222" width="363" height="18"/>
+                                                        <rect key="frame" x="24" y="208" width="363" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="radio" title="Until a specific day and/or time" bezelStyle="regularSquare" imagePosition="left" alignment="left" enabled="NO" inset="2" id="rgO-Bp-SJN">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1810,7 +1799,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </connections>
                                                     </button>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="If1-BU-NTa">
-                                                        <rect key="frame" x="261" y="271" width="13" height="17"/>
+                                                        <rect key="frame" x="261" y="252" width="13" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="+" id="59O-bO-PLd">
                                                             <font key="font" metaFont="systemBold"/>
@@ -1819,7 +1808,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="fvg-Jr-yj9">
-                                                        <rect key="frame" x="138" y="193" width="8" height="17"/>
+                                                        <rect key="frame" x="138" y="179" width="8" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title=":" id="kRd-Z6-wfs">
                                                             <font key="font" metaFont="systemBold"/>
@@ -1828,7 +1817,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="izk-el-koB">
-                                                        <rect key="frame" x="263" y="193" width="8" height="17"/>
+                                                        <rect key="frame" x="263" y="179" width="8" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title=":" id="PHm-t1-ITC">
                                                             <font key="font" metaFont="systemBold"/>
@@ -1837,7 +1826,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="Erq-u5-k78">
-                                                        <rect key="frame" x="136" y="271" width="13" height="17"/>
+                                                        <rect key="frame" x="136" y="252" width="13" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="+" id="z33-tA-HN2">
                                                             <font key="font" metaFont="systemBold"/>
@@ -1857,7 +1846,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </connections>
                                                     </button>
                                                     <box titlePosition="noTitle" id="pbf-db-SIs">
-                                                        <rect key="frame" x="36" y="77" width="338" height="93"/>
+                                                        <rect key="frame" x="36" y="63" width="338" height="93"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="K6S-4l-zny">
                                                             <rect key="frame" x="3" y="3" width="332" height="87"/>
@@ -1912,7 +1901,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                             </view>
                                         </box>
                                         <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="hgg-d7-xNz">
-                                            <rect key="frame" x="339" y="33" width="19" height="27"/>
+                                            <rect key="frame" x="339" y="52" width="19" height="27"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                             <stepperCell key="cell" continuous="YES" alignment="left" maxValue="100" id="p2m-a9-1oC"/>
                                             <connections>
@@ -1920,7 +1909,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                             </connections>
                                         </stepper>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="4MH-0X-KEO">
-                                            <rect key="frame" x="361" y="39" width="466" height="17"/>
+                                            <rect key="frame" x="361" y="58" width="466" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Automatically snooze any item that has been idle for longer than X days" id="tEP-gK-nnN">
                                                 <font key="font" metaFont="system"/>
@@ -1940,7 +1929,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                             </connections>
                                         </button>
                                         <button id="YS0-gj-k5Q">
-                                            <rect key="frame" x="646" y="10" width="181" height="18"/>
+                                            <rect key="frame" x="361" y="10" width="466" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                             <buttonCell key="cell" type="check" title="Hide snoozed section" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="faa-p8-d9y">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1948,6 +1937,17 @@ to a higher number in order to keep your API usage reasonable</string>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="hideSnoozedItemsChanged:" target="vQH-WF-vh2" id="LaH-Fe-ctb"/>
+                                            </connections>
+                                        </button>
+                                        <button id="fpY-gk-scj">
+                                            <rect key="frame" x="361" y="34" width="458" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Include visible snoozed items in menubar count" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="69h-Au-DoO">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="countSnoozedItemsChanged:" target="vQH-WF-vh2" id="vGb-JY-3vf"/>
                                             </connections>
                                         </button>
                                     </subviews>
@@ -2338,7 +2338,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="checkForUpdatesLabel" destination="hkX-Jd-o2h" id="X6n-gD-voM"/>
                 <outlet property="checkForUpdatesSelector" destination="AT5-aS-AgQ" id="s48-Pe-cgZ"/>
                 <outlet property="commentAuthorBlacklist" destination="DTL-cq-VaA" id="xWf-YT-bda"/>
-                <outlet property="countOnlyListedItems" destination="rEz-q1-QZq" id="wAM-fd-WAq"/>
+                <outlet property="countSnoozedItems" destination="fpY-gk-scj" id="Eel-zY-BHV"/>
                 <outlet property="defaultOpenApp" destination="9gm-ih-X7o" id="Itu-YH-f0g"/>
                 <outlet property="defaultOpenLinks" destination="BEH-9y-PVP" id="KRd-mp-FUE"/>
                 <outlet property="disableAllCommentNotifications" destination="xXn-f2-021" id="OJl-UW-ZWi"/>

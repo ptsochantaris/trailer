@@ -602,12 +602,6 @@ final class Settings {
 	static let snoozeWakeOnMentionHelp = "Wake up snoozing items in you are mentioned in a new comment"
 	static let snoozeWakeOnStatusUpdateHelp = "Wake up snoozing items if there is a status or CI update"
 
-	static let countOnlyListedItemsHelp = "Show the number of items currently visible in Trailer in the menu bar. If this is unselected, the menubar will display the count of all open items in the current watchlist, irrespective of filters or visibility settings. It's recommended you keep this on."
-    class var countOnlyListedItems: Bool {
-        get { return get("COUNT_ONLY_LISTED_PRS") as? Bool ?? true }
-        set { set("COUNT_ONLY_LISTED_PRS", newValue) }
-    }
-
 	static let showMilestonesHelp = "Include milestone information, if any, on current items."
 	class var showMilestones: Bool {
 		get { return get("DISPLAY_MILESTONES") as? Bool ?? false }
@@ -815,4 +809,11 @@ final class Settings {
 		get { return get("DISPLAY_NUMBERS_FOR_ITEMS") as? Bool ?? false }
 		set { set("DISPLAY_NUMBERS_FOR_ITEMS", newValue) }
 	}
+
+	static let countVisibleSnoozedItemsHelp = "Include visible snoozed items in menubar count."
+	class var countVisibleSnoozedItems: Bool {
+		get { return get("COUNT_VISIBLE_SNOOZED_ITEMS") as? Bool ?? true }
+		set { set("COUNT_VISIBLE_SNOOZED_ITEMS", newValue) }
+	}
+
 }
