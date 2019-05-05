@@ -1393,26 +1393,40 @@ final class API {
 	}
 
 	static func fetchAllRepos(owner: String, from server: ApiServer, completion: @escaping (Error?) -> Void) {
-		var userError, orgError: Error?
 		let group = DispatchGroup()
+
 		group.enter()
-		group.enter()
-		getData(in: "\(server.apiPath ?? "")/users/\(owner)/repos", from: server) { data, lastPage, resultCode in
-			if let repoData = data as? [[AnyHashable : Any]] {
-				Repo.syncRepos(from: repoData, server: server, addNewRepos: true, manuallyAdded: true)
-			} else {
+		var userError: Error?
+		var userList = [[AnyHashable : Any]]()
+		let userPath = "\(server.apiPath ?? "")/users/\(owner)/repos"
+		getPagedData(at: userPath, from: server, perPageCallback: { data, lastPage -> Bool in
+			if let data = data {
+				userList.append(contentsOf: data)
+			}
+			return false
+		}, finalCallback: { success, resultCode in
+			if !success {
 				userError = apiError("Operation failed with code \(resultCode)")
 			}
 			group.leave()
-		}
-		getData(in: "\(server.apiPath ?? "")/orgs/\(owner)/repos", from: server) { data, lastPage, resultCode in
-			if let repoData = data as? [[AnyHashable : Any]] {
-				Repo.syncRepos(from: repoData, server: server, addNewRepos: true, manuallyAdded: true)
-			} else {
+		})
+
+		group.enter()
+		var orgError: Error?
+		var orgList = [[AnyHashable : Any]]()
+		let orgPath = "\(server.apiPath ?? "")/orgs/\(owner)/repos"
+		getPagedData(at: orgPath, from: server, perPageCallback: { data, lastPage -> Bool in
+			if let data = data {
+				orgList.append(contentsOf: data)
+			}
+			return false
+		}, finalCallback: { success, resultCode in
+			if !success {
 				orgError = apiError("Operation failed with code \(resultCode)")
 			}
 			group.leave()
-		}
+		})
+
 		group.notify(queue: DispatchQueue.main) {
 			if let orgError = orgError as NSError?, let userError = userError as NSError? {
 				if orgError.code == 404 {
@@ -1421,6 +1435,7 @@ final class API {
 					completion(orgError)
 				}
 			} else {
+				Repo.syncRepos(from: userList+orgList, server: server, addNewRepos: true, manuallyAdded: true)
 				completion(nil)
 			}
 		}
