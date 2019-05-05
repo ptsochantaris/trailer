@@ -43,11 +43,6 @@ final class Issue: ListableItem {
 		return try! moc.fetch(f)
 	}
 
-	static func reasonForEmpty(with filterValue: String?, criterion: GroupingCriterion?) -> NSAttributedString {
-		let openIssueCount = Issue.countOpen(in: DataManager.main, criterion: criterion)
-		return reasonForEmpty(with: filterValue, criterion: criterion, openItemCount: openIssueCount)
-	}
-
 	#if os(iOS)
 	override var searchKeywords: [String] {
 		return ["Issue", "Issues"] + super.searchKeywords
@@ -78,11 +73,12 @@ final class Issue: ListableItem {
 		return badgeCount(from: f, in: moc)
 	}
 
-	static func countOpen(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
+	override class func hasOpen(in moc: NSManagedObjectContext, criterion: GroupingCriterion?) -> Bool {
 		let f = NSFetchRequest<Issue>(entityName: "Issue")
 		f.includesSubentities = false
-		add(criterion: criterion, toFetchRequest: f, originalPredicate: ItemCondition.isOpenPredicate, in: moc)
-		return try! moc.count(for: f)
+		f.fetchLimit = 1
+		add(criterion: criterion, toFetchRequest: f, originalPredicate: ItemCondition.open.matchingPredicate, in: moc)
+		return try! moc.count(for: f) > 0
 	}
 
 	@objc var sectionName: String {

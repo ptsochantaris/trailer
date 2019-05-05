@@ -424,7 +424,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
 		switch filteredSections[section].title {
 		case SettingsSection.Filtering.title:
-			return buildFooter("You can also use title: server: label: repo: user: number: milestone: assignee: and status: to filter specific properties, e.g. \"label:bug,suggestion\". Prefix with '!' to exclude some terms.")
+			return buildFooter("You can use title: server: label: repo: user: number: milestone: assignee: and status: to filter specific properties, e.g. \"label:bug,suggestion\". Prefix with '!' to exclude some terms. You can also use \"state:\" with unread/open/closed/merged/snoozed as an argument.")
 		case SettingsSection.Reviews.title:
 			return buildFooter("To disable usage of the Reviews API, uncheck all options above and set the moving option to \"Don't Move It\".")
 		case SettingsSection.Reactions.title:

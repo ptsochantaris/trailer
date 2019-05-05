@@ -412,8 +412,8 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		let f = NSFetchRequest<T>(entityName: String(describing: type))
 		f.includesSubentities = false
 		let p = Settings.hideUncommentedItems
-			? NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, ItemCondition.isOpenPredicate, type.includeInUnreadPredicate])
-			: NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, ItemCondition.isOpenPredicate])
+			? NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, ItemCondition.open.matchingPredicate, type.includeInUnreadPredicate])
+			: NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, ItemCondition.open.matchingPredicate])
 		DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc)
 		return try! moc.count(for: f)
 	}

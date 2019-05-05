@@ -113,11 +113,12 @@ final class PullRequest: ListableItem {
 		return try! moc.fetch(f)
 	}
 
-	static func countOpen(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
+	override class func hasOpen(in moc: NSManagedObjectContext, criterion: GroupingCriterion?) -> Bool {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.includesSubentities = false
-		add(criterion: criterion, toFetchRequest: f, originalPredicate: ItemCondition.isOpenPredicate, in: moc)
-		return try! moc.count(for: f)
+		f.fetchLimit = 1
+		add(criterion: criterion, toFetchRequest: f, originalPredicate: ItemCondition.open.matchingPredicate, in: moc)
+		return try! moc.count(for: f) > 0
 	}
 
 	static func markEverythingRead(in section: Section, in moc: NSManagedObjectContext) {
@@ -171,11 +172,6 @@ final class PullRequest: ListableItem {
 	private static let _unreadOrNewCommitsPredicate = NSPredicate(format: "unreadComments > 0 or hasNewCommits == YES")
 	override class var includeInUnreadPredicate: NSPredicate {
 		return Settings.markPrsAsUnreadOnNewCommits ? _unreadOrNewCommitsPredicate : super.includeInUnreadPredicate
-	}
-
-	static func reasonForEmpty(with filterValue: String?, criterion: GroupingCriterion?) -> NSAttributedString {
-		let openRequestCount = PullRequest.countOpen(in: DataManager.main, criterion: criterion)
-		return reasonForEmpty(with: filterValue, criterion: criterion, openItemCount: openRequestCount)
 	}
 
 	func shouldBeCheckedForRedStatuses(in section: Section) -> Bool {

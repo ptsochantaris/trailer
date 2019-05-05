@@ -784,40 +784,88 @@ class ListableItem: DataItem {
 	}
 
 	private static func predicate(from token: String, termAt: Int, format: String, numeric: Bool) -> NSPredicate? {
-		if token.count > termAt {
-			let items = token.dropFirst(termAt)
-			if !items.isEmpty {
-				var orTerms = [NSPredicate]()
-				var notTerms = [NSPredicate]()
-				for term in items.components(separatedBy: ",") {
-					let negative = term.hasPrefix("!")
-					let T = negative ? String(term.dropFirst()) : term
-					let P: NSPredicate
-					if numeric, let n = UInt64(T) {
-						P = NSPredicate(format: format, n)
-					} else {
-						P = NSPredicate(format: format, T)
-					}
-					if negative {
-						notTerms.append(NSCompoundPredicate(notPredicateWithSubpredicate: P))
-					} else {
-						orTerms.append(P)
-					}
-				}
-				if notTerms.count > 0 && orTerms.count > 0 {
-					let n = NSCompoundPredicate(andPredicateWithSubpredicates: notTerms)
-					let o = NSCompoundPredicate(orPredicateWithSubpredicates: orTerms)
-					return NSCompoundPredicate(andPredicateWithSubpredicates: [n,o])
-				} else if notTerms.count > 0 {
-					return NSCompoundPredicate(andPredicateWithSubpredicates: notTerms)
-				} else if orTerms.count > 0 {
-					return NSCompoundPredicate(orPredicateWithSubpredicates: orTerms)
-				} else {
-					return nil
-				}
+		if token.count <= termAt {
+			return nil
+		}
+
+		let items = token.dropFirst(termAt)
+		if items.isEmpty {
+			return nil
+		}
+
+		var orTerms = [NSPredicate]()
+		var notTerms = [NSPredicate]()
+		for term in items.components(separatedBy: ",") {
+			let negative = term.hasPrefix("!")
+			let T = negative ? String(term.dropFirst()) : term
+			let P: NSPredicate
+			if numeric, let n = UInt64(T) {
+				P = NSPredicate(format: format, n)
+			} else {
+				P = NSPredicate(format: format, T)
+			}
+			if negative {
+				notTerms.append(NSCompoundPredicate(notPredicateWithSubpredicate: P))
+			} else {
+				orTerms.append(P)
 			}
 		}
-		return nil
+		return predicate(notTerms: notTerms, orTerms: orTerms)
+	}
+
+	private static func statePredicate(from token: String, termAt: Int) -> NSPredicate? {
+		if token.count <= termAt {
+			return nil
+		}
+
+		let items = token.dropFirst(termAt)
+		if items.isEmpty {
+			return nil
+		}
+
+		var orTerms = [NSPredicate]()
+		var notTerms = [NSPredicate]()
+		for term in items.components(separatedBy: ",") {
+			let negative = term.hasPrefix("!")
+			let T = negative ? String(term.dropFirst()) : term
+
+			let P: NSPredicate
+			switch T {
+			case "open":
+				P = ItemCondition.open.matchingPredicate
+			case "closed":
+				P = ItemCondition.closed.matchingPredicate
+			case "merged":
+				P = ItemCondition.merged.matchingPredicate
+			case "unread":
+				P = includeInUnreadPredicate
+			case "snoozed":
+				P = isSnoozingPredicate
+			default:
+				continue
+			}
+
+			if negative {
+				notTerms.append(NSCompoundPredicate(notPredicateWithSubpredicate: P))
+			} else {
+				orTerms.append(P)
+			}
+		}
+		return predicate(notTerms: notTerms, orTerms: orTerms)
+	}
+
+	private static func predicate(notTerms: [NSPredicate], orTerms: [NSPredicate]) -> NSPredicate? {
+		if notTerms.count > 0 && orTerms.count > 0 {
+			let n = NSCompoundPredicate(andPredicateWithSubpredicates: notTerms)
+			let o = NSCompoundPredicate(orPredicateWithSubpredicates: orTerms)
+			return NSCompoundPredicate(andPredicateWithSubpredicates: [n,o])
+		} else if notTerms.count > 0 {
+			return NSCompoundPredicate(andPredicateWithSubpredicates: notTerms)
+		} else if orTerms.count > 0 {
+			return NSCompoundPredicate(orPredicateWithSubpredicates: orTerms)
+		} else {
+			return nil
+		}
 	}
 
 	private static let filterTitlePredicate = "title contains[cd] %@"
@@ -878,6 +926,7 @@ class ListableItem: DataItem {
 			check(forTag: "assignee")    	{ predicate(from: $0, termAt: $1, format: filterAssigneePredicate, numeric: false) }
 			check(forTag: "label")        	{ predicate(from: $0, termAt: $1, format: filterLabelPredicate, numeric: false) }
 			check(forTag: "status")        	{ predicate(from: $0, termAt: $1, format: filterStatusPredicate, numeric: false) }
+			check(forTag: "state")			{ statePredicate(from: $0, termAt: $1) }
 
 			if !fi.isEmpty {
 				var predicates = [NSPredicate]()
@@ -943,6 +992,8 @@ class ListableItem: DataItem {
 	class var includeInUnreadPredicate: NSPredicate {
 		return _unreadPredicate
 	}
+
+	private static let isSnoozingPredicate = NSPredicate(format: "snoozeUntil != nil")
 
 	static func relatedItems(from notificationUserInfo: [AnyHashable : Any]) -> (PRComment?, ListableItem)? {
 		var item: ListableItem?
@@ -1044,7 +1095,11 @@ class ListableItem: DataItem {
 		return repo.shouldSync && repo.postSyncAction != PostSyncAction.delete.rawValue && apiServer.lastSyncSucceeded
 	}
 
-	static func reasonForEmpty(with filterValue: String?, criterion: GroupingCriterion?, openItemCount: Int) -> NSAttributedString {
+	class func hasOpen(in moc: NSManagedObjectContext, criterion: GroupingCriterion?) -> Bool {
+		return false
+	}
+
+	static func reasonForEmpty(with filterValue: String?, criterion: GroupingCriterion?) -> NSAttributedString {
 
 		let color: COLOR_CLASS
 		let message: String
@@ -1058,7 +1113,7 @@ class ListableItem: DataItem {
 		} else if !S(filterValue).isEmpty {
 			color = COLOR_CLASS.lightGray
 			message = "There are no items matching this filter."
-		} else if openItemCount > 0 {
+		} else if hasOpen(in: DataManager.main, criterion: criterion) {
 			color = COLOR_CLASS.lightGray
 			message = "Some items are hidden by your settings."
 		} else if !Repo.anyVisibleRepos(in: DataManager.main, criterion: criterion, excludeGrouped: true) {
@@ -1072,12 +1127,9 @@ class ListableItem: DataItem {
 		} else if !Repo.interestedInPrs(fromServerWithId: criterion?.apiServerId) && !Repo.interestedInIssues(fromServerWithId: criterion?.apiServerId) {
 			color = COLOR_CLASS(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)
 			message = "All your watched repositories are marked as hidden, please enable issues or PRs on at least one."
-		} else if openItemCount==0 {
-			color = COLOR_CLASS.lightGray
-			message = "No open items in your configured repositories."
 		} else {
 			color = COLOR_CLASS.lightGray
-			message = ""
+			message = "No open items in your configured repositories."
 		}
 
 		return styleForEmpty(message: message, color: color)

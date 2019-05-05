@@ -102,8 +102,6 @@ func bootUp() {
 enum ItemCondition: Int64 {
 	case open, closed, merged
 
-	static let isOpenPredicate = NSPredicate(format: "condition == %lld or condition == nil", ItemCondition.open.rawValue)
-
 	static private var predicateMatchCache = [ItemCondition : NSPredicate]()
 	var matchingPredicate: NSPredicate {
 		if let predicate = ItemCondition.predicateMatchCache[self] {
