@@ -1905,7 +1905,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                         <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="hgg-d7-xNz">
                                             <rect key="frame" x="339" y="52" width="19" height="27"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                                            <stepperCell key="cell" continuous="YES" alignment="left" maxValue="100" id="p2m-a9-1oC"/>
+                                            <stepperCell key="cell" continuous="YES" alignment="left" maxValue="1000" id="p2m-a9-1oC"/>
                                             <connections>
                                                 <action selector="autoSnoozeDurationChanged:" target="vQH-WF-vh2" id="yHl-g7-u0A"/>
                                             </connections>
