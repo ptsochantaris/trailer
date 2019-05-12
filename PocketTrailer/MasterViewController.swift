@@ -210,10 +210,7 @@ UITableViewDragDelegate {
 
 		navigationItem.largeTitleDisplayMode = .automatic
 
-		updateTabItems()
-		atNextEvent {
-			self.tableView.reloadData() // ensure footers are correct
-		}
+		updateTabItems(animated: false)
 	}
 
 	func tableView(_ tableView: UITableView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
@@ -545,7 +542,7 @@ UITableViewDragDelegate {
 		}
 	}
 
-	private func updateTabItems() {
+	private func updateTabItems(animated: Bool) {
 
 		tabBarSets.removeAll()
 
@@ -579,7 +576,7 @@ UITableViewDragDelegate {
 			if splitViewController?.isCollapsed ?? false && (splitViewController?.viewControllers.first as? UINavigationController)?.viewControllers.count == 2 {
 				// collapsed split view, and detail view is showing
 			} else {
-				showTabBar(show: true, animated: true)
+				showTabBar(show: true, animated: animated)
 			}
 
 			tabs.items = items
@@ -597,7 +594,7 @@ UITableViewDragDelegate {
 			tabs.items = items
 			tabs.selectedItem = items.first
 			currentTabBarSet = tabBarSetForTabItem(i: items.first)
-			showTabBar(show: false, animated: true)
+			showTabBar(show: false, animated: animated)
 		}
 
 		if let i = tabs.selectedItem?.image {
@@ -627,7 +624,7 @@ UITableViewDragDelegate {
 			let w = tabs.bounds.size.width / CGFloat(tabs.items?.count ?? 1)
 			let x = w * CGFloat(ind)
 			let f = CGRect(x: x, y: 0, width: w, height: tabs.bounds.size.height)
-			ts.scrollRectToVisible(f, animated: tabsAlreadyWereVisible)
+			ts.scrollRectToVisible(f, animated: animated && tabsAlreadyWereVisible)
 		}
 		lastTabCount = tabs.items?.count ?? 0
 
@@ -644,110 +641,118 @@ UITableViewDragDelegate {
 	private func showTabBar(show: Bool, animated: Bool) {
 		if show {
 
-			if tabScroll == nil, let v = navigationController?.view {
+			guard tabScroll == nil, let v = navigationController?.view else { return }
 
-				tableView.scrollIndicatorInsets = UIEdgeInsets(top: tableView.scrollIndicatorInsets.top, left: 0, bottom: 49, right: 0)
+			tableView.scrollIndicatorInsets = UIEdgeInsets(top: tableView.scrollIndicatorInsets.top, left: 0, bottom: 49, right: 0)
 
-				tabs.translatesAutoresizingMaskIntoConstraints = false
-				tabs.delegate = self
+			tabs.translatesAutoresizingMaskIntoConstraints = false
+			tabs.delegate = self
 
-				let ts = UIScrollView()
-				ts.translatesAutoresizingMaskIntoConstraints = false
-				ts.showsHorizontalScrollIndicator = false
-				ts.alwaysBounceHorizontal = true
-				ts.scrollsToTop = false
-				ts.addSubview(tabs)
+			let ts = UIScrollView()
+			ts.translatesAutoresizingMaskIntoConstraints = false
+			ts.showsHorizontalScrollIndicator = false
+			ts.alwaysBounceHorizontal = true
+			ts.scrollsToTop = false
+			ts.contentInsetAdjustmentBehavior = .never
+			ts.addSubview(tabs)
 
-				let s1 = UIVisualEffectView(effect: UIBlurEffect(style: .extraLight))
-				s1.translatesAutoresizingMaskIntoConstraints = false
-				ts.addSubview(s1)
+			let s1 = UIVisualEffectView(effect: UIBlurEffect(style: .extraLight))
+			s1.translatesAutoresizingMaskIntoConstraints = false
+			ts.addSubview(s1)
 
-				let s2 = UIVisualEffectView(effect: UIBlurEffect(style: .extraLight))
-				s2.translatesAutoresizingMaskIntoConstraints = false
-				ts.addSubview(s2)
+			let s2 = UIVisualEffectView(effect: UIBlurEffect(style: .extraLight))
+			s2.translatesAutoresizingMaskIntoConstraints = false
+			ts.addSubview(s2)
 
-				let b = UIView()
-				b.translatesAutoresizingMaskIntoConstraints = false
-				b.backgroundColor = UIColor.black.withAlphaComponent(DISABLED_FADE)
-				b.isUserInteractionEnabled = false
-				v.addSubview(b)
-				tabBorder = b
+			let b = UIView()
+			b.translatesAutoresizingMaskIntoConstraints = false
+			b.backgroundColor = UIColor.black.withAlphaComponent(DISABLED_FADE)
+			b.isUserInteractionEnabled = false
+			v.addSubview(b)
+			tabBorder = b
 
-				v.addSubview(ts)
-				tabScroll = ts
+			v.addSubview(ts)
+			tabScroll = ts
 
-				tabs.heightAnchor.constraint(equalTo: ts.heightAnchor).isActive = true
-				tabs.widthAnchor.constraint(greaterThanOrEqualTo: v.widthAnchor).isActive = true
-				tabsWidth = tabs.widthAnchor.constraint(greaterThanOrEqualToConstant: 0)
-				tabsWidth!.isActive = true
+			tabsWidth = tabs.widthAnchor.constraint(greaterThanOrEqualToConstant: 0)
 
-				tabs.topAnchor.constraint(equalTo: ts.contentLayoutGuide.topAnchor).isActive = true
-				tabs.leadingAnchor.constraint(equalTo: ts.contentLayoutGuide.leadingAnchor).isActive = true
-				tabs.trailingAnchor.constraint(equalTo: ts.contentLayoutGuide.trailingAnchor).isActive = true
-				tabs.bottomAnchor.constraint(equalTo: ts.contentLayoutGuide.bottomAnchor).isActive = true
+			let cl = ts.contentLayoutGuide
+			let top = cl.topAnchor
+			let bottom = cl.bottomAnchor
 
-				ts.bottomAnchor.constraint(equalTo: v.bottomAnchor).isActive = true
-				ts.leadingAnchor.constraint(equalTo: v.leadingAnchor).isActive = true
-				ts.trailingAnchor.constraint(equalTo: v.trailingAnchor).isActive = true
-				ts.topAnchor.constraint(equalTo: v.safeAreaLayoutGuide.bottomAnchor, constant: -49).isActive = true
+			NSLayoutConstraint.activate([
+				tabs.heightAnchor.constraint(equalTo: ts.heightAnchor),
+				tabs.widthAnchor.constraint(greaterThanOrEqualTo: v.widthAnchor),
+				tabsWidth!,
 
-				b.heightAnchor.constraint(equalToConstant: 0.5).isActive = true
-				b.bottomAnchor.constraint(equalTo: ts.topAnchor).isActive = true
-				b.leadingAnchor.constraint(equalTo: ts.leadingAnchor).isActive = true
-				b.trailingAnchor.constraint(equalTo: ts.trailingAnchor).isActive = true
+				tabs.topAnchor.constraint(equalTo: top),
+				tabs.leadingAnchor.constraint(equalTo: cl.leadingAnchor),
+				tabs.trailingAnchor.constraint(equalTo: cl.trailingAnchor),
+				tabs.bottomAnchor.constraint(equalTo: bottom),
 
-				s2.trailingAnchor.constraint(equalTo: tabs.leadingAnchor).isActive = true
-				s2.widthAnchor.constraint(equalToConstant: 320).isActive = true
-				s2.topAnchor.constraint(equalTo: ts.contentLayoutGuide.topAnchor).isActive = true
-				s2.bottomAnchor.constraint(equalTo: ts.contentLayoutGuide.bottomAnchor).isActive = true
+				ts.bottomAnchor.constraint(equalTo: v.bottomAnchor),
+				ts.leadingAnchor.constraint(equalTo: v.leadingAnchor),
+				ts.trailingAnchor.constraint(equalTo: v.trailingAnchor),
+				ts.topAnchor.constraint(equalTo: v.safeAreaLayoutGuide.bottomAnchor, constant: -49),
 
-				s1.leadingAnchor.constraint(equalTo: tabs.trailingAnchor).isActive = true
-				s1.widthAnchor.constraint(equalToConstant: 320).isActive = true
-				s1.topAnchor.constraint(equalTo: ts.contentLayoutGuide.topAnchor).isActive = true
-				s1.bottomAnchor.constraint(equalTo: ts.contentLayoutGuide.bottomAnchor).isActive = true
+				b.heightAnchor.constraint(equalToConstant: 0.5),
+				b.bottomAnchor.constraint(equalTo: ts.topAnchor),
+				b.leadingAnchor.constraint(equalTo: ts.leadingAnchor),
+				b.trailingAnchor.constraint(equalTo: ts.trailingAnchor),
 
-				if animated {
-					let h = 49 + view.safeAreaInsets.bottom
-					ts.transform = CGAffineTransform(translationX: 0, y: h)
-					b.transform = CGAffineTransform(translationX: 0, y: h)
-					UIView.animate(withDuration: 0.25,
-					               delay: 0.0,
-					               options: .curveEaseInOut,
-					               animations: {
-									ts.transform = .identity
-									b.transform = .identity
-					}, completion: nil)
-				}
+				s2.trailingAnchor.constraint(equalTo: tabs.leadingAnchor),
+				s2.widthAnchor.constraint(equalToConstant: 320),
+				s2.topAnchor.constraint(equalTo: top),
+				s2.bottomAnchor.constraint(equalTo: bottom),
+
+				s1.leadingAnchor.constraint(equalTo: tabs.trailingAnchor),
+				s1.widthAnchor.constraint(equalToConstant: 320),
+				s1.topAnchor.constraint(equalTo: top),
+				s1.bottomAnchor.constraint(equalTo: bottom),
+			])
+
+			if animated {
+				let h = 49 + view.safeAreaInsets.bottom
+				ts.transform = CGAffineTransform(translationX: 0, y: h)
+				b.transform = CGAffineTransform(translationX: 0, y: h)
+				view.layoutIfNeeded()
+				UIView.animate(withDuration: 0.25,
+							   delay: 0.0,
+							   options: .curveEaseInOut,
+							   animations: {
+								ts.transform = .identity
+								b.transform = .identity
+				}, completion: nil)
 			}
 
 		} else {
 
 			tableView.scrollIndicatorInsets = UIEdgeInsets(top: tableView.scrollIndicatorInsets.top, left: 0, bottom: 0, right: 0)
 
-			if let t = tabScroll, let b = tabBorder {
+			guard let t = tabScroll, let b = tabBorder else { return  }
 
-				tabScroll = nil
-				tabBorder = nil
-				tabsWidth = nil
+			tabScroll = nil
+			tabBorder = nil
+			tabsWidth = nil
 
-				if animated {
-					let h = 49 + view.safeAreaInsets.bottom
-					UIView.animate(withDuration: 0.25,
-					               delay: 0.0,
-					               options: .curveEaseInOut,
-					               animations: {
-									t.transform = CGAffineTransform(translationX: 0, y: h)
-									b.transform = CGAffineTransform(translationX: 0, y: h)
-					}, completion: { finished in
-						t.removeFromSuperview()
-						b.removeFromSuperview()
-						self.tabs.removeFromSuperview()
-					})
-				} else {
+			if animated {
+				let h = 49 + view.safeAreaInsets.bottom
+				view.layoutIfNeeded()
+				UIView.animate(withDuration: 0.25,
+							   delay: 0.0,
+							   options: .curveEaseInOut,
+							   animations: {
+								t.transform = CGAffineTransform(translationX: 0, y: h)
+								b.transform = CGAffineTransform(translationX: 0, y: h)
+				}, completion: { finished in
 					t.removeFromSuperview()
 					b.removeFromSuperview()
 					self.tabs.removeFromSuperview()
-				}
+				})
+			} else {
+				t.removeFromSuperview()
+				b.removeFromSuperview()
+				tabs.removeFromSuperview()
 			}
 		}
 	}
@@ -1110,7 +1115,7 @@ UITableViewDragDelegate {
 		}
 
 		if becauseOfChanges || updateItems {
-			updateTabItems()
+			updateTabItems(animated: true)
 		}
 
 		updateFooter()
