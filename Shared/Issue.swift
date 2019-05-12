@@ -43,11 +43,10 @@ final class Issue: ListableItem {
 		return try! moc.fetch(f)
 	}
 
-	#if os(iOS)
+	@available(OSX 10.11, *)
 	override var searchKeywords: [String] {
 		return ["Issue", "Issues"] + super.searchKeywords
 	}
-	#endif
 
 	static func markEverythingRead(in section: Section, in moc: NSManagedObjectContext) {
 		let f = NSFetchRequest<Issue>(entityName: "Issue")

@@ -1,8 +1,8 @@
 
 import CoreData
+import CoreSpotlight
 #if os(iOS)
 	import UIKit
-	import CoreSpotlight
 	import MobileCoreServices
 	import UserNotifications
 #endif
@@ -142,11 +142,11 @@ class ListableItem: DataItem {
 	}
 
 	final func ensureInvisible() {
-		#if os(iOS)
+		if #available(OSX 10.11, *) {
 			if CSSearchableIndex.isIndexingAvailable() {
 				CSSearchableIndex.default().deleteSearchableItems(withIdentifiers: [objectID.uriRepresentation().absoluteString], completionHandler: nil)
 			}
-		#endif
+		}
 		if Settings.removeNotificationsWhenItemIsRemoved {
 			ListableItem.removeRelatedNotifications(uri: objectID.uriRepresentation().absoluteString)
 		}
@@ -1044,34 +1044,31 @@ class ListableItem: DataItem {
 		#endif
 	}
 
-	#if os(iOS)
+	@available(OSX 10.11, *)
 	var searchKeywords: [String] {
 		let labelNames = labels.compactMap { $0.name }
 		let orgAndRepo = repo.fullName?.components(separatedBy: "/") ?? []
+		#if os(iOS)
 		return [(userLogin ?? "NO_USERNAME"), "Trailer", "PocketTrailer", "Pocket Trailer"] + labelNames + orgAndRepo
+		#else
+		return [(userLogin ?? "NO_USERNAME"), "Trailer"] + labelNames + orgAndRepo
+		#endif
 	}
-	final var searchTitle: String {
-		let labelNames = labels.compactMap { $0.name }
-		var suffix = ""
-		if labelNames.count > 0 {
-			for l in labelNames {
-				suffix += " [\(l)]"
-			}
-		}
-		let t = S(title)
-		return "#\(number) - \(t)\(suffix)"
-	}
+	@available(OSX 10.11, *)
 	final func indexForSpotlight() {
 		
 		guard CSSearchableIndex.isIndexingAvailable() else { return }
-		
+
 		let s = CSSearchableItemAttributeSet(itemContentType: kUTTypeText as String)
-		s.title = searchTitle
+
+		let titleSuffix = labels.compactMap { $0.name }.reduce("") { $0 + " [\($1)]" }
+		s.title = "#\(number) - \(S(title))\(titleSuffix)"
+
 		s.contentCreationDate = createdAt
 		s.contentModificationDate = updatedAt
 		s.keywords = searchKeywords
 		s.creator = userLogin
-		
+
 		s.contentDescription = "\(S(repo.fullName)) @\(S(userLogin)) - \(S(body?.trim))"
 		
 		func completeIndex(withSet s: CSSearchableItemAttributeSet) {
@@ -1089,7 +1086,6 @@ class ListableItem: DataItem {
 			completeIndex(withSet: s)
 		}
 	}
-	#endif
 
 	final var shouldCheckForClosing: Bool {
 		return repo.shouldSync && repo.postSyncAction != PostSyncAction.delete.rawValue && apiServer.lastSyncSucceeded

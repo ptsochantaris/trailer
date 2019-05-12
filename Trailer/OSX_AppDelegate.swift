@@ -1,3 +1,5 @@
+import CoreSpotlight
+
 enum Theme {
 	case light, darkLegacy, dark
 }
@@ -719,6 +721,22 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 	private func relatedMenus(for i: ListableItem) -> [MenuBarSet] {
 		return menuBarSets.compactMap{ ($0.viewCriterion?.isRelated(to: i) ?? true) ? $0 : nil }
+	}
+
+	func application(_ application: NSApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([NSUserActivityRestoring]) -> Void) -> Bool {
+		if #available(OSX 10.11, *) {
+			if userActivity.activityType == CSSearchableItemActionType,
+				let uriPath = userActivity.userInfo?[CSSearchableItemActivityIdentifier] as? String,
+				let itemId = DataManager.id(for: uriPath),
+				let item = existingObject(with: itemId) as? ListableItem,
+				let urlString = item.webUrl,
+				let url = URL(string: urlString) {
+
+				NSWorkspace.shared.open(url)
+				return true
+			}
+		}
+		return false
 	}
 
 	func updateAllMenus() {

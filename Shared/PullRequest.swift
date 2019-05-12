@@ -48,11 +48,10 @@ final class PullRequest: ListableItem {
 		}
 	}
 
-	#if os(iOS)
+	@available(OSX 10.11, *)
 	override var searchKeywords: [String] {
 		return ["PR", "Pull Request", "PRs", "Pull Requests"] + super.searchKeywords
 	}
-	#endif
 
 	override var hasUnreadCommentsOrAlert: Bool {
 		return super.hasUnreadCommentsOrAlert || hasNewCommits

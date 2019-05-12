@@ -151,11 +151,11 @@ final class DataManager {
 							i.reopened = false
 						}
 					}
-					#if os(iOS)
+					if #available(OSX 10.11, *) {
 						atNextEvent {
 							i.indexForSpotlight()
 						}
-					#endif
+					}
 				} else {
 					atNextEvent {
 						i.ensureInvisible()
