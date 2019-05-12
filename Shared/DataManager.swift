@@ -140,12 +140,14 @@ final class DataManager {
 					if !i.createdByMe {
 						if i.isNewAssignment {
 							NotificationQueue.add(type: assignmentNotification, for: i)
+							i.announced = true
 							i.isNewAssignment = false
 						} else if !i.announced {
 							NotificationQueue.add(type: newNotification, for: i)
 							i.announced = true
 						} else if i.reopened {
 							NotificationQueue.add(type: reopenedNotification, for: i)
+							i.announced = true
 							i.reopened = false
 						}
 					}
