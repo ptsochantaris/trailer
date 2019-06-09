@@ -142,7 +142,7 @@ class ListableItem: DataItem {
 	}
 
 	final func ensureInvisible() {
-		if #available(OSX 10.11, *) {
+		if #available(OSX 10.11, iOS 9, *) {
 			if CSSearchableIndex.isIndexingAvailable() {
 				CSSearchableIndex.default().deleteSearchableItems(withIdentifiers: [objectID.uriRepresentation().absoluteString], completionHandler: nil)
 			}

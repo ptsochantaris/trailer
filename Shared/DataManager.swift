@@ -151,7 +151,7 @@ final class DataManager {
 							i.reopened = false
 						}
 					}
-					if #available(OSX 10.11, *) {
+					if #available(OSX 10.11, iOS 9, *) {
 						atNextEvent {
 							i.indexForSpotlight()
 						}
