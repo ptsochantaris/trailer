@@ -925,7 +925,9 @@ class ListableItem: DataItem {
 			check(forTag: "milestone")    	{ predicate(from: $0, termAt: $1, format: filterMilestonePredicate, numeric: false) }
 			check(forTag: "assignee")    	{ predicate(from: $0, termAt: $1, format: filterAssigneePredicate, numeric: false) }
 			check(forTag: "label")        	{ predicate(from: $0, termAt: $1, format: filterLabelPredicate, numeric: false) }
-			check(forTag: "status")        	{ predicate(from: $0, termAt: $1, format: filterStatusPredicate, numeric: false) }
+			if itemType.self == PullRequest.self {
+				check(forTag: "status")        	{ predicate(from: $0, termAt: $1, format: filterStatusPredicate, numeric: false) }
+			}
 			check(forTag: "state")			{ statePredicate(from: $0, termAt: $1) }
 
 			if !fi.isEmpty {
