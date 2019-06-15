@@ -908,8 +908,7 @@ class ListableItem: DataItem {
 							if let p = process(token, prefix.count) {
 								andPredicates.append(p)
 							}
-							fi = fi.replacingOccurrences(of: token, with: "")
-							fi = fi.trim
+							fi = fi.replacingOccurrences(of: token, with: "").trim
 							foundOne = true
 							break
 						}

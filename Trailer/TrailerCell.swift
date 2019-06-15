@@ -225,7 +225,7 @@ class TrailerCell: NSTableCellView {
 					title = String(format: "Wake (auto: %@)", itemDateFormatter.string(from: snooze))
 				}
 				let c = m.addItem(withTitle: title, action: #selector(wakeUpSelected), keyEquivalent: "0")
-				c.keyEquivalentModifierMask = [.command, .shift]
+				c.keyEquivalentModifierMask = [.command, .option]
 
 			} else {
 
