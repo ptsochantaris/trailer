@@ -7,6 +7,31 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.6.17</title>
+			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>New “state:” filtering option (arguments can be: unread/open/closed/merged/snoozed)</li>
+				<li>Corrected filtering of status items based on included or excluded terms</li>
+				<li>Extra hotkey characters added (thanks to @j-martin)</li>
+				<li>Option to (not) include snoozed items in menubar count</li>
+				<li>Added simple support for Spotlight in newer macOS versions</li>
+				<li>Group labels for repos properly support copy/paste/undo/redo now</li>
+				<li>Removed old confusing option to count all open items in watchlist</li>
+                <li>Fix for filtering of status items based on included or excluded terms</li>
+				<li>Fix for adding manual repos using “*” from an org with many repos</li>
+                <li>Fix for repeat assigned item announcements when first synced</li>
+				<li>Built with latest toolchain for performance</li>
+				</ul></font>]]></description>
+			<pubDate>Wed, 14 Aug 2019 20:00:00 +0000</pubDate>
+			<enclosure
+			url="https://github.com/ptsochantaris/trailer/releases/download/1.6.17/trailer1617.zip"
+			sparkle:version="1497"
+			sparkle:shortVersionString="1.6.17"
+			sparkle:dsaSignature="MC0CFB2oWadytBDpSaXwcN2+u2ldl+JBAhUAvtmDgEBgUdC2R2GWf+Lou1ZQpU4="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.6.16</title>
 			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
