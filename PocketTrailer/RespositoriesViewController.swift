@@ -39,6 +39,8 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 	override func viewDidLoad() {
 		super.viewDidLoad()
 
+        definesPresentationContext = true
+        
 		let searchController = UISearchController(searchResultsController: nil)
 		searchController.dimsBackgroundDuringPresentation = false
 		searchController.obscuresBackgroundDuringPresentation = false
