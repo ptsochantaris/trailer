@@ -12,6 +12,30 @@ let GLOBAL_SCREEN_SCALE = UIScreen.main.scale
 let GLOBAL_TINT = UIColor(red: 52.0/255.0, green: 110.0/255.0, blue: 183.0/255.0, alpha: 1.0)
 let DISABLED_FADE: CGFloat = 0.3
 
+var labelColour: UIColor = {
+    if #available(iOS 13, *) {
+        return UIColor.label
+    } else {
+        return UIColor.darkText
+    }
+}()
+
+var secondaryLabelColour: UIColor = {
+    if #available(iOS 13, *) {
+        return UIColor.secondaryLabel
+    } else {
+        return UIColor.darkGray
+    }
+}()
+
+var tertiaryLabelColour: UIColor = {
+    if #available(iOS 13, *) {
+        return UIColor.tertiaryLabel
+    } else {
+        return UIColor.lightGray
+    }
+}()
+
 typealias COLOR_CLASS = UIColor
 typealias FONT_CLASS = UIFont
 typealias IMAGE_CLASS = UIImage
@@ -339,4 +363,3 @@ let SyncProgressUpdateNotification = Notification.Name("SyncProgressUpdateNotifi
 let ApiUsageUpdateNotification = Notification.Name("ApiUsageUpdateNotification")
 let AppleInterfaceThemeChangedNotification = Notification.Name("AppleInterfaceThemeChangedNotification")
 let SettingsExportedNotification = Notification.Name("SettingsExportedNotification")
-

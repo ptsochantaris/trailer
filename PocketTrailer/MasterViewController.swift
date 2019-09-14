@@ -85,7 +85,7 @@ UITableViewDragDelegate {
 		})
 		present(a, animated: true)
 	}
-
+    
 	func removeAllMerged() {
 		atNextEvent(self) { S in
 			if Settings.dontAskBeforeWipingMerged {
@@ -656,17 +656,17 @@ UITableViewDragDelegate {
 			ts.contentInsetAdjustmentBehavior = .never
 			ts.addSubview(tabs)
 
-			let s1 = UIVisualEffectView(effect: UIBlurEffect(style: .extraLight))
+            let s1 = UIVisualEffectView(effect: UIBlurEffect(style: .regular))
 			s1.translatesAutoresizingMaskIntoConstraints = false
 			ts.addSubview(s1)
 
-			let s2 = UIVisualEffectView(effect: UIBlurEffect(style: .extraLight))
+			let s2 = UIVisualEffectView(effect: UIBlurEffect(style: .regular))
 			s2.translatesAutoresizingMaskIntoConstraints = false
 			ts.addSubview(s2)
 
 			let b = UIView()
 			b.translatesAutoresizingMaskIntoConstraints = false
-			b.backgroundColor = UIColor.black.withAlphaComponent(DISABLED_FADE)
+			b.backgroundColor = labelColour.withAlphaComponent(DISABLED_FADE)
 			b.isUserInteractionEnabled = false
 			v.addSubview(b)
 			tabBorder = b
@@ -675,6 +675,8 @@ UITableViewDragDelegate {
 			tabScroll = ts
 
 			tabsWidth = tabs.widthAnchor.constraint(greaterThanOrEqualToConstant: 0)
+            
+            updateTabUI()
 
 			let cl = ts.contentLayoutGuide
 			let top = cl.topAnchor
@@ -756,6 +758,31 @@ UITableViewDragDelegate {
 			}
 		}
 	}
+    
+    private func updateTabUI() {
+        if #available(iOS 13.0, *) {
+            for s in tabScroll?.subviews ?? [] {
+                if let s = s as? UITabBar {
+                    if traitCollection.userInterfaceStyle == .dark {
+                        s.barTintColor = UIColor.init(white: 0.1, alpha: 1)
+                    } else {
+                        s.barTintColor = nil
+                    }
+                } else {
+                    if traitCollection.userInterfaceStyle == .dark {
+                        s.backgroundColor = UIColor.init(white: 0.3, alpha: 1)
+                    } else {
+                        s.backgroundColor = nil
+                    }
+                }
+            }
+        }
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        updateTabUI()
+    }
 
 	func localNotificationSelected(userInfo: [AnyHashable : Any], action: String) {
 		var urlToOpen = userInfo[NOTIFICATION_URL_KEY] as? String
@@ -987,7 +1014,7 @@ UITableViewDragDelegate {
 				let w = UITableViewRowAction(style: .normal, title: "Wake") { action, indexPath in
 					i.wakeUp()
 				}
-				w.backgroundColor = .darkGray
+				w.backgroundColor = secondaryLabelColour
 				actions.append(w)
 
 			} else {
@@ -999,7 +1026,7 @@ UITableViewDragDelegate {
 				let s = UITableViewRowAction(style: .normal, title: "Snooze") { [weak self] action, indexPath in
 					self?.showSnoozeMenuFor(i: i)
 				}
-				s.backgroundColor = .darkGray
+				s.backgroundColor = secondaryLabelColour
 				actions.append(s)
 			}
 		}

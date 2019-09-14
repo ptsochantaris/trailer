@@ -190,7 +190,7 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 	private func detailColor(for number: Int64) -> UIColor {
 		if typeSelector.selectedSegmentIndex==0 {
 			if number == 0 {
-				return .lightGray
+				return tertiaryLabelColour
 			} else {
 				return view.tintColor
 			}

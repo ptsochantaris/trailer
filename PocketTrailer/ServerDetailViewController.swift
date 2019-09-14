@@ -88,7 +88,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 			testButton.isEnabled = false
 			testButton.alpha = 0.6
 		} else {
-			authTokenLabel.textColor =  .black
+			authTokenLabel.textColor =  labelColour
 			testButton.isEnabled = true
 			testButton.alpha = 1.0
 		}

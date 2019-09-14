@@ -33,15 +33,11 @@ final class PRCell: UITableViewCell {
 		unreadCount.textColor = .white
 		contentView.addSubview(unreadCount)
 
-		readCount.textColor = .darkGray
+        readCount.textColor = .darkGray
 		contentView.addSubview(readCount)
 
 		_image.layer.cornerRadius = 25
 		_image.clipsToBounds = true
-
-		let bg = UIView()
-		bg.backgroundColor = UIColor(red: 0.82, green: 0.88, blue: 0.97, alpha: 1.0)
-		selectedBackgroundView = bg
 
 		contentView.addConstraints([
 
@@ -97,8 +93,8 @@ final class PRCell: UITableViewCell {
 
 
 		let detailFont = UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)
-		_title.attributedText = pullRequest.title(with: _title.font, labelFont: detailFont.withSize(detailFont.pointSize-2), titleColor: .darkText, darkMode: false)
-		_description.attributedText = pullRequest.subtitle(with: detailFont, lightColor: .lightGray, darkColor: .darkGray)
+		_title.attributedText = pullRequest.title(with: _title.font, labelFont: detailFont.withSize(detailFont.pointSize-2), titleColor: labelColour, darkMode: false)
+		_description.attributedText = pullRequest.subtitle(with: detailFont, lightColor: tertiaryLabelColour, darkColor: secondaryLabelColour)
 
 		let muted = pullRequest.muted
 		setCountsImageAndFade(item: pullRequest, muted: muted)
@@ -143,8 +139,8 @@ final class PRCell: UITableViewCell {
 	func setIssue(issue: Issue) {
 
 		let detailFont = UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)
-		_title.attributedText = issue.title(with: _title.font, labelFont: detailFont.withSize(detailFont.pointSize-2), titleColor: .darkText, darkMode: false)
-		_description.attributedText = issue.subtitle(with: detailFont, lightColor: .lightGray, darkColor: .darkGray)
+		_title.attributedText = issue.title(with: _title.font, labelFont: detailFont.withSize(detailFont.pointSize-2), titleColor: labelColour, darkMode: false)
+		_description.attributedText = issue.subtitle(with: detailFont, lightColor: tertiaryLabelColour, darkColor: secondaryLabelColour)
 		_statuses.attributedText = nil
 
 		statusToAvatarDistance.constant = 0.0

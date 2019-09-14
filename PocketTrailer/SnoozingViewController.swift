@@ -1,6 +1,15 @@
 
 import UIKit
 
+final class PreferencesTabBarController: UITabBarController {
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        if preferencesDirty {
+            app.startRefresh()
+        }
+    }
+}
+
 final class SnoozingViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, PickerViewControllerDelegate {
 
 	@IBOutlet private weak var table: UITableView!
@@ -17,7 +26,6 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 	}
 
 	@IBAction private func done(_ sender: UIBarButtonItem) {
-		if preferencesDirty { app.startRefresh() }
 		dismiss(animated: true)
 	}
 

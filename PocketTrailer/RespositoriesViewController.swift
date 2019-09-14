@@ -27,12 +27,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 	@IBOutlet weak var setAllPrsItem: UIBarButtonItem!
 
 	@IBAction private func done(_ sender: UIBarButtonItem) {
-		if preferencesDirty {
-			app.startRefresh()
-		}
-		if presentedViewController != nil {
-			dismiss(animated: false)
-		}
+        presentedViewController?.dismiss(animated: false)
 		dismiss(animated: true)
 	}
 
@@ -236,7 +231,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 	private func configureCell(_ cell: RepoCell, atIndexPath: IndexPath) {
 		let repo = fetchedResultsController.object(at: atIndexPath)
 
-		let titleColor: UIColor = repo.shouldSync ? .black : .lightGray
+		let titleColor: UIColor = repo.shouldSync ? labelColour : tertiaryLabelColour
 		let titleAttributes = [ NSAttributedString.Key.foregroundColor: titleColor ]
 
 		let title = NSMutableAttributedString(attributedString: NSAttributedString(string: S(repo.fullName), attributes: titleAttributes))
@@ -277,7 +272,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 
 		let fullName = S(repo.fullName)
 		let text = repo.inaccessible ? "\(fullName) (inaccessible)" : fullName
-		let color: UIColor = repo.shouldSync ? .darkText : .lightGray
+		let color: UIColor = repo.shouldSync ? labelColour : tertiaryLabelColour
 		return NSAttributedString(string: text, attributes: [ NSAttributedString.Key.foregroundColor: color ])
 	}
 
@@ -296,12 +291,12 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 	private func groupTitleForRepo(repo: Repo) -> NSAttributedString {
 		if let l = repo.groupLabel {
 			return NSAttributedString(string: "Group: \(l)", attributes: [
-				NSAttributedString.Key.foregroundColor : UIColor.darkGray,
+				NSAttributedString.Key.foregroundColor : secondaryLabelColour,
 				NSAttributedString.Key.font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)
 				])
 		} else {
 			return NSAttributedString(string: "Ungrouped", attributes: [
-				NSAttributedString.Key.foregroundColor : UIColor.lightGray,
+				NSAttributedString.Key.foregroundColor : tertiaryLabelColour,
 				NSAttributedString.Key.font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)
 				])
 		}

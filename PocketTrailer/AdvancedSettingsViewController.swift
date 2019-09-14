@@ -321,10 +321,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	private var importExport: ImportExport!
 
 	@IBAction private func done(_ sender: UIBarButtonItem) {
-		if preferencesDirty { app.startRefresh() }
-		if presentedViewController != nil {
-			dismiss(animated: false)
-		}
+        presentedViewController?.dismiss(animated: false)
 		dismiss(animated: true)
 	}
 
@@ -414,7 +411,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			string: message,
 			attributes: [
 				NSAttributedString.Key.font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize),
-				NSAttributedString.Key.foregroundColor: UIColor.lightGray,
+				NSAttributedString.Key.foregroundColor: tertiaryLabelColour,
 				NSAttributedString.Key.paragraphStyle: p,
 				])
 		l.numberOfLines = 0

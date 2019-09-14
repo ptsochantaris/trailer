@@ -8,9 +8,6 @@ final class ServersViewController: UITableViewController {
 	private var allServers: [ApiServer]!
 
 	@IBAction private func doneSelected() {
-		if preferencesDirty {
-			app.startRefresh()
-		}
 		dismiss(animated: true)
 	}
 
@@ -48,7 +45,7 @@ final class ServersViewController: UITableViewController {
 				T.textColor = .red
 				T.text = "\(S(a.label)) (last sync failed)"
 			} else {
-				T.textColor = .darkText
+                T.textColor = labelColour
 				T.text = a.label
 			}
 			if a.requestsLimit == 0 {
