@@ -55,7 +55,7 @@
 		<true/>
 	</dict>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright (c) 2014-2018 Paul Tsochantaris. Parts copyright (c) 2013-2014 HouseTrip Ltd. Released under the terms of the MIT licence, see the file LICENCE for details.</string>
+	<string>Copyright (c) 2014-2019 Paul Tsochantaris. Parts copyright (c) 2013-2014 HouseTrip Ltd. Released under the terms of the MIT licence, see the file LICENCE for details.</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>

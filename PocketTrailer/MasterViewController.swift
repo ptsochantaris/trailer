@@ -47,7 +47,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 UITabBarControllerDelegate, UITabBarDelegate, UISearchResultsUpdating,
 UITableViewDragDelegate {
 
-	private var detailViewController: DetailViewController!
 	private var fetchedResultsController: NSFetchedResultsController<ListableItem>!
 
 	// Tabs
@@ -186,15 +185,11 @@ UITableViewDragDelegate {
 		clearsSelectionOnViewWillAppear = false
 		tableView.dragDelegate = self
 
-		if let detailNav = splitViewController?.viewControllers.last as? UINavigationController {
-			detailViewController = detailNav.topViewController as? DetailViewController
-		}
-
 		let n = NotificationCenter.default
-		n.addObserver(self, selector: #selector(refreshStarting), name: RefreshStartedNotification, object: nil)
-		n.addObserver(self, selector: #selector(refreshUpdated), name: SyncProgressUpdateNotification, object: nil)
-		n.addObserver(self, selector: #selector(refreshProcessing), name: RefreshProcessingNotification, object: nil)
-		n.addObserver(self, selector: #selector(refreshEnded), name: RefreshEndedNotification, object: nil)
+        n.addObserver(self, selector: #selector(refreshStarting), name: .RefreshStarted, object: nil)
+        n.addObserver(self, selector: #selector(refreshUpdated), name: .SyncProgressUpdate, object: nil)
+        n.addObserver(self, selector: #selector(refreshProcessing), name: .RefreshProcessing, object: nil)
+        n.addObserver(self, selector: #selector(refreshEnded), name: .RefreshEnded, object: nil)
 		n.addObserver(self, selector: #selector(dataUpdated(_:)), name: .NSManagedObjectContextObjectsDidChange, object: nil)
 
 		dataUpdateTimer = PopTimer(timeInterval: 1) { [weak self] in
@@ -355,10 +350,9 @@ UITableViewDragDelegate {
 		}
 		updateStatus(becauseOfChanges: false)
 	}
-
+    
 	@objc private func keyFocusDetailView() {
-		showDetailViewController(detailViewController.navigationController ?? detailViewController, sender: self)
-		detailViewController.becomeFirstResponder()
+        performSegue(withIdentifier: "showDetail", sender: nil)
 	}
 
 	@objc private func keyOpenInSafari() {
@@ -703,12 +697,12 @@ UITableViewDragDelegate {
 				b.trailingAnchor.constraint(equalTo: ts.trailingAnchor),
 
 				s2.trailingAnchor.constraint(equalTo: tabs.leadingAnchor),
-				s2.widthAnchor.constraint(equalToConstant: 320),
+                s2.widthAnchor.constraint(equalTo: ts.widthAnchor, multiplier: 1),
 				s2.topAnchor.constraint(equalTo: top),
 				s2.bottomAnchor.constraint(equalTo: bottom),
 
 				s1.leadingAnchor.constraint(equalTo: tabs.trailingAnchor),
-				s1.widthAnchor.constraint(equalToConstant: 320),
+                s1.widthAnchor.constraint(equalTo: ts.widthAnchor, multiplier: 1),
 				s1.topAnchor.constraint(equalTo: top),
 				s1.bottomAnchor.constraint(equalTo: bottom),
 			])
@@ -880,19 +874,14 @@ UITableViewDragDelegate {
 
 	private func showDetail(url: URL, objectId: NSManagedObjectID) {
 
-		if forceSafari || (Settings.openItemsDirectlyInSafari && !detailViewController.isVisible) {
+        if forceSafari || (Settings.openItemsDirectlyInSafari && splitViewController?.displayMode != .allVisible) {
 			forceSafari = false
 			if let item = existingObject(with: objectId) as? ListableItem {
 				item.catchUpWithComments()
 			}
 			UIApplication.shared.open(url, options: [:])
 		} else {
-			detailViewController.catchupWithDataItemWhenLoaded = objectId
-			detailViewController.detailItem = url
-			if !detailViewController.isVisible {
-				showTabBar(show: false, animated: true)
-				keyFocusDetailView()
-			}
+            performSegue(withIdentifier: "showDetail", sender: (url, objectId))
 		}
 	}
 
@@ -1155,7 +1144,7 @@ UITableViewDragDelegate {
 		}
 
 		if splitViewController?.displayMode != .allVisible {
-			detailViewController.navigationItem.leftBarButtonItem?.title = title
+            NotificationCenter.default.post(name: .MasterViewTitleChanged, object: title)
 		}
 
 		if !appIsRefreshing {
@@ -1260,6 +1249,14 @@ UITableViewDragDelegate {
 				destination.delegate = self
 			}
 		}
+        
+        if let destination = segue.destination as? UINavigationController, let detailVc = destination.viewControllers.first as? DetailViewController, let info = sender as? (URL, NSManagedObjectID) {
+            detailVc.detailItem = info.0
+            detailVc.catchupWithDataItemWhenLoaded = info.1
+            if let s = splitViewController, s.isCollapsed {
+                showTabBar(show: false, animated: true)
+            }
+        }
 	}
 
 	func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {

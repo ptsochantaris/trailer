@@ -15,7 +15,7 @@ final class ServersViewController: UITableViewController {
 		super.viewDidLoad()
 		navigationItem.largeTitleDisplayMode = .automatic
 		clearsSelectionOnViewWillAppear = true
-		NotificationCenter.default.addObserver(tableView!, selector: #selector(UITableView.reloadData), name: RefreshEndedNotification, object: nil)
+        NotificationCenter.default.addObserver(tableView!, selector: #selector(UITableView.reloadData), name: .RefreshEnded, object: nil)
 	}
 
 	deinit {

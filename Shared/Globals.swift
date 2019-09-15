@@ -356,10 +356,13 @@ extension String {
 
 ////////////////////// Notifications
 
-let RefreshStartedNotification = Notification.Name("RefreshStartedNotification")
-let RefreshProcessingNotification = Notification.Name("RefreshProcessingNotification")
-let RefreshEndedNotification = Notification.Name("RefreshEndedNotification")
-let SyncProgressUpdateNotification = Notification.Name("SyncProgressUpdateNotification")
-let ApiUsageUpdateNotification = Notification.Name("ApiUsageUpdateNotification")
-let AppleInterfaceThemeChangedNotification = Notification.Name("AppleInterfaceThemeChangedNotification")
-let SettingsExportedNotification = Notification.Name("SettingsExportedNotification")
+extension Notification.Name {
+    static let RefreshStarted = Notification.Name("RefreshStartedNotification")
+    static let RefreshProcessing = Notification.Name("RefreshProcessingNotification")
+    static let RefreshEnded = Notification.Name("RefreshEndedNotification")
+    static let SyncProgressUpdate = Notification.Name("SyncProgressUpdateNotification")
+    static let ApiUsageUpdate = Notification.Name("ApiUsageUpdateNotification")
+    static let AppleInterfaceThemeChanged = Notification.Name("AppleInterfaceThemeChangedNotification")
+    static let SettingsExported = Notification.Name("SettingsExportedNotification")
+    static let MasterViewTitleChanged = Notification.Name("MasterViewTitleChangedNotification")
+}

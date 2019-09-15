@@ -197,7 +197,7 @@ final class Settings {
 			DLog("Warning, exporting settings failed")
 			return false
 		}
-		NotificationCenter.default.post(name: SettingsExportedNotification, object: nil)
+        NotificationCenter.default.post(name: .SettingsExported, object: nil)
 		DLog("Written settings to %@", url.absoluteString)
 		return true
 	}

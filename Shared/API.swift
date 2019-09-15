@@ -43,7 +43,7 @@ final class API {
 			API.start(call: path, on: server, ignoreLastSync: ignoreLastSync) { code, headers, data, error, shouldRetry in
 
 				self.completion(code, headers, data, error, shouldRetry)
-				NotificationCenter.default.post(name: SyncProgressUpdateNotification, object: nil)
+                NotificationCenter.default.post(name: .SyncProgressUpdate, object: nil)
 
 				#if os(iOS)
 					API.networkIndicationEnd()
@@ -503,7 +503,7 @@ final class API {
 
 		DLog("Wrapping up sync")
 
-		NotificationCenter.default.post(name: RefreshProcessingNotification, object: nil)
+        NotificationCenter.default.post(name: .RefreshProcessing, object: nil)
 
 		// discard any changes related to any failed API server
 		for apiServer in ApiServer.allApiServers(in: moc) {

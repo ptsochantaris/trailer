@@ -22,7 +22,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="8fS-aE-onr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="302" y="12"/>
+            <point key="canvasLocation" x="-1660" y="-33"/>
         </scene>
         <!--Detail-->
         <scene sceneID="yUG-lL-AsK">
@@ -33,7 +33,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <wkWebView hidden="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="c78-A5-p3w">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="900"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                 <wkWebViewConfiguration key="configuration">
                                     <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
@@ -76,7 +76,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="FJe-Yq-33r" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1128.75" y="11.25"/>
+            <point key="canvasLocation" x="1252" y="-785"/>
         </scene>
         <!--Split View Controller-->
         <scene sceneID="Nki-YV-4Qg">
@@ -91,7 +91,7 @@
                 </splitViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cZU-Oi-B1e" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="302" y="-792"/>
+            <point key="canvasLocation" x="-1660" y="-792"/>
         </scene>
         <!--Master-->
         <scene sceneID="smW-Zh-WAh">
@@ -210,11 +210,12 @@
                     </refreshControl>
                     <connections>
                         <segue destination="8Eb-eH-MUP" kind="presentation" identifier="showQuickstart" modalPresentationStyle="formSheet" id="noo-V8-yYe"/>
+                        <segue destination="vC3-pB-5Vb" kind="showDetail" identifier="showDetail" id="SCZ-xz-0uS"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Rux-fX-hf1" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="302" y="747"/>
+            <point key="canvasLocation" x="-737" y="-33"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="r7l-gg-dq7">
@@ -230,7 +231,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SLD-UC-DBI" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1130" y="-792"/>
+            <point key="canvasLocation" x="425" y="-792"/>
         </scene>
         <!--Repositories-->
         <scene sceneID="mBS-8s-j5u">
@@ -1237,7 +1238,7 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="top" showsHorizontalScrollIndicator="NO" editable="NO" textAlignment="center" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cun-Cw-EIG">
                                 <rect key="frame" x="0.0" y="227.66666666666666" width="375" height="447.33333333333337"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <string key="text">Copyright (c) 2014-2018 Paul Tsochantaris
+                                <mutableString key="text">Copyright (c) 2014-2019 Paul Tsochantaris
 Parts copyright (c) 2013-2014 HouseTrip Ltd.
 
 Released under the terms of the MIT licence:
@@ -1247,7 +1248,7 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</string>
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</mutableString>
                                 <color key="textColor" systemColor="secondaryLabelColor" red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="13"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
@@ -1398,7 +1399,7 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="5Bv-33-6Zi" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="302" y="2289"/>
+            <point key="canvasLocation" x="1252" y="-31"/>
         </scene>
         <!--Preferences Tab Bar Controller-->
         <scene sceneID="hQr-lF-Zam">
@@ -1422,7 +1423,7 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="scD-nX-LYc" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1130" y="747"/>
+            <point key="canvasLocation" x="1252" y="746"/>
         </scene>
         <!--Repos-->
         <scene sceneID="4VK-bY-2jl">
@@ -1503,7 +1504,7 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
                                 </connections>
                             </tableView>
                         </subviews>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <color key="backgroundColor" systemColor="systemGroupedBackgroundColor" red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="ybt-jX-dKb" firstAttribute="top" secondItem="e93-KL-zzt" secondAttribute="top" id="GWU-td-ZVU"/>
                             <constraint firstItem="e93-KL-zzt" firstAttribute="bottom" secondItem="ybt-jX-dKb" secondAttribute="bottom" id="TNO-2h-J2y"/>
@@ -1594,7 +1595,7 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="xpq-Rw-jAR" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="302" y="1513"/>
+            <point key="canvasLocation" x="425" y="-31"/>
         </scene>
         <!--Snoozing-->
         <scene sceneID="RRL-yw-aRe">
@@ -1634,6 +1635,7 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="T4S-uD-LHq"/>
+        <segue reference="SCZ-xz-0uS"/>
     </inferredMetricsTieBreakers>
     <color key="tintColor" red="0.20270904898643494" green="0.43045499920845032" blue="0.71786797046661377" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
 </document>

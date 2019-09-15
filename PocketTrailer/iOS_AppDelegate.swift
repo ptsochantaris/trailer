@@ -53,8 +53,6 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 		UIBarButtonItem.appearance().tintColor = GLOBAL_TINT
 
 		let splitViewController = window!.rootViewController as! UISplitViewController
-		splitViewController.minimumPrimaryColumnWidth = 320
-		splitViewController.maximumPrimaryColumnWidth = 320
 		splitViewController.delegate = popupManager
 
 		application.setMinimumBackgroundFetchInterval(TimeInterval(Settings.backgroundRefreshPeriod))
@@ -176,7 +174,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 			self?.endBGTask()
 		}
 
-		NotificationCenter.default.post(name: RefreshStartedNotification, object: nil)
+        NotificationCenter.default.post(name: .RefreshStarted, object: nil)
 
 		NotificationQueue.clear()
 
@@ -225,7 +223,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 		appIsRefreshing = false
 		DataManager.saveDB() // Ensure object IDs are permanent before sending notifications
 		DataManager.sendNotificationsIndexAndSave()
-		NotificationCenter.default.post(name: RefreshEndedNotification, object: nil)
+        NotificationCenter.default.post(name: .RefreshEnded, object: nil)
 
 		if !success && UIApplication.shared.applicationState == .active {
 			showMessage("Refresh failed", "Loading the latest data from GitHub failed")

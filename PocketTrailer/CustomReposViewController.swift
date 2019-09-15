@@ -16,7 +16,7 @@ final class CustomReposViewController: UIViewController, UITableViewDelegate, UI
 		navigationItem.largeTitleDisplayMode = .automatic
 
 		sizer = table.dequeueReusableCell(withIdentifier: "CustomRepoCellId") as? CustomRepoCell
-		NotificationCenter.default.addObserver(self, selector: #selector(updateRepos), name: RefreshEndedNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(updateRepos), name: .RefreshEnded, object: nil)
 	}
 	
 	override func viewWillAppear(_ animated: Bool) {

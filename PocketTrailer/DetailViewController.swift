@@ -17,13 +17,26 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 			configureView()
 		}
 	}
+    
+    private var titleObserver: NSObjectProtocol?
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		title = "Loading…"
 		webView.navigationDelegate = self
 		configureView()
+        titleObserver = NotificationCenter.default.addObserver(forName: .MasterViewTitleChanged, object: nil, queue: OperationQueue.main) { [weak self] notification in
+            guard let newTitle = notification.object as? String else { return }
+            self?.navigationItem.leftBarButtonItem?.title = newTitle
+        }
 	}
+    
+    deinit {
+        if let t = titleObserver {
+            NotificationCenter.default.removeObserver(t)
+            titleObserver = nil
+        }
+    }
 		
 	@objc private func configureView() {
 		guard let webView = webView else { return }

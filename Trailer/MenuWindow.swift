@@ -46,7 +46,7 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
 		w.state = .active
 		header.addSubview(w, positioned: .below, relativeTo: filter)
 
-		NotificationCenter.default.addObserver(self, selector: #selector(refreshUpdate), name: SyncProgressUpdateNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(refreshUpdate), name: .SyncProgressUpdate, object: nil)
 	}
 
 	func controlTextDidChange(_ obj: Notification) {

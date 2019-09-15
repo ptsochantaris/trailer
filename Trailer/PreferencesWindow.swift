@@ -205,8 +205,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 
 		let n = NotificationCenter.default
-		n.addObserver(self, selector: #selector(updateApiTable), name: ApiUsageUpdateNotification, object: nil)
-		n.addObserver(self, selector: #selector(updateImportExportSettings), name: SettingsExportedNotification, object: nil)
+        n.addObserver(self, selector: #selector(updateApiTable), name: .ApiUsageUpdate, object: nil)
+        n.addObserver(self, selector: #selector(updateImportExportSettings), name: .SettingsExported, object: nil)
 
 		deferredUpdateTimer = PopTimer(timeInterval: 1.0) { [weak self] in
 			if let s = self, s.serversDirty {
