@@ -34,7 +34,11 @@ private final class TextFieldCellTextView: NSTextView, NSTextViewDelegate {
 				textView.paste(self)
 				return
 			}
-		}
+            
+        } else if event.keyCode == 36 { // enter
+            window?.makeFirstResponder(nil)
+            return
+        }
 
 		super.keyDown(with: event)
 	}
