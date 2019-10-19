@@ -214,7 +214,7 @@ final class ApiServer: NSManagedObject {
 		return nil
 	}
 
-	class var archivedApiServers: [AnyHashable : [AnyHashable : Any]] {
+	static var archivedApiServers: [AnyHashable : [AnyHashable : Any]] {
 		var archivedData = [AnyHashable : [AnyHashable : Any]]()
 		for a in ApiServer.allApiServers(in: DataManager.main) {
 			if let authToken = a.authToken, !authToken.isEmpty {

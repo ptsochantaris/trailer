@@ -681,7 +681,7 @@ struct Settings {
 		set { set("INCLUDE_TITLES_IN_FILTER", newValue) }
 	}
 
-	static let markPrsAsUnreadOnNewCommitsHelp = "Mark a PR with an exclamation mark even if they it may not have unread comments, in case there have been new commits."
+	static let markPrsAsUnreadOnNewCommitsHelp = "Mark a PR with an exclamation mark even if they it may not have unread comments, in case there have been new commits from other users."
 	static var markPrsAsUnreadOnNewCommits: Bool {
 		get { return get("MARK_PRS_AS_UNREAD_ON_NEW_COMMITS") as? Bool ?? false }
 		set { set("MARK_PRS_AS_UNREAD_ON_NEW_COMMITS", newValue) }

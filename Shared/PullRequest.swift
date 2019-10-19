@@ -21,17 +21,25 @@ final class PullRequest: ListableItem {
 	@NSManaged var reviews: Set<Review>
 
 	static func syncPullRequests(from data: [[AnyHashable : Any]]?, in repo: Repo) {
-		items(with: data, type: PullRequest.self, server: repo.apiServer) { item, info, isNewOrUpdated in
+        let apiServer = repo.apiServer
+        let apiServerUserId = apiServer.userId
+		items(with: data, type: PullRequest.self, server: apiServer) { item, info, isNewOrUpdated in
 			if isNewOrUpdated {
 
 				item.baseSync(from: info, in: repo)
-
-				let newMergeCommitSha = info["merge_commit_sha"] as? String
-				if item.mergeCommitSha != newMergeCommitSha {
-					let hadOneBefore = item.mergeCommitSha != nil
-					item.mergeCommitSha = newMergeCommitSha
-					item.hasNewCommits = hadOneBefore && Settings.markPrsAsUnreadOnNewCommits && !(item.postSyncAction == PostSyncAction.isNew.rawValue)
-				}
+                
+                if
+                    let headInfo = info["head"] as? [AnyHashable: Any],
+                    let newHeadCommitSha = headInfo["sha"] as? String,
+                    let commitUserInfo = headInfo["user"] as? [AnyHashable: Any],
+                    let newHeadCommitUserId = commitUserInfo["id"] as? Int64 {
+                    
+                    let currentSha = item.mergeCommitSha
+                    if currentSha != nil && currentSha != newHeadCommitSha && apiServerUserId != newHeadCommitUserId {
+                        item.hasNewCommits = Settings.markPrsAsUnreadOnNewCommits && !(item.postSyncAction == PostSyncAction.isNew.rawValue)
+                    }
+                    item.mergeCommitSha = newHeadCommitSha
+                }
 
 				if let linkInfo = info["_links"] as? [AnyHashable : Any] {
 					item.issueCommentLink = (linkInfo["comments"] as? [AnyHashable : Any])?["href"] as? String

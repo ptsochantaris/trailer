@@ -149,7 +149,7 @@ final class API {
 		}
 	}
 
-	class var hasNetworkConnection: Bool {
+	static var hasNetworkConnection: Bool {
 		DLog("Actively verifying reported network availability state…")
 		let previousNetworkStatus = currentNetworkStatus
 		checkNetworkAvailability()
@@ -163,11 +163,11 @@ final class API {
 
 	/////////////////////////////////////////////////////// Utilities
 
-	class var pendingCallCount: Int {
+	static var pendingCallCount: Int {
 		return apiQueue.operationCount
 	}
 
-	class var lastUpdateDescription: String {
+	static var lastUpdateDescription: String {
 		if appIsRefreshing {
 			let operations = pendingCallCount
 			if operations < 2 {
@@ -970,13 +970,13 @@ final class API {
 		}
 	}
 
-	class var shouldSyncReactions: Bool {
+	static var shouldSyncReactions: Bool {
 		return Settings.notifyOnItemReactions || Settings.notifyOnCommentReactions
 	}
-	class var shouldSyncReviews: Bool {
+	static var shouldSyncReviews: Bool {
 		return Settings.displayReviewsOnItems || Settings.notifyOnReviewDismissals || Settings.notifyOnReviewAcceptances || Settings.notifyOnReviewChangeRequests
 	}
-	class var shouldSyncReviewAssignments: Bool {
+	static var shouldSyncReviewAssignments: Bool {
 		return Settings.displayReviewsOnItems || Settings.notifyOnReviewAssignments || (Int64(Settings.assignedReviewHandlingPolicy) != Section.none.rawValue)
 	}
 

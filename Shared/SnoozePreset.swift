@@ -124,7 +124,7 @@ final class SnoozePreset: NSManagedObject {
 		}
 	}
 
-	class var archivedPresets: [[String : NSObject]] {
+	static var archivedPresets: [[String : NSObject]] {
 		var archivedData = [[String : NSObject]]()
 		for a in SnoozePreset.allSnoozePresets(in: DataManager.main) {
 			var presetData = [String : NSObject]()

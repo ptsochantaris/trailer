@@ -2,11 +2,11 @@
 
 final class StartupLaunch: NSObject {
 
-	class var isAppLoginItem: Bool {
+	static var isAppLoginItem: Bool {
 		return itemReferencesInLoginItems.existingReference != nil
 	}
 
-	private class var itemReferencesInLoginItems: (existingReference: LSSharedFileListItem?, lastReference: LSSharedFileListItem?) {
+	private static var itemReferencesInLoginItems: (existingReference: LSSharedFileListItem?, lastReference: LSSharedFileListItem?) {
 
 		if let loginItemsRef = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems.takeRetainedValue(), nil).takeRetainedValue() as LSSharedFileList? {
 			let loginItems = LSSharedFileListCopySnapshot(loginItemsRef, nil).takeRetainedValue() as NSArray as! [LSSharedFileListItem]

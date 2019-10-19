@@ -460,7 +460,6 @@ UITableViewDragDelegate {
 		guard let ip = fetchedResultsController.indexPath(forObject: item) else { return }
 
 		tableView.selectRow(at: ip, animated: false, scrollPosition: .middle)
-		tableView(tableView, didSelectRowAt: ip)
 
 		atNextEvent(self) { S in
 			if let u = overrideUrl, let url = URL(string: u) {
@@ -879,6 +878,9 @@ UITableViewDragDelegate {
 			}
 			UIApplication.shared.open(url, options: [:])
 		} else {
+            if let n = navigationController, n.viewControllers.count > 1 {
+                n.popToRootViewController(animated: false)
+            }
             performSegue(withIdentifier: "showDetail", sender: (url, objectId))
 		}
 	}

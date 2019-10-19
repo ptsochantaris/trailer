@@ -348,7 +348,7 @@ final class DataManager {
 		} catch { /* no directory */ }
 	}
 
-	class var appIsConfigured: Bool {
+	static var appIsConfigured: Bool {
 		return ApiServer.someServersHaveAuthTokens(in: main) && Repo.anyVisibleRepos(in: main)
 	}
 
