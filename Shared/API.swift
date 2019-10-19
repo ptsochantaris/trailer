@@ -1606,6 +1606,7 @@ final class API {
 		if (shouldSyncReviews || shouldSyncReviewAssignments) && (!server.isGitHub) {
 			acceptTypes.append("application/vnd.github.black-cat-preview+json")
 		}
+        acceptTypes.append("application/vnd.github.shadow-cat-preview+json") // draft indicators
 		acceptTypes.append("application/vnd.github.v3+json")
 		request.setValue(acceptTypes.joined(separator: ", "), forHTTPHeaderField: "Accept")
 		if let a = server.authToken {

@@ -249,6 +249,11 @@ enum RepoDisplayPolicy: Int64 {
 	}
 }
 
+enum DraftHandlingPolicy: Int {
+    case nothing, display, hide
+    static let labels = ["Do Nothing", "Display in Title", "Hide"]
+}
+
 enum RepoHidingPolicy: Int64 {
 	case noHiding, hideMyAuthoredPrs, hideMyAuthoredIssues, hideAllMyAuthoredItems, hideOthersPrs, hideOthersIssues, hideAllOthersItems
 	static let labels = ["No Filter", "Hide My PRs", "Hide My Issues", "Hide All Mine", "Hide Others PRs", "Hide Others Issues", "Hide All Others"]

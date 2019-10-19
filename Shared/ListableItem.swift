@@ -34,6 +34,7 @@ class ListableItem: DataItem {
 	@NSManaged var milestone: String?
 	@NSManaged var dirty: Bool
 	@NSManaged var requiresReactionRefreshFromUrl: String?
+    @NSManaged var draft: Bool
 
 	@NSManaged var snoozeUntil: Date?
 	@NSManaged var snoozingPreset: SnoozePreset?
@@ -53,6 +54,7 @@ class ListableItem: DataItem {
 		title = info["title"] as? String
 		body = info["body"] as? String
 		milestone = (info["milestone"] as? [AnyHashable : Any])?["title"] as? String
+        draft = info["draft"] as? Bool ?? false
 
 		if let userInfo = info["user"] as? [AnyHashable : Any] {
 			userId = userInfo["id"] as? Int64 ?? 0
@@ -346,6 +348,7 @@ class ListableItem: DataItem {
 		let isMine = createdByMe
 		var targetSection: Section
 		let currentCondition = condition
+        let hideDrafts = Settings.draftHandlingPolicy == DraftHandlingPolicy.hide.rawValue
 
 		if currentCondition == ItemCondition.merged.rawValue            	{ targetSection = .merged }
 		else if currentCondition == ItemCondition.closed.rawValue      		{ targetSection = .closed }
@@ -373,6 +376,10 @@ class ListableItem: DataItem {
 		}
 
 		////////// Apply visibility policies
+        
+        if hideDrafts && targetSection != .none && draft {
+            targetSection = .none
+        }
 
 		if targetSection != .none {
 			switch self is Issue ? repo.displayPolicyForIssues : repo.displayPolicyForPrs {
@@ -521,6 +528,9 @@ class ListableItem: DataItem {
 		if let t = title {
 			components.append(t)
 		}
+        if draft && Settings.draftHandlingPolicy == DraftHandlingPolicy.display.rawValue {
+            components.append("draft")
+        }
 		components.append("\(labels.count) labels:")
 		for l in sortedLabels {
 			if let n = l.name {
@@ -536,6 +546,17 @@ class ListableItem: DataItem {
 		})
 	}
 
+    private final func buildLabelAttributes(labelFont: FONT_CLASS, offset: CGFloat) -> [NSAttributedString.Key: Any] {
+        let lp = NSMutableParagraphStyle()
+        #if os(iOS)
+        lp.lineHeightMultiple = 1.15
+        return [.font: labelFont, .baselineOffset: offset, .paragraphStyle: lp]
+        #elseif os(OSX)
+        lp.minimumLineHeight = labelFont.pointSize + 4
+        return [.font: labelFont, .baselineOffset: offset, .paragraphStyle: lp]
+        #endif
+    }
+    
 	final func title(with font: FONT_CLASS, labelFont: FONT_CLASS, titleColor: COLOR_CLASS, darkMode: Bool) -> NSMutableAttributedString {
 
 		let p = NSMutableParagraphStyle()
@@ -548,32 +569,27 @@ class ListableItem: DataItem {
 		if let t = title {
 
 			if Settings.displayNumbersForItems {
-				let fadedTitleAttributes = [NSAttributedString.Key.font: font,
-											NSAttributedString.Key.foregroundColor: (darkMode ? COLOR_CLASS.lightGray : COLOR_CLASS.gray),
-											NSAttributedString.Key.paragraphStyle: p]
+                var fadedTitleAttributes = titleAttributes
+                fadedTitleAttributes[NSAttributedString.Key.foregroundColor] = (darkMode ? COLOR_CLASS.lightGray : COLOR_CLASS.gray)
 				_title.append(NSAttributedString(string: "#\(number) ", attributes: fadedTitleAttributes))
 			}
 			
 			_title.append(NSAttributedString(string: t, attributes: titleAttributes))
+            
+            if draft && Settings.draftHandlingPolicy == DraftHandlingPolicy.display.rawValue {
+                _title.append(NSAttributedString(string: " ", attributes: titleAttributes))
+
+                let font = FONT_CLASS.boldSystemFont(ofSize: labelFont.pointSize - 2)
+                var draftAttributes = buildLabelAttributes(labelFont: font, offset: 3)
+                draftAttributes[.foregroundColor] = COLOR_CLASS.systemOrange
+                _title.append(NSAttributedString(string: "DRAFT", attributes: draftAttributes))
+            }
 
 			if Settings.showLabels {
 
 				let sorted = sortedLabels
 				let labelCount = sorted.count
 				if labelCount > 0 {
-
-					let lp = NSMutableParagraphStyle()
-					#if os(iOS)
-						lp.lineHeightMultiple = 1.15
-						let labelAttributes: [NSAttributedString.Key: Any] = [NSAttributedString.Key.font: labelFont,
-						                                                     NSAttributedString.Key.baselineOffset: 2.0,
-						                                                     NSAttributedString.Key.paragraphStyle: lp]
-					#elseif os(OSX)
-						lp.minimumLineHeight = labelFont.pointSize + 4
-						let labelAttributes: [NSAttributedString.Key: Any] = [NSAttributedString.Key.font: labelFont,
-						                                                     NSAttributedString.Key.baselineOffset: 2.0,
-						                                                     NSAttributedString.Key.paragraphStyle: lp]
-					#endif
 
 					func isDark(color: COLOR_CLASS) -> Bool {
 						var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0
@@ -584,6 +600,7 @@ class ListableItem: DataItem {
 
 					_title.append(NSAttributedString(string: "\n", attributes: titleAttributes))
 
+                    let labelAttributes = buildLabelAttributes(labelFont: labelFont, offset: 2)
 					var count = 0
 					for l in sorted {
 						var a = labelAttributes
@@ -841,6 +858,8 @@ class ListableItem: DataItem {
 				P = includeInUnreadPredicate
 			case "snoozed":
 				P = isSnoozingPredicate
+            case "draft":
+                P = isDraftPredicate
 			default:
 				continue
 			}
@@ -995,6 +1014,8 @@ class ListableItem: DataItem {
 	}
 
 	private static let isSnoozingPredicate = NSPredicate(format: "snoozeUntil != nil")
+
+    private static let isDraftPredicate = NSPredicate(format: "draft == true")
 
 	static func relatedItems(from notificationUserInfo: [AnyHashable : Any]) -> (PRComment?, ListableItem)? {
 		var item: ListableItem?

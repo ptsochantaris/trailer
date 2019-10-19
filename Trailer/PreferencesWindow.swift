@@ -103,7 +103,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet private weak var showRelativeDates: NSButton!
 	@IBOutlet private weak var displayMilestones: NSButton!
 	@IBOutlet private weak var displayNumbersForItems: NSButton!
-
+    @IBOutlet private weak var draftHandlingPolicy: NSPopUpButton!
+    
 	// Servers
 	@IBOutlet private weak var serverList: NSTableView!
 	@IBOutlet private weak var apiServerName: NSTextField!
@@ -320,6 +321,12 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		deferredUpdateTimer.push()
 		showOptionalReviewAssignmentWarning(previousSync: previousShouldSync)
 	}
+    
+    @IBAction private func draftHandlingPolicy(_ sender: NSPopUpButton) {
+        Settings.draftHandlingPolicy = sender.index(of: sender.selectedItem!)
+        DataManager.postProcessAllItems()
+        deferredUpdateTimer.push()
+    }
 
 	private func showLongSyncWarning() {
 		let a = NSAlert()
@@ -360,6 +367,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		sortingOrder.toolTip = Settings.sortDescendingHelp
 		groupByRepo.toolTip = Settings.groupByRepoHelp
 		assignedPrHandlingPolicy.toolTip = Settings.assignedPrHandlingPolicyHelp
+        draftHandlingPolicy.toolTip = Settings.draftHandlingPolicyHelp
 		includeTitlesInFiltering.toolTip = Settings.includeTitlesInFilterHelp
 		includeMilestonesInFiltering.toolTip = Settings.includeMilestonesInFilterHelp
 		includeAssigneeNamesInFiltering.toolTip = Settings.includeAssigneeInFilterHelp
@@ -496,6 +504,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		showCreationDates.integerValue = Settings.showCreatedInsteadOfUpdated ? 1 : 0
 		groupByRepo.integerValue = Settings.groupByRepo ? 1 : 0
 		assignedPrHandlingPolicy.selectItem(at: Settings.assignedPrHandlingPolicy)
+        draftHandlingPolicy.selectItem(at: Settings.draftHandlingPolicy)
 		showStatusItems.integerValue = Settings.showStatusItems ? 1 : 0
 		makeStatusItemsSelectable.integerValue = Settings.makeStatusItemsSelectable ? 1 : 0
 		openPrAtFirstUnreadComment.integerValue = Settings.openPrAtFirstUnreadComment ? 1 : 0

@@ -32,7 +32,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		Setting(section: .Refresh,
 		        title: "Background refresh interval (minimum)",
 		        description: Settings.backgroundRefreshPeriodHelp,
-		        valueDisplayed: { String(format: "%.0f minutes", Settings.backgroundRefreshPeriod/60.0) }),
+		        valueDisplayed: { String(format: "%.0f minutes", Settings.backgroundRefreshPeriod / 60.0) }),
 		Setting(section: .Refresh,
 		        title: "Watchlist & team list refresh interval",
 		        description: Settings.newRepoCheckPeriodHelp,
@@ -82,6 +82,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				title: "Prefix PR/Issue numbers in item titles",
 				description: Settings.displayNumbersForItemsHelp,
 				valueDisplayed: { Settings.displayNumbersForItems ? "✓" : " " }),
+        Setting(section: .Display,
+                title: "Show draft indicator in item titles",
+                description: Settings.draftHandlingPolicyHelp,
+                valueDisplayed: { DraftHandlingPolicy.labels[Settings.draftHandlingPolicy] }),
 
 		Setting(section: .Filtering,
 		        title: "Include item titles",
@@ -421,7 +425,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
 		switch filteredSections[section].title {
 		case SettingsSection.Filtering.title:
-			return buildFooter("You can use title: server: label: repo: user: number: milestone: assignee: and status: to filter specific properties, e.g. \"label:bug,suggestion\". Prefix with '!' to exclude some terms. You can also use \"state:\" with unread/open/closed/merged/snoozed as an argument.")
+			return buildFooter("You can use title: server: label: repo: user: number: milestone: assignee: and status: to filter specific properties, e.g. \"label:bug,suggestion\". Prefix with '!' to exclude some terms. You can also use \"state:\" with unread/open/closed/merged/snoozed/draft as an argument, e.g. \"state:unread,draft\"")
 		case SettingsSection.Reviews.title:
 			return buildFooter("To disable usage of the Reviews API, uncheck all options above and set the moving option to \"Don't Move It\".")
 		case SettingsSection.Reactions.title:
@@ -592,6 +596,12 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			case 10:
 				Settings.displayNumbersForItems = !Settings.displayNumbersForItems
 				settingsChangedTimer.push()
+            case 11:
+                pickerName = setting.title
+                selectedIndexPath = IndexPath(row: originalIndex, section: section.rawValue)
+                valuesToPush = DraftHandlingPolicy.labels
+                previousValue = Settings.draftHandlingPolicy
+                performSegue(withIdentifier: "showPicker", sender: self)
 			default: break
 			}
 
@@ -907,14 +917,19 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				if sip.row == 0 {
 					Settings.refreshPeriod = Float(didSelectIndexPath.row*10+60)
 				} else if sip.row == 1 {
-					Settings.backgroundRefreshPeriod = Float((didSelectIndexPath.row*5+5)*60)
+					Settings.backgroundRefreshPeriod = Double((didSelectIndexPath.row*5+5)*60)
 				} else if sip.row == 2 {
 					Settings.newRepoCheckPeriod = Float(didSelectIndexPath.row+2)
 				}
 
 			} else if sip.section == SettingsSection.Display.rawValue {
-				Settings.assignedPrHandlingPolicy = didSelectIndexPath.row
-				settingsChangedTimer.push()
+                if sip.row == 3 {
+                    Settings.assignedPrHandlingPolicy = didSelectIndexPath.row
+                    settingsChangedTimer.push()
+                } else if sip.row == 11 {
+                    Settings.draftHandlingPolicy = didSelectIndexPath.row
+                    settingsChangedTimer.push()
+                }
 
 			} else if sip.section == SettingsSection.Sort.rawValue {
 				Settings.sortMethod = didSelectIndexPath.row
