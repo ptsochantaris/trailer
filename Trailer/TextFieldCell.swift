@@ -35,17 +35,30 @@ private final class TextFieldCellTextView: NSTextView, NSTextViewDelegate {
 				return
 			}
             
-        } else if event.keyCode == 36 { // enter
-            window?.makeFirstResponder(nil)
-            return
         }
 
 		super.keyDown(with: event)
 	}
+    
+    override func insertNewline(_ sender: Any?) {
+        window?.makeFirstResponder(nextResponder)
+    }
+    
+    var originalText: String?
+    override func cancelOperation(_ sender: Any?) {
+        if let o = originalText {
+            self.string = o
+        }
+        window?.makeFirstResponder(nextResponder)
+    }
 }
 
 final class TextFieldCell: NSTextFieldCell {
 	override func fieldEditor(for controlView: NSView) -> NSTextView? {
-		return TextFieldCellTextView()
+		let v = TextFieldCellTextView()
+        DispatchQueue.main.async {
+            v.originalText = self.stringValue
+        }
+        return v
 	}
 }
