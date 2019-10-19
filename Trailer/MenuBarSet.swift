@@ -106,12 +106,9 @@ final class MenuBarSet {
 		DLog("Updating \(type) menu, \(countString) total items")
 		
 		let itemLabel = viewCriterion?.label
-		let disable = itemLabel != nil && preFilterCount == 0 && !(forceVisible && type == PullRequest.self)
+        let enable = preFilterCount > 0 || (forceVisible && type == PullRequest.self)
 		
-		if disable {
-			menu.hideStatusItem()
-		} else {
-			
+		if enable {
 			let shouldGray = Settings.grayOutWhenRefreshing && appIsRefreshing
 			
 			let siv = menu.showStatusItem
@@ -128,7 +125,9 @@ final class MenuBarSet {
 				siv.title = itemLabel
 				siv.sizeToFit()
 			}
-		}
+        } else {
+            menu.hideStatusItem()
+        }
 		
 		menu.reload()
 		
