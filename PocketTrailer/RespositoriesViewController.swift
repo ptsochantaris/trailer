@@ -33,8 +33,6 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
-
-        definesPresentationContext = true
         
 		let searchController = UISearchController(searchResultsController: nil)
 		searchController.dimsBackgroundDuringPresentation = false
@@ -42,9 +40,9 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 		searchController.searchResultsUpdater = self
 		searchController.searchBar.tintColor = view.tintColor
 		searchController.searchBar.placeholder = "Filter"
-		searchController.hidesNavigationBarDuringPresentation = false
+		searchController.hidesNavigationBarDuringPresentation = true
 		navigationItem.searchController = searchController
-
+        
 		navigationItem.hidesSearchBarWhenScrolling = false
 		navigationItem.largeTitleDisplayMode = .automatic
 
@@ -291,13 +289,13 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 	private func groupTitleForRepo(repo: Repo) -> NSAttributedString {
 		if let l = repo.groupLabel {
 			return NSAttributedString(string: "Group: \(l)", attributes: [
-				NSAttributedString.Key.foregroundColor : secondaryLabelColour,
-				NSAttributedString.Key.font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)
+				.foregroundColor : secondaryLabelColour,
+				.font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)
 				])
 		} else {
 			return NSAttributedString(string: "Ungrouped", attributes: [
-				NSAttributedString.Key.foregroundColor : tertiaryLabelColour,
-				NSAttributedString.Key.font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)
+				.foregroundColor : tertiaryLabelColour,
+				.font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)
 				])
 		}
 	}
@@ -310,15 +308,15 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 
 	private func attributes(for policy: RepoDisplayPolicy) -> [NSAttributedString.Key : Any] {
 		return [
-			NSAttributedString.Key.font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize-1.0),
-			NSAttributedString.Key.foregroundColor: policy.color
+			.font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize-1.0),
+			.foregroundColor: policy.color
 		]
 	}
 
 	private func attributes(for policy: RepoHidingPolicy) -> [NSAttributedString.Key : Any] {
 		return [
-			NSAttributedString.Key.font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize-1.0),
-			NSAttributedString.Key.foregroundColor: policy.color
+			.font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize-1.0),
+			.foregroundColor: policy.color
 		]
 	}
 
@@ -349,13 +347,11 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 			tableView.insertSections(IndexSet(addedIndexes), with: .fade)
 		}
 		tableView.endUpdates()
-
-
 	}
 
 	override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-		let searchBar = navigationItem.searchController!.searchBar
-		if searchBar.isFirstResponder {
+		let searchBar = navigationItem.searchController?.searchBar
+		if let searchBar = searchBar, searchBar.isFirstResponder {
 			searchBar.resignFirstResponder()
 		}
 	}
