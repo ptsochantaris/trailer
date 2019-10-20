@@ -97,7 +97,6 @@
 		169B92971CC52C05002774A8 /* SnoozePreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169B92951CC52C05002774A8 /* SnoozePreset.swift */; };
 		169FB2361A3DBD7D00E00771 /* SectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169FB2351A3DBD7D00E00771 /* SectionHeader.swift */; };
 		16A0B0371A48AC7900B3452D /* OSX_AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A0B0361A48AC7900B3452D /* OSX_AppDelegate.swift */; };
-		16A0B03C1A49AEC200B3452D /* StartupLaunch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A0B03B1A49AEC200B3452D /* StartupLaunch.swift */; };
 		16A41E9E22A71C7A00D1D352 /* TextFieldCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A41E9D22A71C7A00D1D352 /* TextFieldCell.swift */; };
 		16A505E01A3888D6005DD3B7 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16A505DF1A3888D6005DD3B7 /* Sparkle.framework */; };
 		16A505E21A3889B9005DD3B7 /* Sparkle.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 16A505DF1A3888D6005DD3B7 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -146,6 +145,12 @@
 		16DD6AB01AE457C300145425 /* trailerDoc44.png in Resources */ = {isa = PBXBuildFile; fileRef = 16DD6AAC1AE457C300145425 /* trailerDoc44.png */; };
 		16DD6AB11AE457C300145425 /* trailerDoc64.png in Resources */ = {isa = PBXBuildFile; fileRef = 16DD6AAD1AE457C300145425 /* trailerDoc64.png */; };
 		16DD6AB21AE457C300145425 /* trailerDoc320.png in Resources */ = {isa = PBXBuildFile; fileRef = 16DD6AAE1AE457C300145425 /* trailerDoc320.png */; };
+		16DEA925235C6D7C004589B3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16DEA924235C6D7C004589B3 /* AppDelegate.swift */; };
+		16DEA933235C6DC0004589B3 /* LauncherCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16DEA932235C6DC0004589B3 /* LauncherCommon.swift */; };
+		16DEA934235C6DC0004589B3 /* LauncherCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16DEA932235C6DC0004589B3 /* LauncherCommon.swift */; };
+		16DEA936235C6EDA004589B3 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16DEA935235C6EDA004589B3 /* main.swift */; };
+		16DEA937235C6F00004589B3 /* TrailerLauncher.app in Resources */ = {isa = PBXBuildFile; fileRef = 16DEA922235C6D7C004589B3 /* TrailerLauncher.app */; };
+		16DEA93D235C6F69004589B3 /* TrailerLauncher.app in Embed Helper */ = {isa = PBXBuildFile; fileRef = 16DEA922235C6D7C004589B3 /* TrailerLauncher.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		16E93D121AB467DA00CA967E /* PRListController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E93D111AB467DA00CA967E /* PRListController.swift */; };
 		16E93D141AB4680F00CA967E /* PRDetailController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E93D131AB4680F00CA967E /* PRDetailController.swift */; };
 		16E93D171AB46CE600CA967E /* LabelRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E93D161AB46CE600CA967E /* LabelRow.swift */; };
@@ -181,6 +186,20 @@
 			proxyType = 1;
 			remoteGlobalIDString = 16522D7B1AB03AE500B1C3FB;
 			remoteInfo = "PocketTrailer WatchKit App";
+		};
+		16DEA938235C6F00004589B3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 168BC6A217EC2DF000BC4584 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 16DEA921235C6D7C004589B3;
+			remoteInfo = TrailerLauncher;
+		};
+		16DEA93A235C6F17004589B3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 168BC6A217EC2DF000BC4584 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 16DEA921235C6D7C004589B3;
+			remoteInfo = TrailerLauncher;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -227,6 +246,17 @@
 				16CE47881B7755E00086F4DC /* PocketTrailer WatchKit App.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		16DEA93C235C6F45004589B3 /* Embed Helper */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Contents/Library/LoginItems;
+			dstSubfolderSpec = 1;
+			files = (
+				16DEA93D235C6F69004589B3 /* TrailerLauncher.app in Embed Helper */,
+			);
+			name = "Embed Helper";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -337,7 +367,6 @@
 		169B92951CC52C05002774A8 /* SnoozePreset.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = SnoozePreset.swift; path = ../Shared/SnoozePreset.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		169FB2351A3DBD7D00E00771 /* SectionHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SectionHeader.swift; sourceTree = "<group>"; };
 		16A0B0361A48AC7900B3452D /* OSX_AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = OSX_AppDelegate.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		16A0B03B1A49AEC200B3452D /* StartupLaunch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = StartupLaunch.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16A41E9D22A71C7A00D1D352 /* TextFieldCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldCell.swift; sourceTree = "<group>"; };
 		16A505DF1A3888D6005DD3B7 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = Trailer/Sparkle.framework; sourceTree = "<group>"; };
 		16A69ED91AC83020008231F9 /* ListableItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = ListableItem.swift; path = ../Shared/ListableItem.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -394,6 +423,12 @@
 		16DD6AAC1AE457C300145425 /* trailerDoc44.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = trailerDoc44.png; sourceTree = "<group>"; };
 		16DD6AAD1AE457C300145425 /* trailerDoc64.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = trailerDoc64.png; sourceTree = "<group>"; };
 		16DD6AAE1AE457C300145425 /* trailerDoc320.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = trailerDoc320.png; sourceTree = "<group>"; };
+		16DEA922235C6D7C004589B3 /* TrailerLauncher.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrailerLauncher.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		16DEA924235C6D7C004589B3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		16DEA92D235C6D7E004589B3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		16DEA92E235C6D7E004589B3 /* TrailerLauncher.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TrailerLauncher.entitlements; sourceTree = "<group>"; };
+		16DEA932235C6DC0004589B3 /* LauncherCommon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LauncherCommon.swift; sourceTree = "<group>"; };
+		16DEA935235C6EDA004589B3 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		16E07C831D2DC31300B0525C /* Trailer 30.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 30.xcdatamodel"; sourceTree = "<group>"; };
 		16E93D111AB467DA00CA967E /* PRListController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PRListController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16E93D131AB4680F00CA967E /* PRDetailController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PRDetailController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -442,6 +477,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		16DEA91F235C6D7C004589B3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -472,7 +514,6 @@
 				164785B31A2CE80800297764 /* Trailer-Bridging-Header.h */,
 				162002CF1A2A3E2100FF95F3 /* Application.swift */,
 				16A0B0361A48AC7900B3452D /* OSX_AppDelegate.swift */,
-				16A0B03B1A49AEC200B3452D /* StartupLaunch.swift */,
 				16358F3A1CF138190055F849 /* ItemDelegate.swift */,
 				16358F3C1CF206CE0055F849 /* MenuBarSet.swift */,
 			);
@@ -653,6 +694,7 @@
 				1628A6F218789EA3005EDA69 /* Shared */,
 				168BC6B317EC2DF000BC4584 /* Trailer */,
 				164DEAFA1AC0C8BB00AA6F73 /* Pocket Trailer */,
+				16DEA923235C6D7C004589B3 /* TrailerLauncher */,
 				168BC6AC17EC2DF000BC4584 /* Frameworks */,
 				168BC6AB17EC2DF000BC4584 /* Products */,
 			);
@@ -666,6 +708,7 @@
 				16522D701AB03AE500B1C3FB /* PocketTrailer WatchKit Extension.appex */,
 				16522D7C1AB03AE500B1C3FB /* PocketTrailer WatchKit App.app */,
 				1618527B1AB2CB9000526D81 /* PocketTrailer Today Extension.appex */,
+				16DEA922235C6D7C004589B3 /* TrailerLauncher.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -757,6 +800,18 @@
 				163341361D579A39005F6BF2 /* SummaryRow.swift */,
 			);
 			name = Sections;
+			sourceTree = "<group>";
+		};
+		16DEA923235C6D7C004589B3 /* TrailerLauncher */ = {
+			isa = PBXGroup;
+			children = (
+				16DEA924235C6D7C004589B3 /* AppDelegate.swift */,
+				16DEA92D235C6D7E004589B3 /* Info.plist */,
+				16DEA92E235C6D7E004589B3 /* TrailerLauncher.entitlements */,
+				16DEA932235C6DC0004589B3 /* LauncherCommon.swift */,
+				16DEA935235C6EDA004589B3 /* main.swift */,
+			);
+			path = TrailerLauncher;
 			sourceTree = "<group>";
 		};
 		16E93D101AB467BF00CA967E /* List */ = {
@@ -916,14 +971,34 @@
 				168BC6A717EC2DF000BC4584 /* Frameworks */,
 				168BC6A817EC2DF000BC4584 /* Resources */,
 				16A505D71A387C99005DD3B7 /* Embed Frameworks */,
+				16DEA93C235C6F45004589B3 /* Embed Helper */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				16DEA939235C6F00004589B3 /* PBXTargetDependency */,
+				16DEA93B235C6F17004589B3 /* PBXTargetDependency */,
+			);
+			name = Trailer;
+			productName = Trailer;
+			productReference = 168BC6AA17EC2DF000BC4584 /* Trailer.app */;
+			productType = "com.apple.product-type.application";
+		};
+		16DEA921235C6D7C004589B3 /* TrailerLauncher */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 16DEA92F235C6D7E004589B3 /* Build configuration list for PBXNativeTarget "TrailerLauncher" */;
+			buildPhases = (
+				16DEA91E235C6D7C004589B3 /* Sources */,
+				16DEA91F235C6D7C004589B3 /* Frameworks */,
+				16DEA920235C6D7C004589B3 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = Trailer;
-			productName = Trailer;
-			productReference = 168BC6AA17EC2DF000BC4584 /* Trailer.app */;
+			name = TrailerLauncher;
+			productName = TrailerLauncher;
+			productReference = 16DEA922235C6D7C004589B3 /* TrailerLauncher.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -933,8 +1008,8 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftMigration = 0700;
-				LastSwiftUpdateCheck = 0700;
-				LastUpgradeCheck = 1100;
+				LastSwiftUpdateCheck = 1110;
+				LastUpgradeCheck = 1110;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
 					1618527A1AB2CB9000526D81 = {
@@ -986,6 +1061,10 @@
 							};
 						};
 					};
+					16DEA921235C6D7C004589B3 = {
+						CreatedOnToolsVersion = 11.1;
+						ProvisioningStyle = Automatic;
+					};
 				};
 			};
 			buildConfigurationList = 168BC6A517EC2DF000BC4584 /* Build configuration list for PBXProject "Trailer" */;
@@ -1002,6 +1081,7 @@
 			projectRoot = "";
 			targets = (
 				168BC6A917EC2DF000BC4584 /* Trailer */,
+				16DEA921235C6D7C004589B3 /* TrailerLauncher */,
 				1628A6B018789E73005EDA69 /* PocketTrailer */,
 				1618527A1AB2CB9000526D81 /* PocketTrailer Today Extension */,
 				16522D7B1AB03AE500B1C3FB /* PocketTrailer WatchKit App */,
@@ -1067,6 +1147,14 @@
 				168BC6C917EC2DF000BC4584 /* Images.xcassets in Resources */,
 				16519EB41ACF0E91002171D0 /* Trailer.icns in Resources */,
 				168BC6C417EC2DF000BC4584 /* MainMenu.xib in Resources */,
+				16DEA937235C6F00004589B3 /* TrailerLauncher.app in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		16DEA920235C6D7C004589B3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1173,7 +1261,6 @@
 			files = (
 				16B3B31F1A34E8E2000BE6CC /* PRStatus.swift in Sources */,
 				160E19E21D672BD1006C1A59 /* PopTimer.swift in Sources */,
-				16A0B03C1A49AEC200B3452D /* StartupLaunch.swift in Sources */,
 				164840C11ACFEA5A009E6383 /* AboutWindow.swift in Sources */,
 				16B3B3211A34E8E2000BE6CC /* PullRequest.swift in Sources */,
 				162002D61A2A49A300FF95F3 /* ViewAllowsVibrancy.swift in Sources */,
@@ -1213,11 +1300,22 @@
 				160D312C1A9619CE006B74BC /* FilledView.swift in Sources */,
 				16DB793C1E326C950076A36D /* AdvancedReposWindow.swift in Sources */,
 				162A29D91A4085FD008F41A9 /* GroupingCriterion.swift in Sources */,
+				16DEA933235C6DC0004589B3 /* LauncherCommon.swift in Sources */,
 				167B10571E6A86A300B0E1AE /* Review.swift in Sources */,
 				16B3B34F1A34E990000BE6CC /* Trailer.xcdatamodeld in Sources */,
 				1633C1921ABCEC4A0086C692 /* Issue.swift in Sources */,
 				1694008C1E7AAE32002C5DAD /* Reaction.swift in Sources */,
 				1639E2C11E4007B900C561E1 /* Timer.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		16DEA91E235C6D7C004589B3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				16DEA934235C6DC0004589B3 /* LauncherCommon.swift in Sources */,
+				16DEA925235C6D7C004589B3 /* AppDelegate.swift in Sources */,
+				16DEA936235C6EDA004589B3 /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1238,6 +1336,16 @@
 			isa = PBXTargetDependency;
 			target = 16522D7B1AB03AE500B1C3FB /* PocketTrailer WatchKit App */;
 			targetProxy = 16D780461B77E00D00A4D0BE /* PBXContainerItemProxy */;
+		};
+		16DEA939235C6F00004589B3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 16DEA921235C6D7C004589B3 /* TrailerLauncher */;
+			targetProxy = 16DEA938235C6F00004589B3 /* PBXContainerItemProxy */;
+		};
+		16DEA93B235C6F17004589B3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 16DEA921235C6D7C004589B3 /* TrailerLauncher */;
+			targetProxy = 16DEA93A235C6F17004589B3 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1481,10 +1589,9 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1505;
+				CURRENT_PROJECT_VERSION = 1506;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = YES;
 				GCC_FAST_MATH = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -1501,7 +1608,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_SWIFT_FLAGS = "-D DEBUG";
 				STRIP_INSTALLED_PRODUCT = NO;
@@ -1538,7 +1645,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1505;
+				CURRENT_PROJECT_VERSION = 1506;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEPLOYMENT_POSTPROCESSING = YES;
@@ -1557,7 +1664,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../Frameworks";
 				LLVM_LTO = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				SEPARATE_STRIP = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_DISABLE_SAFETY_CHECKS = YES;
@@ -1571,6 +1678,7 @@
 		168BC6DF17EC2DF000BC4584 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Trailer/Trailer.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -1596,6 +1704,7 @@
 		168BC6E017EC2DF000BC4584 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Trailer/Trailer.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -1615,6 +1724,75 @@
 				SDKROOT = macosx;
 				SWIFT_OBJC_BRIDGING_HEADER = "Trailer/Trailer-Bridging-Header.h";
 				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		16DEA930235C6D7E004589B3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = TrailerLauncher/TrailerLauncher.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = X727JSJUGJ;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = TrailerLauncher/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MARKETING_VERSION = 1.6.19;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.housetrip.Trailer.Launcher;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		16DEA931235C6D7E004589B3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = TrailerLauncher/TrailerLauncher.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = X727JSJUGJ;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = TrailerLauncher/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MARKETING_VERSION = 1.6.19;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.housetrip.Trailer.Launcher;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Osize";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -1671,6 +1849,15 @@
 			buildConfigurations = (
 				168BC6DF17EC2DF000BC4584 /* Debug */,
 				168BC6E017EC2DF000BC4584 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		16DEA92F235C6D7E004589B3 /* Build configuration list for PBXNativeTarget "TrailerLauncher" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				16DEA930235C6D7E004589B3 /* Debug */,
+				16DEA931235C6D7E004589B3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

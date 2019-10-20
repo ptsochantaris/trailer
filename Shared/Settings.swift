@@ -1,6 +1,8 @@
 
 #if os(iOS)
 	import UIKit
+#else
+    import ServiceManagement
 #endif
 
 struct Settings {
@@ -117,9 +119,24 @@ struct Settings {
 			repo.archived = false
 			repo.updatedAt = .distantPast
 		}
+        
+        if Settings.lastRunVersion != "" && sharedDefaults.object(forKey: "launchAtLogin") == nil {
+            DLog("Migrated to the new startup mechanism, activating it by default")
+            isAppLoginItem = true
+        }
 
 		sharedDefaults.synchronize()
 	}
+    
+    static var isAppLoginItem: Bool {
+        get {
+            return sharedDefaults.bool(forKey: "launchAtLogin")
+        }
+        set {
+            sharedDefaults.set(newValue, forKey: "launchAtLogin")
+            SMLoginItemSetEnabled(LauncherCommon.helperAppId as CFString, newValue)
+        }
+    }
 
 	private static func set(_ key: String, _ value: Any?) {
 

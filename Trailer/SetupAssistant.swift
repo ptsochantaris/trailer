@@ -15,7 +15,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate, NSControlTextEditingDele
 	private var checkTimer: Timer?
 
 	override func awakeFromNib() {
-		StartupLaunch.setLaunchOnLogin(true)
+        Settings.isAppLoginItem = true
 		startAtLogin.integerValue = 1
 	}
 
@@ -44,7 +44,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate, NSControlTextEditingDele
 	}
 
 	@IBAction private func startAtLoginSelected(_ sender: NSButton) {
-		StartupLaunch.setLaunchOnLogin(startAtLogin.integerValue==1)
+        Settings.isAppLoginItem = sender.integerValue == 1
 	}
 
 	@IBAction private func testAndCompleteSelected(_ sender: NSButton) {

@@ -78,6 +78,8 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 	func applicationDidFinishLaunching(_ notification: Notification) {
 
+        LauncherCommon.killHelper()
+
 		if DataManager.main.persistentStoreCoordinator == nil {
 			databaseErrorOnStartup()
 			return

@@ -475,7 +475,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		prMergedPolicy.selectItem(at: Settings.mergeHandlingPolicy)
 		prClosedPolicy.selectItem(at: Settings.closeHandlingPolicy)
 
-		launchAtStartup.integerValue = StartupLaunch.isAppLoginItem ? 1 : 0
+		launchAtStartup.integerValue = Settings.isAppLoginItem ? 1 : 0
 		dontConfirmRemoveAllClosed.integerValue = Settings.dontAskBeforeWipingClosed ? 1 : 0
 		displayRepositoryNames.integerValue = Settings.showReposInName ? 1 : 0
 		includeRepositoriesInFiltering.integerValue = Settings.includeReposInFilter ? 1 : 0
@@ -1044,7 +1044,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	@IBAction private func launchAtStartSelected(_ sender: NSButton) {
-		StartupLaunch.setLaunchOnLogin(sender.integerValue==1)
+        Settings.isAppLoginItem = sender.integerValue == 1
 	}
 
 	func refreshRepos() {
