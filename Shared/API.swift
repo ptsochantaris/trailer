@@ -106,8 +106,6 @@ final class API {
 
 		let config = URLSessionConfiguration.default
 		config.httpShouldUsePipelining = true
-		config.requestCachePolicy = .useProtocolCachePolicy
-		config.timeoutIntervalForRequest = 60
 		config.urlCache = URLCache(memoryCapacity: 32 * 1024 * 1024, diskCapacity: 1024 * 1024 * 1024, diskPath: cacheDirectory)
 		config.httpAdditionalHeaders = ["User-Agent" : userAgent]
 		return URLSession(configuration: config, delegate: nil, delegateQueue: sessionCallbackQueue)
@@ -218,8 +216,8 @@ final class API {
 				completion(nil)
 				return
 			}
+            
 			let task = urlSession.dataTask(with: url) { data, response, error in
-
 				if error == nil, let d = data, let r = response as? HTTPURLResponse, r.statusCode < 300, r.expectedContentLength == Int64(d.count) {
 					completion(d)
 				} else {
@@ -238,54 +236,29 @@ final class API {
 		}
 
 		let connector = path.contains("?") ? "&" : "?"
-		#if os(iOS)
-			let side = 40.0*GLOBAL_SCREEN_SCALE
-			let absolutePath = "\(path)\(connector)s=\(side)"
-		#else
-			let absolutePath = "\(path)\(connector)s=104"
-		#endif
+        let absolutePath = "\(path)\(connector)s=256"
 		let md5 = MD5Hashing.md5(str: "\(absolutePath) \(currentAppVersion)")
-		let cachePath = cacheDirectory.appending(pathComponent: "imgcache-\(md5)")
+		let cachePath = cacheDirectory.appending(pathComponent: "imgc-\(md5)")
 
-		let fileManager = FileManager.default
-		if fileManager.fileExists(atPath: cachePath) {
-			#if os(iOS)
-				let imgData = try? Data(contentsOf: URL(fileURLWithPath: cachePath)) as CFData
-				let imgDataProvider = CGDataProvider(data: imgData!)
-				var ret: UIImage?
-				if let cfImage = CGImage(jpegDataProviderSource: imgDataProvider!, decode: nil, shouldInterpolate: false, intent: .defaultIntent) {
-					ret = UIImage(cgImage: cfImage, scale: GLOBAL_SCREEN_SCALE, orientation: .up)
-				}
-			#else
-				let ret = NSImage(contentsOfFile: cachePath)
-			#endif
-			if let r = ret {
-				atNextEvent {
-					callback(r, cachePath)
-				}
-				return true
-			} else {
-				try! fileManager.removeItem(atPath: cachePath)
-			}
-		}
-
+        let fileManager = FileManager.default
+        if fileManager.fileExists(atPath: cachePath) {
+            if let imgData = try? Data(contentsOf: URL(fileURLWithPath: cachePath)), let r = IMAGE_CLASS(data: imgData) {
+                atNextEvent {
+                    callback(r, cachePath)
+                }
+                return true
+            } else {
+                try? fileManager.removeItem(atPath: cachePath)
+            }
+        }
 
 		getImage(at: absolutePath) { data in
 			// in thread
 			var result: IMAGE_CLASS?
-			#if os(iOS)
-				if let d = data, let i = UIImage(data: d, scale: GLOBAL_SCREEN_SCALE) {
-					result = i
-					if let imageData = i.jpegData(compressionQuality: 1) {
-						try? imageData.write(to: URL(fileURLWithPath: cachePath), options: .atomic)
-					}
-				}
-			#else
-				if let d = data, let i = IMAGE_CLASS(data: d) {
-					result = i
-					_ = try? i.tiffRepresentation?.write(to: URL(fileURLWithPath: cachePath), options: [.atomic])
-				}
-			#endif
+            if let d = data, let i = IMAGE_CLASS(data: d) {
+                result = i
+                try? d.write(to: URL(fileURLWithPath: cachePath))
+            }
 			atNextEvent {
 				callback(result, cachePath)
 				#if os(iOS)

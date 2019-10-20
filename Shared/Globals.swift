@@ -44,7 +44,7 @@ let stringDrawingOptions: NSStringDrawingOptions = [.usesLineFragmentOrigin, .us
 
 #elseif os(OSX)
 
-	weak var app: OSX_AppDelegate!
+weak var app: OSX_AppDelegate!
 
 let AVATAR_SIZE: CGFloat = 26
 let AVATAR_PADDING: CGFloat = 8
