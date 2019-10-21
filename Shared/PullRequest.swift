@@ -36,7 +36,7 @@ final class PullRequest: ListableItem {
                     
                     let currentSha = item.mergeCommitSha
                     if currentSha != nil && currentSha != newHeadCommitSha && apiServerUserId != newHeadCommitUserId {
-                        item.hasNewCommits = Settings.markPrsAsUnreadOnNewCommits && !(item.postSyncAction == PostSyncAction.isNew.rawValue)
+                        item.hasNewCommits = Settings.markPrsAsUnreadOnNewCommits && item.postSyncAction != PostSyncAction.isNew.rawValue
                     }
                     item.mergeCommitSha = newHeadCommitSha
                 }
