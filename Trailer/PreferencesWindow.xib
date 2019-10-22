@@ -543,7 +543,7 @@ Token</string>
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="Display" identifier="" id="eo7-T1-mRS">
-                                <view key="view" id="fNr-eq-ZlF">
+                                <view key="view" ambiguous="YES" id="fNr-eq-ZlF">
                                     <rect key="frame" x="10" y="33" width="834" height="426"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
@@ -1254,7 +1254,7 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft as an arg
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="Reviews" identifier="" id="uC9-7Y-asH" userLabel="Reviews">
-                                <view key="view" ambiguous="YES" id="dJh-so-Oju">
+                                <view key="view" id="dJh-so-Oju">
                                     <rect key="frame" x="10" y="33" width="834" height="426"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
@@ -2387,7 +2387,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="dontConfirmRemoveAllClosed" destination="w0K-BS-Gti" id="jaB-In-zbi"/>
                 <outlet property="dontConfirmRemoveAllMerged" destination="ptr-tf-eNM" id="KHp-pR-L6T"/>
                 <outlet property="dontKeepPrsMergedByMe" destination="ZiV-Lz-lSl" id="oZV-a8-3NT"/>
-                <outlet property="draftHandlingPolicy" destination="lB5-eS-YSK" id="yso-gh-NGb"/>
+                <outlet property="draftHandlingPolicy" destination="Cpe-1u-UbD" id="UzH-7h-Uqx"/>
                 <outlet property="dumpApiResponsesToConsole" destination="qos-T0-XKj" id="1Cn-a4-l3d"/>
                 <outlet property="grayOutWhenRefreshing" destination="ueT-Kq-j9E" id="0DE-vy-hy2"/>
                 <outlet property="groupByRepo" destination="TqD-G8-E24" id="nQt-v1-4Mx"/>
