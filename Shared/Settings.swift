@@ -120,14 +120,17 @@ struct Settings {
 			repo.updatedAt = .distantPast
 		}
         
+        #if os(macOS)
         if Settings.lastRunVersion != "" && sharedDefaults.object(forKey: "launchAtLogin") == nil {
             DLog("Migrated to the new startup mechanism, activating it by default")
             isAppLoginItem = true
         }
+        #endif
 
 		sharedDefaults.synchronize()
 	}
     
+    #if os(macOS)
     static var isAppLoginItem: Bool {
         get {
             return sharedDefaults.bool(forKey: "launchAtLogin")
@@ -137,7 +140,8 @@ struct Settings {
             SMLoginItemSetEnabled(LauncherCommon.helperAppId as CFString, newValue)
         }
     }
-
+    #endif
+    
 	private static func set(_ key: String, _ value: Any?) {
 
 		let previousValue = sharedDefaults.object(forKey: key)

@@ -16,37 +16,37 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 
 	private var titleAttributes: [NSAttributedString.Key : Any] {
 		return [
-			NSAttributedString.Key.foregroundColor: UIColor.black,
-			NSAttributedString.Key.font: UIFont.systemFont(ofSize: UIFont.systemFontSize+2.0),
-			NSAttributedString.Key.paragraphStyle: paragraph ]
+            .foregroundColor: UIColor(named: "strong")!,
+			.font: UIFont.systemFont(ofSize: UIFont.systemFontSize + 2),
+			.paragraphStyle: paragraph ]
 	}
 
 	private var normalAttributes: [NSAttributedString.Key : Any] {
 		return [
-			NSAttributedString.Key.foregroundColor: UIColor.darkGray,
-			NSAttributedString.Key.font: UIFont.systemFont(ofSize: UIFont.systemFontSize+2.0),
-			NSAttributedString.Key.paragraphStyle: paragraph ]
+			.foregroundColor: UIColor(named: "text")!,
+			.font: UIFont.systemFont(ofSize: UIFont.systemFontSize + 2),
+			.paragraphStyle: paragraph ]
 	}
 
 	private var dimAttributes: [NSAttributedString.Key : Any] {
 		return [
-			NSAttributedString.Key.foregroundColor: UIColor.gray,
-			NSAttributedString.Key.font: UIFont.systemFont(ofSize: UIFont.systemFontSize+2.0),
-			NSAttributedString.Key.paragraphStyle: paragraph ]
+			.foregroundColor: UIColor(named: "dimText")!,
+			.font: UIFont.systemFont(ofSize: UIFont.systemFontSize + 2),
+			.paragraphStyle: paragraph ]
 	}
 
 	private var redAttributes: [NSAttributedString.Key : Any] {
 		return [
-			NSAttributedString.Key.foregroundColor: UIColor.red,
-			NSAttributedString.Key.font: UIFont.systemFont(ofSize: UIFont.systemFontSize+2.0),
-			NSAttributedString.Key.paragraphStyle: paragraph ]
+			.foregroundColor: UIColor.red,
+			.font: UIFont.systemFont(ofSize: UIFont.systemFontSize + 2),
+			.paragraphStyle: paragraph ]
 	}
 
 	private var smallAttributes: [NSAttributedString.Key : Any] {
 		return [
-			NSAttributedString.Key.foregroundColor: UIColor.gray,
-			NSAttributedString.Key.font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize),
-			NSAttributedString.Key.paragraphStyle: paragraph ]
+			.foregroundColor: UIColor(named: "dimText")!,
+			.font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize),
+			.paragraphStyle: paragraph ]
 	}
 
 	override func viewDidLoad() {
