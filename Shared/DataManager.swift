@@ -76,7 +76,6 @@ final class DataManager {
 			d.removeObject(forKey: "API_SERVER_PATH")
 			d.removeObject(forKey: "API_FRONTEND_SERVER")
 			d.removeObject(forKey: "GITHUB_AUTH_TOKEN")
-			d.synchronize()
 		} else {
 			ApiServer.ensureAtLeastGithub(in: main)
 		}

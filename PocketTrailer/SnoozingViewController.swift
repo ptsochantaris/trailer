@@ -90,8 +90,13 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 			Settings.hideSnoozedItems = !Settings.hideSnoozedItems
 			tableView.reloadData()
 			settingsChangedTimer.push()
+            
 		} else if indexPath.section == 1 {
-			performSegue(withIdentifier: "showPicker", sender: self)
+            let count = stride(from: 2, to: 9000, by: 1).map { "\($0) days" }
+            let values = ["Never", "1 day"] + count
+            let v = PickerViewController.Info(title: "Auto Snooze Items After", values: values, selectedIndex: Settings.autoSnoozeDuration, sourceIndexPath: indexPath)
+			performSegue(withIdentifier: "showPicker", sender: v)
+            
 		} else {
 			let s = SnoozePreset.allSnoozePresets(in: DataManager.main)[indexPath.row]
 			performSegue(withIdentifier: "showSnoozeEditor", sender: s)
@@ -99,12 +104,9 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 	}
 
 	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-		if let d = segue.destination as? PickerViewController {
+        if let d = segue.destination as? PickerViewController, let i = sender as? PickerViewController.Info {
 			d.delegate = self
-			d.title = "Auto Snooze Items After"
-			let count = stride(from: 2, to: 9000, by: 1).map { "\($0) days" }
-			d.values = ["Never", "1 day"] + count
-			d.previousValue = Settings.autoSnoozeDuration
+            d.info = i
 		} else if let d = segue.destination as? SnoozingEditorViewController {
 			if let s = sender as? SnoozePreset {
 				d.isNew = false
@@ -116,7 +118,7 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 		}
 	}
 
-	func pickerViewController(picker: PickerViewController, didSelectIndexPath: IndexPath) {
+    func pickerViewController(picker: PickerViewController, didSelectIndexPath: IndexPath, info: PickerViewController.Info) {
 		Settings.autoSnoozeDuration = didSelectIndexPath.row
 		table.reloadData()
 		for p in DataItem.allItems(of: PullRequest.self, in: DataManager.main) {

@@ -31,13 +31,16 @@ final class WatchlistSettingsViewController: UITableViewController, PickerViewCo
 		hideArchivedCell.accessoryType = Settings.hideArchivedRepos ? .checkmark : .none
 	}
 
-	func pickerViewController(picker: PickerViewController, didSelectIndexPath: IndexPath) {
+    func pickerViewController(picker: PickerViewController, didSelectIndexPath: IndexPath, info: PickerViewController.Info) {
 		Settings.newRepoCheckPeriod = Float(didSelectIndexPath.row + 2)
 	}
 
 	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		if indexPath.section == 0 {
-			performSegue(withIdentifier: "showPicker", sender: self)
+            let values = (2 ..< 1000).map { "\($0) hours" }
+            let index = Int(Settings.newRepoCheckPeriod) - 2
+            let v = PickerViewController.Info(title: "Re-scan every…", values: values, selectedIndex: index, sourceIndexPath: indexPath)
+			performSegue(withIdentifier: "showPicker", sender: v)
 		} else {
 			if indexPath.row == 0 {
 				Settings.automaticallyAddNewReposFromWatchlist = !Settings.automaticallyAddNewReposFromWatchlist
@@ -56,10 +59,8 @@ final class WatchlistSettingsViewController: UITableViewController, PickerViewCo
 	}
 
 	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-		if let p = segue.destination as? PickerViewController {
-			p.title = "Re-scan every…"
-			p.values = (2 ..< 1000).map { "\($0) hours" }
-			p.previousValue = Int(Settings.newRepoCheckPeriod) - 2
+        if let p = segue.destination as? PickerViewController, let i = sender as? PickerViewController.Info {
+            p.info = i
 			p.delegate = self
 		}
 	}

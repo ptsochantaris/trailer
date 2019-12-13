@@ -3,7 +3,7 @@ import UIKit
 
 let popupManager = PopupManager()
 
-final class PopupManager: NSObject, UISplitViewControllerDelegate {
+final class PopupManager: NSObject {
 
 	/////////////// Popovers
 
@@ -30,17 +30,8 @@ final class PopupManager: NSObject, UISplitViewControllerDelegate {
 	////////////// Master view
 
 	var masterController: MasterViewController {
-		let s = app.window!.rootViewController as! UISplitViewController
-		return (s.viewControllers.first as! UINavigationController).viewControllers.first as! MasterViewController
-	}
-
-	func splitViewController(_ splitViewController: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {
-		let d = (secondaryViewController as! UINavigationController).viewControllers.first as! DetailViewController
-		return d.detailItem==nil
-	}
-
-	func splitViewController(_ splitViewController: UISplitViewController, separateSecondaryFrom primaryViewController: UIViewController) -> UIViewController? {
-		return nil
+		let s = app.window!.rootViewController as! UINavigationController
+		return s.viewControllers.first as! MasterViewController
 	}
 }
 

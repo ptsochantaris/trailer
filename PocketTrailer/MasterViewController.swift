@@ -37,12 +37,6 @@ final class TabBarSet {
 	}
 }
 
-final class CustomTabBar: UITabBar {
-	override var traitCollection: UITraitCollection {
-		return UITraitCollection(horizontalSizeClass: .compact)
-	}
-}
-
 final class MasterViewController: UITableViewController, NSFetchedResultsControllerDelegate,
 UITabBarControllerDelegate, UITabBarDelegate, UISearchResultsUpdating,
 UITableViewDragDelegate {
@@ -50,14 +44,13 @@ UITableViewDragDelegate {
 	private var fetchedResultsController: NSFetchedResultsController<ListableItem>!
 
 	// Tabs
-	private var tabs = CustomTabBar()
+	private var tabs = UITabBar()
 	private var tabScroll: UIScrollView?
 	private var tabBorder: UIView?
 	private var tabBarSets = [TabBarSet]()
 	private var currentTabBarSet: TabBarSet?
 
 	private var searchTimer: PopTimer!
-	private var forceSafari = false
 
 	private var pluralNameForItems: String {
 		return viewingPrs ? "pull requests" : "issues"
@@ -150,7 +143,6 @@ UITableViewDragDelegate {
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
 		updateStatus(becauseOfChanges: false, updateItems: true)
-		tabs.setNeedsLayout() // iPhone X bug?
 
 		if let s = splitViewController, !s.isCollapsed {
 			return
@@ -194,6 +186,8 @@ UITableViewDragDelegate {
 			self?.updateStatus(becauseOfChanges: true)
 		}
 
+        tabs.tintColor = UIColor(named: "apptint")
+        
 		/*let prs = DataItem.allItems(of: PullRequest.self, in: DataManager.main)
 		if prs.count > 0 {
 			prs[0].postSyncAction = PostSyncAction.delete.rawValue
@@ -266,7 +260,6 @@ UITableViewDragDelegate {
 	override var keyCommands: [UIKeyCommand]? {
         return [
 		makeKeyCommand(input: "f", modifierFlags: .command, action: #selector(focusFilter), discoverabilityTitle: "Filter items"),
-		makeKeyCommand(input: "o", modifierFlags: .command, action: #selector(keyOpenInSafari), discoverabilityTitle: "Open in Safari"),
         makeKeyCommand(input: "a", modifierFlags: .command, action: #selector(keyToggleRead), discoverabilityTitle: "Mark item read/unread"),
 		makeKeyCommand(input: "m", modifierFlags: .command, action: #selector(keyToggleMute), discoverabilityTitle: "Set item mute/unmute"),
 		makeKeyCommand(input: "s", modifierFlags: .command, action: #selector(keyToggleSnooze), discoverabilityTitle: "Snooze/wake item"),
@@ -278,7 +271,6 @@ UITableViewDragDelegate {
 		makeKeyCommand(input: UIKeyCommand.inputUpArrow, modifierFlags: [], action: #selector(keyMoveToPreviousItem), discoverabilityTitle: "Previous item"),
 		makeKeyCommand(input: UIKeyCommand.inputDownArrow, modifierFlags: .alternate, action: #selector(keyMoveToNextSection), discoverabilityTitle: "Move to the next section"),
 		makeKeyCommand(input: UIKeyCommand.inputUpArrow, modifierFlags: .alternate, action: #selector(keyMoveToPreviousSection), discoverabilityTitle: "Move to the previous section"),
-		makeKeyCommand(input: UIKeyCommand.inputRightArrow, modifierFlags: .command, action: #selector(keyFocusDetailView), discoverabilityTitle: "Focus keyboard on detail view"),
 		makeKeyCommand(input: UIKeyCommand.inputLeftArrow, modifierFlags: .command, action: #selector(becomeFirstResponder), discoverabilityTitle: "Focus keyboard on list view")
         ]
 	}
@@ -343,17 +335,6 @@ UITableViewDragDelegate {
 		updateStatus(becauseOfChanges: false)
 	}
     
-	@objc private func keyFocusDetailView() {
-        performSegue(withIdentifier: "showDetail", sender: nil)
-	}
-
-	@objc private func keyOpenInSafari() {
-		if let ip = tableView.indexPathForSelectedRow {
-			forceSafari = true
-			tableView(tableView, didSelectRowAt: ip)
-		}
-	}
-
 	@objc private func keyShowSelectedItem() {
 		if let ip = tableView.indexPathForSelectedRow {
 			tableView(tableView, didSelectRowAt: ip)
@@ -561,7 +542,7 @@ UITableViewDragDelegate {
 			if splitViewController?.isCollapsed ?? false && (splitViewController?.viewControllers.first as? UINavigationController)?.viewControllers.count == 2 {
 				// collapsed split view, and detail view is showing
 			} else {
-				showTabBar(show: true, animated: animated)
+				showTabBar()
 			}
 
 			tabs.items = items
@@ -579,7 +560,7 @@ UITableViewDragDelegate {
 			tabs.items = items
 			tabs.selectedItem = items.first
 			currentTabBarSet = tabBarSetForTabItem(i: items.first)
-			showTabBar(show: false, animated: animated)
+			hideTabBar()
 		}
 
 		if let i = tabs.selectedItem?.image {
@@ -621,154 +602,82 @@ UITableViewDragDelegate {
 	}
 
 	private var lastTabIndex = 0
-	private var lastTabCount = 0
-	private var tabsWidth: NSLayoutConstraint?
-	private func showTabBar(show: Bool, animated: Bool) {
-		if show {
-
-			guard tabScroll == nil, let v = navigationController?.view else { return }
-
-            additionalSafeAreaInsets = UIEdgeInsets(top: 0, left: 0, bottom: 49, right: 0)
-
-			tabs.translatesAutoresizingMaskIntoConstraints = false
-			tabs.delegate = self
-
-			let ts = UIScrollView()
-			ts.translatesAutoresizingMaskIntoConstraints = false
-			ts.showsHorizontalScrollIndicator = false
-			ts.alwaysBounceHorizontal = true
-			ts.scrollsToTop = false
-			ts.contentInsetAdjustmentBehavior = .never
-			ts.addSubview(tabs)
-
-            let s1 = UIVisualEffectView(effect: UIBlurEffect(style: .regular))
-			s1.translatesAutoresizingMaskIntoConstraints = false
-			ts.addSubview(s1)
-
-			let s2 = UIVisualEffectView(effect: UIBlurEffect(style: .regular))
-			s2.translatesAutoresizingMaskIntoConstraints = false
-			ts.addSubview(s2)
-
-			let b = UIView()
-			b.translatesAutoresizingMaskIntoConstraints = false
-			b.backgroundColor = labelColour.withAlphaComponent(DISABLED_FADE)
-			b.isUserInteractionEnabled = false
-			v.addSubview(b)
-			tabBorder = b
-
-			v.addSubview(ts)
-			tabScroll = ts
-
-			tabsWidth = tabs.widthAnchor.constraint(greaterThanOrEqualToConstant: 0)
-            
-            updateTabUI()
-
-			let cl = ts.contentLayoutGuide
-			let top = cl.topAnchor
-			let bottom = cl.bottomAnchor
-
-			NSLayoutConstraint.activate([
-				tabs.heightAnchor.constraint(equalTo: ts.heightAnchor),
-				tabs.widthAnchor.constraint(greaterThanOrEqualTo: v.widthAnchor),
-				tabsWidth!,
-
-				tabs.topAnchor.constraint(equalTo: top),
-				tabs.leadingAnchor.constraint(equalTo: cl.leadingAnchor),
-				tabs.trailingAnchor.constraint(equalTo: cl.trailingAnchor),
-				tabs.bottomAnchor.constraint(equalTo: bottom),
-
-				ts.bottomAnchor.constraint(equalTo: v.bottomAnchor),
-				ts.leadingAnchor.constraint(equalTo: v.leadingAnchor),
-				ts.trailingAnchor.constraint(equalTo: v.trailingAnchor),
-				ts.topAnchor.constraint(equalTo: v.safeAreaLayoutGuide.bottomAnchor, constant: -49),
-
-				b.heightAnchor.constraint(equalToConstant: 0.5),
-				b.bottomAnchor.constraint(equalTo: ts.topAnchor),
-				b.leadingAnchor.constraint(equalTo: ts.leadingAnchor),
-				b.trailingAnchor.constraint(equalTo: ts.trailingAnchor),
-
-				s2.trailingAnchor.constraint(equalTo: tabs.leadingAnchor),
-                s2.widthAnchor.constraint(equalTo: ts.widthAnchor, multiplier: 1),
-				s2.topAnchor.constraint(equalTo: top),
-				s2.bottomAnchor.constraint(equalTo: bottom),
-
-				s1.leadingAnchor.constraint(equalTo: tabs.trailingAnchor),
-                s1.widthAnchor.constraint(equalTo: ts.widthAnchor, multiplier: 1),
-				s1.topAnchor.constraint(equalTo: top),
-				s1.bottomAnchor.constraint(equalTo: bottom),
-			])
-
-			if animated {
-				let h = 49 + view.safeAreaInsets.bottom
-				ts.transform = CGAffineTransform(translationX: 0, y: h)
-				b.transform = CGAffineTransform(translationX: 0, y: h)
-				view.layoutIfNeeded()
-				UIView.animate(withDuration: 0.25,
-							   delay: 0.0,
-							   options: .curveEaseInOut,
-							   animations: {
-								ts.transform = .identity
-								b.transform = .identity
-				}, completion: nil)
-			}
-
-		} else {
-
-			guard let t = tabScroll, let b = tabBorder else { return  }
-
-            additionalSafeAreaInsets = .zero
-            
-			tabScroll = nil
-			tabBorder = nil
-			tabsWidth = nil
-
-			if animated {
-				let h = 49 + view.safeAreaInsets.bottom
-				view.layoutIfNeeded()
-				UIView.animate(withDuration: 0.25,
-							   delay: 0.0,
-							   options: .curveEaseInOut,
-							   animations: {
-								t.transform = CGAffineTransform(translationX: 0, y: h)
-								b.transform = CGAffineTransform(translationX: 0, y: h)
-				}, completion: { finished in
-					t.removeFromSuperview()
-					b.removeFromSuperview()
-					self.tabs.removeFromSuperview()
-				})
-			} else {
-				t.removeFromSuperview()
-				b.removeFromSuperview()
-				tabs.removeFromSuperview()
-			}
-		}
-	}
+    private var lastTabCount = 0
+    private var tabsWidth: NSLayoutConstraint?
     
-    private func updateTabUI() {
-        if #available(iOS 13.0, *) {
-            for s in tabScroll?.subviews ?? [] {
-                if let s = s as? UITabBar {
-                    if traitCollection.userInterfaceStyle == .dark {
-                        s.barTintColor = UIColor.init(white: 0.1, alpha: 1)
-                    } else {
-                        s.barTintColor = nil
-                    }
-                } else {
-                    if traitCollection.userInterfaceStyle == .dark {
-                        s.backgroundColor = UIColor.init(white: 0.3, alpha: 1)
-                    } else {
-                        s.backgroundColor = nil
-                    }
-                }
-            }
-        }
+    private func showTabBar() {
+        guard tabScroll == nil, let v = navigationController?.view else { return }
+        
+        tabs.translatesAutoresizingMaskIntoConstraints = false
+        tabs.delegate = self
+        
+        let ts = UIScrollView()
+        ts.translatesAutoresizingMaskIntoConstraints = false
+        ts.showsHorizontalScrollIndicator = false
+        ts.showsVerticalScrollIndicator = false
+        ts.alwaysBounceHorizontal = true
+        ts.scrollsToTop = false
+        ts.contentInsetAdjustmentBehavior = .never
+        ts.backgroundColor = .systemBackground
+        ts.addSubview(tabs)
+                
+        let b = UIView()
+        b.translatesAutoresizingMaskIntoConstraints = false
+        b.backgroundColor = UIColor.label.withAlphaComponent(DISABLED_FADE)
+        b.isUserInteractionEnabled = false
+        v.addSubview(b)
+        tabBorder = b
+        
+        v.addSubview(ts)
+        tabScroll = ts
+        
+        tabsWidth = tabs.widthAnchor.constraint(greaterThanOrEqualToConstant: 0)
+                
+        let cl = ts.contentLayoutGuide
+        let top = cl.topAnchor
+        let bottom = cl.bottomAnchor
+        
+        let frameHeight: CGFloat = 50
+        
+        additionalSafeAreaInsets = UIEdgeInsets(top: 0, left: 0, bottom: frameHeight, right: 0)
+        
+        NSLayoutConstraint.activate([
+            tabs.heightAnchor.constraint(equalTo: ts.heightAnchor),
+            tabs.widthAnchor.constraint(greaterThanOrEqualTo: v.widthAnchor),
+            tabsWidth!,
+            
+            tabs.topAnchor.constraint(equalTo: top),
+            tabs.leadingAnchor.constraint(equalTo: cl.leadingAnchor),
+            tabs.trailingAnchor.constraint(equalTo: cl.trailingAnchor),
+            tabs.bottomAnchor.constraint(equalTo: bottom),
+            
+            ts.bottomAnchor.constraint(equalTo: v.bottomAnchor),
+            ts.leadingAnchor.constraint(equalTo: v.leadingAnchor),
+            ts.trailingAnchor.constraint(equalTo: v.trailingAnchor),
+            ts.topAnchor.constraint(equalTo: v.safeAreaLayoutGuide.bottomAnchor, constant: -frameHeight),
+            
+            b.heightAnchor.constraint(equalToConstant: 0.5),
+            b.bottomAnchor.constraint(equalTo: ts.topAnchor),
+            b.leadingAnchor.constraint(equalTo: ts.leadingAnchor),
+            b.trailingAnchor.constraint(equalTo: ts.trailingAnchor),
+        ])
+        
     }
     
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        updateTabUI()
+    private func hideTabBar() {
+        guard let ts = tabScroll, let b = tabBorder else { return  }
+        
+        additionalSafeAreaInsets = .zero
+        
+        tabScroll = nil
+        tabBorder = nil
+        tabsWidth = nil
+        
+        ts.removeFromSuperview()
+        b.removeFromSuperview()
+        tabs.removeFromSuperview()
     }
-
+    
 	func localNotificationSelected(userInfo: [AnyHashable : Any], action: String) {
 		var urlToOpen = userInfo[NOTIFICATION_URL_KEY] as? String
 		var relatedItem: ListableItem?
@@ -861,22 +770,15 @@ UITableViewDragDelegate {
 		if let u = p.urlForOpening, let url = URL(string: u) {
 			showDetail(url: url, objectId: p.objectID)
 		}
+        
+        tableView.deselectRow(at: indexPath, animated: true)
 	}
 
 	private func showDetail(url: URL, objectId: NSManagedObjectID) {
-
-        if forceSafari || (Settings.openItemsDirectlyInSafari && splitViewController?.displayMode != .allVisible) {
-			forceSafari = false
-			if let item = existingObject(with: objectId) as? ListableItem {
-				item.catchUpWithComments()
-			}
-			UIApplication.shared.open(url, options: [:])
-		} else {
-            if let n = navigationController, n.viewControllers.count > 1 {
-                n.popToRootViewController(animated: false)
-            }
-            performSegue(withIdentifier: "showDetail", sender: (url, objectId))
-		}
+        if let item = existingObject(with: objectId) as? ListableItem {
+            item.catchUpWithComments()
+        }
+        UIApplication.shared.open(url, options: [:])
 	}
 
 	override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -1002,7 +904,7 @@ UITableViewDragDelegate {
 					i.wakeUp()
                     completion(true)
 				}
-				w.backgroundColor = secondaryLabelColour
+				w.backgroundColor = UIColor.secondaryLabel
 				actions.append(w)
 
 			} else {
@@ -1015,7 +917,7 @@ UITableViewDragDelegate {
 					self?.showSnoozeMenuFor(i: i)
                     completion(true)
 				}
-				s.backgroundColor = secondaryLabelColour
+				s.backgroundColor = UIColor.secondaryLabel
 				actions.append(s)
 			}
 		}
@@ -1026,10 +928,9 @@ UITableViewDragDelegate {
 	private func showSnoozeMenuFor(i: ListableItem) {
 		let snoozePresets = SnoozePreset.allSnoozePresets(in: DataManager.main)
 		let hasPresets = snoozePresets.count > 0
-		let singleColumn = splitViewController?.isCollapsed ?? true
 		let a = UIAlertController(title: hasPresets ? "Snooze" : nil,
 		                          message: hasPresets ? S(i.title) : "You do not currently have any snoozing presets configured. Please add some in the relevant preferences tab.",
-		                          preferredStyle: singleColumn ? .actionSheet : .alert)
+		                          preferredStyle: .alert)
 		for preset in snoozePresets {
 			a.addAction(UIAlertAction(title: preset.listDescription, style: .default) { action in
 				i.snooze(using: preset)
@@ -1246,18 +1147,10 @@ UITableViewDragDelegate {
 
 		if let destination = segue.destination as? UITabBarController {
 			if allServersHaveTokens {
-				destination.selectedIndex = min(Settings.lastPreferencesTabSelected, (destination.viewControllers?.count ?? 1)-1)
-				destination.delegate = self
+                destination.selectedIndex = min(Settings.lastPreferencesTabSelected, (destination.viewControllers?.count ?? 1)-1)
 			}
+            destination.delegate = self
 		}
-        
-        if let destination = segue.destination as? UINavigationController, let detailVc = destination.viewControllers.first as? DetailViewController, let info = sender as? (URL, NSManagedObjectID) {
-            detailVc.detailItem = info.0
-            detailVc.catchupWithDataItemWhenLoaded = info.1
-            if let s = splitViewController, s.isCollapsed {
-                showTabBar(show: false, animated: true)
-            }
-        }
 	}
 
 	func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {

@@ -26,10 +26,6 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 	private let settings = [
 		Setting(section: .Refresh,
-		        title: "Foreground refresh interval",
-		        description: Settings.refreshPeriodHelp,
-		        valueDisplayed: { String(format: "%.0f seconds", Settings.refreshPeriod) }),
-		Setting(section: .Refresh,
 		        title: "Background refresh interval (minimum)",
 		        description: Settings.backgroundRefreshPeriodHelp,
 		        valueDisplayed: { String(format: "%.0f minutes", Settings.backgroundRefreshPeriod / 60.0) }),
@@ -58,10 +54,6 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		        title: "Display repository names",
 		        description: Settings.showReposInNameHelp,
 		        valueDisplayed: { Settings.showReposInName ? "✓" : " " }),
-		Setting(section: .Display,
-		        title: "Open items directly in Safari if internal web view is not already visible.",
-		        description: Settings.openItemsDirectlyInSafariHelp,
-		        valueDisplayed: { Settings.openItemsDirectlyInSafari ? "✓" : " " }),
 		Setting(section: .Display,
 		        title: "Separate API servers into their own groups",
 		        description: Settings.showSeparateApiServersInMenuHelp,
@@ -317,10 +309,6 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	private var searchTimer: PopTimer!
 
 	// for the picker
-	private var valuesToPush: [String]?
-	private var pickerName: String?
-	private var selectedIndexPath: IndexPath?
-	private var previousValue: Int?
 	private var showHelp = true
 	private var importExport: ImportExport!
 
@@ -370,12 +358,6 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		}
 
 		importExport = ImportExport(parent: self)
-
-		navigationItem.rightBarButtonItems = [
-			UIBarButtonItem(image: UIImage(named: "export"), style: .plain, target: importExport, action: #selector(ImportExport.exportSelected)),
-			UIBarButtonItem(image: UIImage(named: "import"), style: .plain, target: importExport, action: #selector(ImportExport.importSelected)),
-			UIBarButtonItem(image: UIImage(named: "showHelp"), style: .plain, target: self, action: #selector(toggleHelp)),
-		]
 	}
 
 	override func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -393,7 +375,15 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		}
 	}
 
-	@objc private func toggleHelp(button: UIBarButtonItem) {
+    @IBAction private func importSelected(button: UIBarButtonItem) {
+        importExport.importSelected(sender: button)
+    }
+    
+    @IBAction private func exportSelected(button: UIBarButtonItem) {
+        importExport.exportSelected(sender: button)
+    }
+    
+	@IBAction private func toggleHelp(button: UIBarButtonItem) {
 		showHelp = !showHelp
 		if let s = navigationItem.searchController?.searchBar.text, !s.isEmpty {
 			reload()
@@ -414,7 +404,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			string: message,
 			attributes: [
 				NSAttributedString.Key.font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize),
-				NSAttributedString.Key.foregroundColor: tertiaryLabelColour,
+                NSAttributedString.Key.foregroundColor: UIColor.tertiaryLabel,
 				NSAttributedString.Key.paragraphStyle: p,
 				])
 		l.numberOfLines = 0
@@ -516,39 +506,31 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			originalIndex += 1
 		}
 
-		previousValue = nil
-
 		if section == SettingsSection.Refresh {
-			pickerName = setting.title
-			selectedIndexPath = IndexPath(row: originalIndex, section: section.rawValue)
 			var values = [String]()
 			var count=0
+            var previousIndex: Int?
 			switch originalIndex {
 			case 0:
-				// seconds
-				for f in stride(from: 60, to: 3600, by: 10) {
-					if f == Int(Settings.refreshPeriod) { previousValue = count }
-					values.append("\(f) seconds")
-					count += 1
-				}
-			case 1:
 				// minutes
-				for f in stride(from: 5, to: 10000, by: 5) {
-					if f == Int(Settings.backgroundRefreshPeriod/60.0) { previousValue = count }
+                let period = Int(Settings.backgroundRefreshPeriod / 60)
+                for f in 2 ..< 1000 {
+					if f == period { previousIndex = count }
 					values.append("\(f) minutes")
 					count += 1
 				}
-			case 2:
+			case 1:
 				// hours
-				for f in 2..<100 {
-					if f == Int(Settings.newRepoCheckPeriod) { previousValue = count }
+                let period = Int(Settings.newRepoCheckPeriod)
+				for f in 2 ..< 100 {
+					if f == period { previousIndex = count }
 					values.append("\(f) hours")
 					count += 1
 				}
 			default: break
 			}
-			valuesToPush = values
-			performSegue(withIdentifier: "showPicker", sender: self)
+            let v = PickerViewController.Info(title: setting.title, values: values, selectedIndex: previousIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+			performSegue(withIdentifier: "showPicker", sender: v)
 
 		} else if section == SettingsSection.Display {
 			switch originalIndex {
@@ -568,39 +550,31 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				Settings.showRelativeDates = !Settings.showRelativeDates
 				settingsChangedTimer.push()
 			case 3:
-				pickerName = setting.title
-				selectedIndexPath = IndexPath(row: originalIndex, section: section.rawValue)
-				valuesToPush = AssignmentPolicy.labels
-				previousValue = Settings.assignedPrHandlingPolicy
-				performSegue(withIdentifier: "showPicker", sender: self)
+                let v = PickerViewController.Info(title: setting.title, values: AssignmentPolicy.labels, selectedIndex: Settings.assignedPrHandlingPolicy, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+				performSegue(withIdentifier: "showPicker", sender: v)
 			case 4:
 				Settings.showReposInName = !Settings.showReposInName
 				settingsChangedTimer.push()
 			case 5:
-				Settings.openItemsDirectlyInSafari = !Settings.openItemsDirectlyInSafari
-			case 6:
 				Settings.showSeparateApiServersInMenu = !Settings.showSeparateApiServersInMenu
 				atNextEvent {
 					popupManager.masterController.updateStatus(becauseOfChanges: true)
 				}
 				settingsChangedTimer.push()
-			case 7:
+			case 6:
 				Settings.alwaysRequestDesktopSite = !Settings.alwaysRequestDesktopSite
-            case 8:
+            case 7:
                 Settings.markPrsAsUnreadOnNewCommits = !Settings.markPrsAsUnreadOnNewCommits
                 settingsChangedTimer.push()
-			case 9:
+			case 8:
 				Settings.showMilestones = !Settings.showMilestones
 				settingsChangedTimer.push()
-			case 10:
+			case 9:
 				Settings.displayNumbersForItems = !Settings.displayNumbersForItems
 				settingsChangedTimer.push()
-            case 11:
-                pickerName = setting.title
-                selectedIndexPath = IndexPath(row: originalIndex, section: section.rawValue)
-                valuesToPush = DraftHandlingPolicy.labels
-                previousValue = Settings.draftHandlingPolicy
-                performSegue(withIdentifier: "showPicker", sender: self)
+            case 10:
+                let v = PickerViewController.Info(title: setting.title, values: DraftHandlingPolicy.labels, selectedIndex: Settings.draftHandlingPolicy, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                performSegue(withIdentifier: "showPicker", sender: v)
 			default: break
 			}
 
@@ -647,17 +621,15 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				Settings.hideUncommentedItems = !Settings.hideUncommentedItems
 				settingsChangedTimer.push()
 			case 2, 3, 4:
-				pickerName = setting.title
-				valuesToPush = Section.movePolicyNames
-				selectedIndexPath = IndexPath(row: originalIndex, section: section.rawValue)
-				previousValue = originalIndex == 2 ? Settings.newMentionMovePolicy :
-								originalIndex == 3 ? Settings.teamMentionMovePolicy :
-													 Settings.newItemInOwnedRepoMovePolicy
-				performSegue(withIdentifier: "showPicker", sender: self)
+                let previousIndex = originalIndex == 2 ? Settings.newMentionMovePolicy :
+                    originalIndex == 3 ? Settings.teamMentionMovePolicy :
+                    Settings.newItemInOwnedRepoMovePolicy
+                let v = PickerViewController.Info(title: setting.title, values: Section.movePolicyNames, selectedIndex: previousIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                performSegue(withIdentifier: "showPicker", sender: v)
 			case 5:
 				Settings.openPrAtFirstUnreadComment = !Settings.openPrAtFirstUnreadComment
 			case 6:
-				performSegue(withIdentifier: "showBlacklist", sender: self)
+				performSegue(withIdentifier: "showBlacklist", sender: nil)
 			case 7:
 				Settings.disableAllCommentNotifications = !Settings.disableAllCommentNotifications
 			case 8:
@@ -674,11 +646,8 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				showOptionalReviewWarning(previousSync: previousShouldSync)
 
 			case 1:
-				pickerName = setting.title
-				valuesToPush = Section.movePolicyNames
-				selectedIndexPath = IndexPath(row: originalIndex, section: section.rawValue)
-				previousValue = Settings.assignedReviewHandlingPolicy
-				performSegue(withIdentifier: "showPicker", sender: self)
+                let v = PickerViewController.Info(title: setting.title, values: Section.movePolicyNames, selectedIndex: Settings.assignedReviewHandlingPolicy, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+				performSegue(withIdentifier: "showPicker", sender: v)
 
 			case 2:
 				let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
@@ -736,35 +705,32 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				settingsChangedTimer.push()
 
 			case 2:
-				selectedIndexPath = IndexPath(row: originalIndex, section: section.rawValue)
-				pickerName = setting.title
 				var values = [String]()
 				var count = 1
 				values.append("Every refresh")
-				previousValue = 0
+                var previousIndex: Int?
 				for f in 2..<100 {
-					if f == Settings.reactionScanningInterval { previousValue = count }
+					if f == Settings.reactionScanningInterval { previousIndex = count }
 					values.append("Every \(f) refreshes")
 					count += 1
 				}
-				valuesToPush = values
-				performSegue(withIdentifier: "showPicker", sender: self)
+                let v = PickerViewController.Info(title: setting.title, values: values, selectedIndex: previousIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+				performSegue(withIdentifier: "showPicker", sender: v)
 
 			default: break
 			}
 
 		} else if section == SettingsSection.Watchlist {
-			pickerName = setting.title
-			valuesToPush = RepoDisplayPolicy.labels
-			selectedIndexPath = IndexPath(row: originalIndex, section: section.rawValue)
+            var previousIndex: Int?
 			switch originalIndex {
 			case 0:
-				previousValue = Settings.displayPolicyForNewPrs
+				previousIndex = Settings.displayPolicyForNewPrs
 			case 1:
-				previousValue = Settings.displayPolicyForNewIssues
+				previousIndex = Settings.displayPolicyForNewIssues
 			default: break
 			}
-			performSegue(withIdentifier: "showPicker", sender: self)
+            let v = PickerViewController.Info(title: setting.title, values: RepoDisplayPolicy.labels, selectedIndex: previousIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+			performSegue(withIdentifier: "showPicker", sender: v)
 			
 		} else if section == SettingsSection.Stauses {
 			switch originalIndex {
@@ -783,19 +749,17 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 					preferencesDirty = true
 				}
 			case 2:
-				selectedIndexPath = IndexPath(row: originalIndex, section: section.rawValue)
-				pickerName = setting.title
 				var values = [String]()
 				var count = 1
 				values.append("Every refresh")
-				previousValue = 0
+                var previousIndex: Int?
 				for f in 2..<100 {
-					if f == Settings.statusItemRefreshInterval { previousValue = count }
+					if f == Settings.statusItemRefreshInterval { previousIndex = count }
 					values.append("Every \(f) refreshes")
 					count += 1
 				}
-				valuesToPush = values
-				performSegue(withIdentifier: "showPicker", sender: self)
+                let v = PickerViewController.Info(title: setting.title, values: values, selectedIndex: previousIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+				performSegue(withIdentifier: "showPicker", sender: v)
 			case 3:
 				Settings.notifyOnStatusUpdates = !Settings.notifyOnStatusUpdates
 			case 4:
@@ -812,17 +776,11 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		} else if section == SettingsSection.History {
 			switch originalIndex {
 			case 0:
-				selectedIndexPath = IndexPath(row: originalIndex, section: section.rawValue)
-				previousValue = Settings.mergeHandlingPolicy
-				pickerName = setting.title
-				valuesToPush = HandlingPolicy.labels
-				performSegue(withIdentifier: "showPicker", sender: self)
+                let v = PickerViewController.Info(title: setting.title, values: HandlingPolicy.labels, selectedIndex: Settings.mergeHandlingPolicy, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+				performSegue(withIdentifier: "showPicker", sender: v)
 			case 1:
-				selectedIndexPath = IndexPath(row: originalIndex, section: section.rawValue)
-				previousValue = Settings.closeHandlingPolicy
-				pickerName = setting.title
-				valuesToPush = HandlingPolicy.labels
-				performSegue(withIdentifier: "showPicker", sender: self)
+                let v = PickerViewController.Info(title: setting.title, values: HandlingPolicy.labels, selectedIndex: Settings.closeHandlingPolicy, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+				performSegue(withIdentifier: "showPicker", sender: v)
 			case 2:
 				Settings.dontKeepPrsMergedByMe = !Settings.dontKeepPrsMergedByMe
 			case 3:
@@ -844,11 +802,9 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				Settings.sortDescending = !Settings.sortDescending
 				settingsChangedTimer.push()
 			case 1:
-				selectedIndexPath = IndexPath(row: originalIndex, section: section.rawValue)
-				previousValue = Settings.sortMethod
-				pickerName = setting.title
-				valuesToPush = Settings.sortDescending ? SortingMethod.reverseTitles : SortingMethod.normalTitles
-				performSegue(withIdentifier: "showPicker", sender: self)
+				let valuesToPush = Settings.sortDescending ? SortingMethod.reverseTitles : SortingMethod.normalTitles
+                let v = PickerViewController.Info(title: setting.title, values: valuesToPush, selectedIndex: Settings.sortMethod, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+				performSegue(withIdentifier: "showPicker", sender: v)
 			case 2:
 				Settings.groupByRepo = !Settings.groupByRepo
 				settingsChangedTimer.push()
@@ -897,82 +853,74 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		matchingSettings.forEach { matchingSections.insert($0.section) }
 		return matchingSections.sorted { $0.rawValue < $1.rawValue }
 	}
-
+    
 	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-		if let p = segue.destination as? PickerViewController {
-			p.delegate = self
-			p.title = pickerName
-			p.values = valuesToPush
-			p.previousValue = previousValue
-			pickerName = nil
-			valuesToPush = nil
+        if let p = segue.destination as? PickerViewController, let i = sender as? PickerViewController.Info {
+            p.info = i
+            p.delegate = self
 		}
 	}
 
-	func pickerViewController(picker: PickerViewController, didSelectIndexPath: IndexPath) {
-		if let sip = selectedIndexPath {
-
-			if sip.section == SettingsSection.Refresh.rawValue {
-				if sip.row == 0 {
-					Settings.refreshPeriod = Float(didSelectIndexPath.row*10+60)
-				} else if sip.row == 1 {
-					Settings.backgroundRefreshPeriod = Double((didSelectIndexPath.row*5+5)*60)
-				} else if sip.row == 2 {
-					Settings.newRepoCheckPeriod = Float(didSelectIndexPath.row+2)
-				}
-
-			} else if sip.section == SettingsSection.Display.rawValue {
-                if sip.row == 3 {
-                    Settings.assignedPrHandlingPolicy = didSelectIndexPath.row
-                    settingsChangedTimer.push()
-                } else if sip.row == 11 {
-                    Settings.draftHandlingPolicy = didSelectIndexPath.row
-                    settingsChangedTimer.push()
-                }
-
-			} else if sip.section == SettingsSection.Sort.rawValue {
-				Settings.sortMethod = didSelectIndexPath.row
-				settingsChangedTimer.push()
-
-			} else if sip.section == SettingsSection.Watchlist.rawValue {
-				if sip.row == 0 {
-					Settings.displayPolicyForNewPrs = didSelectIndexPath.row
-				} else if sip.row == 1 {
-					Settings.displayPolicyForNewIssues = didSelectIndexPath.row
-				}
-
-			} else if sip.section == SettingsSection.History.rawValue {
-				if sip.row == 0 {
-					Settings.mergeHandlingPolicy = didSelectIndexPath.row
-				} else if sip.row == 1 {
-					Settings.closeHandlingPolicy = didSelectIndexPath.row
-				}
-
-			} else if sip.section == SettingsSection.Stauses.rawValue {
-				Settings.statusItemRefreshInterval = didSelectIndexPath.row+1
-
-			} else if sip.section == SettingsSection.Comments.rawValue {
-				if sip.row == 2 {
-					Settings.newMentionMovePolicy = didSelectIndexPath.row
-				} else if sip.row == 3 {
-					Settings.teamMentionMovePolicy = didSelectIndexPath.row
-				} else if sip.row == 4 {
-					Settings.newItemInOwnedRepoMovePolicy = didSelectIndexPath.row
-				}
-				settingsChangedTimer.push()
-
-			} else if sip.section == SettingsSection.Reviews.rawValue {
-				let previous = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
-				Settings.assignedReviewHandlingPolicy = didSelectIndexPath.row
-				showOptionalReviewWarning(previousSync: previous)
-
-			} else if sip.section == SettingsSection.Reactions.rawValue {
-				let previous = API.shouldSyncReactions
-				Settings.reactionScanningInterval = didSelectIndexPath.row+1
-				showOptionalReviewWarning(previousSync: previous)
-			}
-			reload()
-			selectedIndexPath = nil
-		}
-	}
+    func pickerViewController(picker: PickerViewController, didSelectIndexPath: IndexPath, info: PickerViewController.Info) {
+        let sip = info.sourceIndexPath
+        
+        if sip.section == SettingsSection.Refresh.rawValue {
+            if sip.row == 0 {
+                Settings.backgroundRefreshPeriod = Double(didSelectIndexPath.row + 2) * 60.0
+            } else if sip.row == 1 {
+                Settings.newRepoCheckPeriod = Float(didSelectIndexPath.row + 2)
+            }
+            
+        } else if sip.section == SettingsSection.Display.rawValue {
+            if sip.row == 3 {
+                Settings.assignedPrHandlingPolicy = didSelectIndexPath.row
+                settingsChangedTimer.push()
+            } else if sip.row == 11 {
+                Settings.draftHandlingPolicy = didSelectIndexPath.row
+                settingsChangedTimer.push()
+            }
+            
+        } else if sip.section == SettingsSection.Sort.rawValue {
+            Settings.sortMethod = didSelectIndexPath.row
+            settingsChangedTimer.push()
+            
+        } else if sip.section == SettingsSection.Watchlist.rawValue {
+            if sip.row == 0 {
+                Settings.displayPolicyForNewPrs = didSelectIndexPath.row
+            } else if sip.row == 1 {
+                Settings.displayPolicyForNewIssues = didSelectIndexPath.row
+            }
+            
+        } else if sip.section == SettingsSection.History.rawValue {
+            if sip.row == 0 {
+                Settings.mergeHandlingPolicy = didSelectIndexPath.row
+            } else if sip.row == 1 {
+                Settings.closeHandlingPolicy = didSelectIndexPath.row
+            }
+            
+        } else if sip.section == SettingsSection.Stauses.rawValue {
+            Settings.statusItemRefreshInterval = didSelectIndexPath.row+1
+            
+        } else if sip.section == SettingsSection.Comments.rawValue {
+            if sip.row == 2 {
+                Settings.newMentionMovePolicy = didSelectIndexPath.row
+            } else if sip.row == 3 {
+                Settings.teamMentionMovePolicy = didSelectIndexPath.row
+            } else if sip.row == 4 {
+                Settings.newItemInOwnedRepoMovePolicy = didSelectIndexPath.row
+            }
+            settingsChangedTimer.push()
+            
+        } else if sip.section == SettingsSection.Reviews.rawValue {
+            let previous = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
+            Settings.assignedReviewHandlingPolicy = didSelectIndexPath.row
+            showOptionalReviewWarning(previousSync: previous)
+            
+        } else if sip.section == SettingsSection.Reactions.rawValue {
+            let previous = API.shouldSyncReactions
+            Settings.reactionScanningInterval = didSelectIndexPath.row+1
+            showOptionalReviewWarning(previousSync: previous)
+        }
+        reload()
+    }
 }

@@ -2,22 +2,35 @@
 import UIKit
 
 protocol PickerViewControllerDelegate: class {
-	func pickerViewController(picker: PickerViewController, didSelectIndexPath: IndexPath)
+    func pickerViewController(picker: PickerViewController, didSelectIndexPath: IndexPath, info: PickerViewController.Info)
 }
 
 final class PickerViewController: UITableViewController {
 
-	var values: [String]!
-	weak var delegate: PickerViewControllerDelegate!
-	var previousValue: Int?
+    struct Info {
+        let title: String
+        let values: [String]
+        let selectedIndex: Int?
+        let sourceIndexPath: IndexPath
+    }
+
+    var info: Info! {
+        didSet {
+            previousValue = info.selectedIndex
+            title = info.title
+        }
+    }
+    
+    weak var delegate: PickerViewControllerDelegate?
+    private var previousValue: Int?
 
 	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		return values.count
+        return info.values.count
 	}
 
 	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) 
-		cell.textLabel?.text = values[indexPath.row]
+        cell.textLabel?.text = info.values[indexPath.row]
 		cell.accessoryType = indexPath.row == previousValue ? .checkmark : .none
 		return cell
 	}
@@ -29,7 +42,7 @@ final class PickerViewController: UITableViewController {
 
 		atNextEvent(self) { S in
 			_ = S.navigationController?.popViewController(animated: true)
-			S.delegate.pickerViewController(picker: S, didSelectIndexPath: indexPath)
+            S.delegate?.pickerViewController(picker: S, didSelectIndexPath: indexPath, info: S.info)
 		}
 	}
 

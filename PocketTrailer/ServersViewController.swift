@@ -45,7 +45,7 @@ final class ServersViewController: UITableViewController {
 				T.textColor = .systemRed
 				T.text = "\(S(a.label)) (last sync failed)"
 			} else {
-                T.textColor = labelColour
+                T.textColor = UIColor.label
 				T.text = a.label
 			}
 			if a.requestsLimit == 0 {

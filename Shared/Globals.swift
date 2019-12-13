@@ -11,30 +11,6 @@ weak var app: iOS_AppDelegate!
 let GLOBAL_SCREEN_SCALE = UIScreen.main.scale
 let DISABLED_FADE: CGFloat = 0.3
 
-var labelColour: UIColor = {
-    if #available(iOS 13, *) {
-        return UIColor.label
-    } else {
-        return UIColor.darkText
-    }
-}()
-
-var secondaryLabelColour: UIColor = {
-    if #available(iOS 13, *) {
-        return UIColor.secondaryLabel
-    } else {
-        return UIColor.darkGray
-    }
-}()
-
-var tertiaryLabelColour: UIColor = {
-    if #available(iOS 13, *) {
-        return UIColor.tertiaryLabel
-    } else {
-        return UIColor.lightGray
-    }
-}()
-
 typealias COLOR_CLASS = UIColor
 typealias FONT_CLASS = UIFont
 typealias IMAGE_CLASS = UIImage

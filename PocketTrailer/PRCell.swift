@@ -24,9 +24,6 @@ final class PRCell: UITableViewCell {
 	@IBOutlet private weak var _title: UILabel!
 	@IBOutlet private weak var _description: UILabel!
 	@IBOutlet private weak var _statuses: UILabel!
-	@IBOutlet private weak var statusToAvatarDistance: NSLayoutConstraint!
-	@IBOutlet private weak var statusToDescriptionDistance: NSLayoutConstraint!
-	@IBOutlet private weak var statusToBottomDistance: NSLayoutConstraint!
 
 	override func awakeFromNib() {
 
@@ -90,11 +87,9 @@ final class PRCell: UITableViewCell {
 	}
 
 	func setPullRequest(pullRequest: PullRequest) {
-
-
-		let detailFont = UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)
-		_title.attributedText = pullRequest.title(with: _title.font, labelFont: detailFont.withSize(detailFont.pointSize-2), titleColor: labelColour, darkMode: false)
-		_description.attributedText = pullRequest.subtitle(with: detailFont, lightColor: tertiaryLabelColour, darkColor: secondaryLabelColour)
+		let detailFont = _description.font!
+        _title.attributedText = pullRequest.title(with: _title.font, labelFont: detailFont, titleColor: UIColor.label, darkMode: false)
+        _description.attributedText = pullRequest.subtitle(with: detailFont, lightColor: UIColor.tertiaryLabel, darkColor: UIColor.secondaryLabel)
 
 		let muted = pullRequest.muted
 		setCountsImageAndFade(item: pullRequest, muted: muted)
@@ -120,32 +115,22 @@ final class PRCell: UITableViewCell {
 		_statuses.attributedText = statusText
 
 		if let statusString = statusText?.string {
-			statusToAvatarDistance.constant = 9.0
-			statusToDescriptionDistance.constant = 9.0
-			statusToBottomDistance.constant = 3.0
 			var title = pullRequest.accessibleTitle
 			if muted {
 				title = "(Muted) - \(title)"
 			}
 			accessibilityLabel = "\(title), \(S(unreadCount.text)) unread comments, \(S(readCount.text)) total comments, \(pullRequest.accessibleSubtitle). \(statusCount) statuses: \(statusString)"
 		} else {
-			statusToAvatarDistance.constant = 0.0
-			statusToDescriptionDistance.constant = 0.0
-			statusToBottomDistance.constant = 4.0
 			accessibilityLabel = "\(pullRequest.accessibleTitle), \(S(unreadCount.text)) unread comments, \(S(readCount.text)) total comments, \(pullRequest.accessibleSubtitle)"
 		}
 	}
 
 	func setIssue(issue: Issue) {
 
-		let detailFont = UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)
-		_title.attributedText = issue.title(with: _title.font, labelFont: detailFont.withSize(detailFont.pointSize-2), titleColor: labelColour, darkMode: false)
-		_description.attributedText = issue.subtitle(with: detailFont, lightColor: tertiaryLabelColour, darkColor: secondaryLabelColour)
+        let detailFont = _description.font!
+        _title.attributedText = issue.title(with: _title.font, labelFont: detailFont, titleColor: UIColor.label, darkMode: false)
+        _description.attributedText = issue.subtitle(with: detailFont, lightColor: UIColor.tertiaryLabel, darkColor: UIColor.secondaryLabel)
 		_statuses.attributedText = nil
-
-		statusToAvatarDistance.constant = 0.0
-		statusToDescriptionDistance.constant = 0.0
-		statusToBottomDistance.constant = 4.0
 
 		let muted = issue.muted
 		setCountsImageAndFade(item: issue, muted: muted)

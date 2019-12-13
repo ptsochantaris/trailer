@@ -102,6 +102,11 @@
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
+		<string>processing</string>
+	</array>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.housetrip.mobile.trailer.ios.PocketTrailer.refresh</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>Launch</string>

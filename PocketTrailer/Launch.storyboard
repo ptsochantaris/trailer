@@ -21,11 +21,11 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="launchIcon" translatesAutoresizingMaskIntoConstraints="NO" id="IQd-6w-ukx">
-                                <rect key="frame" x="30" y="154" width="260" height="260"/>
+                                <rect key="frame" x="110" y="234" width="100" height="100"/>
                                 <color key="tintColor" name="apptint"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="260" id="a0k-y0-bZJ"/>
-                                    <constraint firstAttribute="height" constant="260" id="pLC-zx-Pc2"/>
+                                    <constraint firstAttribute="width" constant="100" id="a0k-y0-bZJ"/>
+                                    <constraint firstAttribute="height" constant="100" id="pLC-zx-Pc2"/>
                                 </constraints>
                             </imageView>
                         </subviews>

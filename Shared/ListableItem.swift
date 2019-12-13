@@ -549,12 +549,11 @@ class ListableItem: DataItem {
     private final func buildLabelAttributes(labelFont: FONT_CLASS, offset: CGFloat) -> [NSAttributedString.Key: Any] {
         let lp = NSMutableParagraphStyle()
         #if os(iOS)
-        lp.lineHeightMultiple = 1.15
-        return [.font: labelFont, .baselineOffset: offset, .paragraphStyle: lp]
+        lp.lineHeightMultiple = 1.05
         #elseif os(OSX)
         lp.minimumLineHeight = labelFont.pointSize + 4
-        return [.font: labelFont, .baselineOffset: offset, .paragraphStyle: lp]
         #endif
+        return [.font: labelFont, .baselineOffset: offset, .paragraphStyle: lp]
     }
     
 	final func title(with font: FONT_CLASS, labelFont: FONT_CLASS, titleColor: COLOR_CLASS, darkMode: Bool) -> NSMutableAttributedString {
@@ -601,7 +600,6 @@ class ListableItem: DataItem {
 					_title.append(NSAttributedString(string: "\n", attributes: titleAttributes))
 
                     let labelAttributes = buildLabelAttributes(labelFont: labelFont, offset: 2)
-					var count = 0
 					for l in sorted {
 						var a = labelAttributes
 						let color = l.colorForDisplay
@@ -609,10 +607,7 @@ class ListableItem: DataItem {
 						a[NSAttributedString.Key.foregroundColor] = isDark(color: color) ? COLOR_CLASS.white : COLOR_CLASS.black
 						let name = l.name!.replacingOccurrences(of: " ", with: "\u{a0}")
 						_title.append(NSAttributedString(string: "\u{a0}\(name)\u{a0}", attributes: a))
-						if count < labelCount-1 {
-							_title.append(NSAttributedString(string: " ", attributes: labelAttributes))
-						}
-						count += 1
+                        _title.append(NSAttributedString(string: " ", attributes: titleAttributes))
 					}
 				}
 			}
@@ -705,9 +700,6 @@ class ListableItem: DataItem {
 	func subtitle(with font: FONT_CLASS, lightColor: COLOR_CLASS, darkColor: COLOR_CLASS) -> NSMutableAttributedString {
 		let _subtitle = NSMutableAttributedString()
 		let p = NSMutableParagraphStyle()
-		#if os(iOS)
-			p.lineHeightMultiple = 1.3
-		#endif
 
 		let lightSubtitle = [NSAttributedString.Key.foregroundColor: lightColor,
 		                     NSAttributedString.Key.font: font,

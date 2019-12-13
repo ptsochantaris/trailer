@@ -1,6 +1,7 @@
 
 import UIKit
 import UserNotifications
+import BackgroundTasks
 
 @UIApplicationMain
 final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
@@ -8,11 +9,8 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 	var window: UIWindow?
 
 	private var lastUpdateFailed = false
-	private var backgroundTask = UIBackgroundTaskIdentifier.invalid
 	private var watchManager: WatchManager?
-	private var refreshTimer: Timer?
-	private var backgroundCallback: ((UIBackgroundFetchResult) -> Void)?
-	private var actOnLocalNotification = true
+    private var backgroundProcessing: BGProcessingTask?
 
 	func updateBadgeAndSaveDB() {
 		watchManager?.updateContext()
@@ -51,10 +49,13 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 
         UIToolbar.appearance().tintColor = UIColor(named: "apptint")
 
-		let splitViewController = window!.rootViewController as! UISplitViewController
-		splitViewController.delegate = popupManager
-
-		application.setMinimumBackgroundFetchInterval(TimeInterval(Settings.backgroundRefreshPeriod))
+        BGTaskScheduler.shared.register(forTaskWithIdentifier: "com.housetrip.mobile.trailer.ios.PocketTrailer.refresh", using: DispatchQueue.main) { task in
+            guard let task = task as? BGProcessingTask, DataManager.appIsConfigured else {
+                return
+            }
+            self.backgroundProcessing = task
+            self.startRefresh()
+        }
 
 		NotificationManager.setup(delegate: self)
 
@@ -119,27 +120,18 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 
 	func startRefreshIfItIsDue() {
 
-		refreshTimer = nil
-
 		if let l = Settings.lastSuccessfulRefresh {
 			let howLongAgo = Date().timeIntervalSince(l)
-			if fabs(howLongAgo) > TimeInterval(Settings.refreshPeriod) {
+            let period = TimeInterval(Settings.backgroundRefreshPeriod)
+			if fabs(howLongAgo) > period {
 				startRefresh()
 			} else {
-				let howLongUntilNextSync = TimeInterval(Settings.refreshPeriod) - howLongAgo
+				let howLongUntilNextSync = period - howLongAgo
 				DLog("No need to refresh yet, will refresh in %@", howLongUntilNextSync)
-				refreshTimer = Timer(repeats: false, interval: howLongUntilNextSync) { [weak self] in
-					self?.refreshTimerDone()
-				}
 			}
 		} else {
 			startRefresh()
 		}
-	}
-
-	func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-		backgroundCallback = completionHandler
-		startRefresh()
 	}
 
 	private func checkApiUsage() {
@@ -162,47 +154,76 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 		}
 	}
 
-	private func prepareForRefresh() {
-		refreshTimer = nil
-
-		DataManager.postMigrationTasks()
-
-		appIsRefreshing = true
-
-		backgroundTask = UIApplication.shared.beginBackgroundTask(withName: "com.housetrip.Trailer.refresh") { [weak self] in
-			self?.endBGTask()
-		}
-
-        NotificationCenter.default.post(name: .RefreshStarted, object: nil)
-
-		NotificationQueue.clear()
-
-		DLog("Starting refresh")
-	}
-
 	enum RefreshStartResult {
 		case started, noNetwork, noConfiguredServers, alreadyRefreshing
 	}
+    
+    private func wrapBackgroundProcessing(success: Bool) {
+        scheduleRefreshTask()
+        
+        guard let bc = backgroundProcessing else {
+            return
+        }
+        
+        if success && DataManager.main.hasChanges {
+            DLog("Background fetch: Got new data")
+        } else if success {
+            DLog("Background fetch: No new data")
+        } else {
+            DLog("Background fetch: FAILED")
+        }
+        bc.setTaskCompleted(success: success)
+        
+        backgroundProcessing = nil
+    }
+    
+    private var backgroundTask = UIBackgroundTaskIdentifier.invalid
+    
+    private func startBGTask() {
+        backgroundTask = UIApplication.shared.beginBackgroundTask(withName: "com.housetrip.Trailer.refresh") { [weak self] in
+            self?.endBGTask()
+        }
+        DLog("BG task started")
+    }
+    
+    private func endBGTask() {
+        if backgroundTask == .invalid {
+            return
+        }
+        UIApplication.shared.endBackgroundTask(backgroundTask)
+        backgroundTask = .invalid
+        DLog("BG task ended")
+    }
 
 	@discardableResult
 	func startRefresh() -> RefreshStartResult {
 
 		if appIsRefreshing {
+            wrapBackgroundProcessing(success: false)
 			return .alreadyRefreshing
 		}
 
 		if !API.hasNetworkConnection {
+            wrapBackgroundProcessing(success: false)
 			return .noNetwork
 		}
 
 		if !ApiServer.someServersHaveAuthTokens(in: DataManager.main) {
+            wrapBackgroundProcessing(success: false)
 			return .noConfiguredServers
 		}
 
-		prepareForRefresh()
+        DataManager.postMigrationTasks()
+        appIsRefreshing = true
+        NotificationCenter.default.post(name: .RefreshStarted, object: nil)
+        NotificationQueue.clear()
+        DLog("Starting refresh")
+
+        startBGTask()
 
 		API.syncItemsForActiveReposAndCallback { [weak self] in
-			self?.processRefresh()
+            guard let s = self else { return }
+			s.processRefresh()
 		}
 
 		return .started
@@ -228,59 +249,21 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 			showMessage("Refresh failed", "Loading the latest data from GitHub failed")
 		}
 
-		refreshTimer = Timer(repeats: false, interval: TimeInterval(Settings.refreshPeriod)) {
-			self.refreshTimerDone()
-		}
-		DLog("Refresh done")
-
+        wrapBackgroundProcessing(success: success)
 		endBGTask()
-
-		if let bc = backgroundCallback {
-			if success && DataManager.main.hasChanges {
-				DLog("Background fetch: Got new data")
-				bc(.newData)
-			} else if success {
-				DLog("Background fetch: No new data")
-				bc(.noData)
-			} else {
-				DLog("Background fetch: FAILED")
-				bc(.failed)
-			}
-			backgroundCallback = nil
-		}
-	}
-
-	private func endBGTask() {
-		if backgroundTask != .invalid {
-			UIApplication.shared.endBackgroundTask(backgroundTask)
-			backgroundTask = .invalid
-		}
-	}
-
-	private func refreshTimerDone() {
-		refreshTimer = nil
-		if DataManager.appIsConfigured {
-			startRefresh()
-		}
+        
+        DLog("Refresh done")
 	}
 
 	func applicationDidBecomeActive(_ application: UIApplication) {
+        BGTaskScheduler.shared.cancelAllTaskRequests()
 		startRefreshIfItIsDue()
-		actOnLocalNotification = false
 	}
-
-	func applicationWillEnterForeground(_ application: UIApplication) {
-		actOnLocalNotification = true
-	}
-
-	func applicationDidEnterBackground(_ application: UIApplication) {
-		actOnLocalNotification = false
-	}
-
-	func applicationWillResignActive(_ application: UIApplication) {
-		actOnLocalNotification = true
-	}
-
+    
+    func applicationWillResignActive(_ application: UIApplication) {
+        scheduleRefreshTask()
+    }
+    
 	func markEverythingRead() {
 		PullRequest.markEverythingRead(in: .none, in: DataManager.main)
 		Issue.markEverythingRead(in: .none, in: DataManager.main)
@@ -300,4 +283,28 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 			DataManager.main.delete(p)
 		}
 	}
+    
+    // e -l objc -- (void)[[BGTaskScheduler sharedScheduler] _simulateLaunchForTaskWithIdentifier:@"com.housetrip.mobile.trailer.ios.PocketTrailer.refresh"]
+    
+    private func scheduleRefreshTask() {
+        BGTaskScheduler.shared.cancelAllTaskRequests()
+        
+        let request = BGProcessingTaskRequest(identifier: "com.housetrip.mobile.trailer.ios.PocketTrailer.refresh")
+        request.requiresNetworkConnectivity = true
+        request.requiresExternalPower = false
+        
+        let period = Settings.backgroundRefreshPeriod
+        if let lastRefresh = Settings.lastSuccessfulRefresh {
+            request.earliestBeginDate = max(Date(timeIntervalSinceNow: 10), lastRefresh.addingTimeInterval(period))
+        } else {
+            request.earliestBeginDate = Date(timeIntervalSinceNow: period)
+        }
+
+        do {
+            try BGTaskScheduler.shared.submit(request)
+            DLog("Scheduled next refresh after \(request.earliestBeginDate!)")
+        } catch {
+            DLog("Could not schedule app refresh: \(error)")
+        }
+    }
 }

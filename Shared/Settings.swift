@@ -162,7 +162,6 @@ struct Settings {
 				sharedDefaults.removeObject(forKey: key)
 			}
 		}
-		sharedDefaults.synchronize()
 
 		if let v = value {
 			DLog("Setting %@ to %@", key, String(describing: v))
@@ -181,13 +180,17 @@ struct Settings {
 
 	static func possibleExport(_ key: String?) {
 		#if os(OSX)
+        if !Settings.autoRepeatSettingsExport {
+            return
+        }
+        
 		let keyIsGood: Bool
 		if let k = key {
 			keyIsGood = !["LAST_SUCCESSFUL_REFRESH", "LAST_EXPORT_URL", "LAST_EXPORT_TIME"].contains(k)
 		} else {
 			keyIsGood = true
 		}
-		if Settings.autoRepeatSettingsExport && keyIsGood && Settings.lastExportUrl != nil {
+		if keyIsGood && Settings.lastExportUrl != nil {
 			saveTimer.push()
 		}
 		#endif
@@ -232,7 +235,6 @@ struct Settings {
 					sharedDefaults.set(v, forKey: k)
 				}
 			}
-			sharedDefaults.synchronize()
 			return ApiServer.configure(from: settings["DB_CONFIG_OBJECTS"] as! [String : [String : NSObject]])
 			&& SnoozePreset.configure(from: settings["DB_SNOOZE_OBJECTS"] as! [[String : NSObject]])
 		}
@@ -243,7 +245,6 @@ struct Settings {
 		for k in allFields {
 			sharedDefaults.removeObject(forKey: k)
 		}
-		sharedDefaults.synchronize()
 	}
 
 	///////////////////////////////// NUMBERS
@@ -375,20 +376,19 @@ struct Settings {
 
 	/////////////////////////// FLOATS
 
-	static let refreshPeriodHelp = "How often to refresh items when the app is active and in the foreground."
-	static var refreshPeriod: Float {
-		get { if let n = get("REFRESH_PERIOD_KEY") as? Float { return n < 60 ? 120 : n } else { return 120 } }
-		set { set("REFRESH_PERIOD_KEY", newValue) }
-	}
-
     #if os(iOS)
     static let backgroundRefreshPeriodHelp = "The minimum amount of time to wait before requesting an update when the app is in the background. Even though this is quite efficient, it's still a good idea to keep this to a high value in order to keep battery and bandwidth use low. The default of half an hour is generally a good number. Please note that iOS may ignore this value and perform background refreshes at longer intervals depending on battery level and other reasons."
     static var backgroundRefreshPeriod: Double {
         get { if let n = get("IOS_BACKGROUND_REFRESH_PERIOD_KEY") as? Double { return n > 0 ? n : 1800 } else { return 1800 } }
         set {
             set("IOS_BACKGROUND_REFRESH_PERIOD_KEY", newValue)
-            UIApplication.shared.setMinimumBackgroundFetchInterval(TimeInterval(newValue))
         }
+    }
+    #else
+    static let refreshPeriodHelp = "How often to refresh items when the app is active and in the foreground."
+    static var refreshPeriod: Float {
+        get { if let n = get("REFRESH_PERIOD_KEY") as? Float { return n < 60 ? 120 : n } else { return 120 } }
+        set { set("REFRESH_PERIOD_KEY", newValue) }
     }
     #endif
 
@@ -599,12 +599,6 @@ struct Settings {
 	static var dumpAPIResponsesInConsole: Bool {
 		get { return get("DUMP_API_RESPONSES_IN_CONSOLE") as? Bool ?? false }
 		set { set("DUMP_API_RESPONSES_IN_CONSOLE", newValue) }
-	}
-
-	static let openItemsDirectlyInSafariHelp = "Directly open items in the Safari browser rather than the internal web view. Especially useful on iPad when using split-screen view,, you can pull in Trailer from the side but stay in Safari, or on iPhone, you can use the status-bar button as a back button. If the detail view is already visible (for instance when runing in full-screen mode on iPad) the internal view will still get used, even if this option is turned on."
-	static var openItemsDirectlyInSafari: Bool {
-		get { return get("OPEN_ITEMS_DIRECTLY_IN_SAFARI") as? Bool ?? false }
-		set { set("OPEN_ITEMS_DIRECTLY_IN_SAFARI", newValue) }
 	}
 
 	static let hidePrsThatArentPassingHelp = "Hide PR items which have status items, but are not all green. Useful for hiding PRs which are not ready to review or those who have not passed certain checks yet."
