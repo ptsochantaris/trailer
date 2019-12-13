@@ -1518,10 +1518,17 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		if tv === projectsTable {
 			let r = repos[row]
 			if tableColumn?.identifier.rawValue == "group" {
-				let g = S(object as? String)
-				r.groupLabel = g.isEmpty ? nil : g
-				serversDirty = true
-				deferredUpdateTimer.push()
+                let g = S(object as? String)
+                let newValue = g.isEmpty ? nil : g
+                if newValue != r.groupLabel {
+                    r.groupLabel = newValue
+                    self.serversDirty = true
+                    self.deferredUpdateTimer.push()
+                }
+                DispatchQueue.main.async {
+                    self.windowController?.window?.makeFirstResponder(tv)
+                }
+
 			} else if let index = object as? Int64 {
 				if tableColumn?.identifier.rawValue == "prs" {
 					r.displayPolicyForPrs = index
