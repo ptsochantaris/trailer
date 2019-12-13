@@ -1475,7 +1475,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 				if apiServer.lastSyncSucceeded {
 					tc.textColor = .textColor
 				} else {
-					tc.textColor = .red
+					tc.textColor = .systemRed
 				}
 			} else { // api usage
 				let c = cell as! NSLevelIndicatorCell

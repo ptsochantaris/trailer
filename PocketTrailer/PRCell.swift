@@ -220,7 +220,7 @@ final class PRCell: UITableViewCell {
 	}
 
 	private func tone() {
-		unreadCount.backgroundColor = .red
+		unreadCount.backgroundColor = .systemRed
 		readCount.backgroundColor = UIColor(white: 0.9, alpha: 1.0)
 	}
 }

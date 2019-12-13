@@ -167,7 +167,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 	
 	private func loadFailed(error: Error) {
 		spinner.stopAnimating()
-		statusLabel.textColor = .red
+		statusLabel.textColor = .systemRed
 		statusLabel.text = "Loading Error: \(error.localizedDescription)"
 		statusLabel.isHidden = false
 		webView?.isHidden = true

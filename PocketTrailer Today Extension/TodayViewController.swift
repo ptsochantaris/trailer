@@ -37,7 +37,7 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 
 	private var redAttributes: [NSAttributedString.Key : Any] {
 		return [
-			.foregroundColor: UIColor.red,
+			.foregroundColor: UIColor.systemRed,
 			.font: UIFont.systemFont(ofSize: UIFont.systemFontSize + 2),
 			.paragraphStyle: paragraph ]
 	}
