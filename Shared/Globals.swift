@@ -9,7 +9,6 @@ import CoreData
 weak var app: iOS_AppDelegate!
 
 let GLOBAL_SCREEN_SCALE = UIScreen.main.scale
-let GLOBAL_TINT = UIColor(red: 52.0/255.0, green: 110.0/255.0, blue: 183.0/255.0, alpha: 1.0)
 let DISABLED_FADE: CGFloat = 0.3
 
 var labelColour: UIColor = {

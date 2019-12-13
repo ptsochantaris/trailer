@@ -14,7 +14,7 @@ class SectionHeaderView: UITableViewHeaderFooterView {
 
 	override func awakeFromNib() {
 		super.awakeFromNib()
-		action.setTitleColor(GLOBAL_TINT, for: .normal)
+		action.setTitleColor(UIColor(named: "apptint"), for: .normal)
 	}
 
 }

@@ -49,8 +49,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 			API.updateLimitsFromServer()
 		}
 
-		UITabBar.appearance().tintColor = GLOBAL_TINT
-		UIBarButtonItem.appearance().tintColor = GLOBAL_TINT
+        UIToolbar.appearance().tintColor = UIColor(named: "apptint")
 
 		let splitViewController = window!.rootViewController as! UISplitViewController
 		splitViewController.delegate = popupManager
