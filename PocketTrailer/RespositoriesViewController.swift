@@ -35,7 +35,6 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 		super.viewDidLoad()
         
 		let searchController = UISearchController(searchResultsController: nil)
-		searchController.dimsBackgroundDuringPresentation = false
 		searchController.obscuresBackgroundDuringPresentation = false
 		searchController.searchResultsUpdater = self
 		searchController.searchBar.tintColor = view.tintColor

@@ -381,16 +381,16 @@ struct Settings {
 		set { set("REFRESH_PERIOD_KEY", newValue) }
 	}
 
-	static let backgroundRefreshPeriodHelp = "The minimum amount of time to wait before requesting an update when the app is in the background. Even though this is quite efficient, it's still a good idea to keep this to a high value in order to keep battery and bandwidth use low. The default of half an hour is generally a good number. Please note that iOS may ignore this value and perform background refreshes at longer intervals depending on battery level and other reasons."
-	static var backgroundRefreshPeriod: Double {
-		get { if let n = get("IOS_BACKGROUND_REFRESH_PERIOD_KEY") as? Double { return n > 0 ? n : 1800 } else { return 1800 } }
-		set {
-			set("IOS_BACKGROUND_REFRESH_PERIOD_KEY", newValue)
-			#if os(iOS)
-				UIApplication.shared.setMinimumBackgroundFetchInterval(TimeInterval(newValue))
-			#endif
-		}
-	}
+    #if os(iOS)
+    static let backgroundRefreshPeriodHelp = "The minimum amount of time to wait before requesting an update when the app is in the background. Even though this is quite efficient, it's still a good idea to keep this to a high value in order to keep battery and bandwidth use low. The default of half an hour is generally a good number. Please note that iOS may ignore this value and perform background refreshes at longer intervals depending on battery level and other reasons."
+    static var backgroundRefreshPeriod: Double {
+        get { if let n = get("IOS_BACKGROUND_REFRESH_PERIOD_KEY") as? Double { return n > 0 ? n : 1800 } else { return 1800 } }
+        set {
+            set("IOS_BACKGROUND_REFRESH_PERIOD_KEY", newValue)
+            UIApplication.shared.setMinimumBackgroundFetchInterval(TimeInterval(newValue))
+        }
+    }
+    #endif
 
 	static let newRepoCheckPeriodHelp = "How long before reloading your team list and watched repositories from a server. Since this doesn't change often, it's good to keep this as high as possible in order to keep bandwidth use as low as possible during refreshes. Set this to a lower value if you often update your watched repositories or teams."
 	static var newRepoCheckPeriod: Float {

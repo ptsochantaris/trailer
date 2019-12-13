@@ -163,7 +163,6 @@ UITableViewDragDelegate {
 		super.viewDidLoad()
 
 		let searchController = UISearchController(searchResultsController: nil)
-		searchController.dimsBackgroundDuringPresentation = false
 		searchController.obscuresBackgroundDuringPresentation = false
 		searchController.searchResultsUpdater = self
 		searchController.searchBar.tintColor = view.tintColor
@@ -265,33 +264,28 @@ UITableViewDragDelegate {
 	}
 
 	override var keyCommands: [UIKeyCommand]? {
-		let f = UIKeyCommand(input: "f", modifierFlags: .command, action: #selector(focusFilter), discoverabilityTitle: "Filter items")
-		let o = UIKeyCommand(input: "o", modifierFlags: .command, action: #selector(keyOpenInSafari), discoverabilityTitle: "Open in Safari")
-		let a = UIKeyCommand(input: "a", modifierFlags: .command, action: #selector(keyToggleRead), discoverabilityTitle: "Mark item read/unread")
-		let m = UIKeyCommand(input: "m", modifierFlags: .command, action: #selector(keyToggleMute), discoverabilityTitle: "Set item mute/unmute")
-		let s = UIKeyCommand(input: "s", modifierFlags: .command, action: #selector(keyToggleSnooze), discoverabilityTitle: "Snooze/wake item")
-		let r = UIKeyCommand(input: "r", modifierFlags: .command, action: #selector(keyForceRefresh), discoverabilityTitle: "Refresh now")
-		let nt = UIKeyCommand(input: "\t", modifierFlags: .alternate, action: #selector(moveToNextTab), discoverabilityTitle: "Move to next tab")
-		let pt = UIKeyCommand(input: "\t", modifierFlags: [.alternate, .shift], action: #selector(moveToPreviousTab), discoverabilityTitle: "Move to previous tab")
-		let sp = UIKeyCommand(input: " ", modifierFlags: [], action: #selector(keyShowSelectedItem), discoverabilityTitle: "Display current item")
-		let d = UIKeyCommand(input: UIKeyCommand.inputDownArrow, modifierFlags: [], action: #selector(keyMoveToNextItem), discoverabilityTitle: "Next item")
-		let u = UIKeyCommand(input: UIKeyCommand.inputUpArrow, modifierFlags: [], action: #selector(keyMoveToPreviousItem), discoverabilityTitle: "Previous item")
-		let dd = UIKeyCommand(input: UIKeyCommand.inputDownArrow, modifierFlags: .alternate, action: #selector(keyMoveToNextSection), discoverabilityTitle: "Move to the next section")
-		let uu = UIKeyCommand(input: UIKeyCommand.inputUpArrow, modifierFlags: .alternate, action: #selector(keyMoveToPreviousSection), discoverabilityTitle: "Move to the previous section")
-		let fd = UIKeyCommand(input: UIKeyCommand.inputRightArrow, modifierFlags: .command, action: #selector(keyFocusDetailView), discoverabilityTitle: "Focus keyboard on detail view")
-		let fm = UIKeyCommand(input: UIKeyCommand.inputLeftArrow, modifierFlags: .command, action: #selector(becomeFirstResponder), discoverabilityTitle: "Focus keyboard on list view")
-		return [u,d,uu,dd,nt,pt,fd,fm,sp,f,r,a,m,o,s]
+        return [
+		makeKeyCommand(input: "f", modifierFlags: .command, action: #selector(focusFilter), discoverabilityTitle: "Filter items"),
+		makeKeyCommand(input: "o", modifierFlags: .command, action: #selector(keyOpenInSafari), discoverabilityTitle: "Open in Safari"),
+        makeKeyCommand(input: "a", modifierFlags: .command, action: #selector(keyToggleRead), discoverabilityTitle: "Mark item read/unread"),
+		makeKeyCommand(input: "m", modifierFlags: .command, action: #selector(keyToggleMute), discoverabilityTitle: "Set item mute/unmute"),
+		makeKeyCommand(input: "s", modifierFlags: .command, action: #selector(keyToggleSnooze), discoverabilityTitle: "Snooze/wake item"),
+		makeKeyCommand(input: "r", modifierFlags: .command, action: #selector(keyForceRefresh), discoverabilityTitle: "Refresh now"),
+		makeKeyCommand(input: "\t", modifierFlags: .alternate, action: #selector(moveToNextTab), discoverabilityTitle: "Move to next tab"),
+		makeKeyCommand(input: "\t", modifierFlags: [.alternate, .shift], action: #selector(moveToPreviousTab), discoverabilityTitle: "Move to previous tab"),
+		makeKeyCommand(input: " ", modifierFlags: [], action: #selector(keyShowSelectedItem), discoverabilityTitle: "Display current item"),
+		makeKeyCommand(input: UIKeyCommand.inputDownArrow, modifierFlags: [], action: #selector(keyMoveToNextItem), discoverabilityTitle: "Next item"),
+		makeKeyCommand(input: UIKeyCommand.inputUpArrow, modifierFlags: [], action: #selector(keyMoveToPreviousItem), discoverabilityTitle: "Previous item"),
+		makeKeyCommand(input: UIKeyCommand.inputDownArrow, modifierFlags: .alternate, action: #selector(keyMoveToNextSection), discoverabilityTitle: "Move to the next section"),
+		makeKeyCommand(input: UIKeyCommand.inputUpArrow, modifierFlags: .alternate, action: #selector(keyMoveToPreviousSection), discoverabilityTitle: "Move to the previous section"),
+		makeKeyCommand(input: UIKeyCommand.inputRightArrow, modifierFlags: .command, action: #selector(keyFocusDetailView), discoverabilityTitle: "Focus keyboard on detail view"),
+		makeKeyCommand(input: UIKeyCommand.inputLeftArrow, modifierFlags: .command, action: #selector(becomeFirstResponder), discoverabilityTitle: "Focus keyboard on list view")
+        ]
 	}
 
-
 	private func canIssueKeyForIndexPath(actionTitle: String, indexPath: IndexPath) -> Bool {
-		if let actions = tableView(tableView, editActionsForRowAt: indexPath) {
-
-			for a in actions {
-				if a.title == actionTitle {
-					return true
-				}
-			}
+        if let c = tableView(tableView, trailingSwipeActionsConfigurationForRowAt: indexPath), c.actions.contains(where: { $0.title == actionTitle }) {
+            return true
 		}
 		showMessage("\(actionTitle) not available", "This command cannot be used on this item")
 		return false
@@ -634,7 +628,7 @@ UITableViewDragDelegate {
 
 			guard tabScroll == nil, let v = navigationController?.view else { return }
 
-			tableView.scrollIndicatorInsets = UIEdgeInsets(top: tableView.scrollIndicatorInsets.top, left: 0, bottom: 49, right: 0)
+            additionalSafeAreaInsets = UIEdgeInsets(top: 0, left: 0, bottom: 49, right: 0)
 
 			tabs.translatesAutoresizingMaskIntoConstraints = false
 			tabs.delegate = self
@@ -720,10 +714,10 @@ UITableViewDragDelegate {
 
 		} else {
 
-			tableView.scrollIndicatorInsets = UIEdgeInsets(top: tableView.scrollIndicatorInsets.top, left: 0, bottom: 0, right: 0)
-
 			guard let t = tabScroll, let b = tabBorder else { return  }
 
+            additionalSafeAreaInsets = .zero
+            
 			tabScroll = nil
 			tabBorder = nil
 			tabsWidth = nil
@@ -946,25 +940,26 @@ UITableViewDragDelegate {
 		}
 	}
 
-	override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
-
-		var actions = [UITableViewRowAction]()
+    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+		var actions = [UIContextualAction]()
 
 		func appendReadUnread(i: ListableItem) {
-			let r: UITableViewRowAction
+			let r: UIContextualAction
 			if i.hasUnreadCommentsOrAlert {
-				r = UITableViewRowAction(style: .normal, title: "Read") { [weak self] action, indexPath in
+				r = UIContextualAction(style: .normal, title: "Read") { [weak self] action, indexPath, completion in
 					tableView.setEditing(false, animated: true)
 					DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
 						self?.markItemAsRead(itemUri: i.objectID.uriRepresentation().absoluteString)
 					}
+                    completion(true)
 				}
 			} else {
-				r = UITableViewRowAction(style: .normal, title: "Unread") { [weak self] action, indexPath in
+				r = UIContextualAction(style: .normal, title: "Unread") { [weak self] action, indexPath, completion in
 					tableView.setEditing(false, animated: true)
 					DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
 						self?.markItemAsUnRead(itemUri: i.objectID.uriRepresentation().absoluteString)
 					}
+                    completion(true)
 				}
 			}
 			r.backgroundColor = view.tintColor
@@ -972,16 +967,18 @@ UITableViewDragDelegate {
 		}
 
 		func appendMuteUnmute(i: ListableItem) {
-			let m: UITableViewRowAction
+			let m: UIContextualAction
 			if i.muted {
-				m = UITableViewRowAction(style: .normal, title: "Unmute") { action, indexPath in
+				m = UIContextualAction(style: .normal, title: "Unmute") { action, indexPath, completion in
 					tableView.setEditing(false, animated: true)
 					i.setMute(to: false)
+                    completion(true)
 				}
 			} else {
-				m = UITableViewRowAction(style: .normal, title: "Mute") { action, indexPath in
+				m = UIContextualAction(style: .normal, title: "Mute") { action, indexPath, completion in
 					tableView.setEditing(false, animated: true)
 					i.setMute(to: true)
+                    completion(true)
 				}
 			}
 			actions.append(m)
@@ -993,15 +990,17 @@ UITableViewDragDelegate {
 			if sectionName == Section.merged.prMenuName || sectionName == Section.closed.prMenuName || sectionName == Section.closed.issuesMenuName {
 
 				appendReadUnread(i: i)
-				let d = UITableViewRowAction(style: .destructive, title: "Remove") { action, indexPath in
+				let d = UIContextualAction(style: .destructive, title: "Remove") { action, indexPath, completion in
 					DataManager.main.delete(i)
+                    completion(true)
 				}
 				actions.append(d)
 
 			} else if i.isSnoozing {
 
-				let w = UITableViewRowAction(style: .normal, title: "Wake") { action, indexPath in
+				let w = UIContextualAction(style: .normal, title: "Wake") { action, indexPath, completion in
 					i.wakeUp()
+                    completion(true)
 				}
 				w.backgroundColor = secondaryLabelColour
 				actions.append(w)
@@ -1012,14 +1011,16 @@ UITableViewDragDelegate {
 					appendReadUnread(i: i)
 				}
 				appendMuteUnmute(i: i)
-				let s = UITableViewRowAction(style: .normal, title: "Snooze") { [weak self] action, indexPath in
+				let s = UIContextualAction(style: .normal, title: "Snooze") { [weak self] action, indexPath, completion in
 					self?.showSnoozeMenuFor(i: i)
+                    completion(true)
 				}
 				s.backgroundColor = secondaryLabelColour
 				actions.append(s)
 			}
 		}
-		return actions
+        
+        return UISwipeActionsConfiguration(actions: actions)
 	}
 
 	private func showSnoozeMenuFor(i: ListableItem) {

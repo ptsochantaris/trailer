@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15702" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="H1p-Uh-vWS">
-    <device id="retina5_9" orientation="portrait" appearance="dark"/>
+    <device id="retina5_9" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15704"/>
@@ -97,7 +97,7 @@
         <!--Master-->
         <scene sceneID="smW-Zh-WAh">
             <objects>
-                <tableViewController title="Master" definesPresentationContext="YES" clearsSelectionOnViewWillAppear="NO" id="7bK-jq-Zjz" customClass="MasterViewController" customModule="PocketTrailer" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController title="Master" extendedLayoutIncludesOpaqueBars="YES" definesPresentationContext="YES" clearsSelectionOnViewWillAppear="NO" id="7bK-jq-Zjz" customClass="MasterViewController" customModule="PocketTrailer" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="110" sectionHeaderHeight="10" sectionFooterHeight="10" id="r7i-6Z-zg0">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -193,12 +193,12 @@
                     </tableView>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" title="Pull Requests" largeTitleDisplayMode="never" id="Zdf-7t-Un8">
-                        <barButtonItem key="leftBarButtonItem" image="settings" id="uCG-Gj-QGq">
+                        <barButtonItem key="leftBarButtonItem" image="gear" catalog="system" id="uCG-Gj-QGq">
                             <connections>
                                 <segue destination="D5t-dR-eFB" kind="presentation" identifier="showPreferences" modalPresentationStyle="formSheet" id="Z9a-R6-dGL"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" image="checkmark" id="vlQ-6x-FuM">
+                        <barButtonItem key="rightBarButtonItem" image="checkmark.circle" catalog="system" id="vlQ-6x-FuM">
                             <connections>
                                 <action selector="editSelected:" destination="7bK-jq-Zjz" id="ciS-ir-tQR"/>
                             </connections>
@@ -333,12 +333,12 @@
                         </barButtonItem>
                     </toolbarItems>
                     <navigationItem key="navigationItem" title="Repositories" largeTitleDisplayMode="never" id="QfX-C1-a3i">
-                        <barButtonItem key="leftBarButtonItem" image="close" style="done" id="mYI-Lo-soT">
+                        <barButtonItem key="leftBarButtonItem" image="xmark.circle" catalog="system" style="done" id="mYI-Lo-soT">
                             <connections>
                                 <action selector="done:" destination="qen-v7-82i" id="W4S-ba-b5i"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" image="more" id="kBh-JC-HZv">
+                        <barButtonItem key="rightBarButtonItem" image="ellipsis" catalog="system" id="kBh-JC-HZv">
                             <connections>
                                 <action selector="actionSelected:" destination="qen-v7-82i" id="LdD-A8-dPl"/>
                             </connections>
@@ -410,7 +410,7 @@
                         <viewLayoutGuide key="safeArea" id="llw-yU-Sw3"/>
                     </view>
                     <navigationItem key="navigationItem" title="Custom Repositories" largeTitleDisplayMode="never" id="r0R-ry-5bR">
-                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="RZ9-pW-dW7">
+                        <barButtonItem key="rightBarButtonItem" image="plus" catalog="system" id="RZ9-pW-dW7">
                             <connections>
                                 <action selector="addSelected:" destination="QN8-91-ety" id="HpM-Dt-HfG"/>
                             </connections>
@@ -595,12 +595,12 @@
                                 <rect key="frame" x="0.0" y="486" width="375" height="56"/>
                                 <items>
                                     <navigationItem id="Xbd-PP-COm">
-                                        <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="u1K-W9-ADw">
+                                        <barButtonItem key="leftBarButtonItem" image="xmark.circle" catalog="system" id="u1K-W9-ADw">
                                             <connections>
                                                 <action selector="pickerCancelSelected:" destination="hkd-74-v5I" id="F3j-Gh-owT"/>
                                             </connections>
                                         </barButtonItem>
-                                        <barButtonItem key="rightBarButtonItem" style="done" systemItem="done" id="b9y-AJ-b6Y">
+                                        <barButtonItem key="rightBarButtonItem" image="checkmark.circle.fill" catalog="system" style="done" id="b9y-AJ-b6Y">
                                             <connections>
                                                 <action selector="pickerDoneSelected:" destination="hkd-74-v5I" id="7yb-bC-S9U"/>
                                             </connections>
@@ -644,17 +644,17 @@
                     <toolbarItems/>
                     <navigationItem key="navigationItem" title="Edit" largeTitleDisplayMode="never" id="pWy-SZ-aD1">
                         <rightBarButtonItems>
-                            <barButtonItem image="delete" id="DAd-j7-giv">
+                            <barButtonItem image="bin.xmark" catalog="system" id="DAd-j7-giv">
                                 <connections>
                                     <action selector="deleteSelected:" destination="hkd-74-v5I" id="hyQ-Ih-2ky"/>
                                 </connections>
                             </barButtonItem>
-                            <barButtonItem image="arrowDown" id="j0n-Yf-9p8">
+                            <barButtonItem image="arrow.down" catalog="system" id="j0n-Yf-9p8">
                                 <connections>
                                     <action selector="downSelected:" destination="hkd-74-v5I" id="wuy-rj-e7i"/>
                                 </connections>
                             </barButtonItem>
-                            <barButtonItem image="arrowUp" id="O2s-Gc-xhs">
+                            <barButtonItem image="arrow.up" catalog="system" id="O2s-Gc-xhs">
                                 <connections>
                                     <action selector="upSelected:" destination="hkd-74-v5I" id="Y1x-yY-UyC"/>
                                 </connections>
@@ -832,7 +832,7 @@
                     </tableView>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" title="Comment Blocking" largeTitleDisplayMode="never" id="Juw-ZJ-mYS">
-                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="lmw-zy-yiu">
+                        <barButtonItem key="rightBarButtonItem" image="plus" catalog="system" id="lmw-zy-yiu">
                             <connections>
                                 <action selector="addSelected" destination="QXf-Ap-v0o" id="P67-d6-O7I"/>
                             </connections>
@@ -905,7 +905,7 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Advanced" largeTitleDisplayMode="never" id="0ij-Vd-OcD">
-                        <barButtonItem key="leftBarButtonItem" image="close" style="done" id="cbh-rc-sSM">
+                        <barButtonItem key="leftBarButtonItem" image="xmark.circle" catalog="system" style="done" id="cbh-rc-sSM">
                             <connections>
                                 <action selector="done:" destination="ls6-NX-hye" id="WNJ-zz-WqT"/>
                             </connections>
@@ -961,12 +961,12 @@
                     </tableView>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" title="Servers" largeTitleDisplayMode="never" id="xL8-Y9-77V">
-                        <barButtonItem key="leftBarButtonItem" image="close" style="done" id="3yS-pI-1hb">
+                        <barButtonItem key="leftBarButtonItem" image="xmark.circle" catalog="system" style="done" id="3yS-pI-1hb">
                             <connections>
                                 <action selector="doneSelected" destination="Ny5-Q9-wJN" id="MVl-LW-Jyc"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="w7v-i7-rs4">
+                        <barButtonItem key="rightBarButtonItem" image="plus" catalog="system" id="w7v-i7-rs4">
                             <connections>
                                 <action selector="newServer" destination="Ny5-Q9-wJN" id="qAI-Ok-FBy"/>
                             </connections>
@@ -1155,7 +1155,7 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
                         </barButtonItem>
                     </toolbarItems>
                     <navigationItem key="navigationItem" title="API Server Details" largeTitleDisplayMode="never" id="WuN-oo-IBq">
-                        <barButtonItem key="rightBarButtonItem" image="delete" id="uhq-Gt-M9L">
+                        <barButtonItem key="rightBarButtonItem" image="bin.xmark" catalog="system" id="uhq-Gt-M9L">
                             <connections>
                                 <action selector="deleteSelected:" destination="iSf-H9-TPW" id="yQC-jA-dGI"/>
                             </connections>
@@ -1379,12 +1379,12 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
                     </view>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" title="Welcome!" id="cOg-SY-AQN">
-                        <barButtonItem key="leftBarButtonItem" title="Skip" id="TOi-p0-I4W">
+                        <barButtonItem key="leftBarButtonItem" title="Skip" image="xmark.circle" catalog="system" id="TOi-p0-I4W">
                             <connections>
                                 <action selector="skipSelected:" destination="ZQR-qN-jZ1" id="Bxo-oH-Lh4"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" image="import" id="1Y7-oO-3ta">
+                        <barButtonItem key="rightBarButtonItem" image="icloud.and.arrow.down" catalog="system" id="1Y7-oO-3ta">
                             <connections>
                                 <action selector="importSelected:" destination="ZQR-qN-jZ1" id="6Wb-Qb-BJt"/>
                             </connections>
@@ -1437,7 +1437,7 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
         <scene sceneID="4VK-bY-2jl">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="hV5-hQ-Klx" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Repos" image="repos" id="GbY-BF-5eA"/>
+                    <tabBarItem key="tabBarItem" title="Repos" image="list.dash" catalog="system" id="GbY-BF-5eA"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="zTJ-3E-UPj">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="108"/>
@@ -1461,7 +1461,7 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
         <scene sceneID="ZNa-ko-Uvz">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="4lU-fx-xrq" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="About" image="about" id="21w-d1-k6l"/>
+                    <tabBarItem key="tabBarItem" title="About" image="info.circle" catalog="system" id="21w-d1-k6l"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="TL4-K7-73x">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="108"/>
@@ -1523,12 +1523,12 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
                     </view>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" title="Snoozing" largeTitleDisplayMode="never" id="Pb8-pk-J6i">
-                        <barButtonItem key="leftBarButtonItem" image="close" style="done" id="lwn-3B-bw8">
+                        <barButtonItem key="leftBarButtonItem" image="xmark.circle" catalog="system" style="done" id="lwn-3B-bw8">
                             <connections>
                                 <action selector="done:" destination="JhQ-db-hF3" id="YgM-PA-nPr"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="P6M-Go-Apj">
+                        <barButtonItem key="rightBarButtonItem" image="plus" catalog="system" id="P6M-Go-Apj">
                             <connections>
                                 <action selector="addNew:" destination="JhQ-db-hF3" id="RpS-wh-mSd"/>
                             </connections>
@@ -1549,7 +1549,7 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
         <scene sceneID="AE2-3Q-laH">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="S0n-Er-w3n" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Advanced" image="advanced" id="byu-eU-4PM"/>
+                    <tabBarItem key="tabBarItem" title="Advanced" image="gear" catalog="system" id="byu-eU-4PM"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="DjA-kY-8aC">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="108"/>
@@ -1568,7 +1568,7 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
         <scene sceneID="O8y-pt-1Ow">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="uY2-9H-xYT" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Servers" image="servers" id="4P2-5Y-Yda"/>
+                    <tabBarItem key="tabBarItem" title="Servers" image="globe" catalog="system" id="4P2-5Y-Yda"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="uZE-n9-f8D">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="108"/>
@@ -1609,7 +1609,7 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
         <scene sceneID="RRL-yw-aRe">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="A4U-QV-6il" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Snoozing" image="snoozing" id="UzS-WF-WqY"/>
+                    <tabBarItem key="tabBarItem" title="Snoozing" image="clock" catalog="system" id="UzS-WF-WqY"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="IIN-0r-xoJ">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="108"/>
@@ -1627,19 +1627,21 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
     </scenes>
     <resources>
         <image name="TeamOctopusLogo" width="862" height="862"/>
-        <image name="about" width="30" height="30"/>
-        <image name="advanced" width="28" height="28"/>
-        <image name="arrowDown" width="20" height="10.333333015441895"/>
-        <image name="arrowUp" width="20" height="10.333333015441895"/>
-        <image name="checkmark" width="22" height="20"/>
+        <image name="arrow.down" catalog="system" width="60" height="64"/>
+        <image name="arrow.up" catalog="system" width="60" height="64"/>
+        <image name="bin.xmark" catalog="system" width="64" height="46"/>
+        <image name="checkmark.circle" catalog="system" width="64" height="60"/>
+        <image name="checkmark.circle.fill" catalog="system" width="64" height="60"/>
+        <image name="clock" catalog="system" width="64" height="60"/>
         <image name="close" width="28" height="28"/>
-        <image name="delete" width="21.333333969116211" height="28"/>
-        <image name="import" width="28" height="27.333333969116211"/>
-        <image name="more" width="22" height="6"/>
-        <image name="repos" width="28" height="28"/>
-        <image name="servers" width="28" height="28"/>
-        <image name="settings" width="28" height="28"/>
-        <image name="snoozing" width="28" height="28"/>
+        <image name="ellipsis" catalog="system" width="64" height="18"/>
+        <image name="gear" catalog="system" width="64" height="58"/>
+        <image name="globe" catalog="system" width="64" height="60"/>
+        <image name="icloud.and.arrow.down" catalog="system" width="64" height="56"/>
+        <image name="info.circle" catalog="system" width="64" height="60"/>
+        <image name="list.dash" catalog="system" width="64" height="42"/>
+        <image name="plus" catalog="system" width="64" height="56"/>
+        <image name="xmark.circle" catalog="system" width="64" height="60"/>
         <namedColor name="apptint">
             <color red="0.20299999415874481" green="0.43000000715255737" blue="0.71799999475479126" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>

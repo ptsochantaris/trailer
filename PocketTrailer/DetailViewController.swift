@@ -120,9 +120,10 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 	}
 	
 	override var keyCommands: [UIKeyCommand]? {
-		let ff = UIKeyCommand(input: UIKeyCommand.inputLeftArrow, modifierFlags: .command, action: #selector(focusOnMaster), discoverabilityTitle: "Focus keyboard on item list")
-		let s = UIKeyCommand(input: "o", modifierFlags: .command, action: #selector(keyOpenInSafari), discoverabilityTitle: "Open in Safari")
-		return [ff,s]
+		return [
+            makeKeyCommand(input: UIKeyCommand.inputLeftArrow, modifierFlags: .command, action: #selector(focusOnMaster), discoverabilityTitle: "Focus keyboard on item list"),
+            makeKeyCommand(input: "o", modifierFlags: .command, action: #selector(keyOpenInSafari), discoverabilityTitle: "Open in Safari")
+        ]
 	}
 	
 	@objc private func keyOpenInSafari() {

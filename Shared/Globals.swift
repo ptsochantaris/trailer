@@ -41,6 +41,10 @@ typealias IMAGE_CLASS = UIImage
 
 let stringDrawingOptions: NSStringDrawingOptions = [.usesLineFragmentOrigin, .usesFontLeading]
 
+func makeKeyCommand(input: String, modifierFlags: UIKeyModifierFlags, action: Selector, discoverabilityTitle: String) -> UIKeyCommand {
+    return UIKeyCommand(title: discoverabilityTitle, image: nil, action: action, input: input, modifierFlags: modifierFlags, propertyList: nil, alternates: [], discoverabilityTitle: nil, attributes: [], state: .off)
+}
+
 #elseif os(OSX)
 
 weak var app: OSX_AppDelegate!

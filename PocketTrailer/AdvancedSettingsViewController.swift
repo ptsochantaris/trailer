@@ -351,7 +351,6 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		tableView.estimatedRowHeight = 120
 
 		let searchController = UISearchController(searchResultsController: nil)
-		searchController.dimsBackgroundDuringPresentation = false
 		searchController.obscuresBackgroundDuringPresentation = false
 		searchController.searchResultsUpdater = self
 		searchController.searchBar.tintColor = view.tintColor

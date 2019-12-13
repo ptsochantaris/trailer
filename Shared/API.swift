@@ -1709,7 +1709,6 @@ final class API {
 		networkIndicationCount += 1
 		if networkIndicationCount == 1 {
 			let a = UIApplication.shared
-			a.isNetworkActivityIndicatorVisible = true
 			networkBGTask = a.beginBackgroundTask(withName: "com.housetrip.Trailer.network") {
 				endNetworkBGTask()
 			}
@@ -1719,7 +1718,6 @@ final class API {
 	private static func networkIndicationEnd() {
 		networkIndicationCount -= 1
 		if networkIndicationCount == 0 {
-			UIApplication.shared.isNetworkActivityIndicatorVisible = false
 			networkBGEndPopTimer.push()
 		}
 	}

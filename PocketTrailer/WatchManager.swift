@@ -223,7 +223,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		tempMoc.persistentStoreCoordinator = DataManager.main.persistentStoreCoordinator
 		tempMoc.perform { [weak self] in
 			let items = try! tempMoc.fetch(f).map { self?.baseDataForItem(item: $0, showLabels: showLabels) }
-			let compressedData = NSKeyedArchiver.archivedData(withRootObject: items).data(operation: .compress)!
+			let compressedData = (try? NSKeyedArchiver.archivedData(withRootObject: items, requiringSecureCoding: false).data(operation: .compress)) ?? Data()
 			replyHandler(["result" : compressedData])
 		}
 	}
@@ -280,7 +280,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			result["description"] = item.body
 			result["comments"] = commentsForItem(item: item)
 
-			return NSKeyedArchiver.archivedData(withRootObject: result).data(operation: .compress)!
+            return try? NSKeyedArchiver.archivedData(withRootObject: result, requiringSecureCoding: false).data(operation: .compress)
 		}
 		return nil
 	}

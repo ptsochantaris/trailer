@@ -106,7 +106,7 @@ final class CustomReposViewController: UIViewController, UITableViewDelegate, UI
 			return
 		}
 		
-		let a = UIActivityIndicatorView(style: .gray)
+		let a = UIActivityIndicatorView(style: .medium)
 		a.startAnimating()
 		addButton.customView = a
 
