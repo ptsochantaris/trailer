@@ -50,11 +50,6 @@ final class PickerViewController: UITableViewController {
 		return "Please select an option"
 	}
 
-	override func viewDidLoad() {
-		super.viewDidLoad()
-		navigationItem.largeTitleDisplayMode = .automatic
-	}
-
 	private var layoutDone = false
 
 	override func viewDidLayoutSubviews() {

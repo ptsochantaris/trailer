@@ -43,7 +43,6 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 		navigationItem.searchController = searchController
         
 		navigationItem.hidesSearchBarWhenScrolling = false
-		navigationItem.largeTitleDisplayMode = .automatic
 
 		searchTimer = PopTimer(timeInterval: 0.4) { [weak self] in
 			self?.reloadData()
@@ -88,6 +87,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 		v.addAction(c)
 		v.addAction(cancel)
 		present(v, animated: true)
+        v.popoverPresentationController?.barButtonItem = sender
 	}
 
 	@IBAction private func setAllPrsSelected(_ sender: UIBarButtonItem) {
@@ -124,6 +124,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 		}))
 		a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
 		present(a, animated: true)
+        a.popoverPresentationController?.barButtonItem = sender
 	}
 
 	private func refreshList() {

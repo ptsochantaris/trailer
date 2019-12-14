@@ -21,6 +21,8 @@ func makeKeyCommand(input: String, modifierFlags: UIKeyModifierFlags, action: Se
     return UIKeyCommand(title: discoverabilityTitle, image: nil, action: action, input: input, modifierFlags: modifierFlags, propertyList: nil, alternates: [], discoverabilityTitle: nil, attributes: [], state: .off)
 }
 
+let compactTraits = UITraitCollection(horizontalSizeClass: .compact)
+
 #elseif os(OSX)
 
 weak var app: OSX_AppDelegate!

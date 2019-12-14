@@ -15,7 +15,6 @@ final class WatchlistSettingsViewController: UITableViewController, PickerViewCo
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		navigationItem.largeTitleDisplayMode = .automatic
 		tableView.estimatedRowHeight = 100
 		tableView.rowHeight = UITableView.automaticDimension
 		rescanCell.detailTextLabel?.text = Settings.newRepoCheckPeriodHelp

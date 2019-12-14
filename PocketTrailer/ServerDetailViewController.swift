@@ -19,7 +19,6 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		navigationItem.largeTitleDisplayMode = .automatic
 
 		var a: ApiServer
 		if let sid = serverId {

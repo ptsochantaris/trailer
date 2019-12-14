@@ -87,9 +87,12 @@ final class PRCell: UITableViewCell {
 	}
 
 	func setPullRequest(pullRequest: PullRequest) {
+        
+        let separator = traitCollection.containsTraits(in: compactTraits) ? "\n" : "   "
+        
 		let detailFont = _description.font!
         _title.attributedText = pullRequest.title(with: _title.font, labelFont: detailFont, titleColor: UIColor.label, darkMode: false)
-        _description.attributedText = pullRequest.subtitle(with: detailFont, lightColor: UIColor.tertiaryLabel, darkColor: UIColor.secondaryLabel)
+        _description.attributedText = pullRequest.subtitle(with: detailFont, lightColor: UIColor.secondaryLabel, darkColor: UIColor.label, separator: separator)
 
 		let muted = pullRequest.muted
 		setCountsImageAndFade(item: pullRequest, muted: muted)
@@ -127,9 +130,11 @@ final class PRCell: UITableViewCell {
 
 	func setIssue(issue: Issue) {
 
+        let separator = traitCollection.containsTraits(in: compactTraits) ? "\n" : "   "
+
         let detailFont = _description.font!
         _title.attributedText = issue.title(with: _title.font, labelFont: detailFont, titleColor: UIColor.label, darkMode: false)
-        _description.attributedText = issue.subtitle(with: detailFont, lightColor: UIColor.tertiaryLabel, darkColor: UIColor.secondaryLabel)
+        _description.attributedText = issue.subtitle(with: detailFont, lightColor: UIColor.secondaryLabel, darkColor: UIColor.label, separator: separator)
 		_statuses.attributedText = nil
 
 		let muted = issue.muted

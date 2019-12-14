@@ -3,11 +3,6 @@ import UIKit
 
 final class CommentBlacklistViewController: UITableViewController {
 
-	override func viewDidLoad() {
-		super.viewDidLoad()
-		navigationItem.largeTitleDisplayMode = .automatic
-	}
-
 	override func numberOfSections(in tableView: UITableView) -> Int {
 		return Settings.commentAuthorBlacklist.count == 0 ? 0 : 1
 	}

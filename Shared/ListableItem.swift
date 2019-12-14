@@ -607,7 +607,11 @@ class ListableItem: DataItem {
 						a[NSAttributedString.Key.foregroundColor] = isDark(color: color) ? COLOR_CLASS.white : COLOR_CLASS.black
 						let name = l.name!.replacingOccurrences(of: " ", with: "\u{a0}")
 						_title.append(NSAttributedString(string: "\u{a0}\(name)\u{a0}", attributes: a))
+                        #if os(iOS)
                         _title.append(NSAttributedString(string: " ", attributes: titleAttributes))
+                        #elseif os(OSX)
+                        _title.append(NSAttributedString(string: " ", attributes: a))
+                        #endif
 					}
 				}
 			}
@@ -696,8 +700,8 @@ class ListableItem: DataItem {
 		}
 		return _title
 	}
-
-	func subtitle(with font: FONT_CLASS, lightColor: COLOR_CLASS, darkColor: COLOR_CLASS) -> NSMutableAttributedString {
+    
+    func subtitle(with font: FONT_CLASS, lightColor: COLOR_CLASS, darkColor: COLOR_CLASS, separator: String) -> NSMutableAttributedString {
 		let _subtitle = NSMutableAttributedString()
 		let p = NSMutableParagraphStyle()
 
@@ -705,28 +709,24 @@ class ListableItem: DataItem {
 		                     NSAttributedString.Key.font: font,
 		                     NSAttributedString.Key.paragraphStyle: p]
 
-		#if os(iOS)
-			let separator = NSAttributedString(string:"\n", attributes: lightSubtitle)
-		#elseif os(OSX)
-			let separator = NSAttributedString(string:"   ", attributes: lightSubtitle)
-		#endif
+        let separatorString = NSAttributedString(string: separator, attributes: lightSubtitle)
 
 		var darkSubtitle = lightSubtitle
 		darkSubtitle[NSAttributedString.Key.foregroundColor] = darkColor
 
 		if Settings.showReposInName, let n = repo.fullName {
 			_subtitle.append(NSAttributedString(string: n, attributes: darkSubtitle))
-			_subtitle.append(separator)
+			_subtitle.append(separatorString)
 		}
 
 		if Settings.showMilestones, let m = milestone, !m.isEmpty {
 			_subtitle.append(NSAttributedString(string: m, attributes: darkSubtitle))
-			_subtitle.append(separator)
+			_subtitle.append(separatorString)
 		}
 
 		if let l = userLogin {
 			_subtitle.append(NSAttributedString(string: "@\(l)", attributes: lightSubtitle))
-			_subtitle.append(separator)
+			_subtitle.append(separatorString)
 		}
 
 		_subtitle.append(NSAttributedString(string: displayDate, attributes: lightSubtitle))

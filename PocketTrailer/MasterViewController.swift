@@ -194,8 +194,6 @@ UITableViewDragDelegate {
 			DataItem.nukeDeletedItems(in: DataManager.main)
 		}*/
 
-		navigationItem.largeTitleDisplayMode = .automatic
-
 		updateTabItems(animated: false)
 	}
 

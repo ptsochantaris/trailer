@@ -58,10 +58,6 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		        title: "Separate API servers into their own groups",
 		        description: Settings.showSeparateApiServersInMenuHelp,
 		        valueDisplayed: { Settings.showSeparateApiServersInMenu ? "✓" : " " }),
-		Setting(section: .Display,
-		        title: "Try requesting desktop GitHub pages",
-		        description: Settings.alwaysRequestDesktopSiteHelp,
-		        valueDisplayed: { Settings.alwaysRequestDesktopSite ? "✓" : " " }),
         Setting(section: .Display,
                 title: "Highlight PRs with new commits",
                 description: Settings.markPrsAsUnreadOnNewCommitsHelp,
@@ -347,7 +343,6 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		navigationItem.searchController = searchController
 
 		navigationItem.hidesSearchBarWhenScrolling = false
-		navigationItem.largeTitleDisplayMode = .automatic
 
 		searchTimer = PopTimer(timeInterval: 0.2) { [weak self] in
 			self?.reload(searchChanged: true)
@@ -451,28 +446,29 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		let settingsForSection = filteredItemsForTableSection(section: indexPath.section)
 		let setting = settingsForSection[indexPath.row]
 		cell.titleLabel.text = setting.title
-		cell.descriptionLabel.text = setting.description
+        cell.descriptionLabel.text = showHelp ? setting.description : nil
+        cell.descriptionLabel.isHidden = !showHelp
 
 		let v = setting.valueDisplayed()
 		if v == "✓" {
-			cell.accessoryType = .checkmark
-			cell.valueLabel.text = " "
-		} else if v == ">" {
-			cell.accessoryType = .disclosureIndicator
-			cell.valueLabel.text = " "
-		} else {
-			cell.accessoryType = .none
-			cell.valueLabel.text = v ?? " "
-		}
+            cell.iconView.image = UIImage(systemName: "checkmark.circle.fill", withConfiguration: nil)
+            cell.iconView.isHidden = false
+            cell.valueLabel.text = nil
 
-		cell.detailsBottomAnchor.priority = UILayoutPriority(rawValue: 750)
-		if showHelp {
-			cell.detailsBottomAnchor.constant = 6
-			cell.detailsTopAnchor.constant = 6
+        } else if v == " " {
+            cell.iconView.image = UIImage(systemName: "circle", withConfiguration: nil)
+            cell.iconView.isHidden = false
+            cell.valueLabel.text = nil
+
+		} else if v == ">" {
+            cell.iconView.image = UIImage(systemName: "chevron.right.circle", withConfiguration: nil)
+            cell.iconView.isHidden = false
+			cell.valueLabel.text = nil
+            
 		} else {
-			cell.descriptionLabel.text = nil
-			cell.detailsBottomAnchor.constant = 4
-			cell.detailsTopAnchor.constant = 0
+            cell.iconView.image = nil
+            cell.iconView.isHidden = true
+			cell.valueLabel.text = v
 		}
 	}
 
@@ -562,17 +558,15 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				}
 				settingsChangedTimer.push()
 			case 6:
-				Settings.alwaysRequestDesktopSite = !Settings.alwaysRequestDesktopSite
-            case 7:
                 Settings.markPrsAsUnreadOnNewCommits = !Settings.markPrsAsUnreadOnNewCommits
                 settingsChangedTimer.push()
-			case 8:
+			case 7:
 				Settings.showMilestones = !Settings.showMilestones
 				settingsChangedTimer.push()
-			case 9:
+			case 8:
 				Settings.displayNumbersForItems = !Settings.displayNumbersForItems
 				settingsChangedTimer.push()
-            case 10:
+            case 9:
                 let v = PickerViewController.Info(title: setting.title, values: DraftHandlingPolicy.labels, selectedIndex: Settings.draftHandlingPolicy, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
                 performSegue(withIdentifier: "showPicker", sender: v)
 			default: break

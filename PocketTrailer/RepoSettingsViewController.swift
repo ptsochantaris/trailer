@@ -17,7 +17,6 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		navigationItem.largeTitleDisplayMode = .automatic
 
 		if let repo = repo {
 			repoNameTitle.text = repo.fullName

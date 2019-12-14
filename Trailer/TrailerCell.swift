@@ -135,7 +135,7 @@ class TrailerCell: NSTableCellView {
 		let light: NSColor = .secondaryLabelColor
 		let strong: NSColor = .controlTextColor
 		title.attributedStringValue = item.title(with: titleFont, labelFont: detailFont, titleColor: strong, darkMode: isDark)
-        subtitle.attributedStringValue = item.subtitle(with: detailFont, lightColor: light, darkColor: strong)
+        subtitle.attributedStringValue = item.subtitle(with: detailFont, lightColor: light, darkColor: strong, separator: "   ")
     }
 
 	var selected = false {
