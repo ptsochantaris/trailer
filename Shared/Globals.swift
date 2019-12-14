@@ -11,7 +11,6 @@ weak var app: iOS_AppDelegate!
 let GLOBAL_SCREEN_SCALE = UIScreen.main.scale
 let DISABLED_FADE: CGFloat = 0.3
 
-typealias COLOR_CLASS = UIColor
 typealias FONT_CLASS = UIFont
 typealias IMAGE_CLASS = UIImage
 
@@ -34,7 +33,6 @@ let MENU_WIDTH: CGFloat = 500
 let REMOVE_BUTTON_WIDTH: CGFloat = 80
 let DISABLED_FADE: CGFloat = 0.4
 
-typealias COLOR_CLASS = NSColor
 typealias FONT_CLASS = NSFont
 typealias IMAGE_CLASS = NSImage
 
@@ -51,32 +49,6 @@ let COMMENT_ID_KEY = "commentIdKey"
 let NOTIFICATION_URL_KEY = "urlKey"
 
 ////////////////////////// Utilities
-
-extension COLOR_CLASS {
-    static var appGreen: COLOR_CLASS {
-        if #available(OSX 10.13, iOS 13, *) {
-            return COLOR_CLASS(named: "appGreen")!
-        } else {
-            return COLOR_CLASS(red: 0.3, green: 0.6, blue: 0.2, alpha: 1.0)
-        }
-    }
-
-    static var appYellow: COLOR_CLASS {
-        if #available(OSX 10.13, iOS 13, *) {
-            return COLOR_CLASS(named: "appYellow")!
-        } else {
-            return COLOR_CLASS(red: 0.6, green: 0.6, blue: 0.0, alpha: 1.0)
-        }
-    }
-    
-    static var appRed: COLOR_CLASS {
-        if #available(OSX 10.13, iOS 13, *) {
-            return COLOR_CLASS(named: "appRed")!
-        } else {
-            return COLOR_CLASS(red: 0.7, green: 0.2, blue: 0.2, alpha: 1.0)
-        }
-    }
-}
 
 #if os(iOS)
 
@@ -236,7 +208,7 @@ enum RepoDisplayPolicy: Int64 {
 	case hide, mine, mineAndPaticipated, all
 	static let labels = ["Hide", "Mine", "Participated", "All"]
 	static let policies = [hide, mine, mineAndPaticipated, all]
-    static let colors = [    COLOR_CLASS.tertiaryLabelColor,
+    static let colors = [    COLOR_CLASS.appTertiaryLabel,
 	                         COLOR_CLASS(red: 0.7, green: 0.0, blue: 0.0, alpha: 1.0),
 	                         COLOR_CLASS(red: 0.8, green: 0.4, blue: 0.0, alpha: 1.0),
 	                         COLOR_CLASS(red: 0.0, green: 0.5, blue: 0.0, alpha: 1.0)]
@@ -265,7 +237,7 @@ enum RepoHidingPolicy: Int64 {
 	case noHiding, hideMyAuthoredPrs, hideMyAuthoredIssues, hideAllMyAuthoredItems, hideOthersPrs, hideOthersIssues, hideAllOthersItems
 	static let labels = ["No Filter", "Hide My PRs", "Hide My Issues", "Hide All Mine", "Hide Others PRs", "Hide Others Issues", "Hide All Others"]
 	static let policies = [noHiding, hideMyAuthoredPrs, hideMyAuthoredIssues, hideAllMyAuthoredItems, hideOthersPrs, hideOthersIssues, hideAllOthersItems]
-	static let colors = [    COLOR_CLASS.tertiaryLabelColor,
+	static let colors = [    COLOR_CLASS.appTertiaryLabel,
 	                         COLOR_CLASS(red: 0.1, green: 0.1, blue: 0.5, alpha: 1.0),
 	                         COLOR_CLASS(red: 0.1, green: 0.1, blue: 0.5, alpha: 1.0),
 	                         COLOR_CLASS(red: 0.1, green: 0.1, blue: 0.5, alpha: 1.0),

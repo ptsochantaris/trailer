@@ -99,7 +99,7 @@ final class PRCell: UITableViewCell {
         _labels.attributedText = l
         _labels.isHidden = (l?.length ?? 0) == 0
 
-        let r = pullRequest.reviewsAttributedString(labelFont: _reviews.font, darkMode: false)
+        let r = pullRequest.reviewsAttributedString(labelFont: _reviews.font)
         _reviews.attributedText = r
         _reviews.isHidden = (r?.length ?? 0) == 0
 

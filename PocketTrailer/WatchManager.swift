@@ -240,7 +240,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
             "title" : item.title(with: font, labelFont: font, titleColor: .white, numberColor: .gray),
             "subtitle" : item.subtitle(with: smallFont, lightColor: .lightGray, darkColor: .gray, separator: "\n"),
             "labels" : item.labelsAttributedString(labelFont: smallFont) ?? NSAttributedString(),
-            "reviews" : (item as? PullRequest)?.reviewsAttributedString(labelFont: smallFont, darkMode: true) ?? NSAttributedString(),
+            "reviews" : (item as? PullRequest)?.reviewsAttributedString(labelFont: smallFont) ?? NSAttributedString(),
 			]
 
 		if showLabels {
@@ -267,7 +267,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		var statusLines = [[String : Any]]()
 		for status in pr.displayedStatuses {
 			statusLines.append([
-				"color": status.colorForDarkDisplay,
+				"color": status.colorForDisplay,
 				"text": S(status.descriptionText)
 				])
 		}

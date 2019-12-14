@@ -1025,17 +1025,17 @@ class ListableItem: DataItem {
 			color = COLOR_CLASS(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)
 			message = "There are no configured API servers in your settings, please ensure you have added at least one server with a valid API token."
 		} else if appIsRefreshing {
-			color = COLOR_CLASS.secondaryLabelColor
+			color = COLOR_CLASS.appSecondaryLabel
 			message = "Refreshing information, please wait a moment…"
 		} else if !S(filterValue).isEmpty {
-			color = COLOR_CLASS.secondaryLabelColor
+			color = COLOR_CLASS.appSecondaryLabel
 			message = "There are no items matching this filter."
 		} else if hasOpen(in: DataManager.main, criterion: criterion) {
-			color = COLOR_CLASS.secondaryLabelColor
+			color = COLOR_CLASS.appSecondaryLabel
 			message = "Some items are hidden by your settings."
 		} else if !Repo.anyVisibleRepos(in: DataManager.main, criterion: criterion, excludeGrouped: true) {
 			if Repo.anyVisibleRepos(in: DataManager.main) {
-				color = COLOR_CLASS.secondaryLabelColor
+				color = COLOR_CLASS.appSecondaryLabel
 				message = "There are no repositories that are currently visible in this category."
 			} else {
 				color = COLOR_CLASS(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)
@@ -1045,7 +1045,7 @@ class ListableItem: DataItem {
 			color = COLOR_CLASS(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)
 			message = "All your watched repositories are marked as hidden, please enable issues or PRs on at least one."
 		} else {
-			color = COLOR_CLASS.secondaryLabelColor
+			color = COLOR_CLASS.appSecondaryLabel
 			message = "No open items in your configured repositories."
 		}
 

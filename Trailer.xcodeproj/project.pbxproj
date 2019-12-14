@@ -159,6 +159,9 @@
 		16EDAB1C1AB4CB6F009B38DD /* StatusRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16EDAB1B1AB4CB6F009B38DD /* StatusRow.swift */; };
 		16EE6AD01A9A711C000A8483 /* CountLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16EE6ACF1A9A711C000A8483 /* CountLabel.swift */; };
 		16EE871B1A446BFE00A1D16F /* EmptyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16EE871A1A446BFE00A1D16F /* EmptyView.swift */; };
+		16F0BAD623A53EB4002EC348 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F0BAD523A53EB4002EC348 /* Colors.swift */; };
+		16F0BAD723A53EBF002EC348 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F0BAD523A53EB4002EC348 /* Colors.swift */; };
+		16F0BAD823A53EC0002EC348 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F0BAD523A53EB4002EC348 /* Colors.swift */; };
 		16F413701BA5850A006B0195 /* RepoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F4136F1BA5850A006B0195 /* RepoCell.swift */; };
 		16F70CC11EDC99A000B17E9F /* md5.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F70CC01EDC99A000B17E9F /* md5.swift */; };
 		16F70CC21EDC99A000B17E9F /* md5.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F70CC01EDC99A000B17E9F /* md5.swift */; };
@@ -438,6 +441,7 @@
 		16EDC3AC21348487005E327F /* Trailer 39.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 39.xcdatamodel"; sourceTree = "<group>"; };
 		16EE6ACF1A9A711C000A8483 /* CountLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CountLabel.swift; sourceTree = "<group>"; };
 		16EE871A1A446BFE00A1D16F /* EmptyView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmptyView.swift; sourceTree = "<group>"; };
+		16F0BAD523A53EB4002EC348 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		16F4136F1BA5850A006B0195 /* RepoCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RepoCell.swift; sourceTree = "<group>"; };
 		16F51FA019DE8C78007B0BB1 /* PRIVACY */ = {isa = PBXFileReference; lastKnownFileType = text; lineEnding = 0; path = PRIVACY; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = "<none>"; };
 		16F70CC01EDC99A000B17E9F /* md5.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = md5.swift; path = Shared/md5.swift; sourceTree = "<group>"; };
@@ -763,6 +767,7 @@
 			children = (
 				164785A91A2CE7BD00297764 /* Globals.swift */,
 				1664CBC91B7796840006BDE7 /* Enums.swift */,
+				16F0BAD523A53EB4002EC348 /* Colors.swift */,
 			);
 			name = Globals;
 			sourceTree = "<group>";
@@ -1163,6 +1168,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				162C44291F37BC6500FD95E2 /* Enums.swift in Sources */,
+				16F0BAD823A53EC0002EC348 /* Colors.swift in Sources */,
 				161852821AB2CB9000526D81 /* TodayViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1188,6 +1194,7 @@
 				1668CFE91D5E16B70021CDC5 /* Reachability.swift in Sources */,
 				1694008D1E7AAE32002C5DAD /* Reaction.swift in Sources */,
 				169205661E34DACA00FB9547 /* WatchlistSettingsViewController.swift in Sources */,
+				16F0BAD723A53EBF002EC348 /* Colors.swift in Sources */,
 				16F70CC21EDC99A000B17E9F /* md5.swift in Sources */,
 				16C9A27A1A44DD0200EE54EC /* CommentBlacklistViewController.swift in Sources */,
 				166ADEC81CCB009A001BA61F /* SnoozingEditorViewController.swift in Sources */,
@@ -1280,6 +1287,7 @@
 				1664CBCA1B7796840006BDE7 /* Enums.swift in Sources */,
 				162002DB1A2A545C00FF95F3 /* CenterTextFieldCell.swift in Sources */,
 				16B74E481A3B4AC800410EF6 /* PrTable.swift in Sources */,
+				16F0BAD623A53EB4002EC348 /* Colors.swift in Sources */,
 				16B3B3191A34E8E2000BE6CC /* DataItem.swift in Sources */,
 				16CBE1C11A2DBB2700485053 /* DataManager.swift in Sources */,
 				16901A451D659E9500141595 /* NotificationQueue.swift in Sources */,
