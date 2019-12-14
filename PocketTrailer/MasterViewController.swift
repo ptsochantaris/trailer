@@ -811,14 +811,7 @@ UITableViewDragDelegate {
 	}
 
 	override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-		return 64
-	}
-
-	override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-		if section == numberOfSections(in: tableView)-1 {
-			return 20 + (tabScroll == nil ? 0 : 49)
-		}
-		return CGFloat.leastNonzeroMagnitude
+		return 40
 	}
 
 	private func markItemAsRead(itemUri: String?) {

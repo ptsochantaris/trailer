@@ -1,56 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13196" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
-    <device id="retina5_9" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15702" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina5_9" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13173"/>
-        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15704"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
-    <customFonts key="customFonts">
-        <array key="HelveticaNeue.ttc">
-            <string>HelveticaNeue</string>
-        </array>
-    </customFonts>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="SectionHeaderView" customModule="Trailer" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="385" height="56"/>
+        <view contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" layoutMarginsFollowReadableWidth="YES" id="iN0-l3-epB" customClass="SectionHeaderView" customModule="PocketTrailer" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="385" height="130"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Kwv-d9-rKO">
-                    <rect key="frame" x="10" y="33" width="34.666666666666664" height="17"/>
-                    <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="14"/>
-                    <color key="textColor" cocoaTouchSystemColor="scrollViewTexturedBackgroundColor"/>
+                    <rect key="frame" x="30" y="72.333333333333329" width="33" height="15.666666666666671"/>
+                    <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
+                    <color key="textColor" systemColor="secondaryLabelColor" red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="bottom" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7yK-c1-LPp">
-                    <rect key="frame" x="303" y="23.666666666666671" width="72" height="33"/>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7yK-c1-LPp">
+                    <rect key="frame" x="323" y="56.666666666666657" width="44" height="44"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="33" id="hZa-gd-q61"/>
+                        <constraint firstAttribute="width" constant="44" id="Pre-rW-OtK"/>
+                        <constraint firstAttribute="height" constant="44" id="hZa-gd-q61"/>
                     </constraints>
-                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                    <state key="normal" title="Remove All"/>
+                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                    <state key="normal" image="xmark.circle" catalog="system"/>
                     <connections>
                         <action selector="buttonSelected:" destination="iN0-l3-epB" eventType="touchUpInside" id="axb-Pv-k3A"/>
                     </connections>
                 </button>
             </subviews>
+            <color key="tintColor" name="apptint"/>
             <constraints>
-                <constraint firstAttribute="bottom" secondItem="Kwv-d9-rKO" secondAttribute="bottom" constant="6" id="1ew-pL-IZu"/>
-                <constraint firstItem="7yK-c1-LPp" firstAttribute="baseline" secondItem="Kwv-d9-rKO" secondAttribute="baseline" id="cQ8-Cm-GqW"/>
-                <constraint firstItem="Kwv-d9-rKO" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" constant="-6" id="uMy-k8-PyT"/>
-                <constraint firstAttribute="trailing" secondItem="7yK-c1-LPp" secondAttribute="trailing" constant="10" id="yoY-d9-Z6P"/>
+                <constraint firstAttribute="bottomMargin" secondItem="Kwv-d9-rKO" secondAttribute="bottom" id="1ew-pL-IZu"/>
+                <constraint firstItem="Kwv-d9-rKO" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="uMy-k8-PyT"/>
+                <constraint firstItem="7yK-c1-LPp" firstAttribute="firstBaseline" secondItem="Kwv-d9-rKO" secondAttribute="firstBaseline" id="vgK-Jv-7Rz"/>
+                <constraint firstAttribute="trailingMargin" secondItem="7yK-c1-LPp" secondAttribute="trailing" constant="-12" id="yoY-d9-Z6P"/>
             </constraints>
             <nil key="simulatedStatusBarMetrics"/>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <edgeInsets key="layoutMargins" top="6" left="30" bottom="6" right="30"/>
             <connections>
                 <outlet property="action" destination="7yK-c1-LPp" id="HkO-Ol-3jH"/>
                 <outlet property="title" destination="Kwv-d9-rKO" id="hQ2-xN-UYN"/>
             </connections>
-            <point key="canvasLocation" x="250.5" y="309"/>
+            <point key="canvasLocation" x="250.40000000000001" y="335.46798029556652"/>
         </view>
     </objects>
+    <resources>
+        <image name="xmark.circle" catalog="system" width="64" height="60"/>
+        <namedColor name="apptint">
+            <color red="0.20299999415874481" green="0.43000000715255737" blue="0.71799999475479126" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
 </document>

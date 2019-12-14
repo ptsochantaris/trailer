@@ -421,15 +421,11 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		}
 	}
 
-	override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-		return 55
-	}
-
 	override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
 		if let footer = self.tableView(tableView, viewForFooterInSection: section) {
 			return footer.systemLayoutSizeFitting(CGSize(width: tableView.bounds.size.width, height: 0),
-			                                      withHorizontalFittingPriority: UILayoutPriority.required,
-			                                      verticalFittingPriority: UILayoutPriority.fittingSizeLevel).height + 15.0
+			                                      withHorizontalFittingPriority: .required,
+			                                      verticalFittingPriority: .fittingSizeLevel).height + 25.0
 		} else {
 			return 0
 		}

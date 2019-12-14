@@ -1524,7 +1524,6 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
         <!--Navigation Controller-->
         <scene sceneID="G34-pc-zxQ">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="ryQ-BO-oWi" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="RFw-pn-qBh" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" largeTitles="YES" id="17D-F1-Sn8">
@@ -1536,6 +1535,7 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
                         <segue destination="7bK-jq-Zjz" kind="relationship" relationship="rootViewController" id="hWL-Ac-Bha"/>
                     </connections>
                 </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ryQ-BO-oWi" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-10" y="-33"/>
         </scene>
