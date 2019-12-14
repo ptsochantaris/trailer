@@ -22,7 +22,9 @@ final class PRCell: UITableViewCell {
 
 	@IBOutlet private weak var _image: UIImageView!
 	@IBOutlet private weak var _title: UILabel!
-	@IBOutlet private weak var _description: UILabel!
+	@IBOutlet private weak var _labels: UILabel!
+    @IBOutlet private weak var _reviews: UILabel!
+    @IBOutlet private weak var _description: UILabel!
 	@IBOutlet private weak var _statuses: UILabel!
 
 	override func awakeFromNib() {
@@ -30,7 +32,7 @@ final class PRCell: UITableViewCell {
 		unreadCount.textColor = .white
 		contentView.addSubview(unreadCount)
 
-        readCount.textColor = .darkGray
+        readCount.textColor = .label
 		contentView.addSubview(readCount)
 
 		_image.layer.cornerRadius = 25
@@ -91,7 +93,16 @@ final class PRCell: UITableViewCell {
         let separator = traitCollection.containsTraits(in: compactTraits) ? "\n" : "   "
         
 		let detailFont = _description.font!
-        _title.attributedText = pullRequest.title(with: _title.font, labelFont: detailFont, titleColor: UIColor.label, darkMode: false)
+        _title.attributedText = pullRequest.title(with: _title.font, labelFont: detailFont, titleColor: UIColor.label, numberColor: UIColor.secondaryLabel)
+
+        let l = pullRequest.labelsAttributedString(labelFont: _labels.font)
+        _labels.attributedText = l
+        _labels.isHidden = (l?.length ?? 0) == 0
+
+        let r = pullRequest.reviewsAttributedString(labelFont: _reviews.font, darkMode: false)
+        _reviews.attributedText = r
+        _reviews.isHidden = (r?.length ?? 0) == 0
+
         _description.attributedText = pullRequest.subtitle(with: detailFont, lightColor: UIColor.secondaryLabel, darkColor: UIColor.label, separator: separator)
 
 		let muted = pullRequest.muted
@@ -133,9 +144,18 @@ final class PRCell: UITableViewCell {
         let separator = traitCollection.containsTraits(in: compactTraits) ? "\n" : "   "
 
         let detailFont = _description.font!
-        _title.attributedText = issue.title(with: _title.font, labelFont: detailFont, titleColor: UIColor.label, darkMode: false)
+        _title.attributedText = issue.title(with: _title.font, labelFont: detailFont, titleColor: UIColor.label, numberColor: UIColor.secondaryLabel)
+
+        let l = issue.labelsAttributedString(labelFont: _labels.font)
+        _labels.attributedText = l
+        _labels.isHidden = (l?.length ?? 0) == 0
+
+        _reviews.attributedText = nil
+        _reviews.isHidden = true
+        
         _description.attributedText = issue.subtitle(with: detailFont, lightColor: UIColor.secondaryLabel, darkColor: UIColor.label, separator: separator)
-		_statuses.attributedText = nil
+
+        _statuses.attributedText = nil
 
 		let muted = issue.muted
 		setCountsImageAndFade(item: issue, muted: muted)
@@ -210,7 +230,7 @@ final class PRCell: UITableViewCell {
 	}
 
 	private func tone() {
-		unreadCount.backgroundColor = .systemRed
-		readCount.backgroundColor = UIColor(white: 0.9, alpha: 1.0)
+		unreadCount.badgeColor = .appRed
+        readCount.badgeColor = .systemFill
 	}
 }

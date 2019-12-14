@@ -52,6 +52,32 @@ let NOTIFICATION_URL_KEY = "urlKey"
 
 ////////////////////////// Utilities
 
+extension COLOR_CLASS {
+    static var appGreen: COLOR_CLASS {
+        if #available(OSX 10.13, iOS 13, *) {
+            return COLOR_CLASS(named: "appGreen")!
+        } else {
+            return COLOR_CLASS(red: 0.3, green: 0.6, blue: 0.2, alpha: 1.0)
+        }
+    }
+
+    static var appYellow: COLOR_CLASS {
+        if #available(OSX 10.13, iOS 13, *) {
+            return COLOR_CLASS(named: "appYellow")!
+        } else {
+            return COLOR_CLASS(red: 0.6, green: 0.6, blue: 0.0, alpha: 1.0)
+        }
+    }
+    
+    static var appRed: COLOR_CLASS {
+        if #available(OSX 10.13, iOS 13, *) {
+            return COLOR_CLASS(named: "appRed")!
+        } else {
+            return COLOR_CLASS(red: 0.7, green: 0.2, blue: 0.2, alpha: 1.0)
+        }
+    }
+}
+
 #if os(iOS)
 
 	func showMessage(_ title: String, _ message: String?) {
@@ -210,7 +236,7 @@ enum RepoDisplayPolicy: Int64 {
 	case hide, mine, mineAndPaticipated, all
 	static let labels = ["Hide", "Mine", "Participated", "All"]
 	static let policies = [hide, mine, mineAndPaticipated, all]
-	static let colors = [    COLOR_CLASS(red: 0.8, green: 0.8, blue: 0.8, alpha: 1.0),
+    static let colors = [    COLOR_CLASS.tertiaryLabelColor,
 	                         COLOR_CLASS(red: 0.7, green: 0.0, blue: 0.0, alpha: 1.0),
 	                         COLOR_CLASS(red: 0.8, green: 0.4, blue: 0.0, alpha: 1.0),
 	                         COLOR_CLASS(red: 0.0, green: 0.5, blue: 0.0, alpha: 1.0)]
@@ -239,7 +265,7 @@ enum RepoHidingPolicy: Int64 {
 	case noHiding, hideMyAuthoredPrs, hideMyAuthoredIssues, hideAllMyAuthoredItems, hideOthersPrs, hideOthersIssues, hideAllOthersItems
 	static let labels = ["No Filter", "Hide My PRs", "Hide My Issues", "Hide All Mine", "Hide Others PRs", "Hide Others Issues", "Hide All Others"]
 	static let policies = [noHiding, hideMyAuthoredPrs, hideMyAuthoredIssues, hideAllMyAuthoredItems, hideOthersPrs, hideOthersIssues, hideAllOthersItems]
-	static let colors = [    COLOR_CLASS.lightGray,
+	static let colors = [    COLOR_CLASS.tertiaryLabelColor,
 	                         COLOR_CLASS(red: 0.1, green: 0.1, blue: 0.5, alpha: 1.0),
 	                         COLOR_CLASS(red: 0.1, green: 0.1, blue: 0.5, alpha: 1.0),
 	                         COLOR_CLASS(red: 0.1, green: 0.1, blue: 0.5, alpha: 1.0),

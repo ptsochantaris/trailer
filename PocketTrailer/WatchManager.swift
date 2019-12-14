@@ -237,8 +237,10 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			"commentCount": item.totalComments,
 			"unreadCount": item.unreadComments,
 			"localId": item.objectID.uriRepresentation().absoluteString,
-			"title" : item.title(with: font, labelFont: font, titleColor: .white, darkMode: true),
+            "title" : item.title(with: font, labelFont: font, titleColor: .white, numberColor: .gray),
             "subtitle" : item.subtitle(with: smallFont, lightColor: .lightGray, darkColor: .gray, separator: "\n"),
+            "labels" : item.labelsAttributedString(labelFont: smallFont) ?? NSAttributedString(),
+            "reviews" : (item as? PullRequest)?.reviewsAttributedString(labelFont: smallFont, darkMode: true) ?? NSAttributedString(),
 			]
 
 		if showLabels {

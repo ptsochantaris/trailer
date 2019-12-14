@@ -2,15 +2,16 @@
 import UIKit
 
 final class CountLabel: UILabel {
+    
+    var badgeColor: UIColor?
 
 	override init(frame: CGRect) {
 		super.init(frame: frame)
 		isHidden = true
-		layer.cornerRadius = 9
-		clipsToBounds = true
-		font = UIFont.systemFont(ofSize: 12)
+        font = UIFont.preferredFont(forTextStyle: .caption2)
 		textAlignment = .center
 		translatesAutoresizingMaskIntoConstraints = false
+        backgroundColor = .clear
 	}
 
 	required init(coder aDecoder: NSCoder) {
@@ -18,10 +19,18 @@ final class CountLabel: UILabel {
 	}
 
 	override var intrinsicContentSize: CGSize {
-		var s = super.intrinsicContentSize
-		s.height += 4
-		s.width = max(s.height, s.width+9)
-		return s
+		let s = super.intrinsicContentSize
+        let side = max(s.height+4, s.width+9)
+		return CGSize(width: side, height: side)
 	}
+    
+    override func draw(_ rect: CGRect) {
+        guard let b = badgeColor?.cgColor, let c = UIGraphicsGetCurrentContext() else { return }
+        c.setFillColor(UIColor.systemBackground.cgColor)
+        c.fillEllipse(in: rect)
+        c.setFillColor(b)
+        c.fillEllipse(in: rect)
+        super.draw(rect)
+    }
 
 }

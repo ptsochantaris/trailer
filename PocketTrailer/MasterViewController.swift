@@ -659,7 +659,6 @@ UITableViewDragDelegate {
             b.leadingAnchor.constraint(equalTo: ts.leadingAnchor),
             b.trailingAnchor.constraint(equalTo: ts.trailingAnchor),
         ])
-        
     }
     
     private func hideTabBar() {
@@ -742,6 +741,11 @@ UITableViewDragDelegate {
 	deinit {
 		NotificationCenter.default.removeObserver(self)
 	}
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        tableView.reloadData()
+    }
 
 	override func numberOfSections(in tableView: UITableView) -> Int {
 		return fetchedResultsController.sections?.count ?? 0

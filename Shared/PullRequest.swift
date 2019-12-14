@@ -237,4 +237,82 @@ final class PullRequest: ListableItem {
 	@objc var sectionName: String {
 		return Section.prMenuTitles[Int(sectionIndex)]
 	}
+    
+    func reviewsAttributedString(labelFont: FONT_CLASS) -> NSAttributedString? {
+        if !Settings.displayReviewsOnItems {
+            return nil
+        }
+        
+        let res = NSMutableAttributedString()
+        
+        var latestReviewByUser = [String: Review]()
+        for r in reviews.filter({ $0.affectsBottomLine }).sorted(by: { $0.createdBefore($1) }) {
+            latestReviewByUser[S(r.username)] = r
+        }
+
+        if latestReviewByUser.count > 0 || !reviewers.isEmpty {
+
+            let reviews = latestReviewByUser.values.sorted { $0.createdBefore($1) }
+
+            let approvers = reviews.filter { $0.state == Review.State.APPROVED.rawValue }
+            if approvers.count > 0 {
+
+                let a = [NSAttributedString.Key.font: labelFont, NSAttributedString.Key.foregroundColor: COLOR_CLASS.appGreen]
+
+                var count = 0
+                for r in approvers {
+                    let name = r.username!.replacingOccurrences(of: " ", with: "\u{a0}")
+                    res.append(NSAttributedString(string: "@\(name) ", attributes: a))
+                    if count == approvers.count - 1 {
+                        res.append(NSAttributedString(string: "approved changes", attributes: a))
+                    }
+                    count += 1
+                }
+            }
+
+            let requesters = reviews.filter { $0.state == Review.State.CHANGES_REQUESTED.rawValue }
+            if requesters.count > 0 {
+
+                let a = [NSAttributedString.Key.font: labelFont, NSAttributedString.Key.foregroundColor: COLOR_CLASS.appRed]
+
+                if res.length > 0 {
+                    res.append(NSAttributedString(string: "\n", attributes: a))
+                }
+                
+                var count = 0
+                for r in requesters {
+                    let name = r.username!.replacingOccurrences(of: " ", with: "\u{a0}")
+                    res.append(NSAttributedString(string: "@\(name) ", attributes: a))
+                    if count == requesters.count - 1 {
+                        res.append(NSAttributedString(string: requesters.count > 1 ? "request changes" : "requests changes", attributes: a))
+                    }
+                    count += 1
+                }
+            }
+
+            let approverNames = approvers.compactMap { $0.username }
+            let requesterNames = requesters.compactMap { $0.username }
+            let otherReviewers = reviewers.components(separatedBy: ",").filter({ !($0.isEmpty || approverNames.contains($0) || requesterNames.contains($0)) })
+            if otherReviewers.count > 0 {
+
+                let a = [NSAttributedString.Key.font: labelFont, NSAttributedString.Key.foregroundColor: COLOR_CLASS.appYellow]
+
+                if res.length > 0 {
+                    res.append(NSAttributedString(string: "\n", attributes: a))
+                }
+
+                var count = 0
+                for r in otherReviewers {
+                    let name = r.replacingOccurrences(of: " ", with: "\u{a0}")
+                    res.append(NSAttributedString(string: "@\(name) ", attributes: a))
+                    if count == otherReviewers.count - 1 {
+                        res.append(NSAttributedString(string: otherReviewers.count > 1 ? "haven't reviewed yet" : "hasn't reviewed yet", attributes: a))
+                    }
+                    count += 1
+                }
+            }
+        }
+        
+        return res
+    }
 }

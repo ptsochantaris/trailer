@@ -7,18 +7,19 @@ class TrailerCell: NSTableCellView {
 		paragraphStyle.headIndent = 17
 
 		return [
-			NSAttributedString.Key.font: NSFont(name: "Monaco", size: 9)!,
-			NSAttributedString.Key.paragraphStyle: paragraphStyle
+			.font: NSFont(name: "Monaco", size: 9)!,
+			.paragraphStyle: paragraphStyle
 		]
 	}()
 
-
-	private let detailFont = NSFont.menuFont(ofSize: 10.0)
-	private let titleFont = NSFont.menuBarFont(ofSize: 14.0)
+    private let detailFont = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
+    private let titleFont = NSFont.systemFont(ofSize: NSFont.systemFontSize)
 
 	private let dataItemId: NSManagedObjectID
 
     private let title = CenterTextField(frame: .zero)
+    private let labels = CenterTextField(frame: .zero)
+    private let reviews = CenterTextField(frame: .zero)
     private let subtitle = CenterTextField(frame: .zero)
 	private var trackingArea: NSTrackingArea?
 
@@ -39,53 +40,53 @@ class TrailerCell: NSTableCellView {
 		let shift: CGFloat = showAvatar ? AVATAR_SIZE + AVATAR_PADDING : -4
 		W -= shift
 
-		let bottom: CGFloat
-		let cellPadding: CGFloat
-		var statusBottom: CGFloat = 0
+		var y: CGFloat = 8
 		let widthLimit = CGSize(width: W, height: .greatestFiniteMagnitude)
 
+        func append(_ field: CenterTextField) {
+            let a = field.attributedStringValue
+            if a.length == 0 { return }
+            let height = a.boundingRect(with: widthLimit, options: stringDrawingOptions).integral.size.height + 2
+            field.frame = CGRect(x: LEFTPADDING + shift, y: y, width: W, height: height)
+            addSubview(field)
+            y += height
+        }
+        
 		if let pullRequest = item as? PullRequest, pullRequest.shouldShowStatuses {
-			cellPadding = 10
-			bottom = 5
-
-			for status in pullRequest.displayedStatuses.reversed() {
-				let text = status.displayText
-				let H = text.boundingRect(with: widthLimit, options: stringDrawingOptions, attributes: TrailerCell.statusAttributes).integral.size.height
-				let rect = CGRect(x: LEFTPADDING + shift, y: bottom + statusBottom, width: W, height: H)
-				statusBottom += H
-
-				let statusLabel = LinkField(frame: rect)
-				statusLabel.targetUrl = status.targetUrl
-				statusLabel.needsCommand = !Settings.makeStatusItemsSelectable
-				statusLabel.attributedStringValue = NSAttributedString(string: text, attributes: TrailerCell.statusAttributes)
-				statusLabel.textColor = isDark ? status.colorForDarkDisplay : status.colorForDisplay
-				statusLabel.alphaValue = faded ? DISABLED_FADE : 1.0
-				addSubview(statusLabel)
-			}
-
-		} else {
-			cellPadding = 6
-			bottom = 3
+            let statuses = pullRequest.displayedStatuses.reversed()
+            if !statuses.isEmpty {
+                for status in statuses {
+                    let statusLabel = LinkField(frame: .zero)
+                    statusLabel.targetUrl = status.targetUrl
+                    statusLabel.needsCommand = !Settings.makeStatusItemsSelectable
+                    statusLabel.attributedStringValue = NSAttributedString(string: status.displayText, attributes: TrailerCell.statusAttributes)
+                    statusLabel.textColor = status.colorForDisplay
+                    statusLabel.alphaValue = faded ? DISABLED_FADE : 1.0
+                    append(statusLabel)
+                }
+                y += 1
+            }
 		}
 
         updateText(for: item)
+        append(subtitle)
+        append(reviews)
+        y += 1
+        append(labels)
+        append(title)
+        
+        let cellPadding: CGFloat = 5
+        y += cellPadding
 
-		let titleHeight = title.attributedStringValue.boundingRect(with: widthLimit, options: stringDrawingOptions).integral.size.height + 2
-		let subtitleHeight = subtitle.attributedStringValue.boundingRect(with: widthLimit, options: stringDrawingOptions).integral.size.height + 4
+		frame = CGRect(x: 0, y: 0, width: MENU_WIDTH, height: y)
 
-		let titlesBottom = statusBottom + bottom + 1
-        title.frame = CGRect(x: LEFTPADDING + shift, y: titlesBottom + subtitleHeight, width: W, height: titleHeight)
-        subtitle.frame = CGRect(x: LEFTPADDING + shift, y: titlesBottom, width: W, height: subtitleHeight)
-		frame = CGRect(x: 0, y: 0, width: MENU_WIDTH, height: titleHeight + subtitleHeight + statusBottom + cellPadding)
-
-        addSubview(title)
-        addSubview(subtitle)
-
+        let accesoryCenterY = y - AVATAR_SIZE * 0.5 - cellPadding - 7
+        
 		let hasNewCommits = (item as? PullRequest)?.hasNewCommits ?? false
-		addCounts(total: item.totalComments, unread: item.unreadComments, alert: hasNewCommits, faded: faded)
+		addCounts(total: item.totalComments, unread: item.unreadComments, alert: hasNewCommits, faded: faded, centerY: accesoryCenterY)
 
 		if showAvatar {
-			let avatarRect = CGRect(x: LEFTPADDING, y: bounds.size.height-AVATAR_SIZE-7.0, width: AVATAR_SIZE, height: AVATAR_SIZE)
+            let avatarRect = CGRect(x: LEFTPADDING, y: accesoryCenterY - AVATAR_SIZE * 0.5, width: AVATAR_SIZE, height: AVATAR_SIZE)
 			let userImage = AvatarView(frame: avatarRect, url: S(item.userAvatarUrl))
 			userImage.alphaValue = faded ? DISABLED_FADE : 1.0
 			addSubview(userImage)
@@ -127,15 +128,11 @@ class TrailerCell: NSTableCellView {
 		selected = false
 	}
 
-	private var isDark: Bool {
-		return app.theme != .light
-	}
-
     private func updateText(for item: ListableItem) {
-		let light: NSColor = .secondaryLabelColor
-		let strong: NSColor = .controlTextColor
-		title.attributedStringValue = item.title(with: titleFont, labelFont: detailFont, titleColor: strong, darkMode: isDark)
-        subtitle.attributedStringValue = item.subtitle(with: detailFont, lightColor: light, darkColor: strong, separator: "   ")
+        title.attributedStringValue = item.title(with: titleFont, labelFont: detailFont, titleColor: .controlTextColor, numberColor: .secondaryLabelColor)
+        labels.attributedStringValue = item.labelsAttributedString(labelFont: detailFont) ?? NSAttributedString()
+        reviews.attributedStringValue = (item as? PullRequest)?.reviewsAttributedString(labelFont: detailFont) ?? NSAttributedString()
+        subtitle.attributedStringValue = item.subtitle(with: detailFont, lightColor: .tertiaryLabelColor, darkColor: .secondaryLabelColor, separator: "   ")
     }
 
 	var selected = false {
@@ -341,7 +338,7 @@ class TrailerCell: NSTableCellView {
 	private var newBackground: FilledView?
 	private var countView: CenterTextField?
 
-	func addCounts(total: Int64, unread: Int64, alert: Bool, faded: Bool) {
+    func addCounts(total: Int64, unread: Int64, alert: Bool, faded: Bool, centerY: CGFloat) {
 
 		if total == 0 && !alert {
 			return
@@ -357,10 +354,9 @@ class TrailerCell: NSTableCellView {
 
 		var height: CGFloat = 20
 		var width = max(height, countString.size().width+10)
-		var bottom = bounds.size.height-height-10.0
 		var left = (LEFTPADDING-width)*0.5
 
-		let c = FilledView(frame: CGRect(x: left, y: bottom, width: width, height: height).integral)
+        let c = FilledView(frame: CGRect(x: left, y: centerY - height * 0.5, width: width, height: height).integral)
 		c.cornerRadius = floor(height/2.0)
 
 		countView = CenterTextField(frame: c.bounds)
@@ -380,13 +376,11 @@ class TrailerCell: NSTableCellView {
 				NSAttributedString.Key.foregroundColor: NSColor.white,
 				NSAttributedString.Key.paragraphStyle: pCenter])
 
-			bottom += height
 			height = 14
 			width = max(height, alertString.size().width+8.0)
-			bottom -= height * 0.5 + 1
 			left -= width * 0.5
 
-			let cc = FilledView(frame: CGRect(x: left, y: bottom, width: width, height: height).integral)
+			let cc = FilledView(frame: CGRect(x: left, y: centerY, width: width, height: height).integral)
 			cc.cornerRadius = floor(height*0.5)
 
 			let alertCount = CenterTextField(frame: cc.bounds)

@@ -547,30 +547,51 @@ class ListableItem: DataItem {
 	}
 
     private final func buildLabelAttributes(labelFont: FONT_CLASS, offset: CGFloat) -> [NSAttributedString.Key: Any] {
-        let lp = NSMutableParagraphStyle()
-        #if os(iOS)
-        lp.lineHeightMultiple = 1.05
-        #elseif os(OSX)
-        lp.minimumLineHeight = labelFont.pointSize + 4
-        #endif
-        return [.font: labelFont, .baselineOffset: offset, .paragraphStyle: lp]
+        return [.font: labelFont, .baselineOffset: offset]
     }
     
-	final func title(with font: FONT_CLASS, labelFont: FONT_CLASS, titleColor: COLOR_CLASS, darkMode: Bool) -> NSMutableAttributedString {
+    final func labelsAttributedString(labelFont: FONT_CLASS) -> NSAttributedString? {
+        if !Settings.showLabels {
+            return nil
+        }
+        
+        let sorted = sortedLabels
+        let labelCount = sorted.count
+        if labelCount == 0 {
+            return nil
+        }
 
-		let p = NSMutableParagraphStyle()
-		p.paragraphSpacing = 1.0
-		let titleAttributes = [NSAttributedString.Key.font: font,
-		                       NSAttributedString.Key.foregroundColor: titleColor,
-		                       NSAttributedString.Key.paragraphStyle: p]
+        func isDark(color: COLOR_CLASS) -> Bool {
+            var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0
+            color.getRed(&r, green: &g, blue: &b, alpha: nil)
+            let lum = 0.2126 * r + 0.7152 * g + 0.0722 * b
+            return (lum < 0.5)
+        }
+
+        let labelAttributes = buildLabelAttributes(labelFont: labelFont, offset: 0)
+        let res = NSMutableAttributedString()
+        for l in sorted {
+            var a = labelAttributes
+            let color = l.colorForDisplay
+            a[.backgroundColor] = color
+            a[.foregroundColor] = isDark(color: color) ? COLOR_CLASS.white : COLOR_CLASS.black
+            let name = l.name!.replacingOccurrences(of: " ", with: "\u{a0}")
+            res.append(NSAttributedString(string: "\u{a0}\(name)\u{a0}", attributes: a))
+            res.append(NSAttributedString(string: " ", attributes: labelAttributes))
+        }
+        return res
+    }
+    
+    final func title(with font: FONT_CLASS, labelFont: FONT_CLASS, titleColor: COLOR_CLASS, numberColor: COLOR_CLASS) -> NSMutableAttributedString {
+        
+		let titleAttributes = [NSAttributedString.Key.font: font, NSAttributedString.Key.foregroundColor: titleColor]
 
 		let _title = NSMutableAttributedString()
 		if let t = title {
 
 			if Settings.displayNumbersForItems {
-                var fadedTitleAttributes = titleAttributes
-                fadedTitleAttributes[NSAttributedString.Key.foregroundColor] = (darkMode ? COLOR_CLASS.lightGray : COLOR_CLASS.gray)
-				_title.append(NSAttributedString(string: "#\(number) ", attributes: fadedTitleAttributes))
+                let numberAttributes = [NSAttributedString.Key.font: font, NSAttributedString.Key.foregroundColor: numberColor]
+				_title.append(NSAttributedString(string: "#\(number) ", attributes: numberAttributes))
 			}
 			
 			_title.append(NSAttributedString(string: t, attributes: titleAttributes))
@@ -583,120 +604,6 @@ class ListableItem: DataItem {
                 draftAttributes[.foregroundColor] = COLOR_CLASS.systemOrange
                 _title.append(NSAttributedString(string: "DRAFT", attributes: draftAttributes))
             }
-
-			if Settings.showLabels {
-
-				let sorted = sortedLabels
-				let labelCount = sorted.count
-				if labelCount > 0 {
-
-					func isDark(color: COLOR_CLASS) -> Bool {
-						var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0
-						color.getRed(&r, green: &g, blue: &b, alpha: nil)
-						let lum = 0.2126 * r + 0.7152 * g + 0.0722 * b
-						return (lum < 0.5)
-					}
-
-					_title.append(NSAttributedString(string: "\n", attributes: titleAttributes))
-
-                    let labelAttributes = buildLabelAttributes(labelFont: labelFont, offset: 2)
-					for l in sorted {
-						var a = labelAttributes
-						let color = l.colorForDisplay
-						a[NSAttributedString.Key.backgroundColor] = color
-						a[NSAttributedString.Key.foregroundColor] = isDark(color: color) ? COLOR_CLASS.white : COLOR_CLASS.black
-						let name = l.name!.replacingOccurrences(of: " ", with: "\u{a0}")
-						_title.append(NSAttributedString(string: "\u{a0}\(name)\u{a0}", attributes: a))
-                        #if os(iOS)
-                        _title.append(NSAttributedString(string: " ", attributes: titleAttributes))
-                        #elseif os(OSX)
-                        _title.append(NSAttributedString(string: " ", attributes: a))
-                        #endif
-					}
-				}
-			}
-
-			if Settings.displayReviewsOnItems, let p = self as? PullRequest {
-
-				var latestReviewByUser = [String:Review]()
-				for r in p.reviews.filter({ $0.affectsBottomLine }).sorted(by: { $0.createdBefore($1) }) {
-					latestReviewByUser[S(r.username)] = r
-				}
-
-				if latestReviewByUser.count > 0 || !p.reviewers.isEmpty {
-
-					let reviews = latestReviewByUser.values.sorted { $0.createdBefore($1) }
-
-					let lp = NSMutableParagraphStyle()
-					#if os(iOS)
-						lp.lineHeightMultiple = 1.15
-					#else
-						lp.minimumLineHeight = labelFont.pointSize + 5
-					#endif
-
-					let approvers = reviews.filter { $0.state == Review.State.APPROVED.rawValue }
-					if approvers.count > 0 {
-
-						let a = [NSAttributedString.Key.font: labelFont,
-								 NSAttributedString.Key.foregroundColor: (darkMode ? darkModeGreen : lightModeGreen),
-						         NSAttributedString.Key.paragraphStyle: lp]
-
-						_title.append(NSAttributedString(string: "\n", attributes: a))
-
-						var count = 0
-						for r in approvers {
-							let name = r.username!.replacingOccurrences(of: " ", with: "\u{a0}")
-							_title.append(NSAttributedString(string: "@\(name) ", attributes: a))
-							if count == approvers.count - 1 {
-								_title.append(NSAttributedString(string: "approved changes", attributes: a))
-							}
-							count += 1
-						}
-					}
-
-					let requesters = reviews.filter { $0.state == Review.State.CHANGES_REQUESTED.rawValue }
-					if requesters.count > 0 {
-
-						let a = [NSAttributedString.Key.font: labelFont,
-								 NSAttributedString.Key.foregroundColor: (darkMode ? darkModeRed : lightModeRed),
-						         NSAttributedString.Key.paragraphStyle: lp]
-
-						_title.append(NSAttributedString(string: "\n", attributes: a))
-
-						var count = 0
-						for r in requesters {
-							let name = r.username!.replacingOccurrences(of: " ", with: "\u{a0}")
-							_title.append(NSAttributedString(string: "@\(name) ", attributes: a))
-							if count == requesters.count - 1 {
-								_title.append(NSAttributedString(string: requesters.count > 1 ? "request changes" : "requests changes", attributes: a))
-							}
-							count += 1
-						}
-					}
-
-					let approverNames = approvers.compactMap { $0.username }
-					let requesterNames = requesters.compactMap { $0.username }
-					let otherReviewers = p.reviewers.components(separatedBy: ",").filter({ !($0.isEmpty || approverNames.contains($0) || requesterNames.contains($0)) })
-					if otherReviewers.count > 0 {
-
-						let a = [NSAttributedString.Key.font: labelFont,
-								 NSAttributedString.Key.foregroundColor: (darkMode ? darkModeYellow : lightModeYellow),
-						         NSAttributedString.Key.paragraphStyle: lp]
-
-						_title.append(NSAttributedString(string: "\n", attributes: a))
-
-						var count = 0
-						for r in otherReviewers {
-							let name = r.replacingOccurrences(of: " ", with: "\u{a0}")
-							_title.append(NSAttributedString(string: "@\(name) ", attributes: a))
-							if count == otherReviewers.count - 1 {
-								_title.append(NSAttributedString(string: otherReviewers.count > 1 ? "haven't reviewed yet" : "hasn't reviewed yet", attributes: a))
-							}
-							count += 1
-						}
-					}
-				}
-			}
 		}
 		return _title
 	}
@@ -1118,17 +1025,17 @@ class ListableItem: DataItem {
 			color = COLOR_CLASS(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)
 			message = "There are no configured API servers in your settings, please ensure you have added at least one server with a valid API token."
 		} else if appIsRefreshing {
-			color = COLOR_CLASS.lightGray
+			color = COLOR_CLASS.secondaryLabelColor
 			message = "Refreshing information, please wait a moment…"
 		} else if !S(filterValue).isEmpty {
-			color = COLOR_CLASS.lightGray
+			color = COLOR_CLASS.secondaryLabelColor
 			message = "There are no items matching this filter."
 		} else if hasOpen(in: DataManager.main, criterion: criterion) {
-			color = COLOR_CLASS.lightGray
+			color = COLOR_CLASS.secondaryLabelColor
 			message = "Some items are hidden by your settings."
 		} else if !Repo.anyVisibleRepos(in: DataManager.main, criterion: criterion, excludeGrouped: true) {
 			if Repo.anyVisibleRepos(in: DataManager.main) {
-				color = COLOR_CLASS.lightGray
+				color = COLOR_CLASS.secondaryLabelColor
 				message = "There are no repositories that are currently visible in this category."
 			} else {
 				color = COLOR_CLASS(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)
@@ -1138,7 +1045,7 @@ class ListableItem: DataItem {
 			color = COLOR_CLASS(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)
 			message = "All your watched repositories are marked as hidden, please enable issues or PRs on at least one."
 		} else {
-			color = COLOR_CLASS.lightGray
+			color = COLOR_CLASS.secondaryLabelColor
 			message = "No open items in your configured repositories."
 		}
 

@@ -1,13 +1,5 @@
 import Foundation
 
-let darkModeRed = COLOR_CLASS(red: 0.9, green: 0.5, blue: 0.5, alpha: 1.0)
-let darkModeYellow = COLOR_CLASS(red: 0.8, green: 0.8, blue: 0.3, alpha: 1.0)
-let darkModeGreen = COLOR_CLASS(red: 0.5, green: 0.8, blue: 0.5, alpha: 1.0)
-
-let lightModeRed = COLOR_CLASS(red: 0.7, green: 0.2, blue: 0.2, alpha: 1.0)
-let lightModeYellow = COLOR_CLASS(red: 0.6, green: 0.6, blue: 0.0, alpha: 1.0)
-let lightModeGreen = COLOR_CLASS(red: 0.3, green: 0.6, blue: 0.2, alpha: 1.0)
-
 final class PRStatus: DataItem {
 
     @NSManaged var descriptionText: String?
@@ -32,25 +24,14 @@ final class PRStatus: DataItem {
 		}
 	}
 
-	var colorForDarkDisplay: COLOR_CLASS {
-		switch S(state) {
-		case "pending":
-			return darkModeYellow
-		case "success":
-			return darkModeGreen
-		default:
-			return darkModeRed
-		}
-	}
-
 	var colorForDisplay: COLOR_CLASS {
 		switch S(state) {
 		case "pending":
-			return lightModeYellow
+            return .appYellow
 		case "success":
-			return lightModeGreen
+            return .appGreen
 		default:
-			return lightModeRed
+            return .appRed
 		}
 	}
 
