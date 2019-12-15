@@ -29,7 +29,7 @@ final class SnoozePreset: NSManagedObject {
 			if minute > 0 {
 				resultItems.append(minute > 1 ? "\(minute) minutes" : "1 minute")
 			}
-			if resultItems.count == 0 {
+			if resultItems.isEmpty {
 				if wakeOnComment || wakeOnMention || wakeOnStatusChange {
 					return "Until event or manual wake"
 				} else {

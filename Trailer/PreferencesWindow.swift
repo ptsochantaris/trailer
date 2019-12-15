@@ -8,8 +8,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	func reset() {
 		preferencesDirty = true
-		API.refreshesSinceLastStatusCheck.removeAll()
-		API.refreshesSinceLastReactionsCheck.removeAll()
 		Settings.lastSuccessfulRefresh = nil
 		lastRepoCheck = .distantPast
 		reloadRepositories()
@@ -59,13 +57,13 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet private weak var dontConfirmRemoveAllMerged: NSButton!
 	@IBOutlet private weak var dontConfirmRemoveAllClosed: NSButton!
 	@IBOutlet private weak var removeNotificationsWhenItemIsRemoved: NSButton!
-
+    @IBOutlet private weak var scanClosedAndMergedItems: NSButton!
+    
 	// Statuses
 	@IBOutlet private weak var showStatusItems: NSButton!
 	@IBOutlet private weak var makeStatusItemsSelectable: NSButton!
 	@IBOutlet private weak var statusItemRescanLabel: NSTextField!
 	@IBOutlet private weak var statusItemRefreshCounter: NSStepper!
-	@IBOutlet private weak var statusItemsRefreshNote: NSTextField!
 	@IBOutlet private weak var notifyOnStatusUpdates: NSButton!
 	@IBOutlet private weak var notifyOnStatusUpdatesForAllPrs: NSButton!
 	@IBOutlet private weak var statusTermMenu: NSPopUpButton!
@@ -104,7 +102,9 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet private weak var displayMilestones: NSButton!
 	@IBOutlet private weak var displayNumbersForItems: NSButton!
     @IBOutlet private weak var draftHandlingPolicy: NSPopUpButton!
-    
+    @IBOutlet private weak var markUnmergeablePrs: NSButton!
+    @IBOutlet private weak var showPrLines: NSButton!
+
 	// Servers
 	@IBOutlet private weak var serverList: NSTableView!
 	@IBOutlet private weak var apiServerName: NSTextField!
@@ -115,7 +115,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet private weak var apiServerTestButton: NSButton!
 	@IBOutlet private weak var apiServerDeleteButton: NSButton!
 	@IBOutlet private weak var apiServerReportError: NSButton!
-
+    @IBOutlet private weak var v4ApiSwitch: NSButton!
+    
 	// Snoozing
 	@IBOutlet private weak var snoozePresetsList: NSTableView!
 	@IBOutlet private weak var snoozeTypeDuration: NSButton!
@@ -145,7 +146,9 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet private weak var dumpApiResponsesToConsole: NSButton!
 	@IBOutlet private weak var defaultOpenApp: NSTextField!
 	@IBOutlet private weak var defaultOpenLinks: NSTextField!
-
+    @IBOutlet private weak var reloadAllData: NSButton!
+    @IBOutlet private weak var reloadAllDataHelp: NSTextField!
+    
 	// Keyboard
 	@IBOutlet private weak var hotkeyEnable: NSButton!
 	@IBOutlet private weak var hotkeyCommandModifier: NSButton!
@@ -173,7 +176,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet private weak var notifyOnAllAcceptances: NSButton!
 	@IBOutlet private weak var notifyOnAllReviewDismissals: NSButton!
 	@IBOutlet private weak var supportReviews: NSButton!
-
+    @IBOutlet private weak var showRequestedTeamReviews: NSButton!
+    
 	// Reactions
 	@IBOutlet private weak var notifyOnItemReactions: NSButton!
 	@IBOutlet private weak var notifyOnCommentReactions: NSButton!
@@ -201,7 +205,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		let selectedIndex = min(tabs.numberOfTabViewItems-1, Settings.lastPreferencesTabSelectedOSX)
 		tabs.selectTabViewItem(tabs.tabViewItem(at: selectedIndex))
 
-		if projectsTable.sortDescriptors.count == 0, let firstSortDescriptor = projectsTable.tableColumns.first?.sortDescriptorPrototype {
+		if projectsTable.sortDescriptors.isEmpty, let firstSortDescriptor = projectsTable.tableColumns.first?.sortDescriptorPrototype {
 			projectsTable.sortDescriptors = [firstSortDescriptor]
 		}
 
@@ -261,11 +265,28 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
+    @IBAction private func showPrLinesSelected(_ sender: NSButton) {
+        Settings.showPrLines = sender.integerValue == 1
+        deferredUpdateTimer.push()
+    }
+    
+    @IBAction private func markUnmergeablePrsSelected(_ sender: NSButton) {
+        Settings.markUnmergeablePrs = sender.integerValue == 1
+        deferredUpdateTimer.push()
+    }
+
 	@IBAction private func supportReviewsSelected(_ sender: NSButton) {
 		let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
 		Settings.displayReviewsOnItems = sender.integerValue == 1
 		showOptionalReviewWarning(previousSync: previousShouldSync)
 	}
+    
+    @IBAction private func showRequestedTeamReviewsSelected(_ sender: NSButton) {
+        let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
+        Settings.showRequestedTeamReviews = sender.integerValue == 1
+        showOptionalReviewWarning(previousSync: previousShouldSync)
+        deferredUpdateTimer.push()
+    }
 
 	@IBAction private func notifyOnChangeRequestsSelected(_ sender: NSButton) {
 		let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
@@ -333,6 +354,19 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		a.messageText = "The next sync may take a while, because everything will need to be fully re-synced. This will be needed only once: Subsequent syncs will be fast again."
 		a.beginSheetModal(for: self, completionHandler: nil)
 	}
+    
+    @IBAction private func v4APISwitchChanged(_ sender: NSButton) {
+        let turnOn = sender.integerValue == 1
+        if turnOn && !API.canUseV4API(for: DataManager.main) {
+            sender.integerValue = 0
+            let a = NSAlert()
+            a.messageText = Settings.v4title
+            a.informativeText = Settings.v4Message
+            a.beginSheetModal(for: self, completionHandler: nil)
+        } else {
+            Settings.useV4API = turnOn
+        }
+    }
 
 	@objc private func updateApiTable() {
 		serverList.reloadData()
@@ -347,7 +381,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		serverList.toolTip = "The list of GitHub API servers that Trailer will attempt to sync data from. You can edit each server's details from the pane on the right. Bear in mind that some servers, like the public GitHub server for instance, have strict API volume limits, and syncing too many repos or items too often can result in API usage going over the limit. You can monitor your usage from the bar next to the server's name. If it is red, you're close to maximum. Your API usage is reset every hour."
 		apiServerName.toolTip = "An internal name you want to use to refer to this server."
 		apiServerApiPath.toolTip = "The full URL of the root of the API endpoints for this server. The placeholder text shows examples for GitHub and GitHub Enterprise servers, but your own custom configuration may vary."
-		apiServerWebPath.toolTip = "This is the root of the web front-end of your server. It is used for constructing the paths to open your watchlist and API key management links. Other than that it is not used to sync data."
+        apiServerWebPath.toolTip = "This is the root of the web front-end of your server. It is used for constructing the paths to open your watchlist and API key management links. Other than that it is not used to sync data."
 		apiServerReportError.toolTip = "If this is checked, Trailer will display a red 'X' symbol on your menubar if sync fails with this server. It is usually a good idea to keep this on, but you may want to turn it off if a specific server isn't always reacahble, for instance."
 		projectsTable.toolTip = "These are all your watched repositories.\n\nTrailer scans the watchlists of all the servers you have configured and adds the repositories to this combined watchlist.\n\nYou can visit and edit the watchlist of each server from the link provided on that server's entry on the 'Servers' tab.\n\nYou can keep clutter low by editing the visibility of items from each repository with the dropdown menus on the right."
 		repoFilter.toolTip = "Quickly find a repository you are looking for by typing some text in there. Productivity tip: If you use the buttons on the right to set visibility of 'all' items, those settings will apply to only the visible filtered items."
@@ -384,7 +418,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		prClosedPolicy.toolTip = Settings.closeHandlingPolicyHelp
 		dontKeepPrsMergedByMe.toolTip = Settings.dontKeepPrsMergedByMeHelp
 		removeNotificationsWhenItemIsRemoved.toolTip = Settings.removeNotificationsWhenItemIsRemovedHelp
-		dontConfirmRemoveAllClosed.toolTip = Settings.dontAskBeforeWipingClosedHelp
+        scanClosedAndMergedItems.toolTip = Settings.scanClosedAndMergedItemsHelp
+        dontConfirmRemoveAllClosed.toolTip = Settings.dontAskBeforeWipingClosedHelp
 		dontConfirmRemoveAllMerged.toolTip = Settings.dontAskBeforeWipingMergedHelp
 		showAllComments.toolTip = Settings.showCommentsEverywhereHelp
 		hideUncommentedPrs.toolTip = Settings.hideUncommentedItemsHelp
@@ -392,8 +427,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		assumeCommentsBeforeMineAreRead.toolTip = Settings.assumeReadItemIfUserHasNewerCommentsHelp
 		disableAllCommentNotifications.toolTip = Settings.disableAllCommentNotificationsHelp
 		showStatusItems.toolTip = Settings.showStatusItemsHelp
-		statusItemRefreshCounter.toolTip = Settings.statusItemRefreshIntervalHelp
-		statusItemRescanLabel.toolTip = Settings.statusItemRefreshIntervalHelp
+		statusItemRefreshCounter.toolTip = Settings.statusItemRefreshBatchSizeHelp
+		statusItemRescanLabel.toolTip = Settings.statusItemRefreshBatchSizeHelp
 		makeStatusItemsSelectable.toolTip = Settings.makeStatusItemsSelectableHelp
 		notifyOnStatusUpdates.toolTip = Settings.notifyOnStatusUpdatesHelp
 		notifyOnStatusUpdatesForAllPrs.toolTip = Settings.notifyOnStatusUpdatesForAllPrsHelp
@@ -424,14 +459,19 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		notifyOnReviewAssignments.toolTip = Settings.notifyOnReviewAssignmentsHelp
 		assignedReviewHandlingPolicy.toolTip = Settings.assignedReviewHandlingPolicyHelp
 		supportReviews.toolTip = Settings.displayReviewsOnItemsHelp
-		notifyOnItemReactions.toolTip = Settings.notifyOnItemReactionsHelp
+        showRequestedTeamReviews.toolTip = Settings.showRequestedTeamReviewsHelp
+        notifyOnItemReactions.toolTip = Settings.notifyOnItemReactionsHelp
 		notifyOnCommentReactions.toolTip = Settings.notifyOnCommentReactionsHelp
 		showLabels.toolTip = Settings.showLabelsHelp
-		reactionIntervalLabel.toolTip = Settings.reactionScanningIntervalHelp
-		reactionIntervalStepper.toolTip = Settings.reactionScanningIntervalHelp
+		reactionIntervalLabel.toolTip = Settings.reactionScanningBatchSizeHelp
+		reactionIntervalStepper.toolTip = Settings.reactionScanningBatchSizeHelp
 		showRelativeDates.toolTip = Settings.showRelativeDatesHelp
 		displayMilestones.toolTip = Settings.showMilestonesHelp
 		displayNumbersForItems.toolTip = Settings.displayNumbersForItemsHelp
+        v4ApiSwitch.toolTip = Settings.useV4APIHelp
+        markUnmergeablePrs.toolTip = Settings.markUnmergeablePrsHelp
+        showPrLines.toolTip = Settings.showPrLinesHelp
+        reloadAllDataHelp.stringValue = Settings.reloadAllDataHelp
 	}
 
 	private func updateAllItemSettingButtons() {
@@ -495,7 +535,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		showSeparateApiServersInMenu.integerValue = Settings.showSeparateApiServersInMenu ? 1 : 0
 		dontKeepPrsMergedByMe.integerValue = Settings.dontKeepPrsMergedByMe ? 1 : 0
 		removeNotificationsWhenItemIsRemoved.integerValue = Settings.removeNotificationsWhenItemIsRemoved ? 1 : 0
-		grayOutWhenRefreshing.integerValue = Settings.grayOutWhenRefreshing ? 1 : 0
+        scanClosedAndMergedItems.integerValue = Settings.scanClosedAndMergedItems ? 1 : 0
+        grayOutWhenRefreshing.integerValue = Settings.grayOutWhenRefreshing ? 1 : 0
 		notifyOnStatusUpdates.integerValue = Settings.notifyOnStatusUpdates ? 1 : 0
 		notifyOnStatusUpdatesForAllPrs.integerValue = Settings.notifyOnStatusUpdatesForAllPrs ? 1 : 0
 		disableAllCommentNotifications.integerValue = Settings.disableAllCommentNotifications ? 1 : 0
@@ -520,7 +561,11 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		showRelativeDates.integerValue = Settings.showRelativeDates ? 1 : 0
 		displayMilestones.integerValue = Settings.showMilestones ? 1 : 0
 		displayNumbersForItems.integerValue = Settings.displayNumbersForItems ? 1 : 0
-
+        v4ApiSwitch.integerValue = Settings.useV4API ? 1 : 0
+        markUnmergeablePrs.integerValue = Settings.markUnmergeablePrs ? 1 : 0
+        showPrLines.integerValue = Settings.showPrLines ? 1 : 0
+        showRequestedTeamReviews.integerValue = Settings.showRequestedTeamReviews ? 1 : 0
+        
 		defaultOpenApp.stringValue = Settings.defaultAppForOpeningItems
 		defaultOpenLinks.stringValue = Settings.defaultAppForOpeningWeb
 
@@ -558,7 +603,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 		hotkeyEnable.isEnabled = true
 
-		refreshDurationStepper.floatValue = min(Settings.refreshPeriod, 3600)
+		refreshDurationStepper.doubleValue = min(Settings.refreshPeriod, 3600)
 		refreshDurationChanged(nil)
 
 		updateImportExportSettings()
@@ -569,24 +614,44 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	func updateActivity() {
-		if appIsRefreshing {
-			projectsTable.alphaValue = 0.3
-			projectsTable.isEnabled = false
-			allPrsSetting.isEnabled = false
-			allIssuesSetting.isEnabled = false
-			allHidingSetting.isEnabled = false
+        
+        let isIdle = !API.isRefreshing
+        projectsTable.isEnabled = isIdle
+        allPrsSetting.isEnabled = isIdle
+        allIssuesSetting.isEnabled = isIdle
+        allHidingSetting.isEnabled = isIdle
+        v4ApiSwitch.isEnabled = isIdle
+        reloadAllData.isEnabled = isIdle
+
+		if isIdle {
+            projectsTable.alphaValue = 1
+            reloadRepositories()
 		} else {
-			projectsTable.alphaValue = 1.0
-			projectsTable.isEnabled = true
-			allPrsSetting.isEnabled = true
-			allIssuesSetting.isEnabled = true
-			allHidingSetting.isEnabled = true
-			reloadRepositories()
+            projectsTable.alphaValue = 0.3
 		}
 		advancedReposWindow?.updateActivity()
 	}
+    
+    @IBAction private func reloadAllDataSelected(_ sender: NSButton) {
+        let alert = NSAlert()
+        alert.messageText = "Reload All Data?"
+        alert.informativeText = Settings.reloadAllDataHelp
+        alert.addButton(withTitle: "Cancel")
+        alert.addButton(withTitle: "Reload All Data")
 
-	@IBAction func displayNumbersForItemsSelected(_ sender: NSButton) {
+        if alert.runModal() == .alertSecondButtonReturn {
+            for a in ApiServer.allApiServers(in: DataManager.main) {
+                a.deleteEverything()
+                a.resetSyncState()
+            }
+            DataManager.saveDB()
+            RestAccess.clearAllBadLinks()
+            app.updateAllMenus()
+            app.startRefresh()
+        }
+    }
+
+	@IBAction private func displayNumbersForItemsSelected(_ sender: NSButton) {
 		Settings.displayNumbersForItems = sender.integerValue == 1
 		deferredUpdateTimer.push()
 	}
@@ -603,7 +668,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction private func notifyOnItemReactionsSelected(_ sender: NSButton) {
 		Settings.notifyOnItemReactions = sender.integerValue == 1
-		API.refreshesSinceLastReactionsCheck.removeAll()
 		updateReactionItemOptions()
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
@@ -611,7 +675,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction private func notifyOnCommentReactionsSelected(_ sender: NSButton) {
 		Settings.notifyOnCommentReactions = sender.integerValue == 1
-		API.refreshesSinceLastReactionsCheck.removeAll()
 		updateReactionItemOptions()
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
@@ -772,6 +835,10 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		Settings.removeNotificationsWhenItemIsRemoved = (sender.integerValue==1)
 	}
 
+    @IBAction private func scanClosedAndMergedItemsSelected(_ sender: NSButton) {
+        Settings.scanClosedAndMergedItems = sender.integerValue == 1
+    }
+    
 	@IBAction private func dontKeepMyPrsSelected(_ sender: NSButton) {
 		Settings.dontKeepPrsMergedByMe = (sender.integerValue==1)
 		updateHistoryOptions()
@@ -812,7 +879,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		Settings.showStatusesOnAllItems = (sender.integerValue==1)
 		deferredUpdateTimer.push()
 		if Settings.showStatusItems {
-			API.refreshesSinceLastStatusCheck.removeAll()
 			preferencesDirty = true
 		}
 	}
@@ -937,7 +1003,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		updateStatusItemsOptions()
 
 		if Settings.showStatusItems {
-			API.refreshesSinceLastStatusCheck.removeAll()
 			preferencesDirty = true
 		}
 	}
@@ -959,24 +1024,23 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		statusTermMenu.isEnabled = enable
 		statusItemRefreshCounter.isEnabled = enable
 		statusItemRescanLabel.alphaValue = enable ? 1.0 : 0.5
-		statusItemsRefreshNote.alphaValue = enable ? 1.0 : 0.5
 		hidePrsThatDontPass.alphaValue = enable ? 1.0 : 0.5
 		hidePrsThatDontPass.isEnabled = enable
 		showStatusesForAll.isEnabled = enable
 		hidePrsThatDontPassOnlyInAll.isEnabled = enable && Settings.hidePrsThatArentPassing
 		notifyOnStatusUpdatesForAllPrs.isEnabled = enable && Settings.notifyOnStatusUpdates
 
-		let count = Settings.statusItemRefreshInterval
+		let count = Settings.statusItemRefreshBatchSize
 		statusItemRefreshCounter.integerValue = count
-		statusItemRescanLabel.stringValue = count>1 ? "…and re-scan once every \(count) refreshes" : "…and re-scan on every refresh"
+		statusItemRescanLabel.stringValue = "…re-scan up to \(count) items on every refresh"
 
 		updateStatusTermPreferenceControls()
 	}
 
 	private func updateReactionItemOptions() {
-		let count = Settings.reactionScanningInterval
+		let count = Settings.reactionScanningBatchSize
 		reactionIntervalStepper.integerValue = count
-		reactionIntervalLabel.stringValue = count>1 ? "Re-scan all reaction-related items every \(count) refreshes" : "Re-scan all reaction-related items on every refresh"
+		reactionIntervalLabel.stringValue = "Re-scan up to \(count) items on every refresh"
 		let enabled = API.shouldSyncReactions
 		reactionIntervalStepper.isEnabled = enabled
 		reactionIntervalLabel.isEnabled = enabled
@@ -984,12 +1048,12 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	@IBAction private func reactionIntervalCountChanged(_ sender: NSStepper) {
-		Settings.reactionScanningInterval = sender.integerValue
+		Settings.reactionScanningBatchSize = sender.integerValue
 		updateReactionItemOptions()
 	}
 
 	@IBAction private func statusItemRefreshCountChanged(_ sender: NSStepper) {
-		Settings.statusItemRefreshInterval = sender.integerValue
+		Settings.statusItemRefreshBatchSize = sender.integerValue
 		updateStatusItemsOptions()
 	}
 
@@ -1146,7 +1210,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		o.allowedFileTypes = ["trailerSettings"]
 		o.beginSheetModal(for: self) { response in
 			if response.rawValue == NSFileHandlingPanelOKButton, let url = o.url {
-				atNextEvent {
+                DispatchQueue.main.async {
 					app.tryLoadSettings(from: url, skipConfirm: Settings.dontConfirmSettingsImport)
 				}
 			}
@@ -1249,18 +1313,53 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBAction private func testApiServerSelected(_ sender: NSButton) {
 		sender.isEnabled = false
 		let apiServer = selectedServer!
+        let group = DispatchGroup()
+
+        var finalSuccess = true
+        var finalError: Error?
+        var failedPath: String?
+        
+        if apiServer.graphQLPath != nil {
+            DLog("Checking GraphQL interface on \(S(apiServer.graphQLPath))")
+            group.enter()
+            GraphQL.testApi(to: apiServer) { success, error in
+                if let e = error {
+                    finalError = e
+                    finalSuccess = false
+                    failedPath = apiServer.graphQLPath
+                } else if !success {
+                    finalSuccess = false
+                    failedPath = apiServer.graphQLPath
+                }
+                group.leave()
+            }
+        }
+        
+        group.enter()
 		API.testApi(to: apiServer) { error in
-			let alert = NSAlert()
-			if let e = error {
-				alert.messageText = "The test failed for \(S(apiServer.apiPath))"
-				alert.informativeText = e.localizedDescription
-			} else {
-				alert.messageText = "This API server seems OK!"
-			}
-			alert.addButton(withTitle: "OK")
-			alert.runModal()
-			sender.isEnabled = true
+            if let e = error {
+                finalError = e
+                finalSuccess = false
+                failedPath = apiServer.apiPath
+            }
+            group.leave()
 		}
+        
+        group.notify(queue: .main) {
+            let alert = NSAlert()
+            if let e = finalError {
+                alert.messageText = "The test failed for \(S(failedPath))"
+                alert.informativeText = e.localizedDescription
+            } else if !finalSuccess {
+                alert.messageText = "The test failed for \(S(failedPath))"
+                alert.informativeText = "There was no network error"
+            } else {
+                alert.messageText = "This API server seems OK!"
+            }
+            alert.addButton(withTitle: "OK")
+            alert.runModal()
+            sender.isEnabled = true
+        }
 	}
 
 	@IBAction private func apiRestoreDefaultsSelected(_ sender: NSButton)
@@ -1277,7 +1376,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			apiServerName.stringValue = S(apiServer.label)
 			apiServerWebPath.stringValue = S(apiServer.webPath)
 			apiServerApiPath.stringValue = S(apiServer.apiPath)
-			apiServerAuthToken.stringValue = S(apiServer.authToken)
+            apiServerAuthToken.stringValue = S(apiServer.authToken)
 			apiServerSelectedBox.title = apiServer.label ?? "New Server"
 			apiServerTestButton.isEnabled = !S(apiServer.authToken).isEmpty
 			apiServerDeleteButton.isEnabled = (ApiServer.countApiServers(in: DataManager.main) > 1)
@@ -1311,7 +1410,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	@IBAction private func refreshDurationChanged(_ sender: NSStepper?) {
-		Settings.refreshPeriod = refreshDurationStepper.floatValue
+		Settings.refreshPeriod = refreshDurationStepper.doubleValue
 		refreshDurationLabel.stringValue = "Refresh items every \(refreshDurationStepper.integerValue) seconds"
 	}
 
@@ -1346,7 +1445,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 				if let apiServer = selectedServer {
 					apiServer.apiPath = apiServerApiPath.stringValue
 					storeApiFormToSelectedServer()
-					apiServer.clearAllRelatedInfo()
 					reset()
 				}
 			} else if obj===apiServerWebPath {
@@ -1440,7 +1538,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 					for policy in RepoHidingPolicy.policies {
 						let m = NSMenuItem()
 						m.attributedTitle = NSAttributedString(string: policy.name, attributes: [
-							NSAttributedString.Key.font: count==0 ? NSFont.systemFont(ofSize: fontSize) : NSFont.boldSystemFont(ofSize: fontSize),
+							NSAttributedString.Key.font: count == 0 ? NSFont.systemFont(ofSize: fontSize) : NSFont.boldSystemFont(ofSize: fontSize),
 							NSAttributedString.Key.foregroundColor: policy.color,
 							])
 						menuCell.menu?.addItem(m)
@@ -1451,7 +1549,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 					for policy in RepoDisplayPolicy.policies {
 						let m = NSMenuItem()
 						m.attributedTitle = NSAttributedString(string: policy.name, attributes: [
-							NSAttributedString.Key.font: count==0 ? NSFont.systemFont(ofSize: fontSize) : NSFont.boldSystemFont(ofSize: fontSize),
+							NSAttributedString.Key.font: count == 0 ? NSFont.systemFont(ofSize: fontSize) : NSFont.boldSystemFont(ofSize: fontSize),
 							NSAttributedString.Key.foregroundColor: policy.color,
 							])
 						menuCell.menu?.addItem(m)
@@ -1562,7 +1660,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func countSnoozedItemsChanged(_ sender: NSButton) {
+	@IBAction private func countSnoozedItemsChanged(_ sender: NSButton) {
 		Settings.countVisibleSnoozedItems = countSnoozedItems.integerValue == 1
 		deferredUpdateTimer.push()
 	}

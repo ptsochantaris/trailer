@@ -6,23 +6,61 @@ import CoreData
 
 final class PullRequest: ListableItem {
 
-	@NSManaged var issueCommentLink: String?
-	@NSManaged var issueUrl: String?
-	@NSManaged var reviewCommentLink: String?
-	@NSManaged var statusesLink: String?
 	@NSManaged var lastStatusNotified: String?
 	@NSManaged var mergeCommitSha: String?
 	@NSManaged var hasNewCommits: Bool
 	@NSManaged var assignedForReview: Bool
 	@NSManaged var reviewers: String
 	@NSManaged var teamReviewers: String
+    @NSManaged var mergedByNodeId: String?
+    @NSManaged var linesAdded: Int64
+    @NSManaged var linesRemoved: Int64
+    @NSManaged var isMergeable: Bool
 
 	@NSManaged var statuses: Set<PRStatus>
 	@NSManaged var reviews: Set<Review>
+    
+    override var webUrl: String? {
+        return super.webUrl?.appending(pathComponent: "pull").appending(pathComponent: String(number))
+    }
+    
+    static func mostRecentItemUpdate(in repo: Repo) -> Date {
+        return repo.pullRequests.reduce(.distantPast) { max($0, $1.updatedAt ?? .distantPast) }
+    }
+        
+    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer) {
+        syncItems(of: PullRequest.self, from: nodes, on: server) { pr, node in
+            
+            guard node.created || node.updated,
+                let parentId = node.parent?.id,
+                let moc = server.managedObjectContext,
+                let parent = DataItem.item(of: Repo.self, with: parentId, in: moc)
+                else { return }
+
+            let json = node.jsonPayload
+
+            let mergeField = json["mergeable"] as? String ?? "MERGEABLE"
+            pr.isMergeable = mergeField == "MERGEABLE"
+            pr.linesAdded = json["additions"] as? Int64 ?? 0
+            pr.linesRemoved = json["deletions"] as? Int64 ?? 0
+            pr.mergeCommitSha = json["headRefOid"] as? String
+            pr.mergedByNodeId = (json["mergedBy"] as? [AnyHashable: Any])?["id"] as? String
+            pr.baseNodeSync(nodeJson: json, parent: parent)
+        }
+    }
+
+    var reviewCommentLink: String? {
+        return repo.apiUrl?.appending(pathComponent: "pulls").appending(pathComponent: String(number)).appending(pathComponent: "comments")
+    }
+    
+    var statusesLink: String? {
+        return repo.apiUrl?.appending(pathComponent: "statuses").appending(pathComponent: mergeCommitSha ?? "")
+    }
+    
 
 	static func syncPullRequests(from data: [[AnyHashable : Any]]?, in repo: Repo) {
         let apiServer = repo.apiServer
-        let apiServerUserId = apiServer.userId
+        let apiServerUserId = apiServer.userNodeId
 		items(with: data, type: PullRequest.self, server: apiServer) { item, info, isNewOrUpdated in
 			if isNewOrUpdated {
 
@@ -32,7 +70,7 @@ final class PullRequest: ListableItem {
                     let headInfo = info["head"] as? [AnyHashable: Any],
                     let newHeadCommitSha = headInfo["sha"] as? String,
                     let commitUserInfo = headInfo["user"] as? [AnyHashable: Any],
-                    let newHeadCommitUserId = commitUserInfo["id"] as? Int64 {
+                    let newHeadCommitUserId = commitUserInfo["node_id"] as? String {
                     
                     let currentSha = item.mergeCommitSha
                     if currentSha != nil && currentSha != newHeadCommitSha && apiServerUserId != newHeadCommitUserId {
@@ -40,23 +78,14 @@ final class PullRequest: ListableItem {
                     }
                     item.mergeCommitSha = newHeadCommitSha
                 }
-
-				if let linkInfo = info["_links"] as? [AnyHashable : Any] {
-					item.issueCommentLink = (linkInfo["comments"] as? [AnyHashable : Any])?["href"] as? String
-					item.reviewCommentLink = (linkInfo["review_comments"] as? [AnyHashable : Any])?["href"] as? String
-					item.statusesLink = (linkInfo["statuses"] as? [AnyHashable : Any])?["href"] as? String
-					item.issueUrl = (linkInfo["issue"] as? [AnyHashable : Any])?["href"] as? String
-				}
-
-				API.refreshesSinceLastStatusCheck[item.objectID] = nil
-				API.refreshesSinceLastReactionsCheck[item.objectID] = 1
 			}
-			item.reopened = item.condition == ItemCondition.closed.rawValue
+            if item.condition == ItemCondition.closed.rawValue {
+                item.stateChanged = StateChange.reopened.rawValue
+            }
 			item.condition = ItemCondition.open.rawValue
 		}
 	}
 
-	@available(OSX 10.11, *)
 	override var searchKeywords: [String] {
 		return ["PR", "Pull Request", "PRs", "Pull Requests"] + super.searchKeywords
 	}
@@ -74,11 +103,11 @@ final class PullRequest: ListableItem {
 		return false
 	}
 
-	var shouldShowStatuses: Bool {
+	var interestedInStatuses: Bool {
 		return Settings.showStatusItems && (Settings.showStatusesOnAllItems || (Section(rawValue: sectionIndex)?.isLoud ?? false))
 	}
-
-	func checkAndStoreReviewAssignments(_ reviewerNames: Set<String>, _ reviewerTeams: Set<String>) -> Bool {
+    
+	func checkAndStoreReviewAssignments(_ reviewerNames: Set<String>, _ reviewerTeams: Set<String>) {
 		reviewers = reviewerNames.joined(separator: ",")
 		teamReviewers = reviewerTeams.joined(separator: ",")
 		var assigned = reviewerNames.contains(S(apiServer.userName))
@@ -92,14 +121,9 @@ final class PullRequest: ListableItem {
 		}
 		let shouldNotify = assigned && !assignedForReview
 		assignedForReview = assigned
-		return shouldNotify
-	}
-
-	static func pullRequestsThatNeedReactionsToBeRefreshed(in moc: NSManagedObjectContext) -> [PullRequest] {
-		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
-		f.returnsObjectsAsFaults = false
-		f.predicate = NSPredicate(format: "requiresReactionRefreshFromUrl != nil")
-		return try! moc.fetch(f)
+        if shouldNotify && Settings.notifyOnReviewAssignments {
+            NotificationQueue.add(type: .assignedForReview, for: self)
+        }
 	}
 
 	static func allMerged(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, includeAllGroups: Bool = false) -> [PullRequest] {
@@ -192,6 +216,25 @@ final class PullRequest: ListableItem {
 		return false
 	}
 
+    static func statusCheckBatch(in moc: NSManagedObjectContext) -> [PullRequest] {
+        let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
+        f.predicate = NSPredicate(format: "apiServer.lastSyncSucceeded == YES")
+        f.sortDescriptors = [
+            NSSortDescriptor(key: "lastStatusScan", ascending: true),
+            NSSortDescriptor(key: "updatedAt", ascending: false),
+        ]
+        let prs = try! moc.fetch(f)
+            .filter { $0.interestedInStatuses }
+            .prefix(Settings.statusItemRefreshBatchSize)
+        
+        prs.forEach {
+            $0.statuses.forEach {
+                $0.postSyncAction = PostSyncAction.delete.rawValue
+            }
+        }
+        return Array(prs)
+    }
+    
 	var displayedStatuses: [PRStatus] {
 
 		var contexts = [String : PRStatus]()
@@ -212,7 +255,7 @@ final class PullRequest: ListableItem {
 		let mode = Settings.statusFilteringMode
 		if mode != StatusFilter.all.rawValue {
 			let terms = Settings.statusFilteringTerms
-			if terms.count > 0 {
+			if !terms.isEmpty {
 				let inclusive = mode == StatusFilter.include.rawValue
 				// contains(a) or contains(b) or contains(c)  -vs-  not(contains(a) or contains(b) or contains(c))
 
@@ -237,7 +280,34 @@ final class PullRequest: ListableItem {
 	@objc var sectionName: String {
 		return Section.prMenuTitles[Int(sectionIndex)]
 	}
-    
+
+    func linesAttributedString(labelFont: FONT_CLASS) -> NSAttributedString? {
+        let added = linesAdded
+        let removed = linesRemoved
+        
+        if added == 0 && removed == 0 {
+            return nil
+        }
+
+        let font = FONT_CLASS.boldSystemFont(ofSize: labelFont.pointSize - 3)
+        var attributes = buildLabelAttributes(labelFont: font, offset: 4)
+
+        let res = NSMutableAttributedString()
+        if added > 0, let addedString = numberFormatter.string(for: added) {
+            attributes[.foregroundColor] = COLOR_CLASS.appGreen
+            res.append(NSAttributedString(string: "+\(addedString)", attributes: attributes))
+            if removed > 0 {
+                attributes[.foregroundColor] = COLOR_CLASS.lightGray
+                res.append(NSAttributedString(string: "\u{a0}", attributes: attributes))
+            }
+        }
+        if removed > 0, let removedString = numberFormatter.string(for: removed) {
+            attributes[.foregroundColor] = COLOR_CLASS.appRed
+            res.append(NSAttributedString(string: "-\(removedString)", attributes: attributes))
+        }
+        return res
+    }
+
     func reviewsAttributedString(labelFont: FONT_CLASS) -> NSAttributedString? {
         if !Settings.displayReviewsOnItems {
             return nil
@@ -245,19 +315,38 @@ final class PullRequest: ListableItem {
         
         let res = NSMutableAttributedString()
         
+        if Settings.showRequestedTeamReviews {
+            let teamReviewRequests = teamReviewers.components(separatedBy: ",")
+            let names = teamReviewRequests.compactMap {
+                if let moc = managedObjectContext {
+                    return Team.team(with: $0, in: moc)?.calculatedReferral
+                } else {
+                    return nil
+                }
+            }.joined(separator: ", ")
+            if !names.isEmpty {
+                let a = [NSAttributedString.Key.font: labelFont, NSAttributedString.Key.foregroundColor: COLOR_CLASS.appYellow]
+                res.append(NSAttributedString(string: "Reviews asked from \(names)", attributes: a))
+            }
+        }
+        
         var latestReviewByUser = [String: Review]()
         for r in reviews.filter({ $0.affectsBottomLine }).sorted(by: { $0.createdBefore($1) }) {
             latestReviewByUser[S(r.username)] = r
         }
 
-        if latestReviewByUser.count > 0 || !reviewers.isEmpty {
+        if !latestReviewByUser.isEmpty || !reviewers.isEmpty {
 
             let reviews = latestReviewByUser.values.sorted { $0.createdBefore($1) }
 
             let approvers = reviews.filter { $0.state == Review.State.APPROVED.rawValue }
-            if approvers.count > 0 {
+            if !approvers.isEmpty {
 
                 let a = [NSAttributedString.Key.font: labelFont, NSAttributedString.Key.foregroundColor: COLOR_CLASS.appGreen]
+
+                if res.length > 0 {
+                    res.append(NSAttributedString(string: "\n", attributes: a))
+                }
 
                 var count = 0
                 for r in approvers {
@@ -271,7 +360,7 @@ final class PullRequest: ListableItem {
             }
 
             let requesters = reviews.filter { $0.state == Review.State.CHANGES_REQUESTED.rawValue }
-            if requesters.count > 0 {
+            if !requesters.isEmpty {
 
                 let a = [NSAttributedString.Key.font: labelFont, NSAttributedString.Key.foregroundColor: COLOR_CLASS.appRed]
 
@@ -293,7 +382,7 @@ final class PullRequest: ListableItem {
             let approverNames = approvers.compactMap { $0.username }
             let requesterNames = requesters.compactMap { $0.username }
             let otherReviewers = reviewers.components(separatedBy: ",").filter({ !($0.isEmpty || approverNames.contains($0) || requesterNames.contains($0)) })
-            if otherReviewers.count > 0 {
+            if !otherReviewers.isEmpty {
 
                 let a = [NSAttributedString.Key.font: labelFont, NSAttributedString.Key.foregroundColor: COLOR_CLASS.appYellow]
 
@@ -314,5 +403,34 @@ final class PullRequest: ListableItem {
         }
         
         return res
+    }
+    
+    func handleMerging() {
+        let byUserId = mergedByNodeId
+        let myUserId = apiServer.userNodeId
+        DLog("Detected merged PR: %@ by user %@, local user id is: %@, handling policy is %@, coming from section %@",
+             title,
+             byUserId,
+             myUserId,
+             Settings.mergeHandlingPolicy,
+             sectionIndex)
+
+        if !isVisibleOnMenu {
+            DLog("Merged PR was hidden, won't announce")
+            return
+        }
+
+        let mergedByMe = byUserId == myUserId
+        if !(mergedByMe && Settings.dontKeepPrsMergedByMe) {
+            DLog("Checking if we want to keep this merged PR")
+            if shouldKeep(accordingTo: Settings.mergeHandlingPolicy) {
+                DLog("Will keep merged PR")
+                keep(as: .merged, notification: .prMerged)
+            } else {
+                DLog("Will not keep merged PR")
+            }
+        } else {
+            DLog("Will not keep PR merged by me")
+        }
     }
 }

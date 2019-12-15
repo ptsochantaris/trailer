@@ -70,8 +70,7 @@ UITableViewDragDelegate {
 		}
 
 		let a = UIAlertController(title: promptTitle, message: "Mark all as read?", preferredStyle: .alert)
-		a.addAction(UIAlertAction(title: "No", style: .cancel) { action in
-		})
+        a.addAction(UIAlertAction(title: "No", style: .cancel))
 		a.addAction(UIAlertAction(title: "Yes", style: .default) { action in
 			self.markAllAsRead()
 		})
@@ -79,7 +78,8 @@ UITableViewDragDelegate {
 	}
     
 	func removeAllMerged() {
-		atNextEvent(self) { S in
+        DispatchQueue.main.async { [weak self] in
+            guard let S = self else { return }
 			if Settings.dontAskBeforeWipingMerged {
 				S.removeAllMergedConfirmed()
 			} else {
@@ -94,7 +94,8 @@ UITableViewDragDelegate {
 	}
 
 	func removeAllClosed() {
-		atNextEvent(self) { S in
+        DispatchQueue.main.async { [weak self] in
+            guard let S = self else { return }
 			if Settings.dontAskBeforeWipingClosed {
 				S.removeAllClosedConfirmed()
 			} else {
@@ -108,7 +109,7 @@ UITableViewDragDelegate {
 		}
 	}
 
-	func removeAllClosedConfirmed() {
+	private func removeAllClosedConfirmed() {
 		if viewingPrs {
 			for p in PullRequest.allClosed(in: DataManager.main, criterion: currentTabBarSet?.viewCriterion) {
 				DataManager.main.delete(p)
@@ -120,7 +121,7 @@ UITableViewDragDelegate {
 		}
 	}
 
-	func removeAllMergedConfirmed() {
+	private func removeAllMergedConfirmed() {
 		if viewingPrs {
 			for p in PullRequest.allMerged(in: DataManager.main, criterion: currentTabBarSet?.viewCriterion) {
 				DataManager.main.delete(p)
@@ -128,7 +129,7 @@ UITableViewDragDelegate {
 		}
 	}
 
-	func markAllAsRead() {
+	private func markAllAsRead() {
 		for i in fetchedResultsController.fetchedObjects ?? [] {
 			i.catchUpWithComments()
 		}
@@ -150,7 +151,28 @@ UITableViewDragDelegate {
 			tableView.deselectRow(at: i, animated: true)
 		}
 	}
+    
+    private var firstAppearance = true
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        guard firstAppearance else {
+            return
+        }
+        
+        firstAppearance = false
+        if !ApiServer.someServersHaveAuthTokens(in: DataManager.main) {
+            let m = popupManager.masterController
+            if ApiServer.countApiServers(in: DataManager.main) == 1, let a = ApiServer.allApiServers(in: DataManager.main).first, a.authToken == nil || a.authToken!.isEmpty {
+                m.performSegue(withIdentifier: "showQuickstart", sender: self)
+            } else {
+                m.performSegue(withIdentifier: "showPreferences", sender: self)
+            }
+        }
+    }
 
+    let watchManager = WatchManager()
+    
 	override func viewDidLoad() {
 		super.viewDidLoad()
 
@@ -175,25 +197,12 @@ UITableViewDragDelegate {
 		tableView.dragDelegate = self
 
 		let n = NotificationCenter.default
-        n.addObserver(self, selector: #selector(refreshStarting), name: .RefreshStarted, object: nil)
         n.addObserver(self, selector: #selector(refreshUpdated), name: .SyncProgressUpdate, object: nil)
-        n.addObserver(self, selector: #selector(refreshProcessing), name: .RefreshProcessing, object: nil)
         n.addObserver(self, selector: #selector(refreshEnded), name: .RefreshEnded, object: nil)
 		n.addObserver(self, selector: #selector(dataUpdated(_:)), name: .NSManagedObjectContextObjectsDidChange, object: nil)
 
-		dataUpdateTimer = PopTimer(timeInterval: 1) { [weak self] in
-			DLog("Detected possible status update")
-			self?.updateStatus(becauseOfChanges: true)
-		}
-
         tabs.tintColor = UIColor(named: "apptint")
         
-		/*let prs = DataItem.allItems(of: PullRequest.self, in: DataManager.main)
-		if prs.count > 0 {
-			prs[0].postSyncAction = PostSyncAction.delete.rawValue
-			DataItem.nukeDeletedItems(in: DataManager.main)
-		}*/
-
 		updateTabItems(animated: false)
 	}
 
@@ -208,49 +217,76 @@ UITableViewDragDelegate {
 		return session.items.contains(dragItem) ? [] : [dragItem]
 	}
 
-	private var dataUpdateTimer: PopTimer!
 	@objc private func dataUpdated(_ notification: Notification) {
 
 		guard let relatedMoc = notification.object as? NSManagedObjectContext, relatedMoc === DataManager.main else { return }
 
-		if let items = notification.userInfo?[NSInsertedObjectsKey] as? Set<NSManagedObject>,
-			items.first(where: { $0 is ListableItem }) != nil {
+		if let items = notification.userInfo?[NSInsertedObjectsKey] as? Set<NSManagedObject>, items.contains(where: { $0 is ListableItem }) {
 			//DLog(">>>>>>>>>>>>>>> detected inserted items")
-			dataUpdateTimer.push()
+            DispatchQueue.main.async {
+                self.updateStatus(becauseOfChanges: true)
+            }
 			return
 		}
 
-		if let items = notification.userInfo?[NSDeletedObjectsKey] as? Set<NSManagedObject>,
-			items.first(where: { $0 is ListableItem }) != nil {
+		if let items = notification.userInfo?[NSDeletedObjectsKey] as? Set<NSManagedObject>, items.contains(where: { $0 is ListableItem }) {
 			//DLog(">>>>>>>>>>>>>>> detected deleted items")
-			dataUpdateTimer.push()
+            DispatchQueue.main.async {
+                self.updateStatus(becauseOfChanges: true)
+            }
 			return
 		}
 
-		if let items = notification.userInfo?[NSUpdatedObjectsKey] as? Set<NSManagedObject>,
-			items.first(where: { ($0 as? ListableItem)?.hasPersistentChangedValues ?? false }) != nil {
+		if let items = notification.userInfo?[NSUpdatedObjectsKey] as? Set<NSManagedObject>, items.contains(where: { ($0 as? ListableItem)?.hasPersistentChangedValues ?? false }) {
 			//DLog(">>>>>>>>>>>>>>> detected permanently changed items")
-			dataUpdateTimer.push()
+            DispatchQueue.main.async {
+                self.updateStatus(becauseOfChanges: true)
+            }
 			return
 		}
-	}
-
-	@objc private func refreshStarting() {
-		updateStatus(becauseOfChanges: false)
 	}
 
 	@objc private func refreshEnded() {
-		dataUpdateTimer.push()
+        refreshControl?.endRefreshing()
 	}
+    
+    private func updateTitle() {
+        let newTitle: String
+        
+        if API.isRefreshing {
+            newTitle = "Refreshing…"
+            
+        } else if viewingPrs {
+            let item = currentTabBarSet?.prItem
+            let unreadCount = Int(item?.badgeValue ?? "0")!
+            let t = item?.title ?? "Pull Requests"
+            if unreadCount > 0 {
+                newTitle = t.appending(" (\(unreadCount))")
+            } else {
+                newTitle = t
+            }
+            
+        } else {
+            let item = currentTabBarSet?.issuesItem
+            let unreadCount = Int(item?.badgeValue ?? "0")!
+            let t = item?.title ?? "Issues"
+            if unreadCount > 0 {
+                newTitle = t.appending(" (\(unreadCount))")
+            } else {
+                newTitle = t
+            }
+        }
+        
+        if title != newTitle {
+            title = newTitle
+        }
+    }
 
 	@objc private func refreshUpdated() {
-		refreshControl?.attributedTitle = NSAttributedString(string: API.lastUpdateDescription, attributes: nil)
+        updateTitle()
+		refreshControl?.attributedTitle = NSAttributedString(string: API.currentOperationName, attributes: nil)
 	}
-
-	@objc private func refreshProcessing() {
-		refreshControl?.attributedTitle = NSAttributedString(string: "Processing…", attributes: nil)
-	}
-
+    
 	override var canBecomeFirstResponder: Bool {
 		return true
 	}
@@ -273,23 +309,26 @@ UITableViewDragDelegate {
         ]
 	}
 
-	private func canIssueKeyForIndexPath(actionTitle: String, indexPath: IndexPath) -> Bool {
-        if let c = tableView(tableView, trailingSwipeActionsConfigurationForRowAt: indexPath), c.actions.contains(where: { $0.title == actionTitle }) {
+    private func canIssueKeyForIndexPath(action: ListableItem.MenuAction, indexPath: IndexPath) -> Bool {
+        let actions = fetchedResultsController.object(at: indexPath).contextActions
+        if actions.contains(action) {
             return true
-		}
-		showMessage("\(actionTitle) not available", "This command cannot be used on this item")
-		return false
+        } else {
+            showMessage("\(action.title) not available", "This command cannot be used on this item")
+            return false
+        }
 	}
 
 	@objc private func keyToggleSnooze() {
 		if let ip = tableView.indexPathForSelectedRow {
 			let i = fetchedResultsController.object(at: ip)
 			if i.isSnoozing {
-				if canIssueKeyForIndexPath(actionTitle: "Wake", indexPath: ip) {
+                if canIssueKeyForIndexPath(action: .wake(date: i.snoozeUntil), indexPath: ip) {
 					i.wakeUp()
 				}
 			} else {
-				if canIssueKeyForIndexPath(actionTitle: "Snooze", indexPath: ip) {
+                let presets = SnoozePreset.allSnoozePresets(in: DataManager.main)
+                if canIssueKeyForIndexPath(action: .snooze(presets: presets), indexPath: ip) {
 					showSnoozeMenuFor(i: i)
 				}
 			}
@@ -300,11 +339,11 @@ UITableViewDragDelegate {
 		if let ip = tableView.indexPathForSelectedRow {
 			let i = fetchedResultsController.object(at: ip)
 			if i.hasUnreadCommentsOrAlert {
-				if canIssueKeyForIndexPath(actionTitle: "Read", indexPath: ip) {
+                if canIssueKeyForIndexPath(action: .markRead, indexPath: ip) {
 					markItemAsRead(itemUri: i.objectID.uriRepresentation().absoluteString)
 				}
 			} else {
-				if canIssueKeyForIndexPath(actionTitle: "Unread", indexPath: ip) {
+                if canIssueKeyForIndexPath(action: .markUnread, indexPath: ip) {
 					markItemAsUnRead(itemUri: i.objectID.uriRepresentation().absoluteString)
 				}
 			}
@@ -315,7 +354,7 @@ UITableViewDragDelegate {
 		if let ip = tableView.indexPathForSelectedRow {
 			let i = fetchedResultsController.object(at: ip)
 			let isMuted = i.muted
-			if (!isMuted && canIssueKeyForIndexPath(actionTitle: "Mute", indexPath: ip)) || (isMuted && canIssueKeyForIndexPath(actionTitle: "Unmute", indexPath: ip)) {
+            if (!isMuted && canIssueKeyForIndexPath(action: .mute, indexPath: ip)) || (isMuted && canIssueKeyForIndexPath(action: .unmute, indexPath: ip)) {
 				i.setMute(to: !isMuted)
 			}
 		}
@@ -434,7 +473,8 @@ UITableViewDragDelegate {
 
 		tableView.selectRow(at: ip, animated: false, scrollPosition: .middle)
 
-		atNextEvent(self) { S in
+        DispatchQueue.main.async { [weak self] in
+            guard let S = self else { return }
 			if let u = overrideUrl, let url = URL(string: u) {
 				S.showDetail(url: url, objectId: item.objectID)
 			} else if let u = item.webUrl, let url = URL(string: u) {
@@ -476,13 +516,13 @@ UITableViewDragDelegate {
 		let untouchedIndexes = dataIndexes.filter { !(removedIndexes.contains($0) || addedIndexes.contains($0)) }
 
 		tableView.beginUpdates()
-		if removedIndexes.count > 0 {
+		if !removedIndexes.isEmpty {
 			tableView.deleteSections(IndexSet(removedIndexes), with: .fade)
 		}
-		if untouchedIndexes.count > 0 {
+		if !untouchedIndexes.isEmpty {
 			tableView.reloadSections(IndexSet(untouchedIndexes), with: .fade)
 		}
-		if addedIndexes.count > 0 {
+		if !addedIndexes.isEmpty {
 			tableView.insertSections(IndexSet(addedIndexes), with: .fade)
 		}
 		tableView.endUpdates()
@@ -621,7 +661,7 @@ UITableViewDragDelegate {
                 
         let b = UIView()
         b.translatesAutoresizingMaskIntoConstraints = false
-        b.backgroundColor = UIColor.label.withAlphaComponent(DISABLED_FADE)
+        b.backgroundColor = UIColor.separator
         b.isUserInteractionEnabled = false
         v.addSubview(b)
         tabBorder = b
@@ -818,7 +858,7 @@ UITableViewDragDelegate {
 		return 40
 	}
 
-	private func markItemAsRead(itemUri: String?) {
+	func markItemAsRead(itemUri: String?) {
 		if let
 			i = itemUri,
 			let oid = DataManager.id(for: i),
@@ -827,7 +867,7 @@ UITableViewDragDelegate {
 		}
 	}
 
-	private func markItemAsUnRead(itemUri: String?) {
+	func markItemAsUnRead(itemUri: String?) {
 		if let
 			i = itemUri,
 			let oid = DataManager.id(for: i),
@@ -837,92 +877,9 @@ UITableViewDragDelegate {
 		}
 	}
 
-    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-		var actions = [UIContextualAction]()
-
-		func appendReadUnread(i: ListableItem) {
-			let r: UIContextualAction
-			if i.hasUnreadCommentsOrAlert {
-				r = UIContextualAction(style: .normal, title: "Read") { [weak self] action, indexPath, completion in
-					tableView.setEditing(false, animated: true)
-					DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-						self?.markItemAsRead(itemUri: i.objectID.uriRepresentation().absoluteString)
-					}
-                    completion(true)
-				}
-			} else {
-				r = UIContextualAction(style: .normal, title: "Unread") { [weak self] action, indexPath, completion in
-					tableView.setEditing(false, animated: true)
-					DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-						self?.markItemAsUnRead(itemUri: i.objectID.uriRepresentation().absoluteString)
-					}
-                    completion(true)
-				}
-			}
-			r.backgroundColor = view.tintColor
-			actions.append(r)
-		}
-
-		func appendMuteUnmute(i: ListableItem) {
-			let m: UIContextualAction
-			if i.muted {
-				m = UIContextualAction(style: .normal, title: "Unmute") { action, indexPath, completion in
-					tableView.setEditing(false, animated: true)
-					i.setMute(to: false)
-                    completion(true)
-				}
-			} else {
-				m = UIContextualAction(style: .normal, title: "Mute") { action, indexPath, completion in
-					tableView.setEditing(false, animated: true)
-					i.setMute(to: true)
-                    completion(true)
-				}
-			}
-			actions.append(m)
-		}
-
-		let i = fetchedResultsController.object(at: indexPath)
-		if let sectionName = fetchedResultsController.sections?[indexPath.section].name {
-
-			if sectionName == Section.merged.prMenuName || sectionName == Section.closed.prMenuName || sectionName == Section.closed.issuesMenuName {
-
-				appendReadUnread(i: i)
-				let d = UIContextualAction(style: .destructive, title: "Remove") { action, indexPath, completion in
-					DataManager.main.delete(i)
-                    completion(true)
-				}
-				actions.append(d)
-
-			} else if i.isSnoozing {
-
-				let w = UIContextualAction(style: .normal, title: "Wake") { action, indexPath, completion in
-					i.wakeUp()
-                    completion(true)
-				}
-				w.backgroundColor = UIColor.secondaryLabel
-				actions.append(w)
-
-			} else {
-
-				if Settings.showCommentsEverywhere || (sectionName != Section.all.prMenuName && sectionName != Section.all.issuesMenuName) {
-					appendReadUnread(i: i)
-				}
-				appendMuteUnmute(i: i)
-				let s = UIContextualAction(style: .normal, title: "Snooze") { [weak self] action, indexPath, completion in
-					self?.showSnoozeMenuFor(i: i)
-                    completion(true)
-				}
-				s.backgroundColor = UIColor.secondaryLabel
-				actions.append(s)
-			}
-		}
-        
-        return UISwipeActionsConfiguration(actions: actions)
-	}
-
 	private func showSnoozeMenuFor(i: ListableItem) {
 		let snoozePresets = SnoozePreset.allSnoozePresets(in: DataManager.main)
-		let hasPresets = snoozePresets.count > 0
+		let hasPresets = !snoozePresets.isEmpty
 		let a = UIAlertController(title: hasPresets ? "Snooze" : nil,
 		                          message: hasPresets ? S(i.title) : "You do not currently have any snoozing presets configured. Please add some in the relevant preferences tab.",
 		                          preferredStyle: .alert)
@@ -1023,30 +980,16 @@ UITableViewDragDelegate {
 
 	func updateStatus(becauseOfChanges: Bool, updateItems: Bool = false) {
 
-		if becauseOfChanges {
-			app.updateBadgeAndSaveDB()
-		}
-
 		if becauseOfChanges || updateItems {
-			updateTabItems(animated: true)
+            if becauseOfChanges {
+                watchManager.updateContext()
+            }
+            updateTabItems(animated: true)
 		}
 
 		updateFooter()
 		refreshUpdated()
-
-		if appIsRefreshing {
-			title = "Refreshing…"
-		} else {
-			title = viewingPrs ? pullRequestsTitle : issuesTitle
-		}
-
-		if splitViewController?.displayMode != .allVisible {
-            NotificationCenter.default.post(name: .MasterViewTitleChanged, object: title)
-		}
-
-		if !appIsRefreshing {
-			refreshControl?.endRefreshing()
-		}
+        updateTitle()
 	}
 
 	private func updateFooter() {
@@ -1068,32 +1011,13 @@ UITableViewDragDelegate {
 		return count == 0 ? "" : count == 1 ? " (1 update)" : " (\(count) updates)"
 	}
 
-	private var pullRequestsTitle: String {
-		let item = currentTabBarSet?.prItem
-		let unreadCount = Int(item?.badgeValue ?? "0")!
-		let title = item?.title ?? "Pull Requests"
-		if unreadCount > 0 {
-			return title.appending(" (\(unreadCount))")
-		} else {
-			return title
-		}
-	}
-
-	private var issuesTitle: String {
-		let item = currentTabBarSet?.issuesItem
-		let unreadCount = Int(item?.badgeValue ?? "0")!
-		let title = item?.title ?? "Issues"
-		if unreadCount > 0 {
-			return title.appending(" (\(unreadCount))")
-		} else {
-			return title
-		}
-	}
-
 	///////////////////////////// filtering
 
 	override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
 		becomeFirstResponder()
+        if scrollView.contentOffset.y <= 0, !API.isRefreshing {
+            refreshControl?.attributedTitle = NSAttributedString(string: API.lastSuccessfulSyncAt, attributes: nil)
+        }
 	}
 
 	func updateSearchResults(for searchController: UISearchController) {
@@ -1102,11 +1026,12 @@ UITableViewDragDelegate {
 
 	private func safeScrollToTop(completion: Completion?) {
 		tableView.contentOffset = tableView.contentOffset // halt any inertial scrolling
-		atNextEvent(self) { S in
+        DispatchQueue.main.async { [weak self] in
+            guard let S = self else { return }
 			if S.tableView.numberOfSections > 0 {
 				S.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
 			}
-			atNextEvent {
+			DispatchQueue.main.async {
 				completion?()
 			}
 		}
@@ -1141,8 +1066,9 @@ UITableViewDragDelegate {
 		}
 
 		if let destination = segue.destination as? UITabBarController {
-			if allServersHaveTokens {
-                destination.selectedIndex = min(Settings.lastPreferencesTabSelected, (destination.viewControllers?.count ?? 1)-1)
+            let index = sender as? Int ?? Settings.lastPreferencesTabSelected
+            if allServersHaveTokens {
+                destination.selectedIndex = min(index, (destination.viewControllers?.count ?? 1)-1)
 			}
             destination.delegate = self
 		}
@@ -1151,5 +1077,4 @@ UITableViewDragDelegate {
 	func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
 		Settings.lastPreferencesTabSelected = tabBarController.viewControllers?.firstIndex(of: viewController) ?? 0
 	}
-
 }

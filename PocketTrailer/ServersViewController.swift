@@ -7,7 +7,9 @@ final class ServersViewController: UITableViewController {
 	private var selectedServerId: NSManagedObjectID?
 	private var allServers: [ApiServer]!
 
-	@IBAction private func doneSelected() {
+    @IBOutlet weak var apiSwitch: UIBarButtonItem!
+    
+    @IBAction private func doneSelected() {
 		dismiss(animated: true)
 	}
 
@@ -15,7 +17,12 @@ final class ServersViewController: UITableViewController {
 		super.viewDidLoad()
 		clearsSelectionOnViewWillAppear = true
         NotificationCenter.default.addObserver(tableView!, selector: #selector(UITableView.reloadData), name: .RefreshEnded, object: nil)
+        updateApiLabel()
 	}
+    
+    private func updateApiLabel() {
+        apiSwitch.title = Settings.useV4API ? "Using v4 API" : "Using v3 API"
+    }
 
 	deinit {
 		if let tableView = tableView {
@@ -88,8 +95,44 @@ final class ServersViewController: UITableViewController {
 
 	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
 		if let sd = segue.destination as? ServerDetailViewController {
-			sd.serverId = selectedServerId
+			sd.serverLocalId = selectedServerId
 			selectedServerId = nil
 		}
 	}
+    
+    @IBAction private func apiToggleSelected(_ sender: UIBarButtonItem) {
+        let a = UIAlertController(title: "Switch API", message: Settings.useV4APIHelp, preferredStyle: .actionSheet)
+        a.addAction(UIAlertAction(title: "Use legacy v3 API", style: .default) { [weak self] _ in
+            Settings.useV4API = false
+            self?.updateApiLabel()
+        })
+        a.addAction(UIAlertAction(title: "Use v4 API", style: .default) { [weak self] _ in
+            if !API.canUseV4API(for: DataManager.main) {
+                showMessage(Settings.v4title, Settings.v4Message)
+            } else {
+                Settings.useV4API = true
+                self?.updateApiLabel()
+            }
+        })
+        a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        present(a, animated: true)
+        a.popoverPresentationController?.barButtonItem = sender
+    }
+    
+    @IBAction private func resyncEverythingSelected(_ sender: UIBarButtonItem) {
+        let a = UIAlertController(title: sender.title, message: Settings.reloadAllDataHelp, preferredStyle: .actionSheet)
+        a.addAction(UIAlertAction(title: sender.title, style: .destructive) { _ in
+            for a in ApiServer.allApiServers(in: DataManager.main) {
+                a.deleteEverything()
+                a.resetSyncState()
+            }
+            DataManager.saveDB()
+            RestAccess.clearAllBadLinks()
+            DataManager.postProcessAllItems()
+            app.startRefresh()
+        })
+        a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        present(a, animated: true)
+        a.popoverPresentationController?.barButtonItem = sender
+    }
 }

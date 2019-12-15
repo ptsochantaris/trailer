@@ -11,19 +11,19 @@ struct Settings {
 
 	private static var allFields: [String] {
 		return [
-			"SORT_METHOD_KEY", "STATUS_FILTERING_METHOD_KEY", "LAST_PREFS_TAB_SELECTED", "STATUS_ITEM_REFRESH_COUNT", "UPDATE_CHECK_INTERVAL_KEY", "ASSIGNED_REVIEW_HANDLING_POLICY", "NOTIFY_ON_REVIEW_CHANGE_REQUESTS", "NOTIFY_ON_ALL_REVIEW_CHANGE_REQUESTS",
+			"SORT_METHOD_KEY", "STATUS_FILTERING_METHOD_KEY", "LAST_PREFS_TAB_SELECTED", "STATUS_ITEM_REFRESH_BATCH", "UPDATE_CHECK_INTERVAL_KEY", "ASSIGNED_REVIEW_HANDLING_POLICY", "NOTIFY_ON_REVIEW_CHANGE_REQUESTS", "NOTIFY_ON_ALL_REVIEW_CHANGE_REQUESTS",
 			"STATUS_FILTERING_TERMS_KEY", "COMMENT_AUTHOR_BLACKLIST", "HOTKEY_LETTER", "REFRESH_PERIOD_KEY", "IOS_BACKGROUND_REFRESH_PERIOD_KEY", "NEW_REPO_CHECK_PERIOD", "LAST_SUCCESSFUL_REFRESH",
 			"LAST_RUN_VERSION_KEY", "UPDATE_CHECK_AUTO_KEY", "HIDE_UNCOMMENTED_PRS_KEY", "SHOW_COMMENTS_EVERYWHERE_KEY", "SORT_ORDER_KEY", "SHOW_UPDATED_KEY", "DONT_KEEP_MY_PRS_KEY", "HIDE_AVATARS_KEY",
 			"DONT_ASK_BEFORE_WIPING_MERGED", "DONT_ASK_BEFORE_WIPING_CLOSED", "HIDE_NEW_REPOS_KEY", "GROUP_BY_REPO", "HIDE_ALL_SECTION", "SHOW_STATUS_ITEMS", "NOTIFY_ON_REVIEW_ACCEPTANCES", "NOTIFY_ON_ALL_REVIEW_ACCEPTANCES", "NOTIFY_ON_REVIEW_ASSIGNMENTS",
 			"MAKE_STATUS_ITEMS_SELECTABLE", "COUNT_ONLY_LISTED_PRS", "OPEN_PR_AT_FIRST_UNREAD_COMMENT_KEY", "LOG_ACTIVITY_TO_CONSOLE_KEY", "NOTIFY_ON_REVIEW_DISMISSALS", "NOTIFY_ON_ALL_REVIEW_DISMISSALS",
 			"HOTKEY_ENABLE", "HOTKEY_CONTROL_MODIFIER", "DISABLE_ALL_COMMENT_NOTIFICATIONS", "NOTIFY_ON_STATUS_UPDATES", "NOTIFY_ON_STATUS_UPDATES_ALL", "SHOW_REPOS_IN_NAME", "INCLUDE_REPOS_IN_FILTER", "SHOW_STATUSES_EVERYWHERE",
 			"INCLUDE_LABELS_IN_FILTER", "INCLUDE_STATUSES_IN_FILTER", "HOTKEY_COMMAND_MODIFIER", "HOTKEY_OPTION_MODIFIER", "HOTKEY_SHIFT_MODIFIER", "GRAY_OUT_WHEN_REFRESHING", "SHOW_ISSUES_MENU", "NOTIFY_ON_ITEM_REACTIONS",
-			"SHOW_ISSUES_IN_WATCH_GLANCE", "ASSIGNED_PR_HANDLING_POLICY", "HIDE_DESCRIPTION_IN_WATCH_DETAIL_VIEW", "AUTO_REPEAT_SETTINGS_EXPORT", "DONT_CONFIRM_SETTINGS_IMPORT", "NOTIFY_ON_COMMENT_REACTIONS", "REACTION_SCANNING_INTERVAL",
+			"SHOW_ISSUES_IN_WATCH_GLANCE", "ASSIGNED_PR_HANDLING_POLICY", "HIDE_DESCRIPTION_IN_WATCH_DETAIL_VIEW", "AUTO_REPEAT_SETTINGS_EXPORT", "DONT_CONFIRM_SETTINGS_IMPORT", "NOTIFY_ON_COMMENT_REACTIONS", "REACTION_SCANNING_BATCH",
 			"LAST_EXPORT_URL", "LAST_EXPORT_TIME", "CLOSE_HANDLING_POLICY_2", "MERGE_HANDLING_POLICY_2", "LAST_PREFS_TAB_SELECTED_OSX", "NEW_PR_DISPLAY_POLICY_INDEX", "NEW_ISSUE_DISPLAY_POLICY_INDEX", "HIDE_PRS_THAT_ARENT_PASSING_ONLY_IN_ALL",
 			"INCLUDE_SERVERS_IN_FILTER", "INCLUDE_USERS_IN_FILTER", "INCLUDE_TITLES_IN_FILTER", "INCLUDE_NUMBERS_IN_FILTER", "DUMP_API_RESPONSES_IN_CONSOLE", "OPEN_ITEMS_DIRECTLY_IN_SAFARI", "HIDE_PRS_THAT_ARENT_PASSING",
 			"REMOVE_RELATED_NOTIFICATIONS_ON_ITEM_REMOVE", "HIDE_SNOOZED_ITEMS", "INCLUDE_MILESTONES_IN_FILTER", "INCLUDE_ASSIGNEE_NAMES_IN_FILTER", "API_SERVERS_IN_SEPARATE_MENUS", "ASSUME_READ_ITEM_IF_USER_HAS_NEWER_COMMENTS",
 			"AUTO_SNOOZE_DAYS", "HIDE_MENUBAR_COUNTS", "AUTO_ADD_NEW_REPOS", "AUTO_REMOVE_DELETED_REPOS", "MARK_PRS_AS_UNREAD_ON_NEW_COMMITS", "SHOW_LABELS", "DISPLAY_REVIEW_CHANGE_REQUESTS", "SHOW_RELATIVE_DATES",
-			"DISPLAY_MILESTONES", "DEFAULT_APP_FOR_OPENING_WEB", "DEFAULT_APP_FOR_OPENING_ITEMS", "HIDE_ARCHIVED_REPOS", "DRAFT_HANDLING_POLICY"]
+			"DISPLAY_MILESTONES", "DEFAULT_APP_FOR_OPENING_WEB", "DEFAULT_APP_FOR_OPENING_ITEMS", "HIDE_ARCHIVED_REPOS", "DRAFT_HANDLING_POLICY", "MARK_UNMERGEABLE_ITEMS", "SHOW_PR_LINES", "SCAN_CLOSED_AND_MERGED", "USE_V4_API", "REQUESTED_TEAM_REVIEWS"]
 	}
 
     static func checkMigration() {
@@ -119,7 +119,7 @@ struct Settings {
 			repo.archived = false
 			repo.updatedAt = .distantPast
 		}
-        
+                
         #if os(macOS)
         if Settings.lastRunVersion != "" && sharedDefaults.object(forKey: "launchAtLogin") == nil {
             DLog("Migrated to the new startup mechanism, activating it by default")
@@ -288,10 +288,10 @@ struct Settings {
 		set { set("MERGE_HANDLING_POLICY_2", newValue) }
 	}
 
-	static let statusItemRefreshIntervalHelp = "Because querying statuses can be bandwidth-intensive, if you have a lot of items in your lists, you may want to raise this to a higher value. You can always see how much API usage you have left per-hour from the 'Servers' tab."
-	static var statusItemRefreshInterval: Int {
-		get { if let n = get("STATUS_ITEM_REFRESH_COUNT") as? Int { return n>0 ? n : 10 } else { return 10 } }
-		set { set("STATUS_ITEM_REFRESH_COUNT", newValue) }
+	static let statusItemRefreshBatchSizeHelp = "Because querying statuses can be bandwidth and time intensive, Trailer will scan for updates on items that haven't been scanned for the longest time, at every refresh, up to a maximum of this number of items. Higher values mean longer sync times and more API usage."
+	static var statusItemRefreshBatchSize: Int {
+		get { if let n = get("STATUS_ITEM_REFRESH_BATCH") as? Int { return n>0 ? n : 100 } else { return 100 } }
+		set { set("STATUS_ITEM_REFRESH_BATCH", newValue) }
 	}
 
 	static var checkForUpdatesInterval: Int {
@@ -378,16 +378,16 @@ struct Settings {
 
     #if os(iOS)
     static let backgroundRefreshPeriodHelp = "The minimum amount of time to wait before requesting an update when the app is in the background. Even though this is quite efficient, it's still a good idea to keep this to a high value in order to keep battery and bandwidth use low. The default of half an hour is generally a good number. Please note that iOS may ignore this value and perform background refreshes at longer intervals depending on battery level and other reasons."
-    static var backgroundRefreshPeriod: Double {
-        get { if let n = get("IOS_BACKGROUND_REFRESH_PERIOD_KEY") as? Double { return n > 0 ? n : 1800 } else { return 1800 } }
+    static var backgroundRefreshPeriod: TimeInterval {
+        get { if let n = get("IOS_BACKGROUND_REFRESH_PERIOD_KEY") as? TimeInterval { return n > 0 ? n : 1800 } else { return 1800 } }
         set {
             set("IOS_BACKGROUND_REFRESH_PERIOD_KEY", newValue)
         }
     }
     #else
     static let refreshPeriodHelp = "How often to refresh items when the app is active and in the foreground."
-    static var refreshPeriod: Float {
-        get { if let n = get("REFRESH_PERIOD_KEY") as? Float { return n < 60 ? 120 : n } else { return 120 } }
+    static var refreshPeriod: TimeInterval {
+        get { if let n = get("REFRESH_PERIOD_KEY") as? TimeInterval { return n < 60 ? 120 : n } else { return 120 } }
         set { set("REFRESH_PERIOD_KEY", newValue) }
     }
     #endif
@@ -443,7 +443,7 @@ struct Settings {
 		set { set("HIDE_SNOOZED_ITEMS", newValue) }
 	}
 
-	static let hideUncommentedItemsHelp = "Hide all items except items which have unread comments (items with a red number badge)."
+	static let hideUncommentedItemsHelp = "Only show items which have red number badges."
 	static var hideUncommentedItems: Bool {
 		get { return get("HIDE_UNCOMMENTED_PRS_KEY") as? Bool ?? false }
 		set { set("HIDE_UNCOMMENTED_PRS_KEY", newValue) }
@@ -795,10 +795,10 @@ struct Settings {
 		set { set("DISPLAY_REVIEW_CHANGE_REQUESTS", newValue) }
 	}
 
-	static let reactionScanningIntervalHelp = "Items need to be regularly re-scanned in order to detect any added reactions, which can raise API usage and slow down sync. This option controls how often items will be marked for a reaction checkup."
-	static var reactionScanningInterval: Int {
-		get { return get("REACTION_SCANNING_INTERVAL") as? Int ?? 4 }
-		set { set("REACTION_SCANNING_INTERVAL", newValue) }
+    static let reactionScanningBatchSizeHelp = "Because querying reactions can be bandwidth and time intensive, Trailer will scan for updates on items that haven't been scanned for the longest time, at every refresh, up to a maximum of this number of items. Higher values mean longer sync times and more API usage."
+	static var reactionScanningBatchSize: Int {
+		get { return get("REACTION_SCANNING_BATCH") as? Int ?? 100 }
+		set { set("REACTION_SCANNING_BATCH", newValue) }
 	}
 
 	static let notifyOnItemReactionsHelp = "Count reactions to PRs and issues as comments. Increase the total count. Notify and badge an item as unread depending on the comment section settings."
@@ -819,7 +819,7 @@ struct Settings {
 		set { set("DISPLAY_NUMBERS_FOR_ITEMS", newValue) }
 	}
     
-    static let draftHandlingPolicyHelp = "How to deal with an item if it is marked as a draft."
+    static let draftHandlingPolicyHelp = "How to deal with a PR if it is marked as a draft."
     static var draftHandlingPolicy: Int {
         get { return get("DRAFT_HANDLING_POLICY") as? Int ?? 0 }
         set { set("DRAFT_HANDLING_POLICY", newValue) }
@@ -830,5 +830,38 @@ struct Settings {
 		get { return get("COUNT_VISIBLE_SNOOZED_ITEMS") as? Bool ?? true }
 		set { set("COUNT_VISIBLE_SNOOZED_ITEMS", newValue) }
 	}
+    
+    static let markUnmergeablePrsHelp = "Indicate PRs which cannot be merged. This option only works for items synced via the new v4 API."
+    static var markUnmergeablePrs: Bool {
+        get { return get("MARK_UNMERGEABLE_ITEMS") as? Bool ?? false }
+        set { set("MARK_UNMERGEABLE_ITEMS", newValue) }
+    }
+    
+    static let showPrLinesHelp = "Sync and show the number of lines added and/or removed on PRs. This option only works for items synced via the new v4 API."
+    static var showPrLines: Bool {
+        get { return get("SHOW_PR_LINES") as? Bool ?? false }
+        set { set("SHOW_PR_LINES", newValue) }
+    }
 
+    static let scanClosedAndMergedItemsHelp = "Also scan closed and merged items for new comments. This can use up a small additional amount of bandwidth on each refresh. This option only works for items synced via the new v4 API."
+    static var scanClosedAndMergedItems: Bool {
+        get { return get("SCAN_CLOSED_AND_MERGED") as? Bool ?? false }
+        set { set("SCAN_CLOSED_AND_MERGED", newValue) }
+    }
+    
+    static let showRequestedTeamReviewsHelp = "Display the name(s) of teams which have been assigned as reviewers on PRs"
+    static var showRequestedTeamReviews: Bool {
+        get { return get("REQUESTED_TEAM_REVIEWS") as? Bool ?? false }
+        set { set("REQUESTED_TEAM_REVIEWS", newValue) }
+    }
+
+    static let v4title = "Can't be turned on yet"
+    static let v4Message = "Your database seems to contain items which have not yet been migrated in order to be able to use the new API.\n\nItems are migrated after a sync, but merged and/or closed items are never migrated.\n\nYou will have to perform a sync, and then remove merged and closed items before being able to turn this setting on."
+    static let useV4APIHelp = "In cases where the new v4 API is available, such as the public GitHub server, using it can result in significant efficiency and speed improvements when syncing."
+    static var useV4API: Bool {
+        get { return get("USE_V4_API") as? Bool ?? false }
+        set { set("USE_V4_API", newValue) }
+    }
+    
+    static let reloadAllDataHelp = "Chosing this option will remove all synced data and reload everything from scratch. This can take a while and use up a large amount of API quota, so only use it if things seem broken."
 }

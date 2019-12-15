@@ -1,10 +1,3 @@
-//
-//  Colors.swift
-//  Trailer
-//
-//  Created by Paul Tsochantaris on 14/12/2019.
-//
-
 #if os(iOS)
 import UIKit
 typealias COLOR_CLASS = UIColor

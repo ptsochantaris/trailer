@@ -13,7 +13,7 @@ final class Repo: DataItem {
 	@NSManaged var itemHidingPolicy: Int64
 	@NSManaged var pullRequests: Set<PullRequest>
 	@NSManaged var issues: Set<Issue>
-	@NSManaged var ownerId: Int64
+    @NSManaged var ownerNodeId: String?
 	@NSManaged var manuallyAdded: Bool
 	@NSManaged var archived: Bool
 	@NSManaged var lastScannedIssueEventId: Int64
@@ -21,8 +21,9 @@ final class Repo: DataItem {
 	override func resetSyncState() {
 		super.resetSyncState()
 		lastScannedIssueEventId = 0
+        updatedAt = updatedAt?.addingTimeInterval(-1)
 	}
-
+    
 	static func syncRepos(from data: [[AnyHashable : Any]]?, server: ApiServer, addNewRepos: Bool, manuallyAdded: Bool) {
 		let filteredData = data?.filter { info -> Bool in
 			if info["private"] as? Bool ?? false {
@@ -51,7 +52,7 @@ final class Repo: DataItem {
 				item.webUrl = info["html_url"] as? String
 				item.inaccessible = false
 				item.archived = info["archived"] as? Bool ?? false
-				item.ownerId = (info["owner"] as? [AnyHashable : Any])?["id"] as? Int64 ?? 0
+				item.ownerNodeId = (info["owner"] as? [AnyHashable : Any])?["node_id"] as? String
 				item.manuallyAdded = manuallyAdded
 				if item.postSyncAction == PostSyncAction.isNew.rawValue {
 					item.displayPolicyForPrs = Int64(Settings.displayPolicyForNewPrs)
@@ -65,16 +66,20 @@ final class Repo: DataItem {
 	static func hideArchivedRepos(in moc: NSManagedObjectContext) -> Bool {
 		var madeChanges = false
 		for repo in Repo.allItems(of: Repo.self, in: moc) where repo.archived && repo.shouldSync {
-			DLog("Auto-hiding archived repo \(repo.serverId)")
+			DLog("Auto-hiding archived repo ID \(repo.nodeId ?? "<no ID>")")
 			repo.displayPolicyForPrs = RepoDisplayPolicy.hide.rawValue
 			repo.displayPolicyForIssues = RepoDisplayPolicy.hide.rawValue
 			madeChanges = true
 		}
 		return madeChanges
 	}
+    
+    var apiUrl: String? {
+        return apiServer.apiPath?.appending(pathComponent: "repos").appending(pathComponent: fullName ?? "")
+    }
 
 	var isMine: Bool {
-		return ownerId == apiServer.userId
+		return ownerNodeId == apiServer.userNodeId
 	}
 
 	var shouldSync: Bool {
@@ -203,5 +208,12 @@ final class Repo: DataItem {
 		mark(type: PullRequest.self)
 		mark(type: Issue.self)
 	}
-
+    
+    var shouldIncludeClosedAndMergedPrs: Bool {
+        return Settings.scanClosedAndMergedItems && PullRequest.mostRecentItemUpdate(in: self) > .distantPast
+    }
+    
+    var shouldIncludeClosedAndMergedIssues: Bool {
+        return Settings.scanClosedAndMergedItems && Issue.mostRecentItemUpdate(in: self) > .distantPast
+    }
 }

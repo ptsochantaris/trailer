@@ -6,7 +6,7 @@ import CoreSpotlight
 final class NotificationManager {
 
 	static func handleLocalNotification(notification: UNNotificationContent, action: String) {
-		if notification.userInfo.count > 0 {
+		if !notification.userInfo.isEmpty {
 			DLog("Received local notification: %@", notification.userInfo)
 			popupManager.masterController.localNotificationSelected(userInfo: notification.userInfo, action: action)
 		}
@@ -46,10 +46,6 @@ final class NotificationManager {
 	}
 
 	static func postNotification(type: NotificationType, for item: DataItem) {
-		if preferencesDirty {
-			return
-		}
-
 		let notification = UNMutableNotificationContent()
 
 		switch (type) {

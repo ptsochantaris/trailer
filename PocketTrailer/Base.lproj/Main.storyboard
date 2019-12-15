@@ -24,8 +24,8 @@
                                     <rect key="frame" x="0.0" y="0.0" width="343" height="340"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <stackView opaque="NO" contentMode="scaleToFill" alignment="top" spacing="12" translatesAutoresizingMaskIntoConstraints="NO" id="W1j-m4-s4j">
-                                            <rect key="frame" x="15" y="11" width="313" height="318"/>
+                                        <stackView opaque="NO" contentMode="scaleToFill" alignment="top" spacing="11" translatesAutoresizingMaskIntoConstraints="NO" id="W1j-m4-s4j">
+                                            <rect key="frame" x="11" y="11" width="321" height="318"/>
                                             <subviews>
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="1000" verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="dbg-hz-tPt" userLabel="Avatar">
                                                     <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
@@ -35,34 +35,28 @@
                                                     </constraints>
                                                 </imageView>
                                                 <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="6" translatesAutoresizingMaskIntoConstraints="NO" id="5pC-dF-JJS">
-                                                    <rect key="frame" x="62" y="0.0" width="251" height="274"/>
+                                                    <rect key="frame" x="61" y="0.0" width="260" height="218"/>
                                                     <subviews>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="750" verticalHuggingPriority="1000" verticalCompressionResistancePriority="1000" placeholderIntrinsicWidth="50" placeholderIntrinsicHeight="50" text="Title" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Vv-dH-kVA" userLabel="TitleLabel">
-                                                            <rect key="frame" x="0.0" y="0.0" width="251" height="50"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="260" height="50"/>
                                                             <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
                                                             <nil key="textColor"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="1000" verticalCompressionResistancePriority="1000" placeholderIntrinsicWidth="50" placeholderIntrinsicHeight="50" text="Labels" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="AQh-N4-Eak" userLabel="DescriptionLabel">
-                                                            <rect key="frame" x="0.0" y="56" width="251" height="50"/>
-                                                            <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
-                                                            <color key="textColor" systemColor="secondaryLabelColor" red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
-                                                            <nil key="highlightedColor"/>
-                                                        </label>
-                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="1000" verticalCompressionResistancePriority="1000" placeholderIntrinsicWidth="50" placeholderIntrinsicHeight="50" text="Reviews" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0uC-Dk-bnz" userLabel="DescriptionLabel">
-                                                            <rect key="frame" x="0.0" y="112" width="251" height="50"/>
+                                                            <rect key="frame" x="0.0" y="56" width="260" height="50"/>
                                                             <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
                                                             <color key="textColor" systemColor="secondaryLabelColor" red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="1000" verticalCompressionResistancePriority="1000" placeholderIntrinsicWidth="50" placeholderIntrinsicHeight="50" text="Description" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cqW-C7-a8P" userLabel="DescriptionLabel">
-                                                            <rect key="frame" x="0.0" y="168" width="251" height="50"/>
+                                                            <rect key="frame" x="0.0" y="112" width="260" height="50"/>
                                                             <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
                                                             <color key="textColor" systemColor="secondaryLabelColor" red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="1000" verticalCompressionResistancePriority="1000" placeholderIntrinsicWidth="50" placeholderIntrinsicHeight="50" text="Statuses" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wDD-T8-hhR" userLabel="StatusLabel">
-                                                            <rect key="frame" x="0.0" y="224" width="251" height="50"/>
+                                                            <rect key="frame" x="0.0" y="168" width="260" height="50"/>
                                                             <fontDescription key="fontDescription" name="Courier" family="Courier" pointSize="10"/>
                                                             <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             <nil key="highlightedColor"/>
@@ -80,11 +74,11 @@
                                     </constraints>
                                 </tableViewCellContentView>
                                 <color key="backgroundColor" cocoaTouchSystemColor="tableCellGroupedBackgroundColor"/>
+                                <edgeInsets key="layoutMargins" top="11" left="11" bottom="12" right="11"/>
                                 <connections>
                                     <outlet property="_description" destination="cqW-C7-a8P" id="sR3-4K-zdO"/>
                                     <outlet property="_image" destination="dbg-hz-tPt" id="ip5-bc-vaF"/>
                                     <outlet property="_labels" destination="AQh-N4-Eak" id="AsZ-ik-UTt"/>
-                                    <outlet property="_reviews" destination="0uC-Dk-bnz" id="UuC-kr-j8V"/>
                                     <outlet property="_statuses" destination="wDD-T8-hhR" id="yxt-cA-JJx"/>
                                     <outlet property="_title" destination="7Vv-dH-kVA" id="eZa-b3-NJm"/>
                                 </connections>
@@ -311,7 +305,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="0SJ-po-lgZ" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="5348" y="-33"/>
+            <point key="canvasLocation" x="5428" y="-33"/>
         </scene>
         <!--View Options-->
         <scene sceneID="6Fr-dO-LIV">
@@ -375,7 +369,7 @@
                     </constraints>
                 </view>
             </objects>
-            <point key="canvasLocation" x="5348" y="-785"/>
+            <point key="canvasLocation" x="5428" y="-785"/>
         </scene>
         <!--Edit-->
         <scene sceneID="zxZ-6j-71v">
@@ -561,7 +555,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="J5I-c4-2Ch" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="5348" y="746.30541871921184"/>
+            <point key="canvasLocation" x="5428" y="746"/>
         </scene>
         <!--Advanced Repo Settings-->
         <scene sceneID="Ddp-tq-86K">
@@ -693,7 +687,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="DFs-Ot-r5o" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="6199.1999999999998" y="746.30541871921184"/>
+            <point key="canvasLocation" x="6282" y="746"/>
         </scene>
         <!--Comment Blocking-->
         <scene sceneID="L4e-B0-eWh">
@@ -735,23 +729,23 @@
         <scene sceneID="13M-SK-H8U">
             <objects>
                 <tableViewController definesPresentationContext="YES" modalPresentationStyle="currentContext" id="ls6-NX-hye" customClass="AdvancedSettingsViewController" customModule="PocketTrailer" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="insetGrouped" separatorStyle="default" rowHeight="134" sectionHeaderHeight="18" sectionFooterHeight="18" id="Q1r-gB-XEK">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="insetGrouped" separatorStyle="default" rowHeight="84" sectionHeaderHeight="18" sectionFooterHeight="18" id="Q1r-gB-XEK">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="758"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <inset key="separatorInset" minX="15" minY="0.0" maxX="0.0" maxY="0.0"/>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" rowHeight="134" id="0IG-O1-8fc" customClass="AdvancedSettingsCell" customModule="PocketTrailer" customModuleProvider="target">
-                                <rect key="frame" x="16" y="55.333332061767578" width="343" height="134"/>
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" rowHeight="84" id="0IG-O1-8fc" customClass="AdvancedSettingsCell" customModule="PocketTrailer" customModuleProvider="target">
+                                <rect key="frame" x="16" y="55.333332061767578" width="343" height="84"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="0IG-O1-8fc" id="Cde-Zq-FvG">
-                                    <rect key="frame" x="0.0" y="0.0" width="343" height="134"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="343" height="84"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="12" translatesAutoresizingMaskIntoConstraints="NO" id="25R-TQ-CNL">
-                                            <rect key="frame" x="15" y="11" width="313" height="112"/>
+                                            <rect key="frame" x="15" y="11" width="313" height="62"/>
                                             <subviews>
                                                 <stackView opaque="NO" contentMode="scaleToFill" alignment="top" spacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="xwV-d7-Cp9">
-                                                    <rect key="frame" x="0.0" y="0.0" width="313" height="85.666666666666671"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="313" height="35.666666666666664"/>
                                                     <subviews>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="750" verticalCompressionResistancePriority="1000" text="Option Title" textAlignment="natural" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ar9-3E-qS5">
                                                             <rect key="frame" x="0.0" y="0.0" width="251" height="20.333333333333332"/>
@@ -770,7 +764,7 @@
                                                     </subviews>
                                                 </stackView>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="naL-Ei-MIR">
-                                                    <rect key="frame" x="0.0" y="97.666666666666671" width="313" height="14.333333333333329"/>
+                                                    <rect key="frame" x="0.0" y="47.666666666666664" width="313" height="14.333333333333336"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
                                                     <color key="textColor" systemColor="secondaryLabelColor" red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <nil key="highlightedColor"/>
@@ -829,7 +823,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="5U3-kt-wt7" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2774" y="2288"/>
+            <point key="canvasLocation" x="2773.5999999999999" y="2287.6847290640394"/>
         </scene>
         <!--Servers-->
         <scene sceneID="dTo-Cu-ELq">
@@ -870,7 +864,19 @@
                             <outlet property="delegate" destination="Ny5-Q9-wJN" id="wVG-H4-wp4"/>
                         </connections>
                     </tableView>
-                    <toolbarItems/>
+                    <toolbarItems>
+                        <barButtonItem title="Reload All Data" id="ADr-dn-QfX">
+                            <connections>
+                                <action selector="resyncEverythingSelected:" destination="Ny5-Q9-wJN" id="9Fi-ds-F5S"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem style="plain" systemItem="flexibleSpace" id="DTS-rX-o6V"/>
+                        <barButtonItem title="Using v3 API" id="h3U-iB-BHS">
+                            <connections>
+                                <action selector="apiToggleSelected:" destination="Ny5-Q9-wJN" id="Ygs-Np-gox"/>
+                            </connections>
+                        </barButtonItem>
+                    </toolbarItems>
                     <navigationItem key="navigationItem" title="Servers" id="xL8-Y9-77V">
                         <barButtonItem key="leftBarButtonItem" image="xmark.circle" catalog="system" style="done" id="3yS-pI-1hb">
                             <connections>
@@ -885,6 +891,7 @@
                     </navigationItem>
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
+                        <outlet property="apiSwitch" destination="h3U-iB-BHS" id="o5J-gh-WhV"/>
                         <segue destination="iSf-H9-TPW" kind="show" identifier="editServer" id="uv4-xw-XIN"/>
                     </connections>
                 </tableViewController>
@@ -1152,7 +1159,7 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="top" showsHorizontalScrollIndicator="NO" editable="NO" textAlignment="center" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cun-Cw-EIG">
                                 <rect key="frame" x="0.0" y="279.66666666666674" width="375" height="395.33333333333326"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <string key="text">Copyright (c) 2014-2019 Paul Tsochantaris
+                                <string key="text">Copyright (c) 2014-2020 Paul Tsochantaris
 Parts copyright (c) 2013-2014 HouseTrip Ltd.
 
 Released under the terms of the MIT licence:
@@ -1478,7 +1485,7 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
         <!--Servers-->
         <scene sceneID="O8y-pt-1Ow">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="uY2-9H-xYT" sceneMemberID="viewController">
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" toolbarHidden="NO" id="uY2-9H-xYT" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Servers" image="globe" catalog="system" id="4P2-5Y-Yda"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="uZE-n9-f8D">
@@ -1486,6 +1493,10 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
+                    <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="hbK-x7-Cv8">
+                        <rect key="frame" x="0.0" y="626" width="375" height="49"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </toolbar>
                     <connections>
                         <segue destination="Ny5-Q9-wJN" kind="relationship" relationship="rootViewController" id="TnG-Ii-7ZS"/>
                     </connections>
@@ -1581,7 +1592,7 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
         </namedColor>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="T4S-uD-LHq"/>
+        <segue reference="jwG-rd-TEN"/>
     </inferredMetricsTieBreakers>
     <color key="tintColor" name="apptint"/>
 </document>

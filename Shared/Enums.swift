@@ -69,60 +69,47 @@ let shortDateFormatter: DateFormatter = {
 
 private let agoFormatter: DateComponentsFormatter = {
 	let f = DateComponentsFormatter()
-	f.allowedUnits = [.year, .month, .day, .hour, .minute]
+    f.allowedUnits = [.year, .month, .day, .hour, .minute, .second]
 	f.unitsStyle = .abbreviated
+    f.collapsesLargestUnit = true
+    f.maximumUnitCount = 2
 	return f
 }()
 
 func agoFormat(prefix: String, since: Date?) -> String {
-
 	guard let since = since, since != .distantPast else {
-		return "not \(prefix) yet"
+        return "Not \(prefix.lowercased()) yet"
 	}
 
-	let interval = -since.timeIntervalSinceNow
-	if interval < 60.0 {
-		return "\(prefix) just now"
-	} else {
-		let duration = agoFormatter.string(from: since, to: Date()) ?? "unknown time"
-		return "\(prefix) \(duration) ago"
-	}
+    let now = Date()
+    if now.timeIntervalSince(since) < 3 {
+        return "\(prefix) just now"
+    }
+    let duration = agoFormatter.string(from: since, to: now) ?? "unknown time"
+    return "\(prefix) \(duration) ago"
 }
 
 ////
 
-func atNextEvent(_ completion: @escaping Completion) {
-	OperationQueue.main.addOperation(completion)
-}
-
-func atNextEvent<T: AnyObject>(_ owner: T?, completion: @escaping (T)->Void) {
-	if let o = owner {
-		atNextEvent(o, completion: completion)
-	}
-}
-
-func atNextEvent<T: AnyObject>(_ owner: T, completion: @escaping (T)->Void) {
-	atNextEvent { [weak owner] in
-		if let o = owner {
-			completion(o)
-		}
-	}
-}
-
-////
-
-func delay(_ delay: TimeInterval, closure: @escaping Completion) {
-	let time = DispatchTime.now() + Double(Int64(delay * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
-	DispatchQueue.main.asyncAfter(deadline: time, execute: closure)
-}
-
-func delay<T: AnyObject>(_ time: TimeInterval, _ owner: T, completion: @escaping (T) -> Void) {
-	let time = DispatchTime.now() + Double(Int64(time * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
-	DispatchQueue.main.asyncAfter(deadline: time) { [weak owner] in
-		atNextEvent { [weak owner] in
-			if let o = owner {
-				completion(o)
-			}
-		}
-	}
+extension String {
+    var trim: String {
+        return trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+    var capitalFirstLetter: String {
+        if !isEmpty {
+            return prefix(1).uppercased() + dropFirst()
+        }
+        return self
+    }
+    func appending(pathComponent: String) -> String {
+        let endSlash = hasSuffix("/")
+        let firstSlash = pathComponent.hasPrefix("/")
+        if endSlash && firstSlash {
+            return appending(pathComponent.dropFirst())
+        } else if (!endSlash && !firstSlash) {
+            return appending("/\(pathComponent)")
+        } else {
+            return appending(pathComponent)
+        }
+    }
 }

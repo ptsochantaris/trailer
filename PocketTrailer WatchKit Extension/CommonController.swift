@@ -67,11 +67,12 @@ class CommonController: WKInterfaceController {
 				S.update(from: response)
 			}
 		}) { error in
-			atNextEvent(self) { S in
+            DispatchQueue.main.async { [weak self] in
+                guard let S = self else { return }
 				if S.loading==5 {
 					S.loadingFailed(with: error)
 				} else {
-					delay(0.3, S) { S in
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
 						S.attempt(request: request)
 					}
 				}
@@ -82,9 +83,9 @@ class CommonController: WKInterfaceController {
 	private func showTemporaryError(_ mesage: String) {
 		_statusLabel.setTextColor(UIColor(red: 1, green: 0.2, blue: 0.2, alpha: 1))
 		show(status: mesage, hideTable: true)
-		delay(4, self) { S in
-			S._statusLabel.setTextColor(.white)
-			S.show(status: "", hideTable: false)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 4) { [weak self] in
+			self?._statusLabel.setTextColor(.white)
+			self?.show(status: "", hideTable: false)
 		}
 	}
 

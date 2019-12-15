@@ -11,10 +11,10 @@ final class ApiServer: NSManagedObject {
     @NSManaged var requestsLimit: Int64
     @NSManaged var requestsRemaining: Int64
     @NSManaged var resetDate: Date?
-    @NSManaged var userId: Int64
     @NSManaged var userName: String?
     @NSManaged var webPath: String?
 	@NSManaged var createdAt: Date?
+    @NSManaged var userNodeId: String?
 
     @NSManaged var comments: Set<PRComment>
     @NSManaged var labels: Set<PRLabel>
@@ -65,6 +65,7 @@ final class ApiServer: NSManagedObject {
 	static func resetSyncOfEverything() {
 		DLog("RESETTING SYNC STATE OF ALL ITEMS")
 		for r in DataItem.allItems(of: Repo.self, in: DataManager.main, prefetchRelationships: ["pullRequests", "issues"]) {
+            r.resetSyncState()
 			for p in r.pullRequests {
 				p.resetSyncState()
 			}
@@ -74,10 +75,25 @@ final class ApiServer: NSManagedObject {
 		}
 		if app != nil {
 			preferencesDirty = true
-			API.clearAllBadLinks()
+			RestAccess.clearAllBadLinks()
 		}
 	}
 
+    func deleteEverything() {
+        for p in pullRequests {
+            managedObjectContext?.delete(p)
+        }
+        for i in issues {
+            managedObjectContext?.delete(i)
+        }
+        for l in labels {
+            managedObjectContext?.delete(l)
+        }
+        for t in teams {
+            managedObjectContext?.delete(t)
+        }
+    }
+    
 	static func insertNewServer(in moc: NSManagedObjectContext) -> ApiServer {
 		let githubServer: ApiServer = NSEntityDescription.insertNewObject(forEntityName: "ApiServer", into: moc) as! ApiServer
 		githubServer.createdAt = Date()
@@ -167,10 +183,10 @@ final class ApiServer: NSManagedObject {
 		}
 	}
 
-	func updateApiLimits(_ limits: ApiRateLimits) {
-		requestsRemaining = limits.requestsRemaining
-		requestsLimit = limits.requestLimit
-		resetDate = limits.resetDate
+	func updateApiStats(_ stats: ApiStats) {
+		requestsRemaining = stats.remaining
+		requestsLimit = stats.limit
+		resetDate = stats.resetAt
         NotificationCenter.default.post(name: .ApiUsageUpdate, object: self, userInfo: nil)
 	}
 
@@ -180,6 +196,10 @@ final class ApiServer: NSManagedObject {
 		label = "GitHub"
 		resetSyncState()
 	}
+    
+    var graphQLPath: String? {
+        return apiPath?.appending(pathComponent: "graphql")
+    }
 
 	func resetSyncState() {
 		if app != nil {
@@ -240,7 +260,8 @@ final class ApiServer: NSManagedObject {
 					repoData[k] = v
 				}
 			}
-			archivedData["\(r.serverId)"] = repoData
+            let id = r.nodeId ?? UUID().uuidString
+            archivedData[id] = repoData
 		}
 		return archivedData
 	}
@@ -290,5 +311,39 @@ final class ApiServer: NSManagedObject {
 			r.postSyncAction = PostSyncAction.isUpdated.rawValue
 		}
 	}
-
+    
+    // MARK: GraphQL
+        
+    func run(queries: [GQLQuery], completion: @escaping (Error?)->Void) {
+        let path = self.graphQLPath ?? ""
+        let token = self.authToken ?? ""
+        ApiServer.runQueries(queries: queries, on: path, token: token) { error, newStats in
+            if let newStats = newStats {
+                self.updateApiStats(newStats)
+            }
+            completion(error)
+        }
+    }
+    
+    static func runQueries(queries: [GQLQuery], on path: String, token: String, completion: @escaping (Error?, ApiStats?)->Void) {
+        var finalError: Error?
+        var updatedStats: ApiStats?
+        
+        let group = DispatchGroup()
+        for query in queries {
+            group.enter()
+            query.run(for: path, authToken: token, attempt: 5) { err, apiStats in
+                if let apiStats = apiStats {
+                    updatedStats = apiStats
+                }
+                if let err = err {
+                    finalError = err
+                }
+                group.leave()
+            }
+        }
+        group.notify(queue: .main) {
+            completion(finalError, updatedStats)
+        }
+    }
 }

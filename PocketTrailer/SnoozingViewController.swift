@@ -38,10 +38,10 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 	}
 
 	func numberOfSections(in tableView: UITableView) -> Int {
-		if SnoozePreset.allSnoozePresets(in: DataManager.main).count > 0 {
-			return 3
-		} else {
+		if SnoozePreset.allSnoozePresets(in: DataManager.main).isEmpty {
 			return 2
+		} else {
+			return 3
 		}
 	}
 

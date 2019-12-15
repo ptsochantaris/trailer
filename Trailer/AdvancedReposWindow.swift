@@ -48,7 +48,7 @@ final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 
 	// chain this to updateActivity from the main repferences window
 	func updateActivity() {
-		if appIsRefreshing {
+        if API.isRefreshing {
 			refreshButton.isEnabled = false
 			activityDisplay.startAnimation(nil)
 		} else {
@@ -56,14 +56,14 @@ final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 			activityDisplay.stopAnimation(nil)
 			updateRemovableRepos()
 		}
-		addButton.isEnabled = !appIsRefreshing
-		removeButton.isEnabled = !appIsRefreshing
+		addButton.isEnabled = !API.isRefreshing
+		removeButton.isEnabled = !API.isRefreshing
 	}
 
 	private func updateRemovableRepos() {
 		removeRepoList.removeAllItems()
 		let manuallyAddedRepos = Repo.allItems(of: Repo.self, in: DataManager.main).filter { $0.manuallyAdded }
-		if manuallyAddedRepos.count == 0 {
+		if manuallyAddedRepos.isEmpty {
 			let m = NSMenuItem()
 			m.title = "You have not added any custom repositories"
 			removeRepoList.menu?.addItem(m)

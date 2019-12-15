@@ -2,15 +2,22 @@
 import WatchKit
 
 final class TitleRow: NSObject, PopulatableRow {
-	var title: String?
+    var label: String?
+    var prRelated = false
+    
 	func populate(from other: Any) {
 		if let o = other as? TitleRow {
-			titleL.setText(o.title)
+            prIcon.setHidden(!o.prRelated)
+            issueIcon.setHidden(o.prRelated)
+            if let l = o.label, !l.isEmpty {
+                titleL.setText(l)
+            } else {
+                titleL.setText(o.prRelated ? "PRs" : "Issues")
+            }
 		}
 	}
-	var rowType: String {
-		return String(describing: type(of: self))
-	}
-	
-	@IBOutlet private weak var titleL: WKInterfaceLabel!
+    	
+    @IBOutlet private weak var titleL: WKInterfaceLabel!
+    @IBOutlet private weak var prIcon: WKInterfaceImage!
+    @IBOutlet private weak var issueIcon: WKInterfaceImage!
 }

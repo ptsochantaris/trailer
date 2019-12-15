@@ -13,7 +13,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 	@IBOutlet private weak var authTokenLabel: UILabel!
 	@IBOutlet private weak var testButton: UIButton!
 
-	var serverId: NSManagedObjectID?
+	var serverLocalId: NSManagedObjectID?
 
 	private var focusedField: UITextField?
 
@@ -21,12 +21,12 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 		super.viewDidLoad()
 
 		var a: ApiServer
-		if let sid = serverId {
+		if let sid = serverLocalId {
 			a = existingObject(with: sid) as! ApiServer
 		} else {
 			a = ApiServer.addDefaultGithub(in: DataManager.main)
 			try! DataManager.main.save()
-			serverId = a.objectID
+			serverLocalId = a.objectID
 		}
 		name.text = a.label
 		apiPath.text = a.apiPath
@@ -64,7 +64,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 
 	@discardableResult
 	private func updateServerFromForm() -> ApiServer? {
-		if let sid = serverId {
+		if let sid = serverLocalId {
 			let a = existingObject(with: sid) as! ApiServer
 			a.label = name.text?.trim
 			a.apiPath = apiPath.text?.trim
@@ -165,11 +165,11 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 	}
 
 	private func deleteServer() {
-		if let a = existingObject(with: serverId!) {
+		if let a = existingObject(with: serverLocalId!) {
 			DataManager.main.delete(a)
 			DataManager.saveDB()
 		}
-		serverId = nil
+		serverLocalId = nil
 		_ = navigationController?.popViewController(animated: true)
 	}
 

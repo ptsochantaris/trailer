@@ -6,44 +6,45 @@ import CoreData
 
 final class Issue: ListableItem {
 
-	@NSManaged var commentsLink: String?
+    static func mostRecentItemUpdate(in repo: Repo) -> Date {
+        return repo.issues.reduce(.distantPast) { max($0, $1.updatedAt ?? .distantPast) }
+    }
+    
+    override var webUrl: String? {
+        return super.webUrl?.appending(pathComponent: "issues").appending(pathComponent: String(number))
+    }
+    
+    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer) {
+        syncItems(of: Issue.self, from: nodes, on: server) { issue, node in
+            
+            guard node.created || node.updated,
+                let parentId = node.parent?.id,
+                let moc = server.managedObjectContext,
+                let parent = DataItem.item(of: Repo.self, with: parentId, in: moc)
+                else { return }
+
+            let json = node.jsonPayload
+            issue.baseNodeSync(nodeJson: json, parent: parent)
+        }
+    }
 
 	static func syncIssues(from data: [[AnyHashable : Any]]?, in repo: Repo) {
 		let filteredData = data?.filter { $0["pull_request"] == nil } // don't sync issues which are pull requests, they are already synced
 		items(with: filteredData, type: Issue.self, server: repo.apiServer, prefetchRelationships: ["labels"]) { item, info, isNewOrUpdated in
-
 			if isNewOrUpdated {
-
 				item.baseSync(from: info, in: repo)
-
-				if let R = repo.fullName {
-					item.commentsLink = "/repos/\(R)/issues/\(item.number)/comments"
-				}
 
 				for l in item.labels {
 					l.postSyncAction = PostSyncAction.delete.rawValue
 				}
-
-				if Settings.showLabels, let labelList = info["labels"] as? [[AnyHashable : Any]] {
-					PRLabel.syncLabels(from: labelList, withParent: item)
-				}
-
-				item.processReactions(from: info)
 			}
-			item.reopened = item.condition == ItemCondition.closed.rawValue
+            if item.condition == ItemCondition.closed.rawValue {
+                item.stateChanged = StateChange.reopened.rawValue
+            }
 			item.condition = ItemCondition.open.rawValue
-			API.refreshesSinceLastReactionsCheck[item.objectID] = 1
 		}
 	}
 
-	static func issuesThatNeedReactionsToBeRefreshed(in moc: NSManagedObjectContext) -> [Issue] {
-		let f = NSFetchRequest<Issue>(entityName: "Issue")
-		f.returnsObjectsAsFaults = false
-		f.predicate = NSPredicate(format: "requiresReactionRefreshFromUrl != nil")
-		return try! moc.fetch(f)
-	}
-
-	@available(OSX 10.11, *)
 	override var searchKeywords: [String] {
 		return ["Issue", "Issues"] + super.searchKeywords
 	}
@@ -80,6 +81,10 @@ final class Issue: ListableItem {
 		return try! moc.count(for: f) > 0
 	}
 
+    var labelsLink: String? {
+        return issueUrl?.appending(pathComponent: "labels")
+    }
+    
 	@objc var sectionName: String {
 		return Section.issueMenuTitles[Int(sectionIndex)]
 	}

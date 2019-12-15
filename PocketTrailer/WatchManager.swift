@@ -18,7 +18,8 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
 		if session.isPaired, session.isWatchAppInstalled, activationState == .activated {
-			atNextEvent(self) { S in
+            DispatchQueue.main.async { [weak self] in
+                guard let S = self else { return }
 				S.sendOverview()
 			}
 		}
@@ -26,7 +27,8 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	func sessionReachabilityDidChange(_ session: WCSession) {
 		if session.isPaired, session.isWatchAppInstalled, session.activationState == .activated, session.isReachable {
-			atNextEvent(self) { S in
+            DispatchQueue.main.async { [weak self] in
+                guard let S = self else { return }
 				S.sendOverview()
 			}
 		}
@@ -38,37 +40,50 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	private func sendOverview() {
 
-		let validSession = (session?.isPaired ?? false)
-			&& (session?.isWatchAppInstalled ?? false)
-			&& session?.activationState == .activated
+        guard let session = session,
+            session.isPaired,
+            session.isWatchAppInstalled,
+            session.activationState == .activated,
+            let overview = NSDictionary(contentsOf: overviewPath)
+            else { return }
+        
+        do {
+            try session.updateApplicationContext(["overview": overview])
+        } catch {
+            DLog("Error updating watch session: %@", error.localizedDescription)
+        }
+    }
 
-		do {
-			if validSession, let overview = NSDictionary(contentsOf: overviewPath) {
-				try session?.updateApplicationContext(["overview": overview])
-			}
-		} catch {
-			DLog("Error updating watch session: %@", error.localizedDescription)
+    private var updateGroup: DispatchGroup?
+    func updateContext() {
+        let u = DispatchGroup()
+        u.enter()
+        updateGroup = u
+        BackgroundTask.registerForBackground()
+		buildOverview { overview in
+			(overview as NSDictionary).write(to: self.overviewPath, atomically: true)
+			self.sendOverview()
+            u.leave()
+            self.updateGroup = nil
+            BackgroundTask.unregisterForBackground()
 		}
 	}
-
-	func updateContext() {
-		DataManager.saveDB()
-
-		buildOverview { [weak self] overview in
-			guard let s = self else { return }
-
-			(overview as NSDictionary).write(to: s.overviewPath, atomically: true)
-			s.sendOverview()
-		}
-	}
+    func waitForUpdate(callback: @escaping ()->Void) {
+        if let u = updateGroup {
+            u.notify(queue: .main, execute: callback)
+        } else {
+            callback()
+        }
+    }
 
 	private var overviewPath: URL {
 		return DataManager.dataFilesDirectory.appendingPathComponent("overview.plist")
 	}
 
 	func session(_ session: WCSession, didReceiveMessage message: [String : Any], replyHandler: @escaping ([String : Any]) -> Void) {
-		atNextEvent(self) { s in
-			s.handle(message: message, replyHandler: replyHandler)
+        DispatchQueue.main.async { [weak self] in
+            guard let S = self else { return }
+			S.handle(message: message, replyHandler: replyHandler)
 		}
 	}
 
@@ -246,7 +261,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		if showLabels {
 			itemData["labels"] = labelsForItem(item: item)
 		}
-		if let item = item as? PullRequest, item.shouldShowStatuses {
+		if let item = item as? PullRequest, item.interestedInStatuses {
 			itemData["statuses"] = statusLinesForPr(pr: item)
 		}
 		return itemData
@@ -306,11 +321,11 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 		//DLog("Building remote overview")
 
-		let allTabSets = popupManager.masterController.allTabSets
+        let allViewCriteria = popupManager.masterController.allTabSets.map { $0.viewCriterion }
 
 		let tempMoc = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 		tempMoc.undoManager = nil
-		tempMoc.persistentStoreCoordinator = DataManager.main.persistentStoreCoordinator
+        tempMoc.parent = DataManager.main
 		tempMoc.perform {
 
 			var views = [[String : Any]]()
@@ -318,9 +333,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			var totalUnreadPrCount = 0
 			var totalUnreadIssueCount = 0
 
-			for tabSet in allTabSets {
-
-				let c = tabSet.viewCriterion
+			for c in allViewCriteria {
 
 				let myPrs = WatchManager.counts(for: PullRequest.self, in: .mine, criterion: c, moc: tempMoc)
 				let participatedPrs = WatchManager.counts(for: PullRequest.self, in: .participated, criterion: c, moc: tempMoc)
@@ -364,6 +377,8 @@ final class WatchManager : NSObject, WCSessionDelegate {
 					]])
 			}
 
+            DLog("Remote overview updated")
+
 			DispatchQueue.main.async {
 				completion([
 					"views": views,
@@ -372,8 +387,6 @@ final class WatchManager : NSObject, WCSessionDelegate {
 					])
 				UIApplication.shared.applicationIconBadgeNumber = totalUnreadPrCount + totalUnreadIssueCount
 			}
-
-			DLog("Remote overview updated")
 		}
 	}
 

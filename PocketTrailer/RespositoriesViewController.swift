@@ -51,7 +51,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 
 	override func viewDidAppear(_ animated: Bool) {
 		actionsButton.isEnabled = ApiServer.someServersHaveAuthTokens(in: DataManager.main)
-		if actionsButton.isEnabled && fetchedResultsController.fetchedObjects?.count==0 {
+		if actionsButton.isEnabled && (fetchedResultsController.fetchedObjects?.isEmpty ?? true) {
 			refreshList()
 		} else if let selectedIndex = tableView.indexPathForSelectedRow {
 			tableView.deselectRow(at: selectedIndex, animated: true)
@@ -106,7 +106,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 	}
 
 	@IBAction private func sortSelected(_ sender: UIBarButtonItem) {
-		let a = UIAlertController(title: "Sort by...", message: nil, preferredStyle: .actionSheet)
+		let a = UIAlertController(title: "Sort by…", message: nil, preferredStyle: .actionSheet)
 		a.addAction(UIAlertAction(title: "Name", style: .default, handler: { _ in
 			self.setSort(by: .name)
 		}))
@@ -337,13 +337,13 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 		let untouchedIndexes = dataIndexes.filter { !(removedIndexes.contains($0) || addedIndexes.contains($0)) }
 
 		tableView.beginUpdates()
-		if removedIndexes.count > 0 {
+		if !removedIndexes.isEmpty {
 			tableView.deleteSections(IndexSet(removedIndexes), with: .fade)
 		}
-		if untouchedIndexes.count > 0 {
+		if !untouchedIndexes.isEmpty {
 			tableView.reloadSections(IndexSet(untouchedIndexes), with:.fade)
 		}
-		if addedIndexes.count > 0 {
+		if !addedIndexes.isEmpty {
 			tableView.insertSections(IndexSet(addedIndexes), with: .fade)
 		}
 		tableView.endUpdates()

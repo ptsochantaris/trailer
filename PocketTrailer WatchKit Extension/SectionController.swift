@@ -8,7 +8,7 @@ final class SectionController: CommonController {
 
 	@IBOutlet private weak var table: WKInterfaceTable!
 	@IBOutlet private weak var statusLabel: WKInterfaceLabel!
-
+    
 	private var rowControllers = [PopulatableRow]()
 
 	override func awake(withContext context: Any?) {
@@ -83,13 +83,13 @@ final class SectionController: CommonController {
 
 		rowControllers.removeAll(keepingCapacity: false)
 
-		func addSectionsFor(_ entry: [AnyHashable : Any], itemType: String, label: String, apiServerUri: String, header: String, showEmptyDescriptions: Bool) {
+		func addSectionsFor(_ entry: [AnyHashable : Any], itemType: String, label: String, apiServerUri: String, showEmptyDescriptions: Bool) {
 			let items = entry[itemType] as! [AnyHashable : Any]
 			let totalItems = items["total"] as! Int
-			let prefix = label.isEmpty ? "" : "\(label): "
 			if totalItems > 0 {
 				let pt = TitleRow()
-				pt.title = "\(prefix)\(totalItems) \(header)"
+                pt.prRelated = itemType == "prs"
+                pt.label = label
 				rowControllers.append(pt)
 				var totalUnread = 0
 				for itemSection in Section.apiTitles {
@@ -122,7 +122,7 @@ final class SectionController: CommonController {
 			} else if showEmptyDescriptions {
 				let error = (items["error"] as? String) ?? ""
 				let pt = TitleRow()
-				pt.title = "\(prefix)\(header): \(error)"
+                pt.label = "\(label): \(error)"
 				rowControllers.append(pt)
 			}
 		}
@@ -145,28 +145,30 @@ final class SectionController: CommonController {
 			}
 			return
 		}
-
+        
 		guard let views = result["views"] as? [[AnyHashable : Any]] else {
 			show(status: "There is no data from Trailer on your iOS device yet. Please launch it once and configure your settings.", hideTable: true)
 			return
 		}
+        
+        if let update = result["lastUpdated"] as? Date {
+            let u = UpdatedRow()
+            u.label = agoFormat(prefix: "Updated", since: update)
+            rowControllers.append(u)
+        }
 		
 		let showEmptyDescriptions = views.count == 1
-
-		let s = SummaryRow()
-		if s.setSummary(from: result) {
-			rowControllers.append(s)
-		}
 
 		for v in views {
 			let label = v["title"] as! String
 			let apiServerUri = v["apiUri"] as! String
-			addSectionsFor(v, itemType: "prs", label: label, apiServerUri: apiServerUri, header: "PRs", showEmptyDescriptions: showEmptyDescriptions)
-			addSectionsFor(v, itemType: "issues", label: label, apiServerUri: apiServerUri, header: "Issues", showEmptyDescriptions: showEmptyDescriptions)
+			addSectionsFor(v, itemType: "prs", label: label, apiServerUri: apiServerUri, showEmptyDescriptions: showEmptyDescriptions)
+			addSectionsFor(v, itemType: "issues", label: label, apiServerUri: apiServerUri, showEmptyDescriptions: showEmptyDescriptions)
 		}
 
-		let rowTypes = rowControllers.map { $0.rowType }
-		table.setRowTypes(rowTypes)
+		table.setRowTypes(rowControllers.map {
+            String(describing: type(of: $0))
+        })
 
 		var index = 0
 		for rc in rowControllers {

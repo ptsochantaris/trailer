@@ -52,7 +52,7 @@ class TrailerCell: NSTableCellView {
             y += height
         }
         
-		if let pullRequest = item as? PullRequest, pullRequest.shouldShowStatuses {
+		if let pullRequest = item as? PullRequest, pullRequest.interestedInStatuses {
             let statuses = pullRequest.displayedStatuses.reversed()
             if !statuses.isEmpty {
                 for status in statuses {
@@ -107,6 +107,7 @@ class TrailerCell: NSTableCellView {
 		if faded {
 			title.alphaValue = DISABLED_FADE
 			subtitle.alphaValue = DISABLED_FADE
+            reviews.alphaValue = DISABLED_FADE
 		}
 	}
 
@@ -183,79 +184,75 @@ class TrailerCell: NSTableCellView {
 			return nil
 		}
 
-		let title: String
-		let muted = item.muted
-		let n = item.number
-		if item is PullRequest {
-			title = muted ? "PR #\(n) (muted)" : "PR #\(n)"
-		} else {
-			title = muted ? "Issue #\(n) (muted)" : "Issue #\(n)"
-		}
-
+        let title = item.contextMenuTitle
+        
 		let m = NSMenu(title: title)
 		m.addItem(withTitle: title, action: #selector(copyNumberToClipboard), keyEquivalent: "")
 		m.addItem(NSMenuItem.separator())
 
-		let c1 = m.addItem(withTitle: "Copy URL", action: #selector(copyToClipboard), keyEquivalent: "c")
-		c1.keyEquivalentModifierMask = [.command]
+        for a in item.contextActions {
+            switch a {
+            case .copy:
+                let c = m.addItem(withTitle: a.title, action: #selector(copyToClipboard), keyEquivalent: "c")
+                c.keyEquivalentModifierMask = [.command]
 
-		let c2 = m.addItem(withTitle: "Open Repo", action: #selector(openRepo), keyEquivalent: "o")
-		c2.keyEquivalentModifierMask = [.command]
+            case .openRepo:
+                let c = m.addItem(withTitle: a.title, action: #selector(openRepo), keyEquivalent: "o")
+                c.keyEquivalentModifierMask = [.command]
 
-		if item.snoozeUntil == nil {
-			if item.hasUnreadCommentsOrAlert {
-				let c = m.addItem(withTitle: "Mark as read", action: #selector(markReadSelected), keyEquivalent: "a")
-				c.keyEquivalentModifierMask = [.command]
-			} else {
-				let c = m.addItem(withTitle: "Mark as unread", action: #selector(markUnreadSelected), keyEquivalent: "a")
-				c.keyEquivalentModifierMask = [.command]
-			}
-		}
+            case .markRead:
+                let c = m.addItem(withTitle: a.title, action: #selector(markReadSelected), keyEquivalent: "a")
+                c.keyEquivalentModifierMask = [.command]
 
-		if let section = Section(item.sectionIndex), !(section == .closed || section == .merged) {
+            case .markUnread:
+                let c = m.addItem(withTitle: a.title, action: #selector(markUnreadSelected), keyEquivalent: "a")
+                c.keyEquivalentModifierMask = [.command]
 
-			if let snooze = item.snoozeUntil {
-				let title: String
-				if snooze == .distantFuture || snooze == autoSnoozeSentinelDate {
-					title = String(format: "Wake")
-				} else {
-					title = String(format: "Wake (auto: %@)", itemDateFormatter.string(from: snooze))
-				}
-				let c = m.addItem(withTitle: title, action: #selector(wakeUpSelected), keyEquivalent: "0")
-				c.keyEquivalentModifierMask = [.command, .option]
+            case .wake:
+                let c = m.addItem(withTitle: a.title, action: #selector(wakeUpSelected), keyEquivalent: "0")
+                c.keyEquivalentModifierMask = [.command, .option]
 
-			} else {
+            case .snooze(let presets):
+                let s = NSMenu(title: "Snooze")
+                var count = 1
+                for i in presets {
+                    let keyEquivalent = count < 10 ? "\(count)" : ""
+                    let smi = s.addItem(withTitle: i.listDescription, action: #selector(snoozeSelected), keyEquivalent: keyEquivalent)
+                    smi.representedObject = i.objectID
+                    if !keyEquivalent.isEmpty {
+                        smi.keyEquivalentModifierMask = [.command, .option]
+                        count += 1
+                    }
+                }
+                s.addItem(withTitle: "Configure…", action: #selector(snoozeConfigSelected), keyEquivalent: "")
 
-				if muted {
-					let c = m.addItem(withTitle: "Un-Mute", action: #selector(unMuteSelected), keyEquivalent: "m")
-					c.keyEquivalentModifierMask = [.command]
-				} else {
-					let c = m.addItem(withTitle: "Mute", action: #selector(muteSelected), keyEquivalent: "m")
-					c.keyEquivalentModifierMask = [.command]
-				}
+                let c = m.addItem(withTitle: "Snooze…", action: nil, keyEquivalent: "")
+                c.submenu = s
 
-				let snoozeItems = SnoozePreset.allSnoozePresets(in: DataManager.main)
-				if snoozeItems.count > 0 {
-					var count = 1
-					let c = m.addItem(withTitle: "Snooze…", action: nil, keyEquivalent: "")
-					let s = NSMenu(title: "Snooze")
-					for i in snoozeItems {
-						let keyEquivalent = count < 10 ? "\(count)" : ""
-						let smi = s.addItem(withTitle: i.listDescription, action: #selector(snoozeSelected), keyEquivalent: keyEquivalent)
-						smi.representedObject = i.objectID
-						if !keyEquivalent.isEmpty {
-							smi.keyEquivalentModifierMask = [.command, .option]
-							count += 1
-						}
-					}
-					s.addItem(withTitle: "Configure…", action: #selector(snoozeConfigSelected), keyEquivalent: "")
-					c.submenu = s
-				}
-			}
-		}
+            case .mute:
+                let c = m.addItem(withTitle: a.title, action: #selector(muteSelected), keyEquivalent: "m")
+                c.keyEquivalentModifierMask = [.command]
 
+            case .unmute:
+                let c = m.addItem(withTitle: a.title, action: #selector(unMuteSelected), keyEquivalent: "0")
+                c.keyEquivalentModifierMask = [.command]
+
+            case .remove:
+                m.addItem(withTitle: a.title, action: #selector(removeSelected), keyEquivalent: "")
+            }
+        }
+        
 		return m
 	}
+    
+    @objc private func removeSelected() {
+        if let item = associatedDataItem {
+            item.sectionIndex = Section.none.rawValue
+            app.updateRelatedMenus(for: item) // saveAndRequestMenuUpdate won't work in this case
+            DataManager.main.delete(item)
+            DataManager.saveDB()
+        }
+    }
 
 	@objc private func snoozeConfigSelected() {
 		app.showPreferencesWindow(andSelect: 6)
@@ -347,7 +344,7 @@ class TrailerCell: NSTableCellView {
 		let pCenter = NSMutableParagraphStyle()
 		pCenter.alignment = .center
 
-		let countString = NSAttributedString(string: itemCountFormatter.string(for: total)!, attributes: [
+		let countString = NSAttributedString(string: numberFormatter.string(for: total)!, attributes: [
 			NSAttributedString.Key.font: NSFont.menuFont(ofSize: 11),
 			NSAttributedString.Key.foregroundColor: NSColor.controlTextColor,
 			NSAttributedString.Key.paragraphStyle: pCenter])
@@ -370,7 +367,7 @@ class TrailerCell: NSTableCellView {
 
 		if unread > 0 || alert {
 
-			let alertText = unread==0 ? "!" : itemCountFormatter.string(for: unread)!
+			let alertText = unread==0 ? "!" : numberFormatter.string(for: unread)!
 			let alertString = NSAttributedString(string: alertText, attributes: [
 				NSAttributedString.Key.font: NSFont.menuFont(ofSize: 8),
 				NSAttributedString.Key.foregroundColor: NSColor.white,

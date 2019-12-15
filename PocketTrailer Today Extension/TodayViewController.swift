@@ -156,14 +156,13 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 			
 			prLabel.attributedText = writeOutSection("prs")
 			issuesLabel.attributedText = writeOutSection("issues")
-			updatedLabel.attributedText = NSAttributedString(string: agoFormat(prefix: "updated", since: result["lastUpdated"] as? Date).capitalized, attributes: smallAttributes)
+			updatedLabel.attributedText = NSAttributedString(string: agoFormat(prefix: "updated", since: result["lastUpdated"] as? Date).capitalFirstLetter, attributes: smallAttributes)
 		} else {
 			issuesLabel.attributedText = nil
 			prLabel.attributedText = NSAttributedString(string: "--", attributes: dimAttributes)
 			issuesLabel.attributedText = NSAttributedString(string: "--", attributes: dimAttributes)
 			updatedLabel.attributedText = NSAttributedString(string: "Not updated yet", attributes: smallAttributes)
 		}
-
 	}
 
 	override func viewDidLayoutSubviews() {

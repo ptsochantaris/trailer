@@ -89,15 +89,15 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
 	}
 
 	@objc private func menuWillOpen(_ menu: NSMenu) {
-		if appIsRefreshing {
+		if API.isRefreshing {
 			refreshUpdate()
 		} else {
-			refreshMenuItem.title = " Refresh - \(API.lastUpdateDescription)"
+            refreshMenuItem.title = " Refresh (\(API.lastSuccessfulSyncAt))"
 		}
 	}
 
 	@objc private func refreshUpdate() {
-		refreshMenuItem.title = " \(API.lastUpdateDescription)"
+		refreshMenuItem.title = " Refresh: " + API.currentOperationName
 	}
 
 	func scrollToTop() {
@@ -212,7 +212,8 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
 			i = itemDelegate.itemAtRow(row)
 		}
 		if blink {
-			atNextEvent(self) { S in
+            DispatchQueue.main.async { [weak self] in
+                guard let S = self else { return }
 				S.table.selectRowIndexes(IndexSet(integer: row), byExtendingSelection: false)
 			}
 		}

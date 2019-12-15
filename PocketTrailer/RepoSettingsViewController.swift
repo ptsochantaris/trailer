@@ -162,7 +162,7 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
 		if let r = repo, r.groupLabel != newText {
 			r.groupLabel = newText
 			commit()
-			atNextEvent {
+			DispatchQueue.main.async {
 				popupManager.masterController.updateStatus(becauseOfChanges: true)
 			}
 		}

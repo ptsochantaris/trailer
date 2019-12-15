@@ -41,7 +41,8 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 	func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
 		potentialUpdate()
 		if applicationContext.keys.contains("overview") {
-			atNextEvent(self) { S in
+            DispatchQueue.main.async { [weak self] in
+                guard let S = self else { return }
 				S.updateComplications()
 				if S.appIsLaunched {
 					WKExtension.shared().scheduleSnapshotRefresh(withPreferredDate: Date(), userInfo: nil) { error in
@@ -59,13 +60,14 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 	
 	private func potentialUpdate() {
 		// Possibly in thread!
-		atNextEvent(self) { S in
+        DispatchQueue.main.async { [weak self] in
+            guard let S = self else { return }
 			if let l = S.lastView, S.session.isReachable && !S.requestedUpdate {
 				S.requestedUpdate = true
 				l.requestData(command: nil)
-				delay(0.5, S) { S in
-					S.requestedUpdate = false
-				}
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    S.requestedUpdate = false
+                }
 			} else if !S.appIsLaunched, S.session.isReachable, !S.session.receivedApplicationContext.keys.contains("overview") {
 				S.session.sendMessage(["command": "needsOverview"], replyHandler: nil, errorHandler: nil)
 			}

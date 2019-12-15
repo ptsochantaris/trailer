@@ -9,18 +9,18 @@ final class SettingsManager {
 		if Settings.readFromURL(url) {
 			DataManager.saveDB()
 
-			atNextEvent {
+			DispatchQueue.main.async {
 				popupManager.masterController.resetView(becauseOfChanges: true)
 
 				preferencesDirty = true
 				Settings.lastSuccessfulRefresh = nil
 
-				atNextEvent {
+				DispatchQueue.main.async {
 					app.startRefreshIfItIsDue()
 				}
 			}
 		} else {
-			atNextEvent {
+			DispatchQueue.main.async {
 				showMessage("Error", "These settings could not be imported due to an error")
 			}
 		}
@@ -36,7 +36,7 @@ final class SettingsManager {
 			a.addAction(UIAlertAction(title: "No", style: .cancel) { action in
 				withCompletion?(false)
 			})
-			atNextEvent {
+			DispatchQueue.main.async {
 				v.present(a, animated: true)
 			}
 		} else {
