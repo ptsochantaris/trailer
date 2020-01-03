@@ -104,7 +104,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
             let howLongAgo = Date().timeIntervalSince(l).rounded()
             let howLongUntilNextSync = Settings.backgroundRefreshPeriod - howLongAgo
             if howLongUntilNextSync > 0 {
-                DLog("No need to refresh yet, will refresh in %@", howLongUntilNextSync)
+                DLog("No need to refresh yet, will refresh in %@ sec", howLongUntilNextSync)
                 return
 			}
 		}

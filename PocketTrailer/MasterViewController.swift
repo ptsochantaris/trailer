@@ -456,31 +456,39 @@ UITableViewDragDelegate {
 		}
 	}
 
-	private func requestTabFocus(tabItem: UITabBarItem?, andOpen: ListableItem? = nil, overrideUrl: String? = nil) {
+    private func requestTabFocus(tabItem: UITabBarItem?, item: ListableItem? = nil, overrideUrl: String? = nil, andOpen: Bool = false) {
+        let group = DispatchGroup()
 		if let tabItem = tabItem {
-			tabbing(tabs, didSelect: tabItem) { [weak self] in
-				if let andOpen = andOpen {
-					self?.openInCurrentTab(item: andOpen, overrideUrl: overrideUrl)
-				}
+            group.enter()
+			tabbing(tabs, didSelect: tabItem) {
+                group.leave()
 			}
-		} else if let andOpen = andOpen { // no tabs
-			openInCurrentTab(item: andOpen, overrideUrl: overrideUrl)
 		}
+        group.notify(queue: .main) { [weak self] in
+            if let item = item {
+                self?.selectInCurrentTab(item: item, overrideUrl: overrideUrl, andOpen: andOpen)
+            }
+        }
 	}
 
-	private func openInCurrentTab(item: ListableItem, overrideUrl: String?) {
+    private func selectInCurrentTab(item: ListableItem, overrideUrl: String?, andOpen: Bool) {
 		guard let ip = fetchedResultsController.indexPath(forObject: item) else { return }
-
-		tableView.selectRow(at: ip, animated: false, scrollPosition: .middle)
-
-        DispatchQueue.main.async { [weak self] in
-            guard let S = self else { return }
-			if let u = overrideUrl, let url = URL(string: u) {
-				S.showDetail(url: url, objectId: item.objectID)
-			} else if let u = item.webUrl, let url = URL(string: u) {
-				S.showDetail(url: url, objectId: item.objectID)
-			}
-		}
+        
+        tableView.selectRow(at: ip, animated: false, scrollPosition: .middle)
+        if andOpen {
+            DispatchQueue.main.async { [weak self] in
+                guard let S = self else { return }
+                if let u = overrideUrl, let url = URL(string: u) {
+                    S.showDetail(url: url, objectId: item.objectID)
+                } else if let u = item.webUrl, let url = URL(string: u) {
+                    S.showDetail(url: url, objectId: item.objectID)
+                }
+            }
+        } else {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                self.tableView.deselectRow(at: ip, animated: true)
+            }
+        }
 	}
 
 	private func tabBarSetForTabItem(i: UITabBarItem?) -> TabBarSet? {
@@ -569,10 +577,7 @@ UITableViewDragDelegate {
 			tabBarSets.append(s)
 		}
 
-		var items = [UITabBarItem]()
-		for d in tabBarSets {
-			items.append(contentsOf: d.tabItems)
-		}
+        let items = tabBarSets.reduce([], { $0 + $1.tabItems })
 
 		let tabsAlreadyWereVisible = tabScroll != nil
 
@@ -742,7 +747,7 @@ UITableViewDragDelegate {
 					sc.isActive = false
 				}
 				DispatchQueue.main.asyncAfter(deadline: .now()+0.1) {
-					self.selectTabAndOpen(item, overrideUrl: urlToOpen)
+                    self.selectTab(for: item, overrideUrl: urlToOpen, andOpen: true)
 				}
 			}
 		} else {
@@ -750,7 +755,7 @@ UITableViewDragDelegate {
 		}
 	}
 
-	private func selectTabAndOpen(_ item: ListableItem, overrideUrl: String?) {
+    private func selectTab(for item: ListableItem, overrideUrl: String?, andOpen: Bool) {
 		var tabItem: UITabBarItem?
 		for d in tabBarSets {
 			if d.viewCriterion == nil || d.viewCriterion?.isRelated(to: item) ?? false {
@@ -758,14 +763,14 @@ UITableViewDragDelegate {
 				break
 			}
 		}
-		requestTabFocus(tabItem: tabItem, andOpen: item, overrideUrl: overrideUrl)
+        requestTabFocus(tabItem: tabItem, item: item, overrideUrl: overrideUrl, andOpen: andOpen)
 	}
 
-	func openItemWithUriPath(uriPath: String) {
+    func highightItemWithUriPath(uriPath: String) {
 		if
 			let itemId = DataManager.id(for: uriPath),
 			let item = existingObject(with: itemId) as? ListableItem {
-			selectTabAndOpen(item, overrideUrl: nil)
+            selectTab(for: item, overrideUrl: nil, andOpen: false)
 		}
 	}
 
@@ -774,7 +779,7 @@ UITableViewDragDelegate {
 			itemId = DataManager.id(for: cId),
 			let comment = existingObject(with: itemId) as? PRComment,
 			let item = comment.parent {
-			selectTabAndOpen(item, overrideUrl: nil)
+            selectTab(for: item, overrideUrl: nil, andOpen: true)
 		}
 	}
 

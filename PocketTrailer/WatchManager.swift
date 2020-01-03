@@ -106,7 +106,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 		case "openItem":
 			if let itemId = message["localId"] as? String {
-				popupManager.masterController.openItemWithUriPath(uriPath: itemId)
+				popupManager.masterController.highightItemWithUriPath(uriPath: itemId)
 			}
 			processList(message: message, replyHandler: replyHandler)
 

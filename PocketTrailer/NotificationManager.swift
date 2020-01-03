@@ -16,7 +16,7 @@ final class NotificationManager {
 
 		if let info = activity.userInfo {
 			if activity.activityType == CSSearchableItemActionType, let uid = info[CSSearchableItemActivityIdentifier] as? String {
-				popupManager.masterController.openItemWithUriPath(uriPath: uid)
+				popupManager.masterController.highightItemWithUriPath(uriPath: uid)
 				return true
 
 			} else if activity.activityType == CSQueryContinuationActionType, let searchString = info[CSSearchQueryString] as? String {
