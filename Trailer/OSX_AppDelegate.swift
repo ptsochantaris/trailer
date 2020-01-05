@@ -1,7 +1,7 @@
 import CoreSpotlight
 
 enum Theme {
-	case light, darkLegacy, dark
+	case light, dark
 }
 
 @NSApplicationMain
@@ -19,11 +19,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	private var keyDownMonitor: Any?
 	private var mouseIgnoreTimer: PopTimer!
 
-	private let themeDetector = NSView()
-
 	func setupWindows() {
-
-		theme = currentTheme
 
 		for d in menuBarSets {
 			d.throwAway()
@@ -57,7 +53,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 		menuBarSets.append(contentsOf: newSets.reversed())
 
-		updateScrollBarWidth() // also updates menu
+		updateScrollBarWidth() // also updates menus
 
 		for d in menuBarSets {
 			d.prMenu.scrollToTop()
@@ -74,8 +70,6 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		NSTextField.cellClass = CenterTextFieldCell.self
 	}
 
-	private var themeCheck: Timer!
-
 	func applicationDidFinishLaunching(_ notification: Notification) {
 
         LauncherCommon.killHelper()
@@ -85,20 +79,13 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			return
 		}
 
-		themeCheck = Timer(repeats: true, interval: 2) { [weak self] in
-			guard let s = self else { return }
-			if s.theme != s.currentTheme {
-				s.applyTheme()
-			}
-		}
-
 		DataManager.postProcessAllItems()
 
 		mouseIgnoreTimer = PopTimer(timeInterval: 0.4) {
 			app.isManuallyScrolling = false
 		}
 
-		applyTheme() // also sets up windows
+        theme = currentTheme // also sets up windows
 
 		API.updateLimitsFromServer()
 
@@ -112,8 +99,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 		if ApiServer.someServersHaveAuthTokens(in: DataManager.main) {
             DispatchQueue.main.async { [weak self] in
-                guard let S = self else { return }
-				S.startRefreshIfItIsDue()
+				self?.startRefreshIfItIsDue()
 			}
 		} else if ApiServer.countApiServers(in: DataManager.main) == 1, let a = ApiServer.allApiServers(in: DataManager.main).first, a.authToken == nil || a.authToken!.isEmpty {
 			startupAssistant()
@@ -123,19 +109,30 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 		let n = NotificationCenter.default
 		n.addObserver(self, selector: #selector(updateScrollBarWidth), name: NSScroller.preferredScrollerStyleDidChangeNotification, object: nil)
+        
+        let dn = DistributedNotificationCenter.default()
+        dn.addObserver(self, selector: #selector(themeCheck), name: Notification.Name("AppleInterfaceThemeChangedNotification"), object: nil)
 
 		addHotKeySupport()
 
-		let s = SUUpdater.shared()
-		setUpdateCheckParameters()
-		if !(s?.updateInProgress)! && Settings.checkForUpdatesAutomatically {
-			s?.checkForUpdatesInBackground()
-		}
-
+        if let updater = SUUpdater.shared() {
+            setUpdateCheckParameters()
+            if !updater.updateInProgress && Settings.checkForUpdatesAutomatically {
+                updater.checkForUpdatesInBackground()
+            }
+        }
+        
 		let wn = NSWorkspace.shared.notificationCenter
 		wn.addObserver(self, selector: #selector(systemWillSleep), name: NSWorkspace.willSleepNotification, object: nil)
 		wn.addObserver(self, selector: #selector(systemDidWake), name: NSWorkspace.didWakeNotification, object: nil)
 	}
+    
+    @objc private func themeCheck() {
+        let c = currentTheme
+        if theme != c {
+            theme = c
+        }
+    }
 
 	@objc private func systemWillSleep() {
 		systemSleeping = true
@@ -146,6 +143,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		DLog("System woke up")
 		systemSleeping = false
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+            self?.themeCheck()
 			self?.startRefreshIfItIsDue()
 		}
 	}
@@ -1074,7 +1072,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	////////////// scrollbars
 
 	@objc private func updateScrollBarWidth() {
-		if let s = menuBarSets.first!.prMenu.scrollView.verticalScroller {
+		if let s = menuBarSets.first?.prMenu.scrollView.verticalScroller {
 			if s.scrollerStyle == .legacy {
 				scrollBarWidth = s.frame.size.width
 			} else {
@@ -1180,21 +1178,14 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 	//////////////////////// Dark mode
 
-	var theme = Theme.light
-	private func applyTheme() {
-		if !systemSleeping {
-			if menuBarSets.isEmpty || theme != currentTheme {
-				setupWindows()
-			}
-		}
-	}
+    var theme = Theme.light {
+        didSet {
+            setupWindows()
+        }
+    }
 
 	private var currentTheme: Theme {
-		if #available(OSX 10.14, *) {
-			return UserDefaults.standard.string(forKey: "AppleInterfaceStyle") == "Dark" ? .dark : .light
-		} else {
-			return UserDefaults.standard.string(forKey: "AppleInterfaceStyle") == "Dark" ? .darkLegacy : .light
-		}
+        return UserDefaults.standard.string(forKey: "AppleInterfaceStyle") == "Dark" ? .dark : .light
 	}
 
 	// Server display list

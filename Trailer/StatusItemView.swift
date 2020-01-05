@@ -53,7 +53,7 @@ final class StatusItemView: NSView {
 		app.statusItem(for: self)?.drawStatusBarBackground(in: dirtyRect, withHighlight: highlighted)
 
 		var countAttributes = textAttributes
-		var foreground: NSColor
+		let foreground: NSColor
 
 		if highlighted {
 			foreground = .selectedMenuItemTextColor

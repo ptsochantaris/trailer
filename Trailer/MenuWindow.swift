@@ -57,12 +57,12 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
 		switch app.theme {
 		case .light:
 			appearance = NSAppearance(named: .vibrantLight)
-		case .darkLegacy:
-			appearance = NSAppearance(named: .vibrantDark)
 		case .dark:
 			if #available(OSX 10.14, *) {
 				appearance = NSAppearance(named: .darkAqua)
-			}
+            } else {
+                appearance = NSAppearance(named: .vibrantDark)
+            }
 		}
 	}
 

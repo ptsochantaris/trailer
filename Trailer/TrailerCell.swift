@@ -394,26 +394,28 @@ class TrailerCell: NSTableCellView {
 	}
 
 	private func highlight(_ on: Bool) {
-		if let c = countBackground {
-			var color: NSColor
-			switch app.theme {
-			case .light:
-				color = .controlTextColor
-				c.backgroundColor = NSColor(red: 0.92, green: 0.92, blue: 0.92, alpha: 1.0)
-				newBackground?.backgroundColor = NSColor(red: 1.0, green: 0.4, blue: 0.4, alpha: 1.0)
-			case .dark:
-				color = on ? .black : NSColor(red: 0.94, green: 0.94, blue: 0.94, alpha: 1.0)
-				c.backgroundColor = on ? NSColor.white.withAlphaComponent(DISABLED_FADE) : NSColor.controlShadowColor
-				newBackground?.backgroundColor = NSColor(red: 1.0, green: 0.1, blue: 0.1, alpha: 1.0)
-			case .darkLegacy:
-				color = on ? .black : NSColor(red: 0.94, green: 0.94, blue: 0.94, alpha: 1.0)
-				c.backgroundColor = on ? NSColor.white.withAlphaComponent(DISABLED_FADE) : NSColor.black
-				newBackground?.backgroundColor = NSColor(red: 1.0, green: 0.1, blue: 0.1, alpha: 1.0)
-			}
-			if let a = countView?.attributedStringValue.mutableCopy() as? NSMutableAttributedString {
-				a.addAttribute(NSAttributedString.Key.foregroundColor, value: color, range: NSRange(location: 0, length: a.length))
-				countView?.attributedStringValue = a
-			}
-		}
+        guard let c = countBackground else { return }
+
+        let color: NSColor
+        switch app.theme {
+        case .light:
+            color = .controlTextColor
+            newBackground?.backgroundColor = NSColor(red: 1.0, green: 0.4, blue: 0.4, alpha: 1.0)
+            c.backgroundColor = NSColor(red: 0.92, green: 0.92, blue: 0.92, alpha: 1.0)
+
+        case .dark:
+            color = on ? .black : NSColor(red: 0.94, green: 0.94, blue: 0.94, alpha: 1.0)
+            newBackground?.backgroundColor = NSColor(red: 1.0, green: 0.1, blue: 0.1, alpha: 1.0)
+            if #available(OSX 10.14, *) {
+                c.backgroundColor = on ? NSColor.white.withAlphaComponent(DISABLED_FADE) : NSColor.controlShadowColor
+            } else {
+                c.backgroundColor = on ? NSColor.white.withAlphaComponent(0.1) : NSColor.black
+            }
+        }
+
+        if let a = countView?.attributedStringValue.mutableCopy() as? NSMutableAttributedString {
+            a.addAttribute(NSAttributedString.Key.foregroundColor, value: color, range: NSRange(location: 0, length: a.length))
+            countView?.attributedStringValue = a
+        }
 	}
 }
