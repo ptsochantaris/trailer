@@ -156,12 +156,13 @@ final class GQLQuery {
             let allData = json["data"] as? [AnyHashable : Any]
             guard let data = (self.parent == nil) ? allData : allData?["node"] as? [AnyHashable : Any] else {
                 let code = (response as? HTTPURLResponse)?.statusCode
+                let shouldRetry = code == 403 || code == 502 || code == 503 // pause to retry in case of throttle or ongoing GH deployment
                 if let errors = json["errors"] as? [[AnyHashable:Any]] {
                     let msg = errors.first?["message"] as? String ?? "Unspecified server error: \(json)"
-                    doneWithError("Failed with error: '\(msg)'", nil, shouldRetry: code == 403 || code == 502, apiStats: apiStats)
+                    doneWithError("Failed with error: '\(msg)'", nil, shouldRetry: shouldRetry, apiStats: apiStats)
                 } else {
                     let msg = json["message"] as? String ?? "Unspecified server error: \(json)"
-                    doneWithError("Failed with error: '\(msg)'", nil, shouldRetry: code == 403 || code == 502, apiStats: apiStats)
+                    doneWithError("Failed with error: '\(msg)'", nil, shouldRetry: shouldRetry, apiStats: apiStats)
                 }
                 return
             }

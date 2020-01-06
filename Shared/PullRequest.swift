@@ -30,7 +30,7 @@ final class PullRequest: ListableItem {
         
     static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer) {
         syncItems(of: PullRequest.self, from: nodes, on: server) { pr, node in
-            
+
             guard node.created || node.updated,
                 let parentId = node.parent?.id,
                 let moc = server.managedObjectContext,
@@ -39,8 +39,11 @@ final class PullRequest: ListableItem {
 
             let json = node.jsonPayload
 
-            let mergeField = json["mergeable"] as? String ?? "MERGEABLE"
-            pr.isMergeable = mergeField == "MERGEABLE"
+            if let mergeField = json["mergeable"] as? String {
+                pr.isMergeable = mergeField != "CONFLICTING"
+            } else {
+                pr.isMergeable = true
+            }
             pr.linesAdded = json["additions"] as? Int64 ?? 0
             pr.linesRemoved = json["deletions"] as? Int64 ?? 0
             pr.mergeCommitSha = json["headRefOid"] as? String
