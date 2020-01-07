@@ -10,8 +10,8 @@
 		1606F1BB1A4703E60088368E /* iOS_AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1606F1BA1A4703E60088368E /* iOS_AppDelegate.swift */; };
 		1606F1BD1A471CDC0088368E /* RespositoriesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1606F1BC1A471CDC0088368E /* RespositoriesViewController.swift */; };
 		160823F51A44997F006F91AD /* UINavigationControllerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160823F31A44982F006F91AD /* UINavigationControllerExtensions.swift */; };
-		160CA03023A65152003FA0D8 /* Query.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160CA02A23A65152003FA0D8 /* Query.swift */; };
-		160CA03123A65152003FA0D8 /* Query.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160CA02A23A65152003FA0D8 /* Query.swift */; };
+		160CA03023A65152003FA0D8 /* GQLQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160CA02A23A65152003FA0D8 /* GQLQuery.swift */; };
+		160CA03123A65152003FA0D8 /* GQLQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160CA02A23A65152003FA0D8 /* GQLQuery.swift */; };
 		160CA03223A65152003FA0D8 /* GraphQL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160CA02B23A65152003FA0D8 /* GraphQL.swift */; };
 		160CA03323A65152003FA0D8 /* GraphQL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160CA02B23A65152003FA0D8 /* GraphQL.swift */; };
 		160CA03623A65152003FA0D8 /* GQLFragment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160CA02D23A65152003FA0D8 /* GQLFragment.swift */; };
@@ -98,6 +98,14 @@
 		167B10581E6A86A300B0E1AE /* Review.swift in Sources */ = {isa = PBXBuildFile; fileRef = 167B10561E6A86A300B0E1AE /* Review.swift */; };
 		167F7BF623B38D4D00A01529 /* UpdatedRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 167F7BF523B38D4D00A01529 /* UpdatedRow.swift */; };
 		16813CBF1BA16D660020F8EB /* CommonController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16813CBE1BA16D660020F8EB /* CommonController.swift */; };
+		16878B7923C50D6A00F2213B /* GQLElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16878B7823C50D6A00F2213B /* GQLElement.swift */; };
+		16878B7A23C50D6A00F2213B /* GQLElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16878B7823C50D6A00F2213B /* GQLElement.swift */; };
+		16878B7C23C50D7500F2213B /* GQLNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16878B7B23C50D7500F2213B /* GQLNode.swift */; };
+		16878B7D23C50D7500F2213B /* GQLNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16878B7B23C50D7500F2213B /* GQLNode.swift */; };
+		16878B7F23C50D8000F2213B /* GQLField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16878B7E23C50D8000F2213B /* GQLField.swift */; };
+		16878B8023C50D8000F2213B /* GQLField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16878B7E23C50D8000F2213B /* GQLField.swift */; };
+		16878B8223C50D8A00F2213B /* GQLScanning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16878B8123C50D8A00F2213B /* GQLScanning.swift */; };
+		16878B8323C50D8A00F2213B /* GQLScanning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16878B8123C50D8A00F2213B /* GQLScanning.swift */; };
 		168839C71DEF8C3B002D9448 /* ImportExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 168839C61DEF8C3B002D9448 /* ImportExport.swift */; };
 		168BC6C417EC2DF000BC4584 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 168BC6C217EC2DF000BC4584 /* MainMenu.xib */; };
 		168BC6C917EC2DF000BC4584 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 168BC6C817EC2DF000BC4584 /* Images.xcassets */; };
@@ -285,7 +293,7 @@
 		1606F1BA1A4703E60088368E /* iOS_AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = iOS_AppDelegate.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		1606F1BC1A471CDC0088368E /* RespositoriesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = RespositoriesViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		160823F31A44982F006F91AD /* UINavigationControllerExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UINavigationControllerExtensions.swift; sourceTree = "<group>"; };
-		160CA02A23A65152003FA0D8 /* Query.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Query.swift; sourceTree = "<group>"; };
+		160CA02A23A65152003FA0D8 /* GQLQuery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GQLQuery.swift; sourceTree = "<group>"; };
 		160CA02B23A65152003FA0D8 /* GraphQL.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GraphQL.swift; sourceTree = "<group>"; };
 		160CA02D23A65152003FA0D8 /* GQLFragment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GQLFragment.swift; sourceTree = "<group>"; };
 		160CA02E23A65152003FA0D8 /* GQLBatchGroup.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GQLBatchGroup.swift; sourceTree = "<group>"; };
@@ -375,6 +383,10 @@
 		167F7BF523B38D4D00A01529 /* UpdatedRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdatedRow.swift; sourceTree = "<group>"; };
 		16813CBE1BA16D660020F8EB /* CommonController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = CommonController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		1686B1D41AE59AED009118C5 /* PocketTrailer.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PocketTrailer.entitlements; sourceTree = "<group>"; };
+		16878B7823C50D6A00F2213B /* GQLElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GQLElement.swift; sourceTree = "<group>"; };
+		16878B7B23C50D7500F2213B /* GQLNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GQLNode.swift; sourceTree = "<group>"; };
+		16878B7E23C50D8000F2213B /* GQLField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GQLField.swift; sourceTree = "<group>"; };
+		16878B8123C50D8A00F2213B /* GQLScanning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GQLScanning.swift; sourceTree = "<group>"; };
 		168839C61DEF8C3B002D9448 /* ImportExport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImportExport.swift; sourceTree = "<group>"; };
 		168BC6AA17EC2DF000BC4584 /* Trailer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Trailer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		168BC6B517EC2DF000BC4584 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -519,12 +531,16 @@
 		160CA02923A65142003FA0D8 /* V4API */ = {
 			isa = PBXGroup;
 			children = (
+				1657230023AAA23500F597EF /* V4API.swift */,
+				160CA02B23A65152003FA0D8 /* GraphQL.swift */,
+				160CA02A23A65152003FA0D8 /* GQLQuery.swift */,
 				160CA02E23A65152003FA0D8 /* GQLBatchGroup.swift */,
 				160CA02D23A65152003FA0D8 /* GQLFragment.swift */,
 				160CA02F23A65152003FA0D8 /* GQLGroup.swift */,
-				160CA02B23A65152003FA0D8 /* GraphQL.swift */,
-				160CA02A23A65152003FA0D8 /* Query.swift */,
-				1657230023AAA23500F597EF /* V4API.swift */,
+				16878B7823C50D6A00F2213B /* GQLElement.swift */,
+				16878B7B23C50D7500F2213B /* GQLNode.swift */,
+				16878B7E23C50D8000F2213B /* GQLField.swift */,
+				16878B8123C50D8A00F2213B /* GQLScanning.swift */,
 			);
 			name = V4API;
 			sourceTree = "<group>";
@@ -1254,10 +1270,12 @@
 				166ADEC81CCB009A001BA61F /* SnoozingEditorViewController.swift in Sources */,
 				165C49101BA63B45006BBCF5 /* AdvancedSettingsCell.swift in Sources */,
 				1657230523AAA2AC00F597EF /* V3API.swift in Sources */,
+				16878B8323C50D8A00F2213B /* GQLScanning.swift in Sources */,
 				169205641E34DA9F00FB9547 /* CustomReposViewController.swift in Sources */,
 				164840FC1AD196D6009E6383 /* SettingsManager.swift in Sources */,
 				1657230923AAA3B000F597EF /* RestAccess.swift in Sources */,
 				1633C1931ABCEC4A0086C692 /* Issue.swift in Sources */,
+				16878B7A23C50D6A00F2213B /* GQLElement.swift in Sources */,
 				16F413701BA5850A006B0195 /* RepoCell.swift in Sources */,
 				168839C71DEF8C3B002D9448 /* ImportExport.swift in Sources */,
 				1606F1BD1A471CDC0088368E /* RespositoriesViewController.swift in Sources */,
@@ -1265,11 +1283,13 @@
 				166A84C41A45CEE000A3B292 /* PickerViewController.swift in Sources */,
 				1657230223AAA23500F597EF /* V4API.swift in Sources */,
 				166A84C21A45A37700A3B292 /* AdvancedSettingsViewController.swift in Sources */,
+				16878B8023C50D8000F2213B /* GQLField.swift in Sources */,
 				16CBE1C21A2DBB2700485053 /* DataManager.swift in Sources */,
 				164841021AD19933009E6383 /* NotificationManager.swift in Sources */,
 				16B3B3221A34E8E2000BE6CC /* PullRequest.swift in Sources */,
 				1664CBCB1B7796840006BDE7 /* Enums.swift in Sources */,
 				16B3B3241A34E8E2000BE6CC /* Repo.swift in Sources */,
+				16878B7D23C50D7500F2213B /* GQLNode.swift in Sources */,
 				16C90F021B13BC180095E8D5 /* RepoSettingsViewController.swift in Sources */,
 				16B3B31E1A34E8E2000BE6CC /* PRLabel.swift in Sources */,
 				16EE871B1A446BFE00A1D16F /* EmptyView.swift in Sources */,
@@ -1283,7 +1303,7 @@
 				164840FE1AD19837009E6383 /* PopupManager.swift in Sources */,
 				16B3B31A1A34E8E2000BE6CC /* DataItem.swift in Sources */,
 				160CA03B23A65152003FA0D8 /* GQLGroup.swift in Sources */,
-				160CA03123A65152003FA0D8 /* Query.swift in Sources */,
+				160CA03123A65152003FA0D8 /* GQLQuery.swift in Sources */,
 				166A84C01A4582C100A3B292 /* ServerDetailViewController.swift in Sources */,
 				169B92971CC52C05002774A8 /* SnoozePreset.swift in Sources */,
 				164841001AD198A6009E6383 /* WatchManager.swift in Sources */,
@@ -1324,7 +1344,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				16B3B31F1A34E8E2000BE6CC /* PRStatus.swift in Sources */,
-				160CA03023A65152003FA0D8 /* Query.swift in Sources */,
+				160CA03023A65152003FA0D8 /* GQLQuery.swift in Sources */,
 				160E19E21D672BD1006C1A59 /* PopTimer.swift in Sources */,
 				164840C11ACFEA5A009E6383 /* AboutWindow.swift in Sources */,
 				16B3B3211A34E8E2000BE6CC /* PullRequest.swift in Sources */,
@@ -1336,6 +1356,7 @@
 				160CA03A23A65152003FA0D8 /* GQLGroup.swift in Sources */,
 				1657230823AAA3B000F597EF /* RestAccess.swift in Sources */,
 				1671A11F1AC73CCB0047440A /* SetupAssistant.swift in Sources */,
+				16878B8223C50D8A00F2213B /* GQLScanning.swift in Sources */,
 				169B92961CC52C05002774A8 /* SnoozePreset.swift in Sources */,
 				160FB1401AE3F78E00EB5C8E /* PreferencesWindow.swift in Sources */,
 				16A0B0371A48AC7900B3452D /* OSX_AppDelegate.swift in Sources */,
@@ -1352,9 +1373,12 @@
 				162002DD1A2A58B900FF95F3 /* CenterTextField.swift in Sources */,
 				16358F3D1CF206CE0055F849 /* MenuBarSet.swift in Sources */,
 				162002E71A2A75BD00FF95F3 /* AvatarView.swift in Sources */,
+				16878B7F23C50D8000F2213B /* GQLField.swift in Sources */,
 				1664CBCA1B7796840006BDE7 /* Enums.swift in Sources */,
 				162002DB1A2A545C00FF95F3 /* CenterTextFieldCell.swift in Sources */,
 				16B74E481A3B4AC800410EF6 /* PrTable.swift in Sources */,
+				16878B7C23C50D7500F2213B /* GQLNode.swift in Sources */,
+				16878B7923C50D6A00F2213B /* GQLElement.swift in Sources */,
 				16F0BAD623A53EB4002EC348 /* Colors.swift in Sources */,
 				1657230423AAA2AC00F597EF /* V3API.swift in Sources */,
 				16B3B3191A34E8E2000BE6CC /* DataItem.swift in Sources */,
@@ -1654,7 +1678,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1529;
+				CURRENT_PROJECT_VERSION = 1531;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_FAST_MATH = YES;
@@ -1711,7 +1735,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1529;
+				CURRENT_PROJECT_VERSION = 1531;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEPLOYMENT_POSTPROCESSING = YES;

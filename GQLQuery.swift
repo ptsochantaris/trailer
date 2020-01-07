@@ -1,54 +1,6 @@
 import Foundation
 import Dispatch
 
-protocol GQLElement {
-    var name: String { get }
-    var queryText: String { get }
-    var fragments: [GQLFragment] { get }
-}
-
-final class GQLNode: Hashable {
-    let id: String
-    let elementType: String
-    let jsonPayload: [AnyHashable: Any]
-    let parent: GQLNode?
-    var creationSkipped = false
-    var created = false
-    var updated = false
-    
-    init(id: String, elementType: String, jsonPayload: [AnyHashable: Any], parent: GQLNode?) {
-        self.id = id
-        self.elementType = elementType
-        self.jsonPayload = jsonPayload
-        self.parent = parent
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-        if let parentId = parent?.id {
-            hasher.combine(parentId)
-        }
-    }
-    
-    static func == (lhs: GQLNode, rhs: GQLNode) -> Bool {
-        return (lhs.id == rhs.id) && (lhs.parent?.id == rhs.parent?.id)
-    }
-}
-
-final class GQLField: GQLElement {
-    let name: String
-    var queryText: String { return name }
-    var fragments: [GQLFragment] { return [] }
-    
-    init(name: String) {
-        self.name = name
-    }
-}
-
-protocol GQLScanning: GQLElement {
-    func scan(query: GQLQuery, pageData: Any, parent: GQLNode?, level: Int) -> [GQLQuery]
-}
-
 final class GQLQuery {
     
     static let countOfIdsToBatch = 100
@@ -124,7 +76,7 @@ final class GQLQuery {
                 DLog("\(self.logPrefix) Error: \(message)")
                 if shouldRetry && attempt > 0 {
                     DLog("\(self.logPrefix) Pausing for retry, attempt \(attempt)")
-                    Thread.sleep(forTimeInterval: 10)
+                    Thread.sleep(forTimeInterval: 15)
                     self.run(for: url, authToken: authToken, attempt: attempt - 1, completion: completion)
                 } else {
                     let e = error ?? NSError(domain: "com.housetrip.Trailer.gqlError", code: 1, userInfo: [NSLocalizedDescriptionKey: "message"])
