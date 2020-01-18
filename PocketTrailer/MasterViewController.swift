@@ -162,11 +162,10 @@ UITableViewDragDelegate {
         
         firstAppearance = false
         if !ApiServer.someServersHaveAuthTokens(in: DataManager.main) {
-            let m = popupManager.masterController
             if ApiServer.countApiServers(in: DataManager.main) == 1, let a = ApiServer.allApiServers(in: DataManager.main).first, a.authToken == nil || a.authToken!.isEmpty {
-                m.performSegue(withIdentifier: "showQuickstart", sender: self)
+                performSegue(withIdentifier: "showQuickstart", sender: self)
             } else {
-                m.performSegue(withIdentifier: "showPreferences", sender: self)
+                performSegue(withIdentifier: "showPreferences", sender: self)
             }
         }
     }
@@ -862,6 +861,85 @@ UITableViewDragDelegate {
 	override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
 		return 40
 	}
+    
+    private func createShortcutActions(for item: ListableItem) -> UIMenu? {
+        
+        let children = item.contextActions.map { action -> UIMenuElement in
+            switch action {
+            case .copy:
+                return UIAction(title: action.title, image: UIImage(systemName: "doc.on.doc")) { _ in
+                    UIPasteboard.general.string = item.webUrl
+                }
+                
+            case .markUnread:
+                return UIAction(title: action.title, image: UIImage(systemName: "envelope.badge")) { _ in
+                    self.markItemAsUnRead(itemUri: item.objectID.uriRepresentation().absoluteString)
+                }
+                
+            case .markRead:
+                return UIAction(title: action.title, image: UIImage(systemName: "checkmark")) { _ in
+                    self.markItemAsRead(itemUri: item.objectID.uriRepresentation().absoluteString)
+                }
+                
+            case .mute:
+                return UIAction(title: action.title, image: UIImage(systemName: "speaker.slash")) { _ in
+                    item.setMute(to: true)
+                }
+                
+            case .unmute:
+                return UIAction(title: action.title, image: UIImage(systemName: "speaker.2")) { _ in
+                    item.setMute(to: false)
+                }
+                
+            case .openRepo:
+                return UIAction(title: action.title, image: UIImage(systemName: "list.dash")) { _ in
+                    if let urlString = item.repo.webUrl, let url = URL(string: urlString) {
+                        UIApplication.shared.open(url, options: [:])
+                    }
+                }
+            case .remove:
+                return UIAction(title: action.title, image: UIImage(systemName: "bin.xmark"), attributes: .destructive) { _ in
+                    DataManager.main.delete(item)
+                }
+                
+            case .snooze(let presets):
+                var presetItems = presets.map { preset -> UIAction in
+                    return UIAction(title: preset.listDescription) { _ in
+                        item.snooze(using: preset)
+                    }
+                }
+                presetItems.append(UIAction(title: "Configure...", image: UIImage(systemName: "gear"), identifier: nil) { _ in
+                    self.performSegue(withIdentifier: "showPreferences", sender: 3)
+                })
+                return UIMenu(title: action.title, image: UIImage(systemName: "moon.zzz"), children: presetItems)
+                
+            case .wake:
+                return UIAction(title: action.title, image: UIImage(systemName: "sun.max")) { _ in
+                    item.wakeUp()
+                }
+            }
+        }
+        
+        return UIMenu(title: item.contextMenuTitle, image: nil, identifier: nil, options: [], children: children)
+    }
+    
+    override func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        let item = fetchedResultsController.object(at: indexPath)
+        
+        return UIContextMenuConfiguration(identifier: item.objectID, previewProvider: nil) { [weak self] _ in
+            return self?.createShortcutActions(for: item)
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration, animator: UIContextMenuInteractionCommitAnimating) {
+        animator.preferredCommitStyle = .dismiss
+        animator.addCompletion {
+            if let id = configuration.identifier as? NSManagedObjectID, let item = try? DataManager.main.existingObject(with: id) as? ListableItem, let urlString = item.urlForOpening, let url = URL(string: urlString) {
+                item.catchUpWithComments()
+                UIApplication.shared.open(url, options: [:])
+            }
+        }
+    }
 
 	func markItemAsRead(itemUri: String?) {
 		if let

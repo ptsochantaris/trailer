@@ -73,9 +73,6 @@ final class PRCell: UITableViewCell {
 			])
 
 		NotificationCenter.default.addObserver(self, selector: #selector(networkStateChanged), name: ReachabilityChangedNotification, object: nil)
-        
-        let interaction = UIContextMenuInteraction(delegate: self)
-        addInteraction(interaction)
 	}
 
 	@objc private func networkStateChanged() {
@@ -244,92 +241,4 @@ final class PRCell: UITableViewCell {
 		unreadCount.badgeColor = .appRed
         readCount.badgeColor = .systemFill
 	}
-}
-
-extension PRCell: UIContextMenuInteractionDelegate {
-    private func createShortcutActions() -> UIMenu? {
-        guard let item = item else { return nil }
-        
-        let children = item.contextActions.map { action -> UIMenuElement in
-            switch action {
-            case .copy:
-                return UIAction(title: action.title, image: UIImage(systemName: "doc.on.doc")) { _ in
-                    UIPasteboard.general.string = item.webUrl
-                }
-                
-            case .markUnread:
-                return UIAction(title: action.title, image: UIImage(systemName: "envelope.badge")) { _ in
-                    popupManager.masterController.markItemAsUnRead(itemUri: item.objectID.uriRepresentation().absoluteString)
-                }
-                
-            case .markRead:
-                return UIAction(title: action.title, image: UIImage(systemName: "checkmark")) { _ in
-                    popupManager.masterController.markItemAsRead(itemUri: item.objectID.uriRepresentation().absoluteString)
-                }
-                
-            case .mute:
-                return UIAction(title: action.title, image: UIImage(systemName: "speaker.slash")) { _ in
-                    item.setMute(to: true)
-                }
-                
-            case .unmute:
-                return UIAction(title: action.title, image: UIImage(systemName: "speaker.2")) { _ in
-                    item.setMute(to: false)
-                }
-                
-            case .openRepo:
-                return UIAction(title: action.title, image: UIImage(systemName: "list.dash")) { _ in
-                    if let urlString = item.repo.webUrl, let url = URL(string: urlString) {
-                        UIApplication.shared.open(url, options: [:])
-                    }
-                }
-            case .remove:
-                return UIAction(title: action.title, image: UIImage(systemName: "bin.xmark"), attributes: .destructive) { _ in
-                    DataManager.main.delete(item)
-                }
-                
-            case .snooze(let presets):
-                var presetItems = presets.map { preset -> UIAction in
-                    return UIAction(title: preset.listDescription) { _ in
-                        item.snooze(using: preset)
-                    }
-                }
-                presetItems.append(UIAction(title: "Configure...", image: UIImage(systemName: "gear"), identifier: nil) { _ in
-                    popupManager.masterController.performSegue(withIdentifier: "showPreferences", sender: 3)
-                })
-                return UIMenu(title: action.title, image: UIImage(systemName: "moon.zzz"), children: presetItems)
-                
-            case .wake:
-                return UIAction(title: action.title, image: UIImage(systemName: "sun.max")) { _ in
-                    item.wakeUp()
-                }
-            }
-        }
-        
-        return UIMenu(title: item.contextMenuTitle, image: nil, identifier: nil, options: [], children: children)
-    }
-    
-    func contextMenuInteraction(_ interaction: UIContextMenuInteraction, previewForHighlightingMenuWithConfiguration configuration: UIContextMenuConfiguration) -> UITargetedPreview? {
-        if let v = interaction.view {
-            return UITargetedPreview(view: v)
-        } else {
-            return nil
-        }
-    }
-    
-    func contextMenuInteraction(_ interaction: UIContextMenuInteraction, willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration, animator: UIContextMenuInteractionCommitAnimating) {
-        animator.preferredCommitStyle = .dismiss
-        animator.addCompletion { [weak self] in
-            if let item = self?.item, let urlString = item.urlForOpening, let url = URL(string: urlString) {
-                item.catchUpWithComments()
-                UIApplication.shared.open(url, options: [:])
-            }
-        }
-    }
-
-    func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
-        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
-            return self?.createShortcutActions()
-        }
-    }
 }
