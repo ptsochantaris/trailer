@@ -207,13 +207,5 @@ final class Repo: DataItem {
 
 		mark(type: PullRequest.self)
 		mark(type: Issue.self)
-	}
-    
-    var shouldIncludeClosedAndMergedPrs: Bool {
-        return Settings.scanClosedAndMergedItems && PullRequest.mostRecentItemUpdate(in: self) > .distantPast
-    }
-    
-    var shouldIncludeClosedAndMergedIssues: Bool {
-        return Settings.scanClosedAndMergedItems && Issue.mostRecentItemUpdate(in: self) > .distantPast
-    }
+	}    
 }

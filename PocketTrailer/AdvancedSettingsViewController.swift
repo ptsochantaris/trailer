@@ -275,7 +275,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		        description: Settings.removeNotificationsWhenItemIsRemovedHelp,
 		        valueDisplayed: { Settings.removeNotificationsWhenItemIsRemoved ? "✓" : " " }),
         Setting(section: .History,
-                title: "Scan closed and merged items for events (v4 API only)",
+                title: "Highlight comments on closed or merged items",
                 description: Settings.scanClosedAndMergedItemsHelp,
                 valueDisplayed: { Settings.scanClosedAndMergedItems ? "✓" : " " }),
 

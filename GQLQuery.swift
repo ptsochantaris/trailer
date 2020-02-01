@@ -4,7 +4,7 @@ import Dispatch
 final class GQLQuery {
     
     static let countOfIdsToBatch = 100
-    static let payloadSize = 50
+    static let payloadSize = 25
 
 	let name: String
     let perNodeCallback: ((GQLNode)->Bool)?
@@ -76,7 +76,7 @@ final class GQLQuery {
                 DLog("\(self.logPrefix) Error: \(message)")
                 if shouldRetry && attempt > 0 {
                     DLog("\(self.logPrefix) Pausing for retry, attempt \(attempt)")
-                    Thread.sleep(forTimeInterval: 15)
+                    Thread.sleep(forTimeInterval: 2)
                     self.run(for: url, authToken: authToken, attempt: attempt - 1, completion: completion)
                 } else {
                     let e = error ?? NSError(domain: "com.housetrip.Trailer.gqlError", code: 1, userInfo: [NSLocalizedDescriptionKey: "message"])

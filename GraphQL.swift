@@ -320,7 +320,7 @@ final class GraphQL {
             }
         }
         
-        var params = ["orderBy": "{direction: DESC, field: UPDATED_AT}"]
+        let params = ["orderBy": "{direction: DESC, field: UPDATED_AT}"]
 
         let allPrsFragment = GQLFragment(on: "Repository", elements: [
             GQLField(name: "id"),
@@ -331,42 +331,11 @@ final class GraphQL {
             GQLField(name: "id"),
             GQLGroup(name: "issues", fields: [issueFragment], extraParams: params, usePaging: true)
             ])
-
-        params["states"] = "OPEN"
-        
-        let openPrsFragment = GQLFragment(on: "Repository", elements: [
-            GQLField(name: "id"),
-            GQLGroup(name: "pullRequests", fields: [prFragment], extraParams: params, usePaging: true),
-            ])
-        
-        let openIssuesFragment = GQLFragment(on: "Repository", elements: [
-            GQLField(name: "id"),
-            GQLGroup(name: "issues", fields: [issueFragment], extraParams: params, usePaging: true)
-            ])
         
         let reposByServer = Dictionary(grouping: repos) { $0.apiServer }
         var count = 0
+        
         for (server, reposInThisServer) in reposByServer {
-
-            let idsForReposInThisServerWantingOpenPrs = reposInThisServer.filter {
-                $0.displayPolicyForPrs != RepoDisplayPolicy.hide.rawValue
-                    && !$0.shouldIncludeClosedAndMergedPrs
-            }.compactMap { $0.nodeId }
-            
-            let idsForReposInThisServerWantingOpenIssues = reposInThisServer.filter {
-                $0.displayPolicyForIssues != RepoDisplayPolicy.hide.rawValue
-                    && !$0.shouldIncludeClosedAndMergedIssues
-            }.compactMap { $0.nodeId }
-            
-            let idsForReposInThisServerWantingAllPrs = reposInThisServer.filter {
-                $0.displayPolicyForPrs != RepoDisplayPolicy.hide.rawValue
-                    && $0.shouldIncludeClosedAndMergedPrs
-            }.compactMap { $0.nodeId }
-            
-            let idsForReposInThisServerWantingAllIssues = reposInThisServer.filter {
-                $0.displayPolicyForIssues != RepoDisplayPolicy.hide.rawValue
-                    && $0.shouldIncludeClosedAndMergedIssues
-            }.compactMap { $0.nodeId }
 
             var nodes = [String: ContiguousArray<GQLNode>]()
 
@@ -412,27 +381,24 @@ final class GraphQL {
                 return true
             }
             
-            var queries = [GQLQuery]()
+            var queriesForServer = [GQLQuery]()
             let serverLabel = server.label ?? "<no label>"
+            let hideValue = RepoDisplayPolicy.hide.rawValue
+
+            let idsForReposInThisServerWantingAllPrs = reposInThisServer.filter { $0.displayPolicyForPrs != hideValue }.compactMap { $0.nodeId }
             if !idsForReposInThisServerWantingAllPrs.isEmpty {
                 let q = GQLQuery.batching("\(serverLabel): PRs", fields: [allPrsFragment], idList: idsForReposInThisServerWantingAllPrs, perNodeCallback: perNodeCallback)
-                queries.append(contentsOf: q)
+                queriesForServer.append(contentsOf: q)
             }
+            
+            let idsForReposInThisServerWantingAllIssues = reposInThisServer.filter { $0.displayPolicyForIssues != hideValue }.compactMap { $0.nodeId }
             if !idsForReposInThisServerWantingAllIssues.isEmpty {
                 let q = GQLQuery.batching("\(serverLabel): Issues", fields: [allIssuesFragment], idList: idsForReposInThisServerWantingAllIssues, perNodeCallback: perNodeCallback)
-                queries.append(contentsOf: q)
-            }
-            if !idsForReposInThisServerWantingOpenPrs.isEmpty {
-                let q = GQLQuery.batching("\(serverLabel): PRs", fields: [openPrsFragment], idList: idsForReposInThisServerWantingOpenPrs, perNodeCallback: perNodeCallback)
-                queries.append(contentsOf: q)
-            }
-            if !idsForReposInThisServerWantingOpenIssues.isEmpty {
-                let q = GQLQuery.batching("\(serverLabel): Issues", fields: [openIssuesFragment], idList: idsForReposInThisServerWantingOpenIssues, perNodeCallback: perNodeCallback)
-                queries.append(contentsOf: q)
+                queriesForServer.append(contentsOf: q)
             }
 
             group.enter()
-            server.run(queries: queries) { error in
+            server.run(queries: queriesForServer) { error in
                 if error != nil {
                     server.lastSyncSucceeded = false
                 } else {

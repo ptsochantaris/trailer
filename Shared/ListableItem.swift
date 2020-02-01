@@ -90,7 +90,7 @@ class ListableItem: DataItem {
         repo = parent
         url = info["url"] as? String
         number = info["number"] as? Int64 ?? 0
-        title = info["title"] as? String
+        title = info["title"] as? String ?? "(No title)"
         body = info["bodyText"] as? String
         milestone = (info["milestone"] as? [AnyHashable : Any])?["title"] as? String
         draft = info["isDraft"] as? Bool ?? false
@@ -129,7 +129,7 @@ class ListableItem: DataItem {
 		repo = parentRepo
 		url = info["url"] as? String
 		number = info["number"] as? Int64 ?? 0
-		title = info["title"] as? String
+		title = info["title"] as? String ?? "(No title)"
 		body = info["body"] as? String
 		milestone = (info["milestone"] as? [AnyHashable : Any])?["title"] as? String
         draft = info["draft"] as? Bool ?? false
@@ -422,15 +422,15 @@ class ListableItem: DataItem {
 		}
 
 		let isMine = createdByMe
-		var targetSection: Section
 		let currentCondition = condition
         let hideDrafts = Settings.draftHandlingPolicy == DraftHandlingPolicy.hide.rawValue
 
+        var targetSection: Section
 		if currentCondition == ItemCondition.merged.rawValue            	{ targetSection = .merged }
 		else if currentCondition == ItemCondition.closed.rawValue      		{ targetSection = .closed }
 		else if shouldMoveToSnoozing             							{ targetSection = .snoozed }
 		else if isMine || assignedToMySection                        		{ targetSection = .mine }
-		else if assignedToParticipated || commentedByMe    || reviewedByMe  { targetSection = .participated }
+		else if assignedToParticipated || commentedByMe || reviewedByMe     { targetSection = .participated }
 		else                                                           		{ targetSection = .all }
 
 		/////////// Pick out any items that need to move to "mentioned"
@@ -480,19 +480,18 @@ class ListableItem: DataItem {
 			default: break
 			}
 		}
-
+        
 		if targetSection != .none, let p = self as? PullRequest, p.shouldBeCheckedForRedStatuses(in: targetSection) {
-			for s in p.displayedStatuses {
-				if s.state != "success" {
-					targetSection = .none
-					break
-				}
-			}
+            if p.displayedStatuses.contains(where: { $0.state != "success" }) {
+                targetSection = .none
+            }
 		}
 
 		/////////// Comment counting
 
-		if !muted && (targetSection.isLoud || Settings.showCommentsEverywhere) && postSyncAction != PostSyncAction.isNew.rawValue {
+        let skipUnreadCommentCheck = (targetSection == .closed || targetSection == .merged) && !Settings.scanClosedAndMergedItems
+
+		if !skipUnreadCommentCheck && !muted && (targetSection.isLoud || Settings.showCommentsEverywhere) && postSyncAction != PostSyncAction.isNew.rawValue {
 			var latestDate = latestReadCommentDate ?? .distantPast
 
 			if Settings.assumeReadItemIfUserHasNewerComments {
@@ -528,7 +527,6 @@ class ListableItem: DataItem {
 			+ reviewCount
 
 		sectionIndex = targetSection.rawValue
-		if title==nil { title = "(No title)" }
 	}
 
 	private var countCommentReactions: Int64 {
@@ -614,10 +612,6 @@ class ListableItem: DataItem {
 			return $0.name!.compare($1.name!) == .orderedAscending
 		}
 	}
-
-    final func buildLabelAttributes(labelFont: FONT_CLASS, offset: CGFloat) -> [NSAttributedString.Key: Any] {
-        return [.font: labelFont, .baselineOffset: offset]
-    }
     
     final func labelsAttributedString(labelFont: FONT_CLASS) -> NSAttributedString? {
         if !Settings.showLabels {
@@ -636,7 +630,7 @@ class ListableItem: DataItem {
             return (lum < 0.5)
         }
 
-        let labelAttributes = buildLabelAttributes(labelFont: labelFont, offset: 0)
+        let labelAttributes: [NSAttributedString.Key: Any] = [.font: labelFont, .baselineOffset: 0]
         let res = NSMutableAttributedString()
         for l in sorted {
             var a = labelAttributes
@@ -652,54 +646,48 @@ class ListableItem: DataItem {
     
     final func title(with font: FONT_CLASS, labelFont: FONT_CLASS, titleColor: COLOR_CLASS, numberColor: COLOR_CLASS) -> NSMutableAttributedString {
         
-        let titleAttributes = [NSAttributedString.Key.font: font, NSAttributedString.Key.foregroundColor: titleColor]
-
 		let _title = NSMutableAttributedString()
-		if let t = title {
+		guard let t = title else {
+            return _title
+        }
 
-			if Settings.displayNumbersForItems {
-                var numberAttributes = titleAttributes
-                numberAttributes[.foregroundColor] = numberColor
-				_title.append(NSAttributedString(string: "#\(number) ", attributes: numberAttributes))
-			}
-			
-			_title.append(NSAttributedString(string: t, attributes: titleAttributes))
-                        
-            if let p = self as? PullRequest {
-                if Settings.showPrLines, let l = p.linesAttributedString(labelFont: labelFont) {
-                    _title.append(NSAttributedString(string: " ", attributes: titleAttributes))
-                    _title.append(l)
-                }
-                if Settings.markUnmergeablePrs, !p.isMergeable {
-                    _title.append(NSAttributedString(string: " ", attributes: titleAttributes))
-
-                    let font = FONT_CLASS.boldSystemFont(ofSize: labelFont.pointSize - 3)
-                    var unmergeableAttributes = buildLabelAttributes(labelFont: font, offset: 4)
-                    unmergeableAttributes[.foregroundColor] = COLOR_CLASS.appRed
-                    _title.append(NSAttributedString(string: "CONFLICT", attributes: unmergeableAttributes))
-                }
+        if Settings.displayNumbersForItems {
+            let numberAttributes: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: numberColor]
+            _title.append(NSAttributedString(string: "#\(number) ", attributes: numberAttributes))
+        }
+        
+        let titleAttributes: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: titleColor]
+        _title.append(NSAttributedString(string: t, attributes: titleAttributes))
+        
+        if let p = self as? PullRequest {
+            if Settings.showPrLines, let l = p.linesAttributedString(labelFont: labelFont) {
+                _title.append(NSAttributedString(string: " ", attributes: titleAttributes))
+                _title.append(l)
             }
-            
-            if draft && Settings.draftHandlingPolicy == DraftHandlingPolicy.display.rawValue {
+            if Settings.markUnmergeablePrs, !p.isMergeable {
                 _title.append(NSAttributedString(string: " ", attributes: titleAttributes))
 
                 let font = FONT_CLASS.boldSystemFont(ofSize: labelFont.pointSize - 3)
-                var draftAttributes = buildLabelAttributes(labelFont: font, offset: 4)
-                draftAttributes[.foregroundColor] = COLOR_CLASS.systemOrange
-                _title.append(NSAttributedString(string: "DRAFT", attributes: draftAttributes))
+                let unmergeableAttributes: [NSAttributedString.Key: Any] = [.font: font, .baselineOffset: 4, .foregroundColor: COLOR_CLASS.appRed]
+                _title.append(NSAttributedString(string: "CONFLICT", attributes: unmergeableAttributes))
             }
+        }
+        
+        if draft && Settings.draftHandlingPolicy == DraftHandlingPolicy.display.rawValue {
+            _title.append(NSAttributedString(string: " ", attributes: titleAttributes))
 
-		}
+            let font = FONT_CLASS.boldSystemFont(ofSize: labelFont.pointSize - 3)
+            let draftAttributes: [NSAttributedString.Key: Any] = [.font: font, .baselineOffset: 4, .foregroundColor: COLOR_CLASS.systemOrange]
+            _title.append(NSAttributedString(string: "DRAFT", attributes: draftAttributes))
+        }
 		return _title
 	}
-        
+    
     func subtitle(with font: FONT_CLASS, lightColor: COLOR_CLASS, darkColor: COLOR_CLASS, separator: String) -> NSMutableAttributedString {
 		let _subtitle = NSMutableAttributedString()
-		let p = NSMutableParagraphStyle()
 
 		let lightSubtitle = [NSAttributedString.Key.foregroundColor: lightColor,
-		                     NSAttributedString.Key.font: font,
-		                     NSAttributedString.Key.paragraphStyle: p]
+		                     NSAttributedString.Key.font: font]
 
         let separatorString = NSAttributedString(string: separator, attributes: lightSubtitle)
 

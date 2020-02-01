@@ -30,7 +30,7 @@ final class PullRequest: ListableItem {
         
     static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer) {
         syncItems(of: PullRequest.self, from: nodes, on: server) { pr, node in
-
+            
             guard node.created || node.updated,
                 let parentId = node.parent?.id,
                 let moc = server.managedObjectContext,
@@ -293,19 +293,18 @@ final class PullRequest: ListableItem {
         }
 
         let font = FONT_CLASS.boldSystemFont(ofSize: labelFont.pointSize - 3)
-        var attributes = buildLabelAttributes(labelFont: font, offset: 4)
 
         let res = NSMutableAttributedString()
         if added > 0, let addedString = numberFormatter.string(for: added) {
-            attributes[.foregroundColor] = COLOR_CLASS.appGreen
+            let attributes: [NSAttributedString.Key: Any] = [.font: font, .baselineOffset: 4, .foregroundColor: COLOR_CLASS.appGreen]
             res.append(NSAttributedString(string: "+\(addedString)", attributes: attributes))
             if removed > 0 {
-                attributes[.foregroundColor] = COLOR_CLASS.lightGray
+                let attributes: [NSAttributedString.Key: Any] = [.font: font, .baselineOffset: 4, .foregroundColor: COLOR_CLASS.lightGray]
                 res.append(NSAttributedString(string: "\u{a0}", attributes: attributes))
             }
         }
         if removed > 0, let removedString = numberFormatter.string(for: removed) {
-            attributes[.foregroundColor] = COLOR_CLASS.appRed
+            let attributes: [NSAttributedString.Key: Any] = [.font: font, .baselineOffset: 4, .foregroundColor: COLOR_CLASS.appRed]
             res.append(NSAttributedString(string: "-\(removedString)", attributes: attributes))
         }
         return res

@@ -843,7 +843,7 @@ struct Settings {
         set { set("SHOW_PR_LINES", newValue) }
     }
 
-    static let scanClosedAndMergedItemsHelp = "Also scan closed and merged items for new comments. This can use up a small additional amount of bandwidth on each refresh. This option only works for items synced via the new v4 API."
+    static let scanClosedAndMergedItemsHelp = "Also highlight unread comments on closed and merged items. This option only works for items synced via the new v4 API."
     static var scanClosedAndMergedItems: Bool {
         get { return get("SCAN_CLOSED_AND_MERGED") as? Bool ?? false }
         set { set("SCAN_CLOSED_AND_MERGED", newValue) }
