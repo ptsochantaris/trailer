@@ -349,6 +349,11 @@ class ListableItem: DataItem {
 	final var isSnoozing: Bool {
 		return snoozeUntil != nil
 	}
+    
+    final var appropriateStateForNotification: Bool {
+        let shouldBeQuietBecauseOfState = (sectionIndex == Section.closed.rawValue || sectionIndex == Section.merged.rawValue) && !Settings.scanClosedAndMergedItems
+        return !shouldBeQuietBecauseOfState
+    }
 
 	final func keep(as newCondition: ItemCondition, notification: NotificationType) {
 		if sectionIndex == Section.all.rawValue && !Settings.showCommentsEverywhere {

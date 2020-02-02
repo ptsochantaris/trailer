@@ -283,6 +283,12 @@ final class PullRequest: ListableItem {
 	@objc var sectionName: String {
 		return Section.prMenuTitles[Int(sectionIndex)]
 	}
+        
+    var shouldAnnounceStatus: Bool {
+        return isVisibleOnMenu
+            && appropriateStateForNotification
+            && (Settings.notifyOnStatusUpdatesForAllPrs || createdByMe || assignedToParticipated || assignedToMySection)
+    }
 
     func linesAttributedString(labelFont: FONT_CLASS) -> NSAttributedString? {
         let added = linesAdded

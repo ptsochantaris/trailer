@@ -102,6 +102,10 @@ final class Review: DataItem {
             return
         }
         
+        guard pullRequest.isVisibleOnMenu, pullRequest.appropriateStateForNotification else {
+            return
+        }
+        
         switch newState {
         case .CHANGES_REQUESTED:
             if Settings.notifyOnAllReviewChangeRequests || (Settings.notifyOnReviewChangeRequests && pullRequest.createdByMe) {

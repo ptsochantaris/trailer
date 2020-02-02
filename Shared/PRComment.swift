@@ -77,7 +77,7 @@ final class PRComment: DataItem {
 	}
 
 	func processNotifications() {
-		if let item = parent, item.postSyncAction == PostSyncAction.isUpdated.rawValue && item.isVisibleOnMenu {
+        if let item = parent, item.postSyncAction == PostSyncAction.isUpdated.rawValue, item.isVisibleOnMenu, item.appropriateStateForNotification {
 			if contains(terms: ["@\(apiServer.userName!)"]) {
 				if item.isSnoozing && item.shouldWakeOnMention {
 					DLog("Waking up snoozed item ID %@ because of mention", item.nodeId ?? "<no ID>")

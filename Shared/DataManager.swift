@@ -180,17 +180,13 @@ final class DataManager {
 		}
 
 		let latestStatuses = PRStatus.newItems(of: PRStatus.self, in: main)
+        var coveredPrs = Set<NSManagedObjectID>()
 		if Settings.notifyOnStatusUpdates {
-			var coveredPrs = Set<NSManagedObjectID>()
-            for pr in latestStatuses.map({ $0.pullRequest }) where pr.isVisibleOnMenu && (Settings.notifyOnStatusUpdatesForAllPrs || pr.createdByMe || pr.assignedToParticipated || pr.assignedToMySection) && !coveredPrs.contains(pr.objectID) {
+            for pr in latestStatuses.map({ $0.pullRequest }) where pr.shouldAnnounceStatus && !coveredPrs.contains(pr.objectID) {
                 coveredPrs.insert(pr.objectID)
                 if let s = pr.displayedStatuses.first {
                     let displayText = s.descriptionText
                     if pr.lastStatusNotified != displayText && pr.postSyncAction != PostSyncAction.isNew.rawValue {
-                        if pr.isSnoozing && pr.shouldWakeOnStatusChange {
-                            DLog("Waking up snoozed PR ID %@ because of a status update", pr.nodeId ?? "<no ID>")
-                            pr.wakeUp()
-                        }
                         NotificationQueue.add(type: .newStatus, for: s)
                         pr.lastStatusNotified = displayText
                     }
@@ -198,7 +194,14 @@ final class DataManager {
                     pr.lastStatusNotified = nil
                 }
 			}
+            coveredPrs.removeAll()
 		}
+        
+        for pr in latestStatuses.map({ $0.pullRequest }) where pr.isSnoozing && pr.shouldWakeOnStatusChange && !coveredPrs.contains(pr.objectID) {
+            coveredPrs.insert(pr.objectID)
+            DLog("Waking up snoozed PR ID %@ because of a status update", pr.nodeId ?? "<no ID>")
+            pr.wakeUp()
+        }
 
 		for s in latestStatuses {
 			s.postSyncAction = PostSyncAction.doNothing.rawValue
