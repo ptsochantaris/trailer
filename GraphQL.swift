@@ -58,7 +58,7 @@ final class GraphQL {
                     GQLField(name: "id"),
                     GQLGroup(name: "requestedReviewer", fields: [userFragment, teamFragment, mannequinFragment]),
                 ])
-                elements.append(GQLGroup(name: "reviewRequests", fields: [requestFragment], usePaging: true))
+                elements.append(GQLGroup(name: "reviewRequests", fields: [requestFragment], pageSize: 100))
             }
             
             if steps.contains(.reviews) {
@@ -77,7 +77,7 @@ final class GraphQL {
                     GQLField(name: "updatedAt"),
                     GQLGroup(name: "author", fields: [userFragment])
                 ])
-                elements.append(GQLGroup(name: "reviews", fields: [reviewFragment], usePaging: true))
+                elements.append(GQLGroup(name: "reviews", fields: [reviewFragment], pageSize: 100))
             }
             
             if steps.contains(.statuses) {
@@ -104,7 +104,7 @@ final class GraphQL {
                             GQLGroup(name: "contexts", fields: [statusFragment])
                         ])
                     ])
-                ], usePaging: true, onlyLast: true))
+                ], pageSize: 100, onlyLast: true))
             }
         }
         
@@ -124,7 +124,7 @@ final class GraphQL {
                 GQLField(name: "createdAt"),
                 GQLGroup(name: "user", fields: [userFragment])
             ])
-            elements.append(GQLGroup(name: "reactions", fields: [reactionFragment], usePaging: true))
+            elements.append(GQLGroup(name: "reactions", fields: [reactionFragment], pageSize: 100))
         }
                 
         if steps.contains(.comments) {
@@ -135,7 +135,7 @@ final class GraphQL {
             }
             elementTypes.append("IssueComment")
             let commentFragment = GQLFragment(on: "IssueComment", elements: commentFields)
-            elements.append(GQLGroup(name: "comments", fields: [commentFragment], usePaging: true))
+            elements.append(GQLGroup(name: "comments", fields: [commentFragment], pageSize: 100))
         }
 
         
@@ -171,7 +171,7 @@ final class GraphQL {
 
         let itemFragment = GQLFragment(on: "IssueComment", elements: [
             GQLField(name: "id"),
-            GQLGroup(name: "reactions", fields: [reactionFragment], usePaging: true)
+            GQLGroup(name: "reactions", fields: [reactionFragment], pageSize: 100)
             ])
         
         process(name: "Reactions", elementType: "Reaction", items: comments, fields: [itemFragment], blockCallback: { server, nodes, error in
@@ -184,7 +184,7 @@ final class GraphQL {
         
         let itemFragment = GQLFragment(on: "PullRequestReview", elements: [
             GQLField(name: "id"),
-            GQLGroup(name: "comments", fields: [commentFragment], usePaging: true)
+            GQLGroup(name: "comments", fields: [commentFragment], pageSize: 100)
         ])
 
         process(name: "Review Comments", elementType: "PullRequestReviewComment", items: reviews, fields: [itemFragment], blockCallback: { server, nodes, error in
@@ -210,10 +210,10 @@ final class GraphQL {
         let itemsByServer = Dictionary(grouping: items) { $0.apiServer }
         var count = 0
         for (server, items) in itemsByServer {
-            let ids = items.compactMap { $0.nodeId }
+            let ids = ContiguousArray(items.compactMap { $0.nodeId })
             var nodes = [String: ContiguousArray<GQLNode>]()
             let serverName = server.label ?? "<no label>"
-            let queries = GQLQuery.batching("\(serverName): \(name)", fields: fields, idList: ids) { node in
+            let queries = GQLQuery.batching("\(serverName): \(name)", fields: fields, idList: ids, batchSize: 100) { node in
                 let type = node.elementType
                 if var existingList = nodes[type] {
                     existingList.append(node)
@@ -291,8 +291,8 @@ final class GraphQL {
             GQLGroup(name: "mergedBy", fields: [userFragment]),
             GQLGroup(name: "milestone", fields: [milestoneFragment]),
             GQLGroup(name: "author", fields: [userFragment]),
-            GQLGroup(name: "assignees", fields: [userFragment], usePaging: true),
-            GQLGroup(name: "labels", fields: [labelFragment], usePaging: true)
+            GQLGroup(name: "assignees", fields: [userFragment], pageSize: 100),
+            GQLGroup(name: "labels", fields: [labelFragment], pageSize: 100)
         ])
 
         let issueFragment = GQLFragment(on: "Issue", elements: [
@@ -306,32 +306,44 @@ final class GraphQL {
             GQLField(name: "url"),
             GQLGroup(name: "milestone", fields: [milestoneFragment]),
             GQLGroup(name: "author", fields: [userFragment]),
-            GQLGroup(name: "assignees", fields: [userFragment], usePaging: true),
-            GQLGroup(name: "labels", fields: [labelFragment], usePaging: true)
+            GQLGroup(name: "assignees", fields: [userFragment], pageSize: 100),
+            GQLGroup(name: "labels", fields: [labelFragment], pageSize: 100)
         ])
 
         var prRepoIdToLatestExistingUpdate = [String: Date]()
         var issueRepoIdToLatestExistingUpdate = [String: Date]()
 
+        let hideValue = RepoDisplayPolicy.hide.rawValue
         repos.forEach {
             if let n = $0.nodeId {
-                prRepoIdToLatestExistingUpdate[n] = PullRequest.mostRecentItemUpdate(in: $0)
-                issueRepoIdToLatestExistingUpdate[n] = Issue.mostRecentItemUpdate(in: $0)
+                if $0.displayPolicyForPrs != hideValue {
+                    prRepoIdToLatestExistingUpdate[n] = PullRequest.mostRecentItemUpdate(in: $0)
+                }
+                if $0.displayPolicyForIssues != hideValue {
+                    issueRepoIdToLatestExistingUpdate[n] = Issue.mostRecentItemUpdate(in: $0)
+                }
             }
         }
         
-        let params = ["orderBy": "{direction: DESC, field: UPDATED_AT}"]
+        let allOpenPrsFragment = GQLFragment(on: "Repository", elements: [
+            GQLField(name: "id"),
+            GQLGroup(name: "pullRequests", fields: [prFragment], extraParams: ["states": "OPEN"], pageSize: 100),
+            ])
+        let allOpenIssuesFragment = GQLFragment(on: "Repository", elements: [
+            GQLField(name: "id"),
+            GQLGroup(name: "issues", fields: [issueFragment], extraParams: ["states": "OPEN"], pageSize: 100)
+            ])
 
-        let allPrsFragment = GQLFragment(on: "Repository", elements: [
-            GQLField(name: "id"),
-            GQLGroup(name: "pullRequests", fields: [prFragment], extraParams: params, usePaging: true),
-            ])
         
-        let allIssuesFragment = GQLFragment(on: "Repository", elements: [
+        let latestPrsFragment = GQLFragment(on: "Repository", elements: [
             GQLField(name: "id"),
-            GQLGroup(name: "issues", fields: [issueFragment], extraParams: params, usePaging: true)
+            GQLGroup(name: "pullRequests", fields: [prFragment], extraParams: ["orderBy": "{direction: DESC, field: UPDATED_AT}"], pageSize: 10),
             ])
-        
+        let latestIssuesFragment = GQLFragment(on: "Repository", elements: [
+            GQLField(name: "id"),
+            GQLGroup(name: "issues", fields: [issueFragment], extraParams: ["orderBy": "{direction: DESC, field: UPDATED_AT}"], pageSize: 10)
+            ])
+
         let reposByServer = Dictionary(grouping: repos) { $0.apiServer }
         var count = 0
         
@@ -383,17 +395,43 @@ final class GraphQL {
             
             var queriesForServer = [GQLQuery]()
             let serverLabel = server.label ?? "<no label>"
-            let hideValue = RepoDisplayPolicy.hide.rawValue
-
-            let idsForReposInThisServerWantingAllPrs = reposInThisServer.filter { $0.displayPolicyForPrs != hideValue }.compactMap { $0.nodeId }
-            if !idsForReposInThisServerWantingAllPrs.isEmpty {
-                let q = GQLQuery.batching("\(serverLabel): PRs", fields: [allPrsFragment], idList: idsForReposInThisServerWantingAllPrs, perNodeCallback: perNodeCallback)
+            
+            var idsForReposInThisServerWantingAllOpenPrs = ContiguousArray<String>()
+            var idsForReposInThisServerWantingLatestPrs = ContiguousArray<String>()
+            var idsForReposInThisServerWantingAllOpenIssues = ContiguousArray<String>()
+            var idsForReposInThisServerWantingLatestIssues = ContiguousArray<String>()
+            for repo in reposInThisServer {
+                if let n = repo.nodeId {
+                    if let last = prRepoIdToLatestExistingUpdate[n], last != .distantPast {
+                        idsForReposInThisServerWantingLatestPrs.append(n)
+                    } else if repo.displayPolicyForPrs != hideValue {
+                        idsForReposInThisServerWantingAllOpenPrs.append(n)
+                    }
+                    if let last = issueRepoIdToLatestExistingUpdate[n], last != .distantPast {
+                        idsForReposInThisServerWantingLatestIssues.append(n)
+                    } else if repo.displayPolicyForIssues != hideValue {
+                        idsForReposInThisServerWantingAllOpenIssues.append(n)
+                    }
+                }
+            }
+            
+            if !idsForReposInThisServerWantingAllOpenPrs.isEmpty {
+                let q = GQLQuery.batching("\(serverLabel): Open PRs", fields: [allOpenPrsFragment], idList: idsForReposInThisServerWantingAllOpenPrs, batchSize: 100, perNodeCallback: perNodeCallback)
                 queriesForServer.append(contentsOf: q)
             }
             
-            let idsForReposInThisServerWantingAllIssues = reposInThisServer.filter { $0.displayPolicyForIssues != hideValue }.compactMap { $0.nodeId }
-            if !idsForReposInThisServerWantingAllIssues.isEmpty {
-                let q = GQLQuery.batching("\(serverLabel): Issues", fields: [allIssuesFragment], idList: idsForReposInThisServerWantingAllIssues, perNodeCallback: perNodeCallback)
+            if !idsForReposInThisServerWantingAllOpenIssues.isEmpty {
+                let q = GQLQuery.batching("\(serverLabel): Open Issues", fields: [allOpenIssuesFragment], idList: idsForReposInThisServerWantingAllOpenIssues, batchSize: 100, perNodeCallback: perNodeCallback)
+                queriesForServer.append(contentsOf: q)
+            }
+
+            if !idsForReposInThisServerWantingLatestPrs.isEmpty {
+                let q = GQLQuery.batching("\(serverLabel): Latest PRs", fields: [latestPrsFragment], idList: idsForReposInThisServerWantingLatestPrs, batchSize: 10, perNodeCallback: perNodeCallback)
+                queriesForServer.append(contentsOf: q)
+            }
+            
+            if !idsForReposInThisServerWantingLatestIssues.isEmpty {
+                let q = GQLQuery.batching("\(serverLabel): Latest Issues", fields: [latestIssuesFragment], idList: idsForReposInThisServerWantingLatestIssues, batchSize: 10, perNodeCallback: perNodeCallback)
                 queriesForServer.append(contentsOf: q)
             }
 

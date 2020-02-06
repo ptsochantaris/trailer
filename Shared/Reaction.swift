@@ -35,8 +35,6 @@ final class Reaction: DataItem {
                 reaction.avatarUrl = user["avatarUrl"] as? String
                 reaction.userNodeId = user["id"] as? String
             }
-            
-            reaction.checkNotification()
         }
     }
         
@@ -47,7 +45,6 @@ final class Reaction: DataItem {
                 item.issue = nil
 				item.comment = comment
 				item.fill(from: info)
-                item.checkNotification()
 			}
 		}
 	}
@@ -59,7 +56,6 @@ final class Reaction: DataItem {
 				item.issue = parent as? Issue
                 item.comment = nil
 				item.fill(from: info)
-                item.checkNotification()
 			}
 		}
 	}
@@ -73,9 +69,9 @@ final class Reaction: DataItem {
 		}
 	}
     
-    private func checkNotification() {
+    func checkNotifications() {
         if postSyncAction == PostSyncAction.isNew.rawValue && !isMine {
-            if let parentItem = (pullRequest ?? issue), Settings.notifyOnItemReactions, parentItem.postSyncAction != PostSyncAction.isNew.rawValue {
+            if let parentItem = (pullRequest ?? issue), Settings.notifyOnItemReactions, parentItem.postSyncAction != PostSyncAction.isNew.rawValue, parentItem.appropriateStateForNotification {
 
                 if Settings.showCommentsEverywhere || (parentItem.sectionIndex != Section.all.rawValue && parentItem.sectionIndex != Section.none.rawValue) {
                     NotificationQueue.add(type: .newReaction, for: self)

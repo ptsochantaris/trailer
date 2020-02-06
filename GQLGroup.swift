@@ -4,15 +4,15 @@ final class GQLGroup: GQLScanning {
 
 	let name: String
 	let fields: [GQLElement]
-	private let usePaging: Bool
+	private let pageSize: Int
 	private let onlyLast: Bool
 	private let extraParams: [String: String]?
 	private var lastCursor: String?
 	
-	init(name: String, fields: [GQLElement], extraParams: [String: String]? = nil, usePaging: Bool = false, onlyLast: Bool = false) {
+	init(name: String, fields: [GQLElement], extraParams: [String: String]? = nil, pageSize: Int = 0, onlyLast: Bool = false) {
 		self.name = name
 		self.fields = fields
-		self.usePaging = usePaging
+		self.pageSize = pageSize
 		self.onlyLast = onlyLast
 		self.extraParams = extraParams
 	}
@@ -20,7 +20,7 @@ final class GQLGroup: GQLScanning {
     init(group: GQLGroup, name: String? = nil) {
         self.name = name ?? group.name
         self.fields = group.fields
-        self.usePaging = group.usePaging
+        self.pageSize = group.pageSize
         self.onlyLast = group.onlyLast
         self.extraParams = group.extraParams
     }
@@ -30,11 +30,11 @@ final class GQLGroup: GQLScanning {
 		var query = name
 		var brackets = [String]()
 		
-		if usePaging {
+		if pageSize > 0 {
 			if onlyLast {
 				brackets.append("last: 1")
 			} else {
-                brackets.append("first: \(GQLQuery.payloadSize)")
+                brackets.append("first: \(pageSize)")
 				if let lastCursor = lastCursor {
 					brackets.append("after: \"\(lastCursor)\"")
 				}
@@ -53,7 +53,7 @@ final class GQLGroup: GQLScanning {
 		
 		let fieldsText = "__typename " + fields.map({$0.queryText}).joined(separator: " ")
 		
-		if usePaging {
+		if pageSize > 0 {
 			query += " { edges { node { " + fieldsText + " } cursor } pageInfo { hasNextPage } }"
 		} else {
 			query += " { " + fieldsText + " }"

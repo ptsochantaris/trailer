@@ -6,8 +6,9 @@ final class GQLBatchGroup: GQLScanning {
 	private var idsToGroups = [String : GQLGroup]()
 	private let originalTemplate: GQLGroup
 	private let nextCount: Int
+    private let batchSize: Int
 
-	init(templateGroup: GQLGroup, idList: [String], startingCount: Int = 0) {
+    init(templateGroup: GQLGroup, idList: [String], startingCount: Int = 0, batchSize: Int) {
         originalTemplate = templateGroup
 		var index = startingCount
 		for id in idList {
@@ -16,6 +17,7 @@ final class GQLBatchGroup: GQLScanning {
 			index += 1
 		}
 		nextCount = index
+        self.batchSize = batchSize
 	}
 
 	var queryText: String {
@@ -37,7 +39,7 @@ final class GQLBatchGroup: GQLScanning {
 
 	private var pageOfIds: [String] {
 		let k = idsToGroups.keys.sorted()
-		let max = min(GQLQuery.countOfIdsToBatch, k.count)
+		let max = min(batchSize, k.count)
 		return Array(k[0 ..< max])
 	}
 
@@ -50,7 +52,7 @@ final class GQLBatchGroup: GQLScanning {
 		let page = pageOfIds
 		let newIds = idsToGroups.keys.filter { !page.contains($0) }
 		if !newIds.isEmpty {
-			let nextPage = GQLQuery(name: query.name, rootElement: GQLBatchGroup(templateGroup: originalTemplate, idList: newIds, startingCount: nextCount), parent: parent)
+			let nextPage = GQLQuery(name: query.name, rootElement: GQLBatchGroup(templateGroup: originalTemplate, idList: newIds, startingCount: nextCount, batchSize: batchSize), parent: parent)
 			extraQueries.append(nextPage)
 		}
 

@@ -207,6 +207,11 @@ final class DataManager {
 			s.postSyncAction = PostSyncAction.doNothing.rawValue
 		}
 
+        for r in DataItem.newOrUpdatedItems(of: Reaction.self, in: main) {
+            r.checkNotifications()
+            r.postSyncAction = PostSyncAction.doNothing.rawValue
+        }
+
 		for p in allPrs {
 			p.postSyncAction = PostSyncAction.doNothing.rawValue
 		}
@@ -220,10 +225,6 @@ final class DataManager {
 		}
 
 		for r in DataItem.newOrUpdatedItems(of: PRComment.self, in: main) {
-			r.postSyncAction = PostSyncAction.doNothing.rawValue
-		}
-
-		for r in DataItem.newOrUpdatedItems(of: Reaction.self, in: main) {
 			r.postSyncAction = PostSyncAction.doNothing.rawValue
 		}
         

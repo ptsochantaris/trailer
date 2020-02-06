@@ -3,9 +3,6 @@ import Dispatch
 
 final class GQLQuery {
     
-    static let countOfIdsToBatch = 100
-    static let payloadSize = 25
-
 	let name: String
     let perNodeCallback: ((GQLNode)->Bool)?
 
@@ -19,16 +16,16 @@ final class GQLQuery {
         self.perNodeCallback = perNodeCallback
 	}
 
-    static func batching(_ name: String, fields: [GQLElement], idList: [String], perNodeCallback: ((GQLNode)->Bool)? = nil) -> [GQLQuery] {
+    static func batching(_ name: String, fields: [GQLElement], idList: ContiguousArray<String>, batchSize: Int, perNodeCallback: ((GQLNode)->Bool)? = nil) -> [GQLQuery] {
 		var list = idList
 		var segments = [[String]]()
 		while !list.isEmpty {
-			let p = min(countOfIdsToBatch, list.count)
+			let p = min(batchSize, list.count)
 			segments.append(Array(list[0..<p]))
-			list = Array(list[p...])
+			list = ContiguousArray(list[p...])
 		}
 		return segments.map {
-            GQLQuery(name: name, rootElement: GQLBatchGroup(templateGroup: GQLGroup(name: "items", fields: fields), idList: $0), perNodeCallback: perNodeCallback)
+            GQLQuery(name: name, rootElement: GQLBatchGroup(templateGroup: GQLGroup(name: "items", fields: fields), idList: $0, batchSize: batchSize), perNodeCallback: perNodeCallback)
 		}
 	}
     
