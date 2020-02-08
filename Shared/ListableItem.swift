@@ -433,7 +433,6 @@ class ListableItem: DataItem {
         var targetSection: Section
 		if currentCondition == ItemCondition.merged.rawValue            	{ targetSection = .merged }
 		else if currentCondition == ItemCondition.closed.rawValue      		{ targetSection = .closed }
-		else if shouldMoveToSnoozing             							{ targetSection = .snoozed }
 		else if isMine || assignedToMySection                        		{ targetSection = .mine }
 		else if assignedToParticipated || commentedByMe || reviewedByMe     { targetSection = .participated }
 		else                                                           		{ targetSection = .all }
@@ -486,11 +485,15 @@ class ListableItem: DataItem {
 			}
 		}
         
-		if targetSection != .none, let p = self as? PullRequest, p.shouldBeCheckedForRedStatuses(in: targetSection) {
-            if p.displayedStatuses.contains(where: { $0.state != "success" }) {
-                targetSection = .none
-            }
+		if targetSection != .none,
+            let p = self as? PullRequest, p.shouldBeCheckedForRedStatuses(in: targetSection),
+            p.displayedStatuses.contains(where: { $0.state != "success" }) {
+            targetSection = .none
 		}
+        
+        if targetSection != .none && shouldMoveToSnoozing {
+            targetSection = .snoozed
+        }
 
 		/////////// Comment counting
 
