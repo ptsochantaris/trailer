@@ -27,7 +27,7 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <buttonCell key="cell" type="check" title="Start Trailer at Login" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" scrollable="YES" lineBreakMode="clipping" state="on" inset="2" id="qbn-he-5QB">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                            <font key="font" metaFont="message" size="11"/>
+                            <font key="font" metaFont="toolTip"/>
                         </buttonCell>
                         <connections>
                             <action selector="launchAtStartSelected:" target="vQH-WF-vh2" id="neu-tk-tNn"/>
@@ -37,7 +37,7 @@
                         <rect key="frame" x="713" y="3" width="158" height="20"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Version" id="YMV-pm-TMh">
-                            <font key="font" metaFont="message" size="11"/>
+                            <font key="font" metaFont="toolTip"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
@@ -48,19 +48,19 @@
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
                             <tabViewItem label="Servers" identifier="" id="SOc-1o-tdR">
-                                <view key="view" id="qLY-Ye-wy7">
+                                <view key="view" ambiguous="YES" id="qLY-Ye-wy7">
                                     <rect key="frame" x="10" y="33" width="834" height="426"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <scrollView fixedFrame="YES" autohidesScrollers="YES" horizontalLineScroll="26" horizontalPageScroll="10" verticalLineScroll="26" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FEq-Qw-Vgd">
-                                            <rect key="frame" x="18" y="55" width="240" height="341"/>
+                                            <rect key="frame" x="18" y="55" width="240" height="330"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" heightSizable="YES"/>
                                             <clipView key="contentView" ambiguous="YES" id="0eh-Pe-UwN">
-                                                <rect key="frame" x="1" y="0.0" width="238" height="340"/>
+                                                <rect key="frame" x="1" y="0.0" width="238" height="329"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" ambiguous="YES" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" headerView="GLY-La-oaP" id="wPh-gi-N9t">
-                                                        <rect key="frame" x="0.0" y="0.0" width="238" height="323"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="238" height="312"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <size key="intercellSpacing" width="3" height="9"/>
                                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -68,7 +68,7 @@
                                                         <tableColumns>
                                                             <tableColumn identifier="server" editable="NO" width="170" minWidth="40" maxWidth="1000" id="8yd-Ed-e1H">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Server">
-                                                                    <font key="font" metaFont="message" size="11"/>
+                                                                    <font key="font" metaFont="toolTip"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                 </tableHeaderCell>
@@ -81,7 +81,7 @@
                                                             </tableColumn>
                                                             <tableColumn identifier="api_use" editable="NO" width="62" minWidth="10" maxWidth="3.4028234663852886e+38" id="pbE-pE-euq">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="API use">
-                                                                    <font key="font" metaFont="message" size="11"/>
+                                                                    <font key="font" metaFont="toolTip"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                 </tableHeaderCell>
@@ -116,7 +116,7 @@
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <buttonCell key="cell" type="smallSquare" title="+ Add API Server" bezelStyle="smallSquare" imagePosition="overlaps" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="7aw-xD-7EL">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="system" size="10"/>
+                                                <font key="font" metaFont="label"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="addNewApiServerSelected:" target="vQH-WF-vh2" id="twq-Bg-WX4"/>
@@ -165,26 +165,17 @@
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2GE-sm-VZ0">
                                                         <rect key="frame" x="6" y="315" width="90" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="API Path" id="3XX-k0-LtU">
-                                                            <font key="font" metaFont="system" size="10"/>
-                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cAh-gg-Wqn">
-                                                        <rect key="frame" x="6" y="283" width="90" height="20"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Web Front End" id="vhl-W9-zqM">
-                                                            <font key="font" metaFont="system" size="10"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="v3 API Path" id="3XX-k0-LtU">
+                                                            <font key="font" metaFont="toolTip"/>
                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4td-hc-6rZ">
-                                                        <rect key="frame" x="6" y="205" width="90" height="68"/>
+                                                        <rect key="frame" x="6" y="174" width="90" height="68"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" id="Bam-mX-Su4">
-                                                            <font key="font" metaFont="smallSystemBold"/>
+                                                            <font key="font" metaFont="toolTip"/>
                                                             <string key="title">Personal
 Access
 Token</string>
@@ -196,13 +187,34 @@ Token</string>
                                                         <rect key="frame" x="6" y="347" width="90" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Name" id="Wcj-U6-Jja">
-                                                            <font key="font" metaFont="system" size="10"/>
+                                                            <font key="font" metaFont="toolTip"/>
                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cAh-gg-Wqn">
+                                                        <rect key="frame" x="6" y="251" width="90" height="20"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Web Front End" id="vhl-W9-zqM">
+                                                            <font key="font" metaFont="toolTip"/>
+                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CT9-ev-oP0">
+                                                        <rect key="frame" x="102" y="254" width="440" height="24"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="https://github.com" drawsBackground="YES" usesSingleLineMode="YES" id="5Ai-jn-gsl">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <outlet property="delegate" destination="vQH-WF-vh2" id="x9J-c3-bhR"/>
+                                                        </connections>
+                                                    </textField>
                                                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yUS-Pw-j0m">
-                                                        <rect key="frame" x="102" y="205" width="440" height="72"/>
+                                                        <rect key="frame" x="102" y="184" width="440" height="63"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="border" drawsBackground="YES" id="9um-Bk-bLh">
                                                             <font key="font" metaFont="system"/>
@@ -225,6 +237,15 @@ Token</string>
                                                         <connections>
                                                             <outlet property="delegate" destination="vQH-WF-vh2" id="8YT-sX-k5B"/>
                                                         </connections>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5aH-Vs-4Lj">
+                                                        <rect key="frame" x="6" y="283" width="90" height="20"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="v4 API Path" id="Xc9-HE-Oom">
+                                                            <font key="font" metaFont="toolTip"/>
+                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Bi3-xh-wlg">
                                                         <rect key="frame" x="102" y="350" width="440" height="24"/>
@@ -271,20 +292,8 @@ Token</string>
                                                             <action selector="createTokenSelected:" target="vQH-WF-vh2" id="77H-5d-fm4"/>
                                                         </connections>
                                                     </button>
-                                                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CT9-ev-oP0">
-                                                        <rect key="frame" x="102" y="286" width="440" height="24"/>
-                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="https://github.com" drawsBackground="YES" usesSingleLineMode="YES" id="5Ai-jn-gsl">
-                                                            <font key="font" metaFont="system"/>
-                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                        <connections>
-                                                            <outlet property="delegate" destination="vQH-WF-vh2" id="x9J-c3-bhR"/>
-                                                        </connections>
-                                                    </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" setsMaxLayoutWidthAtFirstLayout="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qmh-MC-rEN">
-                                                        <rect key="frame" x="100" y="175" width="350" height="22"/>
+                                                        <rect key="frame" x="105" y="155" width="350" height="22"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" id="fPH-KZ-x5J">
                                                             <font key="font" metaFont="label" size="9"/>
@@ -294,21 +303,33 @@ Token</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="97p-7q-Kd5">
-                                                        <rect key="frame" x="100" y="151" width="350" height="18"/>
+                                                        <rect key="frame" x="105" y="131" width="350" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Report syncing problems with this server" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="SQa-fC-sUh">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="message" size="11"/>
+                                                            <font key="font" metaFont="toolTip"/>
                                                         </buttonCell>
                                                         <connections>
                                                             <action selector="apiServerReportErrorSelected:" target="vQH-WF-vh2" id="if5-14-f5r"/>
                                                         </connections>
                                                     </button>
+                                                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KSf-5a-vXT">
+                                                        <rect key="frame" x="102" y="286" width="438" height="24"/>
+                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="https://api.github.com/graphql (for GE: https://server/api/graphql)" drawsBackground="YES" id="jyV-JW-SFT">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <outlet property="delegate" destination="vQH-WF-vh2" id="bGW-gW-w82"/>
+                                                        </connections>
+                                                    </textField>
                                                 </subviews>
                                             </view>
                                         </box>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7V9-LT-Yjg">
-                                            <rect key="frame" x="20" y="402" width="239" height="18"/>
+                                            <rect key="frame" x="20" y="400" width="239" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Use GitHub v4 API" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="x1T-eR-qup">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -342,7 +363,7 @@ Token</string>
                                                         <tableColumns>
                                                             <tableColumn identifier="repos" editable="NO" width="329" minWidth="100" maxWidth="10000" id="nW5-Ng-D0l">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Watched Repository">
-                                                                    <font key="font" metaFont="message" size="11"/>
+                                                                    <font key="font" metaFont="toolTip"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.33333298560000002" alpha="1" colorSpace="calibratedWhite"/>
                                                                 </tableHeaderCell>
@@ -356,12 +377,12 @@ Token</string>
                                                             </tableColumn>
                                                             <tableColumn identifier="group" width="48" minWidth="10" maxWidth="1000" id="8j5-1c-L78" userLabel="Group">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Group">
-                                                                    <font key="font" metaFont="message" size="11"/>
+                                                                    <font key="font" metaFont="toolTip"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                                 </tableHeaderCell>
                                                                 <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" alignment="left" placeholderString="" usesSingleLineMode="YES" id="zpI-WL-h8X" customClass="TextFieldCell" customModule="Trailer" customModuleProvider="target">
-                                                                    <font key="font" metaFont="message" size="11"/>
+                                                                    <font key="font" metaFont="toolTip"/>
                                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                 </textFieldCell>
@@ -369,7 +390,7 @@ Token</string>
                                                             </tableColumn>
                                                             <tableColumn identifier="hide" width="136" minWidth="10" maxWidth="1000" id="pRg-vg-7bD" userLabel="Hide">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Author Based Hiding">
-                                                                    <font key="font" metaFont="message" size="11"/>
+                                                                    <font key="font" metaFont="toolTip"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                                 </tableHeaderCell>
@@ -382,7 +403,7 @@ Token</string>
                                                             </tableColumn>
                                                             <tableColumn identifier="prs" editable="NO" width="110" minWidth="40" maxWidth="1000" id="FAL-Ui-K4b" userLabel="Pull Requests">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Pull Requests">
-                                                                    <font key="font" metaFont="message" size="11"/>
+                                                                    <font key="font" metaFont="toolTip"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.33333298560000002" alpha="1" colorSpace="calibratedWhite"/>
                                                                 </tableHeaderCell>
@@ -395,7 +416,7 @@ Token</string>
                                                             </tableColumn>
                                                             <tableColumn identifier="issues" editable="NO" width="110" minWidth="40" maxWidth="1000" id="P1T-D7-Rnp" userLabel="Issues">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Issues">
-                                                                    <font key="font" metaFont="message" size="11"/>
+                                                                    <font key="font" metaFont="toolTip"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.33333298560000002" alpha="1" colorSpace="calibratedWhite"/>
                                                                 </tableHeaderCell>
@@ -408,7 +429,7 @@ Token</string>
                                                             </tableColumn>
                                                             <tableColumn identifier="fork" editable="NO" width="24" minWidth="10" maxWidth="3.4028234663852886e+38" id="RB5-FQ-ycS" userLabel="Forked">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Fork">
-                                                                    <font key="font" metaFont="message" size="11"/>
+                                                                    <font key="font" metaFont="toolTip"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 </tableHeaderCell>
@@ -507,7 +528,7 @@ Token</string>
                                             <rect key="frame" x="14" y="73" width="408" height="22"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                             <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" placeholderString="Filter…" usesSingleLineMode="YES" bezelStyle="round" id="dZ4-dF-dkV">
-                                                <font key="font" metaFont="label" size="12"/>
+                                                <font key="font" metaFont="controlContent"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </searchFieldCell>
@@ -980,7 +1001,7 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="History" identifier="" id="g1R-BW-1ix">
-                                <view key="view" ambiguous="YES" id="IqF-nu-n45">
+                                <view key="view" id="IqF-nu-n45">
                                     <rect key="frame" x="10" y="33" width="834" height="426"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
@@ -1156,7 +1177,7 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                         <rect key="frame" x="11" y="52" width="651" height="84"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <tokenFieldCell key="cell" selectable="YES" editable="YES" borderStyle="bezel" alignment="left" placeholderString="Comma separated list of usernames (case/accent insensitive, without the '@' prefix)" drawsBackground="YES" allowsEditingTextAttributes="YES" id="i7v-35-449">
-                                                            <font key="font" metaFont="label" size="12"/>
+                                                            <font key="font" metaFont="controlContent"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </tokenFieldCell>
@@ -1706,7 +1727,7 @@ Tip: Reactions are treated like comments, i.e. the rules about being notified on
                                                         <tableColumns>
                                                             <tableColumn width="308" minWidth="40" maxWidth="1000" id="PkK-PU-9s3">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
-                                                                    <font key="font" metaFont="message" size="11"/>
+                                                                    <font key="font" metaFont="toolTip"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                 </tableHeaderCell>
@@ -1987,7 +2008,7 @@ Tip: Reactions are treated like comments, i.e. the rules about being notified on
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <buttonCell key="cell" type="smallSquare" title="+ Add a new preset" bezelStyle="smallSquare" imagePosition="overlaps" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="6h7-fr-KAl">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="system" size="10"/>
+                                                <font key="font" metaFont="label"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="createNewSnoozePresetSelected:" target="vQH-WF-vh2" id="sah-RH-LQv"/>
@@ -2034,7 +2055,7 @@ Tip: Reactions are treated like comments, i.e. the rules about being notified on
                                                         <rect key="frame" x="36" y="49" width="632" height="42"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" id="av8-ls-mGW">
-                                                            <font key="font" metaFont="message" size="11"/>
+                                                            <font key="font" metaFont="toolTip"/>
                                                             <string key="title">Important: When enabling this for the first time you will be asked to provide permission for Trailer to use the keyboard
 in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the permission to take effect!</string>
                                                             <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
@@ -2388,7 +2409,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                                     <rect key="frame" x="18" y="54" width="279" height="77"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" alignment="center" id="OcC-wh-2vb">
-                                                                        <font key="font" metaFont="message" size="11"/>
+                                                                        <font key="font" metaFont="toolTip"/>
                                                                         <string key="title">Chosing this option will remove all synced data and reload everything from scratch. This can take a while and use up a large amount of API quota, so only use it if things seem broken.</string>
                                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -2420,6 +2441,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="apiServerApiPath" destination="9xz-I3-HQw" id="Qbx-W0-uWC"/>
                 <outlet property="apiServerAuthToken" destination="yUS-Pw-j0m" id="TGP-GL-t5j"/>
                 <outlet property="apiServerDeleteButton" destination="k1C-rR-Wxu" id="Czy-Ke-ibg"/>
+                <outlet property="apiServerGraphQLPath" destination="KSf-5a-vXT" id="Xhg-Rn-Gup"/>
                 <outlet property="apiServerName" destination="Bi3-xh-wlg" id="74f-LX-0j3"/>
                 <outlet property="apiServerReportError" destination="97p-7q-Kd5" id="YZT-aN-za3"/>
                 <outlet property="apiServerSelectedBox" destination="Zjr-Bg-vY8" id="n7z-EM-8EF"/>
@@ -2546,5 +2568,6 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
             <point key="canvasLocation" x="189" y="164"/>
         </window>
         <customObject id="cxZ-vL-Iwq" customClass="SUUpdater"/>
+        <userDefaultsController representsSharedInstance="YES" id="GWg-nl-JjT"/>
     </objects>
 </document>

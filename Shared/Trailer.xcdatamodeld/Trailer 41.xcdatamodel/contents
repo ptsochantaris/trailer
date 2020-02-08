@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="15702" systemVersion="19C57" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="15702" systemVersion="19D76" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="ApiServer" representedClassName=".ApiServer" syncable="YES">
         <attribute name="apiPath" optional="YES" attributeType="String"/>
         <attribute name="authToken" optional="YES" attributeType="String"/>
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="graphQLPath" optional="YES" attributeType="String"/>
         <attribute name="label" optional="YES" attributeType="String"/>
         <attribute name="lastSyncSucceeded" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
         <attribute name="reportRefreshFailures" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
@@ -304,7 +305,7 @@
         </fetchIndex>
     </entity>
     <elements>
-        <element name="ApiServer" positionX="9" positionY="153" width="128" height="373"/>
+        <element name="ApiServer" positionX="9" positionY="153" width="128" height="388"/>
         <element name="Issue" positionX="9" positionY="153" width="128" height="583"/>
         <element name="PRComment" positionX="0" positionY="0" width="128" height="313"/>
         <element name="PRLabel" positionX="9" positionY="153" width="128" height="193"/>

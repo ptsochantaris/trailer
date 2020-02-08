@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15702" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="RFw-pn-qBh">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15705" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="RFw-pn-qBh">
     <device id="retina5_9" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment version="4864" identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15704"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15706"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -904,142 +904,138 @@
             <objects>
                 <viewController automaticallyAdjustsScrollViewInsets="NO" id="iSf-H9-TPW" customClass="ServerDetailViewController" customModule="PocketTrailer" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Hjh-Cm-SFi">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="758"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="946"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" keyboardDismissMode="onDrag" translatesAutoresizingMaskIntoConstraints="NO" id="bZU-nh-qhg">
-                                <rect key="frame" x="0.0" y="108" width="375" height="518"/>
+                                <rect key="frame" x="0.0" y="108" width="375" height="706"/>
                                 <subviews>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cvy-3g-Cpb">
-                                        <rect key="frame" x="11" y="20" width="353" height="21"/>
-                                        <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
-                                        <nil key="textColor"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="API Path" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Bve-oc-5Y7">
-                                        <rect key="frame" x="11" y="103" width="353" height="20"/>
-                                        <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
-                                        <nil key="textColor"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Web Front End" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iWB-GC-rdV">
-                                        <rect key="frame" x="11" y="185" width="353" height="21"/>
-                                        <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
-                                        <nil key="textColor"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Personal Access Token" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yVf-Xw-8iy">
-                                        <rect key="frame" x="11" y="268" width="312" height="20.333333333333314"/>
-                                        <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
-                                        <nil key="textColor"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
-                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="GitHub" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="bME-ye-aAN">
-                                        <rect key="frame" x="11" y="49" width="353" height="34"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                        <textInputTraits key="textInputTraits" returnKeyType="done"/>
-                                        <connections>
-                                            <outlet property="delegate" destination="iSf-H9-TPW" id="hPl-zn-3qw"/>
-                                        </connections>
-                                    </textField>
-                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="https://api.github.com (for GE: https://server/api/v3)" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="MTl-S3-U8P">
-                                        <rect key="frame" x="11" y="131" width="353" height="34"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                        <textInputTraits key="textInputTraits" returnKeyType="done"/>
-                                        <connections>
-                                            <outlet property="delegate" destination="iSf-H9-TPW" id="pfr-iG-w6W"/>
-                                        </connections>
-                                    </textField>
-                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Your GitHub personal access token" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="lDU-gx-tBY">
-                                        <rect key="frame" x="11" y="296.33333333333331" width="353" height="34"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                        <textInputTraits key="textInputTraits" returnKeyType="done"/>
-                                        <connections>
-                                            <outlet property="delegate" destination="iSf-H9-TPW" id="9ye-lG-6hR"/>
-                                        </connections>
-                                    </textField>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Report syncing problems with this server" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rgY-HF-p2c">
-                                        <rect key="frame" x="11" y="454.66666666666663" width="296" height="42.333333333333314"/>
-                                        <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
-                                        <nil key="textColor"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
-                                    <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="P3I-BS-Gwz">
-                                        <rect key="frame" x="315" y="460.33333333333337" width="51" height="31"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" constant="49" id="Afs-i7-6GS"/>
-                                        </constraints>
-                                        <connections>
-                                            <action selector="reportChanged:" destination="iSf-H9-TPW" eventType="valueChanged" id="Ytn-P5-yeZ"/>
-                                        </connections>
-                                    </switch>
-                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="https://github.com" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="jgQ-9E-dxw">
-                                        <rect key="frame" x="11" y="214" width="353" height="34"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                        <textInputTraits key="textInputTraits" returnKeyType="done"/>
-                                        <connections>
-                                            <outlet property="delegate" destination="iSf-H9-TPW" id="Vc9-Gt-vkA"/>
-                                        </connections>
-                                    </textField>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="btD-7d-z1H">
-                                        <rect key="frame" x="11" y="340.33333333333331" width="353" height="94.333333333333314"/>
-                                        <string key="text">Paste your GitHub personal access token above or use the links below to view or create one.  You can use 'Test' to verify your Settings.
+                                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="12" translatesAutoresizingMaskIntoConstraints="NO" id="Fid-5v-4yT">
+                                        <rect key="frame" x="20" y="20" width="335" height="552"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cvy-3g-Cpb">
+                                                <rect key="frame" x="0.0" y="0.0" width="335" height="20.333333333333332"/>
+                                                <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="GitHub" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="bME-ye-aAN">
+                                                <rect key="frame" x="0.0" y="32.333333333333343" width="335" height="34"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                <textInputTraits key="textInputTraits" returnKeyType="done"/>
+                                                <connections>
+                                                    <outlet property="delegate" destination="iSf-H9-TPW" id="hPl-zn-3qw"/>
+                                                </connections>
+                                            </textField>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="v3 API Path" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Bve-oc-5Y7">
+                                                <rect key="frame" x="0.0" y="78.333333333333343" width="335" height="20.333333333333329"/>
+                                                <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="https://api.github.com (for GE: https://server/api/v3)" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="MTl-S3-U8P">
+                                                <rect key="frame" x="0.0" y="110.66666666666666" width="335" height="34"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                <textInputTraits key="textInputTraits" returnKeyType="done"/>
+                                                <connections>
+                                                    <outlet property="delegate" destination="iSf-H9-TPW" id="pfr-iG-w6W"/>
+                                                </connections>
+                                            </textField>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="v4 API Path" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1Ix-eR-UF8">
+                                                <rect key="frame" x="0.0" y="156.66666666666669" width="335" height="20.333333333333343"/>
+                                                <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="https://api.github.com/graphql (for GE: https://server/api/graphql)" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Tf3-cs-nIp">
+                                                <rect key="frame" x="0.0" y="189" width="335" height="34"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                <textInputTraits key="textInputTraits" returnKeyType="done"/>
+                                                <connections>
+                                                    <outlet property="delegate" destination="iSf-H9-TPW" id="hVK-Cg-a6g"/>
+                                                </connections>
+                                            </textField>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Web Front End" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iWB-GC-rdV">
+                                                <rect key="frame" x="0.0" y="235" width="335" height="20.333333333333343"/>
+                                                <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="https://github.com" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="jgQ-9E-dxw">
+                                                <rect key="frame" x="0.0" y="267.33333333333331" width="335" height="34"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                <textInputTraits key="textInputTraits" returnKeyType="done"/>
+                                                <connections>
+                                                    <outlet property="delegate" destination="iSf-H9-TPW" id="Vc9-Gt-vkA"/>
+                                                </connections>
+                                            </textField>
+                                            <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="rBO-bc-htC">
+                                                <rect key="frame" x="0.0" y="313.33333333333331" width="335" height="32"/>
+                                                <subviews>
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Personal Access Token" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yVf-Xw-8iy">
+                                                        <rect key="frame" x="0.0" y="5.9999999999999982" width="294" height="20.333333333333329"/>
+                                                        <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                        <nil key="textColor"/>
+                                                        <nil key="highlightedColor"/>
+                                                    </label>
+                                                    <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FSU-dH-Zb1">
+                                                        <rect key="frame" x="304" y="0.0" width="31" height="32"/>
+                                                        <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
+                                                        <state key="normal" title="Test">
+                                                            <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        </state>
+                                                        <connections>
+                                                            <action selector="testConnectionSelected:" destination="iSf-H9-TPW" eventType="touchUpInside" id="9UE-dw-jSv"/>
+                                                        </connections>
+                                                    </button>
+                                                </subviews>
+                                            </stackView>
+                                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Your GitHub personal access token" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="lDU-gx-tBY">
+                                                <rect key="frame" x="0.0" y="357.33333333333331" width="335" height="34"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                <textInputTraits key="textInputTraits" returnKeyType="done"/>
+                                                <connections>
+                                                    <outlet property="delegate" destination="iSf-H9-TPW" id="9ye-lG-6hR"/>
+                                                </connections>
+                                            </textField>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="btD-7d-z1H">
+                                                <rect key="frame" x="0.0" y="403.33333333333337" width="335" height="94.333333333333314"/>
+                                                <string key="text">Paste your GitHub personal access token above or use the links below to view or create one.  You can use 'Test' to verify your Settings.
 
 Tokens need at least all the 'repo' permissions, and the 'read:org' permission.</string>
-                                        <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
-                                        <nil key="textColor"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
-                                    <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FSU-dH-Zb1">
-                                        <rect key="frame" x="333" y="262.66666666666669" width="31" height="32"/>
-                                        <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
-                                        <state key="normal" title="Test">
-                                            <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="testConnectionSelected:" destination="iSf-H9-TPW" eventType="touchUpInside" id="9UE-dw-jSv"/>
-                                        </connections>
-                                    </button>
+                                                <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="y3I-Mq-SXH">
+                                                <rect key="frame" x="0.0" y="509.66666666666657" width="335" height="42.333333333333314"/>
+                                                <subviews>
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Report syncing problems with this server" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rgY-HF-p2c">
+                                                        <rect key="frame" x="0.0" y="0.0" width="278" height="42.333333333333336"/>
+                                                        <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                        <nil key="textColor"/>
+                                                        <nil key="highlightedColor"/>
+                                                    </label>
+                                                    <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="P3I-BS-Gwz">
+                                                        <rect key="frame" x="286" y="5.6666666666667425" width="51" height="31"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" constant="49" id="Afs-i7-6GS"/>
+                                                        </constraints>
+                                                        <connections>
+                                                            <action selector="reportChanged:" destination="iSf-H9-TPW" eventType="valueChanged" id="Ytn-P5-yeZ"/>
+                                                        </connections>
+                                                    </switch>
+                                                </subviews>
+                                            </stackView>
+                                        </subviews>
+                                    </stackView>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstItem="bME-ye-aAN" firstAttribute="leading" secondItem="cvy-3g-Cpb" secondAttribute="leading" id="0Vu-lq-9rV"/>
-                                    <constraint firstItem="lDU-gx-tBY" firstAttribute="top" secondItem="yVf-Xw-8iy" secondAttribute="bottom" constant="8" id="1Up-ua-KYR"/>
-                                    <constraint firstItem="btD-7d-z1H" firstAttribute="top" secondItem="lDU-gx-tBY" secondAttribute="bottom" constant="10" id="22m-Jp-J9P"/>
-                                    <constraint firstItem="cvy-3g-Cpb" firstAttribute="top" secondItem="bZU-nh-qhg" secondAttribute="top" constant="20" id="2JH-Ru-Vyf"/>
-                                    <constraint firstItem="jgQ-9E-dxw" firstAttribute="top" secondItem="iWB-GC-rdV" secondAttribute="bottom" constant="8" id="4Dv-83-0Sy"/>
-                                    <constraint firstItem="iWB-GC-rdV" firstAttribute="trailing" secondItem="MTl-S3-U8P" secondAttribute="trailing" id="75c-Jf-XTY"/>
-                                    <constraint firstItem="rgY-HF-p2c" firstAttribute="leading" secondItem="bZU-nh-qhg" secondAttribute="leading" constant="11" id="8jk-nD-077"/>
-                                    <constraint firstItem="FSU-dH-Zb1" firstAttribute="leading" secondItem="yVf-Xw-8iy" secondAttribute="trailing" constant="10" id="B0C-YB-O0s"/>
-                                    <constraint firstItem="rgY-HF-p2c" firstAttribute="leading" secondItem="lDU-gx-tBY" secondAttribute="leading" id="CYW-EB-Fgk"/>
-                                    <constraint firstItem="Bve-oc-5Y7" firstAttribute="trailing" secondItem="MTl-S3-U8P" secondAttribute="trailing" id="Fj3-Tl-pk4"/>
-                                    <constraint firstItem="Bve-oc-5Y7" firstAttribute="trailing" secondItem="bME-ye-aAN" secondAttribute="trailing" id="GDT-tr-ZJw"/>
-                                    <constraint firstItem="jgQ-9E-dxw" firstAttribute="width" secondItem="lDU-gx-tBY" secondAttribute="width" id="JuA-DE-h0N"/>
-                                    <constraint firstItem="yVf-Xw-8iy" firstAttribute="leading" secondItem="lDU-gx-tBY" secondAttribute="leading" id="KAp-Cf-0tG"/>
-                                    <constraint firstItem="P3I-BS-Gwz" firstAttribute="leading" secondItem="rgY-HF-p2c" secondAttribute="trailing" constant="8" id="Opl-Wu-Jx4"/>
-                                    <constraint firstItem="cvy-3g-Cpb" firstAttribute="trailing" secondItem="bME-ye-aAN" secondAttribute="trailing" id="TfK-tm-s3S"/>
-                                    <constraint firstItem="jgQ-9E-dxw" firstAttribute="leading" secondItem="iWB-GC-rdV" secondAttribute="leading" id="YU7-Ab-qFh"/>
-                                    <constraint firstItem="bME-ye-aAN" firstAttribute="width" secondItem="MTl-S3-U8P" secondAttribute="width" id="YV3-e3-R6X"/>
-                                    <constraint firstItem="Bve-oc-5Y7" firstAttribute="leading" secondItem="MTl-S3-U8P" secondAttribute="leading" id="ZFb-3s-EEK"/>
-                                    <constraint firstItem="iWB-GC-rdV" firstAttribute="trailing" secondItem="jgQ-9E-dxw" secondAttribute="trailing" id="a3Z-aG-A9W"/>
-                                    <constraint firstItem="lDU-gx-tBY" firstAttribute="trailing" secondItem="P3I-BS-Gwz" secondAttribute="trailing" id="bY7-ij-FMZ"/>
-                                    <constraint firstItem="yVf-Xw-8iy" firstAttribute="top" secondItem="jgQ-9E-dxw" secondAttribute="bottom" constant="20" id="bl6-mq-FX4"/>
-                                    <constraint firstItem="lDU-gx-tBY" firstAttribute="trailing" secondItem="FSU-dH-Zb1" secondAttribute="trailing" id="d0o-f4-0eM"/>
-                                    <constraint firstItem="bME-ye-aAN" firstAttribute="top" secondItem="cvy-3g-Cpb" secondAttribute="bottom" constant="8" id="dDN-74-Qjj"/>
-                                    <constraint firstItem="rgY-HF-p2c" firstAttribute="top" secondItem="btD-7d-z1H" secondAttribute="bottom" constant="20" id="dt1-Ck-iqx"/>
-                                    <constraint firstAttribute="trailing" secondItem="bME-ye-aAN" secondAttribute="trailing" constant="11" id="fRI-ng-rIc"/>
-                                    <constraint firstItem="jgQ-9E-dxw" firstAttribute="leading" secondItem="yVf-Xw-8iy" secondAttribute="leading" id="hSx-hY-eqT"/>
-                                    <constraint firstItem="rgY-HF-p2c" firstAttribute="centerY" secondItem="P3I-BS-Gwz" secondAttribute="centerY" id="iFK-ab-Hg3"/>
-                                    <constraint firstItem="iWB-GC-rdV" firstAttribute="top" secondItem="MTl-S3-U8P" secondAttribute="bottom" constant="20" id="jcd-S5-lqv"/>
-                                    <constraint firstItem="Bve-oc-5Y7" firstAttribute="leading" secondItem="bME-ye-aAN" secondAttribute="leading" id="lcv-4C-xSZ"/>
-                                    <constraint firstItem="bME-ye-aAN" firstAttribute="width" secondItem="bZU-nh-qhg" secondAttribute="width" constant="-22" id="lgS-e1-2xs"/>
-                                    <constraint firstItem="MTl-S3-U8P" firstAttribute="leading" secondItem="iWB-GC-rdV" secondAttribute="leading" id="mdK-D6-pJ9"/>
-                                    <constraint firstItem="btD-7d-z1H" firstAttribute="leading" secondItem="lDU-gx-tBY" secondAttribute="leading" id="mgx-1G-DWY"/>
-                                    <constraint firstItem="jgQ-9E-dxw" firstAttribute="width" secondItem="MTl-S3-U8P" secondAttribute="width" id="nLo-KA-Hsv"/>
-                                    <constraint firstItem="FSU-dH-Zb1" firstAttribute="baseline" secondItem="yVf-Xw-8iy" secondAttribute="baseline" id="oGy-d3-R54"/>
-                                    <constraint firstItem="MTl-S3-U8P" firstAttribute="top" secondItem="Bve-oc-5Y7" secondAttribute="bottom" constant="8" id="syz-pH-B1B"/>
-                                    <constraint firstAttribute="bottom" secondItem="rgY-HF-p2c" secondAttribute="bottom" constant="30" id="v89-Tw-gVu"/>
-                                    <constraint firstItem="Bve-oc-5Y7" firstAttribute="top" secondItem="bME-ye-aAN" secondAttribute="bottom" constant="20" id="vJB-0j-M1g"/>
-                                    <constraint firstItem="btD-7d-z1H" firstAttribute="trailing" secondItem="lDU-gx-tBY" secondAttribute="trailing" id="yo2-Z0-572"/>
+                                    <constraint firstItem="Fid-5v-4yT" firstAttribute="top" secondItem="bZU-nh-qhg" secondAttribute="top" constant="20" id="1zv-dO-inZ"/>
+                                    <constraint firstAttribute="trailing" secondItem="Fid-5v-4yT" secondAttribute="trailing" constant="20" id="20U-Ny-WHn"/>
+                                    <constraint firstAttribute="bottom" secondItem="Fid-5v-4yT" secondAttribute="bottom" constant="20" id="CGt-6b-YgO"/>
+                                    <constraint firstItem="Fid-5v-4yT" firstAttribute="width" secondItem="bZU-nh-qhg" secondAttribute="width" constant="-40" id="FGu-S9-R3e"/>
+                                    <constraint firstItem="Fid-5v-4yT" firstAttribute="leading" secondItem="bZU-nh-qhg" secondAttribute="leading" constant="20" id="ufo-WX-0Ie"/>
                                 </constraints>
                             </scrollView>
                         </subviews>
@@ -1080,10 +1076,12 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
                         </barButtonItem>
                     </navigationItem>
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
+                    <size key="freeformSize" width="375" height="1000"/>
                     <connections>
                         <outlet property="apiPath" destination="MTl-S3-U8P" id="DFf-0S-ibw"/>
                         <outlet property="authToken" destination="lDU-gx-tBY" id="vjX-7U-vqD"/>
                         <outlet property="authTokenLabel" destination="yVf-Xw-8iy" id="ohD-Ha-9GT"/>
+                        <outlet property="graphQLPath" destination="Tf3-cs-nIp" id="Quy-yR-WhD"/>
                         <outlet property="name" destination="bME-ye-aAN" id="LkL-7d-dVU"/>
                         <outlet property="reportErrors" destination="P3I-BS-Gwz" id="06j-Hm-CQJ"/>
                         <outlet property="scrollView" destination="bZU-nh-qhg" id="CHr-1c-Bhf"/>
@@ -1093,7 +1091,7 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="IqD-pm-wNg" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1945" y="3071"/>
+            <point key="canvasLocation" x="1945" y="3140"/>
         </scene>
         <!--Picker View Controller-->
         <scene sceneID="5Tx-Cn-3zg">

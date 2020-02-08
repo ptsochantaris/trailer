@@ -107,8 +107,8 @@ final class ServersViewController: UITableViewController {
             self?.updateApiLabel()
         })
         a.addAction(UIAlertAction(title: "Use v4 API", style: .default) { [weak self] _ in
-            if !API.canUseV4API(for: DataManager.main) {
-                showMessage(Settings.v4title, Settings.v4Message)
+            if let error = API.canUseV4API(for: DataManager.main) {
+                showMessage(Settings.v4title, error)
             } else {
                 Settings.useV4API = true
                 self?.updateApiLabel()

@@ -109,6 +109,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet private weak var serverList: NSTableView!
 	@IBOutlet private weak var apiServerName: NSTextField!
 	@IBOutlet private weak var apiServerApiPath: NSTextField!
+    @IBOutlet private weak var apiServerGraphQLPath: NSTextField!
+    
 	@IBOutlet private weak var apiServerWebPath: NSTextField!
 	@IBOutlet private weak var apiServerAuthToken: NSTextField!
 	@IBOutlet private weak var apiServerSelectedBox: NSBox!
@@ -357,11 +359,11 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
     
     @IBAction private func v4APISwitchChanged(_ sender: NSButton) {
         let turnOn = sender.integerValue == 1
-        if turnOn && !API.canUseV4API(for: DataManager.main) {
+        if turnOn, let error = API.canUseV4API(for: DataManager.main) {
             sender.integerValue = 0
             let a = NSAlert()
             a.messageText = Settings.v4title
-            a.informativeText = Settings.v4Message
+            a.informativeText = error
             a.beginSheetModal(for: self, completionHandler: nil)
         } else {
             Settings.useV4API = turnOn
@@ -380,7 +382,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		snoozePresetsList.toolTip = "The list of presets that will be displayed in the snooze context menu"
 		serverList.toolTip = "The list of GitHub API servers that Trailer will attempt to sync data from. You can edit each server's details from the pane on the right. Bear in mind that some servers, like the public GitHub server for instance, have strict API volume limits, and syncing too many repos or items too often can result in API usage going over the limit. You can monitor your usage from the bar next to the server's name. If it is red, you're close to maximum. Your API usage is reset every hour."
 		apiServerName.toolTip = "An internal name you want to use to refer to this server."
-		apiServerApiPath.toolTip = "The full URL of the root of the API endpoints for this server. The placeholder text shows examples for GitHub and GitHub Enterprise servers, but your own custom configuration may vary."
+		apiServerApiPath.toolTip = "The full URL of the root of the v3 REST API endpoints for this server. The placeholder text shows examples for GitHub and GitHub Enterprise servers, but your own custom configuration may vary."
+        apiServerGraphQLPath.toolTip = "The full URL of the root of the v4 GraphQL API endpoints for this server. The placeholder text shows examples for GitHub and GitHub Enterprise servers, but your own custom configuration may vary."
         apiServerWebPath.toolTip = "This is the root of the web front-end of your server. It is used for constructing the paths to open your watchlist and API key management links. Other than that it is not used to sync data."
 		apiServerReportError.toolTip = "If this is checked, Trailer will display a red 'X' symbol on your menubar if sync fails with this server. It is usually a good idea to keep this on, but you may want to turn it off if a specific server isn't always reacahble, for instance."
 		projectsTable.toolTip = "These are all your watched repositories.\n\nTrailer scans the watchlists of all the servers you have configured and adds the repositories to this combined watchlist.\n\nYou can visit and edit the watchlist of each server from the link provided on that server's entry on the 'Servers' tab.\n\nYou can keep clutter low by editing the visibility of items from each repository with the dropdown menus on the right."
@@ -1376,6 +1379,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			apiServerName.stringValue = S(apiServer.label)
 			apiServerWebPath.stringValue = S(apiServer.webPath)
 			apiServerApiPath.stringValue = S(apiServer.apiPath)
+            apiServerGraphQLPath.stringValue = S(apiServer.graphQLPath)
             apiServerAuthToken.stringValue = S(apiServer.authToken)
 			apiServerSelectedBox.title = apiServer.label ?? "New Server"
 			apiServerTestButton.isEnabled = !S(apiServer.authToken).isEmpty
@@ -1386,10 +1390,11 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	private func storeApiFormToSelectedServer() {
 		if let apiServer = selectedServer {
-			apiServer.label = apiServerName.stringValue
-			apiServer.apiPath = apiServerApiPath.stringValue
-			apiServer.webPath = apiServerWebPath.stringValue
-			apiServer.authToken = apiServerAuthToken.stringValue
+            apiServer.label = apiServerName.stringValue.trim
+            apiServer.apiPath = apiServerApiPath.stringValue.trim
+            apiServer.graphQLPath = apiServerGraphQLPath.stringValue.trim
+			apiServer.webPath = apiServerWebPath.stringValue.trim
+			apiServer.authToken = apiServerAuthToken.stringValue.trim
 			apiServerTestButton.isEnabled = !S(apiServer.authToken).isEmpty
 			serverList.reloadData()
 			serversDirty = true
@@ -1428,56 +1433,68 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	func controlTextDidChange(_ n: Notification) {
-		if let obj = n.object as? NSTextField {
+		guard let obj = n.object as? NSTextField else {
+            return
+        }
 
-			if obj===defaultOpenLinks {
-				Settings.defaultAppForOpeningWeb = defaultOpenLinks.stringValue.trim
+        if obj===defaultOpenLinks {
+            Settings.defaultAppForOpeningWeb = defaultOpenLinks.stringValue.trim
 
-			} else if obj===defaultOpenApp {
-				Settings.defaultAppForOpeningItems = defaultOpenApp.stringValue.trim
+        } else if obj===defaultOpenApp {
+            Settings.defaultAppForOpeningItems = defaultOpenApp.stringValue.trim
 
-			} else if obj===apiServerName {
-				if let apiServer = selectedServer {
-					apiServer.label = apiServerName.stringValue
-					storeApiFormToSelectedServer()
-				}
-			} else if obj===apiServerApiPath {
-				if let apiServer = selectedServer {
-					apiServer.apiPath = apiServerApiPath.stringValue
-					storeApiFormToSelectedServer()
-					reset()
-				}
-			} else if obj===apiServerWebPath {
-				if let apiServer = selectedServer {
-					apiServer.webPath = apiServerWebPath.stringValue
-					storeApiFormToSelectedServer()
-				}
-			} else if obj===apiServerAuthToken {
-				if let apiServer = selectedServer {
-					apiServer.authToken = apiServerAuthToken.stringValue
-					storeApiFormToSelectedServer()
-					apiServer.clearAllRelatedInfo()
-					reset()
-				}
-			} else if obj===repoFilter {
-				reloadRepositories()
-				updateAllItemSettingButtons()
+        } else if obj===apiServerName {
+            if let apiServer = selectedServer {
+                apiServer.label = apiServerName.stringValue
+                storeApiFormToSelectedServer()
+            }
+            
+        } else if obj===apiServerApiPath {
+            if let apiServer = selectedServer {
+                apiServer.apiPath = apiServerApiPath.stringValue
+                storeApiFormToSelectedServer()
+                reset()
+            }
+            
+        } else if obj===apiServerGraphQLPath {
+            if let apiServer = selectedServer {
+                apiServer.graphQLPath = apiServerGraphQLPath.stringValue
+                storeApiFormToSelectedServer()
+                reset()
+            }
+            
+        } else if obj===apiServerWebPath {
+            if let apiServer = selectedServer {
+                apiServer.webPath = apiServerWebPath.stringValue
+                storeApiFormToSelectedServer()
+            }
+            
+        } else if obj===apiServerAuthToken {
+            if let apiServer = selectedServer {
+                apiServer.authToken = apiServerAuthToken.stringValue
+                storeApiFormToSelectedServer()
+                apiServer.clearAllRelatedInfo()
+                reset()
+            }
+        } else if obj===repoFilter {
+            reloadRepositories()
+            updateAllItemSettingButtons()
 
-			} else if obj===statusTermsField {
-				let existingTokens = Settings.statusFilteringTerms
-				let newTokens = statusTermsField.objectValue as! [String]
-				if existingTokens != newTokens {
-					Settings.statusFilteringTerms = newTokens
-					deferredUpdateTimer.push()
-				}
-			} else if obj===commentAuthorBlacklist {
-				let existingTokens = Settings.commentAuthorBlacklist
-				let newTokens = commentAuthorBlacklist.objectValue as! [String]
-				if existingTokens != newTokens {
-					Settings.commentAuthorBlacklist = newTokens
-				}
-			}
-		}
+        } else if obj===statusTermsField {
+            let existingTokens = Settings.statusFilteringTerms
+            let newTokens = statusTermsField.objectValue as! [String]
+            if existingTokens != newTokens {
+                Settings.statusFilteringTerms = newTokens
+                deferredUpdateTimer.push()
+            }
+            
+        } else if obj===commentAuthorBlacklist {
+            let existingTokens = Settings.commentAuthorBlacklist
+            let newTokens = commentAuthorBlacklist.objectValue as! [String]
+            if existingTokens != newTokens {
+                Settings.commentAuthorBlacklist = newTokens
+            }
+        }
 	}
 
 	///////////// Tabs

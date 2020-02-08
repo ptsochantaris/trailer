@@ -6,6 +6,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 
 	@IBOutlet private weak var name: UITextField!
 	@IBOutlet private weak var apiPath: UITextField!
+    @IBOutlet private weak var graphQLPath: UITextField!
 	@IBOutlet private weak var webFrontEnd: UITextField!
 	@IBOutlet private weak var authToken: UITextField!
 	@IBOutlet private weak var reportErrors: UISwitch!
@@ -30,6 +31,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 		}
 		name.text = a.label
 		apiPath.text = a.apiPath
+        graphQLPath.text = a.graphQLPath
 		webFrontEnd.text = a.webPath
 		authToken.text = a.authToken
 		reportErrors.isOn = a.reportRefreshFailures
@@ -53,13 +55,53 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 	}
 
 	@IBAction private func testConnectionSelected(_ sender: UIButton) {
-		if let a = updateServerFromForm() {
-			sender.isEnabled = false
-			API.testApi(to: a) { error in
-				sender.isEnabled = true
-				showMessage(error != nil ? "Failed" : "Success", error?.localizedDescription)
-			}
-		}
+		guard let apiServer = updateServerFromForm() else {
+            return
+        }
+
+        sender.isEnabled = false
+        let group = DispatchGroup()
+
+        var finalSuccess = true
+        var finalError: Error?
+        var failedPath: String?
+        
+        if apiServer.graphQLPath != nil {
+            DLog("Checking GraphQL interface on \(S(apiServer.graphQLPath))")
+            group.enter()
+            GraphQL.testApi(to: apiServer) { success, error in
+                if let e = error {
+                    finalError = e
+                    finalSuccess = false
+                    failedPath = apiServer.graphQLPath
+                } else if !success {
+                    finalSuccess = false
+                    failedPath = apiServer.graphQLPath
+                }
+                group.leave()
+            }
+        }
+        
+        group.enter()
+        API.testApi(to: apiServer) { error in
+            if let e = error {
+                finalError = e
+                finalSuccess = false
+                failedPath = apiServer.apiPath
+            }
+            group.leave()
+        }
+        
+        group.notify(queue: .main) {
+            if let e = finalError {
+                showMessage("The test failed for \(S(failedPath))", e.localizedDescription)
+            } else if !finalSuccess {
+                showMessage("The test failed for \(S(failedPath))", "There was no network error")
+            } else {
+                showMessage("This API server seems OK!", nil)
+            }
+            sender.isEnabled = true
+        }
 	}
 
 	@discardableResult
@@ -68,6 +110,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 			let a = existingObject(with: sid) as! ApiServer
 			a.label = name.text?.trim
 			a.apiPath = apiPath.text?.trim
+            a.graphQLPath = graphQLPath.text?.trim
 			a.webPath = webFrontEnd.text?.trim
 			a.authToken = authToken.text?.trim
 			a.reportRefreshFailures = reportErrors.isOn

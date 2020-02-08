@@ -2,7 +2,13 @@ import Foundation
 import CoreData
 
 extension API {
-    static func canUseV4API(for moc: NSManagedObjectContext) -> Bool {
+    static func canUseV4API(for moc: NSManagedObjectContext) -> String? {
+        let servers = ApiServer.allApiServers(in: moc)
+        if servers.contains(where: { $0.goodToGo && S($0.graphQLPath).isEmpty }) {
+            DLog("Warning: Some servers have a blank v4 API path")
+            return Settings.v4DAPIessage
+        }
+        
         var c = 0
         c += DataItem.nullNodeIdItems(of: Repo.self, in: moc)
         c += DataItem.nullNodeIdItems(of: PullRequest.self, in: moc)
@@ -16,10 +22,10 @@ extension API {
 
         if c > 0 {
             DLog("Warning: Some items still have a null node ID")
-            return false
+            return Settings.v4DBMessage
         }
 
-        return true
+        return nil
     }
     
     // MARK: V4 API

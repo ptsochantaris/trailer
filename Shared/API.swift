@@ -267,11 +267,16 @@ final class API {
 
 	static func performSync(callback: @escaping (Bool)->Void) {
 
+        let syncContext = DataManager.buildChildContext()
+
+        if Settings.useV4API && canUseV4API(for: syncContext) != nil {
+            callback(false)
+            return
+        }
+        
         isRefreshing = true
         currentOperationCount += 1
         currentOperationName = "Fetching…"
-
-		let syncContext = DataManager.buildChildContext()
 
 		let shouldRefreshReposToo = lastRepoCheck == .distantPast
 			|| (Date().timeIntervalSince(lastRepoCheck) > TimeInterval(Settings.newRepoCheckPeriod * 3600))
@@ -288,13 +293,12 @@ final class API {
 			}
 		}
 	}
-
-	private static func sync(to moc: NSManagedObjectContext, callback: @escaping (Bool)->Void) {
+    
+    private static func sync(to moc: NSManagedObjectContext, callback: @escaping (Bool)->Void) {
+                
         let repos = Repo.syncableRepos(in: moc)
-        
-        let v4Mode = Settings.useV4API && canUseV4API(for: moc)
-
         let itemGroup = DispatchGroup()
+        let v4Mode = Settings.useV4API
 
         if v4Mode {
             let disabledRepos = Repo.unsyncableRepos(in: moc)

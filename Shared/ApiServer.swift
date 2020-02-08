@@ -4,6 +4,7 @@ import CoreData
 final class ApiServer: NSManagedObject {
 
     @NSManaged var apiPath: String?
+    @NSManaged var graphQLPath: String?
     @NSManaged var authToken: String?
     @NSManaged var label: String?
     @NSManaged var lastSyncSucceeded: Bool
@@ -193,14 +194,11 @@ final class ApiServer: NSManagedObject {
 	func resetToGithub() {
 		webPath = "https://github.com"
 		apiPath = "https://api.github.com"
+        graphQLPath = "https://api.github.com/graphql"
 		label = "GitHub"
 		resetSyncState()
 	}
     
-    var graphQLPath: String? {
-        return apiPath?.appending(pathComponent: "graphql")
-    }
-
 	func resetSyncState() {
 		if app != nil {
 			lastRepoCheck = .distantPast

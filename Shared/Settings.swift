@@ -119,6 +119,10 @@ struct Settings {
 			repo.archived = false
 			repo.updatedAt = .distantPast
 		}
+        
+        for server in ApiServer.allApiServers(in: DataManager.main) where server.isGitHub && S(server.graphQLPath).isEmpty {
+            server.graphQLPath = "https://api.github.com/graphql"
+        }
                 
         #if os(macOS)
         if Settings.lastRunVersion != "" && sharedDefaults.object(forKey: "launchAtLogin") == nil {
@@ -856,7 +860,8 @@ struct Settings {
     }
 
     static let v4title = "Can't be turned on yet"
-    static let v4Message = "Your database seems to contain items which have not yet been migrated in order to be able to use the new API.\n\nItems are migrated after a sync, but merged and/or closed items are never migrated.\n\nYou will have to perform a sync, and then remove merged and closed items before being able to turn this setting on."
+    static let v4DBMessage = "Your database seems to contain items which have not yet been migrated in order to be able to use the new API.\n\nItems are migrated after a sync, but merged and/or closed items are never migrated.\n\nYou will have to perform a sync, and then remove merged and closed items before being able to turn this setting on."
+    static let v4DAPIessage = "One of your servers doesn't have a v4 API path defined. Please configure this before turning on v4 API support."
     static let useV4APIHelp = "In cases where the new v4 API is available, such as the public GitHub server, using it can result in significant efficiency and speed improvements when syncing."
     static var useV4API: Bool {
         get { return get("USE_V4_API") as? Bool ?? false }
