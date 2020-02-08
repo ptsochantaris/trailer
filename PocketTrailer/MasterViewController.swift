@@ -69,12 +69,18 @@ UITableViewDragDelegate {
 			promptTitle = pluralNameForItems.capitalized
 		}
 
-		let a = UIAlertController(title: promptTitle, message: "Mark all as read?", preferredStyle: .alert)
-        a.addAction(UIAlertAction(title: "No", style: .cancel))
-		a.addAction(UIAlertAction(title: "Yes", style: .default) { action in
+		let a = UIAlertController(title: promptTitle, message: nil, preferredStyle: .actionSheet)
+        a.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+		a.addAction(UIAlertAction(title: "Mark All As Read", style: .default) { action in
 			self.markAllAsRead()
 		})
+        if (tabs.items?.count ?? 0) > 1 {
+            a.addAction(UIAlertAction(title: "On Other Tabs Too", style: .destructive) { action in
+                app.markEverythingRead()
+            })
+        }
 		present(a, animated: true)
+        a.popoverPresentationController?.barButtonItem = sender
 	}
     
 	func removeAllMerged() {
