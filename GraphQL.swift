@@ -275,40 +275,44 @@ final class GraphQL {
             GQLField(name: "updatedAt")
         ])
 
-        let prFragment = GQLFragment(on: "PullRequest", elements: [
-            GQLField(name: "id"),
-            GQLField(name: "bodyText"),
-            GQLField(name: "state"),
-            GQLField(name: "createdAt"),
-            GQLField(name: "updatedAt"),
-            GQLField(name: "number"),
-            GQLField(name: "title"),
-            GQLField(name: "url"),
-            GQLField(name: "headRefOid"),
-            GQLField(name: "mergeable"),
-            GQLField(name: "additions"),
-            GQLField(name: "deletions"),
-            GQLGroup(name: "mergedBy", fields: [userFragment]),
-            GQLGroup(name: "milestone", fields: [milestoneFragment]),
-            GQLGroup(name: "author", fields: [userFragment]),
-            GQLGroup(name: "assignees", fields: [userFragment], pageSize: 100),
-            GQLGroup(name: "labels", fields: [labelFragment], pageSize: 100)
-        ])
-
-        let issueFragment = GQLFragment(on: "Issue", elements: [
-            GQLField(name: "id"),
-            GQLField(name: "bodyText"),
-            GQLField(name: "state"),
-            GQLField(name: "createdAt"),
-            GQLField(name: "updatedAt"),
-            GQLField(name: "number"),
-            GQLField(name: "title"),
-            GQLField(name: "url"),
-            GQLGroup(name: "milestone", fields: [milestoneFragment]),
-            GQLGroup(name: "author", fields: [userFragment]),
-            GQLGroup(name: "assignees", fields: [userFragment], pageSize: 100),
-            GQLGroup(name: "labels", fields: [labelFragment], pageSize: 100)
-        ])
+        func prFragment(assigneesAndLabelPageSize: Int) -> GQLFragment {
+            return GQLFragment(on: "PullRequest", elements: [
+                GQLField(name: "id"),
+                GQLField(name: "bodyText"),
+                GQLField(name: "state"),
+                GQLField(name: "createdAt"),
+                GQLField(name: "updatedAt"),
+                GQLField(name: "number"),
+                GQLField(name: "title"),
+                GQLField(name: "url"),
+                GQLGroup(name: "milestone", fields: [milestoneFragment]),
+                GQLGroup(name: "author", fields: [userFragment]),
+                GQLGroup(name: "assignees", fields: [userFragment], pageSize: assigneesAndLabelPageSize),
+                GQLGroup(name: "labels", fields: [labelFragment], pageSize: assigneesAndLabelPageSize),
+                GQLField(name: "headRefOid"),
+                GQLField(name: "mergeable"),
+                GQLField(name: "additions"),
+                GQLField(name: "deletions"),
+                GQLGroup(name: "mergedBy", fields: [userFragment])
+            ])
+        }
+        
+        func issueFragment(assigneesAndLabelPageSize: Int) -> GQLFragment {
+            return GQLFragment(on: "Issue", elements: [
+                GQLField(name: "id"),
+                GQLField(name: "bodyText"),
+                GQLField(name: "state"),
+                GQLField(name: "createdAt"),
+                GQLField(name: "updatedAt"),
+                GQLField(name: "number"),
+                GQLField(name: "title"),
+                GQLField(name: "url"),
+                GQLGroup(name: "milestone", fields: [milestoneFragment]),
+                GQLGroup(name: "author", fields: [userFragment]),
+                GQLGroup(name: "assignees", fields: [userFragment], pageSize: assigneesAndLabelPageSize),
+                GQLGroup(name: "labels", fields: [labelFragment], pageSize: assigneesAndLabelPageSize)
+            ])
+        }
 
         var prRepoIdToLatestExistingUpdate = [String: Date]()
         var issueRepoIdToLatestExistingUpdate = [String: Date]()
@@ -327,21 +331,21 @@ final class GraphQL {
         
         let allOpenPrsFragment = GQLFragment(on: "Repository", elements: [
             GQLField(name: "id"),
-            GQLGroup(name: "pullRequests", fields: [prFragment], extraParams: ["states": "OPEN"], pageSize: 100),
+            GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 24)], extraParams: ["states": "OPEN"], pageSize: 100),
             ])
         let allOpenIssuesFragment = GQLFragment(on: "Repository", elements: [
             GQLField(name: "id"),
-            GQLGroup(name: "issues", fields: [issueFragment], extraParams: ["states": "OPEN"], pageSize: 100)
+            GQLGroup(name: "issues", fields: [issueFragment(assigneesAndLabelPageSize: 24)], extraParams: ["states": "OPEN"], pageSize: 100)
             ])
 
         
         let latestPrsFragment = GQLFragment(on: "Repository", elements: [
             GQLField(name: "id"),
-            GQLGroup(name: "pullRequests", fields: [prFragment], extraParams: ["orderBy": "{direction: DESC, field: UPDATED_AT}"], pageSize: 10),
+            GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 100)], extraParams: ["orderBy": "{direction: DESC, field: UPDATED_AT}"], pageSize: 20),
             ])
         let latestIssuesFragment = GQLFragment(on: "Repository", elements: [
             GQLField(name: "id"),
-            GQLGroup(name: "issues", fields: [issueFragment], extraParams: ["orderBy": "{direction: DESC, field: UPDATED_AT}"], pageSize: 10)
+            GQLGroup(name: "issues", fields: [issueFragment(assigneesAndLabelPageSize: 100)], extraParams: ["orderBy": "{direction: DESC, field: UPDATED_AT}"], pageSize: 20)
             ])
 
         let reposByServer = Dictionary(grouping: repos) { $0.apiServer }
@@ -426,12 +430,12 @@ final class GraphQL {
             }
 
             if !idsForReposInThisServerWantingLatestPrs.isEmpty {
-                let q = GQLQuery.batching("\(serverLabel): Latest PRs", fields: [latestPrsFragment], idList: idsForReposInThisServerWantingLatestPrs, batchSize: 10, perNodeCallback: perNodeCallback)
+                let q = GQLQuery.batching("\(serverLabel): Updated PRs", fields: [latestPrsFragment], idList: idsForReposInThisServerWantingLatestPrs, batchSize: 100, perNodeCallback: perNodeCallback)
                 queriesForServer.append(contentsOf: q)
             }
             
             if !idsForReposInThisServerWantingLatestIssues.isEmpty {
-                let q = GQLQuery.batching("\(serverLabel): Latest Issues", fields: [latestIssuesFragment], idList: idsForReposInThisServerWantingLatestIssues, batchSize: 10, perNodeCallback: perNodeCallback)
+                let q = GQLQuery.batching("\(serverLabel): Updated Issues", fields: [latestIssuesFragment], idList: idsForReposInThisServerWantingLatestIssues, batchSize: 100, perNodeCallback: perNodeCallback)
                 queriesForServer.append(contentsOf: q)
             }
 

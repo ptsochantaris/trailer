@@ -330,7 +330,7 @@ final class ApiServer: NSManagedObject {
         let group = DispatchGroup()
         for query in queries {
             group.enter()
-            query.run(for: path, authToken: token, attempt: 20) { err, apiStats in
+            query.run(for: path, authToken: token, attempt: 10) { err, apiStats in
                 if let apiStats = apiStats {
                     updatedStats = apiStats
                 }

@@ -58,8 +58,9 @@ final class GQLQuery {
     func run(for url: String, authToken: String, attempt: Int, completion: @escaping (Error?, ApiStats?)->Void) {
         
         let Q = queryText
-        //DLog("\(self.logPrefix)Fetching")
-        //DLog("\(self.logPrefix)\(Q)")
+        if Settings.dumpAPIResponsesInConsole {
+            DLog("\(self.logPrefix)Fetching: \(Q)")
+        }
 
         let server = URL(string: url)!
 		var r = URLRequest(url: server)
@@ -115,7 +116,7 @@ final class GQLQuery {
                 }
                 return
             }
-            
+                        
             let r = self.rootElement
             guard let topData = data[r.name] else {
                 doneWithError("No data in JSON", nil, shouldRetry: false, apiStats: apiStats)
