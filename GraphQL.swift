@@ -385,7 +385,7 @@ final class GraphQL {
                 }
 
                 count += 1
-                if count > 199 {
+                if count > 399 {
                     count = 0
                     let nodesCopy = nodes
                     DispatchQueue.main.async {

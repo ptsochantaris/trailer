@@ -124,7 +124,7 @@ final class GQLGroup: GQLScanning {
 				}
 				if let latestCursor = latestCursor, let pageInfo = hash["pageInfo"] as? [AnyHashable : Any], pageInfo["hasNextPage"] as? Bool == true {
                     if let typeToStop = typeToStopSignal {
-                        DLog("\(query.logPrefix)Don't need more '\(typeToStop)' items for '\(name)', got all the updated ones already")
+                        DLog("\(query.logPrefix)Don't need more '\(typeToStop)' items for parent ID '\(parent?.id ?? "<none>")', got all the updated ones already")
                     } else {
                         let newGroup = GQLGroup(group: self)
                         newGroup.lastCursor = latestCursor
@@ -137,7 +137,7 @@ final class GQLGroup: GQLScanning {
 				let (newQueries, typeToStop) = checkFields(query: query, hash: hash, parent: parent, level: level+1)
                 if !newQueries.isEmpty {
                     if let typeToStop = typeToStop, hash["__typename"] as? String == typeToStop {
-                        DLog("\(query.logPrefix)Don't need more '\(typeToStop)' items for '\(name)', got all the updated ones already")
+                        DLog("\(query.logPrefix)Don't need more '\(typeToStop)' items for parent ID '\(parent?.id ?? "<none>")', got all the updated ones already")
                     } else {
                         extraQueries.append(contentsOf: newQueries)
                     }
@@ -149,7 +149,7 @@ final class GQLGroup: GQLScanning {
 				let (newQueries, typeToStop) = checkFields(query: query, hash: node, parent: parent, level: level+1)
                 if !newQueries.isEmpty {
                     if let typeToStop = typeToStop, node["__typename"] as? String == typeToStop {
-                        DLog("\(query.logPrefix)Don't need more '\(typeToStop)' items for '\(name)', got all the updated ones already")
+                        DLog("\(query.logPrefix)Don't need more '\(typeToStop)' items for parent ID '\(parent?.id ?? "<none>")', got all the updated ones already")
                     } else {
                         extraQueries.append(contentsOf: newQueries)
                     }
