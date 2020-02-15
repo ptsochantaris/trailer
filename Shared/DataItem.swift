@@ -280,8 +280,6 @@ class DataItem: NSManagedObject {
     private func populate<T: DataItem>(type: T.Type, node: GQLNode, perItemCallback: (T, GQLNode) -> Void) {
         let info = node.jsonPayload
         let entityName = String(describing: type)
-
-        assert(Thread.isMainThread)
         
         if node.created {
             DLog("Creating \(entityName) ID: %@", node.id)

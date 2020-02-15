@@ -141,24 +141,7 @@ final class GraphQL {
         
         let fields = [GQLFragment(on: typeName, elements: elements)]
 
-        process(name: steps.toString, elementTypes: elementTypes, items: items, fields: fields, blockCallback: { server, nodeLookup, error in
-            for (type, list) in nodeLookup {
-                switch type {
-                case "IssueComment":
-                    PRComment.sync(from: list, on: server)
-                case "Reaction":
-                    Reaction.sync(from: list, for: T.self, on: server)
-                case "ReviewRequest":
-                    Review.syncRequests(from: list, on: server)
-                case "PullRequestReview":
-                    Review.sync(from: list, on: server)
-                case "StatusContext":
-                    PRStatus.sync(from: list, on: server)
-                default:
-                    break
-                }
-            }
-        }, callback: callback)
+        process(name: steps.toString, elementTypes: elementTypes, items: items, parentType: T.self, fields: fields, callback: callback)
     }
     
     static func updateReactions(for comments: [PRComment], moc: NSManagedObjectContext, callback: @escaping (Error?) -> Void) {
@@ -174,9 +157,7 @@ final class GraphQL {
             GQLGroup(name: "reactions", fields: [reactionFragment], pageSize: 100)
             ])
         
-        process(name: "Reactions", elementType: "Reaction", items: comments, fields: [itemFragment], blockCallback: { server, nodes, error in
-            Reaction.sync(from: nodes, for: PRComment.self, on: server)
-        }, callback: callback)
+        process(name: "Comment Reactions", elementTypes: ["Reaction"], items: comments, fields: [itemFragment], callback: callback)
     }
 
     static func updateComments(for reviews: [Review], moc: NSManagedObjectContext, callback: @escaping (Error?) -> Void) {
@@ -187,18 +168,10 @@ final class GraphQL {
             GQLGroup(name: "comments", fields: [commentFragment], pageSize: 100)
         ])
 
-        process(name: "Review Comments", elementType: "PullRequestReviewComment", items: reviews, fields: [itemFragment], blockCallback: { server, nodes, error in
-            PRComment.sync(from: nodes, on: server)
-        }, callback: callback)
+        process(name: "Review Comments", elementTypes: ["PullRequestReviewComment"], items: reviews, fields: [itemFragment], callback: callback)
     }
 
-    private static func process(name: String, elementType: String, items: [DataItem], fields: [GQLElement], blockCallback: @escaping (ApiServer, ContiguousArray<GQLNode>, Error?) -> Void, callback: @escaping (Error?)->Void) {
-        process(name: name, elementTypes: [elementType], items: items, fields: fields, blockCallback: { server, nodeLookup, error in
-            blockCallback(server, nodeLookup[elementType] ?? [], error)
-        }, callback: callback)
-    }
-    
-    private static func process(name: String, elementTypes: [String], items: [DataItem], fields: [GQLElement], blockCallback: @escaping (ApiServer, [String: ContiguousArray<GQLNode>], Error?) -> Void, callback: @escaping (Error?)->Void) {
+    private static func process<T: ListableItem>(name: String, elementTypes: [String], items: [DataItem], parentType: T.Type? = nil, fields: [GQLElement], callback: @escaping (Error?)->Void) {
         if items.isEmpty {
             callback(nil)
             return
@@ -220,18 +193,15 @@ final class GraphQL {
                     nodes[type] = existingList
                 } else {
                     var array = ContiguousArray<GQLNode>()
-                    array.reserveCapacity(200)
                     array.append(node)
                     nodes[type] = array
                 }
                 
                 count += 1
-                if count > 199 {
+                if count > 1999 {
                     count = 0
-                    let nodesCopy = nodes
-                    DispatchQueue.main.async {
-                        blockCallback(server, nodesCopy, nil)
-                    }
+                    group.enter()
+                    processItems(nodes, server.objectID, parentMoc: server.managedObjectContext, parentType: parentType, group: group)
                     nodes.removeAll()
                 }
                 return true
@@ -243,11 +213,14 @@ final class GraphQL {
                         if let error = error {
                             finalError = error
                             server.lastSyncSucceeded = false
+                            group.leave()
+                        } else {
+                            processItems(nodes, server.objectID, parentMoc: server.managedObjectContext, parentType: parentType, group: group)
                         }
-                        blockCallback(server, nodes, error)
                     }
+                } else {
+                    group.leave()
                 }
-                group.leave()
             }
         }
         
@@ -385,12 +358,10 @@ final class GraphQL {
                 }
 
                 count += 1
-                if count > 399 {
+                if count > 1999 {
                     count = 0
-                    let nodesCopy = nodes
-                    DispatchQueue.main.async {
-                        self.processItem(nodesCopy, server)
-                    }
+                    group.enter()
+                    self.processItems(nodes, server.objectID, parentMoc: server.managedObjectContext, group: group)
                     nodes.removeAll()
                 }
                 
@@ -443,24 +414,63 @@ final class GraphQL {
             server.run(queries: queriesForServer) { error in
                 if error != nil {
                     server.lastSyncSucceeded = false
+                    group.leave()
                 } else {
-                    self.processItem(nodes, server)
+                    self.processItems(nodes, server.objectID, parentMoc: server.managedObjectContext, group: group)
                 }
-                group.leave()
             }
         }
     }
+        
+    private static func processItems<T: ListableItem>(_ nodes: [String: ContiguousArray<GQLNode>], _ serverId: NSManagedObjectID, parentMoc: NSManagedObjectContext?, parentType: T.Type? = nil, group: DispatchGroup) {
+        if nodes.isEmpty {
+            group.leave()
+            return
+        }
     
-    private static func processItem(_ nodes: [String: ContiguousArray<GQLNode>], _ server: ApiServer) {
-        // Order must be fixed, since labels may refer to PRs or Issues, ensure they are created first
-        if let nodeList = nodes["PullRequest"] {
-            PullRequest.sync(from: nodeList, on: server)
-        }
-        if let nodeList = nodes["Issue"] {
-            Issue.sync(from: nodeList, on: server)
-        }
-        if let nodeList = nodes["Label"] {
-            PRLabel.sync(from: nodeList, on: server)
+        let processMoc = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        processMoc.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
+        processMoc.parent = parentMoc ?? DataManager.main
+        processMoc.undoManager = nil
+        processMoc.perform {
+            if let server = try? processMoc.existingObject(with: serverId) as? ApiServer {
+                
+                // Order must be fixed, since labels may refer to PRs or Issues, ensure they are created first
+
+                if let nodeList = nodes["Issue"] {
+                    Issue.sync(from: nodeList, on: server)
+                }
+                if let nodeList = nodes["PullRequest"] {
+                    PullRequest.sync(from: nodeList, on: server)
+                }
+                if let nodeList = nodes["Label"] {
+                    PRLabel.sync(from: nodeList, on: server)
+                }
+                if let nodeList = nodes["CommentReaction"] {
+                    Reaction.sync(from: nodeList, for: PRComment.self, on: server)
+                }
+                if let nodeList = nodes["IssueComment"] {
+                    PRComment.sync(from: nodeList, on: server)
+                }
+                if let nodeList = nodes["PullRequestReviewComment"] {
+                    PRComment.sync(from: nodeList, on: server)
+                }
+                if let nodeList = nodes["Reaction"], let parentType = parentType {
+                    Reaction.sync(from: nodeList, for: parentType, on: server)
+                }
+                if let nodeList = nodes["ReviewRequest"] {
+                    Review.syncRequests(from: nodeList, on: server)
+                }
+                if let nodeList = nodes["PullRequestReview"] {
+                    Review.sync(from: nodeList, on: server)
+                }
+                if let nodeList = nodes["StatusContext"] {
+                    PRStatus.sync(from: nodeList, on: server)
+                }
+                
+                try? processMoc.save()
+                group.leave()
+            }
         }
     }
 }
