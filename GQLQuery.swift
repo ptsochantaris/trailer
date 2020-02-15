@@ -123,7 +123,7 @@ final class GQLQuery {
                 return
             }
             
-            let extraQueries = r.scan(query: self, pageData: topData, parent: self.parent, level: 0)
+            let extraQueries = r.scan(query: self, pageData: topData, parent: self.parent)
             if extraQueries.isEmpty {
                 completion(nil, apiStats)
             } else {

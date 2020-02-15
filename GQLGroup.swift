@@ -71,7 +71,7 @@ final class GQLGroup: GQLScanning {
 	}
 	
     private static let nodeCallbackLock = NSLock()
-	private func checkFields(query: GQLQuery, hash: [AnyHashable : Any], parent: GQLNode?, level: Int) -> ([GQLQuery], String?) {
+	private func checkFields(query: GQLQuery, hash: [AnyHashable : Any], parent: GQLNode?) -> ([GQLQuery], String?) {
 
 		let thisObject: GQLNode?
         
@@ -93,18 +93,18 @@ final class GQLGroup: GQLScanning {
         var extraQueries = [GQLQuery]()
 		for field in fields {
 			if let fragment = field as? GQLFragment {
-				let newQueries = fragment.scan(query: query, pageData: hash, parent: thisObject, level: level+1)
+				let newQueries = fragment.scan(query: query, pageData: hash, parent: thisObject)
 				extraQueries.append(contentsOf: newQueries)
                 
 			} else if let ingestable = field as? GQLScanning, let fieldData = hash[field.name] {
-				let newQueries = ingestable.scan(query: query, pageData: fieldData, parent: thisObject, level: level+1)
+				let newQueries = ingestable.scan(query: query, pageData: fieldData, parent: thisObject)
 				extraQueries.append(contentsOf: newQueries)
 			}
 		}
         return (extraQueries, typeToStop)
 	}
 	
-	func scan(query: GQLQuery, pageData: Any, parent: GQLNode?, level: Int) -> [GQLQuery] {
+	func scan(query: GQLQuery, pageData: Any, parent: GQLNode?) -> [GQLQuery] {
 
 		var extraQueries = [GQLQuery]()
 
@@ -115,7 +115,7 @@ final class GQLGroup: GQLScanning {
 				for e in edges {
                     latestCursor = e["cursor"] as? String
 					if let node = e["node"] as? [AnyHashable : Any] {
-						let (newQueries, typeToStop) = checkFields(query: query, hash: node, parent: parent, level: level + 1)
+						let (newQueries, typeToStop) = checkFields(query: query, hash: node, parent: parent)
 						extraQueries.append(contentsOf: newQueries)
                         if let typeToStop = typeToStop, node["__typename"] as? String == typeToStop {
                             typeToStopSignal = typeToStop
@@ -134,7 +134,7 @@ final class GQLGroup: GQLScanning {
                 }
 
 			} else {
-				let (newQueries, typeToStop) = checkFields(query: query, hash: hash, parent: parent, level: level+1)
+				let (newQueries, typeToStop) = checkFields(query: query, hash: hash, parent: parent)
                 if !newQueries.isEmpty {
                     if let typeToStop = typeToStop, hash["__typename"] as? String == typeToStop {
                         DLog("\(query.logPrefix)Don't need more '\(typeToStop)' items for parent ID '\(parent?.id ?? "<none>")', got all the updated ones already")
@@ -146,7 +146,7 @@ final class GQLGroup: GQLScanning {
 			
 		} else if let nodes = pageData as? [[AnyHashable : Any]] { // data was an array of dictionaries with no paging info
 			for node in nodes {
-				let (newQueries, typeToStop) = checkFields(query: query, hash: node, parent: parent, level: level+1)
+				let (newQueries, typeToStop) = checkFields(query: query, hash: node, parent: parent)
                 if !newQueries.isEmpty {
                     if let typeToStop = typeToStop, node["__typename"] as? String == typeToStop {
                         DLog("\(query.logPrefix)Don't need more '\(typeToStop)' items for parent ID '\(parent?.id ?? "<none>")', got all the updated ones already")

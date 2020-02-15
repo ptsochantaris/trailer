@@ -28,14 +28,14 @@ final class GQLFragment: GQLScanning {
 		self.elements = elements
 	}
 	
-	func scan(query: GQLQuery, pageData: Any, parent: GQLNode?, level: Int) -> [GQLQuery] {
+	func scan(query: GQLQuery, pageData: Any, parent: GQLNode?) -> [GQLQuery] {
 		//DLog("\(query.logPrefix)Scanning fragment \(name)")
 		guard let hash = pageData as? [AnyHashable : Any] else { return [] }
 
 		var extraQueries = [GQLQuery]()
 		for element in elements {
 			if let element = element as? GQLScanning, let elementData = hash[element.name] {
-				let newQueries = element.scan(query: query, pageData: elementData, parent: parent, level: level+1)
+				let newQueries = element.scan(query: query, pageData: elementData, parent: parent)
 				extraQueries.append(contentsOf: newQueries)
 			}
 		}
