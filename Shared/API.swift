@@ -346,65 +346,67 @@ final class API {
         }
 	}
 
-	private static func completeSync(in moc: NSManagedObjectContext, andCallback: @escaping (Bool)->Void) {
+	private static func completeSync(in moc: NSManagedObjectContext, andCallback: @escaping (Bool) -> Void) {
+
+        let processMoc = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        processMoc.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
+        processMoc.undoManager = nil
+        processMoc.parent = moc
+        processMoc.perform {
+            // discard any changes related to any failed API server
+            for apiServer in ApiServer.allApiServers(in: processMoc) where !apiServer.lastSyncSucceeded {
+                apiServer.rollBackAllUpdates(in: processMoc)
+                apiServer.lastSyncSucceeded = false // we just wiped all changes, but want to keep this one
+            }
+            DataItem.nukeDeletedItems(in: processMoc)
+            DataItem.nukeOrphanedItems(in: processMoc)
+            DataManager.postProcessAllItems(in: processMoc)
+            if processMoc.hasChanges {
+                try? processMoc.save()
+            }
+            DispatchQueue.main.async {
+                completeSync2(in: moc, andCallback: andCallback)
+            }
+        }
 
         let total = moc.updatedObjects.count + moc.insertedObjects.count + moc.deletedObjects.count
-        if total > 1 {
-            currentOperationName = "Processing \(numberFormatter.string(for: total) ?? "") items…"
+        if total > 1, let totalText = numberFormatter.string(for: total) {
+            currentOperationName = "Processing \(totalText) items…"
         } else {
             currentOperationName = "Processing update…"
         }
-
-		// discard any changes related to any failed API server
-		for apiServer in ApiServer.allApiServers(in: moc) {
-			if !apiServer.lastSyncSucceeded {
-				apiServer.rollBackAllUpdates(in: moc)
-				apiServer.lastSyncSucceeded = false // we just wiped all changes, but want to keep this one
-			}
-		}
-
-		let mainQueue = OperationQueue.main
-
-		mainQueue.addOperation {
-			DataItem.nukeDeletedItems(in: moc)
-            DataItem.nukeOrphanedItems(in: moc)
-		}
-
-		mainQueue.addOperation {
-			DataManager.postProcessAllItems(in: moc)
-		}
-
-		mainQueue.addOperation {
-			DLog("Caching \(numberFormatter.string(for: URLCache.shared.currentMemoryUsage) ?? "") bytes in memory")
-			DLog("Caching \(numberFormatter.string(for: URLCache.shared.currentDiskUsage) ?? "") bytes on disk")
-		}
-		
+        DLog("Caching \(numberFormatter.string(for: URLCache.shared.currentMemoryUsage) ?? "") bytes in memory")
+        DLog("Caching \(numberFormatter.string(for: URLCache.shared.currentDiskUsage) ?? "") bytes on disk")
+	}
+    
+    private static func completeSync2(in moc: NSManagedObjectContext, andCallback: @escaping (Bool) -> Void) {
         var success = false
         
-		mainQueue.addOperation {
-			do {
-				DLog("Committing synced data")
-				try moc.save()
-				DLog("Synced data committed")
-			} catch {
-				DLog("Committing sync failed: %@", error.localizedDescription)
-			}
-            
-            if ApiServer.shouldReportRefreshFailure(in: DataManager.main) {
-                currentOperationName = "Last update failed"
+        do {
+            if moc.hasChanges {
+                DLog("Committing synced data")
+                try moc.save()
+                DLog("Synced data committed")
             } else {
-                Settings.lastSuccessfulRefresh = Date()
-                currentOperationName = lastSuccessfulSyncAt
-                success = true
+                DLog("No changes, skipping commit")
             }
-            isRefreshing = false
-            currentOperationCount -= 1
-		}
-        
-        mainQueue.addOperation {
-            andCallback(success)
+        } catch {
+            DLog("Committing sync failed: %@", error.localizedDescription)
         }
-	}
+        
+        if ApiServer.shouldReportRefreshFailure(in: DataManager.main) {
+            currentOperationName = "Last update failed"
+        } else {
+            Settings.lastSuccessfulRefresh = Date()
+            currentOperationName = lastSuccessfulSyncAt
+            success = true
+        }
+        isRefreshing = false
+        currentOperationCount -= 1
+        
+        DataManager.sendNotificationsIndexAndSave()
+        andCallback(success)
+    }
     
     static var lastSuccessfulSyncAt: String {
         let last = Settings.lastSuccessfulRefresh ?? Date()

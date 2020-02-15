@@ -81,10 +81,6 @@ extension API {
         }
         
         v4_sync(to: moc, prs: newOrUpdatedPrs, issues: newOrUpdatedIssues, steps: steps) { error in
-            checkPrMerges(in: moc)
-            checkClosures(of: PullRequest.self, in: moc)
-            checkClosures(of: Issue.self, in: moc)
-
             if Settings.notifyOnCommentReactions {
                 let comments = PRComment.commentsThatNeedReactionsToBeRefreshed(in: moc)
                 for c in comments {
@@ -102,29 +98,7 @@ extension API {
             }
         }
     }
-    
-    static func checkPrMerges(in moc: NSManagedObjectContext) {
-        let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
-        f.predicate = NSCompoundPredicate(type: .and, subpredicates: [Section.merged.excludingPredicate, ItemCondition.merged.matchingPredicate])
-        f.returnsObjectsAsFaults = false
-        f.includesSubentities = false
-        let items = try! moc.fetch(f)
-        for i in items.filter({ $0.shouldCheckForClosing }) {
-            i.stateChanged = ListableItem.StateChange.merged.rawValue
-        }
-    }
-
-    static func checkClosures<T: ListableItem>(of: T.Type, in moc: NSManagedObjectContext) {
-        let f = NSFetchRequest<T>(entityName: String(describing: T.self))
-        f.predicate = NSCompoundPredicate(type: .and, subpredicates: [Section.closed.excludingPredicate, ItemCondition.closed.matchingPredicate])
-        f.returnsObjectsAsFaults = false
-        f.includesSubentities = false
-        let items = try! moc.fetch(f)
-        for i in items.filter({ $0.shouldCheckForClosing }) {
-            i.stateChanged = ListableItem.StateChange.closed.rawValue
-        }
-    }
-    
+        
     private static func v4_sync(to moc: NSManagedObjectContext, prs: [PullRequest], issues: [Issue], steps: SyncSteps, callback: @escaping (Error?)->Void) {
         var steps = steps
         

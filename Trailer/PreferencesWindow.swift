@@ -1135,11 +1135,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 				alert.informativeText = "Could not refresh repository list from \(serverNames), please ensure that the tokens you are using are valid"
 				alert.addButton(withTitle: "OK")
 				alert.runModal()
-			} else {
-				do {
-					try tempContext.save()
-				} catch {
-				}
+            } else if tempContext.hasChanges {
+                try? tempContext.save()
 			}
 			DataItem.nukeDeletedItems(in: DataManager.main)
 			app.completeRefresh()

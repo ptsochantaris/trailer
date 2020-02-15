@@ -151,7 +151,9 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 				NotificationQueue.clear()
 			} else {
 				DataItem.nukeDeletedItems(in: tempContext)
-				try! tempContext.save()
+                if tempContext.hasChanges {
+                    try? tempContext.save()
+                }
 				NotificationQueue.commit()
 			}
 			preferencesDirty = true

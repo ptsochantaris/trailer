@@ -413,7 +413,7 @@ final class PullRequest: ListableItem {
         return res
     }
     
-    func handleMerging() {
+    func handleMerging() -> Bool {
         let byUserId = mergedByNodeId
         let myUserId = apiServer.userNodeId
         DLog("Detected merged PR: %@ by user %@, local user id is: %@, handling policy is %@, coming from section %@",
@@ -425,20 +425,23 @@ final class PullRequest: ListableItem {
 
         if !isVisibleOnMenu {
             DLog("Merged PR was hidden, won't announce")
-            return
-        }
+            managedObjectContext?.delete(self)
+            return true
 
-        let mergedByMe = byUserId == myUserId
-        if !(mergedByMe && Settings.dontKeepPrsMergedByMe) {
-            DLog("Checking if we want to keep this merged PR")
-            if shouldKeep(accordingTo: Settings.mergeHandlingPolicy) {
-                DLog("Will keep merged PR")
-                keep(as: .merged, notification: .prMerged)
-            } else {
-                DLog("Will not keep merged PR")
-            }
-        } else {
+        } else if byUserId == myUserId && Settings.dontKeepPrsMergedByMe {
             DLog("Will not keep PR merged by me")
+            managedObjectContext?.delete(self)
+            return true
+
+        } else if shouldKeep(accordingTo: Settings.mergeHandlingPolicy) {
+            DLog("Will keep merged PR")
+            keep(as: .merged, notification: .prMerged)
+            return false
+            
+        } else {
+            DLog("Will not keep merged PR")
+            managedObjectContext?.delete(self)
+            return true
         }
     }
 }

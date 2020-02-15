@@ -131,35 +131,39 @@ final class DataManager {
 	}
 
     private static func processNotificationsForItems<T: ListableItem>(of type: T.Type, newNotification: NotificationType, reopenedNotification: NotificationType, assignmentNotification: NotificationType) -> [T] {
-        let allItems = DataItem.allItems(of: type, in: main)
-        for i in allItems where i.isVisibleOnMenu && !i.createdByMe {
-            if i.isNewAssignment {
-                NotificationQueue.add(type: assignmentNotification, for: i)
-                i.announced = true
-                i.isNewAssignment = false
-
-            } else if !i.announced {
-                NotificationQueue.add(type: newNotification, for: i)
-                i.announced = true
-            
-            } else if i.stateChanged != 0 {
+        return DataItem.allItems(of: type, in: main).filter { i -> Bool in
+            if i.stateChanged != 0 {
                 switch i.stateChanged {
                 case ListableItem.StateChange.reopened.rawValue:
                     NotificationQueue.add(type: reopenedNotification, for: i)
                     i.announced = true
-                
+                    
                 case ListableItem.StateChange.merged.rawValue:
-                    (i as? PullRequest)?.handleMerging()
-                
+                    if (i as? PullRequest)?.handleMerging() == true {
+                        return false
+                    }
+                    
                 case ListableItem.StateChange.closed.rawValue:
-                    i.handleClosing()
-                
+                    if i.handleClosing() {
+                        return false
+                    }
+                    
                 default: break
                 }
                 i.stateChanged = 0
+                
+            } else if !i.createdByMe && i.isVisibleOnMenu {
+                if i.isNewAssignment {
+                    NotificationQueue.add(type: assignmentNotification, for: i)
+                    i.announced = true
+                    i.isNewAssignment = false
+                } else if !i.announced {
+                    NotificationQueue.add(type: newNotification, for: i)
+                    i.announced = true
+                }
             }
+            return true
         }
-        return allItems
     }
     
 	static func sendNotificationsIndexAndSave() {
@@ -242,14 +246,16 @@ final class DataManager {
 	}
 
 	static func saveDB() {
-		if main.hasChanges {
-			DLog("Saving DB")
-			do {
-				try main.save()
-			} catch {
-				DLog("Error while saving DB: %@", error.localizedDescription)
-			}
-		}
+		guard main.hasChanges else {
+            return
+        }
+        
+        DLog("Saving DB")
+        do {
+            try main.save()
+        } catch {
+            DLog("Error while saving DB: %@", error.localizedDescription)
+        }
 	}
 
 	static func buildChildContext() -> NSManagedObjectContext {

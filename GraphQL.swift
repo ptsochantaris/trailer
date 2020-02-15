@@ -419,11 +419,11 @@ final class GraphQL {
                 }
             }
             
-            if !idsForReposInThisServerWantingAllOpenPrs.isEmpty {
-                let q = GQLQuery.batching("\(serverLabel): Open PRs", fields: [allOpenPrsFragment], idList: idsForReposInThisServerWantingAllOpenPrs, batchSize: 100, perNodeCallback: perNodeCallback)
+            if !idsForReposInThisServerWantingLatestIssues.isEmpty {
+                let q = GQLQuery.batching("\(serverLabel): Updated Issues", fields: [latestIssuesFragment], idList: idsForReposInThisServerWantingLatestIssues, batchSize: 100, perNodeCallback: perNodeCallback)
                 queriesForServer.append(contentsOf: q)
             }
-            
+
             if !idsForReposInThisServerWantingAllOpenIssues.isEmpty {
                 let q = GQLQuery.batching("\(serverLabel): Open Issues", fields: [allOpenIssuesFragment], idList: idsForReposInThisServerWantingAllOpenIssues, batchSize: 100, perNodeCallback: perNodeCallback)
                 queriesForServer.append(contentsOf: q)
@@ -433,12 +433,12 @@ final class GraphQL {
                 let q = GQLQuery.batching("\(serverLabel): Updated PRs", fields: [latestPrsFragment], idList: idsForReposInThisServerWantingLatestPrs, batchSize: 100, perNodeCallback: perNodeCallback)
                 queriesForServer.append(contentsOf: q)
             }
-            
-            if !idsForReposInThisServerWantingLatestIssues.isEmpty {
-                let q = GQLQuery.batching("\(serverLabel): Updated Issues", fields: [latestIssuesFragment], idList: idsForReposInThisServerWantingLatestIssues, batchSize: 100, perNodeCallback: perNodeCallback)
+
+            if !idsForReposInThisServerWantingAllOpenPrs.isEmpty {
+                let q = GQLQuery.batching("\(serverLabel): Open PRs", fields: [allOpenPrsFragment], idList: idsForReposInThisServerWantingAllOpenPrs, batchSize: 100, perNodeCallback: perNodeCallback)
                 queriesForServer.append(contentsOf: q)
             }
-
+            
             group.enter()
             server.run(queries: queriesForServer) { error in
                 if error != nil {

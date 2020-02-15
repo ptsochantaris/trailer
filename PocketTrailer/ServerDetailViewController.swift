@@ -26,7 +26,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 			a = existingObject(with: sid) as! ApiServer
 		} else {
 			a = ApiServer.addDefaultGithub(in: DataManager.main)
-			try! DataManager.main.save()
+			DataManager.saveDB()
 			serverLocalId = a.objectID
 		}
 		name.text = a.label

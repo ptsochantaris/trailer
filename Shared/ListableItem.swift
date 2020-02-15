@@ -95,17 +95,25 @@ class ListableItem: DataItem {
         milestone = (info["milestone"] as? [AnyHashable : Any])?["title"] as? String
         draft = info["isDraft"] as? Bool ?? false
         
-        let lastCondition = condition
         let newCondition: Int64
         switch (info["state"] as? String) ?? "" {
         case "MERGED": newCondition = ItemCondition.merged.rawValue
         case "CLOSED": newCondition = ItemCondition.closed.rawValue
         default: newCondition = ItemCondition.open.rawValue
         }
-        condition = newCondition
-        if lastCondition == ItemCondition.closed.rawValue && newCondition == ItemCondition.open.rawValue {
+
+        switch condition {
+        case ItemCondition.closed.rawValue where newCondition == ItemCondition.open.rawValue,
+             ItemCondition.merged.rawValue where newCondition == ItemCondition.open.rawValue:
             stateChanged = StateChange.reopened.rawValue
+        case ItemCondition.open.rawValue where newCondition == ItemCondition.merged.rawValue:
+            stateChanged = StateChange.merged.rawValue
+        case ItemCondition.open.rawValue where newCondition == ItemCondition.closed.rawValue:
+            stateChanged = StateChange.closed.rawValue
+        default: break
         }
+
+        condition = newCondition
 
         if let user = info["author"] as? [AnyHashable:Any] {
             userLogin = user["login"] as? String
@@ -1144,7 +1152,7 @@ class ListableItem: DataItem {
 		return styleForEmpty(message: message, color: color)
 	}
     
-    func handleClosing() {
+    func handleClosing() -> Bool {
         DLog("Detected closed item: %@, handling policy is %@, coming from section %@",
              title,
              Settings.closeHandlingPolicy,
@@ -1152,15 +1160,18 @@ class ListableItem: DataItem {
 
         if !isVisibleOnMenu {
             DLog("Closed item was hidden, won't announce")
-            return
-        }
-
-        if shouldKeep(accordingTo: Settings.closeHandlingPolicy) {
+            managedObjectContext?.delete(self)
+            return true
+            
+        } else if shouldKeep(accordingTo: Settings.closeHandlingPolicy) {
             DLog("Will keep closed item")
             keep(as: .closed, notification: self is Issue ? .issueClosed : .prClosed)
+            return false
+            
         } else {
             DLog("Will not keep closed item")
-            postSyncAction = PostSyncAction.delete.rawValue
+            managedObjectContext?.delete(self)
+            return true
         }
     }
 

@@ -181,7 +181,6 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 
     private func processRefresh(success: Bool) {
 
-		DataManager.sendNotificationsIndexAndSave()
         NotificationCenter.default.post(name: .RefreshEnded, object: nil)
 
         checkApiUsage()

@@ -19,12 +19,10 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	private var keyDownMonitor: Any?
 	private var mouseIgnoreTimer: PopTimer!
 
-	func setupWindows() {
+    func setupWindows() {
 
-		for d in menuBarSets {
-			d.throwAway()
-		}
-		menuBarSets.removeAll()
+        menuBarSets.forEach { $0.throwAway() }
+        menuBarSets.removeAll()
 
 		var newSets = [MenuBarSet]()
 		for groupLabel in Repo.allGroupLabels(in: DataManager.main) {
@@ -35,13 +33,11 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 
 		if Settings.showSeparateApiServersInMenu {
-			for a in ApiServer.allApiServers(in: DataManager.main) {
-				if a.goodToGo {
-					let c = GroupingCriterion(apiServerId: a.objectID)
-					let s = MenuBarSet(viewCriterion: c, delegate: self)
-					s.setTimers()
-					newSets.append(s)
-				}
+			for a in ApiServer.allApiServers(in: DataManager.main) where a.goodToGo {
+                let c = GroupingCriterion(apiServerId: a.objectID)
+                let s = MenuBarSet(viewCriterion: c, delegate: self)
+                s.setTimers()
+                newSets.append(s)
 			}
 		}
 
@@ -51,7 +47,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			newSets.append(s)
 		}
 
-		menuBarSets.append(contentsOf: newSets.reversed())
+        menuBarSets = newSets.reversed()
 
 		updateScrollBarWidth() // also updates menus
 
@@ -706,7 +702,6 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	func completeRefresh() {
-		DataManager.sendNotificationsIndexAndSave()
         preferencesWindow?.updateActivity()
         preferencesWindow?.reloadRepositories()
         updateAllMenus()
