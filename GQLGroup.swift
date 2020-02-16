@@ -7,7 +7,7 @@ final class GQLGroup: GQLScanning {
 	private let pageSize: Int
 	private let onlyLast: Bool
 	private let extraParams: [String: String]?
-	private var lastCursor: String?
+	private let lastCursor: String?
 	
 	init(name: String, fields: [GQLElement], extraParams: [String: String]? = nil, pageSize: Int = 0, onlyLast: Bool = false) {
 		self.name = name
@@ -15,14 +15,16 @@ final class GQLGroup: GQLScanning {
 		self.pageSize = pageSize
 		self.onlyLast = onlyLast
 		self.extraParams = extraParams
+        self.lastCursor = nil
 	}
     
-    init(group: GQLGroup, name: String? = nil) {
+    init(group: GQLGroup, name: String? = nil, lastCursor: String? = nil) {
         self.name = name ?? group.name
         self.fields = group.fields
         self.pageSize = group.pageSize
         self.onlyLast = group.onlyLast
         self.extraParams = group.extraParams
+        self.lastCursor = lastCursor
     }
 	
 	var queryText: String {
@@ -69,92 +71,74 @@ final class GQLGroup: GQLScanning {
 		}
 		return res
 	}
-	
+    
     private static let nodeCallbackLock = NSLock()
-	private func checkFields(query: GQLQuery, hash: [AnyHashable : Any], parent: GQLNode?) -> ([GQLQuery], String?) {
 
-		let thisObject: GQLNode?
+    @discardableResult
+    private func scanNode(_ node: [AnyHashable: Any], query: GQLQuery, parent: GQLNode?, extraQueries: inout [GQLQuery]) -> Bool {
         
-        var typeToStop: String?
-        if let typeName = hash["__typename"] as? String, let id = hash["id"] as? String {
-            let o = GQLNode(id: id, elementType: typeName, jsonPayload: hash, parent: parent)
+        let thisObject: GQLNode?
+        
+        if let typeName = node["__typename"] as? String, let id = node["id"] as? String {
+            let o = GQLNode(id: id, elementType: typeName, jsonPayload: node, parent: parent)
             thisObject = o
             if let c = query.perNodeCallback {
                 GQLGroup.nodeCallbackLock.lock()
-                if c(o) == false {
-                    typeToStop = typeName
-                }
+                let keepGoing = c(o)
                 GQLGroup.nodeCallbackLock.unlock()
+                if !keepGoing {
+                    if let parent = parent {
+                        DLog("\(query.logPrefix)Don't need further '\(typeName)' items for parent ID '\(parent.id)', got all the updated ones already")
+                    } else {
+                        DLog("\(query.logPrefix)Don't need further '\(typeName)' items, got all the updated ones already")
+                    }
+                    return false // this and later nodes aren't of interest
+                }
             }
-        } else { // unwrap this level
+        } else { // we're a container, not an object, unwrap this level and recurse into it
             thisObject = parent
         }
-		
-        var extraQueries = [GQLQuery]()
-		for field in fields {
-			if let fragment = field as? GQLFragment {
-				let newQueries = fragment.scan(query: query, pageData: hash, parent: thisObject)
-				extraQueries.append(contentsOf: newQueries)
+        
+        for field in fields {
+            if let fragment = field as? GQLFragment {
+                extraQueries += fragment.scan(query: query, pageData: node, parent: thisObject)
                 
-			} else if let ingestable = field as? GQLScanning, let fieldData = hash[field.name] {
-				let newQueries = ingestable.scan(query: query, pageData: fieldData, parent: thisObject)
-				extraQueries.append(contentsOf: newQueries)
-			}
-		}
-        return (extraQueries, typeToStop)
-	}
-	
+            } else if let ingestable = field as? GQLScanning, let fieldData = node[field.name] {
+                extraQueries += ingestable.scan(query: query, pageData: fieldData, parent: thisObject)
+            }
+        }
+        
+        return true
+    }
+    
+    private func scanPage(_ edges: [[AnyHashable: Any]], pageInfo: [AnyHashable: Any]?, query: GQLQuery, parent: GQLNode?, extraQueries: inout [GQLQuery]) {
+        for e in edges {
+            if let node = e["node"] as? [AnyHashable : Any], !scanNode(node, query: query, parent: parent, extraQueries: &extraQueries) {
+                return
+            }
+        }
+        if let latestCursor = edges.last?["cursor"] as? String,
+            let pageInfo = pageInfo, pageInfo["hasNextPage"] as? Bool == true {
+            let newGroup = GQLGroup(group: self, lastCursor: latestCursor)
+            let nextPage = GQLQuery(name: query.name, rootElement: newGroup, parent: parent, perNodeCallback: query.perNodeCallback)
+            extraQueries.append(nextPage)
+        }
+    }
+
 	func scan(query: GQLQuery, pageData: Any, parent: GQLNode?) -> [GQLQuery] {
 
 		var extraQueries = [GQLQuery]()
-
-		if let hash = pageData as? [AnyHashable : Any] { // data was a dictionary
+                
+		if let hash = pageData as? [AnyHashable : Any] {
 			if let edges = hash["edges"] as? [[AnyHashable : Any]] {
-				var latestCursor: String?
-                var typeToStopSignal: String?
-				for e in edges {
-                    latestCursor = e["cursor"] as? String
-					if let node = e["node"] as? [AnyHashable : Any] {
-						let (newQueries, typeToStop) = checkFields(query: query, hash: node, parent: parent)
-						extraQueries.append(contentsOf: newQueries)
-                        if let typeToStop = typeToStop, node["__typename"] as? String == typeToStop {
-                            typeToStopSignal = typeToStop
-                        }
-                    }
-				}
-				if let latestCursor = latestCursor, let pageInfo = hash["pageInfo"] as? [AnyHashable : Any], pageInfo["hasNextPage"] as? Bool == true {
-                    if let typeToStop = typeToStopSignal {
-                        DLog("\(query.logPrefix)Don't need more '\(typeToStop)' items for parent ID '\(parent?.id ?? "<none>")', got all the updated ones already")
-                    } else {
-                        let newGroup = GQLGroup(group: self)
-                        newGroup.lastCursor = latestCursor
-                        let nextPage = GQLQuery(name: query.name, rootElement: newGroup, parent: parent, perNodeCallback: query.perNodeCallback)
-                        extraQueries.append(nextPage)
-                    }
-                }
+                scanPage(edges, pageInfo: hash["pageInfo"] as? [AnyHashable : Any], query: query, parent: parent, extraQueries: &extraQueries)
 
 			} else {
-				let (newQueries, typeToStop) = checkFields(query: query, hash: hash, parent: parent)
-                if !newQueries.isEmpty {
-                    if let typeToStop = typeToStop, hash["__typename"] as? String == typeToStop {
-                        DLog("\(query.logPrefix)Don't need more '\(typeToStop)' items for parent ID '\(parent?.id ?? "<none>")', got all the updated ones already")
-                    } else {
-                        extraQueries.append(contentsOf: newQueries)
-                    }
-                }
+                scanNode(hash, query: query, parent: parent, extraQueries: &extraQueries)
 			}
 			
-		} else if let nodes = pageData as? [[AnyHashable : Any]] { // data was an array of dictionaries with no paging info
-			for node in nodes {
-				let (newQueries, typeToStop) = checkFields(query: query, hash: node, parent: parent)
-                if !newQueries.isEmpty {
-                    if let typeToStop = typeToStop, node["__typename"] as? String == typeToStop {
-                        DLog("\(query.logPrefix)Don't need more '\(typeToStop)' items for parent ID '\(parent?.id ?? "<none>")', got all the updated ones already")
-                    } else {
-                        extraQueries.append(contentsOf: newQueries)
-                    }
-                }
-			}
+		} else if let nodes = pageData as? [[AnyHashable : Any]] {
+            nodes.forEach { scanNode($0, query: query, parent: parent, extraQueries: &extraQueries) }
 		}
 		
 		if !extraQueries.isEmpty {
