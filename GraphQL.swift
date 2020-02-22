@@ -304,21 +304,21 @@ final class GraphQL {
         
         let allOpenPrsFragment = GQLFragment(on: "Repository", elements: [
             GQLField(name: "id"),
-            GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 24)], extraParams: ["states": "OPEN"], pageSize: 100),
+            GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 20)], extraParams: ["states": "OPEN"], pageSize: 50),
             ])
         let allOpenIssuesFragment = GQLFragment(on: "Repository", elements: [
             GQLField(name: "id"),
-            GQLGroup(name: "issues", fields: [issueFragment(assigneesAndLabelPageSize: 24)], extraParams: ["states": "OPEN"], pageSize: 100)
+            GQLGroup(name: "issues", fields: [issueFragment(assigneesAndLabelPageSize: 20)], extraParams: ["states": "OPEN"], pageSize: 50)
             ])
 
         
         let latestPrsFragment = GQLFragment(on: "Repository", elements: [
             GQLField(name: "id"),
-            GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 100)], extraParams: ["orderBy": "{direction: DESC, field: UPDATED_AT}"], pageSize: 24),
+            GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 20)], extraParams: ["orderBy": "{direction: DESC, field: UPDATED_AT}"], pageSize: 10),
             ])
         let latestIssuesFragment = GQLFragment(on: "Repository", elements: [
             GQLField(name: "id"),
-            GQLGroup(name: "issues", fields: [issueFragment(assigneesAndLabelPageSize: 100)], extraParams: ["orderBy": "{direction: DESC, field: UPDATED_AT}"], pageSize: 24)
+            GQLGroup(name: "issues", fields: [issueFragment(assigneesAndLabelPageSize: 20)], extraParams: ["orderBy": "{direction: DESC, field: UPDATED_AT}"], pageSize: 20)
             ])
 
         let reposByServer = Dictionary(grouping: repos) { $0.apiServer }

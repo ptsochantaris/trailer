@@ -1,6 +1,7 @@
 import Foundation
 
-final class GQLFragment: GQLScanning {
+final class GQLFragment: GQLScanning, Hashable {
+    
 	let name: String
 
     private let elements: [GQLElement]
@@ -41,4 +42,12 @@ final class GQLFragment: GQLScanning {
 		}
 		return extraQueries
 	}
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(name)
+    }
+    
+    static func == (lhs: GQLFragment, rhs: GQLFragment) -> Bool {
+        return lhs.name == rhs.name
+    }
 }

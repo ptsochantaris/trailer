@@ -18,39 +18,41 @@ final class GQLQuery {
 
     static func batching(_ name: String, fields: [GQLElement], idList: ContiguousArray<String>, batchSize: Int, perNodeCallback: ((GQLNode)->Bool)? = nil) -> [GQLQuery] {
 		var list = idList
-		var segments = [[String]]()
+        var queries = [GQLQuery]()
 		while !list.isEmpty {
-			let p = min(batchSize, list.count)
-			segments.append(Array(list[0..<p]))
-			list = ContiguousArray(list[p...])
+            let segment = list.prefix(batchSize)
+            list.removeFirst(segment.count)
+
+            let batchGroup = GQLBatchGroup(templateGroup: GQLGroup(name: "items", fields: fields), idList: Array(segment), batchSize: batchSize)
+            let query = GQLQuery(name: name, rootElement: batchGroup, perNodeCallback: perNodeCallback)
+            queries.append(query)
 		}
-		return segments.map {
-            GQLQuery(name: name, rootElement: GQLBatchGroup(templateGroup: GQLGroup(name: "items", fields: fields), idList: $0, batchSize: batchSize), perNodeCallback: perNodeCallback)
-		}
+        return queries
 	}
     
+    private var rootQueryText: String {
+        if let parentItem = parent {
+            return "node(id: \"\(parentItem.id)\") { ... on \(parentItem.elementType) { " + rootElement.queryText + " } }"
+        } else {
+            return rootElement.queryText
+        }
+    }
+    
+    private var fragmentQueryText: String {
+        var fragments = Set<GQLFragment>()
+        rootElement.fragments.forEach {
+            fragments.insert($0)
+        }
+        return fragments.map { $0.declaration }.joined(separator: " ")
+    }
+    
 	private var queryText: String {
-		var fragments = [GQLFragment]()
-		for f in rootElement.fragments {
-			if !fragments.contains(where: { $0.name == f.name }) {
-				fragments.append(f)
-			}
-		}
-
-		var text = ""
-		for f in fragments {
-			text.append(f.declaration + " ")
-		}
-		var rootQuery = rootElement.queryText
-		if let parentItem = parent {
-			rootQuery = "node(id: \"\(parentItem.id)\") { ... on \(parentItem.elementType) { " + rootQuery + " } }"
-		}
-		return text + "{ " + rootQuery + " rateLimit { limit cost remaining resetAt nodeCount } }"
+		return fragmentQueryText + " { " + rootQueryText + " rateLimit { limit cost remaining resetAt nodeCount } }"
 	}
-        
+
     private static let qlQueue: OperationQueue = {
         let q = OperationQueue()
-        q.maxConcurrentOperationCount = 1
+        q.maxConcurrentOperationCount = 2
         q.qualityOfService = .background
         return q
     }()
