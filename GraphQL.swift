@@ -391,7 +391,7 @@ final class GraphQL {
             }
             
             if !idsForReposInThisServerWantingLatestIssues.isEmpty {
-                let q = GQLQuery.batching("\(serverLabel): Updated Issues", fields: [latestIssuesFragment], idList: idsForReposInThisServerWantingLatestIssues, batchSize: 100, perNodeCallback: perNodeCallback)
+                let q = GQLQuery.batching("\(serverLabel): Updated Issues", fields: [latestIssuesFragment], idList: idsForReposInThisServerWantingLatestIssues, batchSize: 50, perNodeCallback: perNodeCallback)
                 queriesForServer.append(contentsOf: q)
             }
 
@@ -401,7 +401,7 @@ final class GraphQL {
             }
 
             if !idsForReposInThisServerWantingLatestPrs.isEmpty {
-                let q = GQLQuery.batching("\(serverLabel): Updated PRs", fields: [latestPrsFragment], idList: idsForReposInThisServerWantingLatestPrs, batchSize: 100, perNodeCallback: perNodeCallback)
+                let q = GQLQuery.batching("\(serverLabel): Updated PRs", fields: [latestPrsFragment], idList: idsForReposInThisServerWantingLatestPrs, batchSize: 50, perNodeCallback: perNodeCallback)
                 queriesForServer.append(contentsOf: q)
             }
 

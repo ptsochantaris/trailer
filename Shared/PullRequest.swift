@@ -172,11 +172,11 @@ final class PullRequest: ListableItem {
 		super.catchUpWithComments()
 	}
 
-	override class func badgeCount<T: PullRequest>(from fetch: NSFetchRequest<T>, in moc: NSManagedObjectContext) -> Int {
-		var badgeCount = super.badgeCount(from: fetch as! NSFetchRequest<ListableItem>, in: moc)
+	override class func badgeCount<T: ListableItem>(from fetch: NSFetchRequest<T>, in moc: NSManagedObjectContext) -> Int {
+		var badgeCount = super.badgeCount(from: fetch, in: moc)
 		if Settings.markPrsAsUnreadOnNewCommits {
 			for i in try! moc.fetch(fetch) {
-				if i.hasNewCommits {
+				if let i = i as? PullRequest, i.hasNewCommits {
 					badgeCount += 1
 				}
 			}
