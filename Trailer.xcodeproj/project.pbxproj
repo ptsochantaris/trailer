@@ -117,6 +117,8 @@
 		169205681E34EB4D00FB9547 /* CustomRepoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169205671E34EB4D00FB9547 /* CustomRepoCell.swift */; };
 		1694008C1E7AAE32002C5DAD /* Reaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1694008B1E7AAE32002C5DAD /* Reaction.swift */; };
 		1694008D1E7AAE32002C5DAD /* Reaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1694008B1E7AAE32002C5DAD /* Reaction.swift */; };
+		16954D3724333B0B0008AD4F /* Settings.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 16954D3524333B0B0008AD4F /* Settings.storyboard */; };
+		16954D3924333B8E0008AD4F /* Quickstart.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 16954D3824333B8E0008AD4F /* Quickstart.storyboard */; };
 		169B92961CC52C05002774A8 /* SnoozePreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169B92951CC52C05002774A8 /* SnoozePreset.swift */; };
 		169B92971CC52C05002774A8 /* SnoozePreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169B92951CC52C05002774A8 /* SnoozePreset.swift */; };
 		169FB2361A3DBD7D00E00771 /* SectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169FB2351A3DBD7D00E00771 /* SectionHeader.swift */; };
@@ -402,6 +404,8 @@
 		1693CC882019CAA500E3B66E /* Trailer 37.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 37.xcdatamodel"; sourceTree = "<group>"; };
 		1694008A1E7AAADF002C5DAD /* Trailer 35.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 35.xcdatamodel"; sourceTree = "<group>"; };
 		1694008B1E7AAE32002C5DAD /* Reaction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Reaction.swift; path = Shared/Reaction.swift; sourceTree = SOURCE_ROOT; };
+		16954D3624333B0B0008AD4F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = PocketTrailer/Base.lproj/Settings.storyboard; sourceTree = "<group>"; };
+		16954D3824333B8E0008AD4F /* Quickstart.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Quickstart.storyboard; sourceTree = "<group>"; };
 		169B92941CC3E5AD002774A8 /* Trailer 25.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 25.xcdatamodel"; sourceTree = "<group>"; };
 		169B92951CC52C05002774A8 /* SnoozePreset.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = SnoozePreset.swift; path = ../Shared/SnoozePreset.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		169FB2351A3DBD7D00E00771 /* SectionHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SectionHeader.swift; sourceTree = "<group>"; };
@@ -761,6 +765,8 @@
 		168BC6A117EC2DF000BC4584 = {
 			isa = PBXGroup;
 			children = (
+				16954D3824333B8E0008AD4F /* Quickstart.storyboard */,
+				16954D3524333B0B0008AD4F /* Settings.storyboard */,
 				1628A6F218789EA3005EDA69 /* Shared */,
 				168BC6B317EC2DF000BC4584 /* Trailer */,
 				164DEAFA1AC0C8BB00AA6F73 /* Pocket Trailer */,
@@ -1176,10 +1182,12 @@
 			files = (
 				16C4ACF81EB553E20022C33B /* approvesChangesIcon.png in Resources */,
 				16C4ACF71EB553E20022C33B /* requestsChangesIcon.png in Resources */,
+				16954D3724333B0B0008AD4F /* Settings.storyboard in Resources */,
 				1628A6CB18789E73005EDA69 /* Main.storyboard in Resources */,
 				1628A6D618789E73005EDA69 /* Images.xcassets in Resources */,
 				16DD6AB21AE457C300145425 /* trailerDoc320.png in Resources */,
 				16DD6AAF1AE457C300145425 /* trailerDoc22.png in Resources */,
+				16954D3924333B8E0008AD4F /* Quickstart.storyboard in Resources */,
 				16C3048C1CF4EC590017D79F /* SectionHeaderView.xib in Resources */,
 				16DD6AB01AE457C300145425 /* trailerDoc44.png in Resources */,
 				16154E2F19C43E8E00E49139 /* Launch.storyboard in Resources */,
@@ -1469,6 +1477,14 @@
 				168BC6C317EC2DF000BC4584 /* Base */,
 			);
 			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+		16954D3524333B0B0008AD4F /* Settings.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				16954D3624333B0B0008AD4F /* Base */,
+			);
+			name = Settings.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
