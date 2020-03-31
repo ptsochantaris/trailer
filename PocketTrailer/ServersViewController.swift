@@ -18,6 +18,7 @@ final class ServersViewController: UITableViewController {
 		clearsSelectionOnViewWillAppear = true
         NotificationCenter.default.addObserver(tableView!, selector: #selector(UITableView.reloadData), name: .RefreshEnded, object: nil)
         updateApiLabel()
+        self.navigationItem.largeTitleDisplayMode = .automatic
 	}
     
     private func updateApiLabel() {

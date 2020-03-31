@@ -33,22 +33,24 @@ enum Section: Int64 {
 
 	static let nonZeroPredicate = NSPredicate(format: "sectionIndex > 0")
 
-	static private var predicateMatchCache = [Section : NSPredicate]()
+	static private var predicateMatchCache = NSCache<NSNumber, NSPredicate>()
 	var matchingPredicate: NSPredicate {
-		if let predicate = Section.predicateMatchCache[self] {
+        let key = NSNumber(value: self.rawValue)
+        if let predicate = Section.predicateMatchCache.object(forKey: key) {
 			return predicate
 		}
 		let predicate = NSPredicate(format: "sectionIndex == %lld", rawValue)
-		Section.predicateMatchCache[self] = predicate
+        Section.predicateMatchCache.setObject(predicate, forKey: key)
 		return predicate
 	}
-	static private var predicateExcludeCache = [Section : NSPredicate]()
+	static private var predicateExcludeCache = NSCache<NSNumber, NSPredicate>()
 	var excludingPredicate: NSPredicate {
-		if let predicate = Section.predicateExcludeCache[self] {
+        let key = NSNumber(value: self.rawValue)
+        if let predicate = Section.predicateExcludeCache.object(forKey: key) {
 			return predicate
 		}
 		let predicate = NSPredicate(format: "sectionIndex != %lld", rawValue)
-		Section.predicateExcludeCache[self] = predicate
+        Section.predicateExcludeCache.setObject(predicate, forKey: key)
 		return predicate
 	}
 }
