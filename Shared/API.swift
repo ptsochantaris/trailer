@@ -172,7 +172,30 @@ final class API {
             }
         }
     }
-    static var isRefreshing = false
+    
+    static var isRefreshing = false {
+        didSet {
+            if oldValue == isRefreshing {
+                return
+            }
+            if isRefreshing {
+                DLog("Starting refresh")
+                DataManager.postMigrationTasks()
+                NotificationQueue.clear()
+                NotificationCenter.default.post(name: .RefreshStarting, object: nil)
+            } else {
+                DLog("Refresh done")
+                if ApiServer.shouldReportRefreshFailure(in: DataManager.main) {
+                    currentOperationName = "Last update failed"
+                    NotificationCenter.default.post(name: .RefreshEnded, object: false)
+                } else {
+                    Settings.lastSuccessfulRefresh = Date()
+                    currentOperationName = lastSuccessfulSyncAt
+                    NotificationCenter.default.post(name: .RefreshEnded, object: true)
+                }
+            }
+        }
+    }
 
     static var shouldSyncReactions: Bool {
         return Settings.notifyOnItemReactions || Settings.notifyOnCommentReactions
@@ -265,12 +288,11 @@ final class API {
 
 	////////////////////////////////////// API interface
 
-	static func performSync(callback: @escaping (Bool)->Void) {
+	static func performSync() {
 
         let syncContext = DataManager.buildChildContext()
 
         if Settings.useV4API && canUseV4API(for: syncContext) != nil {
-            callback(false)
             return
         }
         
@@ -284,18 +306,18 @@ final class API {
         
 		if shouldRefreshReposToo {
 			fetchRepositories(to: syncContext) {
-				sync(to: syncContext, callback: callback)
+				sync(to: syncContext)
 			}
 		} else {
 			ApiServer.resetSyncSuccess(in: syncContext)
 			ensureApiServersHaveUserIds(in: syncContext) {
-				sync(to: syncContext, callback: callback)
+				sync(to: syncContext)
 			}
 		}
 	}
     
-    private static func sync(to moc: NSManagedObjectContext, callback: @escaping (Bool)->Void) {
-                
+    private static func sync(to moc: NSManagedObjectContext) {
+        
         let repos = Repo.syncableRepos(in: moc)
         let itemGroup = DispatchGroup()
         let v4Mode = Settings.useV4API
@@ -342,11 +364,11 @@ final class API {
         }
         
         postItemGroup.notify(queue: .main) {
-            completeSync(in: moc, andCallback: callback)
+            completeSync(in: moc)
         }
 	}
 
-	private static func completeSync(in moc: NSManagedObjectContext, andCallback: @escaping (Bool) -> Void) {
+	private static func completeSync(in moc: NSManagedObjectContext) {
 
         let processMoc = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         processMoc.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
@@ -365,7 +387,7 @@ final class API {
                 try? processMoc.save()
             }
             DispatchQueue.main.async {
-                completeSync2(in: moc, andCallback: andCallback)
+                completeSync2(in: moc)
             }
         }
 
@@ -379,9 +401,7 @@ final class API {
         DLog("Caching \(numberFormatter.string(for: URLCache.shared.currentDiskUsage) ?? "") bytes on disk")
 	}
     
-    private static func completeSync2(in moc: NSManagedObjectContext, andCallback: @escaping (Bool) -> Void) {
-        var success = false
-        
+    private static func completeSync2(in moc: NSManagedObjectContext) {
         do {
             if moc.hasChanges {
                 DLog("Committing synced data")
@@ -394,18 +414,10 @@ final class API {
             DLog("Committing sync failed: %@", error.localizedDescription)
         }
         
-        if ApiServer.shouldReportRefreshFailure(in: DataManager.main) {
-            currentOperationName = "Last update failed"
-        } else {
-            Settings.lastSuccessfulRefresh = Date()
-            currentOperationName = lastSuccessfulSyncAt
-            success = true
-        }
         isRefreshing = false
         currentOperationCount -= 1
         
         DataManager.sendNotificationsIndexAndSave()
-        andCallback(success)
     }
     
     static var lastSuccessfulSyncAt: String {

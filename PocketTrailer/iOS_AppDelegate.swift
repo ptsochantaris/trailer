@@ -52,6 +52,10 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
         }
 
 		NotificationManager.setup(delegate: self)
+        
+        let n = NotificationCenter.default
+        n.addObserver(self, selector: #selector(refreshStarting), name: .RefreshStarting, object: nil)
+        n.addObserver(self, selector: #selector(refreshDone(_:)), name: .RefreshEnded, object: nil)
 
 		return true
 	}
@@ -168,30 +172,24 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 			return .noConfiguredServers
 		}
 
-        DataManager.postMigrationTasks()
-        popupManager.masterController.updateStatus(becauseOfChanges: false)
-
-        NotificationQueue.clear()
-        DLog("Starting refresh")
-
-		API.performSync(callback: processRefresh)
+		API.performSync()
 
 		return .started
 	}
+    
+    @objc private func refreshStarting() {
+        popupManager.masterController.updateStatus(becauseOfChanges: false)
+    }
 
-    private func processRefresh(success: Bool) {
-
-        NotificationCenter.default.post(name: .RefreshEnded, object: nil)
-
+    @objc private func refreshDone(_ notification: Notification) {
         checkApiUsage()
 
+        let success = notification.object as? Bool ?? false
 		if !success && UIApplication.shared.applicationState == .active {
 			showMessage("Refresh failed", "Loading the latest data from GitHub failed")
 		}
 
         wrapBackgroundProcessing(success: success)
-        
-        DLog("Refresh done")
 	}
 
 	func applicationDidBecomeActive(_ application: UIApplication) {

@@ -105,7 +105,9 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 		let n = NotificationCenter.default
 		n.addObserver(self, selector: #selector(updateScrollBarWidth), name: NSScroller.preferredScrollerStyleDidChangeNotification, object: nil)
-        
+        n.addObserver(self, selector: #selector(refreshStarting), name: .RefreshStarting, object: nil)
+        n.addObserver(self, selector: #selector(refreshDone), name: .RefreshEnded, object: nil)
+
         let dn = DistributedNotificationCenter.default()
         dn.addObserver(self, selector: #selector(themeCheck), name: Notification.Name("AppleInterfaceThemeChangedNotification"), object: nil)
 
@@ -684,10 +686,8 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 	}
 
-	func prepareForRefresh() {
+	@objc private func refreshStarting() {
 		refreshTimer = nil
-
-		DataManager.postMigrationTasks()
 
 		preferencesWindow?.updateActivity()
 
@@ -695,19 +695,23 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			d.prepareForRefresh()
 		}
         ensureAtLeastOneMenuVisible()
-
-		NotificationQueue.clear()
-
-		DLog("Starting refresh")
 	}
+    
+    @objc private func refreshDone() {
+        for d in menuBarSets {
+            d.allowRefresh = true
+        }
 
-	func completeRefresh() {
         preferencesWindow?.updateActivity()
         preferencesWindow?.reloadRepositories()
         updateAllMenus()
+        
+        refreshTimer = Timer(repeats: false, interval: TimeInterval(Settings.refreshPeriod)) { [weak self] in
+            self?.refreshTimerDone()
+        }
+        
         checkApiUsage()
-        DLog("Refresh done")
-	}
+    }
 
 	func updateRelatedMenus(for i: ListableItem) {
 		let menus = relatedMenus(for: i)
@@ -775,23 +779,9 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			return
 		}
 
-		prepareForRefresh()
-
-		API.performSync { [weak self] _ in
-
-			guard let s = self else { return }
-
-			for d in s.menuBarSets {
-				d.allowRefresh = true
-			}
-
-			s.completeRefresh()
-			s.refreshTimer = Timer(repeats: false, interval: TimeInterval(Settings.refreshPeriod)) {
-				s.refreshTimerDone()
-			}
-		}
+		API.performSync()
 	}
-
+    
 	private func refreshTimerDone() {
 		refreshTimer = nil
 		if DataManager.appIsConfigured {

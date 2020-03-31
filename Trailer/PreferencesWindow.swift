@@ -358,15 +358,30 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
     
     @IBAction private func v4APISwitchChanged(_ sender: NSButton) {
-        let turnOn = sender.integerValue == 1
-        if turnOn, let error = API.canUseV4API(for: DataManager.main) {
+        if sender.integerValue == 1, let error = API.canUseV4API(for: DataManager.main) {
             sender.integerValue = 0
             let a = NSAlert()
             a.messageText = Settings.v4title
             a.informativeText = error
             a.beginSheetModal(for: self, completionHandler: nil)
         } else {
-            Settings.useV4API = turnOn
+            confirmApiSwitch(sender: sender)
+        }
+    }
+    
+    private func confirmApiSwitch(sender: NSButton) {
+        let alert = NSAlert()
+        alert.messageText = "Reload All Data?"
+        alert.informativeText = "Changing API versions will require a full delete and reload of all items, which can take a while and/or use quite a bit of bandwidth depending on your settings. Are you sure you'd like to proceed right now?"
+        alert.addButton(withTitle: "Cancel")
+        alert.addButton(withTitle: "Delete & Reload All Items")
+        
+        if alert.runModal() == .alertSecondButtonReturn {
+            Settings.useV4API = sender.integerValue == 1
+            sender.isEnabled = false
+            performFullReload()
+        } else {
+            sender.integerValue = 1 - sender.integerValue
         }
     }
 
@@ -643,15 +658,19 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
         alert.addButton(withTitle: "Reload All Data")
 
         if alert.runModal() == .alertSecondButtonReturn {
-            for a in ApiServer.allApiServers(in: DataManager.main) {
-                a.deleteEverything()
-                a.resetSyncState()
-            }
-            DataManager.saveDB()
-            RestAccess.clearAllBadLinks()
-            app.updateAllMenus()
-            app.startRefresh()
+            performFullReload()
         }
+    }
+    
+    private func performFullReload() {
+        for a in ApiServer.allApiServers(in: DataManager.main) {
+            a.deleteEverything()
+            a.resetSyncState()
+        }
+        DataManager.saveDB()
+        RestAccess.clearAllBadLinks()
+        app.updateAllMenus()
+        app.startRefresh()
     }
 
 	@IBAction private func displayNumbersForItemsSelected(_ sender: NSButton) {
@@ -1115,8 +1134,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	func refreshRepos() {
-		app.prepareForRefresh()
-
+        API.isRefreshing = true
 		let tempContext = DataManager.buildChildContext()
 		API.fetchRepositories(to: tempContext) {
 
@@ -1139,7 +1157,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
                 try? tempContext.save()
 			}
 			DataItem.nukeDeletedItems(in: DataManager.main)
-			app.completeRefresh()
+            API.isRefreshing = false
 		}
 	}
 

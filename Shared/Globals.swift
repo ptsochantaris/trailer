@@ -345,6 +345,7 @@ func openURL(_ url: URL, using path: String) {
 ////////////////////// Notifications
 
 extension Notification.Name {
+    static let RefreshStarting = Notification.Name("RefreshStartingNotification")
     static let RefreshEnded = Notification.Name("RefreshEndedNotification")
     static let SyncProgressUpdate = Notification.Name("SyncProgressUpdateNotification")
     static let ApiUsageUpdate = Notification.Name("ApiUsageUpdateNotification")

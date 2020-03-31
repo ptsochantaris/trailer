@@ -9,19 +9,8 @@ extension API {
             return Settings.v4DAPIessage
         }
         
-        var c = 0
-        c += DataItem.nullNodeIdItems(of: Repo.self, in: moc)
-        c += DataItem.nullNodeIdItems(of: PullRequest.self, in: moc)
-        c += DataItem.nullNodeIdItems(of: PRStatus.self, in: moc)
-        c += DataItem.nullNodeIdItems(of: PRComment.self, in: moc)
-        c += DataItem.nullNodeIdItems(of: PRLabel.self, in: moc)
-        c += DataItem.nullNodeIdItems(of: Issue.self, in: moc)
-        c += DataItem.nullNodeIdItems(of: Team.self, in: moc)
-        c += DataItem.nullNodeIdItems(of: Review.self, in: moc)
-        c += DataItem.nullNodeIdItems(of: Reaction.self, in: moc)
-
-        if c > 0 {
-            DLog("Warning: Some items still have a null node ID")
+        if DataItem.nullNodeIdItems(of: Repo.self, in: moc) > 0 {
+            DLog("Warning: Some repos still have a null node ID")
             return Settings.v4DBMessage
         }
 

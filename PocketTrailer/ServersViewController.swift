@@ -5,7 +5,7 @@ import CoreData
 final class ServersViewController: UITableViewController {
 
 	private var selectedServerId: NSManagedObjectID?
-	private var allServers: [ApiServer]!
+	private var allServers = [ApiServer]()
 
     @IBOutlet weak var apiSwitch: UIBarButtonItem!
     
@@ -35,7 +35,7 @@ final class ServersViewController: UITableViewController {
 		allServers = ApiServer.allApiServers(in: DataManager.main)
 		tableView.reloadData()
 	}
-
+    
 	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		return allServers.count
 	}
@@ -121,18 +121,22 @@ final class ServersViewController: UITableViewController {
     
     @IBAction private func resyncEverythingSelected(_ sender: UIBarButtonItem) {
         let a = UIAlertController(title: sender.title, message: Settings.reloadAllDataHelp, preferredStyle: .actionSheet)
-        a.addAction(UIAlertAction(title: sender.title, style: .destructive) { _ in
-            for a in ApiServer.allApiServers(in: DataManager.main) {
-                a.deleteEverything()
-                a.resetSyncState()
-            }
-            DataManager.saveDB()
-            RestAccess.clearAllBadLinks()
-            DataManager.postProcessAllItems()
-            app.startRefresh()
+        a.addAction(UIAlertAction(title: sender.title, style: .destructive) { [weak self] _ in
+            self?.performFullReload()
         })
         a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         present(a, animated: true)
         a.popoverPresentationController?.barButtonItem = sender
+    }
+    
+    private func performFullReload() {
+        for a in ApiServer.allApiServers(in: DataManager.main) {
+            a.deleteEverything()
+            a.resetSyncState()
+        }
+        DataManager.saveDB()
+        RestAccess.clearAllBadLinks()
+        DataManager.postProcessAllItems()
+        app.startRefresh()
     }
 }

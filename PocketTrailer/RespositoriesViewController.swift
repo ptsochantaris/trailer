@@ -137,6 +137,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 
 		NotificationQueue.clear()
 
+        API.isRefreshing = true
 		let tempContext = DataManager.buildChildContext()
 		API.fetchRepositories(to: tempContext) { [weak self] in
 			if ApiServer.shouldReportRefreshFailure(in: tempContext) {
@@ -163,6 +164,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 			s.tableView.alpha = 1.0
 			s.tableView.isUserInteractionEnabled = true
 			s.navigationItem.rightBarButtonItem?.isEnabled = true
+            API.isRefreshing = false
 		}
 	}
 
