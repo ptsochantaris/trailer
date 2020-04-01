@@ -98,14 +98,10 @@ final class Review: DataItem {
     }
     
     func processNotifications() {
-        guard !isMine, let newState = State(rawValue: state ?? "") else {
+        guard !isMine, pullRequest.appropriateStateForNotification, let newState = State(rawValue: state ?? "") else {
             return
         }
-        
-        guard pullRequest.isVisibleOnMenu, pullRequest.appropriateStateForNotification else {
-            return
-        }
-        
+                
         switch newState {
         case .CHANGES_REQUESTED:
             if Settings.notifyOnAllReviewChangeRequests || (Settings.notifyOnReviewChangeRequests && pullRequest.createdByMe) {

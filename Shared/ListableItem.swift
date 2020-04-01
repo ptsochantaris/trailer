@@ -359,7 +359,7 @@ class ListableItem: DataItem {
 	}
     
     final var appropriateStateForNotification: Bool {
-        let shouldBeQuietBecauseOfState = (sectionIndex == Section.closed.rawValue || sectionIndex == Section.merged.rawValue) && !Settings.scanClosedAndMergedItems
+        let shouldBeQuietBecauseOfState = !isVisibleOnMenu || ((sectionIndex == Section.closed.rawValue || sectionIndex == Section.merged.rawValue) && !Settings.scanClosedAndMergedItems)
         return !shouldBeQuietBecauseOfState
     }
 

@@ -285,9 +285,7 @@ final class PullRequest: ListableItem {
 	}
         
     var shouldAnnounceStatus: Bool {
-        return isVisibleOnMenu
-            && appropriateStateForNotification
-            && (Settings.notifyOnStatusUpdatesForAllPrs || createdByMe || assignedToParticipated || assignedToMySection)
+        return appropriateStateForNotification && (Settings.notifyOnStatusUpdatesForAllPrs || createdByMe || assignedToParticipated || assignedToMySection)
     }
 
     func linesAttributedString(labelFont: FONT_CLASS) -> NSAttributedString? {

@@ -77,37 +77,33 @@ final class PRComment: DataItem {
 	}
 
 	func processNotifications() {
-        if let item = parent, item.postSyncAction == PostSyncAction.isUpdated.rawValue, item.isVisibleOnMenu, item.appropriateStateForNotification {
-			if contains(terms: ["@\(apiServer.userName!)"]) {
-				if item.isSnoozing && item.shouldWakeOnMention {
-					DLog("Waking up snoozed item ID %@ because of mention", item.nodeId ?? "<no ID>")
-					item.wakeUp()
-				}
-				NotificationQueue.add(type: .newMention, for: self)
-			} else if !isMine {
-				if item.isSnoozing && item.shouldWakeOnComment {
-                    DLog("Waking up snoozed item ID %@ because of posted comment", item.nodeId ?? "<no ID>")
-					item.wakeUp()
-				}
-				let notifyForNewComments = item.sectionIndex != Section.all.rawValue || Settings.showCommentsEverywhere
-				if notifyForNewComments && !Settings.disableAllCommentNotifications && !isMine {
-					if let authorName = userName {
-						var blocked = false
-						for blockedAuthor in Settings.commentAuthorBlacklist as [String] {
-							if authorName.compare(blockedAuthor, options: [.caseInsensitive, .diacriticInsensitive]) == .orderedSame {
-								blocked = true
-								break
-							}
-						}
-						if blocked {
-							DLog("Blocked notification for user '%@' as their name is on the blacklist", authorName)
-						} else {
-							DLog("User '%@' not on blacklist, can post notification", authorName)
-							NotificationQueue.add(type: .newComment, for: self)
-						}
-					}
-				}
-			}
+        guard let parent = parent, parent.appropriateStateForNotification else {
+            return
+        }
+        if contains(terms: ["@\(apiServer.userName!)"]) {
+            if parent.isSnoozing && parent.shouldWakeOnMention {
+                DLog("Waking up snoozed item ID %@ because of mention", parent.nodeId ?? "<no ID>")
+                parent.wakeUp()
+            }
+            NotificationQueue.add(type: .newMention, for: self)
+        } else if !isMine {
+            if parent.isSnoozing && parent.shouldWakeOnComment {
+                DLog("Waking up snoozed item ID %@ because of posted comment", parent.nodeId ?? "<no ID>")
+                parent.wakeUp()
+            }
+            let notifyForNewComments = parent.sectionIndex != Section.all.rawValue || Settings.showCommentsEverywhere
+            if notifyForNewComments && !Settings.disableAllCommentNotifications && !isMine {
+                guard let authorName = userName else {
+                    return
+                }
+                let blocked = Settings.commentAuthorBlacklist.contains { authorName.compare($0, options: [.caseInsensitive, .diacriticInsensitive]) == .orderedSame }
+                if blocked {
+                    DLog("Blocked notification for user '%@' as their name is on the blacklist", authorName)
+                } else {
+                    DLog("User '%@' not on blacklist, can post notification", authorName)
+                    NotificationQueue.add(type: .newComment, for: self)
+                }
+            }
 		}
 	}
 
