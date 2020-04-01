@@ -45,13 +45,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
-		navigationController?.setToolbarHidden(false, animated: true)
 		processTokenState(from: authToken.text)
-	}
-
-	override func viewWillDisappear(_ animated: Bool) {
-		super.viewWillDisappear(animated)
-		navigationController?.setToolbarHidden(true, animated: true)
 	}
 
 	@IBAction private func testConnectionSelected(_ sender: UIButton) {
