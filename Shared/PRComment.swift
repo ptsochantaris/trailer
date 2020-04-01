@@ -77,7 +77,7 @@ final class PRComment: DataItem {
 	}
 
 	func processNotifications() {
-        guard let parent = parent, parent.appropriateStateForNotification else {
+        guard let parent = parent, parent.appropriateStateForNotification, parent.postSyncAction != PostSyncAction.isNew.rawValue else {
             return
         }
         if contains(terms: ["@\(apiServer.userName!)"]) {

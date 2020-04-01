@@ -171,18 +171,18 @@ final class DataManager {
 
 		let allPrs = processNotificationsForItems(of: PullRequest.self, newNotification: .newPr, reopenedNotification: .prReopened, assignmentNotification: .newPrAssigned)
 
+        let allIssues = processNotificationsForItems(of: Issue.self, newNotification: .newIssue, reopenedNotification: .issueReopened, assignmentNotification: .newIssueAssigned)
+
+        for c in PRComment.newItems(of: PRComment.self, in: main) {
+            c.processNotifications()
+            c.postSyncAction = PostSyncAction.doNothing.rawValue
+        }
+
         for r in Review.newOrUpdatedItems(of: Review.self, in: main) {
             r.processNotifications()
             r.postSyncAction = PostSyncAction.doNothing.rawValue
         }
-
-        let allIssues = processNotificationsForItems(of: Issue.self, newNotification: .newIssue, reopenedNotification: .issueReopened, assignmentNotification: .newIssueAssigned)
         
-		for c in PRComment.newItems(of: PRComment.self, in: main) {
-			c.processNotifications()
-			c.postSyncAction = PostSyncAction.doNothing.rawValue
-		}
-
 		let latestStatuses = PRStatus.newItems(of: PRStatus.self, in: main)
         var coveredPrs = Set<NSManagedObjectID>()
 		if Settings.notifyOnStatusUpdates {

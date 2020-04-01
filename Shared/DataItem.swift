@@ -4,7 +4,7 @@ import CoreData
 class DataItem: NSManagedObject {
 
     @NSManaged var nodeId: String?
-	@NSManaged var postSyncAction: Int64
+    @NSManaged var postSyncAction: Int64
 	@NSManaged var createdAt: Date?
 	@NSManaged var updatedAt: Date?
 	@NSManaged var apiServer: ApiServer
@@ -282,7 +282,6 @@ class DataItem: NSManagedObject {
         let entityName = String(describing: type)
         
         if node.created {
-            DLog("Creating \(entityName) ID: %@", node.id)
             nodeId = node.id
             createdAt = DataItem.parseGH8601(info["createdAt"] as? String)!
         }
@@ -292,7 +291,6 @@ class DataItem: NSManagedObject {
                 updatedAt = updated
                 if !node.created {
                     node.updated = true
-                    DLog("Updating \(entityName) ID: %@", node.id)
                 }
             }
         } else {
@@ -302,10 +300,14 @@ class DataItem: NSManagedObject {
         }
 
         if node.created {
+            DLog("Creating \(entityName) ID: %@", node.id)
             postSyncAction = PostSyncAction.isNew.rawValue
+            
         } else if node.updated {
+            DLog("Updating \(entityName) ID: %@", node.id)
             postSyncAction = PostSyncAction.isUpdated.rawValue
-        } else {
+            
+        } else if postSyncAction == PostSyncAction.delete.rawValue {
             postSyncAction = PostSyncAction.doNothing.rawValue
         }
         
