@@ -22,7 +22,7 @@ struct Settings {
 			"LAST_EXPORT_URL", "LAST_EXPORT_TIME", "CLOSE_HANDLING_POLICY_2", "MERGE_HANDLING_POLICY_2", "LAST_PREFS_TAB_SELECTED_OSX", "NEW_PR_DISPLAY_POLICY_INDEX", "NEW_ISSUE_DISPLAY_POLICY_INDEX", "HIDE_PRS_THAT_ARENT_PASSING_ONLY_IN_ALL",
 			"INCLUDE_SERVERS_IN_FILTER", "INCLUDE_USERS_IN_FILTER", "INCLUDE_TITLES_IN_FILTER", "INCLUDE_NUMBERS_IN_FILTER", "DUMP_API_RESPONSES_IN_CONSOLE", "OPEN_ITEMS_DIRECTLY_IN_SAFARI", "HIDE_PRS_THAT_ARENT_PASSING",
 			"REMOVE_RELATED_NOTIFICATIONS_ON_ITEM_REMOVE", "HIDE_SNOOZED_ITEMS", "INCLUDE_MILESTONES_IN_FILTER", "INCLUDE_ASSIGNEE_NAMES_IN_FILTER", "API_SERVERS_IN_SEPARATE_MENUS", "ASSUME_READ_ITEM_IF_USER_HAS_NEWER_COMMENTS",
-			"AUTO_SNOOZE_DAYS", "HIDE_MENUBAR_COUNTS", "AUTO_ADD_NEW_REPOS", "AUTO_REMOVE_DELETED_REPOS", "MARK_PRS_AS_UNREAD_ON_NEW_COMMITS", "SHOW_LABELS", "DISPLAY_REVIEW_CHANGE_REQUESTS", "SHOW_RELATIVE_DATES",
+            "AUTO_SNOOZE_DAYS", "HIDE_MENUBAR_COUNTS", "AUTO_ADD_NEW_REPOS", "AUTO_REMOVE_DELETED_REPOS", "MARK_PRS_AS_UNREAD_ON_NEW_COMMITS", "SHOW_LABELS", "DISPLAY_REVIEW_CHANGE_REQUESTS", "SHOW_RELATIVE_DATES", "QUERY_AUTHORED_PRS", "QUERY_AUTHORED_ISSUES",
 			"DISPLAY_MILESTONES", "DEFAULT_APP_FOR_OPENING_WEB", "DEFAULT_APP_FOR_OPENING_ITEMS", "HIDE_ARCHIVED_REPOS", "DRAFT_HANDLING_POLICY", "MARK_UNMERGEABLE_ITEMS", "SHOW_PR_LINES", "SCAN_CLOSED_AND_MERGED", "USE_V4_API", "REQUESTED_TEAM_REVIEWS"]
 	}
 
@@ -786,6 +786,18 @@ struct Settings {
 		get { return get("API_SERVERS_IN_SEPARATE_MENUS") as? Bool ?? false }
 		set { set("API_SERVERS_IN_SEPARATE_MENUS", newValue) }
 	}
+
+    static let queryAuthoredPRsHelp = "Query all authored PRs for the current user, irrespective of repository visibility or if the repository is in the watchlist."
+    static var queryAuthoredPRs: Bool {
+        get { return get("QUERY_AUTHORED_PRS") as? Bool ?? false }
+        set { set("QUERY_AUTHORED_PRS", newValue) }
+    }
+
+    static let queryAuthoredIssuesHelp = "Query all authored issues for the current user, irrespective of repository visibility or if the repository is in the watchlist."
+    static var queryAuthoredIssues: Bool {
+        get { return get("QUERY_AUTHORED_ISSUES") as? Bool ?? false }
+        set { set("QUERY_AUTHORED_ISSUES", newValue) }
+    }
 
 	static let assumeReadItemIfUserHasNewerCommentsHelp = "Mark any comments posted by others before your own as read. Warning: Only turn this on if you are sure you can catch any comments that others may add while you are adding yours! (This is a very useful setting for *secondary* Trailer displays)"
 	static var assumeReadItemIfUserHasNewerComments: Bool {

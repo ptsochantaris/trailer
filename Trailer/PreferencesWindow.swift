@@ -31,7 +31,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	// Preferences window
-	@IBOutlet private weak var projectsTable: NSTableView!
 	@IBOutlet private weak var versionNumber: NSTextField!
 	@IBOutlet private weak var launchAtStartup: NSButton!
 	@IBOutlet private weak var refreshDurationLabel: NSTextField!
@@ -49,6 +48,9 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet private weak var openPrAtFirstUnreadComment: NSButton!
 	@IBOutlet private weak var logActivityToConsole: NSButton!
 	@IBOutlet private weak var commentAuthorBlacklist: NSTokenField!
+    
+    // Repositories
+    @IBOutlet private weak var projectsTable: NSTableView!
 
 	// History
 	@IBOutlet private weak var prMergedPolicy: NSPopUpButton!
@@ -583,7 +585,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
         markUnmergeablePrs.integerValue = Settings.markUnmergeablePrs ? 1 : 0
         showPrLines.integerValue = Settings.showPrLines ? 1 : 0
         showRequestedTeamReviews.integerValue = Settings.showRequestedTeamReviews ? 1 : 0
-        
+                
 		defaultOpenApp.stringValue = Settings.defaultAppForOpeningItems
 		defaultOpenLinks.stringValue = Settings.defaultAppForOpeningWeb
 
@@ -672,7 +674,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
         app.updateAllMenus()
         app.startRefresh()
     }
-
+    
 	@IBAction private func displayNumbersForItemsSelected(_ sender: NSButton) {
 		Settings.displayNumbersForItems = sender.integerValue == 1
 		deferredUpdateTimer.push()
@@ -1564,31 +1566,33 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 				menuCell.isEnabled = true
 				menuCell.arrowPosition = .arrowAtBottom
 
-				var count = 0
 				let fontSize = NSFont.systemFontSize(for: .small)
 				if tid == "hide" {
 					for policy in RepoHidingPolicy.policies {
 						let m = NSMenuItem()
 						m.attributedTitle = NSAttributedString(string: policy.name, attributes: [
-							NSAttributedString.Key.font: count == 0 ? NSFont.systemFont(ofSize: fontSize) : NSFont.boldSystemFont(ofSize: fontSize),
-							NSAttributedString.Key.foregroundColor: policy.color,
+                            .font: policy.bold ? NSFont.boldSystemFont(ofSize: fontSize) : NSFont.systemFont(ofSize: fontSize),
+							.foregroundColor: policy.color,
 							])
 						menuCell.menu?.addItem(m)
-						count += 1
 					}
 					menuCell.selectItem(at: Int(r.itemHidingPolicy))
 				} else {
-					for policy in RepoDisplayPolicy.policies {
+                    let prs = tableColumn?.identifier.rawValue == "prs"
+                    let currentPolicy = prs ? r.displayPolicyForPrs : r.displayPolicyForIssues
+                    let hiddenName = (currentPolicy == RepoDisplayPolicy.authoredOnly.rawValue) ? RepoDisplayPolicy.authoredOnly.name : RepoDisplayPolicy.hide.name
+                    let selectedIndex = (currentPolicy == RepoDisplayPolicy.authoredOnly.rawValue) ? RepoDisplayPolicy.hide.rawValue : currentPolicy
+
+                    for policy in RepoDisplayPolicy.allCases.filter({ $0.selectable }) {
 						let m = NSMenuItem()
-						m.attributedTitle = NSAttributedString(string: policy.name, attributes: [
-							NSAttributedString.Key.font: count == 0 ? NSFont.systemFont(ofSize: fontSize) : NSFont.boldSystemFont(ofSize: fontSize),
-							NSAttributedString.Key.foregroundColor: policy.color,
+                        let name = policy == .hide ? hiddenName : policy.name
+						m.attributedTitle = NSAttributedString(string: name, attributes: [
+							.font: policy.bold ? NSFont.boldSystemFont(ofSize: fontSize) : NSFont.systemFont(ofSize: fontSize),
+							.foregroundColor: policy.color,
 							])
 						menuCell.menu?.addItem(m)
-						count += 1
 					}
-					let selectedIndex = Int(tableColumn?.identifier.rawValue == "prs" ? r.displayPolicyForPrs : r.displayPolicyForIssues)
-					menuCell.selectItem(at: selectedIndex)
+					menuCell.selectItem(at: Int(selectedIndex))
 				}
 			} else if let forkButton = cell as? NSButtonCell {
 				if tid == "fork" {

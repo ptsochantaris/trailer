@@ -163,7 +163,7 @@ final class MenuBarSet {
 	}
 	
 	func updateIssuesMenu(forceVisible: Bool = false) {
-		if forceVisible || Repo.interestedInIssues(fromServerWithId: viewCriterion?.apiServerId) {
+		if forceVisible || Repo.mayProvideIssuesForDisplay(fromServerWithId: viewCriterion?.apiServerId) {
 			
             let hasUnread = Issue.badgeCount(in: DataManager.main, criterion: viewCriterion) > 0
             updateMenu(of: Issue.self, menu: issuesMenu, forceVisible: forceVisible, lengthOffset: 1.5, hasUnread: hasUnread) {
@@ -177,7 +177,7 @@ final class MenuBarSet {
 	
     func updatePrMenu(forceVisible: Bool = false) {
 		let sid = viewCriterion?.apiServerId
-		if forceVisible || Repo.interestedInPrs(fromServerWithId: sid) || !Repo.interestedInIssues(fromServerWithId: sid) {
+		if forceVisible || Repo.mayProvidePrsForDisplay(fromServerWithId: sid) || !Repo.mayProvideIssuesForDisplay(fromServerWithId: sid) {
 			
             let hasUnread = PullRequest.badgeCount(in: DataManager.main, criterion: viewCriterion) > 0
             updateMenu(of: PullRequest.self, menu: prMenu, forceVisible: forceVisible, lengthOffset: -2, hasUnread: hasUnread) {

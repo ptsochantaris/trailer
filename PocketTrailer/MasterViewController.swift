@@ -253,6 +253,9 @@ UITableViewDragDelegate {
 
 	@objc private func refreshEnded() {
         refreshControl?.endRefreshing()
+        if fetchedResultsController.sections?.count ?? 0 == 0 {
+            self.updateStatus(becauseOfChanges: false)
+        }
 	}
     
     private func updateTitle() {
@@ -498,7 +501,7 @@ UITableViewDragDelegate {
 
 	private func tabBarSetForTabItem(i: UITabBarItem?) -> TabBarSet? {
 		guard let i = i else { return tabBarSets.first }
-		return tabBarSets.first(where: { $0.prItem === i || $0.issuesItem === i })
+		return tabBarSets.first { $0.prItem === i || $0.issuesItem === i }
 	}
 
 	func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
@@ -616,7 +619,7 @@ UITableViewDragDelegate {
 		} else if let c = currentTabBarSet {
 			viewingPrs = c.tabItems.first?.image == UIImage(named: "prsTab") // or this :(
 		} else if Repo.anyVisibleRepos(in: DataManager.main, criterion: currentTabBarSet?.viewCriterion, excludeGrouped: true) {
-			viewingPrs = Repo.interestedInPrs(fromServerWithId: currentTabBarSet?.viewCriterion?.apiServerId)
+			viewingPrs = Repo.mayProvidePrsForDisplay(fromServerWithId: currentTabBarSet?.viewCriterion?.apiServerId)
 		} else {
 			viewingPrs = true
 		}

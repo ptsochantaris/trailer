@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="16096" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="16096"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -16,14 +16,14 @@
         <window title="Advanced Repository Settings" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="QvC-M9-y7g" userLabel="Window" customClass="AdvancedReposWindow" customModule="Trailer" customModuleProvider="target">
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="196" y="240" width="638" height="387"/>
+            <rect key="contentRect" x="196" y="240" width="638" height="494"/>
             <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <view key="contentView" wantsLayer="YES" id="EiT-Mj-1SZ">
-                <rect key="frame" x="0.0" y="0.0" width="638" height="387"/>
+                <rect key="frame" x="0.0" y="0.0" width="638" height="494"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <box fixedFrame="YES" title="Watchlists and teams" translatesAutoresizingMaskIntoConstraints="NO" id="5Cb-9o-n6I">
-                        <rect key="frame" x="17" y="201" width="604" height="171"/>
+                        <rect key="frame" x="17" y="308" width="604" height="171"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <view key="contentView" id="VxC-k3-DWi">
                             <rect key="frame" x="3" y="3" width="598" height="153"/>
@@ -97,6 +97,38 @@
                             </subviews>
                         </view>
                     </box>
+                    <box fixedFrame="YES" title="Items created by me in any repository" translatesAutoresizingMaskIntoConstraints="NO" id="z3Y-If-0az">
+                        <rect key="frame" x="17" y="201" width="604" height="103"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <view key="contentView" id="Ksb-TL-CLL">
+                            <rect key="frame" x="3" y="3" width="598" height="85"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ao9-HE-VzB">
+                                    <rect key="frame" x="18" y="49" width="301" height="18"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <buttonCell key="cell" type="check" title="Sync PRs I authored in any repository (v4 API)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="gmb-NI-iE2">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="queryAuthoredPRsSelected:" target="QvC-M9-y7g" id="3rP-jj-HP6"/>
+                                    </connections>
+                                </button>
+                                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KKy-mh-Psl">
+                                    <rect key="frame" x="18" y="22" width="315" height="18"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <buttonCell key="cell" type="check" title="Sync issues I authored in any repository (v4 API)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="elw-Pb-lgG">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="queryAuthoredIssuesSelected:" target="QvC-M9-y7g" id="ifD-2N-ry9"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                        </view>
+                    </box>
                     <box fixedFrame="YES" title="Add a custom repository" translatesAutoresizingMaskIntoConstraints="NO" id="R0A-lE-VTt">
                         <rect key="frame" x="17" y="96" width="604" height="101"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
@@ -145,7 +177,7 @@
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                     <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="fp7-RG-tJa">
                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="menu"/>
+                                        <font key="font" metaFont="system"/>
                                         <menu key="menu" id="jeu-29-d8Q"/>
                                     </popUpButtonCell>
                                 </popUpButton>
@@ -168,7 +200,7 @@
                                     <rect key="frame" x="166" y="19" width="391" height="14"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Enter a star (*) as a repo name to add all repositories from this org/owner." id="f2i-oz-ksw">
-                                        <font key="font" metaFont="smallSystem"/>
+                                        <font key="font" metaFont="message" size="11"/>
                                         <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
@@ -188,7 +220,7 @@
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="zet-Z6-Fkr">
                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="menu"/>
+                                        <font key="font" metaFont="system"/>
                                         <menu key="menu" id="lsq-GS-HWb"/>
                                     </popUpButtonCell>
                                 </popUpButton>
@@ -223,8 +255,10 @@
                 <outlet property="removeRepoList" destination="zet-Z6-Fkr" id="h9Y-fM-K1L"/>
                 <outlet property="repoCheckStepper" destination="5ZD-lq-6Qf" id="VqU-i5-E1y"/>
                 <outlet property="serverPicker" destination="2yd-xG-C2i" id="Tgu-Qe-cSk"/>
+                <outlet property="syncAuthoredIssues" destination="KKy-mh-Psl" id="KWy-nY-0Xd"/>
+                <outlet property="syncAuthoredPrs" destination="ao9-HE-VzB" id="kBK-yp-OJ2"/>
             </connections>
-            <point key="canvasLocation" x="218" y="219.5"/>
+            <point key="canvasLocation" x="218" y="273"/>
         </window>
     </objects>
 </document>

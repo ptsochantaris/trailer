@@ -18,7 +18,7 @@ final class Issue: ListableItem {
         syncItems(of: Issue.self, from: nodes, on: server) { issue, node in
             
             guard node.created || node.updated,
-                let parentId = node.parent?.id,
+                let parentId = node.parent?.id ?? (node.jsonPayload["repository"] as? [AnyHashable: Any])?["id"] as? String,
                 let moc = server.managedObjectContext,
                 let parent = DataItem.item(of: Repo.self, with: parentId, in: moc)
                 else { return }

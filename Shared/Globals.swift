@@ -205,19 +205,60 @@ enum AssignmentPolicy: Int {
 	}
 }
 
-enum RepoDisplayPolicy: Int64 {
-	case hide, mine, mineAndPaticipated, all
-	static let labels = ["Hide", "Mine", "Participated", "All"]
-	static let policies = [hide, mine, mineAndPaticipated, all]
-    static let colors = [    COLOR_CLASS.appTertiaryLabel,
-	                         COLOR_CLASS(red: 0.7, green: 0.0, blue: 0.0, alpha: 1.0),
-	                         COLOR_CLASS(red: 0.8, green: 0.4, blue: 0.0, alpha: 1.0),
-	                         COLOR_CLASS(red: 0.0, green: 0.5, blue: 0.0, alpha: 1.0)]
+enum RepoDisplayPolicy: Int64, CaseIterable {
+	case hide = 0
+    case mine = 1
+    case mineAndPaticipated = 2
+    case all = 3
+    case authoredOnly = 4
+    
+    static var labels: [String] {
+        return self.allCases.map { $0.name }
+    }
+    	                         
 	var name: String {
-		return RepoDisplayPolicy.labels[Int(rawValue)]
+        switch self {
+        case .hide:
+            return "Hide"
+        case .mine:
+            return "Mine"
+        case .mineAndPaticipated:
+            return "Participated"
+        case .all:
+            return "All"
+        case .authoredOnly:
+            return "Authored"
+        }
 	}
-	var color: COLOR_CLASS {
-		return RepoDisplayPolicy.colors[Int(rawValue)]
+    var bold: Bool {
+        switch self {
+        case .hide, .authoredOnly:
+            return false
+        default:
+            return true
+        }
+    }
+    var selectable: Bool {
+        switch self {
+        case .authoredOnly:
+            return false
+        default:
+            return true
+        }
+    }
+    var color: COLOR_CLASS {
+        switch self {
+        case .hide:
+            return COLOR_CLASS.appTertiaryLabel
+        case .authoredOnly:
+            return COLOR_CLASS.label
+        case .mine:
+            return COLOR_CLASS(red: 0.7, green: 0.0, blue: 0.0, alpha: 1.0)
+        case .mineAndPaticipated:
+            return COLOR_CLASS(red: 0.8, green: 0.4, blue: 0.0, alpha: 1.0)
+        case .all:
+            return COLOR_CLASS(red: 0.0, green: 0.5, blue: 0.0, alpha: 1.0)
+        }
 	}
 	var intValue: Int { return Int(rawValue) }
 
@@ -248,7 +289,15 @@ enum RepoHidingPolicy: Int64 {
 	var name: String {
 		return RepoHidingPolicy.labels[Int(rawValue)]
 	}
-	var color: COLOR_CLASS {
+    var bold: Bool {
+        switch self {
+        case .noHiding:
+            return false
+        default:
+            return true
+        }
+    }
+    var color: COLOR_CLASS {
 		return RepoHidingPolicy.colors[Int(rawValue)]
 	}
 	init?(_ rawValue: Int64) {

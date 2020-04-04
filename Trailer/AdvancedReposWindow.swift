@@ -10,6 +10,9 @@ final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 	@IBOutlet private weak var autoRemoveRepos: NSButton!
 	@IBOutlet private weak var hideArchivedRepos: NSButton!
 
+    @IBOutlet private weak var syncAuthoredPrs: NSButton!
+    @IBOutlet private weak var syncAuthoredIssues: NSButton!
+
 	weak var prefs: PreferencesWindow?
 
 	override func awakeFromNib() {
@@ -20,9 +23,14 @@ final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 		refreshReposLabel.toolTip = Settings.newRepoCheckPeriodHelp
 		repoCheckStepper.toolTip = Settings.newRepoCheckPeriodHelp
 		repoCheckStepper.floatValue = Settings.newRepoCheckPeriod
-		autoAddRepos.integerValue = Settings.automaticallyAddNewReposFromWatchlist ? 1 : 0
+        syncAuthoredPrs.toolTip = Settings.queryAuthoredPRsHelp
+        syncAuthoredIssues.toolTip = Settings.queryAuthoredIssuesHelp
+
+        autoAddRepos.integerValue = Settings.automaticallyAddNewReposFromWatchlist ? 1 : 0
 		autoRemoveRepos.integerValue = Settings.automaticallyRemoveDeletedReposFromWatchlist ? 1 : 0
 		hideArchivedRepos.integerValue = Settings.hideArchivedRepos ? 1 : 0
+        syncAuthoredPrs.integerValue = Settings.queryAuthoredPRs ? 1 : 0
+        syncAuthoredIssues.integerValue = Settings.queryAuthoredIssues ? 1 : 0
 
 		newRepoCheckChanged(nil)
 
@@ -101,6 +109,18 @@ final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 			DataManager.saveDB()
 		}
 	}
+    
+    @IBAction private func queryAuthoredPRsSelected(_ sender: NSButton) {
+        Settings.queryAuthoredPRs = (sender.integerValue == 1)
+        lastRepoCheck = .distantPast
+        preferencesDirty = true
+    }
+
+    @IBAction private func queryAuthoredIssuesSelected(_ sender: NSButton) {
+        Settings.queryAuthoredIssues = (sender.integerValue == 1)
+        lastRepoCheck = .distantPast
+        preferencesDirty = true
+    }
 
 	@IBAction private func automaticallyAddNewReposSelected(_ sender: NSButton) {
 		let set = sender.integerValue == 1

@@ -279,15 +279,13 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 	}
 
 	private func prTitleForRepo(repo: Repo) -> NSAttributedString {
-
 		let policy = RepoDisplayPolicy(repo.displayPolicyForPrs) ?? .hide
-		return NSAttributedString(string: "PR Sections: \(policy.name)", attributes: attributes(for: policy))
+		return NSAttributedString(string: "PRs: \(policy.name)", attributes: attributes(for: policy))
 	}
 
 	private func issueTitleForRepo(repo: Repo) -> NSAttributedString {
-
 		let policy = RepoDisplayPolicy(repo.displayPolicyForIssues) ?? .hide
-		return NSAttributedString(string: "Issue Sections: \(policy.name)", attributes: attributes(for: policy))
+		return NSAttributedString(string: "Issues: \(policy.name)", attributes: attributes(for: policy))
 	}
 
 	private func groupTitleForRepo(repo: Repo) -> NSAttributedString {

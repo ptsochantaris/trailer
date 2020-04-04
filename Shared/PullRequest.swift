@@ -32,7 +32,7 @@ final class PullRequest: ListableItem {
         syncItems(of: PullRequest.self, from: nodes, on: server) { pr, node in
             
             guard node.created || node.updated,
-                let parentId = node.parent?.id,
+                let parentId = node.parent?.id ?? (node.jsonPayload["repository"] as? [AnyHashable: Any])?["id"] as? String,
                 let moc = server.managedObjectContext,
                 let parent = DataItem.item(of: Repo.self, with: parentId, in: moc)
                 else { return }

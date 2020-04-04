@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="15705" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="16096" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="15705"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="16096"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -27,7 +27,7 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <buttonCell key="cell" type="check" title="Start Trailer at Login" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" scrollable="YES" lineBreakMode="clipping" state="on" inset="2" id="qbn-he-5QB">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                            <font key="font" metaFont="toolTip"/>
+                            <font key="font" metaFont="message" size="11"/>
                         </buttonCell>
                         <connections>
                             <action selector="launchAtStartSelected:" target="vQH-WF-vh2" id="neu-tk-tNn"/>
@@ -37,7 +37,7 @@
                         <rect key="frame" x="713" y="3" width="158" height="20"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Version" id="YMV-pm-TMh">
-                            <font key="font" metaFont="toolTip"/>
+                            <font key="font" metaFont="message" size="11"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
@@ -48,18 +48,18 @@
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
                             <tabViewItem label="Servers" identifier="" id="SOc-1o-tdR">
-                                <view key="view" ambiguous="YES" id="qLY-Ye-wy7">
+                                <view key="view" id="qLY-Ye-wy7">
                                     <rect key="frame" x="10" y="33" width="834" height="426"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <scrollView fixedFrame="YES" autohidesScrollers="YES" horizontalLineScroll="26" horizontalPageScroll="10" verticalLineScroll="26" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FEq-Qw-Vgd">
                                             <rect key="frame" x="18" y="55" width="240" height="330"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" heightSizable="YES"/>
-                                            <clipView key="contentView" ambiguous="YES" id="0eh-Pe-UwN">
+                                            <clipView key="contentView" id="0eh-Pe-UwN">
                                                 <rect key="frame" x="1" y="0.0" width="238" height="329"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <tableView verticalHuggingPriority="750" ambiguous="YES" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" headerView="GLY-La-oaP" id="wPh-gi-N9t">
+                                                    <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" headerView="GLY-La-oaP" id="wPh-gi-N9t">
                                                         <rect key="frame" x="0.0" y="0.0" width="238" height="312"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <size key="intercellSpacing" width="3" height="9"/>
@@ -68,7 +68,6 @@
                                                         <tableColumns>
                                                             <tableColumn identifier="server" editable="NO" width="170" minWidth="40" maxWidth="1000" id="8yd-Ed-e1H">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Server">
-                                                                    <font key="font" metaFont="toolTip"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                 </tableHeaderCell>
@@ -81,7 +80,6 @@
                                                             </tableColumn>
                                                             <tableColumn identifier="api_use" editable="NO" width="62" minWidth="10" maxWidth="3.4028234663852886e+38" id="pbE-pE-euq">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="API use">
-                                                                    <font key="font" metaFont="toolTip"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                 </tableHeaderCell>
@@ -116,7 +114,7 @@
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <buttonCell key="cell" type="smallSquare" title="+ Add API Server" bezelStyle="smallSquare" imagePosition="overlaps" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="7aw-xD-7EL">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="label"/>
+                                                <font key="font" metaFont="system" size="10"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="addNewApiServerSelected:" target="vQH-WF-vh2" id="twq-Bg-WX4"/>
@@ -166,7 +164,7 @@
                                                         <rect key="frame" x="6" y="315" width="90" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="v3 API Path" id="3XX-k0-LtU">
-                                                            <font key="font" metaFont="toolTip"/>
+                                                            <font key="font" metaFont="message" size="11"/>
                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
@@ -175,7 +173,7 @@
                                                         <rect key="frame" x="6" y="174" width="90" height="68"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" id="Bam-mX-Su4">
-                                                            <font key="font" metaFont="toolTip"/>
+                                                            <font key="font" metaFont="message" size="11"/>
                                                             <string key="title">Personal
 Access
 Token</string>
@@ -187,7 +185,7 @@ Token</string>
                                                         <rect key="frame" x="6" y="347" width="90" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Name" id="Wcj-U6-Jja">
-                                                            <font key="font" metaFont="toolTip"/>
+                                                            <font key="font" metaFont="message" size="11"/>
                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
@@ -196,7 +194,7 @@ Token</string>
                                                         <rect key="frame" x="6" y="251" width="90" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Web Front End" id="vhl-W9-zqM">
-                                                            <font key="font" metaFont="toolTip"/>
+                                                            <font key="font" metaFont="message" size="11"/>
                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
@@ -242,7 +240,7 @@ Token</string>
                                                         <rect key="frame" x="6" y="283" width="90" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="v4 API Path" id="Xc9-HE-Oom">
-                                                            <font key="font" metaFont="toolTip"/>
+                                                            <font key="font" metaFont="message" size="11"/>
                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
@@ -307,7 +305,7 @@ Token</string>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Report syncing problems with this server" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="SQa-fC-sUh">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="toolTip"/>
+                                                            <font key="font" metaFont="message" size="11"/>
                                                         </buttonCell>
                                                         <connections>
                                                             <action selector="apiServerReportErrorSelected:" target="vQH-WF-vh2" id="if5-14-f5r"/>
@@ -315,7 +313,7 @@ Token</string>
                                                     </button>
                                                     <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KSf-5a-vXT">
                                                         <rect key="frame" x="102" y="286" width="438" height="24"/>
-                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="https://api.github.com/graphql (for GE: https://server/api/graphql)" drawsBackground="YES" id="jyV-JW-SFT">
                                                             <font key="font" metaFont="system"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -348,14 +346,14 @@ Token</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <scrollView fixedFrame="YES" autohidesScrollers="YES" horizontalLineScroll="28" horizontalPageScroll="10" verticalLineScroll="28" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dPG-Wd-B7N">
-                                            <rect key="frame" x="14" y="103" width="807" height="315"/>
+                                            <rect key="frame" x="14" y="103" width="807" height="320"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                            <clipView key="contentView" ambiguous="YES" id="hCD-zR-3bF">
-                                                <rect key="frame" x="1" y="0.0" width="805" height="314"/>
-                                                <autoresizingMask key="autoresizingMask"/>
+                                            <clipView key="contentView" id="hCD-zR-3bF">
+                                                <rect key="frame" x="1" y="0.0" width="805" height="319"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <tableView verticalHuggingPriority="750" ambiguous="YES" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" rowHeight="20" headerView="qia-ub-v1J" id="6pK-a1-URw">
-                                                        <rect key="frame" x="0.0" y="0.0" width="805" height="297"/>
+                                                    <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" rowHeight="20" headerView="qia-ub-v1J" id="6pK-a1-URw">
+                                                        <rect key="frame" x="0.0" y="0.0" width="805" height="302"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <size key="intercellSpacing" width="8" height="8"/>
                                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -363,7 +361,6 @@ Token</string>
                                                         <tableColumns>
                                                             <tableColumn identifier="repos" editable="NO" width="329" minWidth="100" maxWidth="10000" id="nW5-Ng-D0l">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Watched Repository">
-                                                                    <font key="font" metaFont="toolTip"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.33333298560000002" alpha="1" colorSpace="calibratedWhite"/>
                                                                 </tableHeaderCell>
@@ -377,12 +374,11 @@ Token</string>
                                                             </tableColumn>
                                                             <tableColumn identifier="group" width="48" minWidth="10" maxWidth="1000" id="8j5-1c-L78" userLabel="Group">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Group">
-                                                                    <font key="font" metaFont="toolTip"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                                 </tableHeaderCell>
                                                                 <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" alignment="left" placeholderString="" usesSingleLineMode="YES" id="zpI-WL-h8X" customClass="TextFieldCell" customModule="Trailer" customModuleProvider="target">
-                                                                    <font key="font" metaFont="toolTip"/>
+                                                                    <font key="font" metaFont="message" size="11"/>
                                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                 </textFieldCell>
@@ -390,7 +386,6 @@ Token</string>
                                                             </tableColumn>
                                                             <tableColumn identifier="hide" width="136" minWidth="10" maxWidth="1000" id="pRg-vg-7bD" userLabel="Hide">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Author Based Hiding">
-                                                                    <font key="font" metaFont="toolTip"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                                 </tableHeaderCell>
@@ -403,7 +398,6 @@ Token</string>
                                                             </tableColumn>
                                                             <tableColumn identifier="prs" editable="NO" width="110" minWidth="40" maxWidth="1000" id="FAL-Ui-K4b" userLabel="Pull Requests">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Pull Requests">
-                                                                    <font key="font" metaFont="toolTip"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.33333298560000002" alpha="1" colorSpace="calibratedWhite"/>
                                                                 </tableHeaderCell>
@@ -416,7 +410,6 @@ Token</string>
                                                             </tableColumn>
                                                             <tableColumn identifier="issues" editable="NO" width="110" minWidth="40" maxWidth="1000" id="P1T-D7-Rnp" userLabel="Issues">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Issues">
-                                                                    <font key="font" metaFont="toolTip"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.33333298560000002" alpha="1" colorSpace="calibratedWhite"/>
                                                                 </tableHeaderCell>
@@ -429,7 +422,6 @@ Token</string>
                                                             </tableColumn>
                                                             <tableColumn identifier="fork" editable="NO" width="24" minWidth="10" maxWidth="3.4028234663852886e+38" id="RB5-FQ-ycS" userLabel="Forked">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Fork">
-                                                                    <font key="font" metaFont="toolTip"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 </tableHeaderCell>
@@ -528,7 +520,7 @@ Token</string>
                                             <rect key="frame" x="14" y="73" width="408" height="22"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                             <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" placeholderString="Filter…" usesSingleLineMode="YES" bezelStyle="round" id="dZ4-dF-dkV">
-                                                <font key="font" metaFont="controlContent"/>
+                                                <font key="font" metaFont="label" size="12"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </searchFieldCell>
@@ -579,424 +571,430 @@ Token</string>
                                     <rect key="frame" x="10" y="33" width="834" height="426"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <box autoresizesSubviews="NO" fixedFrame="YES" boxType="secondary" borderType="line" title="Refreshing" translatesAutoresizingMaskIntoConstraints="NO" id="zpr-xa-Rug">
-                                            <rect key="frame" x="454" y="5" width="373" height="84"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                                            <view key="contentView" id="LeE-vI-Qal">
-                                                <rect key="frame" x="3" y="3" width="367" height="66"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                <subviews>
-                                                    <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="INA-l0-fZh">
-                                                        <rect key="frame" x="335" y="8" width="19" height="27"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <stepperCell key="cell" continuous="YES" alignment="left" increment="10" minValue="60" maxValue="3600" doubleValue="60" id="EvF-c3-Alv"/>
-                                                        <connections>
-                                                            <action selector="refreshDurationChanged:" target="vQH-WF-vh2" id="y1L-xR-vLZ"/>
-                                                        </connections>
-                                                    </stepper>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Zu0-k7-csJ">
-                                                        <rect key="frame" x="72" y="13" width="263" height="17"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Refresh items every 3600 seconds" id="tcS-Fj-NKu">
-                                                            <font key="font" metaFont="system"/>
-                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
-                                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ueT-Kq-j9E">
-                                                        <rect key="frame" x="72" y="39" width="281" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Gray menubar count when refreshing" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="4bJ-dN-Uhp">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="grayOutWhenRefreshingSelected:" target="vQH-WF-vh2" id="fCv-C1-fWf"/>
-                                                        </connections>
-                                                    </button>
-                                                </subviews>
-                                            </view>
-                                        </box>
-                                        <box autoresizesSubviews="NO" fixedFrame="YES" borderType="line" title="When something from &quot;all items&quot; is assigned to me…" translatesAutoresizingMaskIntoConstraints="NO" id="96h-4X-0sU">
-                                            <rect key="frame" x="454" y="274" width="374" height="73"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                                            <view key="contentView" id="evv-lI-oOm">
-                                                <rect key="frame" x="3" y="3" width="368" height="55"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                <subviews>
-                                                    <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lB5-eS-YSK">
-                                                        <rect key="frame" x="16" y="15" width="339" height="26"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <popUpButtonCell key="cell" type="push" title="Do nothing" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="9TM-I1-9UP" id="rPe-gD-wp2">
-                                                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                            <menu key="menu" id="cHj-CQ-Gut">
-                                                                <items>
-                                                                    <menuItem title="Move to &quot;My&quot; section" id="RE2-yr-udn"/>
-                                                                    <menuItem title="Move to &quot;Participated&quot; section" id="RS4-Xg-Tc4"/>
-                                                                    <menuItem title="Do nothing" state="on" id="9TM-I1-9UP"/>
-                                                                </items>
-                                                            </menu>
-                                                        </popUpButtonCell>
-                                                        <connections>
-                                                            <action selector="assignedPrHandlingPolicySelected:" target="vQH-WF-vh2" id="lmg-Bg-Cqp"/>
-                                                        </connections>
-                                                    </popUpButton>
-                                                </subviews>
-                                            </view>
-                                        </box>
-                                        <box autoresizesSubviews="NO" fixedFrame="YES" boxType="secondary" borderType="line" title="When filtering, always check…" translatesAutoresizingMaskIntoConstraints="NO" id="iei-ab-K9r">
-                                            <rect key="frame" x="454" y="161" width="373" height="108"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                                            <view key="contentView" id="Gwd-Lx-fke">
-                                                <rect key="frame" x="3" y="3" width="367" height="90"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                <subviews>
-                                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Jr3-YU-DrS">
-                                                        <rect key="frame" x="21" y="37" width="91" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Statuses" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="Dds-V9-uRU">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="includeStatusesInFilteringSelected:" target="vQH-WF-vh2" id="99K-Kf-87w"/>
-                                                        </connections>
-                                                    </button>
-                                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eFR-P1-MxA">
-                                                        <rect key="frame" x="140" y="62" width="76" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Labels" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="6Za-6G-OIl">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="includeLabelsInFilteringSelected:" target="vQH-WF-vh2" id="YrY-h8-hA2"/>
-                                                        </connections>
-                                                    </button>
-                                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dTw-ed-XkE">
-                                                        <rect key="frame" x="245" y="62" width="91" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Repos" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="gO1-Ad-AhD">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="includeRepositoriesInfilterSelected:" target="vQH-WF-vh2" id="mxT-kL-vT4"/>
-                                                        </connections>
-                                                    </button>
-                                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0Tg-YN-sVl">
-                                                        <rect key="frame" x="140" y="37" width="76" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Author" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="Z30-Co-sRo">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="includeUsersInFilteringSelected:" target="vQH-WF-vh2" id="oBR-vD-jss"/>
-                                                        </connections>
-                                                    </button>
-                                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8bu-9K-ALi">
-                                                        <rect key="frame" x="260" y="12" width="76" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Server" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="3Gg-aQ-pv0">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="includeServersInFilteringSelected:" target="vQH-WF-vh2" id="IWr-bS-8D9"/>
-                                                        </connections>
-                                                    </button>
-                                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Iwj-YJ-JSd">
-                                                        <rect key="frame" x="21" y="62" width="91" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Title" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="ddT-lB-RJ9">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="includeTitlesInFilteringSelected:" target="vQH-WF-vh2" id="dUz-hp-MGj"/>
-                                                        </connections>
-                                                    </button>
-                                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xzP-Bb-u07">
-                                                        <rect key="frame" x="139" y="12" width="77" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Number" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="5z6-1p-c6d">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="includeNumbersInFilteringSelected:" target="vQH-WF-vh2" id="HOz-7T-URJ"/>
-                                                        </connections>
-                                                    </button>
-                                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dox-eD-j7t">
-                                                        <rect key="frame" x="20" y="12" width="92" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Assignee" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="BZz-Yp-SYO">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="includeAssigneeNamesInFilteringSelected:" target="vQH-WF-vh2" id="vOj-Cf-n8G"/>
-                                                        </connections>
-                                                    </button>
-                                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mcG-nC-uWB">
-                                                        <rect key="frame" x="245" y="37" width="91" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Milestone" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="ntc-vT-q5O">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="includeMilestonesInFilteringSelected:" target="vQH-WF-vh2" id="9QK-Oo-Qpz"/>
-                                                        </connections>
-                                                    </button>
-                                                </subviews>
-                                            </view>
-                                        </box>
-                                        <box fixedFrame="YES" borderType="line" title="Sorting" translatesAutoresizingMaskIntoConstraints="NO" id="fNC-DY-p8H">
-                                            <rect key="frame" x="6" y="5" width="446" height="84"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                                            <view key="contentView" id="Feb-GG-39G">
-                                                <rect key="frame" x="3" y="3" width="440" height="66"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                <subviews>
-                                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="afo-70-80J">
-                                                        <rect key="frame" x="51" y="5" width="149" height="25"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Reverse direction" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="6ye-0C-sLV">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="sortOrderSelected:" target="vQH-WF-vh2" id="tjk-D1-1ga"/>
-                                                        </connections>
-                                                    </button>
-                                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TqD-G8-E24">
-                                                        <rect key="frame" x="199" y="5" width="164" height="25"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Group by repository" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="AYd-ds-ReS">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="groupbyRepoSelected:" target="vQH-WF-vh2" id="rlf-CZ-Cee"/>
-                                                        </connections>
-                                                    </button>
-                                                    <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bWX-fP-uhd">
-                                                        <rect key="frame" x="41" y="32" width="312" height="26"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="PQf-4J-ChU">
-                                                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                            <menu key="menu" title="OtherViews" id="oX1-2z-FQn">
-                                                                <items>
-                                                                    <menuItem title="Sorting" id="DAj-5M-Ln1"/>
-                                                                    <menuItem title="Item 2" id="n4v-z6-mEm"/>
-                                                                    <menuItem title="Item 3" id="Hiu-2H-1c4"/>
-                                                                </items>
-                                                            </menu>
-                                                        </popUpButtonCell>
-                                                        <connections>
-                                                            <action selector="sortMethodChanged:" target="vQH-WF-vh2" id="SNP-Ce-rEB"/>
-                                                        </connections>
-                                                    </popUpButton>
-                                                </subviews>
-                                            </view>
-                                        </box>
-                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" setsMaxLayoutWidthAtFirstLayout="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CDe-lj-xrh">
-                                            <rect key="frame" x="480" y="90" width="322" height="72"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" id="ixu-zC-YfY">
-                                                <font key="font" metaFont="label" size="9"/>
-                                                <string key="title">You can use title: server: label: repo: user: number: milestone: assignee: and status: to filter specific properties, e.g. "label:bug,suggestion". Prefix with '!' to exclude some terms.
+                                        <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2sV-KJ-4NT">
+                                            <rect key="frame" x="9" y="9" width="816" height="412"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                            <subviews>
+                                                <box autoresizesSubviews="NO" fixedFrame="YES" boxType="secondary" borderType="line" title="Refreshing" translatesAutoresizingMaskIntoConstraints="NO" id="zpr-xa-Rug">
+                                                    <rect key="frame" x="445" y="-4" width="373" height="84"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                                    <view key="contentView" id="LeE-vI-Qal">
+                                                        <rect key="frame" x="3" y="3" width="367" height="66"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                        <subviews>
+                                                            <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="INA-l0-fZh">
+                                                                <rect key="frame" x="335" y="8" width="19" height="27"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <stepperCell key="cell" continuous="YES" alignment="left" increment="10" minValue="60" maxValue="3600" doubleValue="60" id="EvF-c3-Alv"/>
+                                                                <connections>
+                                                                    <action selector="refreshDurationChanged:" target="vQH-WF-vh2" id="y1L-xR-vLZ"/>
+                                                                </connections>
+                                                            </stepper>
+                                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Zu0-k7-csJ">
+                                                                <rect key="frame" x="72" y="13" width="263" height="17"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Refresh items every 3600 seconds" id="tcS-Fj-NKu">
+                                                                    <font key="font" metaFont="system"/>
+                                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                            </textField>
+                                                            <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ueT-Kq-j9E">
+                                                                <rect key="frame" x="72" y="39" width="281" height="18"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <buttonCell key="cell" type="check" title="Gray menubar count when refreshing" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="4bJ-dN-Uhp">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <connections>
+                                                                    <action selector="grayOutWhenRefreshingSelected:" target="vQH-WF-vh2" id="fCv-C1-fWf"/>
+                                                                </connections>
+                                                            </button>
+                                                        </subviews>
+                                                    </view>
+                                                </box>
+                                                <box fixedFrame="YES" borderType="line" title="Sorting" translatesAutoresizingMaskIntoConstraints="NO" id="fNC-DY-p8H">
+                                                    <rect key="frame" x="-3" y="-4" width="446" height="84"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                                    <view key="contentView" id="Feb-GG-39G">
+                                                        <rect key="frame" x="3" y="3" width="440" height="66"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                        <subviews>
+                                                            <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="afo-70-80J">
+                                                                <rect key="frame" x="51" y="5" width="149" height="25"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <buttonCell key="cell" type="check" title="Reverse direction" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="6ye-0C-sLV">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <connections>
+                                                                    <action selector="sortOrderSelected:" target="vQH-WF-vh2" id="tjk-D1-1ga"/>
+                                                                </connections>
+                                                            </button>
+                                                            <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TqD-G8-E24">
+                                                                <rect key="frame" x="199" y="5" width="164" height="25"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <buttonCell key="cell" type="check" title="Group by repository" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="AYd-ds-ReS">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <connections>
+                                                                    <action selector="groupbyRepoSelected:" target="vQH-WF-vh2" id="rlf-CZ-Cee"/>
+                                                                </connections>
+                                                            </button>
+                                                            <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bWX-fP-uhd">
+                                                                <rect key="frame" x="41" y="32" width="312" height="26"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="PQf-4J-ChU">
+                                                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                    <menu key="menu" title="OtherViews" id="oX1-2z-FQn">
+                                                                        <items>
+                                                                            <menuItem title="Sorting" id="DAj-5M-Ln1"/>
+                                                                            <menuItem title="Item 2" id="n4v-z6-mEm"/>
+                                                                            <menuItem title="Item 3" id="Hiu-2H-1c4"/>
+                                                                        </items>
+                                                                    </menu>
+                                                                </popUpButtonCell>
+                                                                <connections>
+                                                                    <action selector="sortMethodChanged:" target="vQH-WF-vh2" id="SNP-Ce-rEB"/>
+                                                                </connections>
+                                                            </popUpButton>
+                                                        </subviews>
+                                                    </view>
+                                                </box>
+                                                <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="12" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" fixedFrame="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TRE-eo-aLK">
+                                                    <rect key="frame" x="8" y="102" width="328" height="300"/>
+                                                    <subviews>
+                                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="Efg-Id-lOP">
+                                                            <rect key="frame" x="-2" y="284" width="332" height="18"/>
+                                                            <buttonCell key="cell" type="check" title="Display item creation times instead of update times" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="yUS-qR-eV4">
+                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                <font key="font" metaFont="system"/>
+                                                            </buttonCell>
+                                                            <connections>
+                                                                <action selector="showCreationSelected:" target="vQH-WF-vh2" id="ie4-88-nBp"/>
+                                                            </connections>
+                                                        </button>
+                                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="yK4-xL-QRu">
+                                                            <rect key="frame" x="-2" y="258" width="164" height="18"/>
+                                                            <buttonCell key="cell" type="check" title="Show repository names" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="oZY-hH-Udu">
+                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                <font key="font" metaFont="system"/>
+                                                            </buttonCell>
+                                                            <connections>
+                                                                <action selector="displayRepositoryNameSelected:" target="vQH-WF-vh2" id="PMz-8Z-bde"/>
+                                                            </connections>
+                                                        </button>
+                                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="onl-1T-RTg">
+                                                            <rect key="frame" x="-2" y="232" width="271" height="18"/>
+                                                            <buttonCell key="cell" type="check" title="Display relative instead of absolute dates" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="Mtr-gs-YsM">
+                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                <font key="font" metaFont="system"/>
+                                                            </buttonCell>
+                                                            <connections>
+                                                                <action selector="showRelativeDatesSelected:" target="vQH-WF-vh2" id="XEh-sO-gUY"/>
+                                                            </connections>
+                                                        </button>
+                                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="3CV-9S-gLw">
+                                                            <rect key="frame" x="-2" y="206" width="141" height="18"/>
+                                                            <buttonCell key="cell" type="check" title="Hide author avatars" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="UOs-3D-XyL">
+                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                <font key="font" metaFont="system"/>
+                                                            </buttonCell>
+                                                            <connections>
+                                                                <action selector="hideAvatarsSelected:" target="vQH-WF-vh2" id="45w-QA-Tcd"/>
+                                                            </connections>
+                                                        </button>
+                                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="VrU-mc-Czw">
+                                                            <rect key="frame" x="-2" y="180" width="326" height="18"/>
+                                                            <buttonCell key="cell" type="check" title="Separate each API server in its own menu bar item" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="C7K-xS-315">
+                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                <font key="font" metaFont="system"/>
+                                                            </buttonCell>
+                                                            <connections>
+                                                                <action selector="showSeparateApiServersInMenuSelected:" target="vQH-WF-vh2" id="BHL-pf-2SO"/>
+                                                            </connections>
+                                                        </button>
+                                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="9fQ-lN-76c">
+                                                            <rect key="frame" x="-2" y="154" width="226" height="18"/>
+                                                            <buttonCell key="cell" type="check" title="Hide item count in menubar items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="mAZ-e8-NLS">
+                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                <font key="font" metaFont="system"/>
+                                                            </buttonCell>
+                                                            <connections>
+                                                                <action selector="hideCountsOnMenubarSelected:" target="vQH-WF-vh2" id="zMz-z0-ZEU"/>
+                                                            </connections>
+                                                        </button>
+                                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="TdQ-hP-A3t">
+                                                            <rect key="frame" x="-2" y="128" width="221" height="18"/>
+                                                            <buttonCell key="cell" type="check" title="Sync and display labels for items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="5sv-cq-odI">
+                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                <font key="font" metaFont="system"/>
+                                                            </buttonCell>
+                                                            <connections>
+                                                                <action selector="showLabelsSelected:" target="vQH-WF-vh2" id="qDj-Oe-xbz"/>
+                                                            </connections>
+                                                        </button>
+                                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="fsA-E5-SRy">
+                                                            <rect key="frame" x="-2" y="102" width="247" height="18"/>
+                                                            <buttonCell key="cell" type="check" title="Highlight PRs that have new commits" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="T2C-n7-dIU">
+                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                <font key="font" metaFont="system"/>
+                                                            </buttonCell>
+                                                            <connections>
+                                                                <action selector="highlightItemsWithNewCommitsSelected:" target="vQH-WF-vh2" id="ccI-te-cRo"/>
+                                                            </connections>
+                                                        </button>
+                                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="GMt-gT-i3d">
+                                                            <rect key="frame" x="-2" y="76" width="165" height="18"/>
+                                                            <buttonCell key="cell" type="check" title="Display item milestones" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="fnW-oB-nHX">
+                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                <font key="font" metaFont="system"/>
+                                                            </buttonCell>
+                                                            <connections>
+                                                                <action selector="displayMilestonesSelected:" target="vQH-WF-vh2" id="sId-Th-WpZ"/>
+                                                            </connections>
+                                                        </button>
+                                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="CjN-R7-2iD">
+                                                            <rect key="frame" x="-2" y="50" width="247" height="18"/>
+                                                            <buttonCell key="cell" type="check" title="Prefix PR/Issue numbers in item titles" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="A3t-GS-DJr">
+                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                <font key="font" metaFont="system"/>
+                                                            </buttonCell>
+                                                            <connections>
+                                                                <action selector="displayNumbersForItemsSelected:" target="vQH-WF-vh2" id="BQY-uP-tDo"/>
+                                                            </connections>
+                                                        </button>
+                                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="qXS-9a-Cpn">
+                                                            <rect key="frame" x="-2" y="24" width="257" height="18"/>
+                                                            <buttonCell key="cell" type="check" title="Mark non-mergeable PRs (v4 API only)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="lKz-ia-ofo">
+                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                <font key="font" metaFont="system"/>
+                                                            </buttonCell>
+                                                            <connections>
+                                                                <action selector="markUnmergeablePrsSelected:" target="vQH-WF-vh2" id="ENU-Ip-nr5"/>
+                                                            </connections>
+                                                        </button>
+                                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="yQr-zH-RGb">
+                                                            <rect key="frame" x="-2" y="-2" width="226" height="18"/>
+                                                            <buttonCell key="cell" type="check" title="Show PR line counts (v4 API only)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="GH6-q7-P3x">
+                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                <font key="font" metaFont="system"/>
+                                                            </buttonCell>
+                                                            <connections>
+                                                                <action selector="showPrLinesSelected:" target="vQH-WF-vh2" id="Dsc-Fh-32N"/>
+                                                            </connections>
+                                                        </button>
+                                                    </subviews>
+                                                    <visibilityPriorities>
+                                                        <integer value="1000"/>
+                                                        <integer value="1000"/>
+                                                        <integer value="1000"/>
+                                                        <integer value="1000"/>
+                                                        <integer value="1000"/>
+                                                        <integer value="1000"/>
+                                                        <integer value="1000"/>
+                                                        <integer value="1000"/>
+                                                        <integer value="1000"/>
+                                                        <integer value="1000"/>
+                                                        <integer value="1000"/>
+                                                        <integer value="1000"/>
+                                                    </visibilityPriorities>
+                                                    <customSpacing>
+                                                        <real value="3.4028234663852886e+38"/>
+                                                        <real value="3.4028234663852886e+38"/>
+                                                        <real value="3.4028234663852886e+38"/>
+                                                        <real value="3.4028234663852886e+38"/>
+                                                        <real value="3.4028234663852886e+38"/>
+                                                        <real value="3.4028234663852886e+38"/>
+                                                        <real value="3.4028234663852886e+38"/>
+                                                        <real value="3.4028234663852886e+38"/>
+                                                        <real value="3.4028234663852886e+38"/>
+                                                        <real value="3.4028234663852886e+38"/>
+                                                        <real value="3.4028234663852886e+38"/>
+                                                        <real value="3.4028234663852886e+38"/>
+                                                    </customSpacing>
+                                                </stackView>
+                                                <box autoresizesSubviews="NO" fixedFrame="YES" borderType="line" title="If an item is a draft…" translatesAutoresizingMaskIntoConstraints="NO" id="IV7-Ff-s3B">
+                                                    <rect key="frame" x="445" y="343" width="374" height="69"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                                    <view key="contentView" id="Fun-OY-4yH">
+                                                        <rect key="frame" x="3" y="3" width="368" height="51"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                        <subviews>
+                                                            <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Cpe-1u-UbD">
+                                                                <rect key="frame" x="16" y="11" width="339" height="26"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <popUpButtonCell key="cell" type="push" title="Do Nothing" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="k6A-y3-mud" id="pj8-Vh-2mr">
+                                                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                    <menu key="menu" id="lZw-wc-hGu">
+                                                                        <items>
+                                                                            <menuItem title="Do Nothing" state="on" id="k6A-y3-mud"/>
+                                                                            <menuItem title="Display in Title" id="OSK-kJ-Bf9"/>
+                                                                            <menuItem title="Hide It" id="u1k-41-kbo"/>
+                                                                        </items>
+                                                                    </menu>
+                                                                </popUpButtonCell>
+                                                                <connections>
+                                                                    <action selector="draftHandlingPolicy:" target="vQH-WF-vh2" id="lSn-aK-4D8"/>
+                                                                </connections>
+                                                            </popUpButton>
+                                                        </subviews>
+                                                    </view>
+                                                </box>
+                                                <box autoresizesSubviews="NO" fixedFrame="YES" boxType="secondary" borderType="line" title="When filtering, always check…" translatesAutoresizingMaskIntoConstraints="NO" id="iei-ab-K9r">
+                                                    <rect key="frame" x="445" y="152" width="373" height="108"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                                    <view key="contentView" id="Gwd-Lx-fke">
+                                                        <rect key="frame" x="3" y="3" width="367" height="90"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                        <subviews>
+                                                            <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Jr3-YU-DrS">
+                                                                <rect key="frame" x="21" y="37" width="91" height="18"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <buttonCell key="cell" type="check" title="Statuses" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="Dds-V9-uRU">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <connections>
+                                                                    <action selector="includeStatusesInFilteringSelected:" target="vQH-WF-vh2" id="99K-Kf-87w"/>
+                                                                </connections>
+                                                            </button>
+                                                            <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eFR-P1-MxA">
+                                                                <rect key="frame" x="140" y="62" width="76" height="18"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <buttonCell key="cell" type="check" title="Labels" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="6Za-6G-OIl">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <connections>
+                                                                    <action selector="includeLabelsInFilteringSelected:" target="vQH-WF-vh2" id="YrY-h8-hA2"/>
+                                                                </connections>
+                                                            </button>
+                                                            <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dTw-ed-XkE">
+                                                                <rect key="frame" x="245" y="62" width="91" height="18"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <buttonCell key="cell" type="check" title="Repos" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="gO1-Ad-AhD">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <connections>
+                                                                    <action selector="includeRepositoriesInfilterSelected:" target="vQH-WF-vh2" id="mxT-kL-vT4"/>
+                                                                </connections>
+                                                            </button>
+                                                            <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0Tg-YN-sVl">
+                                                                <rect key="frame" x="140" y="37" width="76" height="18"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <buttonCell key="cell" type="check" title="Author" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="Z30-Co-sRo">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <connections>
+                                                                    <action selector="includeUsersInFilteringSelected:" target="vQH-WF-vh2" id="oBR-vD-jss"/>
+                                                                </connections>
+                                                            </button>
+                                                            <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8bu-9K-ALi">
+                                                                <rect key="frame" x="260" y="12" width="76" height="18"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <buttonCell key="cell" type="check" title="Server" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="3Gg-aQ-pv0">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <connections>
+                                                                    <action selector="includeServersInFilteringSelected:" target="vQH-WF-vh2" id="IWr-bS-8D9"/>
+                                                                </connections>
+                                                            </button>
+                                                            <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Iwj-YJ-JSd">
+                                                                <rect key="frame" x="21" y="62" width="91" height="18"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <buttonCell key="cell" type="check" title="Title" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="ddT-lB-RJ9">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <connections>
+                                                                    <action selector="includeTitlesInFilteringSelected:" target="vQH-WF-vh2" id="dUz-hp-MGj"/>
+                                                                </connections>
+                                                            </button>
+                                                            <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xzP-Bb-u07">
+                                                                <rect key="frame" x="139" y="12" width="77" height="18"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <buttonCell key="cell" type="check" title="Number" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="5z6-1p-c6d">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <connections>
+                                                                    <action selector="includeNumbersInFilteringSelected:" target="vQH-WF-vh2" id="HOz-7T-URJ"/>
+                                                                </connections>
+                                                            </button>
+                                                            <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dox-eD-j7t">
+                                                                <rect key="frame" x="20" y="12" width="92" height="18"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <buttonCell key="cell" type="check" title="Assignee" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="BZz-Yp-SYO">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <connections>
+                                                                    <action selector="includeAssigneeNamesInFilteringSelected:" target="vQH-WF-vh2" id="vOj-Cf-n8G"/>
+                                                                </connections>
+                                                            </button>
+                                                            <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mcG-nC-uWB">
+                                                                <rect key="frame" x="245" y="37" width="91" height="18"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <buttonCell key="cell" type="check" title="Milestone" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="ntc-vT-q5O">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <connections>
+                                                                    <action selector="includeMilestonesInFilteringSelected:" target="vQH-WF-vh2" id="9QK-Oo-Qpz"/>
+                                                                </connections>
+                                                            </button>
+                                                        </subviews>
+                                                    </view>
+                                                </box>
+                                                <box autoresizesSubviews="NO" fixedFrame="YES" borderType="line" title="When something from &quot;all items&quot; is assigned to me…" translatesAutoresizingMaskIntoConstraints="NO" id="96h-4X-0sU">
+                                                    <rect key="frame" x="445" y="265" width="374" height="73"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                                    <view key="contentView" id="evv-lI-oOm">
+                                                        <rect key="frame" x="3" y="3" width="368" height="55"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                        <subviews>
+                                                            <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lB5-eS-YSK">
+                                                                <rect key="frame" x="16" y="15" width="339" height="26"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <popUpButtonCell key="cell" type="push" title="Do nothing" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="9TM-I1-9UP" id="rPe-gD-wp2">
+                                                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                    <menu key="menu" id="cHj-CQ-Gut">
+                                                                        <items>
+                                                                            <menuItem title="Move to &quot;My&quot; section" id="RE2-yr-udn"/>
+                                                                            <menuItem title="Move to &quot;Participated&quot; section" id="RS4-Xg-Tc4"/>
+                                                                            <menuItem title="Do nothing" state="on" id="9TM-I1-9UP"/>
+                                                                        </items>
+                                                                    </menu>
+                                                                </popUpButtonCell>
+                                                                <connections>
+                                                                    <action selector="assignedPrHandlingPolicySelected:" target="vQH-WF-vh2" id="lmg-Bg-Cqp"/>
+                                                                </connections>
+                                                            </popUpButton>
+                                                        </subviews>
+                                                    </view>
+                                                </box>
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" setsMaxLayoutWidthAtFirstLayout="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CDe-lj-xrh">
+                                                    <rect key="frame" x="471" y="81" width="322" height="72"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" id="ixu-zC-YfY">
+                                                        <font key="font" metaFont="label" size="9"/>
+                                                        <string key="title">You can use title: server: label: repo: user: number: milestone: assignee: and status: to filter specific properties, e.g. "label:bug,suggestion". Prefix with '!' to exclude some terms.
 
 You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict as an argument, e.g. "state:unread,draft"</string>
-                                                <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                        <box autoresizesSubviews="NO" fixedFrame="YES" borderType="line" title="If an item is a draft…" translatesAutoresizingMaskIntoConstraints="NO" id="IV7-Ff-s3B">
-                                            <rect key="frame" x="454" y="352" width="374" height="69"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                                            <view key="contentView" id="Fun-OY-4yH">
-                                                <rect key="frame" x="3" y="3" width="368" height="51"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                <subviews>
-                                                    <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Cpe-1u-UbD">
-                                                        <rect key="frame" x="16" y="11" width="339" height="26"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <popUpButtonCell key="cell" type="push" title="Do Nothing" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="k6A-y3-mud" id="pj8-Vh-2mr">
-                                                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                            <menu key="menu" id="lZw-wc-hGu">
-                                                                <items>
-                                                                    <menuItem title="Do Nothing" state="on" id="k6A-y3-mud"/>
-                                                                    <menuItem title="Display in Title" id="OSK-kJ-Bf9"/>
-                                                                    <menuItem title="Hide It" id="u1k-41-kbo"/>
-                                                                </items>
-                                                            </menu>
-                                                        </popUpButtonCell>
-                                                        <connections>
-                                                            <action selector="draftHandlingPolicy:" target="vQH-WF-vh2" id="lSn-aK-4D8"/>
-                                                        </connections>
-                                                    </popUpButton>
-                                                </subviews>
-                                            </view>
-                                        </box>
-                                        <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="12" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" fixedFrame="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TRE-eo-aLK">
-                                            <rect key="frame" x="17" y="111" width="328" height="300"/>
-                                            <subviews>
-                                                <button translatesAutoresizingMaskIntoConstraints="NO" id="Efg-Id-lOP">
-                                                    <rect key="frame" x="-2" y="284" width="332" height="18"/>
-                                                    <buttonCell key="cell" type="check" title="Display item creation times instead of update times" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="yUS-qR-eV4">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <connections>
-                                                        <action selector="showCreationSelected:" target="vQH-WF-vh2" id="ie4-88-nBp"/>
-                                                    </connections>
-                                                </button>
-                                                <button translatesAutoresizingMaskIntoConstraints="NO" id="yK4-xL-QRu">
-                                                    <rect key="frame" x="-2" y="258" width="164" height="18"/>
-                                                    <buttonCell key="cell" type="check" title="Show repository names" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="oZY-hH-Udu">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <connections>
-                                                        <action selector="displayRepositoryNameSelected:" target="vQH-WF-vh2" id="PMz-8Z-bde"/>
-                                                    </connections>
-                                                </button>
-                                                <button translatesAutoresizingMaskIntoConstraints="NO" id="onl-1T-RTg">
-                                                    <rect key="frame" x="-2" y="232" width="271" height="18"/>
-                                                    <buttonCell key="cell" type="check" title="Display relative instead of absolute dates" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="Mtr-gs-YsM">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <connections>
-                                                        <action selector="showRelativeDatesSelected:" target="vQH-WF-vh2" id="XEh-sO-gUY"/>
-                                                    </connections>
-                                                </button>
-                                                <button translatesAutoresizingMaskIntoConstraints="NO" id="3CV-9S-gLw">
-                                                    <rect key="frame" x="-2" y="206" width="141" height="18"/>
-                                                    <buttonCell key="cell" type="check" title="Hide author avatars" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="UOs-3D-XyL">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <connections>
-                                                        <action selector="hideAvatarsSelected:" target="vQH-WF-vh2" id="45w-QA-Tcd"/>
-                                                    </connections>
-                                                </button>
-                                                <button translatesAutoresizingMaskIntoConstraints="NO" id="VrU-mc-Czw">
-                                                    <rect key="frame" x="-2" y="180" width="326" height="18"/>
-                                                    <buttonCell key="cell" type="check" title="Separate each API server in its own menu bar item" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="C7K-xS-315">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <connections>
-                                                        <action selector="showSeparateApiServersInMenuSelected:" target="vQH-WF-vh2" id="BHL-pf-2SO"/>
-                                                    </connections>
-                                                </button>
-                                                <button translatesAutoresizingMaskIntoConstraints="NO" id="9fQ-lN-76c">
-                                                    <rect key="frame" x="-2" y="154" width="226" height="18"/>
-                                                    <buttonCell key="cell" type="check" title="Hide item count in menubar items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="mAZ-e8-NLS">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <connections>
-                                                        <action selector="hideCountsOnMenubarSelected:" target="vQH-WF-vh2" id="zMz-z0-ZEU"/>
-                                                    </connections>
-                                                </button>
-                                                <button translatesAutoresizingMaskIntoConstraints="NO" id="TdQ-hP-A3t">
-                                                    <rect key="frame" x="-2" y="128" width="221" height="18"/>
-                                                    <buttonCell key="cell" type="check" title="Sync and display labels for items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="5sv-cq-odI">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <connections>
-                                                        <action selector="showLabelsSelected:" target="vQH-WF-vh2" id="qDj-Oe-xbz"/>
-                                                    </connections>
-                                                </button>
-                                                <button translatesAutoresizingMaskIntoConstraints="NO" id="fsA-E5-SRy">
-                                                    <rect key="frame" x="-2" y="102" width="247" height="18"/>
-                                                    <buttonCell key="cell" type="check" title="Highlight PRs that have new commits" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="T2C-n7-dIU">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <connections>
-                                                        <action selector="highlightItemsWithNewCommitsSelected:" target="vQH-WF-vh2" id="ccI-te-cRo"/>
-                                                    </connections>
-                                                </button>
-                                                <button translatesAutoresizingMaskIntoConstraints="NO" id="GMt-gT-i3d">
-                                                    <rect key="frame" x="-2" y="76" width="165" height="18"/>
-                                                    <buttonCell key="cell" type="check" title="Display item milestones" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="fnW-oB-nHX">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <connections>
-                                                        <action selector="displayMilestonesSelected:" target="vQH-WF-vh2" id="sId-Th-WpZ"/>
-                                                    </connections>
-                                                </button>
-                                                <button translatesAutoresizingMaskIntoConstraints="NO" id="CjN-R7-2iD">
-                                                    <rect key="frame" x="-2" y="50" width="247" height="18"/>
-                                                    <buttonCell key="cell" type="check" title="Prefix PR/Issue numbers in item titles" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="A3t-GS-DJr">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <connections>
-                                                        <action selector="displayNumbersForItemsSelected:" target="vQH-WF-vh2" id="BQY-uP-tDo"/>
-                                                    </connections>
-                                                </button>
-                                                <button translatesAutoresizingMaskIntoConstraints="NO" id="qXS-9a-Cpn">
-                                                    <rect key="frame" x="-2" y="24" width="257" height="18"/>
-                                                    <buttonCell key="cell" type="check" title="Mark non-mergeable PRs (v4 API only)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="lKz-ia-ofo">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <connections>
-                                                        <action selector="markUnmergeablePrsSelected:" target="vQH-WF-vh2" id="ENU-Ip-nr5"/>
-                                                    </connections>
-                                                </button>
-                                                <button translatesAutoresizingMaskIntoConstraints="NO" id="yQr-zH-RGb">
-                                                    <rect key="frame" x="-2" y="-2" width="226" height="18"/>
-                                                    <buttonCell key="cell" type="check" title="Show PR line counts (v4 API only)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="GH6-q7-P3x">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <connections>
-                                                        <action selector="showPrLinesSelected:" target="vQH-WF-vh2" id="Dsc-Fh-32N"/>
-                                                    </connections>
-                                                </button>
+                                                        <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                    </textFieldCell>
+                                                </textField>
                                             </subviews>
-                                            <visibilityPriorities>
-                                                <integer value="1000"/>
-                                                <integer value="1000"/>
-                                                <integer value="1000"/>
-                                                <integer value="1000"/>
-                                                <integer value="1000"/>
-                                                <integer value="1000"/>
-                                                <integer value="1000"/>
-                                                <integer value="1000"/>
-                                                <integer value="1000"/>
-                                                <integer value="1000"/>
-                                                <integer value="1000"/>
-                                                <integer value="1000"/>
-                                            </visibilityPriorities>
-                                            <customSpacing>
-                                                <real value="3.4028234663852886e+38"/>
-                                                <real value="3.4028234663852886e+38"/>
-                                                <real value="3.4028234663852886e+38"/>
-                                                <real value="3.4028234663852886e+38"/>
-                                                <real value="3.4028234663852886e+38"/>
-                                                <real value="3.4028234663852886e+38"/>
-                                                <real value="3.4028234663852886e+38"/>
-                                                <real value="3.4028234663852886e+38"/>
-                                                <real value="3.4028234663852886e+38"/>
-                                                <real value="3.4028234663852886e+38"/>
-                                                <real value="3.4028234663852886e+38"/>
-                                                <real value="3.4028234663852886e+38"/>
-                                            </customSpacing>
-                                        </stackView>
+                                        </customView>
                                     </subviews>
                                 </view>
                             </tabViewItem>
@@ -1177,7 +1175,7 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                         <rect key="frame" x="11" y="52" width="651" height="84"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <tokenFieldCell key="cell" selectable="YES" editable="YES" borderStyle="bezel" alignment="left" placeholderString="Comma separated list of usernames (case/accent insensitive, without the '@' prefix)" drawsBackground="YES" allowsEditingTextAttributes="YES" id="i7v-35-449">
-                                                            <font key="font" metaFont="controlContent"/>
+                                                            <font key="font" metaFont="label" size="12"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </tokenFieldCell>
@@ -1727,7 +1725,6 @@ Tip: Reactions are treated like comments, i.e. the rules about being notified on
                                                         <tableColumns>
                                                             <tableColumn width="308" minWidth="40" maxWidth="1000" id="PkK-PU-9s3">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
-                                                                    <font key="font" metaFont="toolTip"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                 </tableHeaderCell>
@@ -2008,7 +2005,7 @@ Tip: Reactions are treated like comments, i.e. the rules about being notified on
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <buttonCell key="cell" type="smallSquare" title="+ Add a new preset" bezelStyle="smallSquare" imagePosition="overlaps" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="6h7-fr-KAl">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="label"/>
+                                                <font key="font" metaFont="system" size="10"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="createNewSnoozePresetSelected:" target="vQH-WF-vh2" id="sah-RH-LQv"/>
@@ -2055,7 +2052,7 @@ Tip: Reactions are treated like comments, i.e. the rules about being notified on
                                                         <rect key="frame" x="36" y="49" width="632" height="42"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" id="av8-ls-mGW">
-                                                            <font key="font" metaFont="toolTip"/>
+                                                            <font key="font" metaFont="message" size="11"/>
                                                             <string key="title">Important: When enabling this for the first time you will be asked to provide permission for Trailer to use the keyboard
 in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the permission to take effect!</string>
                                                             <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
@@ -2409,7 +2406,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                                     <rect key="frame" x="18" y="54" width="279" height="77"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" alignment="center" id="OcC-wh-2vb">
-                                                                        <font key="font" metaFont="toolTip"/>
+                                                                        <font key="font" metaFont="message" size="11"/>
                                                                         <string key="title">Chosing this option will remove all synced data and reload everything from scratch. This can take a while and use up a large amount of API quota, so only use it if things seem broken.</string>
                                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>

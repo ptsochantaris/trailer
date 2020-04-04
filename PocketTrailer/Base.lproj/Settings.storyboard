@@ -563,6 +563,58 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
+                            <tableViewSection headerTitle="Items created by me in any repository" id="RO7-d4-eRF">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="checkmark" indentationWidth="10" textLabel="w8o-Uj-9R5" detailTextLabel="tLT-1J-zTw" style="IBUITableViewCellStyleSubtitle" id="ai9-eH-GBE">
+                                        <rect key="frame" x="0.0" y="367.5" width="414" height="50"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="ai9-eH-GBE" id="X8p-bN-WXb">
+                                            <rect key="frame" x="0.0" y="0.0" width="370" height="50"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Sync PRs authored in any repo (v4 API)" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="w8o-Uj-9R5">
+                                                    <rect key="frame" x="20" y="8" width="299.5" height="20.5"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Subtitle" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="tLT-1J-zTw">
+                                                    <rect key="frame" x="20" y="28.5" width="44" height="14.5"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                                    <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="calibratedWhite"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="checkmark" indentationWidth="10" textLabel="6bt-EC-z64" detailTextLabel="a2s-cc-wj3" style="IBUITableViewCellStyleSubtitle" id="XQZ-qu-9Vy">
+                                        <rect key="frame" x="0.0" y="417.5" width="414" height="50"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="XQZ-qu-9Vy" id="brO-A2-dmX">
+                                            <rect key="frame" x="0.0" y="0.0" width="370" height="50"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Sync issues authored in any repo (v4 API)" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="6bt-EC-z64">
+                                                    <rect key="frame" x="20" y="8" width="318" height="20.5"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Subtitle" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="a2s-cc-wj3">
+                                                    <rect key="frame" x="20" y="28.5" width="44" height="14.5"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                                    <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="calibratedWhite"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
                         </sections>
                         <connections>
                             <outlet property="dataSource" destination="8c3-Pk-1x6" id="rSU-JO-1px"/>
@@ -574,6 +626,8 @@
                         <outlet property="autoAddCell" destination="Vn6-eI-MkB" id="MZT-fo-j0j"/>
                         <outlet property="autoRemoveCell" destination="who-aQ-2rP" id="JNJ-H0-Up5"/>
                         <outlet property="hideArchivedCell" destination="N6n-y3-0fF" id="eDU-Gr-Lco"/>
+                        <outlet property="queryIssuesInAllReposCell" destination="XQZ-qu-9Vy" id="i5i-dq-PEP"/>
+                        <outlet property="queryPrsInAllReposCell" destination="ai9-eH-GBE" id="cCU-cF-gg2"/>
                         <outlet property="rescanCell" destination="pVc-nc-ZeK" id="7Z5-vf-32s"/>
                         <segue destination="UM1-Tl-R50" kind="show" identifier="showPicker" id="BCG-Sc-dRs"/>
                     </connections>
@@ -1311,7 +1365,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="T4S-uD-LHq"/>
+        <segue reference="BCG-Sc-dRs"/>
     </inferredMetricsTieBreakers>
     <color key="tintColor" name="apptint"/>
     <resources>

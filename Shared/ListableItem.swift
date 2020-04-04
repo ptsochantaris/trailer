@@ -471,7 +471,7 @@ class ListableItem: DataItem {
 
 		if targetSection != .none {
 			switch self is Issue ? repo.displayPolicyForIssues : repo.displayPolicyForPrs {
-			case RepoDisplayPolicy.hide.rawValue,
+            case RepoDisplayPolicy.hide.rawValue,
 			     RepoDisplayPolicy.mine.rawValue where targetSection == .all || targetSection == .participated || targetSection == .mentioned,
 			     RepoDisplayPolicy.mineAndPaticipated.rawValue where targetSection == .all:
 				targetSection = .none
@@ -1141,7 +1141,7 @@ class ListableItem: DataItem {
 				color = COLOR_CLASS(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)
 				message = "You have no repositories in your watchlist, or they are all currently marked as hidden.\n\nYou can change their status from the repositories section in your settings."
 			}
-		} else if !Repo.interestedInPrs(fromServerWithId: criterion?.apiServerId) && !Repo.interestedInIssues(fromServerWithId: criterion?.apiServerId) {
+		} else if !Repo.mayProvidePrsForDisplay(fromServerWithId: criterion?.apiServerId) && !Repo.mayProvideIssuesForDisplay(fromServerWithId: criterion?.apiServerId) {
 			color = COLOR_CLASS(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)
 			message = "All your watched repositories are marked as hidden, please enable issues or PRs on at least one."
 		} else {

@@ -333,7 +333,8 @@ final class API {
                 }
             }
             
-            GraphQL.fetchAllPrsAndIssues(from: repos, group: itemGroup)
+            let servers = ApiServer.allApiServers(in: moc).filter { $0.goodToGo }
+            GraphQL.fetchAllPrsAndIssues(from: repos, servers: servers, group: itemGroup)
         } else {
             itemGroup.enter()
             fetchIssues(for: repos, to: moc) {
@@ -452,7 +453,7 @@ final class API {
 		syncUserDetails(in: moc) {
             
 			for r in DataItem.items(of: Repo.self, surviving: true, in: moc) {
-				r.postSyncAction = r.manuallyAdded ? PostSyncAction.doNothing.rawValue : PostSyncAction.delete.rawValue
+                r.postSyncAction = r.shouldBeWipedIfNotInWatchlist ? PostSyncAction.delete.rawValue : PostSyncAction.doNothing.rawValue
 			}
 
             let goodToGoServers = ApiServer.allApiServers(in: moc).filter { $0.goodToGo }
