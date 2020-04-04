@@ -251,7 +251,7 @@ enum RepoDisplayPolicy: Int64, CaseIterable {
         case .hide:
             return COLOR_CLASS.appTertiaryLabel
         case .authoredOnly:
-            return COLOR_CLASS.label
+            return COLOR_CLASS.appLabel
         case .mine:
             return COLOR_CLASS(red: 0.7, green: 0.0, blue: 0.0, alpha: 1.0)
         case .mineAndPaticipated:

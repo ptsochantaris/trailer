@@ -102,7 +102,16 @@ final class Repo: DataItem {
 	}
     
     var shouldBeWipedIfNotInWatchlist: Bool {
-        return !manuallyAdded && (displayPolicyForIssues == RepoDisplayPolicy.authoredOnly.rawValue && !issues.isEmpty) && (displayPolicyForPrs == RepoDisplayPolicy.authoredOnly.rawValue && !pullRequests.isEmpty)
+        if manuallyAdded {
+            return false
+        }
+        if displayPolicyForIssues == RepoDisplayPolicy.authoredOnly.rawValue {
+            return issues.isEmpty
+        }
+        if displayPolicyForPrs == RepoDisplayPolicy.authoredOnly.rawValue {
+            return pullRequests.isEmpty
+        }
+        return true
     }
 
 	@discardableResult

@@ -334,7 +334,12 @@ final class API {
             }
             
             let servers = ApiServer.allApiServers(in: moc).filter { $0.goodToGo }
-            GraphQL.fetchAllPrsAndIssues(from: repos, servers: servers, group: itemGroup)
+            if !servers.isEmpty {
+                GraphQL.fetchAllAuthoredItems(from: servers, group: itemGroup)
+            }
+            if !repos.isEmpty {
+                GraphQL.fetchAllSubscribedItems(from: repos, group: itemGroup)
+            }
         } else {
             itemGroup.enter()
             fetchIssues(for: repos, to: moc) {

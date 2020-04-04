@@ -310,9 +310,9 @@ class DataItem: NSManagedObject {
         } else if postSyncAction == PostSyncAction.delete.rawValue {
             DLog("Keeping \(entityName) ID: %@", node.id)
             postSyncAction = PostSyncAction.doNothing.rawValue
-        } else {
-            DLog("Ignoring \(entityName) ID: %@", node.id)
-        }
+        } //else {
+            //DLog("Ignoring \(entityName) ID: %@", node.id)
+        //}
         
         perItemCallback(self as! T, node)
     }

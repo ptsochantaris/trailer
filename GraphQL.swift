@@ -230,25 +230,25 @@ final class GraphQL {
             }
         }
     }
-        
-    static func fetchAllPrsAndIssues(from repos: [Repo], servers: [ApiServer], group: DispatchGroup) {
-        if repos.isEmpty && servers.isEmpty {
-            return
-        }
-        
-        let milestoneFragment = GQLFragment(on: "Milestone", elements: [
+
+    private static var milestoneFragment: GQLFragment {
+        return GQLFragment(on: "Milestone", elements: [
             GQLField(name: "title")
         ])
-        
-        let labelFragment = GQLFragment(on: "Label", elements: [
+    }
+    
+    private static var labelFragment: GQLFragment {
+        return GQLFragment(on: "Label", elements: [
             GQLField(name: "id"),
             GQLField(name: "name"),
             GQLField(name: "color"),
             GQLField(name: "createdAt"),
             GQLField(name: "updatedAt")
         ])
-        
-        let repositoryFragment = GQLFragment(on: "Repository", elements: [
+    }
+    
+    private static var repositoryFragment: GQLFragment {
+        return GQLFragment(on: "Repository", elements: [
             GQLField(name: "id"),
             GQLField(name: "createdAt"),
             GQLField(name: "updatedAt"),
@@ -259,89 +259,57 @@ final class GraphQL {
             GQLField(name: "isPrivate"),
             GQLGroup(name: "owner", fields: [GQLField(name: "id")])
         ])
+    }
 
-        func prFragment(assigneesAndLabelPageSize: Int, includeRepo: Bool) -> GQLFragment {
-            var elements: [GQLElement] = [
-                GQLField(name: "id"),
-                GQLField(name: "bodyText"),
-                GQLField(name: "state"),
-                GQLField(name: "createdAt"),
-                GQLField(name: "updatedAt"),
-                GQLField(name: "number"),
-                GQLField(name: "title"),
-                GQLField(name: "url"),
-                GQLGroup(name: "milestone", fields: [milestoneFragment]),
-                GQLGroup(name: "author", fields: [userFragment]),
-                GQLGroup(name: "assignees", fields: [userFragment], pageSize: assigneesAndLabelPageSize),
-                GQLGroup(name: "labels", fields: [labelFragment], pageSize: assigneesAndLabelPageSize),
-                GQLField(name: "headRefOid"),
-                GQLField(name: "mergeable"),
-                GQLField(name: "additions"),
-                GQLField(name: "deletions"),
-                GQLGroup(name: "mergedBy", fields: [userFragment])
-            ]
-            if includeRepo {
-                elements.append(GQLGroup(name: "repository", fields: [repositoryFragment]))
-            }
-            return GQLFragment(on: "PullRequest", elements: elements)
+    private static func prFragment(assigneesAndLabelPageSize: Int, includeRepo: Bool) -> GQLFragment {
+        var elements: [GQLElement] = [
+            GQLField(name: "id"),
+            GQLField(name: "bodyText"),
+            GQLField(name: "state"),
+            GQLField(name: "createdAt"),
+            GQLField(name: "updatedAt"),
+            GQLField(name: "number"),
+            GQLField(name: "title"),
+            GQLField(name: "url"),
+            GQLGroup(name: "milestone", fields: [milestoneFragment]),
+            GQLGroup(name: "author", fields: [userFragment]),
+            GQLGroup(name: "assignees", fields: [userFragment], pageSize: assigneesAndLabelPageSize),
+            GQLGroup(name: "labels", fields: [labelFragment], pageSize: assigneesAndLabelPageSize),
+            GQLField(name: "headRefOid"),
+            GQLField(name: "mergeable"),
+            GQLField(name: "additions"),
+            GQLField(name: "deletions"),
+            GQLGroup(name: "mergedBy", fields: [userFragment])
+        ]
+        if includeRepo {
+            elements.append(GQLGroup(name: "repository", fields: [repositoryFragment]))
         }
-        
-        func issueFragment(assigneesAndLabelPageSize: Int, includeRepo: Bool) -> GQLFragment {
-            var elements: [GQLElement] = [
-                GQLField(name: "id"),
-                GQLField(name: "bodyText"),
-                GQLField(name: "state"),
-                GQLField(name: "createdAt"),
-                GQLField(name: "updatedAt"),
-                GQLField(name: "number"),
-                GQLField(name: "title"),
-                GQLField(name: "url"),
-                GQLGroup(name: "milestone", fields: [milestoneFragment]),
-                GQLGroup(name: "author", fields: [userFragment]),
-                GQLGroup(name: "assignees", fields: [userFragment], pageSize: assigneesAndLabelPageSize),
-                GQLGroup(name: "labels", fields: [labelFragment], pageSize: assigneesAndLabelPageSize)
-            ]
-            if includeRepo {
-                elements.append(GQLGroup(name: "repository", fields: [repositoryFragment]))
-            }
-            return GQLFragment(on: "Issue", elements: elements)
+        return GQLFragment(on: "PullRequest", elements: elements)
+    }
+    
+    private static func issueFragment(assigneesAndLabelPageSize: Int, includeRepo: Bool) -> GQLFragment {
+        var elements: [GQLElement] = [
+            GQLField(name: "id"),
+            GQLField(name: "bodyText"),
+            GQLField(name: "state"),
+            GQLField(name: "createdAt"),
+            GQLField(name: "updatedAt"),
+            GQLField(name: "number"),
+            GQLField(name: "title"),
+            GQLField(name: "url"),
+            GQLGroup(name: "milestone", fields: [milestoneFragment]),
+            GQLGroup(name: "author", fields: [userFragment]),
+            GQLGroup(name: "assignees", fields: [userFragment], pageSize: assigneesAndLabelPageSize),
+            GQLGroup(name: "labels", fields: [labelFragment], pageSize: assigneesAndLabelPageSize)
+        ]
+        if includeRepo {
+            elements.append(GQLGroup(name: "repository", fields: [repositoryFragment]))
         }
+        return GQLFragment(on: "Issue", elements: elements)
+    }
+    
+    static func fetchAllAuthoredItems(from servers: [ApiServer], group: DispatchGroup) {
 
-        var prRepoIdToLatestExistingUpdate = [String: Date]()
-        var issueRepoIdToLatestExistingUpdate = [String: Date]()
-
-        let hideValue = RepoDisplayPolicy.hide.rawValue
-        repos.forEach {
-            if let n = $0.nodeId {
-                if $0.displayPolicyForPrs != hideValue {
-                    prRepoIdToLatestExistingUpdate[n] = PullRequest.mostRecentItemUpdate(in: $0)
-                }
-                if $0.displayPolicyForIssues != hideValue {
-                    issueRepoIdToLatestExistingUpdate[n] = Issue.mostRecentItemUpdate(in: $0)
-                }
-            }
-        }
-        
-        let allOpenPrsFragment = GQLFragment(on: "Repository", elements: [
-            GQLField(name: "id"),
-            GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["states": "OPEN"], pageSize: 50),
-            ])
-
-        let allOpenIssuesFragment = GQLFragment(on: "Repository", elements: [
-            GQLField(name: "id"),
-            GQLGroup(name: "issues", fields: [issueFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["states": "OPEN"], pageSize: 50)
-            ])
-        
-        let latestPrsFragment = GQLFragment(on: "Repository", elements: [
-            GQLField(name: "id"),
-            GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["orderBy": "{direction: DESC, field: UPDATED_AT}"], pageSize: 10),
-            ])
-        let latestIssuesFragment = GQLFragment(on: "Repository", elements: [
-            GQLField(name: "id"),
-            GQLGroup(name: "issues", fields: [issueFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["orderBy": "{direction: DESC, field: UPDATED_AT}"], pageSize: 20)
-            ])
-
-        // Authored items check
         for server in servers {
             var authorFields = [GQLGroup]()
             if Settings.queryAuthoredPRs {
@@ -391,11 +359,48 @@ final class GraphQL {
                 }
             }
         }
+    }
+    
+    static func fetchAllSubscribedItems(from repos: [Repo], group: DispatchGroup) {
         
-        // Checks by repo
+        let latestPrsFragment = GQLFragment(on: "Repository", elements: [
+            GQLField(name: "id"),
+            GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["orderBy": "{direction: DESC, field: UPDATED_AT}"], pageSize: 10),
+            ])
+
+        let latestIssuesFragment = GQLFragment(on: "Repository", elements: [
+            GQLField(name: "id"),
+            GQLGroup(name: "issues", fields: [issueFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["orderBy": "{direction: DESC, field: UPDATED_AT}"], pageSize: 20)
+            ])
+        
+        let allOpenPrsFragment = GQLFragment(on: "Repository", elements: [
+            GQLField(name: "id"),
+            GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["states": "OPEN"], pageSize: 50),
+            ])
+
+        let allOpenIssuesFragment = GQLFragment(on: "Repository", elements: [
+            GQLField(name: "id"),
+            GQLGroup(name: "issues", fields: [issueFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["states": "OPEN"], pageSize: 50)
+            ])
+
         let reposByServer = Dictionary(grouping: repos) { $0.apiServer }
         var count = 0
         
+        var prRepoIdToLatestExistingUpdate = [String: Date]()
+        var issueRepoIdToLatestExistingUpdate = [String: Date]()
+
+        let hideValue = RepoDisplayPolicy.hide.rawValue
+        repos.forEach {
+            if let n = $0.nodeId {
+                if $0.displayPolicyForPrs != hideValue {
+                    prRepoIdToLatestExistingUpdate[n] = PullRequest.mostRecentItemUpdate(in: $0)
+                }
+                if $0.displayPolicyForIssues != hideValue {
+                    issueRepoIdToLatestExistingUpdate[n] = Issue.mostRecentItemUpdate(in: $0)
+                }
+            }
+        }
+
         for (server, reposInThisServer) in reposByServer {
 
             var nodes = [String: ContiguousArray<GQLNode>]()
@@ -463,7 +468,7 @@ final class GraphQL {
             }
             
             if !idsForReposInThisServerWantingLatestIssues.isEmpty {
-                let q = GQLQuery.batching("\(serverLabel): Updated Issues", fields: [latestIssuesFragment], idList: idsForReposInThisServerWantingLatestIssues, batchSize: 20, perNodeCallback: perNodeCallback)
+                let q = GQLQuery.batching("\(serverLabel): Updated Issues", fields: [latestIssuesFragment], idList: idsForReposInThisServerWantingLatestIssues, batchSize: 10, perNodeCallback: perNodeCallback)
                 queriesForServer.append(contentsOf: q)
             }
 
@@ -473,7 +478,7 @@ final class GraphQL {
             }
 
             if !idsForReposInThisServerWantingLatestPrs.isEmpty {
-                let q = GQLQuery.batching("\(serverLabel): Updated PRs", fields: [latestPrsFragment], idList: idsForReposInThisServerWantingLatestPrs, batchSize: 20, perNodeCallback: perNodeCallback)
+                let q = GQLQuery.batching("\(serverLabel): Updated PRs", fields: [latestPrsFragment], idList: idsForReposInThisServerWantingLatestPrs, batchSize: 10, perNodeCallback: perNodeCallback)
                 queriesForServer.append(contentsOf: q)
             }
 

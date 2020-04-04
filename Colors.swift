@@ -33,6 +33,14 @@ extension COLOR_CLASS {
         }
     }
     
+    static var appLabel: COLOR_CLASS {
+        #if os(iOS)
+        return .label
+        #elseif os(OSX)
+        return .labelColor
+        #endif
+    }
+    
     static var appSecondaryLabel: COLOR_CLASS {
         #if os(iOS)
         return .secondaryLabel
