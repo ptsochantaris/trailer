@@ -128,11 +128,11 @@ class TrailerCell: NSTableCellView {
 	override func mouseExited(with theEvent: NSEvent?) {
 		selected = false
 	}
-
+    
     private func updateText(for item: ListableItem) {
         title.attributedStringValue = item.title(with: titleFont, labelFont: detailFont, titleColor: .controlTextColor, numberColor: .secondaryLabelColor)
-        labels.attributedStringValue = item.labelsAttributedString(labelFont: detailFont) ?? NSAttributedString()
-        reviews.attributedStringValue = (item as? PullRequest)?.reviewsAttributedString(labelFont: detailFont) ?? NSAttributedString()
+        labels.attributedStringValue = item.labelsAttributedString(labelFont: detailFont) ?? emptyAttributedString
+        reviews.attributedStringValue = (item as? PullRequest)?.reviewsAttributedString(labelFont: detailFont) ?? emptyAttributedString
         subtitle.attributedStringValue = item.subtitle(with: detailFont, lightColor: .tertiaryLabelColor, darkColor: .secondaryLabelColor, separator: "   ")
     }
 

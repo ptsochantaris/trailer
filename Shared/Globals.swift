@@ -64,6 +64,8 @@ let NOTIFICATION_URL_KEY = "urlKey"
 
 #endif
 
+let emptyAttributedString = NSAttributedString()
+
 func existingObject(with id: NSManagedObjectID) -> NSManagedObject? {
 	return try? DataManager.main.existingObject(with: id)
 }

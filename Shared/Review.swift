@@ -55,6 +55,9 @@ final class Review: DataItem {
         syncItems(of: Review.self, from: nodes, on: server) { review, node in
 
             let info = node.jsonPayload
+            if info.count == 3 { // this node is a container (id, comments, typename)
+                return
+            }
             let newState = info["state"] as? String
             review.check(newState: newState)
 
@@ -132,7 +135,8 @@ final class Review: DataItem {
 	}
 
 	var affectsBottomLine: Bool {
-		return state == State.CHANGES_REQUESTED.rawValue || state == State.APPROVED.rawValue || state == State.DISMISSED.rawValue
+        let s = state
+		return s == State.CHANGES_REQUESTED.rawValue || s == State.APPROVED.rawValue || s == State.DISMISSED.rawValue
 	}
 }
 

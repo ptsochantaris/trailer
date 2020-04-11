@@ -315,6 +315,7 @@ final class PullRequest: ListableItem {
     }
 
     func reviewsAttributedString(labelFont: FONT_CLASS) -> NSAttributedString? {
+        
         if !Settings.displayReviewsOnItems {
             return nil
         }
@@ -387,7 +388,7 @@ final class PullRequest: ListableItem {
 
             let approverNames = approvers.compactMap { $0.username }
             let requesterNames = requesters.compactMap { $0.username }
-            let otherReviewers = reviewers.components(separatedBy: ",").filter({ !($0.isEmpty || approverNames.contains($0) || requesterNames.contains($0)) })
+            let otherReviewers = reviewers.components(separatedBy: ",").filter { !($0.isEmpty || approverNames.contains($0) || requesterNames.contains($0)) }
             if !otherReviewers.isEmpty {
 
                 let a = [NSAttributedString.Key.font: labelFont, NSAttributedString.Key.foregroundColor: COLOR_CLASS.appYellow]
