@@ -155,7 +155,8 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
                 if tempContext.hasChanges {
                     try? tempContext.save()
                 }
-				NotificationQueue.commit()
+                DataManager.saveDB()
+                NotificationQueue.commit(moc: DataManager.main)
 			}
 			preferencesDirty = true
 			guard let s = self  else { return }

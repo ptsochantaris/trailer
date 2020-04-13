@@ -130,8 +130,8 @@ final class DataManager {
 		}
 	}
 
-    private static func processNotificationsForItems<T: ListableItem>(of type: T.Type, newNotification: NotificationType, reopenedNotification: NotificationType, assignmentNotification: NotificationType) -> [T] {
-        return DataItem.allItems(of: type, in: main).filter { i -> Bool in
+    private static func processNotificationsForItems<T: ListableItem>(of type: T.Type, newNotification: NotificationType, reopenedNotification: NotificationType, assignmentNotification: NotificationType) {
+        DataItem.allItems(of: type, in: main).forEach { i in
             if i.stateChanged != 0 {
                 switch i.stateChanged {
                 case ListableItem.StateChange.reopened.rawValue:
@@ -139,14 +139,10 @@ final class DataManager {
                     i.announced = true
                     
                 case ListableItem.StateChange.merged.rawValue:
-                    if (i as? PullRequest)?.handleMerging() == true {
-                        return false
-                    }
+                    (i as? PullRequest)?.handleMerging()
                     
                 case ListableItem.StateChange.closed.rawValue:
-                    if i.handleClosing() {
-                        return false
-                    }
+                    i.handleClosing()
                     
                 default: break
                 }
@@ -162,16 +158,15 @@ final class DataManager {
                     i.announced = true
                 }
             }
-            return true
         }
     }
     
 	static func sendNotificationsIndexAndSave() {
         preferencesDirty = false
 
-		let allPrs = processNotificationsForItems(of: PullRequest.self, newNotification: .newPr, reopenedNotification: .prReopened, assignmentNotification: .newPrAssigned)
+		processNotificationsForItems(of: PullRequest.self, newNotification: .newPr, reopenedNotification: .prReopened, assignmentNotification: .newPrAssigned)
 
-        let allIssues = processNotificationsForItems(of: Issue.self, newNotification: .newIssue, reopenedNotification: .issueReopened, assignmentNotification: .newIssueAssigned)
+        processNotificationsForItems(of: Issue.self, newNotification: .newIssue, reopenedNotification: .issueReopened, assignmentNotification: .newIssueAssigned)
 
         for c in PRComment.newItems(of: PRComment.self, in: main) {
             c.processNotifications()
@@ -216,14 +211,6 @@ final class DataManager {
             r.postSyncAction = PostSyncAction.doNothing.rawValue
         }
 
-		for p in allPrs {
-			p.postSyncAction = PostSyncAction.doNothing.rawValue
-		}
-
-		for i in allIssues {
-			i.postSyncAction = PostSyncAction.doNothing.rawValue
-		}
-
 		for r in DataItem.newOrUpdatedItems(of: Review.self, in: main) {
 			r.postSyncAction = PostSyncAction.doNothing.rawValue
 		}
@@ -232,21 +219,24 @@ final class DataManager {
 			r.postSyncAction = PostSyncAction.doNothing.rawValue
 		}
         
-        DataManager.saveDB() // before comitting notifications, to ensure object IDs are permanent
-        
-        for item in DataItem.allItems(of: PullRequest.self, in: DataManager.main) + DataItem.allItems(of: Issue.self, in: DataManager.main) {
-            if item.isVisibleOnMenu {
-                item.indexForSpotlight()
-            } else {
-                item.ensureInvisible()
-            }
+        for pr in DataItem.allItems(of: PullRequest.self, in: main) {
+            pr.postSyncAction = PostSyncAction.doNothing.rawValue
+            pr.handleSpotlight()
         }
         
-		NotificationQueue.commit()        
+        for issue in DataItem.allItems(of: Issue.self, in: main) {
+            issue.postSyncAction = PostSyncAction.doNothing.rawValue
+            issue.handleSpotlight()
+        }
+        
+        saveDB()
+
+        NotificationQueue.commit(moc: main)
 	}
 
 	static func saveDB() {
 		guard main.hasChanges else {
+            DLog("No DB changes")
             return
         }
         

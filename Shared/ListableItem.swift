@@ -217,25 +217,26 @@ class ListableItem: DataItem {
 	}
 
 	final override func prepareForDeletion() {
-		ensureInvisible()
+        let uri = objectID.uriRepresentation().absoluteString
+        hideFromSpotlightAndNotifications(uri: uri)
 		super.prepareForDeletion()
 	}
 
-	final func ensureInvisible() {
+    private final func hideFromSpotlightAndNotifications(uri: String) {
         if CSSearchableIndex.isIndexingAvailable() {
-            CSSearchableIndex.default().deleteSearchableItems(withIdentifiers: [objectID.uriRepresentation().absoluteString], completionHandler: nil)
+            CSSearchableIndex.default().deleteSearchableItems(withIdentifiers: [uri], completionHandler: nil)
         }
 		if Settings.removeNotificationsWhenItemIsRemoved {
-			ListableItem.removeRelatedNotifications(uri: objectID.uriRepresentation().absoluteString)
+			ListableItem.removeRelatedNotifications(uri: uri)
 		}
 	}
 
 	final func sortedComments(using comparison: ComparisonResult) -> [PRComment] {
-		return Array(comments).sorted(by: { (c1, c2) -> Bool in
+		return comments.sorted { c1, c2 -> Bool in
 			let d1 = c1.createdAt ?? .distantPast
 			let d2 = c2.createdAt ?? .distantPast
 			return d1.compare(d2) == comparison
-		})
+		}
 	}
 
 	final private func catchUpCommentDate() {
@@ -1067,37 +1068,45 @@ class ListableItem: DataItem {
 		return [(userLogin ?? "NO_USERNAME"), "Trailer"] + labelNames + orgAndRepo
 		#endif
 	}
+    
+    final func handleSpotlight() {
+        let uri = objectID.uriRepresentation().absoluteString
+        if isVisibleOnMenu {
+            indexForSpotlight(uri: uri)
+        } else {
+            hideFromSpotlightAndNotifications(uri: uri)
+        }
+    }
 
-    final func indexForSpotlight() {
+    private final func indexForSpotlight(uri: String) {
 		
 		guard CSSearchableIndex.isIndexingAvailable() else { return }
 
 		let s = CSSearchableItemAttributeSet(itemContentType: kUTTypeText as String)
 
+        let group = DispatchGroup()
+        
+        if let i = userAvatarUrl, !Settings.hideAvatars {
+            group.enter()
+            API.haveCachedAvatar(from: i) { _, cachePath in
+                s.thumbnailURL = URL(fileURLWithPath: cachePath)
+                group.leave()
+            }
+        }
+        
 		let titleSuffix = labels.compactMap { $0.name }.reduce("") { $0 + " [\($1)]" }
 		s.title = "#\(number) - \(S(title))\(titleSuffix)"
-
+        
 		s.contentCreationDate = createdAt
 		s.contentModificationDate = updatedAt
 		s.keywords = searchKeywords
 		s.creator = userLogin
-
 		s.contentDescription = "\(S(repo.fullName)) @\(S(userLogin)) - \(S(body?.trim))"
-		
-		func completeIndex(withSet s: CSSearchableItemAttributeSet) {
-			let i = CSSearchableItem(uniqueIdentifier: objectID.uriRepresentation().absoluteString, domainIdentifier: nil, attributeSet: s)
-			CSSearchableIndex.default().indexSearchableItems([i], completionHandler: nil)
-		}
-		
-		if let i = userAvatarUrl, !Settings.hideAvatars {
-			API.haveCachedAvatar(from: i) { _, cachePath in
-				s.thumbnailURL = URL(string: "file://\(cachePath)")
-				completeIndex(withSet: s)
-			}
-		} else {
-			s.thumbnailURL = nil
-			completeIndex(withSet: s)
-		}
+        
+        group.notify(queue: .main) {
+            let i = CSSearchableItem(uniqueIdentifier: uri, domainIdentifier: nil, attributeSet: s)
+            CSSearchableIndex.default().indexSearchableItems([i], completionHandler: nil)
+        }
 	}
 
     override final class func shouldCreate(from node: GQLNode) -> Bool {
@@ -1152,7 +1161,7 @@ class ListableItem: DataItem {
 		return styleForEmpty(message: message, color: color)
 	}
     
-    func handleClosing() -> Bool {
+    final func handleClosing() {
         DLog("Detected closed item: %@, handling policy is %@, coming from section %@",
              title,
              Settings.closeHandlingPolicy,
@@ -1161,17 +1170,14 @@ class ListableItem: DataItem {
         if !isVisibleOnMenu {
             DLog("Closed item was hidden, won't announce")
             managedObjectContext?.delete(self)
-            return true
             
         } else if shouldKeep(accordingTo: Settings.closeHandlingPolicy) {
             DLog("Will keep closed item")
             keep(as: .closed, notification: self is Issue ? .issueClosed : .prClosed)
-            return false
             
         } else {
             DLog("Will not keep closed item")
             managedObjectContext?.delete(self)
-            return true
         }
     }
 

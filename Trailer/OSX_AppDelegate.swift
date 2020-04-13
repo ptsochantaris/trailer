@@ -204,10 +204,6 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	func postNotification(type: NotificationType, for item: DataItem) {
-		if preferencesDirty {
-			return
-		}
-
 		let notification = NSUserNotification()
 
 		func addPotentialExtraActions() {
@@ -371,14 +367,17 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 		notification.userInfo = DataManager.info(for: item)
 
+        let group = DispatchGroup()
 		if let c = item as? PRComment, let url = c.avatarUrl, !Settings.hideAvatars {
+            group.enter()
 			API.haveCachedAvatar(from: url) { image, _ in
 				notification.contentImage = image
-				NSUserNotificationCenter.default.deliver(notification)
+                group.leave()
 			}
-		} else {
-			NSUserNotificationCenter.default.deliver(notification)
 		}
+        group.notify(queue: .main) {
+            NSUserNotificationCenter.default.deliver(notification)
+        }
 	}
 
 	func selected(_ item: ListableItem, alternativeSelect: Bool, window: NSWindow?) {
