@@ -1222,7 +1222,11 @@ class ListableItem: DataItem {
             return muted ? "Issue #\(number) (muted)" : "Issue #\(number)"
         }
     }
-    
+
+    var contextMenuSubtitle: String? {
+        return (self as? PullRequest)?.headRefName
+    }
+
     var contextActions: [MenuAction] {
         var actions: [MenuAction] = [.copy, .openRepo]
 

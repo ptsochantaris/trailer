@@ -16,6 +16,7 @@ final class PullRequest: ListableItem {
     @NSManaged var linesAdded: Int64
     @NSManaged var linesRemoved: Int64
     @NSManaged var isMergeable: Bool
+    @NSManaged var headRefName: String?
 
 	@NSManaged var statuses: Set<PRStatus>
 	@NSManaged var reviews: Set<Review>
@@ -47,6 +48,7 @@ final class PullRequest: ListableItem {
             pr.linesAdded = json["additions"] as? Int64 ?? 0
             pr.linesRemoved = json["deletions"] as? Int64 ?? 0
             pr.mergeCommitSha = json["headRefOid"] as? String
+            pr.headRefName = json["headRefName"] as? String
             pr.mergedByNodeId = (json["mergedBy"] as? [AnyHashable: Any])?["id"] as? String
             pr.baseNodeSync(nodeJson: json, parent: parent)
         }
@@ -60,7 +62,6 @@ final class PullRequest: ListableItem {
         return repo.apiUrl?.appending(pathComponent: "statuses").appending(pathComponent: mergeCommitSha ?? "")
     }
     
-
 	static func syncPullRequests(from data: [[AnyHashable : Any]]?, in repo: Repo) {
         let apiServer = repo.apiServer
         let apiServerUserId = apiServer.userNodeId
@@ -69,10 +70,12 @@ final class PullRequest: ListableItem {
 
 				item.baseSync(from: info, in: repo)
                 
+                let headInfo = info["head"] as? [AnyHashable: Any]
+                item.headRefName = headInfo?["ref"] as? String
+
                 if
-                    let headInfo = info["head"] as? [AnyHashable: Any],
-                    let newHeadCommitSha = headInfo["sha"] as? String,
-                    let commitUserInfo = headInfo["user"] as? [AnyHashable: Any],
+                    let newHeadCommitSha = headInfo?["sha"] as? String,
+                    let commitUserInfo = headInfo?["user"] as? [AnyHashable: Any],
                     let newHeadCommitUserId = commitUserInfo["node_id"] as? String {
                     
                     let currentSha = item.mergeCommitSha

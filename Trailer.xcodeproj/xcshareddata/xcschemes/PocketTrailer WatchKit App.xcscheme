@@ -55,15 +55,6 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "16522D7B1AB03AE500B1C3FB"
-            BuildableName = "PocketTrailer WatchKit App.app"
-            BlueprintName = "PocketTrailer WatchKit App"
-            ReferencedContainer = "container:Trailer.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
       <Testables>
       </Testables>
    </TestAction>
@@ -79,8 +70,8 @@
       allowLocationSimulation = "YES">
       <RemoteRunnable
          runnableDebuggingMode = "2"
-         BundleIdentifier = "com.apple.springboard"
-         RemotePath = "/PocketTrailer">
+         BundleIdentifier = "com.apple.Carousel"
+         RemotePath = "/Trailer">
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "16522D7B1AB03AE500B1C3FB"
@@ -96,8 +87,10 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <RemoteRunnable
+         runnableDebuggingMode = "2"
+         BundleIdentifier = "com.apple.Carousel"
+         RemotePath = "/Trailer">
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "16522D7B1AB03AE500B1C3FB"
@@ -105,7 +98,16 @@
             BlueprintName = "PocketTrailer WatchKit App"
             ReferencedContainer = "container:Trailer.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </RemoteRunnable>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "16522D7B1AB03AE500B1C3FB"
+            BuildableName = "PocketTrailer WatchKit App.app"
+            BlueprintName = "PocketTrailer WatchKit App"
+            ReferencedContainer = "container:Trailer.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

@@ -178,6 +178,15 @@ class TrailerCell: NSTableCellView {
 		}
 	}
 
+    @objc private func copyBranchToClipboard() {
+        if let a = associatedDataItem as? PullRequest, let name = a.headRefName {
+            let p = NSPasteboard.general
+            p.clearContents()
+            p.declareTypes([NSPasteboard.PasteboardType.string], owner: self)
+            p.setString(name, forType: NSPasteboard.PasteboardType.string)
+        }
+    }
+
 	override func menu(for event: NSEvent) -> NSMenu? {
 
 		guard let item = associatedDataItem else {
@@ -188,7 +197,12 @@ class TrailerCell: NSTableCellView {
         
 		let m = NSMenu(title: title)
 		m.addItem(withTitle: title, action: #selector(copyNumberToClipboard), keyEquivalent: "")
-		m.addItem(NSMenuItem.separator())
+        
+        if let subtitle = item.contextMenuSubtitle {
+            m.addItem(withTitle: subtitle, action: #selector(copyBranchToClipboard), keyEquivalent: "")
+        }
+
+        m.addItem(NSMenuItem.separator())
 
         for a in item.contextActions {
             switch a {

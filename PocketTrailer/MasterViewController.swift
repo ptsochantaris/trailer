@@ -873,7 +873,7 @@ UITableViewDragDelegate {
     
     private func createShortcutActions(for item: ListableItem) -> UIMenu? {
         
-        let children = item.contextActions.map { action -> UIMenuElement in
+        var children = item.contextActions.map { action -> UIMenuElement in
             switch action {
             case .copy:
                 return UIAction(title: action.title, image: UIImage(systemName: "doc.on.doc")) { _ in
@@ -929,7 +929,16 @@ UITableViewDragDelegate {
             }
         }
         
-        return UIMenu(title: item.contextMenuTitle, image: nil, identifier: nil, options: [], children: children)
+        var title = item.contextMenuTitle
+
+        if let subtitle = item.contextMenuSubtitle {
+            title += " | " + subtitle
+            children.append(UIAction(title: "Copy Branch Name", image: UIImage(systemName: "arrow.branch")) { _ in
+                UIPasteboard.general.string = subtitle
+            })
+        }
+        
+        return UIMenu(title: title, image: nil, identifier: nil, options: [], children: children)
     }
     
     override func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {

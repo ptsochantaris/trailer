@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="16119" systemVersion="19E266" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="16119" systemVersion="19F101" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="ApiServer" representedClassName=".ApiServer" syncable="YES">
         <attribute name="apiPath" optional="YES" attributeType="String"/>
         <attribute name="authToken" optional="YES" attributeType="String"/>
@@ -152,6 +152,7 @@
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="draft" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="hasNewCommits" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="headRefName" optional="YES" attributeType="String"/>
         <attribute name="isMergeable" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="isNewAssignment" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="issueUrl" optional="YES" attributeType="String"/>
@@ -310,7 +311,7 @@
         <element name="PRComment" positionX="0" positionY="0" width="128" height="313"/>
         <element name="PRLabel" positionX="9" positionY="153" width="128" height="193"/>
         <element name="PRStatus" positionX="0" positionY="0" width="128" height="208"/>
-        <element name="PullRequest" positionX="0" positionY="0" width="128" height="793"/>
+        <element name="PullRequest" positionX="0" positionY="0" width="128" height="808"/>
         <element name="Reaction" positionX="9" positionY="153" width="128" height="253"/>
         <element name="Repo" positionX="0" positionY="0" width="128" height="388"/>
         <element name="Review" positionX="9" positionY="153" width="128" height="208"/>
