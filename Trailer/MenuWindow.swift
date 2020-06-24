@@ -208,14 +208,15 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
 		let row = table.selectedRow
 		var i: ListableItem?
 		if row >= 0 {
-			if blink { table.deselectAll(nil) }
 			i = itemDelegate.itemAtRow(row)
-		}
-		if blink {
-            DispatchQueue.main.async { [weak self] in
-                guard let S = self else { return }
-				S.table.selectRowIndexes(IndexSet(integer: row), byExtendingSelection: false)
-			}
+            if blink {
+                table.deselectAll(nil)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+                    guard let S = self else { return }
+                    let i = IndexSet(integer: row)
+                    S.table.selectRowIndexes(i, byExtendingSelection: false)
+                }
+            }
 		}
 		return i
 	}

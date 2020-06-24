@@ -199,7 +199,8 @@ class TrailerCell: NSTableCellView {
 		m.addItem(withTitle: title, action: #selector(copyNumberToClipboard), keyEquivalent: "")
         
         if let subtitle = item.contextMenuSubtitle {
-            m.addItem(withTitle: subtitle, action: #selector(copyBranchToClipboard), keyEquivalent: "")
+            let c = m.addItem(withTitle: subtitle, action: #selector(copyBranchToClipboard), keyEquivalent: "c")
+            c.keyEquivalentModifierMask = [.command, .option]
         }
 
         m.addItem(NSMenuItem.separator())
@@ -248,7 +249,7 @@ class TrailerCell: NSTableCellView {
                 c.keyEquivalentModifierMask = [.command]
 
             case .unmute:
-                let c = m.addItem(withTitle: a.title, action: #selector(unMuteSelected), keyEquivalent: "0")
+                let c = m.addItem(withTitle: a.title, action: #selector(unMuteSelected), keyEquivalent: "m")
                 c.keyEquivalentModifierMask = [.command]
 
             case .remove:
