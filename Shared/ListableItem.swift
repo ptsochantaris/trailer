@@ -437,39 +437,42 @@ class ListableItem: DataItem {
 
 		let isMine = createdByMe
 		let currentCondition = condition
-        let hideDrafts = Settings.draftHandlingPolicy == DraftHandlingPolicy.hide.rawValue
 
         var targetSection: Section
-		if currentCondition == ItemCondition.merged.rawValue            	{ targetSection = .merged }
-		else if currentCondition == ItemCondition.closed.rawValue      		{ targetSection = .closed }
-		else if isMine || assignedToMySection                        		{ targetSection = .mine }
-		else if assignedToParticipated || commentedByMe || reviewedByMe     { targetSection = .participated }
-		else                                                           		{ targetSection = .all }
-
-		/////////// Pick out any items that need to move to "mentioned"
-
-		if targetSection == .all || targetSection == .none {
-
-			if let p = self as? PullRequest, Int64(Settings.assignedReviewHandlingPolicy) > Section.none.rawValue, p.assignedForReview {
-				targetSection = Section(Settings.assignedReviewHandlingPolicy)!
-
-			} else if Int64(Settings.newMentionMovePolicy) > Section.none.rawValue && contains(terms: ["@\(S(apiServer.userName))"]) {
-				targetSection = Section(Settings.newMentionMovePolicy)!
-
-			} else if Int64(Settings.teamMentionMovePolicy) > Section.none.rawValue && contains(terms: apiServer.teams.compactMap { $0.calculatedReferral }) {
-				targetSection = Section(Settings.teamMentionMovePolicy)!
-
-			} else if Int64(Settings.newItemInOwnedRepoMovePolicy) > Section.none.rawValue && repo.isMine {
-				targetSection = Section(Settings.newItemInOwnedRepoMovePolicy)!
-			}
-		}
+        
+        if Settings.draftHandlingPolicy == DraftHandlingPolicy.hide.rawValue && draft {
+            targetSection = .none
+        
+        } else if currentCondition == ItemCondition.merged.rawValue {
+            targetSection = .merged
+            
+        } else if currentCondition == ItemCondition.closed.rawValue {
+            targetSection = .closed
+            
+        } else if isMine || assignedToMySection {
+            targetSection = .mine
+            
+        } else if assignedToParticipated || commentedByMe || reviewedByMe {
+            targetSection = .participated
+            
+        } else if let p = self as? PullRequest, Int64(Settings.assignedReviewHandlingPolicy) > Section.none.rawValue, p.assignedForReview {
+            targetSection = Section(Settings.assignedReviewHandlingPolicy)!
+            
+        } else if Int64(Settings.newMentionMovePolicy) > Section.none.rawValue && contains(terms: ["@\(S(apiServer.userName))"]) {
+            targetSection = Section(Settings.newMentionMovePolicy)!
+            
+        } else if Int64(Settings.teamMentionMovePolicy) > Section.none.rawValue && contains(terms: apiServer.teams.compactMap { $0.calculatedReferral }) {
+            targetSection = Section(Settings.teamMentionMovePolicy)!
+            
+        } else if Int64(Settings.newItemInOwnedRepoMovePolicy) > Section.none.rawValue && repo.isMine {
+            targetSection = Section(Settings.newItemInOwnedRepoMovePolicy)!
+        
+        } else {
+            targetSection = .all
+        }
 
 		////////// Apply visibility policies
         
-        if hideDrafts && targetSection != .none && draft {
-            targetSection = .none
-        }
-
 		if targetSection != .none {
 			switch self is Issue ? repo.displayPolicyForIssues : repo.displayPolicyForPrs {
             case RepoDisplayPolicy.hide.rawValue,
