@@ -101,6 +101,12 @@ final class MenuBarSet {
 	private static let normalText = [ NSAttributedString.Key.font: NSFont.menuBarFont(ofSize: 10),
 	                                  NSAttributedString.Key.foregroundColor: NSColor.controlTextColor ]
 	
+    private func shouldShow(type: ListableItem.Type) -> Bool {
+        let fc = ListableItem.requestForItems(of: type, withFilter: nil, sectionIndex: -1, criterion: viewCriterion)
+        fc.fetchLimit = 1
+        return try! DataManager.main.count(for: fc) > 0
+    }
+    
 	private func updateMenu(of type: ListableItem.Type,
 	                        menu: MenuWindow,
                             forceVisible: Bool,
@@ -108,28 +114,21 @@ final class MenuBarSet {
 	                        hasUnread: Bool,
 	                        reasonForEmpty: @escaping (String) -> NSAttributedString) {
 		
-		let countString: String
-		let somethingFailed = ApiServer.shouldReportRefreshFailure(in: DataManager.main) && (viewCriterion?.relatedServerFailed ?? true)
-		let attributes = somethingFailed || hasUnread ? MenuBarSet.redText : MenuBarSet.normalText
-		let preFilterCount: Int
-
-		let excludeSnoozed = !Settings.countVisibleSnoozedItems
-		let f = ListableItem.requestForItems(of: type, withFilter: menu.filter.stringValue, sectionIndex: -1, criterion: viewCriterion, excludeSnoozed: excludeSnoozed)
-		countString = somethingFailed ? "X" : String(try! DataManager.main.count(for: f))
-
-		let fc = ListableItem.requestForItems(of: type, withFilter: nil, sectionIndex: -1, criterion: viewCriterion)
-		preFilterCount = try! DataManager.main.count(for: fc)
-
-		DLog("Updating \(type) menu, \(countString) total items")
-		
-		let itemLabel = viewCriterion?.label
-		
-		if preFilterCount > 0 || forceVisible {
+        if forceVisible || shouldShow(type: type) {
 			let shouldGray = Settings.grayOutWhenRefreshing && API.isRefreshing
-			
-			let siv = menu.showStatusItem
-			
-			if !(compare(dictionary: siv.textAttributes, to: attributes) && siv.statusLabel == countString && siv.grayOut == shouldGray) {
+						
+            let somethingFailed = ApiServer.shouldReportRefreshFailure(in: DataManager.main) && (viewCriterion?.relatedServerFailed ?? true)
+            let attributes = somethingFailed || hasUnread ? MenuBarSet.redText : MenuBarSet.normalText
+
+            let excludeSnoozed = !Settings.countVisibleSnoozedItems
+            let f = ListableItem.requestForItems(of: type, withFilter: menu.filter.stringValue, sectionIndex: -1, criterion: viewCriterion, excludeSnoozed: excludeSnoozed)
+            let countString = somethingFailed ? "X" : String(try! DataManager.main.count(for: f))
+
+            DLog("Updating \(type) menu, \(countString) total items")
+            
+            let siv = menu.showStatusItem
+
+			if siv.grayOut != shouldGray || siv.statusLabel != countString || !compare(dictionary: siv.textAttributes, to: attributes) {
 				// Info has changed, update
 				DLog("Updating \(type) status item")
                 if let img = NSImage(named: NSImage.Name("\(type)Icon")) {
@@ -144,7 +143,7 @@ final class MenuBarSet {
 				siv.highlighted = menu.isVisible
 				siv.grayOut = shouldGray
 				siv.statusLabel = countString
-				siv.title = itemLabel
+				siv.title = viewCriterion?.label
 				siv.sizeToFit()
 			}
         } else {
