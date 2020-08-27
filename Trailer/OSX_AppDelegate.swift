@@ -1169,11 +1169,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
     }
 
 	private var currentTheme: Theme {
-        if #available(OSX 10.14, *) {
-            return NSAppearance.current.bestMatch(from: [.darkAqua]) == nil ? .light : .dark
-        } else {
-            return UserDefaults.standard.string(forKey: "AppleInterfaceStyle") == "Dark" ? .dark : .light
-        }
+        return UserDefaults.standard.string(forKey: "AppleInterfaceStyle") == "Dark" ? .dark : .light
 	}
 
 	// Server display list
