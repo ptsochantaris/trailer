@@ -1169,7 +1169,24 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
     }
 
 	private var currentTheme: Theme {
-        return UserDefaults.standard.string(forKey: "AppleInterfaceStyle") == "Dark" ? .dark : .light
+        // with many thanks from https://medium.com/@ruiaureliano/check-light-dark-appearance-for-macos-mojave-catalina-fb2343af875f
+        let d = UserDefaults.standard
+        let autoSwitching = d.bool(forKey: "AppleInterfaceStyleSwitchesAutomatically")
+        let interfaceStyle = d.string(forKey: "AppleInterfaceStyle")
+        if autoSwitching {
+            if interfaceStyle == nil {
+                if #available(OSX 10.14, *) {
+                    let isDark = NSAppearance.current.bestMatch(from: [.darkAqua]) == NSAppearance.Name.darkAqua
+                    return isDark ? .dark : .light
+                } else {
+                    return .dark
+                }
+            } else {
+                return .light
+            }
+        } else {
+            return (interfaceStyle == "Dark") ? .dark : .light
+        }
 	}
 
 	// Server display list
