@@ -4,7 +4,7 @@ import UIKit
 final class CommentBlacklistViewController: UITableViewController {
 
 	override func numberOfSections(in tableView: UITableView) -> Int {
-		return Settings.commentAuthorBlacklist.count == 0 ? 0 : 1
+		return Settings.commentAuthorBlacklist.isEmpty ? 0 : 1
 	}
 
 	override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -26,7 +26,7 @@ final class CommentBlacklistViewController: UITableViewController {
 			var blackList = Settings.commentAuthorBlacklist
 			blackList.remove(at: indexPath.row)
 			Settings.commentAuthorBlacklist = blackList
-			if blackList.count==0 { // last delete
+			if blackList.isEmpty { // last delete
 				tableView.deleteSections(IndexSet(integer: 0), with: .fade)
 			} else {
 				tableView.deleteRows(at: [indexPath], with: .fade)
@@ -50,7 +50,8 @@ final class CommentBlacklistViewController: UITableViewController {
 
 				let name = n.hasPrefix("@") ? String(n.dropFirst()) : n
 
-				atNextEvent(self) { S in
+                DispatchQueue.main.async { [weak self] in
+                    guard let S = self else { return }
 					if !name.isEmpty && !Settings.commentAuthorBlacklist.contains(name) {
 						var blackList = Settings.commentAuthorBlacklist
 						blackList.append(name)

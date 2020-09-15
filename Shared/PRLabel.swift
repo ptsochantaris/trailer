@@ -8,14 +8,41 @@ final class PRLabel: DataItem {
 
     @NSManaged var color: Int64
     @NSManaged var name: String?
-    @NSManaged var url: String?
 
-    @NSManaged var pullRequest: PullRequest?
-	@NSManaged var issue: Issue?
-
+    @NSManaged var pullRequests: Set<PullRequest>
+	@NSManaged var issues: Set<Issue>
+    
+    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer) {
+        syncItems(of: PRLabel.self, from: nodes, on: server) { label, node in
+            guard
+                let moc = server.managedObjectContext,
+                let parent = node.parent else { return }
+            
+            if parent.updated || parent.created {
+                if let parentPr = DataItem.item(of: PullRequest.self, with: parent.id, in: moc) {
+                    parentPr.mutableSetValue(forKey: "labels").add(label)
+                } else if let parentIssue = DataItem.item(of: Issue.self, with: parent.id, in: moc) {
+                    parentIssue.mutableSetValue(forKey: "labels").add(label)
+                } else {
+                    DLog("Warning: PRLabel without parent")
+                }
+            }
+            
+            if node.created || node.updated {
+                let info = node.jsonPayload
+                label.name = info["name"] as? String
+                if let c = info["color"] as? String {
+                    label.color = PRLabel.parse(from: c)
+                } else {
+                    label.color = 0
+                }
+            }
+        }
+    }
+    
 	private static func labels(from data: [[AnyHashable : Any]]?, fromParent: ListableItem, postProcessCallback: (PRLabel, [AnyHashable : Any])->Void) {
 
-		guard let infos=data, infos.count > 0 else { return }
+		guard let infos=data, !infos.isEmpty else { return }
 
 		var namesOfItems = [String]()
 		var namesToInfo = [String : [AnyHashable : Any]]()
@@ -26,15 +53,15 @@ final class PRLabel: DataItem {
 			}
 		}
 
-		if namesOfItems.count == 0 { return }
+		if namesOfItems.isEmpty { return }
 
 		let f = NSFetchRequest<PRLabel>(entityName: "PRLabel")
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false
 		if fromParent is PullRequest {
-			f.predicate = NSPredicate(format:"name in %@ and pullRequest == %@", namesOfItems, fromParent)
+			f.predicate = NSPredicate(format:"name in %@ and pullRequests contains %@", namesOfItems, fromParent)
 		} else {
-			f.predicate = NSPredicate(format:"name in %@ and issue == %@", namesOfItems, fromParent)
+			f.predicate = NSPredicate(format:"name in %@ and issues contains %@", namesOfItems, fromParent)
 		}
 		let existingItems = try! fromParent.managedObjectContext?.fetch(f) ?? []
 
@@ -42,6 +69,10 @@ final class PRLabel: DataItem {
 			if let name = i.name, let idx = namesOfItems.firstIndex(of: name), let info = namesToInfo[name] {
 				namesOfItems.remove(at: idx)
 				DLog("Updating Label: %@", name)
+                if i.nodeId == nil, let nodeId = info["node_id"] as? String { // migrate
+                    i.nodeId = nodeId
+                    DLog("Migrated label '\(name)' with node ID \(nodeId)")
+                }
 				postProcessCallback(i, info)
 			}
 		}
@@ -51,15 +82,11 @@ final class PRLabel: DataItem {
 				DLog("Creating Label: %@", name)
 				let i = NSEntityDescription.insertNewObject(forEntityName: "PRLabel", into: fromParent.managedObjectContext!) as! PRLabel
 				i.name = name
-				i.serverId = 0
+                i.nodeId = info["node_id"] as? String
 				i.updatedAt = .distantPast
 				i.createdAt = .distantPast
 				i.apiServer = fromParent.apiServer
-				if let pr = fromParent as? PullRequest {
-					i.pullRequest = pr
-				} else if let issue = fromParent as? Issue {
-					i.issue = issue
-				}
+                fromParent.mutableSetValue(forKey: "labels").add(i)
 				postProcessCallback(i, info)
 			}
 		}
@@ -67,7 +94,6 @@ final class PRLabel: DataItem {
 
 	static func syncLabels(from info: [[AnyHashable : Any]]?, withParent: ListableItem) {
 		labels(from: info, fromParent: withParent) { label, info in
-			label.url = info["url"] as? String
 			if let c = info["color"] as? String {
 				label.color = parse(from: c)
 			} else {

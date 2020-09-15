@@ -3,7 +3,6 @@ import WatchKit
 
 protocol PopulatableRow {
 	func populate(from other: Any)
-	var rowType: String { get }
 }
 
 final class SectionRow: NSObject, PopulatableRow {
@@ -24,12 +23,14 @@ final class SectionRow: NSObject, PopulatableRow {
 			}
 			groupLabel = other.groupLabel
 			apiServerUri = other.apiServerUri
-			countL.setText("\(other.unreadCount!)")
-			countHolder.setHidden(other.unreadCount==0)
+            
+            if let unread = other.unreadCount, unread > 0 {
+                countL.setText(String(unread))
+                countHolder.setHidden(false)
+            } else {
+                countHolder.setHidden(true)
+            }
 		}
-	}
-	var rowType: String {
-		return String(describing: Swift.type(of: self))
 	}
 	
 	@IBOutlet private weak var titleL: WKInterfaceLabel!

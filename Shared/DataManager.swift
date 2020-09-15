@@ -130,86 +130,86 @@ final class DataManager {
 		}
 	}
 
+    private static func processNotificationsForItems<T: ListableItem>(of type: T.Type, newNotification: NotificationType, reopenedNotification: NotificationType, assignmentNotification: NotificationType) {
+        DataItem.allItems(of: type, in: main).forEach { i in
+            if i.stateChanged != 0 {
+                switch i.stateChanged {
+                case ListableItem.StateChange.reopened.rawValue:
+                    NotificationQueue.add(type: reopenedNotification, for: i)
+                    i.announced = true
+                    
+                case ListableItem.StateChange.merged.rawValue:
+                    (i as? PullRequest)?.handleMerging()
+                    
+                case ListableItem.StateChange.closed.rawValue:
+                    i.handleClosing()
+                    
+                default: break
+                }
+                i.stateChanged = 0
+                
+            } else if !i.createdByMe && i.isVisibleOnMenu {
+                if i.isNewAssignment {
+                    NotificationQueue.add(type: assignmentNotification, for: i)
+                    i.announced = true
+                    i.isNewAssignment = false
+                } else if !i.announced {
+                    NotificationQueue.add(type: newNotification, for: i)
+                    i.announced = true
+                }
+            }
+        }
+    }
+    
 	static func sendNotificationsIndexAndSave() {
+        preferencesDirty = false
 
-		func processItems<T: ListableItem>(of type: T.Type, newNotification: NotificationType, reopenedNotification: NotificationType, assignmentNotification: NotificationType) -> [T] {
-			let allItems = DataItem.allItems(of: type, in: main)
-			for i in allItems {
-				if i.isVisibleOnMenu {
-					if !i.createdByMe {
-						if i.isNewAssignment {
-							NotificationQueue.add(type: assignmentNotification, for: i)
-							i.announced = true
-							i.isNewAssignment = false
-						} else if !i.announced {
-							NotificationQueue.add(type: newNotification, for: i)
-							i.announced = true
-						} else if i.reopened {
-							NotificationQueue.add(type: reopenedNotification, for: i)
-							i.announced = true
-							i.reopened = false
-						}
-					}
-					if #available(OSX 10.11, iOS 9, *) {
-						atNextEvent {
-							i.indexForSpotlight()
-						}
-					}
-				} else {
-					atNextEvent {
-						i.ensureInvisible()
-					}
-				}
-			}
-			return allItems
-		}
+		processNotificationsForItems(of: PullRequest.self, newNotification: .newPr, reopenedNotification: .prReopened, assignmentNotification: .newPrAssigned)
 
-		let allPrs = processItems(of: PullRequest.self, newNotification: .newPr, reopenedNotification: .prReopened, assignmentNotification: .newPrAssigned)
-		let allIssues = processItems(of: Issue.self, newNotification: .newIssue, reopenedNotification: .issueReopened, assignmentNotification: .newIssueAssigned)
+        processNotificationsForItems(of: Issue.self, newNotification: .newIssue, reopenedNotification: .issueReopened, assignmentNotification: .newIssueAssigned)
 
-		let latestComments = PRComment.newItems(of: PRComment.self, in: main)
-		for c in latestComments {
-			c.processNotifications()
-			c.postSyncAction = PostSyncAction.doNothing.rawValue
-		}
+        for c in PRComment.newItems(of: PRComment.self, in: main) {
+            c.processNotifications()
+            c.postSyncAction = PostSyncAction.doNothing.rawValue
+        }
 
+        for r in Review.newOrUpdatedItems(of: Review.self, in: main) {
+            r.processNotifications()
+            r.postSyncAction = PostSyncAction.doNothing.rawValue
+        }
+        
 		let latestStatuses = PRStatus.newItems(of: PRStatus.self, in: main)
+        var coveredPrs = Set<NSManagedObjectID>()
 		if Settings.notifyOnStatusUpdates {
-			var coveredPrs = Set<NSManagedObjectID>()
-			for s in latestStatuses {
-				let pr = s.pullRequest
-				if pr.isVisibleOnMenu && (Settings.notifyOnStatusUpdatesForAllPrs || pr.createdByMe || pr.assignedToParticipated || pr.assignedToMySection) {
-					if !coveredPrs.contains(pr.objectID) {
-						coveredPrs.insert(pr.objectID)
-						if let s = pr.displayedStatuses.first {
-							let displayText = s.descriptionText
-							if pr.lastStatusNotified != displayText && pr.postSyncAction != PostSyncAction.isNew.rawValue {
-								if pr.isSnoozing && pr.shouldWakeOnStatusChange {
-									DLog("Waking up snoozed PR ID %@ because of a status update", pr.serverId)
-									pr.wakeUp()
-								}
-								NotificationQueue.add(type: .newStatus, for: s)
-								pr.lastStatusNotified = displayText
-							}
-						} else {
-							pr.lastStatusNotified = nil
-						}
-					}
-				}
+            for pr in latestStatuses.map({ $0.pullRequest }) where pr.shouldAnnounceStatus && !coveredPrs.contains(pr.objectID) {
+                coveredPrs.insert(pr.objectID)
+                if let s = pr.displayedStatuses.first {
+                    let displayText = s.descriptionText
+                    if pr.lastStatusNotified != displayText && pr.postSyncAction != PostSyncAction.isNew.rawValue {
+                        NotificationQueue.add(type: .newStatus, for: s)
+                        pr.lastStatusNotified = displayText
+                    }
+                } else {
+                    pr.lastStatusNotified = nil
+                }
 			}
+            coveredPrs.removeAll()
 		}
+        
+        for pr in latestStatuses.map({ $0.pullRequest }) where pr.isSnoozing && pr.shouldWakeOnStatusChange && !coveredPrs.contains(pr.objectID) {
+            coveredPrs.insert(pr.objectID)
+            DLog("Waking up snoozed PR ID %@ because of a status update", pr.nodeId ?? "<no ID>")
+            pr.wakeUp()
+        }
 
 		for s in latestStatuses {
 			s.postSyncAction = PostSyncAction.doNothing.rawValue
 		}
 
-		for p in allPrs {
-			p.postSyncAction = PostSyncAction.doNothing.rawValue
-		}
-
-		for i in allIssues {
-			i.postSyncAction = PostSyncAction.doNothing.rawValue
-		}
+        for r in DataItem.newOrUpdatedItems(of: Reaction.self, in: main) {
+            r.checkNotifications()
+            r.postSyncAction = PostSyncAction.doNothing.rawValue
+        }
 
 		for r in DataItem.newOrUpdatedItems(of: Review.self, in: main) {
 			r.postSyncAction = PostSyncAction.doNothing.rawValue
@@ -218,25 +218,34 @@ final class DataManager {
 		for r in DataItem.newOrUpdatedItems(of: PRComment.self, in: main) {
 			r.postSyncAction = PostSyncAction.doNothing.rawValue
 		}
+        
+        for pr in DataItem.allItems(of: PullRequest.self, in: main) {
+            pr.postSyncAction = PostSyncAction.doNothing.rawValue
+            pr.handleSpotlight()
+        }
+        
+        for issue in DataItem.allItems(of: Issue.self, in: main) {
+            issue.postSyncAction = PostSyncAction.doNothing.rawValue
+            issue.handleSpotlight()
+        }
+        
+        saveDB()
 
-		for r in DataItem.newOrUpdatedItems(of: Reaction.self, in: main) {
-			r.postSyncAction = PostSyncAction.doNothing.rawValue
-		}
-
-		saveDB()
-
-		NotificationQueue.commit()
+        NotificationQueue.commit(moc: main)
 	}
 
 	static func saveDB() {
-		if main.hasChanges {
-			DLog("Saving DB")
-			do {
-				try main.save()
-			} catch {
-				DLog("Error while saving DB: %@", error.localizedDescription)
-			}
-		}
+		guard main.hasChanges else {
+            DLog("No DB changes")
+            return
+        }
+        
+        DLog("Saving DB")
+        do {
+            try main.save()
+        } catch {
+            DLog("Error while saving DB: %@", error.localizedDescription)
+        }
 	}
 
 	static func buildChildContext() -> NSManagedObjectContext {
@@ -244,14 +253,6 @@ final class DataManager {
 		c.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
 		c.undoManager = nil
 		c.parent = main
-		return c
-	}
-
-	static func buildParallelContext() -> NSManagedObjectContext {
-		let c = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-		c.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
-		c.undoManager = nil
-		c.persistentStoreCoordinator = persistentStoreCoordinator
 		return c
 	}
 

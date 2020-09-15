@@ -71,9 +71,17 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				description: Settings.displayNumbersForItemsHelp,
 				valueDisplayed: { Settings.displayNumbersForItems ? "✓" : " " }),
         Setting(section: .Display,
-                title: "Show draft indicator in item titles",
+                title: "Draft PRs",
                 description: Settings.draftHandlingPolicyHelp,
                 valueDisplayed: { DraftHandlingPolicy.labels[Settings.draftHandlingPolicy] }),
+        Setting(section: .Display,
+                title: "Mark non-mergeable PRs (v4 API only)",
+                description: Settings.markUnmergeablePrsHelp,
+                valueDisplayed: { Settings.markUnmergeablePrs ? "✓" : " " }),
+        Setting(section: .Display,
+                title: "Show PR line counts (v4 API only)",
+                description: Settings.showPrLinesHelp,
+                valueDisplayed: { Settings.showPrLines ? "✓" : " " }),
 
 		Setting(section: .Filtering,
 		        title: "Include item titles",
@@ -126,7 +134,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		        description: Settings.showCommentsEverywhereHelp,
 		        valueDisplayed: { Settings.showCommentsEverywhere ? "✓" : " "  }),
 		Setting(section: .Comments,
-		        title: "Only display items with unread comments",
+		        title: "Only display items with unread badges",
 		        description: Settings.hideUncommentedItemsHelp,
 		        valueDisplayed: { Settings.hideUncommentedItems ? "✓" : " "  }),
 		Setting(section: .Comments,
@@ -171,6 +179,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		        title: "Show reviews for PRs",
 		        description: Settings.displayReviewsOnItemsHelp,
 		        valueDisplayed: { Settings.displayReviewsOnItems ? "✓" : " " }),
+        Setting(section: .Reviews,
+                title: "Show teams asked to review",
+                description: Settings.showRequestedTeamReviewsHelp,
+                valueDisplayed: { Settings.showRequestedTeamReviews ? "✓" : " " }),
 		Setting(section: .Reviews,
 		        title: "When a PR is assigned to me for review",
 		        description: Settings.assignedReviewHandlingPolicyHelp,
@@ -213,22 +225,22 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		        description: Settings.notifyOnCommentReactionsHelp,
 		        valueDisplayed: { Settings.notifyOnCommentReactions ? "✓" : " " }),
 		Setting(section: .Reactions,
-		        title: "Re-query reactions",
-		        description: Settings.reactionScanningIntervalHelp,
-		        valueDisplayed: { Settings.reactionScanningInterval == 1 ? "Every refresh" : "Every \(Settings.reactionScanningInterval) refreshes" }),
+		        title: "Scan for reactions",
+		        description: Settings.reactionScanningBatchSizeHelp,
+		        valueDisplayed: { "\(Settings.reactionScanningBatchSize) items per refresh" }),
 
 		Setting(section: .Stauses,
 		        title: "Show statuses",
 		        description: Settings.showStatusItemsHelp,
 		        valueDisplayed: { Settings.showStatusItems ? "✓" : " " }),
 		Setting(section: .Stauses,
-		        title: "...for all PRs",
+		        title: "…for all PRs",
 		        description: Settings.showStatusesOnAllItemsHelp,
 		        valueDisplayed: { Settings.showStatusesOnAllItems ? "✓" : " " }),
 		Setting(section: .Stauses,
-		        title: "Re-query statuses",
-		        description: Settings.statusItemRefreshIntervalHelp,
-		        valueDisplayed: { Settings.statusItemRefreshInterval == 1 ? "Every refresh" : "Every \(Settings.statusItemRefreshInterval) refreshes" }),
+		        title: "Scan for statuses",
+		        description: Settings.statusItemRefreshBatchSizeHelp,
+		        valueDisplayed: { "\(Settings.statusItemRefreshBatchSize) items per refresh" }),
 		Setting(section: .Stauses,
 		        title: "Notify status changes for my & participated PRs",
 		        description: Settings.notifyOnStatusUpdatesHelp,
@@ -262,6 +274,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		        title: "Clear notifications of removed items",
 		        description: Settings.removeNotificationsWhenItemIsRemovedHelp,
 		        valueDisplayed: { Settings.removeNotificationsWhenItemIsRemoved ? "✓" : " " }),
+        Setting(section: .History,
+                title: "Highlight comments on closed or merged items",
+                description: Settings.scanClosedAndMergedItemsHelp,
+                valueDisplayed: { Settings.scanClosedAndMergedItems ? "✓" : " " }),
 
 		Setting(section: .Confirm,
 		        title: "Removing all merged items",
@@ -322,7 +338,8 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		}
 		tableView.reloadData()
 		if previousSearchText != searchText {
-			atNextEvent(self) { S in
+            DispatchQueue.main.async { [weak self] in
+                guard let S = self else { return }
 				S.tableView.scrollRectToVisible(CGRect(origin: .zero, size: CGSize(width: 1, height: 1)), animated: false)
 			}
 		}
@@ -409,7 +426,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
 		switch filteredSections[section].title {
 		case SettingsSection.Filtering.title:
-			return buildFooter("You can use title: server: label: repo: user: number: milestone: assignee: and status: to filter specific properties, e.g. \"label:bug,suggestion\". Prefix with '!' to exclude some terms. You can also use \"state:\" with unread/open/closed/merged/snoozed/draft as an argument, e.g. \"state:unread,draft\"")
+			return buildFooter("You can use title: server: label: repo: user: number: milestone: assignee: and status: to filter specific properties, e.g. \"label:bug,suggestion\". Prefix with '!' to exclude some terms. You can also use \"state:\" with unread/open/closed/merged/snoozed/draft/conflict as an argument, e.g. \"state:unread,draft\"")
 		case SettingsSection.Reviews.title:
 			return buildFooter("To disable usage of the Reviews API, uncheck all options above and set the moving option to \"Don't Move It\".")
 		case SettingsSection.Reactions.title:
@@ -549,7 +566,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				settingsChangedTimer.push()
 			case 5:
 				Settings.showSeparateApiServersInMenu = !Settings.showSeparateApiServersInMenu
-				atNextEvent {
+				DispatchQueue.main.async {
 					popupManager.masterController.updateStatus(becauseOfChanges: true)
 				}
 				settingsChangedTimer.push()
@@ -565,6 +582,12 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
             case 9:
                 let v = PickerViewController.Info(title: setting.title, values: DraftHandlingPolicy.labels, selectedIndex: Settings.draftHandlingPolicy, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
                 performSegue(withIdentifier: "showPicker", sender: v)
+            case 10:
+                Settings.markUnmergeablePrs = !Settings.markUnmergeablePrs
+                settingsChangedTimer.push()
+            case 11:
+                Settings.showPrLines = !Settings.showPrLines
+                settingsChangedTimer.push()
 			default: break
 			}
 
@@ -635,35 +658,40 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				Settings.displayReviewsOnItems = !Settings.displayReviewsOnItems
 				showOptionalReviewWarning(previousSync: previousShouldSync)
 
-			case 1:
+            case 1:
+                let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
+                Settings.showRequestedTeamReviews = !Settings.showRequestedTeamReviews
+                showOptionalReviewWarning(previousSync: previousShouldSync)
+                
+			case 2:
                 let v = PickerViewController.Info(title: setting.title, values: Section.movePolicyNames, selectedIndex: Settings.assignedReviewHandlingPolicy, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
 				performSegue(withIdentifier: "showPicker", sender: v)
 
-			case 2:
+			case 3:
 				let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
 				Settings.notifyOnReviewChangeRequests = !Settings.notifyOnReviewChangeRequests
 				showOptionalReviewWarning(previousSync: previousShouldSync)
 
-			case 3:
+			case 4:
 				Settings.notifyOnAllReviewChangeRequests = !Settings.notifyOnAllReviewChangeRequests
 
-			case 4:
+			case 5:
 				let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
 				Settings.notifyOnReviewAcceptances = !Settings.notifyOnReviewAcceptances
 				showOptionalReviewWarning(previousSync: previousShouldSync)
 
-			case 5:
+			case 6:
 				Settings.notifyOnAllReviewAcceptances = !Settings.notifyOnAllReviewAcceptances
 
-			case 6:
+			case 7:
 				let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
 				Settings.notifyOnReviewDismissals = !Settings.notifyOnReviewDismissals
 				showOptionalReviewWarning(previousSync: previousShouldSync)
 
-			case 7:
+			case 8:
 				Settings.notifyOnAllReviewDismissals = !Settings.notifyOnAllReviewDismissals
 
-			case 8:
+			case 9:
 				let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
 				Settings.notifyOnReviewAssignments = !Settings.notifyOnReviewAssignments
 				showOptionalReviewWarning(previousSync: previousShouldSync)
@@ -686,25 +714,19 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			switch originalIndex {
 			case 0:
 				Settings.notifyOnItemReactions = !Settings.notifyOnItemReactions
-				API.refreshesSinceLastReactionsCheck.removeAll()
 				settingsChangedTimer.push()
 
 			case 1:
 				Settings.notifyOnCommentReactions = !Settings.notifyOnCommentReactions
-				API.refreshesSinceLastReactionsCheck.removeAll()
 				settingsChangedTimer.push()
 
 			case 2:
 				var values = [String]()
-				var count = 1
-				values.append("Every refresh")
-                var previousIndex: Int?
-				for f in 2..<100 {
-					if f == Settings.reactionScanningInterval { previousIndex = count }
-					values.append("Every \(f) refreshes")
-					count += 1
+				values.append("1 item per refresh")
+				for f in 2 ..< 999 {
+					values.append("\(f) items per refresh")
 				}
-                let v = PickerViewController.Info(title: setting.title, values: values, selectedIndex: previousIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                let v = PickerViewController.Info(title: setting.title, values: values, selectedIndex: Settings.reactionScanningBatchSize - 1, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
 				performSegue(withIdentifier: "showPicker", sender: v)
 
 			default: break
@@ -728,27 +750,21 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				Settings.showStatusItems = !Settings.showStatusItems
 				settingsChangedTimer.push()
 				if Settings.showStatusItems {
-					API.refreshesSinceLastStatusCheck.removeAll()
 					preferencesDirty = true
 				}
 			case 1:
 				Settings.showStatusesOnAllItems = !Settings.showStatusesOnAllItems
 				settingsChangedTimer.push()
 				if Settings.showStatusesOnAllItems {
-					API.refreshesSinceLastStatusCheck.removeAll()
 					preferencesDirty = true
 				}
 			case 2:
 				var values = [String]()
-				var count = 1
-				values.append("Every refresh")
-                var previousIndex: Int?
-				for f in 2..<100 {
-					if f == Settings.statusItemRefreshInterval { previousIndex = count }
-					values.append("Every \(f) refreshes")
-					count += 1
+				values.append("1 item per refresh")
+				for f in 2 ..< 999 {
+					values.append("\(f) items per refresh")
 				}
-                let v = PickerViewController.Info(title: setting.title, values: values, selectedIndex: previousIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                let v = PickerViewController.Info(title: setting.title, values: values, selectedIndex: Settings.statusItemRefreshBatchSize - 1, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
 				performSegue(withIdentifier: "showPicker", sender: v)
 			case 3:
 				Settings.notifyOnStatusUpdates = !Settings.notifyOnStatusUpdates
@@ -775,6 +791,8 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				Settings.dontKeepPrsMergedByMe = !Settings.dontKeepPrsMergedByMe
 			case 3:
 				Settings.removeNotificationsWhenItemIsRemoved = !Settings.removeNotificationsWhenItemIsRemoved
+            case 4:
+                Settings.scanClosedAndMergedItems = !Settings.scanClosedAndMergedItems
 			default: break
 			}
 
@@ -865,7 +883,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
             if sip.row == 3 {
                 Settings.assignedPrHandlingPolicy = didSelectIndexPath.row
                 settingsChangedTimer.push()
-            } else if sip.row == 11 {
+            } else if sip.row == 9 {
                 Settings.draftHandlingPolicy = didSelectIndexPath.row
                 settingsChangedTimer.push()
             }
@@ -889,7 +907,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
             }
             
         } else if sip.section == SettingsSection.Stauses.rawValue {
-            Settings.statusItemRefreshInterval = didSelectIndexPath.row+1
+            Settings.statusItemRefreshBatchSize = didSelectIndexPath.row+1
             
         } else if sip.section == SettingsSection.Comments.rawValue {
             if sip.row == 2 {
@@ -908,7 +926,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
             
         } else if sip.section == SettingsSection.Reactions.rawValue {
             let previous = API.shouldSyncReactions
-            Settings.reactionScanningInterval = didSelectIndexPath.row+1
+            Settings.reactionScanningBatchSize = didSelectIndexPath.row + 1
             showOptionalReviewWarning(previousSync: previous)
         }
         reload()

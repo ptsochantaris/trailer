@@ -52,7 +52,7 @@ class TrailerCell: NSTableCellView {
             y += height
         }
         
-		if let pullRequest = item as? PullRequest, pullRequest.shouldShowStatuses {
+		if let pullRequest = item as? PullRequest, pullRequest.interestedInStatuses {
             let statuses = pullRequest.displayedStatuses.reversed()
             if !statuses.isEmpty {
                 for status in statuses {
@@ -107,6 +107,7 @@ class TrailerCell: NSTableCellView {
 		if faded {
 			title.alphaValue = DISABLED_FADE
 			subtitle.alphaValue = DISABLED_FADE
+            reviews.alphaValue = DISABLED_FADE
 		}
 	}
 
@@ -127,11 +128,11 @@ class TrailerCell: NSTableCellView {
 	override func mouseExited(with theEvent: NSEvent?) {
 		selected = false
 	}
-
+    
     private func updateText(for item: ListableItem) {
         title.attributedStringValue = item.title(with: titleFont, labelFont: detailFont, titleColor: .controlTextColor, numberColor: .secondaryLabelColor)
-        labels.attributedStringValue = item.labelsAttributedString(labelFont: detailFont) ?? NSAttributedString()
-        reviews.attributedStringValue = (item as? PullRequest)?.reviewsAttributedString(labelFont: detailFont) ?? NSAttributedString()
+        labels.attributedStringValue = item.labelsAttributedString(labelFont: detailFont) ?? emptyAttributedString
+        reviews.attributedStringValue = (item as? PullRequest)?.reviewsAttributedString(labelFont: detailFont) ?? emptyAttributedString
         subtitle.attributedStringValue = item.subtitle(with: detailFont, lightColor: .tertiaryLabelColor, darkColor: .secondaryLabelColor, separator: "   ")
     }
 
@@ -177,85 +178,96 @@ class TrailerCell: NSTableCellView {
 		}
 	}
 
+    @objc private func copyBranchToClipboard() {
+        if let a = associatedDataItem as? PullRequest, let name = a.headRefName {
+            let p = NSPasteboard.general
+            p.clearContents()
+            p.declareTypes([NSPasteboard.PasteboardType.string], owner: self)
+            p.setString(name, forType: NSPasteboard.PasteboardType.string)
+        }
+    }
+
 	override func menu(for event: NSEvent) -> NSMenu? {
 
 		guard let item = associatedDataItem else {
 			return nil
 		}
 
-		let title: String
-		let muted = item.muted
-		let n = item.number
-		if item is PullRequest {
-			title = muted ? "PR #\(n) (muted)" : "PR #\(n)"
-		} else {
-			title = muted ? "Issue #\(n) (muted)" : "Issue #\(n)"
-		}
-
+        let title = item.contextMenuTitle
+        
 		let m = NSMenu(title: title)
 		m.addItem(withTitle: title, action: #selector(copyNumberToClipboard), keyEquivalent: "")
-		m.addItem(NSMenuItem.separator())
+        
+        if let subtitle = item.contextMenuSubtitle {
+            let c = m.addItem(withTitle: subtitle, action: #selector(copyBranchToClipboard), keyEquivalent: "c")
+            c.keyEquivalentModifierMask = [.command, .option]
+        }
 
-		let c1 = m.addItem(withTitle: "Copy URL", action: #selector(copyToClipboard), keyEquivalent: "c")
-		c1.keyEquivalentModifierMask = [.command]
+        m.addItem(NSMenuItem.separator())
 
-		let c2 = m.addItem(withTitle: "Open Repo", action: #selector(openRepo), keyEquivalent: "o")
-		c2.keyEquivalentModifierMask = [.command]
+        for a in item.contextActions {
+            switch a {
+            case .copy:
+                let c = m.addItem(withTitle: a.title, action: #selector(copyToClipboard), keyEquivalent: "c")
+                c.keyEquivalentModifierMask = [.command]
 
-		if item.snoozeUntil == nil {
-			if item.hasUnreadCommentsOrAlert {
-				let c = m.addItem(withTitle: "Mark as read", action: #selector(markReadSelected), keyEquivalent: "a")
-				c.keyEquivalentModifierMask = [.command]
-			} else {
-				let c = m.addItem(withTitle: "Mark as unread", action: #selector(markUnreadSelected), keyEquivalent: "a")
-				c.keyEquivalentModifierMask = [.command]
-			}
-		}
+            case .openRepo:
+                let c = m.addItem(withTitle: a.title, action: #selector(openRepo), keyEquivalent: "o")
+                c.keyEquivalentModifierMask = [.command]
 
-		if let section = Section(item.sectionIndex), !(section == .closed || section == .merged) {
+            case .markRead:
+                let c = m.addItem(withTitle: a.title, action: #selector(markReadSelected), keyEquivalent: "a")
+                c.keyEquivalentModifierMask = [.command]
 
-			if let snooze = item.snoozeUntil {
-				let title: String
-				if snooze == .distantFuture || snooze == autoSnoozeSentinelDate {
-					title = String(format: "Wake")
-				} else {
-					title = String(format: "Wake (auto: %@)", itemDateFormatter.string(from: snooze))
-				}
-				let c = m.addItem(withTitle: title, action: #selector(wakeUpSelected), keyEquivalent: "0")
-				c.keyEquivalentModifierMask = [.command, .option]
+            case .markUnread:
+                let c = m.addItem(withTitle: a.title, action: #selector(markUnreadSelected), keyEquivalent: "a")
+                c.keyEquivalentModifierMask = [.command]
 
-			} else {
+            case .wake:
+                let c = m.addItem(withTitle: a.title, action: #selector(wakeUpSelected), keyEquivalent: "0")
+                c.keyEquivalentModifierMask = [.command, .option]
 
-				if muted {
-					let c = m.addItem(withTitle: "Un-Mute", action: #selector(unMuteSelected), keyEquivalent: "m")
-					c.keyEquivalentModifierMask = [.command]
-				} else {
-					let c = m.addItem(withTitle: "Mute", action: #selector(muteSelected), keyEquivalent: "m")
-					c.keyEquivalentModifierMask = [.command]
-				}
+            case .snooze(let presets):
+                let s = NSMenu(title: "Snooze")
+                var count = 1
+                for i in presets {
+                    let keyEquivalent = count < 10 ? "\(count)" : ""
+                    let smi = s.addItem(withTitle: i.listDescription, action: #selector(snoozeSelected), keyEquivalent: keyEquivalent)
+                    smi.representedObject = i.objectID
+                    if !keyEquivalent.isEmpty {
+                        smi.keyEquivalentModifierMask = [.command, .option]
+                        count += 1
+                    }
+                }
+                s.addItem(withTitle: "Configure…", action: #selector(snoozeConfigSelected), keyEquivalent: "")
 
-				let snoozeItems = SnoozePreset.allSnoozePresets(in: DataManager.main)
-				if snoozeItems.count > 0 {
-					var count = 1
-					let c = m.addItem(withTitle: "Snooze…", action: nil, keyEquivalent: "")
-					let s = NSMenu(title: "Snooze")
-					for i in snoozeItems {
-						let keyEquivalent = count < 10 ? "\(count)" : ""
-						let smi = s.addItem(withTitle: i.listDescription, action: #selector(snoozeSelected), keyEquivalent: keyEquivalent)
-						smi.representedObject = i.objectID
-						if !keyEquivalent.isEmpty {
-							smi.keyEquivalentModifierMask = [.command, .option]
-							count += 1
-						}
-					}
-					s.addItem(withTitle: "Configure…", action: #selector(snoozeConfigSelected), keyEquivalent: "")
-					c.submenu = s
-				}
-			}
-		}
+                let c = m.addItem(withTitle: "Snooze…", action: nil, keyEquivalent: "")
+                c.submenu = s
 
+            case .mute:
+                let c = m.addItem(withTitle: a.title, action: #selector(muteSelected), keyEquivalent: "m")
+                c.keyEquivalentModifierMask = [.command]
+
+            case .unmute:
+                let c = m.addItem(withTitle: a.title, action: #selector(unMuteSelected), keyEquivalent: "m")
+                c.keyEquivalentModifierMask = [.command]
+
+            case .remove:
+                m.addItem(withTitle: a.title, action: #selector(removeSelected), keyEquivalent: "")
+            }
+        }
+        
 		return m
 	}
+    
+    @objc private func removeSelected() {
+        if let item = associatedDataItem {
+            item.sectionIndex = Section.none.rawValue
+            app.updateRelatedMenus(for: item) // saveAndRequestMenuUpdate won't work in this case
+            DataManager.main.delete(item)
+            DataManager.saveDB()
+        }
+    }
 
 	@objc private func snoozeConfigSelected() {
 		app.showPreferencesWindow(andSelect: 6)
@@ -347,7 +359,7 @@ class TrailerCell: NSTableCellView {
 		let pCenter = NSMutableParagraphStyle()
 		pCenter.alignment = .center
 
-		let countString = NSAttributedString(string: itemCountFormatter.string(for: total)!, attributes: [
+		let countString = NSAttributedString(string: numberFormatter.string(for: total)!, attributes: [
 			NSAttributedString.Key.font: NSFont.menuFont(ofSize: 11),
 			NSAttributedString.Key.foregroundColor: NSColor.controlTextColor,
 			NSAttributedString.Key.paragraphStyle: pCenter])
@@ -370,7 +382,7 @@ class TrailerCell: NSTableCellView {
 
 		if unread > 0 || alert {
 
-			let alertText = unread==0 ? "!" : itemCountFormatter.string(for: unread)!
+			let alertText = unread==0 ? "!" : numberFormatter.string(for: unread)!
 			let alertString = NSAttributedString(string: alertText, attributes: [
 				NSAttributedString.Key.font: NSFont.menuFont(ofSize: 8),
 				NSAttributedString.Key.foregroundColor: NSColor.white,
@@ -397,26 +409,28 @@ class TrailerCell: NSTableCellView {
 	}
 
 	private func highlight(_ on: Bool) {
-		if let c = countBackground {
-			var color: NSColor
-			switch app.theme {
-			case .light:
-				color = .controlTextColor
-				c.backgroundColor = NSColor(red: 0.92, green: 0.92, blue: 0.92, alpha: 1.0)
-				newBackground?.backgroundColor = NSColor(red: 1.0, green: 0.4, blue: 0.4, alpha: 1.0)
-			case .dark:
-				color = on ? .black : NSColor(red: 0.94, green: 0.94, blue: 0.94, alpha: 1.0)
-				c.backgroundColor = on ? NSColor.white.withAlphaComponent(DISABLED_FADE) : NSColor.controlShadowColor
-				newBackground?.backgroundColor = NSColor(red: 1.0, green: 0.1, blue: 0.1, alpha: 1.0)
-			case .darkLegacy:
-				color = on ? .black : NSColor(red: 0.94, green: 0.94, blue: 0.94, alpha: 1.0)
-				c.backgroundColor = on ? NSColor.white.withAlphaComponent(DISABLED_FADE) : NSColor.black
-				newBackground?.backgroundColor = NSColor(red: 1.0, green: 0.1, blue: 0.1, alpha: 1.0)
-			}
-			if let a = countView?.attributedStringValue.mutableCopy() as? NSMutableAttributedString {
-				a.addAttribute(NSAttributedString.Key.foregroundColor, value: color, range: NSRange(location: 0, length: a.length))
-				countView?.attributedStringValue = a
-			}
-		}
+        guard let c = countBackground else { return }
+
+        let color: NSColor
+        switch app.theme {
+        case .light:
+            color = .controlTextColor
+            newBackground?.backgroundColor = NSColor(red: 1.0, green: 0.4, blue: 0.4, alpha: 1.0)
+            c.backgroundColor = NSColor(red: 0.92, green: 0.92, blue: 0.92, alpha: 1.0)
+
+        case .dark:
+            color = on ? .black : NSColor(red: 0.94, green: 0.94, blue: 0.94, alpha: 1.0)
+            newBackground?.backgroundColor = NSColor(red: 1.0, green: 0.1, blue: 0.1, alpha: 1.0)
+            if #available(OSX 10.14, *) {
+                c.backgroundColor = on ? NSColor.white.withAlphaComponent(DISABLED_FADE) : NSColor.controlShadowColor
+            } else {
+                c.backgroundColor = on ? NSColor.white.withAlphaComponent(0.1) : NSColor.black
+            }
+        }
+
+        if let a = countView?.attributedStringValue.mutableCopy() as? NSMutableAttributedString {
+            a.addAttribute(NSAttributedString.Key.foregroundColor, value: color, range: NSRange(location: 0, length: a.length))
+            countView?.attributedStringValue = a
+        }
 	}
 }

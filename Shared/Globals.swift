@@ -40,7 +40,6 @@ let stringDrawingOptions: NSString.DrawingOptions = [.usesLineFragmentOrigin, .u
 
 #endif
 
-var appIsRefreshing = false
 var preferencesDirty = false
 var lastRepoCheck = Date.distantPast
 let autoSnoozeSentinelDate = Date.distantFuture.addingTimeInterval(-1)
@@ -65,6 +64,8 @@ let NOTIFICATION_URL_KEY = "urlKey"
 
 #endif
 
+let emptyAttributedString = NSAttributedString()
+
 func existingObject(with id: NSManagedObjectID) -> NSManagedObject? {
 	return try? DataManager.main.existingObject(with: id)
 }
@@ -88,7 +89,7 @@ func DLog(_ message: String, _ arg1: @autoclosure ()->Any? = nil, _ arg2: @autoc
 	}
 }
 
-let itemCountFormatter: NumberFormatter = {
+let numberFormatter: NumberFormatter = {
 	let n = NumberFormatter()
 	n.numberStyle = .decimal
 	return n
@@ -110,7 +111,7 @@ enum ItemCondition: Int64 {
 		if let predicate = ItemCondition.predicateMatchCache[self] {
 			return predicate
 		}
-		let predicate = NSPredicate(format: "condition == %lld", rawValue)
+		let predicate = NSPredicate(format: "condition == \(rawValue)")
 		ItemCondition.predicateMatchCache[self] = predicate
 		return predicate
 	}
@@ -119,7 +120,7 @@ enum ItemCondition: Int64 {
 		if let predicate = ItemCondition.predicateExcludeCache[self] {
 			return predicate
 		}
-		let predicate = NSPredicate(format: "condition != %lld", rawValue)
+		let predicate = NSPredicate(format: "condition != \(rawValue)")
 		ItemCondition.predicateExcludeCache[self] = predicate
 		return predicate
 	}
@@ -157,9 +158,9 @@ enum NotificationType: Int {
 }
 
 enum SortingMethod: Int {
-	case creationDate, recentActivity, title
-	static let reverseTitles = ["Youngest first", "Most recently active", "Reverse alphabetically"]
-	static let normalTitles = ["Oldest first", "Inactive for longest", "Alphabetically"]
+	case creationDate, recentActivity, title, linesAdded, linesRemoved
+    static let reverseTitles = ["Youngest first", "Most recently active", "Reverse alphabetically", "Most lines added", "Most lines removed"]
+	static let normalTitles = ["Oldest first", "Inactive for longest", "Alphabetically", "Least lines added", "Least lines removed"]
 
 	init?(_ rawValue: Int) {
 		self.init(rawValue: rawValue)
@@ -178,6 +179,8 @@ enum SortingMethod: Int {
 		case .creationDate: return "createdAt"
 		case .recentActivity: return "updatedAt"
 		case .title: return "title"
+        case .linesAdded: return "linesAdded"
+        case .linesRemoved: return "linesRemoved"
 		}
 	}
 }
@@ -204,19 +207,60 @@ enum AssignmentPolicy: Int {
 	}
 }
 
-enum RepoDisplayPolicy: Int64 {
-	case hide, mine, mineAndPaticipated, all
-	static let labels = ["Hide", "Mine", "Participated", "All"]
-	static let policies = [hide, mine, mineAndPaticipated, all]
-    static let colors = [    COLOR_CLASS.appTertiaryLabel,
-	                         COLOR_CLASS(red: 0.7, green: 0.0, blue: 0.0, alpha: 1.0),
-	                         COLOR_CLASS(red: 0.8, green: 0.4, blue: 0.0, alpha: 1.0),
-	                         COLOR_CLASS(red: 0.0, green: 0.5, blue: 0.0, alpha: 1.0)]
+enum RepoDisplayPolicy: Int64, CaseIterable {
+	case hide = 0
+    case mine = 1
+    case mineAndPaticipated = 2
+    case all = 3
+    case authoredOnly = 4
+    
+    static var labels: [String] {
+        return self.allCases.map { $0.name }
+    }
+    	                         
 	var name: String {
-		return RepoDisplayPolicy.labels[Int(rawValue)]
+        switch self {
+        case .hide:
+            return "Hide"
+        case .mine:
+            return "Mine"
+        case .mineAndPaticipated:
+            return "Participated"
+        case .all:
+            return "All"
+        case .authoredOnly:
+            return "Authored"
+        }
 	}
-	var color: COLOR_CLASS {
-		return RepoDisplayPolicy.colors[Int(rawValue)]
+    var bold: Bool {
+        switch self {
+        case .hide, .authoredOnly:
+            return false
+        default:
+            return true
+        }
+    }
+    var selectable: Bool {
+        switch self {
+        case .authoredOnly:
+            return false
+        default:
+            return true
+        }
+    }
+    var color: COLOR_CLASS {
+        switch self {
+        case .hide:
+            return COLOR_CLASS.appTertiaryLabel
+        case .authoredOnly:
+            return COLOR_CLASS.appLabel
+        case .mine:
+            return COLOR_CLASS(red: 0.7, green: 0.0, blue: 0.0, alpha: 1.0)
+        case .mineAndPaticipated:
+            return COLOR_CLASS(red: 0.8, green: 0.4, blue: 0.0, alpha: 1.0)
+        case .all:
+            return COLOR_CLASS(red: 0.0, green: 0.5, blue: 0.0, alpha: 1.0)
+        }
 	}
 	var intValue: Int { return Int(rawValue) }
 
@@ -247,7 +291,15 @@ enum RepoHidingPolicy: Int64 {
 	var name: String {
 		return RepoHidingPolicy.labels[Int(rawValue)]
 	}
-	var color: COLOR_CLASS {
+    var bold: Bool {
+        switch self {
+        case .noHiding:
+            return false
+        default:
+            return true
+        }
+    }
+    var color: COLOR_CLASS {
 		return RepoHidingPolicy.colors[Int(rawValue)]
 	}
 	init?(_ rawValue: Int64) {
@@ -258,26 +310,48 @@ enum RepoHidingPolicy: Int64 {
 	}
 }
 
-struct ApiRateLimits {
-	let requestsRemaining, requestLimit: Int64
-	let resetDate: Date?
+let apiDateFormatter: DateFormatter = {
+    let d = DateFormatter()
+    d.timeZone = TimeZone(abbreviation: "UTC")
+    d.locale = Locale(identifier: "en_US")
+    d.dateFormat =  "yyyy-MM-dd'T'HH:mm:ss'Z'"
+    return d
+}()
 
-	static func from(headers: [AnyHashable : Any]) -> ApiRateLimits {
+struct ApiStats {
+	let nodeCount, cost, remaining, limit: Int64
+	let resetAt: Date?
+
+	static func fromV3(headers: [AnyHashable : Any]) -> ApiStats {
 		let date: Date?
 		if let epochSeconds = headers["X-RateLimit-Reset"] as? String, let t = TimeInterval(epochSeconds) {
 			date = Date(timeIntervalSince1970: t)
 		} else {
 			date = nil
 		}
-		return ApiRateLimits(requestsRemaining: Int64(S(headers["X-RateLimit-Remaining"] as? String)) ?? 10000,
-		                     requestLimit: Int64(S(headers["X-RateLimit-Limit"] as? String)) ?? 10000,
-		                     resetDate: date)
+        return ApiStats(nodeCount: 0,
+                             cost: 1,
+                             remaining: Int64(S(headers["X-RateLimit-Remaining"] as? String)) ?? 10000,
+                             limit: Int64(S(headers["X-RateLimit-Limit"] as? String)) ?? 10000,
+                             resetAt: date)
 	}
-	static var noLimits: ApiRateLimits {
-		return ApiRateLimits(requestsRemaining: 10000, requestLimit: 10000, resetDate: nil)
+    
+    static func fromV4(json: [AnyHashable : Any]?) -> ApiStats? {
+        guard let info = json?["rateLimit"] as? [AnyHashable: Any] else { return nil }
+        let date = apiDateFormatter.date(from: info["resetAt"] as? String ?? "")
+        return ApiStats(nodeCount: info["nodeCount"] as? Int64 ?? 0,
+                             cost: info["cost"] as? Int64 ?? 0,
+                             remaining: info["remaining"] as? Int64 ?? 10000,
+                             limit: info["limit"] as? Int64 ?? 10000,
+                             resetAt: date)
+    }
+    
+	static var noLimits: ApiStats {
+        return ApiStats(nodeCount: 0, cost: 0, remaining: 10000, limit: 10000, resetAt: nil)
 	}
+    
 	var areValid: Bool {
-		return requestsRemaining >= 0
+		return remaining >= 0
 	}
 }
 
@@ -319,34 +393,12 @@ func openURL(_ url: URL, using path: String) {
 
 #endif
 
-//////////////////////// Originally from tieferbegabt's post on https://forums.developer.apple.com/message/37935, with thanks!
-
-extension String {
-	func appending(pathComponent: String) -> String {
-		let endSlash = hasSuffix("/")
-		let firstSlash = pathComponent.hasPrefix("/")
-		if endSlash && firstSlash {
-			return appending(pathComponent.dropFirst())
-		} else if (!endSlash && !firstSlash) {
-			return appending("/\(pathComponent)")
-		} else {
-			return appending(pathComponent)
-		}
-	}
-	var trim: String {
-		return trimmingCharacters(in: .whitespacesAndNewlines)
-	}
-}
-
 ////////////////////// Notifications
 
 extension Notification.Name {
-    static let RefreshStarted = Notification.Name("RefreshStartedNotification")
-    static let RefreshProcessing = Notification.Name("RefreshProcessingNotification")
+    static let RefreshStarting = Notification.Name("RefreshStartingNotification")
     static let RefreshEnded = Notification.Name("RefreshEndedNotification")
     static let SyncProgressUpdate = Notification.Name("SyncProgressUpdateNotification")
     static let ApiUsageUpdate = Notification.Name("ApiUsageUpdateNotification")
-    static let AppleInterfaceThemeChanged = Notification.Name("AppleInterfaceThemeChangedNotification")
     static let SettingsExported = Notification.Name("SettingsExportedNotification")
-    static let MasterViewTitleChanged = Notification.Name("MasterViewTitleChangedNotification")
 }

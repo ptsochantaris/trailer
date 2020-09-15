@@ -57,12 +57,12 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
 		switch app.theme {
 		case .light:
 			appearance = NSAppearance(named: .vibrantLight)
-		case .darkLegacy:
-			appearance = NSAppearance(named: .vibrantDark)
 		case .dark:
 			if #available(OSX 10.14, *) {
 				appearance = NSAppearance(named: .darkAqua)
-			}
+            } else {
+                appearance = NSAppearance(named: .vibrantDark)
+            }
 		}
 	}
 
@@ -89,15 +89,15 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
 	}
 
 	@objc private func menuWillOpen(_ menu: NSMenu) {
-		if appIsRefreshing {
+		if API.isRefreshing {
 			refreshUpdate()
 		} else {
-			refreshMenuItem.title = " Refresh - \(API.lastUpdateDescription)"
+            refreshMenuItem.title = " Refresh (\(API.lastSuccessfulSyncAt))"
 		}
 	}
 
 	@objc private func refreshUpdate() {
-		refreshMenuItem.title = " \(API.lastUpdateDescription)"
+		refreshMenuItem.title = " Refresh: " + API.currentOperationName
 	}
 
 	func scrollToTop() {
@@ -208,13 +208,15 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
 		let row = table.selectedRow
 		var i: ListableItem?
 		if row >= 0 {
-			if blink { table.deselectAll(nil) }
 			i = itemDelegate.itemAtRow(row)
-		}
-		if blink {
-			atNextEvent(self) { S in
-				S.table.selectRowIndexes(IndexSet(integer: row), byExtendingSelection: false)
-			}
+            if blink {
+                table.deselectAll(nil)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+                    guard let S = self else { return }
+                    let i = IndexSet(integer: row)
+                    S.table.selectRowIndexes(i, byExtendingSelection: false)
+                }
+            }
 		}
 		return i
 	}

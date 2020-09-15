@@ -55,7 +55,7 @@
 		<true/>
 	</dict>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright (c) 2014-2019 Paul Tsochantaris. Parts copyright (c) 2013-2014 HouseTrip Ltd. Released under the terms of the MIT licence, see the file LICENCE for details.</string>
+	<string>Copyright (c) 2014-2020 Paul Tsochantaris. Parts copyright (c) 2013-2014 HouseTrip Ltd. Released under the terms of the MIT licence, see the file LICENCE for details.</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
@@ -63,7 +63,7 @@
 	<key>NSUserNotificationAlertStyle</key>
 	<string>banner</string>
 	<key>SUFeedURL</key>
-	<string>http://ptsochantaris.github.io/trailer/appcast.xml</string>
+	<string>https://whisper.chat/trailer-beta/appcast-beta.xml</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>dsa_pub.pem</string>
 </dict>

@@ -8,11 +8,14 @@ import CoreSpotlight
 #endif
 
 class ListableItem: DataItem {
+    
+    enum StateChange: Int64 {
+        case none, reopened, merged, closed
+    }
 
 	@NSManaged var assignedToMe: Bool
 	@NSManaged var assigneeName: String? // note: This now could be a list of names, delimited with a ","
 	@NSManaged var body: String?
-	@NSManaged var webUrl: String?
 	@NSManaged var condition: Int64
 	@NSManaged var isNewAssignment: Bool
 	@NSManaged var repo: Repo
@@ -21,20 +24,21 @@ class ListableItem: DataItem {
 	@NSManaged var unreadComments: Int64
 	@NSManaged var url: String?
 	@NSManaged var userAvatarUrl: String?
-	@NSManaged var userId: Int64
+    @NSManaged var userNodeId: String?
 	@NSManaged var userLogin: String?
 	@NSManaged var sectionIndex: Int64
 	@NSManaged var latestReadCommentDate: Date?
-	@NSManaged var state: String?
-	@NSManaged var reopened: Bool
+	@NSManaged var stateChanged: Int64
 	@NSManaged var number: Int64
 	@NSManaged var announced: Bool
 	@NSManaged var muted: Bool
 	@NSManaged var wasAwokenFromSnooze: Bool
 	@NSManaged var milestone: String?
 	@NSManaged var dirty: Bool
-	@NSManaged var requiresReactionRefreshFromUrl: String?
     @NSManaged var draft: Bool
+
+    @NSManaged var lastStatusScan: Date?
+    @NSManaged var lastReactionScan: Date?
 
 	@NSManaged var snoozeUntil: Date?
 	@NSManaged var snoozingPreset: SnoozePreset?
@@ -42,47 +46,123 @@ class ListableItem: DataItem {
 	@NSManaged var comments: Set<PRComment>
 	@NSManaged var labels: Set<PRLabel>
 	@NSManaged var reactions: Set<Reaction>
+    
+    var webUrl: String? {
+        return repo.webUrl
+    }
 
-	final func baseSync(from info: [AnyHashable : Any], in repo: Repo) {
+    var commentsLink: String? {
+        return issueUrl?.appending(pathComponent: "comments")
+    }
 
-		self.repo = repo
+    var issueUrl: String? {
+        return repo.apiUrl?.appending(pathComponent: "issues").appending(pathComponent: String(number))
+    }
+    
+    var reactionsUrl: String? {
+        return issueUrl?.appending(pathComponent: "reactions")
+    }
+    
+    static func reactionCheckBatch<T: ListableItem>(for type: T.Type, in moc: NSManagedObjectContext) -> [T] {
+        let entityName = String(describing: type)
+        let f = NSFetchRequest<T>(entityName: entityName)
+        f.predicate = NSPredicate(format: "apiServer.lastSyncSucceeded == YES")
+        f.sortDescriptors = [
+            NSSortDescriptor(key: "lastReactionScan", ascending: true),
+            NSSortDescriptor(key: "updatedAt", ascending: false)
+        ]
+        let items = try! moc.fetch(f)
+            .filter { $0.interestedInReactions }
+            .prefix(Settings.reactionScanningBatchSize)
 
+        items.forEach {
+            $0.comments.forEach {
+                $0.pendingReactionScan = $0.isMine
+            }
+            $0.reactions.forEach {
+                $0.postSyncAction = PostSyncAction.delete.rawValue
+            }
+        }
+        return Array(items)
+    }
+
+    final func baseNodeSync(nodeJson info: [AnyHashable: Any], parent: Repo) {
+        repo = parent
+        url = info["url"] as? String
+        number = info["number"] as? Int64 ?? 0
+        title = info["title"] as? String ?? "(No title)"
+        body = info["bodyText"] as? String
+        milestone = (info["milestone"] as? [AnyHashable : Any])?["title"] as? String
+        draft = info["isDraft"] as? Bool ?? false
+        
+        let newCondition: Int64
+        switch (info["state"] as? String) ?? "" {
+        case "MERGED": newCondition = ItemCondition.merged.rawValue
+        case "CLOSED": newCondition = ItemCondition.closed.rawValue
+        default: newCondition = ItemCondition.open.rawValue
+        }
+
+        switch condition {
+        case ItemCondition.closed.rawValue where newCondition == ItemCondition.open.rawValue,
+             ItemCondition.merged.rawValue where newCondition == ItemCondition.open.rawValue:
+            stateChanged = StateChange.reopened.rawValue
+        case ItemCondition.open.rawValue where newCondition == ItemCondition.merged.rawValue:
+            stateChanged = StateChange.merged.rawValue
+        case ItemCondition.open.rawValue where newCondition == ItemCondition.closed.rawValue:
+            stateChanged = StateChange.closed.rawValue
+        default: break
+        }
+
+        condition = newCondition
+
+        if let user = info["author"] as? [AnyHashable:Any] {
+            userLogin = user["login"] as? String
+            userAvatarUrl = user["avatarUrl"] as? String
+            userNodeId = user["id"] as? String
+        }
+
+        let i: [[AnyHashable: Any]]
+        if let assignees = (info["assignees"] as? [AnyHashable: Any])?["edges"] as? [[AnyHashable: Any]] {
+            i = assignees.compactMap { $0["node"] as? [AnyHashable: Any] }
+        } else {
+            i = []
+        }
+        
+        processAssignmentStatus(from: ["assignees": i], idField: "id")
+        
+        mutableSetValue(forKey: "labels").removeAllObjects()
+    }
+
+	final func baseSync(from info: [AnyHashable : Any], in parentRepo: Repo) {
+		repo = parentRepo
 		url = info["url"] as? String
-		webUrl = info["html_url"] as? String
 		number = info["number"] as? Int64 ?? 0
-		state = info["state"] as? String
-		title = info["title"] as? String
+		title = info["title"] as? String ?? "(No title)"
 		body = info["body"] as? String
 		milestone = (info["milestone"] as? [AnyHashable : Any])?["title"] as? String
         draft = info["draft"] as? Bool ?? false
 
 		if let userInfo = info["user"] as? [AnyHashable : Any] {
-			userId = userInfo["id"] as? Int64 ?? 0
 			userLogin = userInfo["login"] as? String
 			userAvatarUrl = userInfo["avatar_url"] as? String
+            userNodeId = userInfo["node_id"] as? String
 		}
 
-		processAssignmentStatus(from: info)
+		processAssignmentStatus(from: info, idField: "node_id")
 	}
 
-	final func processReactions(from info: [AnyHashable : Any]?) {
+    var interestedInReactions: Bool {
+        return API.shouldSyncReactions && (Settings.showCommentsEverywhere || (Section(rawValue: sectionIndex)?.isLoud ?? false))
+    }
 
-		if API.shouldSyncReactions, let info = info, let r = info["reactions"] as? [AnyHashable : Any] {
-			requiresReactionRefreshFromUrl = Reaction.changesDetected(in: reactions, from: r)
-		} else {
-			reactions.forEach { $0.postSyncAction = PostSyncAction.delete.rawValue }
-			requiresReactionRefreshFromUrl = nil
-		}
-	}
+    final func processAssignmentStatus(from info: [AnyHashable : Any]?, idField: String) {
 
-	final func processAssignmentStatus(from info: [AnyHashable : Any]?) {
-
-		let myIdOnThisRepo = repo.apiServer.userId
+		let myIdOnThisRepo = repo.apiServer.userNodeId
 		var assigneeNames = [String]()
 
 		func checkAndStoreAssigneeName(from assignee: [AnyHashable : Any]) -> Bool {
 
-			if let name = assignee["login"] as? String, let assigneeId = assignee["id"] as? Int64 {
+			if let name = assignee["login"] as? String, let assigneeId = assignee[idField] as? String {
 				let shouldBeAssignedToMe = assigneeId == myIdOnThisRepo
 				assigneeNames.append(name)
 				return shouldBeAssignedToMe
@@ -93,7 +173,7 @@ class ListableItem: DataItem {
 
 		var foundAssignmentToMe = false
 
-		if let assignees = info?["assignees"] as? [[AnyHashable : Any]], assignees.count > 0 {
+		if let assignees = info?["assignees"] as? [[AnyHashable : Any]], !assignees.isEmpty {
 			for assignee in assignees {
 				if checkAndStoreAssigneeName(from: assignee) {
 					foundAssignmentToMe = true
@@ -106,10 +186,10 @@ class ListableItem: DataItem {
 		isNewAssignment = foundAssignmentToMe && !assignedToMe && !createdByMe
 		assignedToMe = foundAssignmentToMe
 
-		if assigneeNames.count > 0 {
-			assigneeName = assigneeNames.joined(separator: ",")
+		if assigneeNames.isEmpty {
+            assigneeName = nil
 		} else {
-			assigneeName = nil
+            assigneeName = assigneeNames.joined(separator: ",")
 		}
 	}
 
@@ -137,29 +217,26 @@ class ListableItem: DataItem {
 	}
 
 	final override func prepareForDeletion() {
-		API.refreshesSinceLastStatusCheck[objectID] = nil
-		API.refreshesSinceLastReactionsCheck[objectID] = nil
-		ensureInvisible()
+        let uri = objectID.uriRepresentation().absoluteString
+        hideFromSpotlightAndNotifications(uri: uri)
 		super.prepareForDeletion()
 	}
 
-	final func ensureInvisible() {
-		if #available(OSX 10.11, iOS 9, *) {
-			if CSSearchableIndex.isIndexingAvailable() {
-				CSSearchableIndex.default().deleteSearchableItems(withIdentifiers: [objectID.uriRepresentation().absoluteString], completionHandler: nil)
-			}
-		}
+    private final func hideFromSpotlightAndNotifications(uri: String) {
+        if CSSearchableIndex.isIndexingAvailable() {
+            CSSearchableIndex.default().deleteSearchableItems(withIdentifiers: [uri], completionHandler: nil)
+        }
 		if Settings.removeNotificationsWhenItemIsRemoved {
-			ListableItem.removeRelatedNotifications(uri: objectID.uriRepresentation().absoluteString)
+			ListableItem.removeRelatedNotifications(uri: uri)
 		}
 	}
 
 	final func sortedComments(using comparison: ComparisonResult) -> [PRComment] {
-		return Array(comments).sorted(by: { (c1, c2) -> Bool in
+		return comments.sorted { c1, c2 -> Bool in
 			let d1 = c1.createdAt ?? .distantPast
 			let d2 = c2.createdAt ?? .distantPast
 			return d1.compare(d2) == comparison
-		})
+		}
 	}
 
 	final private func catchUpCommentDate() {
@@ -173,33 +250,43 @@ class ListableItem: DataItem {
 					latestReadCommentDate = commentCreation
 				}
 			}
-			if Settings.notifyOnCommentReactions {
-				for r in c.reactions {
-					if let reactionCreation = r.createdAt {
-						if let latestRead = latestReadCommentDate {
-							if latestRead < reactionCreation {
-								latestReadCommentDate = reactionCreation
-							}
-						} else {
-							latestReadCommentDate = reactionCreation
-						}
-					}
-				}
-			}
-		}
-		if Settings.notifyOnItemReactions {
-			for r in reactions {
-				if let reactionCreation = r.createdAt {
-					if let latestRead = latestReadCommentDate {
-						if latestRead < reactionCreation {
-							latestReadCommentDate = reactionCreation
-						}
-					} else {
-						latestReadCommentDate = reactionCreation
-					}
-				}
-			}
-		}
+            for r in c.reactions {
+                if let reactionCreation = r.createdAt {
+                    if let latestRead = latestReadCommentDate {
+                        if latestRead < reactionCreation {
+                            latestReadCommentDate = reactionCreation
+                        }
+                    } else {
+                        latestReadCommentDate = reactionCreation
+                    }
+                }
+            }
+        }
+        for r in reactions {
+            if let reactionCreation = r.createdAt {
+                if let latestRead = latestReadCommentDate {
+                    if latestRead < reactionCreation {
+                        latestReadCommentDate = reactionCreation
+                    }
+                } else {
+                    latestReadCommentDate = reactionCreation
+                }
+            }
+        }
+        if let p = self as? PullRequest {
+            p.hasNewCommits = false
+            for r in p.reviews {
+                if let reviewCreation = r.createdAt {
+                    if let latestRead = latestReadCommentDate {
+                        if latestRead < reviewCreation {
+                            latestReadCommentDate = reviewCreation
+                        }
+                    } else {
+                        latestReadCommentDate = reviewCreation
+                    }
+                }
+            }
+        }
 	}
 
 	func catchUpWithComments() {
@@ -227,7 +314,7 @@ class ListableItem: DataItem {
 	}
 
 	final var createdByMe: Bool {
-		return userId == apiServer.userId
+		return userNodeId == apiServer.userNodeId
 	}
 
 	final private func contains(terms: [String]) -> Bool {
@@ -271,6 +358,11 @@ class ListableItem: DataItem {
 	final var isSnoozing: Bool {
 		return snoozeUntil != nil
 	}
+    
+    final var appropriateStateForNotification: Bool {
+        let shouldBeQuietBecauseOfState = !isVisibleOnMenu || ((sectionIndex == Section.closed.rawValue || sectionIndex == Section.merged.rawValue) && !Settings.scanClosedAndMergedItems)
+        return !shouldBeQuietBecauseOfState
+    }
 
 	final func keep(as newCondition: ItemCondition, notification: NotificationType) {
 		if sectionIndex == Section.all.rawValue && !Settings.showCommentsEverywhere {
@@ -339,51 +431,51 @@ class ListableItem: DataItem {
 
 	final func postProcess() {
 
-		//let D = Date()
-
 		if let s = snoozeUntil, s < Date() { // our snooze-by date is past
 			disableSnoozing(explicityAwoke: true)
 		}
 
 		let isMine = createdByMe
-		var targetSection: Section
 		let currentCondition = condition
-        let hideDrafts = Settings.draftHandlingPolicy == DraftHandlingPolicy.hide.rawValue
 
-		if currentCondition == ItemCondition.merged.rawValue            	{ targetSection = .merged }
-		else if currentCondition == ItemCondition.closed.rawValue      		{ targetSection = .closed }
-		else if shouldMoveToSnoozing             							{ targetSection = .snoozed }
-		else if isMine || assignedToMySection                        		{ targetSection = .mine }
-		else if assignedToParticipated || commentedByMe    || reviewedByMe  { targetSection = .participated }
-		else                                                           		{ targetSection = .all }
-
-		/////////// Pick out any items that need to move to "mentioned"
-
-		if targetSection == .all || targetSection == .none {
-
-			if let p = self as? PullRequest, Int64(Settings.assignedReviewHandlingPolicy) > Section.none.rawValue, p.assignedForReview {
-				targetSection = Section(Settings.assignedReviewHandlingPolicy)!
-
-			} else if Int64(Settings.newMentionMovePolicy) > Section.none.rawValue && contains(terms: ["@\(S(apiServer.userName))"]) {
-				targetSection = Section(Settings.newMentionMovePolicy)!
-
-			} else if Int64(Settings.teamMentionMovePolicy) > Section.none.rawValue && contains(terms: apiServer.teams.compactMap { $0.calculatedReferral }) {
-				targetSection = Section(Settings.teamMentionMovePolicy)!
-
-			} else if Int64(Settings.newItemInOwnedRepoMovePolicy) > Section.none.rawValue && repo.isMine {
-				targetSection = Section(Settings.newItemInOwnedRepoMovePolicy)!
-			}
-		}
+        var targetSection: Section
+        
+        if Settings.draftHandlingPolicy == DraftHandlingPolicy.hide.rawValue && draft {
+            targetSection = .none
+        
+        } else if currentCondition == ItemCondition.merged.rawValue {
+            targetSection = .merged
+            
+        } else if currentCondition == ItemCondition.closed.rawValue {
+            targetSection = .closed
+            
+        } else if isMine || assignedToMySection {
+            targetSection = .mine
+            
+        } else if assignedToParticipated || commentedByMe || reviewedByMe {
+            targetSection = .participated
+            
+        } else if let p = self as? PullRequest, Int64(Settings.assignedReviewHandlingPolicy) > Section.none.rawValue, p.assignedForReview {
+            targetSection = Section(Settings.assignedReviewHandlingPolicy)!
+            
+        } else if Int64(Settings.newMentionMovePolicy) > Section.none.rawValue && contains(terms: ["@\(S(apiServer.userName))"]) {
+            targetSection = Section(Settings.newMentionMovePolicy)!
+            
+        } else if Int64(Settings.teamMentionMovePolicy) > Section.none.rawValue && contains(terms: apiServer.teams.compactMap { $0.calculatedReferral }) {
+            targetSection = Section(Settings.teamMentionMovePolicy)!
+            
+        } else if Int64(Settings.newItemInOwnedRepoMovePolicy) > Section.none.rawValue && repo.isMine {
+            targetSection = Section(Settings.newItemInOwnedRepoMovePolicy)!
+        
+        } else {
+            targetSection = .all
+        }
 
 		////////// Apply visibility policies
         
-        if hideDrafts && targetSection != .none && draft {
-            targetSection = .none
-        }
-
 		if targetSection != .none {
 			switch self is Issue ? repo.displayPolicyForIssues : repo.displayPolicyForPrs {
-			case RepoDisplayPolicy.hide.rawValue,
+            case RepoDisplayPolicy.hide.rawValue,
 			     RepoDisplayPolicy.mine.rawValue where targetSection == .all || targetSection == .participated || targetSection == .mentioned,
 			     RepoDisplayPolicy.mineAndPaticipated.rawValue where targetSection == .all:
 				targetSection = .none
@@ -404,21 +496,22 @@ class ListableItem: DataItem {
 			default: break
 			}
 		}
-
-		if targetSection != .none, let p = self as? PullRequest, p.shouldBeCheckedForRedStatuses(in: targetSection) {
-			for s in p.displayedStatuses {
-				if s.state != "success" {
-					targetSection = .none
-					break
-				}
-			}
+        
+		if targetSection != .none,
+            let p = self as? PullRequest, p.shouldBeCheckedForRedStatuses(in: targetSection),
+            p.displayedStatuses.contains(where: { $0.state != "success" }) {
+            targetSection = .none
 		}
+        
+        if targetSection != .none && shouldMoveToSnoozing {
+            targetSection = .snoozed
+        }
 
 		/////////// Comment counting
 
-		let showComments = !muted && (targetSection.isLoud || Settings.showCommentsEverywhere)
-		if showComments {
+        let skipUnreadCommentCheck = (targetSection == .closed || targetSection == .merged) && !Settings.scanClosedAndMergedItems
 
+		if !skipUnreadCommentCheck && !muted && (targetSection.isLoud || Settings.showCommentsEverywhere) && postSyncAction != PostSyncAction.isNew.rawValue {
 			var latestDate = latestReadCommentDate ?? .distantPast
 
 			if Settings.assumeReadItemIfUserHasNewerComments {
@@ -432,10 +525,8 @@ class ListableItem: DataItem {
 			unreadComments = countOthersComments(since: latestDate)
 
 		} else {
+            catchUpCommentDate()
 			unreadComments = 0
-			if let p = self as? PullRequest {
-				p.hasNewCommits = false
-			}
 		}
 
 		if snoozeUntil != nil, let p = self as? PullRequest, shouldWakeOnComment, p.hasNewCommits { // we wake on comments and have a new commit alarm
@@ -456,10 +547,6 @@ class ListableItem: DataItem {
 			+ reviewCount
 
 		sectionIndex = targetSection.rawValue
-		if title==nil { title = "(No title)" }
-
-		//let T = D.timeIntervalSinceNow
-		//print("postprocess: \(T * -1000)")
 	}
 
 	private var countCommentReactions: Int64 {
@@ -541,14 +628,10 @@ class ListableItem: DataItem {
 	}
 
 	final var sortedLabels: [PRLabel] {
-		return Array(labels).sorted(by: { (l1: PRLabel, l2: PRLabel) -> Bool in
-			return l1.name!.compare(l2.name!) == .orderedAscending
-		})
+        return Array(labels).sorted {
+			return $0.name!.compare($1.name!) == .orderedAscending
+		}
 	}
-
-    private final func buildLabelAttributes(labelFont: FONT_CLASS, offset: CGFloat) -> [NSAttributedString.Key: Any] {
-        return [.font: labelFont, .baselineOffset: offset]
-    }
     
     final func labelsAttributedString(labelFont: FONT_CLASS) -> NSAttributedString? {
         if !Settings.showLabels {
@@ -556,8 +639,7 @@ class ListableItem: DataItem {
         }
         
         let sorted = sortedLabels
-        let labelCount = sorted.count
-        if labelCount == 0 {
+        if sorted.isEmpty {
             return nil
         }
 
@@ -568,7 +650,7 @@ class ListableItem: DataItem {
             return (lum < 0.5)
         }
 
-        let labelAttributes = buildLabelAttributes(labelFont: labelFont, offset: 0)
+        let labelAttributes: [NSAttributedString.Key: Any] = [.font: labelFont, .baselineOffset: 0]
         let res = NSMutableAttributedString()
         for l in sorted {
             var a = labelAttributes
@@ -584,37 +666,48 @@ class ListableItem: DataItem {
     
     final func title(with font: FONT_CLASS, labelFont: FONT_CLASS, titleColor: COLOR_CLASS, numberColor: COLOR_CLASS) -> NSMutableAttributedString {
         
-		let titleAttributes = [NSAttributedString.Key.font: font, NSAttributedString.Key.foregroundColor: titleColor]
-
 		let _title = NSMutableAttributedString()
-		if let t = title {
+		guard let t = title else {
+            return _title
+        }
 
-			if Settings.displayNumbersForItems {
-                let numberAttributes = [NSAttributedString.Key.font: font, NSAttributedString.Key.foregroundColor: numberColor]
-				_title.append(NSAttributedString(string: "#\(number) ", attributes: numberAttributes))
-			}
-			
-			_title.append(NSAttributedString(string: t, attributes: titleAttributes))
-            
-            if draft && Settings.draftHandlingPolicy == DraftHandlingPolicy.display.rawValue {
+        if Settings.displayNumbersForItems {
+            let numberAttributes: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: numberColor]
+            _title.append(NSAttributedString(string: "#\(number) ", attributes: numberAttributes))
+        }
+        
+        let titleAttributes: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: titleColor]
+        _title.append(NSAttributedString(string: t, attributes: titleAttributes))
+        
+        if let p = self as? PullRequest {
+            if Settings.showPrLines, let l = p.linesAttributedString(labelFont: labelFont) {
+                _title.append(NSAttributedString(string: " ", attributes: titleAttributes))
+                _title.append(l)
+            }
+            if Settings.markUnmergeablePrs, !p.isMergeable {
                 _title.append(NSAttributedString(string: " ", attributes: titleAttributes))
 
-                let font = FONT_CLASS.boldSystemFont(ofSize: labelFont.pointSize - 2)
-                var draftAttributes = buildLabelAttributes(labelFont: font, offset: 3)
-                draftAttributes[.foregroundColor] = COLOR_CLASS.systemOrange
-                _title.append(NSAttributedString(string: "DRAFT", attributes: draftAttributes))
+                let font = FONT_CLASS.boldSystemFont(ofSize: labelFont.pointSize - 3)
+                let unmergeableAttributes: [NSAttributedString.Key: Any] = [.font: font, .baselineOffset: 4, .foregroundColor: COLOR_CLASS.appRed]
+                _title.append(NSAttributedString(string: "CONFLICT", attributes: unmergeableAttributes))
             }
-		}
+        }
+        
+        if draft && Settings.draftHandlingPolicy == DraftHandlingPolicy.display.rawValue {
+            _title.append(NSAttributedString(string: " ", attributes: titleAttributes))
+
+            let font = FONT_CLASS.boldSystemFont(ofSize: labelFont.pointSize - 3)
+            let draftAttributes: [NSAttributedString.Key: Any] = [.font: font, .baselineOffset: 4, .foregroundColor: COLOR_CLASS.systemOrange]
+            _title.append(NSAttributedString(string: "DRAFT", attributes: draftAttributes))
+        }
 		return _title
 	}
     
     func subtitle(with font: FONT_CLASS, lightColor: COLOR_CLASS, darkColor: COLOR_CLASS, separator: String) -> NSMutableAttributedString {
 		let _subtitle = NSMutableAttributedString()
-		let p = NSMutableParagraphStyle()
 
 		let lightSubtitle = [NSAttributedString.Key.foregroundColor: lightColor,
-		                     NSAttributedString.Key.font: font,
-		                     NSAttributedString.Key.paragraphStyle: p]
+		                     NSAttributedString.Key.font: font]
 
         let separatorString = NSAttributedString(string: separator, attributes: lightSubtitle)
 
@@ -660,7 +753,7 @@ class ListableItem: DataItem {
 	var displayDate: String {
 		if Settings.showRelativeDates {
 			if Settings.showCreatedInsteadOfUpdated {
-				return agoFormat(prefix: "created", since: createdAt)
+                return agoFormat(prefix: "created", since: createdAt)
 			} else {
 				return agoFormat(prefix: "updated", since: updatedAt)
 			}
@@ -673,7 +766,7 @@ class ListableItem: DataItem {
 		}
 	}
 
-	class final func styleForEmpty(message: String, color: COLOR_CLASS) -> NSAttributedString {
+	static func styleForEmpty(message: String, color: COLOR_CLASS) -> NSAttributedString {
 		let p = NSMutableParagraphStyle()
 		p.lineBreakMode = .byWordWrapping
 		p.alignment = .center
@@ -759,6 +852,8 @@ class ListableItem: DataItem {
 				P = isSnoozingPredicate
             case "draft":
                 P = isDraftPredicate
+            case "conflict":
+                P = isUnmergeablePredicate
 			default:
 				continue
 			}
@@ -773,13 +868,13 @@ class ListableItem: DataItem {
 	}
 
 	private static func predicate(notTerms: [NSPredicate], orTerms: [NSPredicate]) -> NSPredicate? {
-		if notTerms.count > 0 && orTerms.count > 0 {
+		if !notTerms.isEmpty && !orTerms.isEmpty {
 			let n = NSCompoundPredicate(andPredicateWithSubpredicates: notTerms)
 			let o = NSCompoundPredicate(orPredicateWithSubpredicates: orTerms)
 			return NSCompoundPredicate(andPredicateWithSubpredicates: [n,o])
-		} else if notTerms.count > 0 {
+        } else if !notTerms.isEmpty {
 			return NSCompoundPredicate(andPredicateWithSubpredicates: notTerms)
-		} else if orTerms.count > 0 {
+		} else if !orTerms.isEmpty {
 			return NSCompoundPredicate(orPredicateWithSubpredicates: orTerms)
 		} else {
 			return nil
@@ -916,6 +1011,8 @@ class ListableItem: DataItem {
 
     private static let isDraftPredicate = NSPredicate(format: "draft == true")
 
+    private static let isUnmergeablePredicate = NSPredicate(format: "isMergeable == false")
+    
 	static func relatedItems(from notificationUserInfo: [AnyHashable : Any]) -> (PRComment?, ListableItem)? {
 		var item: ListableItem?
 		var comment: PRComment?
@@ -951,7 +1048,7 @@ class ListableItem: DataItem {
 		#elseif os(iOS)
 			let nc = UNUserNotificationCenter.current()
 			nc.getDeliveredNotifications { notifications in
-				atNextEvent {
+				DispatchQueue.main.async {
 					for n in notifications {
 						let r = n.request.identifier
 						let u = n.request.content.userInfo
@@ -965,7 +1062,6 @@ class ListableItem: DataItem {
 		#endif
 	}
 
-	@available(OSX 10.11, *)
 	var searchKeywords: [String] {
 		let labelNames = labels.compactMap { $0.name }
 		let orgAndRepo = repo.fullName?.components(separatedBy: "/") ?? []
@@ -975,38 +1071,54 @@ class ListableItem: DataItem {
 		return [(userLogin ?? "NO_USERNAME"), "Trailer"] + labelNames + orgAndRepo
 		#endif
 	}
-	@available(OSX 10.11, *)
-	final func indexForSpotlight() {
+    
+    final func handleSpotlight() {
+        let uri = objectID.uriRepresentation().absoluteString
+        if isVisibleOnMenu {
+            indexForSpotlight(uri: uri)
+        } else {
+            hideFromSpotlightAndNotifications(uri: uri)
+        }
+    }
+
+    private final func indexForSpotlight(uri: String) {
 		
 		guard CSSearchableIndex.isIndexingAvailable() else { return }
 
 		let s = CSSearchableItemAttributeSet(itemContentType: kUTTypeText as String)
 
+        let group = DispatchGroup()
+        
+        if let i = userAvatarUrl, !Settings.hideAvatars {
+            group.enter()
+            API.haveCachedAvatar(from: i) { _, cachePath in
+                s.thumbnailURL = URL(fileURLWithPath: cachePath)
+                group.leave()
+            }
+        }
+        
 		let titleSuffix = labels.compactMap { $0.name }.reduce("") { $0 + " [\($1)]" }
 		s.title = "#\(number) - \(S(title))\(titleSuffix)"
-
+        
 		s.contentCreationDate = createdAt
 		s.contentModificationDate = updatedAt
 		s.keywords = searchKeywords
 		s.creator = userLogin
-
 		s.contentDescription = "\(S(repo.fullName)) @\(S(userLogin)) - \(S(body?.trim))"
-		
-		func completeIndex(withSet s: CSSearchableItemAttributeSet) {
-			let i = CSSearchableItem(uniqueIdentifier: objectID.uriRepresentation().absoluteString, domainIdentifier: nil, attributeSet: s)
-			CSSearchableIndex.default().indexSearchableItems([i], completionHandler: nil)
-		}
-		
-		if let i = userAvatarUrl, !Settings.hideAvatars {
-			API.haveCachedAvatar(from: i) { _, cachePath in
-				s.thumbnailURL = URL(string: "file://\(cachePath)")
-				completeIndex(withSet: s)
-			}
-		} else {
-			s.thumbnailURL = nil
-			completeIndex(withSet: s)
-		}
+        
+        group.notify(queue: .main) {
+            let i = CSSearchableItem(uniqueIdentifier: uri, domainIdentifier: nil, attributeSet: s)
+            CSSearchableIndex.default().indexSearchableItems([i], completionHandler: nil)
+        }
 	}
+
+    override final class func shouldCreate(from node: GQLNode) -> Bool {
+        if node.jsonPayload["state"] as? String == "OPEN" {
+            return true
+        }
+        node.creationSkipped = true
+        return false
+    }
 
 	final var shouldCheckForClosing: Bool {
 		return repo.shouldSync && repo.postSyncAction != PostSyncAction.delete.rawValue && apiServer.lastSyncSucceeded
@@ -1024,7 +1136,7 @@ class ListableItem: DataItem {
 		if !ApiServer.someServersHaveAuthTokens(in: DataManager.main) {
 			color = COLOR_CLASS(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)
 			message = "There are no configured API servers in your settings, please ensure you have added at least one server with a valid API token."
-		} else if appIsRefreshing {
+		} else if API.isRefreshing {
 			color = COLOR_CLASS.appSecondaryLabel
 			message = "Refreshing information, please wait a moment…"
 		} else if !S(filterValue).isEmpty {
@@ -1041,7 +1153,7 @@ class ListableItem: DataItem {
 				color = COLOR_CLASS(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)
 				message = "You have no repositories in your watchlist, or they are all currently marked as hidden.\n\nYou can change their status from the repositories section in your settings."
 			}
-		} else if !Repo.interestedInPrs(fromServerWithId: criterion?.apiServerId) && !Repo.interestedInIssues(fromServerWithId: criterion?.apiServerId) {
+		} else if !Repo.mayProvidePrsForDisplay(fromServerWithId: criterion?.apiServerId) && !Repo.mayProvideIssuesForDisplay(fromServerWithId: criterion?.apiServerId) {
 			color = COLOR_CLASS(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)
 			message = "All your watched repositories are marked as hidden, please enable issues or PRs on at least one."
 		} else {
@@ -1051,6 +1163,26 @@ class ListableItem: DataItem {
 
 		return styleForEmpty(message: message, color: color)
 	}
+    
+    final func handleClosing() {
+        DLog("Detected closed item: %@, handling policy is %@, coming from section %@",
+             title,
+             Settings.closeHandlingPolicy,
+             sectionIndex)
+
+        if !isVisibleOnMenu {
+            DLog("Closed item was hidden, won't announce")
+            managedObjectContext?.delete(self)
+            
+        } else if shouldKeep(accordingTo: Settings.closeHandlingPolicy) {
+            DLog("Will keep closed item")
+            keep(as: .closed, notification: self is Issue ? .issueClosed : .prClosed)
+            
+        } else {
+            DLog("Will not keep closed item")
+            managedObjectContext?.delete(self)
+        }
+    }
 
 	#if os(iOS)
 	var dragItemForUrl: UIDragItem {
@@ -1062,4 +1194,74 @@ class ListableItem: DataItem {
 		return UIDragItem(itemProvider: provider)
 	}
 	#endif
+    
+    enum MenuAction: Hashable {
+        case remove, copy, markRead, markUnread, mute, unmute, snooze(presets: [SnoozePreset]), wake(date: Date?), openRepo
+        
+        var title: String {
+            switch self {
+            case .remove: return "Remove"
+            case .copy: return "Copy URL"
+            case .markRead: return "Mark as Read"
+            case .markUnread: return "Mark as Unread"
+            case .openRepo: return "Open Repo"
+            case .mute: return "Mute"
+            case .unmute: return "Un-Mute"
+            case .snooze: return "Snooze"
+            case .wake(let date):
+                if let snooze = date, snooze != .distantFuture, snooze != autoSnoozeSentinelDate {
+                    return "Wake (auto: " + itemDateFormatter.string(from: snooze) + ")"
+                } else {
+                    return "Wake"
+                }
+            }
+        }
+    }
+    
+    var contextMenuTitle: String {
+        if self is PullRequest {
+            return muted ? "PR #\(number) (muted)" : "PR #\(number)"
+        } else {
+            return muted ? "Issue #\(number) (muted)" : "Issue #\(number)"
+        }
+    }
+
+    var contextMenuSubtitle: String? {
+        return (self as? PullRequest)?.headRefName
+    }
+
+    var contextActions: [MenuAction] {
+        var actions: [MenuAction] = [.copy, .openRepo]
+
+        if !isSnoozing {
+            if Settings.showCommentsEverywhere || sectionIndex != Section.all.rawValue {
+                if hasUnreadCommentsOrAlert {
+                    actions.append(.markRead)
+                } else {
+                    actions.append(.markUnread)
+                }
+            }
+            
+            if muted {
+                actions.append(.unmute)
+            } else {
+                actions.append(.mute)
+            }
+        }
+        
+        if sectionIndex == Section.merged.rawValue || sectionIndex == Section.closed.rawValue {
+            actions.append(.remove)
+        }
+
+        if isSnoozing {
+            actions.append(.wake(date: snoozeUntil))
+        } else {
+            let presets = SnoozePreset.allSnoozePresets(in: DataManager.main)
+            if !presets.isEmpty {
+                actions.append(.snooze(presets: presets))
+            }
+        }
+
+        return actions
+    }
 }

@@ -58,7 +58,21 @@ final class Application: NSApplication {
 				if let char = event.charactersIgnoringModifiers {
 					if char == "Z" && sendAction(#selector(NSTextField.trailerRedo), to: nil, from: self) { return }
 				}
-			}
+            } else if modifiers == [.command, .option] {
+                if let char = event.charactersIgnoringModifiers {
+                    switch char {
+                    case "c":
+                        if let branch = app.focusedItem(blink: true)?.contextMenuSubtitle {
+                            let p = NSPasteboard.general
+                            p.clearContents()
+                            p.setString(branch, forType: NSPasteboard.PasteboardType.string)
+                            return
+                            
+                        }
+                    default: break
+                    }
+                }
+            }
 		}
 		super.sendEvent(event)
 	}

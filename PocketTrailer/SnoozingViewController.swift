@@ -18,6 +18,7 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
+        self.navigationItem.largeTitleDisplayMode = .automatic
 		settingsChangedTimer = PopTimer(timeInterval: 1.0) {
 			DataManager.postProcessAllItems()
 			DataManager.saveDB()
@@ -38,10 +39,10 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 	}
 
 	func numberOfSections(in tableView: UITableView) -> Int {
-		if SnoozePreset.allSnoozePresets(in: DataManager.main).count > 0 {
-			return 3
-		} else {
+		if SnoozePreset.allSnoozePresets(in: DataManager.main).isEmpty {
 			return 2
+		} else {
+			return 3
 		}
 	}
 

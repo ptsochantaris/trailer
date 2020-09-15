@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="8Eb-eH-MUP">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment version="4864" identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16086"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Welcome!-->
+        <scene sceneID="Agj-LB-cw9">
+            <objects>
+                <viewController id="ZQR-qN-jZ1" customClass="QuickStartViewController" customModule="PocketTrailer" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="uTk-8X-jov">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Quick Start" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wfK-es-Q2m">
+                                <rect key="frame" x="57" y="288.5" width="300" height="26.5"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="300" id="K0m-V1-SA9"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle2"/>
+                                <color key="textColor" systemColor="secondaryLabelColor" red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="51v-nc-Xtf">
+                                <rect key="frame" x="99" y="535.5" width="215" height="32"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
+                                <state key="normal" title="Test Token &amp; Complete Setup"/>
+                                <connections>
+                                    <action selector="testSelected:" destination="ZQR-qN-jZ1" eventType="touchUpInside" id="o0H-Ih-bdv"/>
+                                </connections>
+                            </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kTk-WK-GaF">
+                                <rect key="frame" x="56.5" y="421" width="300" height="94.5"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="300" id="q2B-Yz-7Mf"/>
+                                </constraints>
+                                <string key="text">Use this link to open a web view to your GitHub tokens page - you may have to sign in to GitHub first.
+
+Tokens need at least all the 'repo' permissions, and the 'read:org' permission.</string>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
+                                <color key="textColor" systemColor="secondaryLabelColor" red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Copy &amp; paste your GitHub token in here" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="EED-i1-JTF">
+                                <rect key="frame" x="80.5" y="335" width="252" height="34"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
+                                <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" keyboardType="alphabet" returnKeyType="done"/>
+                                <connections>
+                                    <outlet property="delegate" destination="ZQR-qN-jZ1" id="aLz-WU-eH9"/>
+                                </connections>
+                            </textField>
+                            <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="5rH-Zj-pcO">
+                                <rect key="frame" x="197" y="498" width="20" height="20"/>
+                            </activityIndicatorView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="v1a-vB-r8u">
+                                <rect key="frame" x="66" y="389" width="282" height="32"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
+                                <state key="normal" title="Create a GitHub personal access token">
+                                    <color key="titleColor" name="apptint"/>
+                                </state>
+                                <connections>
+                                    <action selector="openGitHubSelected:" destination="ZQR-qN-jZ1" eventType="touchUpInside" id="Gwe-g2-29s"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <color key="tintColor" name="tint"/>
+                        <constraints>
+                            <constraint firstItem="v1a-vB-r8u" firstAttribute="top" secondItem="EED-i1-JTF" secondAttribute="bottom" constant="20" id="2Ok-nJ-b6R"/>
+                            <constraint firstItem="jAS-Fw-Cfy" firstAttribute="centerX" secondItem="wfK-es-Q2m" secondAttribute="centerX" id="5hd-UN-nNp"/>
+                            <constraint firstItem="v1a-vB-r8u" firstAttribute="centerX" secondItem="EED-i1-JTF" secondAttribute="centerX" constant="0.5" id="Ccm-lQ-dnP"/>
+                            <constraint firstItem="EED-i1-JTF" firstAttribute="centerX" secondItem="51v-nc-Xtf" secondAttribute="centerX" id="Ewp-xo-9qn"/>
+                            <constraint firstItem="51v-nc-Xtf" firstAttribute="top" secondItem="kTk-WK-GaF" secondAttribute="bottom" constant="20" id="IvI-KZ-yUb"/>
+                            <constraint firstItem="v1a-vB-r8u" firstAttribute="centerX" secondItem="wfK-es-Q2m" secondAttribute="centerX" id="Nea-7C-DFb"/>
+                            <constraint firstItem="kTk-WK-GaF" firstAttribute="top" secondItem="v1a-vB-r8u" secondAttribute="bottom" id="TsC-JS-2B8"/>
+                            <constraint firstAttribute="centerY" secondItem="kTk-WK-GaF" secondAttribute="centerY" priority="500" constant="-20" id="U4Q-eQ-ysz"/>
+                            <constraint firstItem="EED-i1-JTF" firstAttribute="top" secondItem="wfK-es-Q2m" secondAttribute="bottom" constant="20" id="cX5-Oe-oVl"/>
+                            <constraint firstItem="jAS-Fw-Cfy" firstAttribute="centerX" secondItem="5rH-Zj-pcO" secondAttribute="centerX" id="gpF-zd-RU6"/>
+                            <constraint firstItem="wfK-es-Q2m" firstAttribute="top" relation="greaterThanOrEqual" secondItem="jAS-Fw-Cfy" secondAttribute="top" constant="20" id="keW-Jb-vYS"/>
+                            <constraint firstAttribute="centerY" secondItem="5rH-Zj-pcO" secondAttribute="centerY" constant="-60" id="shf-Al-rdE"/>
+                            <constraint firstItem="EED-i1-JTF" firstAttribute="centerX" secondItem="kTk-WK-GaF" secondAttribute="centerX" id="x0r-ur-l5x"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="jAS-Fw-Cfy"/>
+                    </view>
+                    <toolbarItems/>
+                    <navigationItem key="navigationItem" title="Welcome!" id="cOg-SY-AQN">
+                        <barButtonItem key="leftBarButtonItem" title="Skip" image="xmark.circle" catalog="system" id="TOi-p0-I4W">
+                            <connections>
+                                <action selector="skipSelected:" destination="ZQR-qN-jZ1" id="Bxo-oH-Lh4"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" image="icloud.and.arrow.down" catalog="system" id="1Y7-oO-3ta">
+                            <connections>
+                                <action selector="importSelected:" destination="ZQR-qN-jZ1" id="6Wb-Qb-BJt"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="feedback" destination="wfK-es-Q2m" id="Wiw-fn-QpE"/>
+                        <outlet property="importer" destination="1Y7-oO-3ta" id="Qq5-fx-kU5"/>
+                        <outlet property="link" destination="v1a-vB-r8u" id="4Wh-gF-zwx"/>
+                        <outlet property="skip" destination="TOi-p0-I4W" id="nI2-ml-HQT"/>
+                        <outlet property="spinner" destination="5rH-Zj-pcO" id="o2t-tw-WNl"/>
+                        <outlet property="testButton" destination="51v-nc-Xtf" id="emm-LZ-CaT"/>
+                        <outletCollection property="otherViews" destination="kTk-WK-GaF" collectionClass="NSMutableArray" id="0wu-hQ-SRt"/>
+                        <outletCollection property="otherViews" destination="EED-i1-JTF" collectionClass="NSMutableArray" id="xJM-ot-hfL"/>
+                        <outletCollection property="otherViews" destination="v1a-vB-r8u" collectionClass="NSMutableArray" id="VLf-up-I0J"/>
+                        <outletCollection property="otherViews" destination="51v-nc-Xtf" collectionClass="NSMutableArray" id="vbm-4s-UrQ"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="5Bv-33-6Zi" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2670" y="-33"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="yPw-1E-BUg">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="8Eb-eH-MUP" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO">
+                        <color key="tintColor" name="apptint"/>
+                    </simulatedNavigationBarMetrics>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="mva-8G-sSM">
+                        <rect key="frame" x="0.0" y="44" width="414" height="96"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="L1I-vk-Oec">
+                        <autoresizingMask key="autoresizingMask"/>
+                    </toolbar>
+                    <connections>
+                        <segue destination="ZQR-qN-jZ1" kind="relationship" relationship="rootViewController" id="Dh6-6j-cjp"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="xpq-Rw-jAR" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1753" y="-33"/>
+        </scene>
+    </scenes>
+    <color key="tintColor" name="apptint"/>
+    <resources>
+        <image name="icloud.and.arrow.down" catalog="system" width="128" height="112"/>
+        <image name="xmark.circle" catalog="system" width="128" height="121"/>
+        <namedColor name="apptint">
+            <color red="0.20299999415874481" green="0.43000000715255737" blue="0.71799999475479126" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="apptint">
+            <color red="0.20299999415874481" green="0.43000000715255737" blue="0.71799999475479126" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="tint">
+            <color red="0.202709049" green="0.43045499920000002" blue="0.71786797049999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
+</document>

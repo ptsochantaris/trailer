@@ -12,6 +12,9 @@ final class WatchlistSettingsViewController: UITableViewController, PickerViewCo
 	@IBOutlet private weak var autoAddCell: UITableViewCell!
 	@IBOutlet private weak var autoRemoveCell: UITableViewCell!
 	@IBOutlet private weak var hideArchivedCell: UITableViewCell!
+    
+    @IBOutlet private weak var queryPrsInAllReposCell: UITableViewCell!
+    @IBOutlet private weak var queryIssuesInAllReposCell: UITableViewCell!
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
@@ -21,6 +24,8 @@ final class WatchlistSettingsViewController: UITableViewController, PickerViewCo
 		autoAddCell.detailTextLabel?.text = Settings.automaticallyAddNewReposFromWatchlistHelp
 		autoRemoveCell.detailTextLabel?.text = Settings.automaticallyRemoveDeletedReposFromWatchlistHelp
 		hideArchivedCell.detailTextLabel?.text = Settings.hideArchivedReposHelp
+        queryPrsInAllReposCell.detailTextLabel?.text = Settings.queryAuthoredPRsHelp
+        queryIssuesInAllReposCell.detailTextLabel?.text = Settings.queryAuthoredIssuesHelp
 	}
 
 	private func updateState() {
@@ -28,6 +33,8 @@ final class WatchlistSettingsViewController: UITableViewController, PickerViewCo
 		autoAddCell.accessoryType = Settings.automaticallyAddNewReposFromWatchlist ? .checkmark : .none
 		autoRemoveCell.accessoryType = Settings.automaticallyRemoveDeletedReposFromWatchlist ? .checkmark : .none
 		hideArchivedCell.accessoryType = Settings.hideArchivedRepos ? .checkmark : .none
+        queryPrsInAllReposCell.accessoryType = Settings.queryAuthoredPRs ? .checkmark : .none
+        queryIssuesInAllReposCell.accessoryType = Settings.queryAuthoredIssues ? .checkmark : .none
 	}
 
     func pickerViewController(picker: PickerViewController, didSelectIndexPath: IndexPath, info: PickerViewController.Info) {
@@ -40,7 +47,7 @@ final class WatchlistSettingsViewController: UITableViewController, PickerViewCo
             let index = Int(Settings.newRepoCheckPeriod) - 2
             let v = PickerViewController.Info(title: "Re-scan every…", values: values, selectedIndex: index, sourceIndexPath: indexPath)
 			performSegue(withIdentifier: "showPicker", sender: v)
-		} else {
+        } else if indexPath.section == 1 {
 			if indexPath.row == 0 {
 				Settings.automaticallyAddNewReposFromWatchlist = !Settings.automaticallyAddNewReposFromWatchlist
 			} else if indexPath.row == 1 {
@@ -53,7 +60,16 @@ final class WatchlistSettingsViewController: UITableViewController, PickerViewCo
 				}
 			}
 			updateState()
-		}
+        } else {
+            if indexPath.row == 0 {
+                Settings.queryAuthoredPRs = !Settings.queryAuthoredPRs
+            } else {
+                Settings.queryAuthoredIssues = !Settings.queryAuthoredIssues
+            }
+            lastRepoCheck = .distantPast
+            preferencesDirty = true
+            updateState()
+        }
 		tableView.deselectRow(at: indexPath, animated: true)
 	}
 

@@ -28,12 +28,12 @@ final class PRRow: NSObject {
 		itemId = itemData["localId"] as? String
 
 		let c = itemData["commentCount"] as? Int ?? 0
-		totalCommentsL.setText("\(c)")
-		totalCommentsGroup.setAlpha(c > 0 ? 1.0 : 0.4)
+		totalCommentsL.setText(String(c))
+		totalCommentsGroup.setHidden(c == 0)
 
 		let u = itemData["unreadCount"] as? Int ?? 0
-		unreadCommentsL.setText("\(u)")
-		unreadCommentsGroup.setAlpha(u > 0 ? 1.0 : 0.4)
+		unreadCommentsL.setText(String(u))
+		unreadCommentsGroup.setHidden(u == 0)
 		hasUnread = u>0
 	}
 }

@@ -1,7 +1,7 @@
 import CoreSpotlight
 
 enum Theme {
-	case light, darkLegacy, dark
+	case light, dark
 }
 
 @NSApplicationMain
@@ -19,16 +19,10 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	private var keyDownMonitor: Any?
 	private var mouseIgnoreTimer: PopTimer!
 
-	private let themeDetector = NSView()
+    func setupWindows() {
 
-	func setupWindows() {
-
-		theme = currentTheme
-
-		for d in menuBarSets {
-			d.throwAway()
-		}
-		menuBarSets.removeAll()
+        menuBarSets.forEach { $0.throwAway() }
+        menuBarSets.removeAll()
 
 		var newSets = [MenuBarSet]()
 		for groupLabel in Repo.allGroupLabels(in: DataManager.main) {
@@ -39,25 +33,23 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 
 		if Settings.showSeparateApiServersInMenu {
-			for a in ApiServer.allApiServers(in: DataManager.main) {
-				if a.goodToGo {
-					let c = GroupingCriterion(apiServerId: a.objectID)
-					let s = MenuBarSet(viewCriterion: c, delegate: self)
-					s.setTimers()
-					newSets.append(s)
-				}
+			for a in ApiServer.allApiServers(in: DataManager.main) where a.goodToGo {
+                let c = GroupingCriterion(apiServerId: a.objectID)
+                let s = MenuBarSet(viewCriterion: c, delegate: self)
+                s.setTimers()
+                newSets.append(s)
 			}
 		}
 
-		if newSets.count == 0 || (!Settings.showSeparateApiServersInMenu && Repo.anyVisibleRepos(in: DataManager.main, excludeGrouped: true)) {
+		if newSets.isEmpty || (!Settings.showSeparateApiServersInMenu && Repo.anyVisibleRepos(in: DataManager.main, excludeGrouped: true)) {
 			let s = MenuBarSet(viewCriterion: nil, delegate: self)
 			s.setTimers()
 			newSets.append(s)
 		}
 
-		menuBarSets.append(contentsOf: newSets.reversed())
+        menuBarSets = newSets.reversed()
 
-		updateScrollBarWidth() // also updates menu
+		updateScrollBarWidth() // also updates menus
 
 		for d in menuBarSets {
 			d.prMenu.scrollToTop()
@@ -74,8 +66,6 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		NSTextField.cellClass = CenterTextFieldCell.self
 	}
 
-	private var themeCheck: Timer!
-
 	func applicationDidFinishLaunching(_ notification: Notification) {
 
         LauncherCommon.killHelper()
@@ -85,34 +75,27 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			return
 		}
 
-		themeCheck = Timer(repeats: true, interval: 2) { [weak self] in
-			guard let s = self else { return }
-			if s.theme != s.currentTheme {
-				s.applyTheme()
-			}
-		}
-
 		DataManager.postProcessAllItems()
 
 		mouseIgnoreTimer = PopTimer(timeInterval: 0.4) {
 			app.isManuallyScrolling = false
 		}
 
-		applyTheme() // also sets up windows
+        theme = currentTheme // also sets up windows
 
 		API.updateLimitsFromServer()
 
 		let nc = NSUserNotificationCenter.default
 		nc.delegate = self
 		if let launchNotification = notification.userInfo?[NSApplication.launchUserNotificationUserInfoKey] as? NSUserNotification {
-			delay(0.5, self) { S in
-				S.userNotificationCenter(nc, didActivate: launchNotification)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+				self?.userNotificationCenter(nc, didActivate: launchNotification)
 			}
 		}
 
 		if ApiServer.someServersHaveAuthTokens(in: DataManager.main) {
-			atNextEvent(self) { S in
-				S.startRefresh()
+            DispatchQueue.main.async { [weak self] in
+				self?.startRefreshIfItIsDue()
 			}
 		} else if ApiServer.countApiServers(in: DataManager.main) == 1, let a = ApiServer.allApiServers(in: DataManager.main).first, a.authToken == nil || a.authToken!.isEmpty {
 			startupAssistant()
@@ -122,19 +105,32 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 		let n = NotificationCenter.default
 		n.addObserver(self, selector: #selector(updateScrollBarWidth), name: NSScroller.preferredScrollerStyleDidChangeNotification, object: nil)
+        n.addObserver(self, selector: #selector(refreshStarting), name: .RefreshStarting, object: nil)
+        n.addObserver(self, selector: #selector(refreshDone), name: .RefreshEnded, object: nil)
+
+        let dn = DistributedNotificationCenter.default()
+        dn.addObserver(self, selector: #selector(themeCheck), name: Notification.Name("AppleInterfaceThemeChangedNotification"), object: nil)
 
 		addHotKeySupport()
 
-		let s = SUUpdater.shared()
-		setUpdateCheckParameters()
-		if !(s?.updateInProgress)! && Settings.checkForUpdatesAutomatically {
-			s?.checkForUpdatesInBackground()
-		}
-
+        if let updater = SUUpdater.shared() {
+            setUpdateCheckParameters()
+            if !updater.updateInProgress && Settings.checkForUpdatesAutomatically {
+                updater.checkForUpdatesInBackground()
+            }
+        }
+        
 		let wn = NSWorkspace.shared.notificationCenter
 		wn.addObserver(self, selector: #selector(systemWillSleep), name: NSWorkspace.willSleepNotification, object: nil)
 		wn.addObserver(self, selector: #selector(systemDidWake), name: NSWorkspace.didWakeNotification, object: nil)
 	}
+    
+    @objc private func themeCheck() {
+        let c = currentTheme
+        if theme != c {
+            theme = c
+        }
+    }
 
 	@objc private func systemWillSleep() {
 		systemSleeping = true
@@ -144,8 +140,9 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	@objc private func systemDidWake() {
 		DLog("System woke up")
 		systemSleeping = false
-		delay(1, self) { S in
-			S.startRefreshIfItIsDue()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+            self?.themeCheck()
+			self?.startRefreshIfItIsDue()
 		}
 	}
 
@@ -207,10 +204,6 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	func postNotification(type: NotificationType, for item: DataItem) {
-		if preferencesDirty {
-			return
-		}
-
 		let notification = NSUserNotification()
 
 		func addPotentialExtraActions() {
@@ -374,14 +367,17 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 		notification.userInfo = DataManager.info(for: item)
 
+        let group = DispatchGroup()
 		if let c = item as? PRComment, let url = c.avatarUrl, !Settings.hideAvatars {
+            group.enter()
 			API.haveCachedAvatar(from: url) { image, _ in
 				notification.contentImage = image
-				NSUserNotificationCenter.default.deliver(notification)
+                group.leave()
 			}
-		} else {
-			NSUserNotificationCenter.default.deliver(notification)
 		}
+        group.notify(queue: .main) {
+            NSUserNotificationCenter.default.deliver(notification)
+        }
 	}
 
 	func selected(_ item: ListableItem, alternativeSelect: Bool, window: NSWindow?) {
@@ -501,6 +497,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 		DataManager.saveDB()
 		menuBarSet.updatePrMenu()
+        ensureAtLeastOneMenuVisible()
 	}
 
 	private func removeAllClosedRequests(under menuBarSet: MenuBarSet) {
@@ -509,6 +506,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 		DataManager.saveDB()
 		menuBarSet.updatePrMenu()
+        ensureAtLeastOneMenuVisible()
 	}
 
 	private func removeAllClosedIssues(under menuBarSet: MenuBarSet) {
@@ -517,6 +515,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 		DataManager.saveDB()
 		menuBarSet.updateIssuesMenu()
+        ensureAtLeastOneMenuVisible()
 	}
 
 	func unPinSelected(for item: ListableItem) {
@@ -528,6 +527,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		} else if item is Issue {
 			menus.forEach { $0.updateIssuesMenu() }
 		}
+        ensureAtLeastOneMenuVisible()
 	}
 
 	func controlTextDidChange(_ n: Notification) {
@@ -544,12 +544,20 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 		guard let menuBarSet = menuBarSet(for: window) else { return }
 
-		let type: ListableItem.Type = (window === menuBarSet.prMenu) ? PullRequest.self : Issue.self
+        let prMenu = window === menuBarSet.prMenu
+		let type: ListableItem.Type = prMenu ? PullRequest.self : Issue.self
 		let f = ListableItem.requestForItems(of: type, withFilter: window.filter.stringValue, sectionIndex: -1, criterion: menuBarSet.viewCriterion)
 		for r in try! DataManager.main.fetch(f) {
 			r.catchUpWithComments()
 		}
-		updateAllMenus()
+        DataManager.saveDB()
+        
+        if prMenu {
+            menuBarSet.updatePrMenu()
+        } else {
+            menuBarSet.updateIssuesMenu()
+        }
+        ensureAtLeastOneMenuVisible()
 	}
 
 	func preferencesSelected() {
@@ -570,7 +578,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 	@discardableResult
 	func tryLoadSettings(from url: URL, skipConfirm: Bool) -> Bool {
-		if appIsRefreshing {
+		if API.isRefreshing {
 			let alert = NSAlert()
 			alert.messageText = "Trailer is currently refreshing data, please wait until it's done and try importing your settings again"
 			alert.addButton(withTitle: "OK")
@@ -637,23 +645,18 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	func startRefreshIfItIsDue() {
-
 		if let l = Settings.lastSuccessfulRefresh {
-			let howLongAgo = Date().timeIntervalSince(l)
-			if fabs(howLongAgo) > TimeInterval(Settings.refreshPeriod) {
-				startRefresh()
-			} else {
-				let howLongUntilNextSync = TimeInterval(Settings.refreshPeriod) - howLongAgo
-				DLog("No need to refresh yet, will refresh in %@", howLongUntilNextSync)
-				refreshTimer = Timer(repeats: false, interval: howLongUntilNextSync) { [weak self] in
-					self?.refreshTimerDone()
-				}
+            let howLongAgo = Date().timeIntervalSince(l).rounded()
+            let howLongUntilNextSync = Settings.refreshPeriod - howLongAgo
+			if howLongUntilNextSync > 0 {
+                DLog("No need to refresh yet, will refresh in %@ sec", howLongUntilNextSync)
+                refreshTimer = Timer(repeats: false, interval: howLongUntilNextSync) { [weak self] in
+                    self?.refreshTimerDone()
+                }
+                return
 			}
 		}
-		else
-		{
-			startRefresh()
-		}
+        startRefresh()
 	}
 
 	private func checkApiUsage() {
@@ -682,35 +685,32 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 	}
 
-	func prepareForRefresh() {
+	@objc private func refreshStarting() {
 		refreshTimer = nil
-
-		DataManager.postMigrationTasks()
-
-		appIsRefreshing = true
 
 		preferencesWindow?.updateActivity()
 
 		for d in menuBarSets {
 			d.prepareForRefresh()
 		}
-
-		NotificationQueue.clear()
-
-		DLog("Starting refresh")
+        ensureAtLeastOneMenuVisible()
 	}
+    
+    @objc private func refreshDone() {
+        for d in menuBarSets {
+            d.allowRefresh = true
+        }
 
-	func completeRefresh() {
-		appIsRefreshing = false
-		preferencesDirty = false
-		preferencesWindow?.updateActivity()
-		DataManager.saveDB()
-		preferencesWindow?.reloadRepositories()
-		checkApiUsage()
-		DataManager.sendNotificationsIndexAndSave()
-		DLog("Refresh done")
-		updateAllMenus()
-	}
+        preferencesWindow?.updateActivity()
+        preferencesWindow?.reloadRepositories()
+        updateAllMenus()
+        
+        refreshTimer = Timer(repeats: false, interval: TimeInterval(Settings.refreshPeriod)) { [weak self] in
+            self?.refreshTimerDone()
+        }
+        
+        checkApiUsage()
+    }
 
 	func updateRelatedMenus(for i: ListableItem) {
 		let menus = relatedMenus(for: i)
@@ -719,6 +719,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		} else if i is Issue {
 			menus.forEach { $0.updateIssuesMenu() }
 		}
+        ensureAtLeastOneMenuVisible()
 	}
 
 	private func relatedMenus(for i: ListableItem) -> [MenuBarSet] {
@@ -726,41 +727,38 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	func application(_ application: NSApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([NSUserActivityRestoring]) -> Void) -> Bool {
-		if #available(OSX 10.11, *) {
-			if userActivity.activityType == CSSearchableItemActionType,
-				let uriPath = userActivity.userInfo?[CSSearchableItemActivityIdentifier] as? String,
-				let itemId = DataManager.id(for: uriPath),
-				let item = existingObject(with: itemId) as? ListableItem,
-				let urlString = item.webUrl,
-				let url = URL(string: urlString) {
+        if userActivity.activityType == CSSearchableItemActionType,
+            let uriPath = userActivity.userInfo?[CSSearchableItemActivityIdentifier] as? String,
+            let itemId = DataManager.id(for: uriPath),
+            let item = existingObject(with: itemId) as? ListableItem,
+            let urlString = item.webUrl,
+            let url = URL(string: urlString) {
 
-				NSWorkspace.shared.open(url)
-				return true
-			}
-		}
-		return false
+            NSWorkspace.shared.open(url)
+            return true
+        }
+        return false
 	}
 
 	func updateAllMenus() {
-		var visibleMenuCount = 0
 		for d in menuBarSets {
-			d.forceVisible = false
-			d.updatePrMenu()
-			d.updateIssuesMenu()
-			if d.prMenu.statusItem != nil { visibleMenuCount += 1 }
-			if d.issuesMenu.statusItem != nil { visibleMenuCount += 1 }
+            d.updatePrMenu()
+            d.updateIssuesMenu()
 		}
-		if visibleMenuCount == 0 && menuBarSets.count > 0 {
-			// Safety net: Ensure that at the very least (usually while importing
-			// from an empty DB, with all repos in groups) *some* menu stays visible
-			let m = menuBarSets.first!
-			m.forceVisible = true
-			m.updatePrMenu()
-		}
+        ensureAtLeastOneMenuVisible()
 	}
+    
+    private func ensureAtLeastOneMenuVisible() {
+        let atLeastOneMenuVisible = menuBarSets.contains { $0.prMenu.statusItem != nil || $0.issuesMenu.statusItem != nil }
+        if !atLeastOneMenuVisible, let firstMenu = menuBarSets.first(where: { $0.viewCriterion?.label == nil }) ?? menuBarSets.first {
+            // Safety net: Ensure that at the very least (usually while importing
+            // from an empty DB, with all repos in groups) *some* menu stays visible
+            firstMenu.updatePrMenu(forceVisible: true)
+        }
+    }
 
 	func startRefresh() {
-		if appIsRefreshing {
+		if API.isRefreshing {
 			DLog("Won't start refresh because refresh is already ongoing")
 			return
 		}
@@ -780,30 +778,9 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			return
 		}
 
-		prepareForRefresh()
-
-		for d in menuBarSets {
-			d.allowRefresh = false
-		}
-
-		API.syncItemsForActiveReposAndCallback { [weak self] in
-
-			guard let s = self else { return }
-
-			for d in s.menuBarSets {
-				d.allowRefresh = true
-			}
-
-			if !ApiServer.shouldReportRefreshFailure(in: DataManager.main) {
-				Settings.lastSuccessfulRefresh = Date()
-			}
-			s.completeRefresh()
-			s.refreshTimer = Timer(repeats: false, interval: TimeInterval(Settings.refreshPeriod)) {
-				s.refreshTimerDone()
-			}
-		}
+		API.performSync()
 	}
-
+    
 	private func refreshTimerDone() {
 		refreshTimer = nil
 		if DataManager.appIsConfigured {
@@ -1011,7 +988,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		app.isManuallyScrolling = true
 		mouseIgnoreTimer.push()
 		inMenu.table.scrollRowToVisible(i)
-		delay(0.01) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
 			if let cell = inMenu.table.view(atColumn: 0, row: i, makeIfNecessary: false) as? TrailerCell {
 				cell.selected = true
 			}
@@ -1079,7 +1056,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	////////////// scrollbars
 
 	@objc private func updateScrollBarWidth() {
-		if let s = menuBarSets.first!.prMenu.scrollView.verticalScroller {
+		if let s = menuBarSets.first?.prMenu.scrollView.verticalScroller {
 			if s.scrollerStyle == .legacy {
 				scrollBarWidth = s.frame.size.width
 			} else {
@@ -1185,21 +1162,31 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 	//////////////////////// Dark mode
 
-	var theme = Theme.light
-	private func applyTheme() {
-		if !systemSleeping {
-			if menuBarSets.count == 0 || theme != currentTheme {
-				setupWindows()
-			}
-		}
-	}
+    var theme = Theme.light {
+        didSet {
+            setupWindows()
+        }
+    }
 
 	private var currentTheme: Theme {
-		if #available(OSX 10.14, *) {
-			return UserDefaults.standard.string(forKey: "AppleInterfaceStyle") == "Dark" ? .dark : .light
-		} else {
-			return UserDefaults.standard.string(forKey: "AppleInterfaceStyle") == "Dark" ? .darkLegacy : .light
-		}
+        // with many thanks from https://medium.com/@ruiaureliano/check-light-dark-appearance-for-macos-mojave-catalina-fb2343af875f
+        let d = UserDefaults.standard
+        let autoSwitching = d.bool(forKey: "AppleInterfaceStyleSwitchesAutomatically")
+        let interfaceStyle = d.string(forKey: "AppleInterfaceStyle")
+        if autoSwitching {
+            if interfaceStyle == nil {
+                if #available(OSX 10.14, *) {
+                    let isDark = NSAppearance.current.bestMatch(from: [.darkAqua]) == NSAppearance.Name.darkAqua
+                    return isDark ? .dark : .light
+                } else {
+                    return .dark
+                }
+            } else {
+                return .light
+            }
+        } else {
+            return (interfaceStyle == "Dark") ? .dark : .light
+        }
 	}
 
 	// Server display list

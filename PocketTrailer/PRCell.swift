@@ -23,7 +23,6 @@ final class PRCell: UITableViewCell {
 	@IBOutlet private weak var _image: UIImageView!
 	@IBOutlet private weak var _title: UILabel!
 	@IBOutlet private weak var _labels: UILabel!
-    @IBOutlet private weak var _reviews: UILabel!
     @IBOutlet private weak var _description: UILabel!
 	@IBOutlet private weak var _statuses: UILabel!
 
@@ -77,7 +76,8 @@ final class PRCell: UITableViewCell {
 	}
 
 	@objc private func networkStateChanged() {
-		atNextEvent(self) { S in
+        DispatchQueue.main.async { [weak self] in
+            guard let S = self else { return }
 			if let f = S.failedToLoadImage, API.currentNetworkStatus != .NotReachable {
 				S.loadImageAtPath(imagePath: f)
 			}
@@ -87,8 +87,11 @@ final class PRCell: UITableViewCell {
 	deinit {
 		NotificationCenter.default.removeObserver(self)
 	}
+    
+    private weak var item: ListableItem?
 
 	func setPullRequest(pullRequest: PullRequest) {
+        item = pullRequest
         
         let separator = traitCollection.containsTraits(in: compactTraits) ? "\n" : "   "
         
@@ -99,48 +102,55 @@ final class PRCell: UITableViewCell {
         _labels.attributedText = l
         _labels.isHidden = (l?.length ?? 0) == 0
 
-        let r = pullRequest.reviewsAttributedString(labelFont: _reviews.font)
-        _reviews.attributedText = r
-        _reviews.isHidden = (r?.length ?? 0) == 0
-
-        _description.attributedText = pullRequest.subtitle(with: detailFont, lightColor: UIColor.secondaryLabel, darkColor: UIColor.label, separator: separator)
+        let sub = pullRequest.subtitle(with: detailFont, lightColor: UIColor.secondaryLabel, darkColor: UIColor.label, separator: separator)
+        let r = pullRequest.reviewsAttributedString(labelFont: detailFont)
+        if let r = r, r.length > 0 {
+            let s = NSMutableAttributedString(attributedString: r)
+            s.append(NSAttributedString(string: "\n"))
+            s.append(sub)
+            _description.attributedText = s
+        } else {
+            _description.attributedText = sub
+        }
 
 		let muted = pullRequest.muted
 		setCountsImageAndFade(item: pullRequest, muted: muted)
 
 		var statusText : NSMutableAttributedString?
-		var statusCount = 0
-		if pullRequest.shouldShowStatuses {
+        var totalStatuses = 0
+		if pullRequest.interestedInStatuses {
 			let statusItems = pullRequest.displayedStatuses
-			statusCount = statusItems.count
-			while statusCount > 0 {
-				statusText = NSMutableAttributedString()
-				for status in statusItems {
-					var lineAttributes = statusAttributes
-					lineAttributes[NSAttributedString.Key.foregroundColor] = status.colorForDisplay
-					statusText?.append(NSAttributedString(string: status.displayText, attributes: lineAttributes))
-					statusCount -= 1
-					if statusCount > 0 {
-						statusText?.append(NSAttributedString(string: "\n", attributes: lineAttributes))
-					}
-				}
-			}
+			var statusCount = statusItems.count
+            totalStatuses = statusCount
+            var lineAttributes = statusAttributes
+
+            statusText = NSMutableAttributedString()
+            for status in statusItems {
+                lineAttributes[.foregroundColor] = status.colorForDisplay
+                statusText?.append(NSAttributedString(string: status.displayText, attributes: lineAttributes))
+                statusCount -= 1
+                if statusCount > 0 {
+                    statusText?.append(NSAttributedString(string: "\n", attributes: lineAttributes))
+                }
+            }
 		}
 		_statuses.attributedText = statusText
+        _statuses.isHidden = totalStatuses == 0 
 
-		if let statusString = statusText?.string {
+		if totalStatuses > 0, let statusString = statusText?.string {
 			var title = pullRequest.accessibleTitle
 			if muted {
 				title = "(Muted) - \(title)"
 			}
-			accessibilityLabel = "\(title), \(S(unreadCount.text)) unread comments, \(S(readCount.text)) total comments, \(pullRequest.accessibleSubtitle). \(statusCount) statuses: \(statusString)"
+			accessibilityLabel = "\(title), \(S(unreadCount.text)) unread comments, \(S(readCount.text)) total comments, \(pullRequest.accessibleSubtitle). \(totalStatuses) statuses: \(statusString)"
 		} else {
 			accessibilityLabel = "\(pullRequest.accessibleTitle), \(S(unreadCount.text)) unread comments, \(S(readCount.text)) total comments, \(pullRequest.accessibleSubtitle)"
 		}
 	}
 
 	func setIssue(issue: Issue) {
-
+        item = issue
+        
         let separator = traitCollection.containsTraits(in: compactTraits) ? "\n" : "   "
 
         let detailFont = _description.font!
@@ -150,12 +160,10 @@ final class PRCell: UITableViewCell {
         _labels.attributedText = l
         _labels.isHidden = (l?.length ?? 0) == 0
 
-        _reviews.attributedText = nil
-        _reviews.isHidden = true
-        
         _description.attributedText = issue.subtitle(with: detailFont, lightColor: UIColor.secondaryLabel, darkColor: UIColor.label, separator: separator)
 
         _statuses.attributedText = nil
+        _statuses.isHidden = true
 
 		let muted = issue.muted
 		setCountsImageAndFade(item: issue, muted: muted)
@@ -171,15 +179,15 @@ final class PRCell: UITableViewCell {
 		let _commentsNew = Int(item.unreadComments)
 		let fade = muted || item.isSnoozing
 
-		readCount.text = itemCountFormatter.string(for: _commentsTotal)
+		readCount.text = numberFormatter.string(for: _commentsTotal)
 		readCount.isHidden = _commentsTotal == 0
 
 		if let p = item as? PullRequest, Settings.markPrsAsUnreadOnNewCommits, p.hasNewCommits {
 			unreadCount.isHidden = false
-			unreadCount.text = _commentsNew == 0 ? "!" : itemCountFormatter.string(for: _commentsNew)
+			unreadCount.text = _commentsNew == 0 ? "!" : numberFormatter.string(for: _commentsNew)
 		} else {
 			unreadCount.isHidden = _commentsNew == 0
-			unreadCount.text = itemCountFormatter.string(for: _commentsNew)
+			unreadCount.text = numberFormatter.string(for: _commentsNew)
 		}
 
 		let a = fade ? DISABLED_FADE : 1.0

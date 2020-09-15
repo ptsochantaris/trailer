@@ -14,7 +14,7 @@ extension Data {
 
 	func data(operation: CompressionOperation) -> Data? {
 
-		guard count > 0 else {
+		guard !isEmpty else {
 			return nil
 		}
 
@@ -22,12 +22,9 @@ extension Data {
 		defer {
 			streamPtr.deallocate()
 		}
-
-		var stream = streamPtr.pointee
-		var status : compression_status
-		var op : compression_stream_operation
-		var flags : Int32
-
+        
+		let flags: Int32
+        let op: compression_stream_operation
 		switch operation {
 		case .compress:
 			op = COMPRESSION_STREAM_ENCODE
@@ -37,7 +34,8 @@ extension Data {
 			flags = 0
 		}
 
-		status = compression_stream_init(&stream, op, COMPRESSION_LZMA)
+        var stream = streamPtr.pointee
+		var status = compression_stream_init(&stream, op, COMPRESSION_LZFSE)
 		guard status != COMPRESSION_STATUS_ERROR else {
 			return nil
 		}
@@ -72,7 +70,7 @@ extension Data {
 				case COMPRESSION_STATUS_OK:
 					// Going to call _process at least once more, so prepare for that
 					if stream.dst_size == 0 {
-						// Output buffer full...
+						// Output buffer full…
 
 						// Write out to outputData
 						outputData.append(dstBufferPtr, count: dstBufferSize)

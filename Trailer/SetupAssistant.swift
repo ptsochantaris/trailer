@@ -82,7 +82,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate, NSControlTextEditingDele
 	}
 
 	private func checkRefreshDone() {
-		if !appIsRefreshing {
+		if !API.isRefreshing {
 
 			checkTimer = nil
 
@@ -145,7 +145,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate, NSControlTextEditingDele
 		o.allowedFileTypes = ["trailerSettings"]
 		o.beginSheetModal(for: self) { response in
 			if response.rawValue == NSFileHandlingPanelOKButton, let url = o.url {
-				atNextEvent { [weak self] in
+                DispatchQueue.main.async { [weak self] in
 					if app.tryLoadSettings(from: url, skipConfirm: Settings.dontConfirmSettingsImport) {
 						self?.close()
 					}

@@ -10,6 +10,9 @@ final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 	@IBOutlet private weak var autoRemoveRepos: NSButton!
 	@IBOutlet private weak var hideArchivedRepos: NSButton!
 
+    @IBOutlet private weak var syncAuthoredPrs: NSButton!
+    @IBOutlet private weak var syncAuthoredIssues: NSButton!
+
 	weak var prefs: PreferencesWindow?
 
 	override func awakeFromNib() {
@@ -20,9 +23,14 @@ final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 		refreshReposLabel.toolTip = Settings.newRepoCheckPeriodHelp
 		repoCheckStepper.toolTip = Settings.newRepoCheckPeriodHelp
 		repoCheckStepper.floatValue = Settings.newRepoCheckPeriod
-		autoAddRepos.integerValue = Settings.automaticallyAddNewReposFromWatchlist ? 1 : 0
+        syncAuthoredPrs.toolTip = Settings.queryAuthoredPRsHelp
+        syncAuthoredIssues.toolTip = Settings.queryAuthoredIssuesHelp
+
+        autoAddRepos.integerValue = Settings.automaticallyAddNewReposFromWatchlist ? 1 : 0
 		autoRemoveRepos.integerValue = Settings.automaticallyRemoveDeletedReposFromWatchlist ? 1 : 0
 		hideArchivedRepos.integerValue = Settings.hideArchivedRepos ? 1 : 0
+        syncAuthoredPrs.integerValue = Settings.queryAuthoredPRs ? 1 : 0
+        syncAuthoredIssues.integerValue = Settings.queryAuthoredIssues ? 1 : 0
 
 		newRepoCheckChanged(nil)
 
@@ -48,7 +56,7 @@ final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 
 	// chain this to updateActivity from the main repferences window
 	func updateActivity() {
-		if appIsRefreshing {
+        if API.isRefreshing {
 			refreshButton.isEnabled = false
 			activityDisplay.startAnimation(nil)
 		} else {
@@ -56,14 +64,14 @@ final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 			activityDisplay.stopAnimation(nil)
 			updateRemovableRepos()
 		}
-		addButton.isEnabled = !appIsRefreshing
-		removeButton.isEnabled = !appIsRefreshing
+		addButton.isEnabled = !API.isRefreshing
+		removeButton.isEnabled = !API.isRefreshing
 	}
 
 	private func updateRemovableRepos() {
 		removeRepoList.removeAllItems()
 		let manuallyAddedRepos = Repo.allItems(of: Repo.self, in: DataManager.main).filter { $0.manuallyAdded }
-		if manuallyAddedRepos.count == 0 {
+		if manuallyAddedRepos.isEmpty {
 			let m = NSMenuItem()
 			m.title = "You have not added any custom repositories"
 			removeRepoList.menu?.addItem(m)
@@ -101,6 +109,18 @@ final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 			DataManager.saveDB()
 		}
 	}
+    
+    @IBAction private func queryAuthoredPRsSelected(_ sender: NSButton) {
+        Settings.queryAuthoredPRs = (sender.integerValue == 1)
+        lastRepoCheck = .distantPast
+        preferencesDirty = true
+    }
+
+    @IBAction private func queryAuthoredIssuesSelected(_ sender: NSButton) {
+        Settings.queryAuthoredIssues = (sender.integerValue == 1)
+        lastRepoCheck = .distantPast
+        preferencesDirty = true
+    }
 
 	@IBAction private func automaticallyAddNewReposSelected(_ sender: NSButton) {
 		let set = sender.integerValue == 1

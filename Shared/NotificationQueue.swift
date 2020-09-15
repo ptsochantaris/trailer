@@ -1,28 +1,30 @@
 
 import Foundation
+import CoreData
 
 final class NotificationQueue {
 
-	private static var queue = [(NotificationType, DataItem)]()
+	private static var queue = [(NotificationType, NSManagedObjectID)]()
 
 	static func add(type: NotificationType, for item: DataItem) {
-		queue.append((type, item))
+        try? item.managedObjectContext?.obtainPermanentIDs(for: [item])
+        queue.append((type, item.objectID))
 	}
 
 	static func clear() {
 		queue.removeAll()
 	}
 
-	static func commit() {
-		for (type, item) in queue {
-			if !item.isDeleted && item.apiServer.lastSyncSucceeded {
-				#if os(iOS)
-					NotificationManager.postNotification(type: type, for: item)
-				#else
-					app.postNotification(type: type, for: item)
-				#endif
-			}
+    static func commit(moc: NSManagedObjectContext) {
+        queue.forEach { type, itemId in
+            if let storedItem = try? moc.existingObject(with: itemId) as? DataItem, storedItem.apiServer.lastSyncSucceeded {
+                #if os(iOS)
+                NotificationManager.postNotification(type: type, for: storedItem)
+                #else
+                app.postNotification(type: type, for: storedItem)
+                #endif
+            }
 		}
-		queue.removeAll()
+        clear()
 	}
 }

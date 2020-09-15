@@ -55,7 +55,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 	}
 
 	private func checkRefreshDone() {
-		if appIsRefreshing {
+        if API.isRefreshing {
 			feedback.text = "\nFetching your watchlist. This will take a moment…"
 		} else {
 			checkTimer = nil

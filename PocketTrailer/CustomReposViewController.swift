@@ -45,7 +45,7 @@ final class CustomReposViewController: UIViewController, UITableViewDelegate, UI
 		let r = repos[indexPath.row]
 		DataManager.main.delete(r)
 		DataManager.saveDB()
-		atNextEvent {
+		DispatchQueue.main.async {
 			popupManager.masterController.updateStatus(becauseOfChanges: true)
 		}
 		updateRepos()
@@ -124,7 +124,7 @@ final class CustomReposViewController: UIViewController, UITableViewDelegate, UI
 						showMessage("Repositories added", "\(addedCount) new repositories have been added to your local list. Trailer will refresh after you close preferences to fetch any items from them.")
 					}
 					DataManager.saveDB()
-					atNextEvent {
+					DispatchQueue.main.async {
 						popupManager.masterController.updateStatus(becauseOfChanges: true)
 					}
 					self.updateRepos()
@@ -144,7 +144,7 @@ final class CustomReposViewController: UIViewController, UITableViewDelegate, UI
 						showMessage("Repository added", "The new repository has been added to your local list. Trailer will refresh after you close preferences to fetch any items from it.")
 					}
 					DataManager.saveDB()
-					atNextEvent {
+					DispatchQueue.main.async {
 						popupManager.masterController.updateStatus(becauseOfChanges: true)
 					}
 					self.updateRepos()

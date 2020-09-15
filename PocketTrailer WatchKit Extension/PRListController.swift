@@ -55,7 +55,8 @@ final class PRListController: CommonController {
 
 	override func didAppear() {
 		super.didAppear()
-		atNextEvent (self) { S in
+        DispatchQueue.main.async { [weak self] in
+            guard let S = self else { return }
 			S.sleeping = false
 		}
 	}
@@ -117,8 +118,8 @@ final class PRListController: CommonController {
 		loadingBuffer.append(contentsOf: page)
 
 		if page.count == PAGE_SIZE {
-			atNextEvent(self) { S in
-				S._requestData(nil)
+            DispatchQueue.main.async { [weak self] in
+				self?._requestData(nil)
 			}
 
 		} else {
@@ -133,7 +134,7 @@ final class PRListController: CommonController {
 				table.insertRows(at: IndexSet(integersIn: Range(uncheckedBounds: (0, recordDelta))), withRowType: "PRRow")
 			}
 
-			if loadingBuffer.count == 0 {
+			if loadingBuffer.isEmpty {
 				show(status: "There are no items in this section", hideTable: true)
 
 			} else {

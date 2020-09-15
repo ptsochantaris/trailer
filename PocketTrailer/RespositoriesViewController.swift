@@ -51,7 +51,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 
 	override func viewDidAppear(_ animated: Bool) {
 		actionsButton.isEnabled = ApiServer.someServersHaveAuthTokens(in: DataManager.main)
-		if actionsButton.isEnabled && fetchedResultsController.fetchedObjects?.count==0 {
+		if actionsButton.isEnabled && (fetchedResultsController.fetchedObjects?.isEmpty ?? true) {
 			refreshList()
 		} else if let selectedIndex = tableView.indexPathForSelectedRow {
 			tableView.deselectRow(at: selectedIndex, animated: true)
@@ -106,7 +106,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 	}
 
 	@IBAction private func sortSelected(_ sender: UIBarButtonItem) {
-		let a = UIAlertController(title: "Sort by...", message: nil, preferredStyle: .actionSheet)
+		let a = UIAlertController(title: "Sort by…", message: nil, preferredStyle: .actionSheet)
 		a.addAction(UIAlertAction(title: "Name", style: .default, handler: { _ in
 			self.setSort(by: .name)
 		}))
@@ -137,6 +137,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 
 		NotificationQueue.clear()
 
+        API.isRefreshing = true
 		let tempContext = DataManager.buildChildContext()
 		API.fetchRepositories(to: tempContext) { [weak self] in
 			if ApiServer.shouldReportRefreshFailure(in: tempContext) {
@@ -151,8 +152,11 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 				NotificationQueue.clear()
 			} else {
 				DataItem.nukeDeletedItems(in: tempContext)
-				try! tempContext.save()
-				NotificationQueue.commit()
+                if tempContext.hasChanges {
+                    try? tempContext.save()
+                }
+                DataManager.saveDB()
+                NotificationQueue.commit(moc: DataManager.main)
 			}
 			preferencesDirty = true
 			guard let s = self  else { return }
@@ -161,6 +165,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 			s.tableView.alpha = 1.0
 			s.tableView.isUserInteractionEnabled = true
 			s.navigationItem.rightBarButtonItem?.isEnabled = true
+            API.isRefreshing = false
 		}
 	}
 
@@ -275,15 +280,13 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 	}
 
 	private func prTitleForRepo(repo: Repo) -> NSAttributedString {
-
 		let policy = RepoDisplayPolicy(repo.displayPolicyForPrs) ?? .hide
-		return NSAttributedString(string: "PR Sections: \(policy.name)", attributes: attributes(for: policy))
+		return NSAttributedString(string: "PRs: \(policy.name)", attributes: attributes(for: policy))
 	}
 
 	private func issueTitleForRepo(repo: Repo) -> NSAttributedString {
-
 		let policy = RepoDisplayPolicy(repo.displayPolicyForIssues) ?? .hide
-		return NSAttributedString(string: "Issue Sections: \(policy.name)", attributes: attributes(for: policy))
+		return NSAttributedString(string: "Issues: \(policy.name)", attributes: attributes(for: policy))
 	}
 
 	private func groupTitleForRepo(repo: Repo) -> NSAttributedString {
@@ -337,13 +340,13 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 		let untouchedIndexes = dataIndexes.filter { !(removedIndexes.contains($0) || addedIndexes.contains($0)) }
 
 		tableView.beginUpdates()
-		if removedIndexes.count > 0 {
+		if !removedIndexes.isEmpty {
 			tableView.deleteSections(IndexSet(removedIndexes), with: .fade)
 		}
-		if untouchedIndexes.count > 0 {
+		if !untouchedIndexes.isEmpty {
 			tableView.reloadSections(IndexSet(untouchedIndexes), with:.fade)
 		}
-		if addedIndexes.count > 0 {
+		if !addedIndexes.isEmpty {
 			tableView.insertSections(IndexSet(addedIndexes), with: .fade)
 		}
 		tableView.endUpdates()

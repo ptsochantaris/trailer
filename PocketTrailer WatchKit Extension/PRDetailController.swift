@@ -92,7 +92,7 @@ final class PRDetailController: CommonController {
 		}
 
 		if let comments = itemInfo["comments"] as? [[AnyHashable : Any]] {
-			if comments.count == 0 {
+			if comments.isEmpty {
 				setTitle("\(comments.count) Comments")
 			} else {
 				setTitle("Details")

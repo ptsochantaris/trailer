@@ -1,10 +1,3 @@
-//
-//  Colors.swift
-//  Trailer
-//
-//  Created by Paul Tsochantaris on 14/12/2019.
-//
-
 #if os(iOS)
 import UIKit
 typealias COLOR_CLASS = UIColor
@@ -38,6 +31,14 @@ extension COLOR_CLASS {
         } else {
             return COLOR_CLASS(red: 0.7, green: 0.2, blue: 0.2, alpha: 1.0)
         }
+    }
+    
+    static var appLabel: COLOR_CLASS {
+        #if os(iOS)
+        return .label
+        #elseif os(OSX)
+        return .labelColor
+        #endif
     }
     
     static var appSecondaryLabel: COLOR_CLASS {

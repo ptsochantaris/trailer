@@ -6,7 +6,7 @@ import CoreSpotlight
 final class NotificationManager {
 
 	static func handleLocalNotification(notification: UNNotificationContent, action: String) {
-		if notification.userInfo.count > 0 {
+		if !notification.userInfo.isEmpty {
 			DLog("Received local notification: %@", notification.userInfo)
 			popupManager.masterController.localNotificationSelected(userInfo: notification.userInfo, action: action)
 		}
@@ -16,7 +16,7 @@ final class NotificationManager {
 
 		if let info = activity.userInfo {
 			if activity.activityType == CSSearchableItemActionType, let uid = info[CSSearchableItemActivityIdentifier] as? String {
-				popupManager.masterController.openItemWithUriPath(uriPath: uid)
+				popupManager.masterController.highightItemWithUriPath(uriPath: uid)
 				return true
 
 			} else if activity.activityType == CSQueryContinuationActionType, let searchString = info[CSSearchQueryString] as? String {
@@ -46,10 +46,6 @@ final class NotificationManager {
 	}
 
 	static func postNotification(type: NotificationType, for item: DataItem) {
-		if preferencesDirty {
-			return
-		}
-
 		let notification = UNMutableNotificationContent()
 
 		switch (type) {
@@ -214,18 +210,22 @@ final class NotificationManager {
 		let identifier = "\(S(notification.title)) - \(S(notification.subtitle)) - \(S(notification.body))"
 
 		notification.userInfo = DataManager.info(for: item)
+        
+        let group = DispatchGroup()
 
 		if let c = item as? PRComment, let url = c.avatarUrl, !Settings.hideAvatars {
+            group.enter()
 			API.haveCachedAvatar(from: url) { image, cachePath in
 				if image != nil, let attachment = try? UNNotificationAttachment(identifier: cachePath, url: URL(fileURLWithPath: cachePath), options: nil) {
 					notification.attachments = [attachment]
+                    group.leave()
 				}
-				let request = UNNotificationRequest(identifier: identifier, content: notification, trigger: nil)
-				UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
 			}
-		} else {
-			let request = UNNotificationRequest(identifier: identifier, content: notification, trigger: nil)
-			UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
 		}
+        
+        group.notify(queue: .main) {
+            let request = UNNotificationRequest(identifier: identifier, content: notification, trigger: nil)
+            UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
+        }
 	}
 }

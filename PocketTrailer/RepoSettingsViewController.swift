@@ -52,7 +52,7 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
 		if section == 2 {
 			return RepoHidingPolicy.labels.count
 		}
-		return RepoDisplayPolicy.labels.count
+        return RepoDisplayPolicy.allCases.filter { $0.selectable }.count
 	}
 
 	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -60,13 +60,17 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
 		if let repo = repo {
 			switch indexPath.section {
 			case 0:
-				cell.accessoryType = (Int(repo.displayPolicyForPrs)==indexPath.row) ? .checkmark : .none
-				cell.textLabel?.text = RepoDisplayPolicy.labels[indexPath.row]
-				cell.textLabel?.textColor = RepoDisplayPolicy.colors[indexPath.row]
+                let special = (indexPath.row == 0 && repo.displayPolicyForPrs == RepoDisplayPolicy.authoredOnly.rawValue)
+				cell.accessoryType = (special || Int(repo.displayPolicyForPrs)==indexPath.row) ? .checkmark : .none
+                let name = special ? RepoDisplayPolicy.authoredOnly.name : RepoDisplayPolicy.labels[indexPath.row]
+				cell.textLabel?.text = name
+                cell.textLabel?.textColor = RepoDisplayPolicy(indexPath.row)?.color
 			case 1:
-				cell.accessoryType = (Int(repo.displayPolicyForIssues)==indexPath.row) ? .checkmark : .none
-				cell.textLabel?.text = RepoDisplayPolicy.labels[indexPath.row]
-				cell.textLabel?.textColor = RepoDisplayPolicy.colors[indexPath.row]
+                let special = (indexPath.row == 0 && repo.displayPolicyForIssues == RepoDisplayPolicy.authoredOnly.rawValue)
+				cell.accessoryType = (special || Int(repo.displayPolicyForIssues)==indexPath.row) ? .checkmark : .none
+                let name = special ? RepoDisplayPolicy.authoredOnly.name : RepoDisplayPolicy.labels[indexPath.row]
+                cell.textLabel?.text = name
+                cell.textLabel?.textColor = RepoDisplayPolicy(indexPath.row)?.color
 			case 2:
 				cell.accessoryType = (Int(repo.itemHidingPolicy)==indexPath.row) ? .checkmark : .none
 				cell.textLabel?.text = RepoHidingPolicy.labels[indexPath.row]
@@ -78,11 +82,11 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
 			case 0:
 				cell.accessoryType = (allPrsIndex==indexPath.row) ? .checkmark : .none
 				cell.textLabel?.text = RepoDisplayPolicy.labels[indexPath.row]
-				cell.textLabel?.textColor = RepoDisplayPolicy.colors[indexPath.row]
+                cell.textLabel?.textColor = RepoDisplayPolicy(indexPath.row)?.color
 			case 1:
 				cell.accessoryType = (allIssuesIndex==indexPath.row) ? .checkmark : .none
 				cell.textLabel?.text = RepoDisplayPolicy.labels[indexPath.row]
-				cell.textLabel?.textColor = RepoDisplayPolicy.colors[indexPath.row]
+                cell.textLabel?.textColor = RepoDisplayPolicy(indexPath.row)?.color
 			case 2:
 				cell.accessoryType = (allHidingIndex==indexPath.row) ? .checkmark : .none
 				cell.textLabel?.text = RepoHidingPolicy.labels[indexPath.row]
@@ -162,7 +166,7 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
 		if let r = repo, r.groupLabel != newText {
 			r.groupLabel = newText
 			commit()
-			atNextEvent {
+			DispatchQueue.main.async {
 				popupManager.masterController.updateStatus(becauseOfChanges: true)
 			}
 		}

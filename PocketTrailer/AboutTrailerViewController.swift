@@ -7,6 +7,7 @@ final class AboutTrailerViewController: UIViewController {
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
+        self.navigationItem.largeTitleDisplayMode = .automatic
 		versionNumber.text = versionString
 	}
 
