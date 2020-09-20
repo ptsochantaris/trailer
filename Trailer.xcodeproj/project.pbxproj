@@ -96,6 +96,7 @@
 		1671A1231AC74BC30047440A /* SetupAssistant.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1671A1221AC74BC30047440A /* SetupAssistant.xib */; };
 		167B10571E6A86A300B0E1AE /* Review.swift in Sources */ = {isa = PBXBuildFile; fileRef = 167B10561E6A86A300B0E1AE /* Review.swift */; };
 		167B10581E6A86A300B0E1AE /* Review.swift in Sources */ = {isa = PBXBuildFile; fileRef = 167B10561E6A86A300B0E1AE /* Review.swift */; };
+		167E80F42517EC1700ED9A67 /* CoreSpotlight.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 167E80F32517EC1700ED9A67 /* CoreSpotlight.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		167F7BF623B38D4D00A01529 /* UpdatedRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 167F7BF523B38D4D00A01529 /* UpdatedRow.swift */; };
 		16813CBF1BA16D660020F8EB /* CommonController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16813CBE1BA16D660020F8EB /* CommonController.swift */; };
 		16878B7923C50D6A00F2213B /* GQLElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16878B7823C50D6A00F2213B /* GQLElement.swift */; };
@@ -375,6 +376,7 @@
 		167B10551E6A856A00B0E1AE /* Trailer 34.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 34.xcdatamodel"; sourceTree = "<group>"; };
 		167B10561E6A86A300B0E1AE /* Review.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Review.swift; path = Shared/Review.swift; sourceTree = SOURCE_ROOT; };
 		167E399B1CF981D900593204 /* Trailer 29.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 29.xcdatamodel"; sourceTree = "<group>"; };
+		167E80F32517EC1700ED9A67 /* CoreSpotlight.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreSpotlight.framework; path = System/Library/Frameworks/CoreSpotlight.framework; sourceTree = SDKROOT; };
 		167F7BF523B38D4D00A01529 /* UpdatedRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdatedRow.swift; sourceTree = "<group>"; };
 		16813CBE1BA16D660020F8EB /* CommonController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = CommonController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		1686B1D41AE59AED009118C5 /* PocketTrailer.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PocketTrailer.entitlements; sourceTree = "<group>"; };
@@ -511,6 +513,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				167E80F42517EC1700ED9A67 /* CoreSpotlight.framework in Frameworks */,
 				16A505E01A3888D6005DD3B7 /* Sparkle.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -785,6 +788,7 @@
 		168BC6AC17EC2DF000BC4584 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				167E80F32517EC1700ED9A67 /* CoreSpotlight.framework */,
 				1644E8E4214E8E2F00EAE523 /* ClockKit.framework */,
 				16A505DF1A3888D6005DD3B7 /* Sparkle.framework */,
 				1618527C1AB2CB9000526D81 /* NotificationCenter.framework */,
@@ -1682,7 +1686,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1566;
+				CURRENT_PROJECT_VERSION = 1567;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -1703,7 +1707,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.7.0;
+				MARKETING_VERSION = 1.7.1;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_SWIFT_FLAGS = "-D DEBUG";
 				STRIP_INSTALLED_PRODUCT = NO;
@@ -1741,7 +1745,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1566;
+				CURRENT_PROJECT_VERSION = 1567;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEPLOYMENT_POSTPROCESSING = YES;
@@ -1761,7 +1765,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../Frameworks";
 				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.7.0;
+				MARKETING_VERSION = 1.7.1;
 				SEPARATE_STRIP = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_DISABLE_SAFETY_CHECKS = YES;

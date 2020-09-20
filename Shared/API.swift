@@ -72,7 +72,7 @@ final class API {
         group.enter()
         
         var previousState = task.state
-        let o = task.observe(\.state) { t, _ in
+        var o: NSKeyValueObservation? = task.observe(\.state) { t, _ in
             let newState = t.state
             if previousState != newState {
                 if previousState == .running && newState != .running {
@@ -88,7 +88,10 @@ final class API {
             task.resume()
             group.wait()
             withExtendedLifetime(o) {
-                currentOperationCount -= 1
+                withExtendedLifetime(task) {
+                    o = nil
+                    currentOperationCount -= 1
+                }
             }
         }
     }

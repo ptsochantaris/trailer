@@ -1178,20 +1178,15 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
         let d = UserDefaults.standard
         let autoSwitching = d.bool(forKey: "AppleInterfaceStyleSwitchesAutomatically")
         let interfaceStyle = d.string(forKey: "AppleInterfaceStyle")
-        if autoSwitching {
-            if interfaceStyle == nil {
-                if #available(OSX 10.14, *) {
-                    let isDark = NSAppearance.current.bestMatch(from: [.darkAqua]) == NSAppearance.Name.darkAqua
-                    return isDark ? .dark : .light
-                } else {
-                    return .dark
-                }
+        if autoSwitching && interfaceStyle == nil {
+            if #available(OSX 10.14, *) {
+                let isDark = NSAppearance.current.bestMatch(from: [.darkAqua]) == .darkAqua
+                return isDark ? .dark : .light
             } else {
-                return .light
+                return .dark
             }
-        } else {
-            return (interfaceStyle == "Dark") ? .dark : .light
         }
+        return (interfaceStyle == "Dark") ? .dark : .light
 	}
 
 	// Server display list

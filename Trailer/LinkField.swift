@@ -1,4 +1,24 @@
 
+extension NSColor {
+    var highlighted: NSColor {
+        if app.theme == .light {
+            if #available(OSX 10.14, *) {
+                return .controlAccentColor
+            } else {
+                return .blue
+            }
+        }
+        guard let c = self.cgColor.components, c.count > 2 else {
+            return self
+        }
+        let r = min(1, c[0] + 0.3)
+        let g = min(1, c[1] + 0.3)
+        let b = min(1, c[2] + 0.3)
+        let cgColor = CGColor(red: r, green: g, blue: b, alpha: 1)
+        return NSColor(cgColor: cgColor) ?? self
+    }
+}
+
 final class LinkField: CenterTextField {
 
 	var targetUrl: String?
@@ -60,7 +80,7 @@ final class LinkField: CenterTextField {
 			} else {
 				if !needsCommand || theEvent.modifierFlags.contains(.command) {
 					highlight = true
-					textColor = .blue
+                    textColor = normalColor?.highlighted
 					window?.invalidateCursorRects(for: self)
 				}
 			}

@@ -280,6 +280,7 @@ final class GraphQL {
             GQLField(name: "additions"),
             GQLField(name: "deletions"),
             GQLField(name: "headRefName"),
+            GQLField(name: "isDraft"),
             GQLGroup(name: "mergedBy", fields: [userFragment])
         ]
         if includeRepo {
