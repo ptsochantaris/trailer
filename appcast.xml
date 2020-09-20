@@ -7,6 +7,39 @@
 		<language>en</language>
 
         <item>
+            <title>Version 1.7.1</title>
+            <sparkle:minimumSystemVersion>10.11.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[<font face="sans-serif" size="3"><ul>
+                <li>This update:</li>
+                <li>Corrects a crash when launching in El Capitan</li>
+                <li>Corrects an issue where Trailer did not identify draft PRs correctly</li>
+                <li>(Yet more) Dark Mode detection fixes</li>
+                <li>Improves highlighting of status items, especially in dark mode</li>
+                <li>From 1.7.0:</li>
+                <li>Added option to use GitHub v4 API for syncing data. If you sync a large amount of PRs, Repositories, sync status items, responses and/or review statuses/assignments, then turning this option on can result in dramatic speed improvements when syncing (and a reduction in corresponding API usage) since the number of calls Trailer has to make is significantly reduced. Trailer needs to re-sync all data when you toggle this option, so be sure to do so as appropriate.</li>
+                <li>v3 API sync also features various improvements and optimisations to speed up some operations.</li>
+                <li>Option to display teams that have been assigned to review a PR.</li>
+                <li>Option to mark merge conflicts in PRs (v4 API only)</li>
+                <li>Option to show added/removed line counts in PRs, as well as the ability to sort using that as a criterion (v4 API only)</li>
+                <li>Option to scan closed and merged items for new events like comments and reactions (v4 API only)</li>
+                <li>Options to scan items created on any repository, irrespective of whether they are in the watchlist (v4 API only)</li>
+                <li>Reaction and status scanning logic has changed to keep syncs sane and help them scale up for larger numbers of items. From now on, Trailer will scan a fixed amount of items for statuses and reactions on every sync, and will round-robin through all items. So if you sync 200 items, and you’ve set 50 items per refresh, then all items will be refreshed within 4 syncs.</li>
+                <li>PR branch names shown in context menus, selecting them copies the branch name to the clipboard.</li>
+                <li>Various minor bug fixes and tweaks across both macOS and iOS.</li>
+                <li>Improvements to colours and dark mode handling.</li>
+                <li>Improvements to keyboard handling in the repository list editor.</li>
+                <li>Notarised binary for greater security.</li>
+                </ul></font>]]></description>
+            <pubDate>Sun, 20 Sep 2020 21:00:00 +0000</pubDate>
+            <enclosure
+            url="https://github.com/ptsochantaris/trailer/releases/download/1.7.1/Trailer-171.zip"
+            sparkle:version="1567"
+            sparkle:shortVersionString="1.7.1"
+            sparkle:dsaSignature="MCwCFHUh0QEFKKOSESJa+Fb7Yt/Nqh7LAhROvsIF7MCMrbXHyeJVtwyiHGqOfA=="
+            type="application/octet-stream"/>
+        </item>
+        
+        <item>
             <title>Version 1.7.0</title>
             <sparkle:minimumSystemVersion>10.11.0</sparkle:minimumSystemVersion>
             <description><![CDATA[<font face="sans-serif" size="3"><ul>
