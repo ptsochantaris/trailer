@@ -1,4 +1,7 @@
+
+#if canImport(CoreSpotlight)
 import CoreSpotlight
+#endif
 
 enum Theme {
 	case light, dark
@@ -727,6 +730,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	func application(_ application: NSApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([NSUserActivityRestoring]) -> Void) -> Bool {
+        #if canImport(CoreSpotlight)
         if userActivity.activityType == CSSearchableItemActionType,
             let uriPath = userActivity.userInfo?[CSSearchableItemActivityIdentifier] as? String,
             let itemId = DataManager.id(for: uriPath),
@@ -737,6 +741,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
             NSWorkspace.shared.open(url)
             return true
         }
+        #endif
         return false
 	}
 

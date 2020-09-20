@@ -1,6 +1,10 @@
 
 import CoreData
+
+#if canImport(CoreSpotlight)
 import CoreSpotlight
+#endif
+
 #if os(iOS)
 	import UIKit
 	import MobileCoreServices
@@ -223,9 +227,11 @@ class ListableItem: DataItem {
 	}
 
     private final func hideFromSpotlightAndNotifications(uri: String) {
+        #if canImport(CoreSpotlight)
         if CSSearchableIndex.isIndexingAvailable() {
             CSSearchableIndex.default().deleteSearchableItems(withIdentifiers: [uri], completionHandler: nil)
         }
+        #endif
 		if Settings.removeNotificationsWhenItemIsRemoved {
 			ListableItem.removeRelatedNotifications(uri: uri)
 		}
@@ -1082,11 +1088,11 @@ class ListableItem: DataItem {
     }
 
     private final func indexForSpotlight(uri: String) {
-		
-		guard CSSearchableIndex.isIndexingAvailable() else { return }
-
-		let s = CSSearchableItemAttributeSet(itemContentType: kUTTypeText as String)
-
+        #if canImport(CoreSpotlight)
+        guard CSSearchableIndex.isIndexingAvailable() else { return }
+        
+        let s = CSSearchableItemAttributeSet(itemContentType: kUTTypeText as String)
+        
         let group = DispatchGroup()
         
         if let i = userAvatarUrl, !Settings.hideAvatars {
@@ -1097,20 +1103,21 @@ class ListableItem: DataItem {
             }
         }
         
-		let titleSuffix = labels.compactMap { $0.name }.reduce("") { $0 + " [\($1)]" }
-		s.title = "#\(number) - \(S(title))\(titleSuffix)"
+        let titleSuffix = labels.compactMap { $0.name }.reduce("") { $0 + " [\($1)]" }
+        s.title = "#\(number) - \(S(title))\(titleSuffix)"
         
-		s.contentCreationDate = createdAt
-		s.contentModificationDate = updatedAt
-		s.keywords = searchKeywords
-		s.creator = userLogin
-		s.contentDescription = "\(S(repo.fullName)) @\(S(userLogin)) - \(S(body?.trim))"
+        s.contentCreationDate = createdAt
+        s.contentModificationDate = updatedAt
+        s.keywords = searchKeywords
+        s.creator = userLogin
+        s.contentDescription = "\(S(repo.fullName)) @\(S(userLogin)) - \(S(body?.trim))"
         
         group.notify(queue: .main) {
             let i = CSSearchableItem(uniqueIdentifier: uri, domainIdentifier: nil, attributeSet: s)
             CSSearchableIndex.default().indexSearchableItems([i], completionHandler: nil)
         }
-	}
+        #endif
+    }
 
     override final class func shouldCreate(from node: GQLNode) -> Bool {
         if node.jsonPayload["state"] as? String == "OPEN" {

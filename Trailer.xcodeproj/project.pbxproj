@@ -216,13 +216,6 @@
 			remoteGlobalIDString = 16522D7B1AB03AE500B1C3FB;
 			remoteInfo = "PocketTrailer WatchKit App";
 		};
-		16DEA938235C6F00004589B3 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 168BC6A217EC2DF000BC4584 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 16DEA921235C6D7C004589B3;
-			remoteInfo = TrailerLauncher;
-		};
 		16DEA93A235C6F17004589B3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 168BC6A217EC2DF000BC4584 /* Project object */;
@@ -1052,7 +1045,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				16DEA939235C6F00004589B3 /* PBXTargetDependency */,
 				16DEA93B235C6F17004589B3 /* PBXTargetDependency */,
 			);
 			name = Trailer;
@@ -1085,7 +1077,7 @@
 			attributes = {
 				LastSwiftMigration = 0700;
 				LastSwiftUpdateCheck = 1110;
-				LastUpgradeCheck = 1140;
+				LastUpgradeCheck = 1200;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
 					1618527A1AB2CB9000526D81 = {
@@ -1442,11 +1434,6 @@
 			target = 16522D7B1AB03AE500B1C3FB /* PocketTrailer WatchKit App */;
 			targetProxy = 16D780461B77E00D00A4D0BE /* PBXContainerItemProxy */;
 		};
-		16DEA939235C6F00004589B3 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 16DEA921235C6D7C004589B3 /* TrailerLauncher */;
-			targetProxy = 16DEA938235C6F00004589B3 /* PBXContainerItemProxy */;
-		};
 		16DEA93B235C6F17004589B3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 16DEA921235C6D7C004589B3 /* TrailerLauncher */;
@@ -1688,13 +1675,14 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1565;
+				CURRENT_PROJECT_VERSION = 1566;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -1746,13 +1734,14 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1565;
+				CURRENT_PROJECT_VERSION = 1566;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEPLOYMENT_POSTPROCESSING = YES;
