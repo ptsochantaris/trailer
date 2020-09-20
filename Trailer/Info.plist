@@ -63,7 +63,7 @@
 	<key>NSUserNotificationAlertStyle</key>
 	<string>banner</string>
 	<key>SUFeedURL</key>
-	<string>https://whisper.chat/trailer-beta/appcast-beta.xml</string>
+	<string>https://ptsochantaris.github.io/trailer/appcast.xml</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>dsa_pub.pem</string>
 </dict>
