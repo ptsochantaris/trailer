@@ -89,6 +89,7 @@ final class PullRequest: ListableItem {
                 item.stateChanged = StateChange.reopened.rawValue
             }
 			item.condition = ItemCondition.open.rawValue
+            item.isMergeable = true // always, for v3 API
 		}
 	}
 

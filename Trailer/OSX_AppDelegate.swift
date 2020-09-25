@@ -84,7 +84,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			app.isManuallyScrolling = false
 		}
 
-        theme = currentTheme // also sets up windows
+        theme = getTheme() // also sets up windows
 
 		API.updateLimitsFromServer()
 
@@ -129,7 +129,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
     
     @objc private func themeCheck() {
-        let c = currentTheme
+        let c = getTheme()
         if theme != c {
             theme = c
         }
@@ -143,7 +143,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	@objc private func systemDidWake() {
 		DLog("System woke up")
 		systemSleeping = false
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
             self?.themeCheck()
 			self?.startRefreshIfItIsDue()
 		}
@@ -1173,14 +1173,14 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
         }
     }
 
-	private var currentTheme: Theme {
+	private func getTheme() -> Theme {
         // with many thanks from https://medium.com/@ruiaureliano/check-light-dark-appearance-for-macos-mojave-catalina-fb2343af875f
         let d = UserDefaults.standard
         let autoSwitching = d.bool(forKey: "AppleInterfaceStyleSwitchesAutomatically")
         let interfaceStyle = d.string(forKey: "AppleInterfaceStyle")
         if autoSwitching && interfaceStyle == nil {
             if #available(OSX 10.14, *) {
-                let isDark = NSAppearance.current.bestMatch(from: [.darkAqua]) == .darkAqua
+                let isDark = NSApplication.shared.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
                 return isDark ? .dark : .light
             } else {
                 return .dark
