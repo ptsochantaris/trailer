@@ -382,6 +382,7 @@ class ListableItem: DataItem {
 		} else {
 			NotificationQueue.add(type: notification, for: self)
 		}
+        postProcess() // make sure it's in the right section and updated correctly for its new status
 	}
 
 	private final var shouldMoveToSnoozing: Bool {

@@ -181,6 +181,7 @@ extension API {
         let items = try! moc.fetch(f)
         for i in items.filter({ $0.shouldCheckForClosing }) {
             i.stateChanged = ListableItem.StateChange.closed.rawValue
+            i.postSyncAction = PostSyncAction.isUpdated.rawValue // let handleClosing() decide
         }
     }
 
@@ -368,13 +369,19 @@ extension API {
                 if let mergeInfo = d["merged_by"] as? [AnyHashable : Any], let mergeUserId = mergeInfo["node_id"] as? String {
                     pullRequest.mergedByNodeId = mergeUserId
                     pullRequest.stateChanged = ListableItem.StateChange.merged.rawValue
+                    pullRequest.postSyncAction = PostSyncAction.isUpdated.rawValue // let handleMerging() decide
+
                 } else {
                     pullRequest.stateChanged = ListableItem.StateChange.closed.rawValue
+                    pullRequest.postSyncAction = PostSyncAction.isUpdated.rawValue // let handleClosing() decide
+
                 }
             } else if resultCode == 404 || resultCode == 410 { // PR gone for good
                 pullRequest.stateChanged = ListableItem.StateChange.closed.rawValue
+                pullRequest.postSyncAction = PostSyncAction.isUpdated.rawValue // let handleClosing() decide
+
             } else { // fetch/server problem
-                pullRequest.postSyncAction = PostSyncAction.doNothing.rawValue // don't delete this, we couldn't check, play it safe
+                pullRequest.postSyncAction = PostSyncAction.doNothing.rawValue // keep since we don't know what's going on here
                 pullRequest.apiServer.lastSyncSucceeded = false
             }
             callback()
