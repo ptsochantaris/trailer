@@ -77,7 +77,7 @@ final class PRComment: DataItem {
 	}
 
 	func processNotifications() {
-        guard let parent = parent, parent.appropriateStateForNotification, parent.postSyncAction != PostSyncAction.isNew.rawValue else {
+        guard let parent = parent, parent.canBadge else {
             return
         }
         if contains(terms: ["@\(apiServer.userName!)"]) {
@@ -91,18 +91,15 @@ final class PRComment: DataItem {
                 DLog("Waking up snoozed item ID %@ because of posted comment", parent.nodeId ?? "<no ID>")
                 parent.wakeUp()
             }
-            let notifyForNewComments = parent.sectionIndex != Section.all.rawValue || Settings.showCommentsEverywhere
-            if notifyForNewComments && !Settings.disableAllCommentNotifications && !isMine {
-                guard let authorName = userName else {
-                    return
-                }
-                let blocked = Settings.commentAuthorBlacklist.contains { authorName.compare($0, options: [.caseInsensitive, .diacriticInsensitive]) == .orderedSame }
-                if blocked {
-                    DLog("Blocked notification for user '%@' as their name is on the blacklist", authorName)
-                } else {
-                    DLog("User '%@' not on blacklist, can post notification", authorName)
-                    NotificationQueue.add(type: .newComment, for: self)
-                }
+            guard !Settings.disableAllCommentNotifications, let authorName = userName else {
+                return
+            }
+            let blocked = Settings.commentAuthorBlacklist.contains { authorName.compare($0, options: [.caseInsensitive, .diacriticInsensitive]) == .orderedSame }
+            if blocked {
+                DLog("Blocked notification for user '%@' as their name is on the blacklist", authorName)
+            } else {
+                DLog("User '%@' not on blacklist, can post notification", authorName)
+                NotificationQueue.add(type: .newComment, for: self)
             }
 		}
 	}

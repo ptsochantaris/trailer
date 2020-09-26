@@ -76,7 +76,7 @@ class ListableItem: DataItem {
             NSSortDescriptor(key: "updatedAt", ascending: false)
         ]
         let items = try! moc.fetch(f)
-            .filter { $0.interestedInReactions }
+            .filter { $0.section.shouldListReactions }
             .prefix(Settings.reactionScanningBatchSize)
 
         items.forEach {
@@ -154,9 +154,9 @@ class ListableItem: DataItem {
 
 		processAssignmentStatus(from: info, idField: "node_id")
 	}
-
-    var interestedInReactions: Bool {
-        return API.shouldSyncReactions && (Settings.showCommentsEverywhere || (Section(rawValue: sectionIndex)?.isLoud ?? false))
+    
+    var section: Section {
+        return Section(rawValue: sectionIndex) ?? .none
     }
 
     final func processAssignmentStatus(from info: [AnyHashable : Any]?, idField: String) {
@@ -365,13 +365,15 @@ class ListableItem: DataItem {
 		return snoozeUntil != nil
 	}
     
-    final var appropriateStateForNotification: Bool {
-        let shouldBeQuietBecauseOfState = !isVisibleOnMenu || ((sectionIndex == Section.closed.rawValue || sectionIndex == Section.merged.rawValue) && !Settings.scanClosedAndMergedItems)
-        return !shouldBeQuietBecauseOfState
+    final var canBadge: Bool {
+        if let section = Section(sectionIndex) {
+            return canBadge(in: section)
+        }
+        return false
     }
 
 	final func keep(as newCondition: ItemCondition, notification: NotificationType) {
-		if sectionIndex == Section.all.rawValue && !Settings.showCommentsEverywhere {
+        if sectionIndex == Section.all.rawValue && !Section.all.shouldBadgeComments {
 			catchUpCommentDate()
 		}
 		postSyncAction = PostSyncAction.doNothing.rawValue
@@ -435,6 +437,51 @@ class ListableItem: DataItem {
 		snoozingPreset = nil
 		wasAwokenFromSnooze = explicityAwoke
 	}
+    
+    private func preferredSection(evaluateConditionToo: Bool) -> Section {
+        if Settings.draftHandlingPolicy == DraftHandlingPolicy.hide.rawValue && draft {
+            return .none
+            
+        } else if evaluateConditionToo && condition == ItemCondition.merged.rawValue {
+            return .merged
+            
+        } else if evaluateConditionToo && condition == ItemCondition.closed.rawValue {
+            return .closed
+            
+        } else if createdByMe || assignedToMySection {
+            return .mine
+            
+        } else if assignedToParticipated || commentedByMe || reviewedByMe {
+            return .participated
+            
+        } else if let p = self as? PullRequest, Int64(Settings.assignedReviewHandlingPolicy) > Section.none.rawValue, p.assignedForReview {
+            return Section(Settings.assignedReviewHandlingPolicy)!
+            
+        } else if Int64(Settings.newMentionMovePolicy) > Section.none.rawValue && contains(terms: ["@\(S(apiServer.userName))"]) {
+            return Section(Settings.newMentionMovePolicy)!
+            
+        } else if Int64(Settings.teamMentionMovePolicy) > Section.none.rawValue && contains(terms: apiServer.teams.compactMap { $0.calculatedReferral }) {
+            return Section(Settings.teamMentionMovePolicy)!
+            
+        } else if Int64(Settings.newItemInOwnedRepoMovePolicy) > Section.none.rawValue && repo.isMine {
+            return Section(Settings.newItemInOwnedRepoMovePolicy)!
+            
+        } else {
+            return .all
+        }
+    }
+    
+    private func canBadge(in targetSection: Section) -> Bool {
+        if muted || !targetSection.shouldBadgeComments || postSyncAction == PostSyncAction.isNew.rawValue {
+            return false
+        }
+        
+        if targetSection == .closed || targetSection == .merged {
+            return preferredSection(evaluateConditionToo: false).shouldBadgeComments
+        }
+
+        return true
+    }
 
 	final func postProcess() {
 
@@ -442,42 +489,8 @@ class ListableItem: DataItem {
 			disableSnoozing(explicityAwoke: true)
 		}
 
-		let isMine = createdByMe
-		let currentCondition = condition
-
-        var targetSection: Section
+        var targetSection = preferredSection(evaluateConditionToo: true)
         
-        if Settings.draftHandlingPolicy == DraftHandlingPolicy.hide.rawValue && draft {
-            targetSection = .none
-        
-        } else if currentCondition == ItemCondition.merged.rawValue {
-            targetSection = .merged
-            
-        } else if currentCondition == ItemCondition.closed.rawValue {
-            targetSection = .closed
-            
-        } else if isMine || assignedToMySection {
-            targetSection = .mine
-            
-        } else if assignedToParticipated || commentedByMe || reviewedByMe {
-            targetSection = .participated
-            
-        } else if let p = self as? PullRequest, Int64(Settings.assignedReviewHandlingPolicy) > Section.none.rawValue, p.assignedForReview {
-            targetSection = Section(Settings.assignedReviewHandlingPolicy)!
-            
-        } else if Int64(Settings.newMentionMovePolicy) > Section.none.rawValue && contains(terms: ["@\(S(apiServer.userName))"]) {
-            targetSection = Section(Settings.newMentionMovePolicy)!
-            
-        } else if Int64(Settings.teamMentionMovePolicy) > Section.none.rawValue && contains(terms: apiServer.teams.compactMap { $0.calculatedReferral }) {
-            targetSection = Section(Settings.teamMentionMovePolicy)!
-            
-        } else if Int64(Settings.newItemInOwnedRepoMovePolicy) > Section.none.rawValue && repo.isMine {
-            targetSection = Section(Settings.newItemInOwnedRepoMovePolicy)!
-        
-        } else {
-            targetSection = .all
-        }
-
 		////////// Apply visibility policies
         
 		if targetSection != .none {
@@ -491,6 +504,8 @@ class ListableItem: DataItem {
 		}
 
 		if targetSection != .none {
+            let isMine = createdByMe
+
 			switch repo.itemHidingPolicy {
 			case RepoHidingPolicy.hideMyAuthoredPrs.rawValue        	where isMine && self is PullRequest,
 			     RepoHidingPolicy.hideMyAuthoredIssues.rawValue        	where isMine && self is Issue,
@@ -515,10 +530,8 @@ class ListableItem: DataItem {
         }
 
 		/////////// Comment counting
-
-        let skipUnreadCommentCheck = (targetSection == .closed || targetSection == .merged) && !Settings.scanClosedAndMergedItems
-
-		if !skipUnreadCommentCheck && !muted && (targetSection.isLoud || Settings.showCommentsEverywhere) && postSyncAction != PostSyncAction.isNew.rawValue {
+        
+        if canBadge(in: targetSection) {
 			var latestDate = latestReadCommentDate ?? .distantPast
 
 			if Settings.assumeReadItemIfUserHasNewerComments {
@@ -908,6 +921,7 @@ class ListableItem: DataItem {
 
 		if sectionIndex < 0 {
 			andPredicates.append(Section.nonZeroPredicate)
+            
 		} else if let s = Section(rawValue: sectionIndex) {
 			andPredicates.append(s.matchingPredicate)
 		}
@@ -1242,7 +1256,8 @@ class ListableItem: DataItem {
         var actions: [MenuAction] = [.copy, .openRepo]
 
         if !isSnoozing {
-            if Settings.showCommentsEverywhere || sectionIndex != Section.all.rawValue {
+            let section = Section(sectionIndex) ?? .none
+            if section.shouldBadgeComments {
                 if hasUnreadCommentsOrAlert {
                     actions.append(.markRead)
                 } else {

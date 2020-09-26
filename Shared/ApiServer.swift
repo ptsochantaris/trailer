@@ -1,4 +1,3 @@
-
 import CoreData
 
 final class ApiServer: NSManagedObject {
@@ -81,17 +80,13 @@ final class ApiServer: NSManagedObject {
 	}
 
     func deleteEverything() {
-        for p in pullRequests {
-            managedObjectContext?.delete(p)
-        }
-        for i in issues {
-            managedObjectContext?.delete(i)
-        }
-        for l in labels {
-            managedObjectContext?.delete(l)
-        }
-        for t in teams {
-            managedObjectContext?.delete(t)
+        guard let moc = managedObjectContext else { return }
+        
+        DLog("Wiping all data for API server %@", label ?? "<no API server name>")
+        
+        let categories: [Set<NSManagedObject>] = [pullRequests, issues, labels, teams, comments, statuses, reviews, reactions]
+        categories.forEach { set in
+            set.forEach { moc.delete($0) }
         }
     }
     

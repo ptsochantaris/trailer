@@ -118,7 +118,7 @@ final class PRCell: UITableViewCell {
 
 		var statusText : NSMutableAttributedString?
         var totalStatuses = 0
-		if pullRequest.interestedInStatuses {
+        if pullRequest.section.shouldListStatuses {
 			let statusItems = pullRequest.displayedStatuses
 			var statusCount = statusItems.count
             totalStatuses = statusCount

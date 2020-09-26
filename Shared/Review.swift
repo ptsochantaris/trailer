@@ -101,7 +101,7 @@ final class Review: DataItem {
     }
     
     func processNotifications() {
-        guard !isMine, pullRequest.appropriateStateForNotification, let newState = State(rawValue: state ?? "") else {
+        guard !isMine, pullRequest.canBadge, let newState = State(rawValue: state ?? "") else {
             return
         }
                 

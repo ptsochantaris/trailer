@@ -261,7 +261,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		if showLabels {
 			itemData["labels"] = labelsForItem(item: item)
 		}
-		if let item = item as? PullRequest, item.interestedInStatuses {
+        if let item = item as? PullRequest, item.section.shouldListStatuses {
 			itemData["statuses"] = statusLinesForPr(pr: item)
 		}
 		return itemData

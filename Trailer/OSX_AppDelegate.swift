@@ -817,7 +817,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			if globalKeyMonitor == nil {
 				let key = kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String
 				let options = [key: NSNumber(value: (AXIsProcessTrusted() == false))] as CFDictionary
-				if AXIsProcessTrustedWithOptions(options) == true {
+				if AXIsProcessTrustedWithOptions(options) {
 					globalKeyMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { [weak self] incomingEvent in
 						self?.checkForHotkey(in: incomingEvent)
 					}

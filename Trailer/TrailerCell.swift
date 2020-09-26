@@ -52,7 +52,7 @@ class TrailerCell: NSTableCellView {
             y += height
         }
         
-		if let pullRequest = item as? PullRequest, pullRequest.interestedInStatuses {
+        if let pullRequest = item as? PullRequest, item.section.shouldListStatuses {
             let statuses = pullRequest.displayedStatuses.reversed()
             if !statuses.isEmpty {
                 for status in statuses {

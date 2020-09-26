@@ -71,17 +71,11 @@ final class Reaction: DataItem {
     
     func checkNotifications() {
         if postSyncAction == PostSyncAction.isNew.rawValue && !isMine {
-            if let parentItem = (pullRequest ?? issue), Settings.notifyOnItemReactions, parentItem.postSyncAction != PostSyncAction.isNew.rawValue, parentItem.appropriateStateForNotification {
+            if let parentItem = (pullRequest ?? issue), Settings.notifyOnItemReactions, parentItem.canBadge {
+                NotificationQueue.add(type: .newReaction, for: self)
 
-                if Settings.showCommentsEverywhere || (parentItem.sectionIndex != Section.all.rawValue && parentItem.sectionIndex != Section.none.rawValue) {
-                    NotificationQueue.add(type: .newReaction, for: self)
-                }
-
-            } else if let c = comment, let parentItem = (c.pullRequest ?? c.issue), Settings.notifyOnCommentReactions, parentItem.postSyncAction != PostSyncAction.isNew.rawValue {
-
-                if Settings.showCommentsEverywhere || (parentItem.sectionIndex != Section.all.rawValue && parentItem.sectionIndex != Section.none.rawValue) {
-                    NotificationQueue.add(type: .newReaction, for: self)
-                }
+            } else if let c = comment, let parentItem = (c.pullRequest ?? c.issue), Settings.notifyOnCommentReactions, parentItem.canBadge {
+                NotificationQueue.add(type: .newReaction, for: self)
             }
         }
     }

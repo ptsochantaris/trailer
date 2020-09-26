@@ -109,10 +109,6 @@ final class PullRequest: ListableItem {
 		}
 		return false
 	}
-
-	var interestedInStatuses: Bool {
-		return Settings.showStatusItems && (Settings.showStatusesOnAllItems || (Section(rawValue: sectionIndex)?.isLoud ?? false))
-	}
     
 	func checkAndStoreReviewAssignments(_ reviewerNames: Set<String>, _ reviewerTeams: Set<String>) {
 		reviewers = reviewerNames.joined(separator: ",")
@@ -231,7 +227,7 @@ final class PullRequest: ListableItem {
             NSSortDescriptor(key: "updatedAt", ascending: false),
         ]
         let prs = try! moc.fetch(f)
-            .filter { $0.interestedInStatuses }
+            .filter { $0.section.shouldCheckStatuses }
             .prefix(Settings.statusItemRefreshBatchSize)
         
         prs.forEach {
@@ -289,7 +285,7 @@ final class PullRequest: ListableItem {
 	}
         
     var shouldAnnounceStatus: Bool {
-        return appropriateStateForNotification && (Settings.notifyOnStatusUpdatesForAllPrs || createdByMe || assignedToParticipated || assignedToMySection)
+        return canBadge && (Settings.notifyOnStatusUpdatesForAllPrs || createdByMe || assignedToParticipated || assignedToMySection)
     }
 
     func linesAttributedString(labelFont: FONT_CLASS) -> NSAttributedString? {

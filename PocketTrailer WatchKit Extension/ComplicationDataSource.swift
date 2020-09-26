@@ -195,7 +195,17 @@ final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
 				abort()
 			}
 
-		@unknown default:
+        case .graphicExtraLarge:
+            if #available(watchOSApplicationExtension 7.0, *) {
+                let t = CLKComplicationTemplateGraphicExtraLargeCircularStackText()
+                t.line1TextProvider = CLKSimpleTextProvider(text: "\(issues ? (issueCount ?? 0) : (prCount ?? 0)) \(issues ? "Iss" : "PRs")")
+                t.line2TextProvider = CLKSimpleTextProvider(text: commentCount == 0 ? "- Com" : "\(commentCount) Com")
+                return t
+            } else {
+                abort()
+            }
+            
+        @unknown default:
 			abort()
 		}
 	}
