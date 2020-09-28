@@ -321,21 +321,21 @@ final class API {
     
     private static func sync(to moc: NSManagedObjectContext) {
         
+        let disabledRepos = Repo.unsyncableRepos(in: moc)
+        disabledRepos.forEach {
+            $0.pullRequests.forEach {
+                $0.postSyncAction = PostSyncAction.delete.rawValue
+            }
+            $0.issues.forEach {
+                $0.postSyncAction = PostSyncAction.delete.rawValue
+            }
+        }
+
         let repos = Repo.syncableRepos(in: moc)
         let itemGroup = DispatchGroup()
         let v4Mode = Settings.useV4API
 
         if v4Mode {
-            let disabledRepos = Repo.unsyncableRepos(in: moc)
-            disabledRepos.forEach {
-                $0.pullRequests.forEach {
-                    $0.postSyncAction = PostSyncAction.delete.rawValue
-                }
-                $0.issues.forEach {
-                    $0.postSyncAction = PostSyncAction.delete.rawValue
-                }
-            }
-            
             let servers = ApiServer.allApiServers(in: moc).filter { $0.goodToGo }
             if !servers.isEmpty {
                 GraphQL.fetchAllAuthoredItems(from: servers, group: itemGroup)
@@ -344,15 +344,7 @@ final class API {
                 GraphQL.fetchAllSubscribedItems(from: repos, group: itemGroup)
             }
         } else {
-            itemGroup.enter()
-            fetchIssues(for: repos, to: moc) {
-                itemGroup.leave()
-            }
-
-            itemGroup.enter()
-            fetchPullRequests(for: repos, to: moc) {
-                itemGroup.leave()
-            }
+            v3_fetchItems(for: repos, to: moc, group: itemGroup)
         }
         
         let postItemGroup = DispatchGroup()
@@ -496,95 +488,6 @@ final class API {
             lastRepoCheck = Date()
             callback()
         }
-	}
-
-	private static func fetchPullRequests(for repos: [Repo], to moc: NSManagedObjectContext, callback: @escaping Completion) {
-
-		for r in Repo.unsyncableRepos(in: moc) {
-			for p in r.pullRequests {
-				p.postSyncAction = PostSyncAction.delete.rawValue
-			}
-		}
-
-        let group = DispatchGroup()
-        
-		for r in repos {
-			for p in r.pullRequests {
-				if p.condition == ItemCondition.open.rawValue {
-					p.postSyncAction = PostSyncAction.delete.rawValue
-				}
-			}
-
-			let apiServer = r.apiServer
-			if apiServer.lastSyncSucceeded && r.displayPolicyForPrs != RepoDisplayPolicy.hide.rawValue {
-				let repoFullName = S(r.fullName)
-                group.enter()
-				RestAccess.getPagedData(at: "/repos/\(repoFullName)/pulls", from: apiServer, perPageCallback: { data, lastPage in
-					PullRequest.syncPullRequests(from: data, in: r)
-					return false
-				}) { success, resultCode in
-					if !success {
-						handleRepoSyncFailure(repo: r, resultCode: resultCode)
-					}
-                    group.leave()
-				}
-			}
-		}
-        
-        group.notify(queue: .main, execute: callback)
-	}
-
-	private static func handleRepoSyncFailure(repo: Repo, resultCode: Int64) {
-		if resultCode == 404 { // repo disabled
-			repo.inaccessible = true
-			repo.postSyncAction = PostSyncAction.doNothing.rawValue
-			for p in repo.pullRequests {
-				p.postSyncAction = PostSyncAction.delete.rawValue
-			}
-			for i in repo.issues {
-				i.postSyncAction = PostSyncAction.delete.rawValue
-			}
-		} else if resultCode==410 { // repo gone for good
-			repo.postSyncAction = PostSyncAction.delete.rawValue
-		} else { // fetch problem
-			repo.apiServer.lastSyncSucceeded = false
-		}
-	}
-
-	private static func fetchIssues(for repos: [Repo], to moc: NSManagedObjectContext, callback: @escaping Completion) {
-
-		for r in Repo.unsyncableRepos(in: moc) {
-			for i in r.issues {
-				i.postSyncAction = PostSyncAction.delete.rawValue
-			}
-		}
-
-        let group = DispatchGroup()
-
-        for r in repos {
-			for i in r.issues {
-				if i.condition == ItemCondition.open.rawValue {
-					i.postSyncAction = PostSyncAction.delete.rawValue
-				}
-			}
-
-			let apiServer = r.apiServer
-			if apiServer.lastSyncSucceeded && r.displayPolicyForIssues != RepoDisplayPolicy.hide.rawValue {
-				let repoFullName = S(r.fullName)
-                group.enter()
-				RestAccess.getPagedData(at: "/repos/\(repoFullName)/issues", from: apiServer, perPageCallback: { data, lastPage in
-					Issue.syncIssues(from: data, in: r)
-					return false
-				}) { success, resultCode in
-					if !success {
-						handleRepoSyncFailure(repo: r, resultCode: resultCode)
-					}
-                    group.leave()
-				}
-			}
-		}
-        
-        group.notify(queue: .main, execute: callback)
 	}
 
 	private static func ensureApiServersHaveUserIds(in moc: NSManagedObjectContext, callback: @escaping Completion) {

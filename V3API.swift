@@ -2,6 +2,70 @@ import Foundation
 import CoreData
 
 extension API {
+    private static func v3_handleRepoSyncFailure(repo: Repo, resultCode: Int64) {
+        if resultCode == 404 { // repo disabled
+            repo.inaccessible = true
+            repo.postSyncAction = PostSyncAction.doNothing.rawValue
+            for p in repo.pullRequests {
+                p.postSyncAction = PostSyncAction.delete.rawValue
+            }
+            for i in repo.issues {
+                i.postSyncAction = PostSyncAction.delete.rawValue
+            }
+        } else if resultCode==410 { // repo gone for good
+            repo.postSyncAction = PostSyncAction.delete.rawValue
+        } else { // fetch problem
+            repo.apiServer.lastSyncSucceeded = false
+        }
+    }
+
+    static func v3_fetchItems(for repos: [Repo], to moc: NSManagedObjectContext, group: DispatchGroup) {        
+        for r in repos {
+            for p in r.pullRequests {
+                if p.condition == ItemCondition.open.rawValue {
+                    p.postSyncAction = PostSyncAction.delete.rawValue
+                }
+            }
+
+            for i in r.issues {
+                if i.condition == ItemCondition.open.rawValue {
+                    i.postSyncAction = PostSyncAction.delete.rawValue
+                }
+            }
+
+            let apiServer = r.apiServer
+            guard apiServer.lastSyncSucceeded else { continue }
+
+            if r.displayPolicyForPrs != RepoDisplayPolicy.hide.rawValue {
+                let repoFullName = S(r.fullName)
+                group.enter()
+                RestAccess.getPagedData(at: "/repos/\(repoFullName)/pulls", from: apiServer, perPageCallback: { data, lastPage in
+                    PullRequest.syncPullRequests(from: data, in: r)
+                    return false
+                }) { success, resultCode in
+                    if !success {
+                        v3_handleRepoSyncFailure(repo: r, resultCode: resultCode)
+                    }
+                    group.leave()
+                }
+            }
+
+            if r.displayPolicyForIssues != RepoDisplayPolicy.hide.rawValue {
+                let repoFullName = S(r.fullName)
+                group.enter()
+                RestAccess.getPagedData(at: "/repos/\(repoFullName)/issues", from: apiServer, perPageCallback: { data, lastPage in
+                    Issue.syncIssues(from: data, in: r)
+                    return false
+                }) { success, resultCode in
+                    if !success {
+                        v3_handleRepoSyncFailure(repo: r, resultCode: resultCode)
+                    }
+                    group.leave()
+                }
+            }
+        }
+    }
+    
     static func V3_markExtraUpdatedItems(from repos: [Repo], to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
         let group = DispatchGroup()
