@@ -38,8 +38,14 @@ final class StatusItemView: NSView {
 		tappedCallback()
 	}
 
-	static private let padding: CGFloat = 1.0
-
+    static private let padding: CGFloat = {
+        if #available(OSX 11.0, *) {
+            return 0
+        } else {
+            return 1
+        }
+    }()
+    
 	func sizeToFit() {
 		let width = Settings.hideMenubarCounts ? (title == nil ? 0 : 4) : statusLabel.size(withAttributes: textAttributes).width
 		let H = NSStatusBar.system.thickness
