@@ -1103,35 +1103,37 @@ class ListableItem: DataItem {
     }
 
     private final func indexForSpotlight(uri: String) {
-        #if canImport(CoreSpotlight)
-        guard CSSearchableIndex.isIndexingAvailable() else { return }
-        
-        let s = CSSearchableItemAttributeSet(itemContentType: kUTTypeText as String)
-        
-        let group = DispatchGroup()
-        
-        if let i = userAvatarUrl, !Settings.hideAvatars {
-            group.enter()
-            API.haveCachedAvatar(from: i) { _, cachePath in
-                s.thumbnailURL = URL(fileURLWithPath: cachePath)
-                group.leave()
+        if #available(OSX 10.13, iOS 13.0, *) {
+            #if canImport(CoreSpotlight)
+            guard CSSearchableIndex.isIndexingAvailable() else { return }
+            
+            let s = CSSearchableItemAttributeSet(itemContentType: kUTTypeText as String)
+            
+            let group = DispatchGroup()
+            
+            if let i = userAvatarUrl, !Settings.hideAvatars {
+                group.enter()
+                API.haveCachedAvatar(from: i) { _, cachePath in
+                    s.thumbnailURL = URL(fileURLWithPath: cachePath)
+                    group.leave()
+                }
             }
+            
+            let titleSuffix = labels.compactMap { $0.name }.reduce("") { $0 + " [\($1)]" }
+            s.title = "#\(number) - \(S(title))\(titleSuffix)"
+            
+            s.contentCreationDate = createdAt
+            s.contentModificationDate = updatedAt
+            s.keywords = searchKeywords
+            s.creator = userLogin
+            s.contentDescription = "\(S(repo.fullName)) @\(S(userLogin)) - \(S(body?.trim))"
+            
+            group.notify(queue: .main) {
+                let i = CSSearchableItem(uniqueIdentifier: uri, domainIdentifier: nil, attributeSet: s)
+                CSSearchableIndex.default().indexSearchableItems([i], completionHandler: nil)
+            }
+            #endif
         }
-        
-        let titleSuffix = labels.compactMap { $0.name }.reduce("") { $0 + " [\($1)]" }
-        s.title = "#\(number) - \(S(title))\(titleSuffix)"
-        
-        s.contentCreationDate = createdAt
-        s.contentModificationDate = updatedAt
-        s.keywords = searchKeywords
-        s.creator = userLogin
-        s.contentDescription = "\(S(repo.fullName)) @\(S(userLogin)) - \(S(body?.trim))"
-        
-        group.notify(queue: .main) {
-            let i = CSSearchableItem(uniqueIdentifier: uri, domainIdentifier: nil, attributeSet: s)
-            CSSearchableIndex.default().indexSearchableItems([i], completionHandler: nil)
-        }
-        #endif
     }
 
     override final class func shouldCreate(from node: GQLNode) -> Bool {

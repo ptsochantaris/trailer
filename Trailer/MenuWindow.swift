@@ -28,7 +28,6 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
 	}
 
 	override func awakeFromNib() {
-
 		super.awakeFromNib()
 
 		contentView?.wantsLayer = true
@@ -39,13 +38,13 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
 			contentView?.layer?.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMinYCorner]
 			contentView?.layer?.cornerRadius = 5
 		}
-
+        
 		let w = NSVisualEffectView(frame: header.bounds)
 		w.autoresizingMask = [.height, .width]
 		w.blendingMode = .behindWindow
 		w.state = .active
 		header.addSubview(w, positioned: .below, relativeTo: filter)
-
+        
         NotificationCenter.default.addObserver(self, selector: #selector(refreshUpdate), name: .SyncProgressUpdate, object: nil)
 	}
 
@@ -130,25 +129,10 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
 
 	func size(andShow makeVisible: Bool) {
 
-		guard let siv = statusItem?.view as? StatusItemView else { return }
-		guard let windowFrame = siv.window?.frame else { return }
-
-		var S: NSScreen?
-		for s in NSScreen.screens {
-			if s.frame.contains(windowFrame) {
-				S = s
-				break
-			}
-		}
-
-		guard let screen = S else { return }
-
-		var menuLeft = windowFrame.origin.x
-		let rightSide = screen.visibleFrame.origin.x + screen.visibleFrame.size.width
-		let overflow = (menuLeft+MENU_WIDTH)-rightSide
-		if overflow > 0 {
-			menuLeft -= overflow
-		}
+		guard let siv = statusItem?.view as? StatusItemView,
+              let windowFrame = siv.window?.frame,
+              let screen = NSScreen.screens.first(where: { $0.frame.contains(windowFrame) })
+        else { return }
 
 		var menuHeight: CGFloat = 28
 		let rowCount = table.numberOfRows
@@ -156,7 +140,6 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
 		if rowCount == 0 {
 			menuHeight += 95
 		} else {
-			menuHeight += 10
 			for f in 0..<rowCount {
 				let rowView = table.view(atColumn: 0, row: f, makeIfNecessary: true)!
 				menuHeight += rowView.frame.size.height + 2
@@ -166,14 +149,29 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
 			}
 		}
 
-		var bottom = screen.visibleFrame.origin.y
-		if menuHeight < screenHeight {
-			bottom += screenHeight-menuHeight
-		} else {
-			menuHeight = screenHeight
-		}
+        var menuWidth = MENU_WIDTH
+        if #available(OSX 11.0, *) {
+            if rowCount > 0 {
+                menuWidth += table.layoutMarginsGuide.frame.origin.x * 2
+                menuHeight += 24
+            }
+        }
+        
+        var menuLeft = windowFrame.origin.x
+        let rightSide = screen.visibleFrame.origin.x + screen.visibleFrame.size.width
+        let overflow = (menuLeft + menuWidth) - rightSide
+        if overflow > 0 {
+            menuLeft -= overflow
+        }
 
-		setFrame(CGRect(x: menuLeft, y: bottom, width: MENU_WIDTH, height: menuHeight), display: false, animate: false)
+        var bottom = screen.visibleFrame.origin.y
+        if menuHeight < screenHeight {
+            bottom += screenHeight - menuHeight
+        } else {
+            menuHeight = screenHeight
+        }
+
+		setFrame(CGRect(x: menuLeft, y: bottom, width: menuWidth, height: menuHeight), display: false, animate: false)
 
 		if makeVisible {
 			siv.highlighted = true
@@ -183,6 +181,7 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
 			makeKeyAndOrderFront(self)
 			NSApp.activate(ignoringOtherApps: true)
 			app.openingWindow = false
+            
 		} else if statusItem == nil {
 			closeMenu()
 		}

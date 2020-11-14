@@ -15,7 +15,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	var openingWindow = false
 	var isManuallyScrolling = false
 	var ignoreNextFocusLoss = false
-	var scrollBarWidth: CGFloat = 0.0
+	var scrollBarWidth: CGFloat = 0
 
 	private var systemSleeping = false
 	private var globalKeyMonitor: Any?

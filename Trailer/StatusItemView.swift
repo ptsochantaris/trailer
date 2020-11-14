@@ -43,10 +43,18 @@ final class StatusItemView: NSView {
 	func sizeToFit() {
 		let width = Settings.hideMenubarCounts ? (title == nil ? 0 : 4) : statusLabel.size(withAttributes: textAttributes).width
 		let H = NSStatusBar.system.thickness
-		let itemWidth = (H + width + StatusItemView.padding*3) + labelOffset
+		let itemWidth = (H + width + StatusItemView.padding * 3) + labelOffset
 		frame = CGRect(x: 0, y: 0, width: itemWidth, height: H)
 		needsDisplay = true
 	}
+        
+    private var isDark: Bool {
+        if #available(OSX 10.14, *) {
+            return self.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+        } else {
+            return app.theme == .dark
+        }
+    }
 
 	override func draw(_ dirtyRect: NSRect) {
 
@@ -55,27 +63,29 @@ final class StatusItemView: NSView {
 		var countAttributes = textAttributes
 		let foreground: NSColor
 
+        let dark = isDark
+        
 		if highlighted {
 			foreground = .selectedMenuItemTextColor
-			countAttributes[NSAttributedString.Key.foregroundColor] = foreground
-		} else if app.theme != .light {
+			countAttributes[.foregroundColor] = foreground
+        } else if dark {
 			foreground = .selectedMenuItemTextColor
-			if countAttributes[NSAttributedString.Key.foregroundColor] as! NSColor == NSColor.controlTextColor {
-				countAttributes[NSAttributedString.Key.foregroundColor] = foreground
+			if countAttributes[.foregroundColor] as! NSColor == NSColor.controlTextColor {
+				countAttributes[.foregroundColor] = foreground
 			}
 		} else {
 			foreground = .controlTextColor
 		}
 
 		if grayOut {
-			if app.theme == .dark {
-				countAttributes[NSAttributedString.Key.foregroundColor] = NSColor.secondaryLabelColor
+			if dark {
+				countAttributes[.foregroundColor] = NSColor.secondaryLabelColor
 			} else {
-				countAttributes[NSAttributedString.Key.foregroundColor] = NSColor.disabledControlTextColor
+				countAttributes[.foregroundColor] = NSColor.disabledControlTextColor
 			}
 		}
 
-		if(Settings.hideMenubarCounts) {
+		if Settings.hideMenubarCounts {
 			drawIconOnly(titleColor: foreground, countAttributes: countAttributes, inRect: dirtyRect)
 		} else {
 			drawStandard(titleColor: foreground, countAttributes: countAttributes, inRect: dirtyRect)
@@ -89,7 +99,6 @@ final class StatusItemView: NSView {
 		let img = tintedImage(from: icon, tint: titleColor)
 
 		if let t = title {
-
 			labelRect = labelRect.offsetBy(dx: -3, dy: -3)
 
 			let r = CGRect(x: 1, y: inRect.height-7, width: inRect.width-2, height: 7)
@@ -103,6 +112,7 @@ final class StatusItemView: NSView {
 				])
 
 			img.draw(in: CGRect(x: imagePoint.x+3, y: imagePoint.y, width: img.size.width-6, height: img.size.height-6))
+            
 		} else {
 			img.draw(at: imagePoint, from: NSZeroRect, operation: .sourceOver, fraction: 1.0)
 		}
