@@ -7,6 +7,21 @@
 		<language>en</language>
 
         <item>
+            <title>Version 1.7.4</title>
+            <sparkle:minimumSystemVersion>10.11.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[<font face="sans-serif" size="3">
+                This is a maintenance update that corrects some visual issues in Big Sur and adds Apple Silicon support.
+                </font>]]></description>
+            <pubDate>Sun, 15 Nov 2020 10:00:00 +0000</pubDate>
+            <enclosure
+            url="https://github.com/ptsochantaris/trailer/releases/download/1.7.4/Trailer-174.zip"
+            sparkle:version="1572"
+            sparkle:shortVersionString="1.7.4"
+            sparkle:dsaSignature="MCwCFCMbhfKmxXYFbUzQmH9EbIivJVJXAhRHnhMpp+fTNd1rjZJLN7vCnKDmJg=="
+            type="application/octet-stream"/>
+        </item>
+        
+        <item>
             <title>Version 1.7.2</title>
             <sparkle:minimumSystemVersion>10.11.0</sparkle:minimumSystemVersion>
             <description><![CDATA[<font face="sans-serif" size="3">
