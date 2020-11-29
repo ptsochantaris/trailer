@@ -51,14 +51,19 @@ private final class TextFieldCellTextView: NSTextView, NSTextViewDelegate {
         }
         window?.makeFirstResponder(nextResponder)
     }
+    
+    override func viewDidMoveToSuperview() {
+        if superview != nil {
+            originalText = textContainer?.textView?.string
+        }
+    }
 }
 
 final class TextFieldCell: NSTextFieldCell {
+    private lazy var tfctv: TextFieldCellTextView = {
+        return TextFieldCellTextView()
+    }()
 	override func fieldEditor(for controlView: NSView) -> NSTextView? {
-		let v = TextFieldCellTextView()
-        DispatchQueue.main.async {
-            v.originalText = self.stringValue
-        }
-        return v
+        return tfctv
 	}
 }
