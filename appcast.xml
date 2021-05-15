@@ -7,6 +7,23 @@
 		<language>en</language>
 
         <item>
+            <title>Version 1.7.5</title>
+            <sparkle:minimumSystemVersion>10.11.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[<font face="sans-serif" size="3">
+                <li>Will not nuke all the contents of a server's repos if the auth token is modified</li>
+                <li>Correction for V4 API artefacts that could cause incremental syncs to bring in insufficient data</li>
+                <li>Built with the latest toolchain for size and performance improvements</li>
+                </font>]]></description>
+            <pubDate>Sun, 15 May 2021 12:00:00 +0000</pubDate>
+            <enclosure
+            url="https://github.com/ptsochantaris/trailer/releases/download/1.7.5/Trailer-175.zip"
+            sparkle:version="1574"
+            sparkle:shortVersionString="1.7.5"
+            sparkle:dsaSignature="MC4CFQC8n5E3FNRz/I5Hw0RI3FaGDP0sQwIVAIY6qkQ32QR7t0xcMauChv+OOxAV"
+            type="application/octet-stream"/>
+        </item>
+
+        <item>
             <title>Version 1.7.4</title>
             <sparkle:minimumSystemVersion>10.11.0</sparkle:minimumSystemVersion>
             <description><![CDATA[<font face="sans-serif" size="3">
