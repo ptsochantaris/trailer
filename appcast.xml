@@ -10,7 +10,7 @@
             <title>Version 1.7.5</title>
             <sparkle:minimumSystemVersion>10.11.0</sparkle:minimumSystemVersion>
             <description><![CDATA[<font face="sans-serif" size="3">
-                <li>Will not nuke all the contents of a server's repos if the auth token is modified</li>
+                <li>Editing or replacing an API auth token in settings will no longer clear the local data for that server</li>
                 <li>Correction for V4 API artefacts that could cause incremental syncs to bring in insufficient data</li>
                 <li>Built with the latest toolchain for size and performance improvements</li>
                 </font>]]></description>
