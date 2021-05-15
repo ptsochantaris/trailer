@@ -171,14 +171,6 @@ final class ApiServer: NSManagedObject {
 		moc.refresh(self, mergeChanges: false)
 	}
 
-	func clearAllRelatedInfo() {
-		if let moc = managedObjectContext {
-			for r in repos {
-				moc.delete(r)
-			}
-		}
-	}
-
 	func updateApiStats(_ stats: ApiStats) {
 		requestsRemaining = stats.remaining
 		requestsLimit = stats.limit

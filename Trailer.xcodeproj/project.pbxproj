@@ -291,11 +291,11 @@
 		1606F1BA1A4703E60088368E /* iOS_AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = iOS_AppDelegate.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		1606F1BC1A471CDC0088368E /* RespositoriesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = RespositoriesViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		160823F31A44982F006F91AD /* UINavigationControllerExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UINavigationControllerExtensions.swift; sourceTree = "<group>"; };
-		160CA02A23A65152003FA0D8 /* GQLQuery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GQLQuery.swift; sourceTree = "<group>"; };
-		160CA02B23A65152003FA0D8 /* GraphQL.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GraphQL.swift; sourceTree = "<group>"; };
-		160CA02D23A65152003FA0D8 /* GQLFragment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GQLFragment.swift; sourceTree = "<group>"; };
-		160CA02E23A65152003FA0D8 /* GQLBatchGroup.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GQLBatchGroup.swift; sourceTree = "<group>"; };
-		160CA02F23A65152003FA0D8 /* GQLGroup.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GQLGroup.swift; sourceTree = "<group>"; };
+		160CA02A23A65152003FA0D8 /* GQLQuery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GQLQuery.swift; path = Shared/GQLQuery.swift; sourceTree = "<group>"; };
+		160CA02B23A65152003FA0D8 /* GraphQL.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GraphQL.swift; path = Shared/GraphQL.swift; sourceTree = "<group>"; };
+		160CA02D23A65152003FA0D8 /* GQLFragment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GQLFragment.swift; path = Shared/GQLFragment.swift; sourceTree = "<group>"; };
+		160CA02E23A65152003FA0D8 /* GQLBatchGroup.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GQLBatchGroup.swift; path = Shared/GQLBatchGroup.swift; sourceTree = "<group>"; };
+		160CA02F23A65152003FA0D8 /* GQLGroup.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GQLGroup.swift; path = Shared/GQLGroup.swift; sourceTree = "<group>"; };
 		160D312B1A9619CE006B74BC /* FilledView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilledView.swift; sourceTree = "<group>"; };
 		160E19E11D672BD1006C1A59 /* PopTimer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PopTimer.swift; path = Shared/PopTimer.swift; sourceTree = "<group>"; };
 		160FB13F1AE3F78E00EB5C8E /* PreferencesWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PreferencesWindow.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -359,9 +359,9 @@
 		16522D841AB03AE500B1C3FB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Interface.storyboard; sourceTree = "<group>"; };
 		16522D861AB03AE500B1C3FB /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		16561EC81BDA8E90008DBAF3 /* Trailer 22.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 22.xcdatamodel"; sourceTree = "<group>"; };
-		1657230023AAA23500F597EF /* V4API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V4API.swift; sourceTree = "<group>"; };
-		1657230323AAA2AC00F597EF /* V3API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V3API.swift; sourceTree = "<group>"; };
-		1657230723AAA3B000F597EF /* RestAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestAccess.swift; sourceTree = "<group>"; };
+		1657230023AAA23500F597EF /* V4API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = V4API.swift; path = Shared/V4API.swift; sourceTree = "<group>"; };
+		1657230323AAA2AC00F597EF /* V3API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = V3API.swift; path = Shared/V3API.swift; sourceTree = "<group>"; };
+		1657230723AAA3B000F597EF /* RestAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RestAccess.swift; path = Shared/RestAccess.swift; sourceTree = "<group>"; };
 		165C490F1BA63B45006BBCF5 /* AdvancedSettingsCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdvancedSettingsCell.swift; sourceTree = "<group>"; };
 		1664CBC91B7796840006BDE7 /* Enums.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = Enums.swift; path = Shared/Enums.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		1668CFE71D5E16B70021CDC5 /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Reachability.swift; path = Shared/Reachability.swift; sourceTree = "<group>"; };
@@ -382,10 +382,10 @@
 		167F7BF523B38D4D00A01529 /* UpdatedRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdatedRow.swift; sourceTree = "<group>"; };
 		16813CBE1BA16D660020F8EB /* CommonController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = CommonController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		1686B1D41AE59AED009118C5 /* PocketTrailer.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PocketTrailer.entitlements; sourceTree = "<group>"; };
-		16878B7823C50D6A00F2213B /* GQLElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GQLElement.swift; sourceTree = "<group>"; };
-		16878B7B23C50D7500F2213B /* GQLNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GQLNode.swift; sourceTree = "<group>"; };
-		16878B7E23C50D8000F2213B /* GQLField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GQLField.swift; sourceTree = "<group>"; };
-		16878B8123C50D8A00F2213B /* GQLScanning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GQLScanning.swift; sourceTree = "<group>"; };
+		16878B7823C50D6A00F2213B /* GQLElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GQLElement.swift; path = Shared/GQLElement.swift; sourceTree = "<group>"; };
+		16878B7B23C50D7500F2213B /* GQLNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GQLNode.swift; path = Shared/GQLNode.swift; sourceTree = "<group>"; };
+		16878B7E23C50D8000F2213B /* GQLField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GQLField.swift; path = Shared/GQLField.swift; sourceTree = "<group>"; };
+		16878B8123C50D8A00F2213B /* GQLScanning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GQLScanning.swift; path = Shared/GQLScanning.swift; sourceTree = "<group>"; };
 		168839C61DEF8C3B002D9448 /* ImportExport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImportExport.swift; sourceTree = "<group>"; };
 		168BC6AA17EC2DF000BC4584 /* Trailer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Trailer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		168BC6B517EC2DF000BC4584 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -454,7 +454,7 @@
 		16CBE1C01A2DBB2700485053 /* DataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = DataManager.swift; path = Shared/DataManager.swift; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16CBE1C41A2DFBA500485053 /* Settings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = Settings.swift; path = Shared/Settings.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16CBE1C91A2E13A400485053 /* StatusItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatusItemView.swift; sourceTree = "<group>"; };
-		16D2B874251FA54E00D86C89 /* Enums+Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Enums+Settings.swift"; sourceTree = "<group>"; };
+		16D2B874251FA54E00D86C89 /* Enums+Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Enums+Settings.swift"; path = "Shared/Enums+Settings.swift"; sourceTree = "<group>"; };
 		16D97065235B243500871F81 /* Trailer 40.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 40.xcdatamodel"; sourceTree = "<group>"; };
 		16DB793B1E326C950076A36D /* AdvancedReposWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdvancedReposWindow.swift; sourceTree = "<group>"; };
 		16DB793D1E326CD90076A36D /* AdvancedReposWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AdvancedReposWindow.xib; sourceTree = "<group>"; };
@@ -481,7 +481,7 @@
 		16EDC3AC21348487005E327F /* Trailer 39.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 39.xcdatamodel"; sourceTree = "<group>"; };
 		16EE6ACF1A9A711C000A8483 /* CountLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CountLabel.swift; sourceTree = "<group>"; };
 		16EE871A1A446BFE00A1D16F /* EmptyView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmptyView.swift; sourceTree = "<group>"; };
-		16F0BAD523A53EB4002EC348 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
+		16F0BAD523A53EB4002EC348 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Colors.swift; path = Shared/Colors.swift; sourceTree = "<group>"; };
 		16F0BAD923A644C9002EC348 /* Trailer 41.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 41.xcdatamodel"; sourceTree = "<group>"; };
 		16F4136F1BA5850A006B0195 /* RepoCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RepoCell.swift; sourceTree = "<group>"; };
 		16F51FA019DE8C78007B0BB1 /* PRIVACY */ = {isa = PBXFileReference; lastKnownFileType = text; lineEnding = 0; path = PRIVACY; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = "<none>"; };
@@ -680,6 +680,8 @@
 			children = (
 				162FB97E1CF517F200F380E1 /* Document Icons */,
 				1628A6C918789E73005EDA69 /* Main.storyboard */,
+				16954D3824333B8E0008AD4F /* Quickstart.storyboard */,
+				16954D3524333B0B0008AD4F /* Settings.storyboard */,
 				16154E2E19C43E8E00E49139 /* Launch.storyboard */,
 				16C4ACF51EB553E20022C33B /* requestsChangesIcon.png */,
 				16C4ACF61EB553E20022C33B /* approvesChangesIcon.png */,
@@ -764,8 +766,6 @@
 		168BC6A117EC2DF000BC4584 = {
 			isa = PBXGroup;
 			children = (
-				16954D3824333B8E0008AD4F /* Quickstart.storyboard */,
-				16954D3524333B0B0008AD4F /* Settings.storyboard */,
 				1628A6F218789EA3005EDA69 /* Shared */,
 				168BC6B317EC2DF000BC4584 /* Trailer */,
 				164DEAFA1AC0C8BB00AA6F73 /* Pocket Trailer */,
@@ -1692,7 +1692,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1572;
+				CURRENT_PROJECT_VERSION = 1574;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -1713,7 +1713,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.7.4;
+				MARKETING_VERSION = 1.7.5;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_SWIFT_FLAGS = "-D DEBUG";
 				STRIP_INSTALLED_PRODUCT = NO;
@@ -1751,7 +1751,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1572;
+				CURRENT_PROJECT_VERSION = 1574;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEPLOYMENT_POSTPROCESSING = YES;
@@ -1771,7 +1771,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../Frameworks";
 				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.7.4;
+				MARKETING_VERSION = 1.7.5;
 				SEPARATE_STRIP = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_DISABLE_SAFETY_CHECKS = YES;

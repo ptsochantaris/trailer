@@ -1490,7 +1490,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
             if let apiServer = selectedServer {
                 apiServer.authToken = apiServerAuthToken.stringValue
                 storeApiFormToSelectedServer()
-                apiServer.clearAllRelatedInfo()
                 reset()
             }
         } else if obj===repoFilter {
