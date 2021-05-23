@@ -1039,7 +1039,7 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="IqD-pm-wNg" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1945" y="3140"/>
+            <point key="canvasLocation" x="1946" y="3105"/>
         </scene>
         <!--Picker View Controller-->
         <scene sceneID="5Tx-Cn-3zg">

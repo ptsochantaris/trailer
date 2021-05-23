@@ -368,6 +368,16 @@ struct Settings {
 		set { set("COMMENT_AUTHOR_BLACKLIST", newValue) }
 	}
 
+    static var itemAuthorBlacklist: [String] {
+        get { return get("ITEM_AUTHOR_BLACKLIST") as? [String] ?? [] }
+        set { set("ITEM_AUTHOR_BLACKLIST", newValue) }
+    }
+
+    static var labelBlacklist: [String] {
+        get { return get("LABEL_BLACKLIST") as? [String] ?? [] }
+        set { set("LABEL_BLACKLIST", newValue) }
+    }
+
 	static var hotkeyLetter: String {
 		get { return get("HOTKEY_LETTER") as? String ?? "T" }
 		set { set("HOTKEY_LETTER", newValue) }
@@ -759,6 +769,21 @@ struct Settings {
 		get { return get("INCLUDE_STATUSES_IN_FILTER") as? Bool ?? true }
 		set { set("INCLUDE_STATUSES_IN_FILTER", newValue) }
 	}
+    
+    static var showStatusesGreen: Bool {
+        get { return get("SHOW_STATUSES_GREEN") as? Bool ?? true }
+        set { set("SHOW_STATUSES_GREEN", newValue) }
+    }
+
+    static var showStatusesYellow: Bool {
+        get { return get("SHOW_STATUSES_YELLOW") as? Bool ?? true }
+        set { set("SHOW_STATUSES_YELLOW", newValue) }
+    }
+
+    static var showStatusesRed: Bool {
+        get { return get("SHOW_STATUSES_RED") as? Bool ?? true }
+        set { set("SHOW_STATUSES_RED", newValue) }
+    }
 
 	static var hotkeyCommandModifier: Bool {
 		get { return get("HOTKEY_COMMAND_MODIFIER") as? Bool ?? true }

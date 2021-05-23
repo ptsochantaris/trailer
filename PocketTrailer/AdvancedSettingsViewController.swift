@@ -303,7 +303,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 					}
 		}),
 		Setting(section: .Sort,
-		        title: "Group by repository",
+		        title: "Bunch by repository",
 		        description: Settings.groupByRepoHelp,
 		        valueDisplayed: { Settings.groupByRepo ? "✓" : " " }),
 		

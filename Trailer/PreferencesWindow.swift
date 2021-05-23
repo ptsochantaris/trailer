@@ -31,162 +31,169 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	// Preferences window
-	@IBOutlet private weak var versionNumber: NSTextField!
-	@IBOutlet private weak var launchAtStartup: NSButton!
-	@IBOutlet private weak var refreshDurationLabel: NSTextField!
-	@IBOutlet private weak var refreshDurationStepper: NSStepper!
-	@IBOutlet private weak var hideUncommentedPrs: NSButton!
-	@IBOutlet private weak var repoFilter: NSTextField!
-	@IBOutlet private weak var showAllComments: NSButton!
-	@IBOutlet private weak var sortingOrder: NSButton!
-	@IBOutlet private weak var sortModeSelect: NSPopUpButton!
-	@IBOutlet private weak var includeRepositoriesInFiltering: NSButton!
-	@IBOutlet private weak var groupByRepo: NSButton!
-	@IBOutlet private weak var checkForUpdatesAutomatically: NSButton!
-	@IBOutlet private weak var checkForUpdatesLabel: NSTextField!
-	@IBOutlet private weak var checkForUpdatesSelector: NSStepper!
-	@IBOutlet private weak var openPrAtFirstUnreadComment: NSButton!
-	@IBOutlet private weak var logActivityToConsole: NSButton!
-	@IBOutlet private weak var commentAuthorBlacklist: NSTokenField!
+	@IBOutlet private var versionNumber: NSTextField!
+	@IBOutlet private var launchAtStartup: NSButton!
+	@IBOutlet private var refreshDurationLabel: NSTextField!
+	@IBOutlet private var refreshDurationStepper: NSStepper!
+	@IBOutlet private var hideUncommentedPrs: NSButton!
+	@IBOutlet private var repoFilter: NSTextField!
+	@IBOutlet private var showAllComments: NSButton!
+	@IBOutlet private var sortingOrder: NSButton!
+	@IBOutlet private var sortModeSelect: NSPopUpButton!
+	@IBOutlet private var groupByRepo: NSButton!
+	@IBOutlet private var checkForUpdatesAutomatically: NSButton!
+	@IBOutlet private var checkForUpdatesLabel: NSTextField!
+	@IBOutlet private var checkForUpdatesSelector: NSStepper!
+	@IBOutlet private var openPrAtFirstUnreadComment: NSButton!
+	@IBOutlet private var logActivityToConsole: NSButton!
+	@IBOutlet private var commentAuthorBlacklist: NSTokenField!
     
     // Repositories
-    @IBOutlet private weak var projectsTable: NSTableView!
+    @IBOutlet private var projectsTable: NSTableView!
 
 	// History
-	@IBOutlet private weak var prMergedPolicy: NSPopUpButton!
-	@IBOutlet private weak var prClosedPolicy: NSPopUpButton!
-	@IBOutlet private weak var dontKeepPrsMergedByMe: NSButton!
-	@IBOutlet private weak var dontConfirmRemoveAllMerged: NSButton!
-	@IBOutlet private weak var dontConfirmRemoveAllClosed: NSButton!
-	@IBOutlet private weak var removeNotificationsWhenItemIsRemoved: NSButton!
-    @IBOutlet private weak var scanClosedAndMergedItems: NSButton!
+	@IBOutlet private var prMergedPolicy: NSPopUpButton!
+	@IBOutlet private var prClosedPolicy: NSPopUpButton!
+	@IBOutlet private var dontKeepPrsMergedByMe: NSButton!
+	@IBOutlet private var dontConfirmRemoveAllMerged: NSButton!
+	@IBOutlet private var dontConfirmRemoveAllClosed: NSButton!
+	@IBOutlet private var removeNotificationsWhenItemIsRemoved: NSButton!
+    @IBOutlet private var scanClosedAndMergedItems: NSButton!
     
 	// Statuses
-	@IBOutlet private weak var showStatusItems: NSButton!
-	@IBOutlet private weak var makeStatusItemsSelectable: NSButton!
-	@IBOutlet private weak var statusItemRescanLabel: NSTextField!
-	@IBOutlet private weak var statusItemRefreshCounter: NSStepper!
-	@IBOutlet private weak var notifyOnStatusUpdates: NSButton!
-	@IBOutlet private weak var notifyOnStatusUpdatesForAllPrs: NSButton!
-	@IBOutlet private weak var statusTermMenu: NSPopUpButton!
-	@IBOutlet private weak var statusTermsField: NSTokenField!
-	@IBOutlet private weak var hidePrsThatDontPass: NSButton!
-	@IBOutlet private weak var hidePrsThatDontPassOnlyInAll: NSButton!
-	@IBOutlet private weak var showStatusesForAll: NSButton!
+	@IBOutlet private var showStatusItems: NSButton!
+	@IBOutlet private var makeStatusItemsSelectable: NSButton!
+	@IBOutlet private var statusItemRescanLabel: NSTextField!
+	@IBOutlet private var statusItemRefreshCounter: NSStepper!
+	@IBOutlet private var notifyOnStatusUpdates: NSButton!
+	@IBOutlet private var notifyOnStatusUpdatesForAllPrs: NSButton!
+	@IBOutlet private var statusTermMenu: NSPopUpButton!
+	@IBOutlet private var statusTermsField: NSTokenField!
+	@IBOutlet private var hidePrsThatDontPass: NSButton!
+	@IBOutlet private var hidePrsThatDontPassOnlyInAll: NSButton!
+	@IBOutlet private var showStatusesForAll: NSButton!
+    @IBOutlet private var showStatusesRed: NSButton!
+    @IBOutlet private var showStatusesYellow: NSButton!
+    @IBOutlet private var showStatusesGreen: NSButton!
+
+    // Filtering
+    @IBOutlet private var includeRepositoriesInFiltering: NSButton!
+    @IBOutlet private var includeLabelsInFiltering: NSButton!
+    @IBOutlet private var includeTitlesInFiltering: NSButton!
+    @IBOutlet private var includeMilestonesInFiltering: NSButton!
+    @IBOutlet private var includeAssigneeNamesInFiltering: NSButton!
+    @IBOutlet private var includeStatusesInFiltering: NSButton!
+    @IBOutlet private var includeServersInFiltering: NSButton!
+    @IBOutlet private var includeUsersInFiltering: NSButton!
+    @IBOutlet private var includeNumbersInFiltering: NSButton!
+    @IBOutlet private var itemFilteringBlacklist: NSTokenField!
+    @IBOutlet private var labelFilteringBlacklist: NSTokenField!
 
 	// Comments
-	@IBOutlet private weak var disableAllCommentNotifications: NSButton!
-	@IBOutlet private weak var assumeCommentsBeforeMineAreRead: NSButton!
-	@IBOutlet private weak var newMentionMovePolicy: NSPopUpButton!
-	@IBOutlet private weak var teamMentionMovePolicy: NSPopUpButton!
-	@IBOutlet private weak var newItemInOwnedRepoMovePolicy: NSPopUpButton!
-	@IBOutlet private weak var highlightItemsWithNewCommits: NSButton!
+	@IBOutlet private var disableAllCommentNotifications: NSButton!
+	@IBOutlet private var assumeCommentsBeforeMineAreRead: NSButton!
+	@IBOutlet private var newMentionMovePolicy: NSPopUpButton!
+	@IBOutlet private var teamMentionMovePolicy: NSPopUpButton!
+	@IBOutlet private var newItemInOwnedRepoMovePolicy: NSPopUpButton!
+	@IBOutlet private var highlightItemsWithNewCommits: NSButton!
 
 	// Display
-	@IBOutlet private weak var includeLabelsInFiltering: NSButton!
-	@IBOutlet private weak var includeTitlesInFiltering: NSButton!
-	@IBOutlet private weak var includeMilestonesInFiltering: NSButton!
-	@IBOutlet private weak var includeAssigneeNamesInFiltering: NSButton!
-	@IBOutlet private weak var includeStatusesInFiltering: NSButton!
-	@IBOutlet private weak var grayOutWhenRefreshing: NSButton!
-	@IBOutlet private weak var assignedPrHandlingPolicy: NSPopUpButton!
-	@IBOutlet private weak var includeServersInFiltering: NSButton!
-	@IBOutlet private weak var includeUsersInFiltering: NSButton!
-	@IBOutlet private weak var includeNumbersInFiltering: NSButton!
-	@IBOutlet private weak var refreshItemsLabel: NSTextField!
-	@IBOutlet private weak var showCreationDates: NSButton!
-	@IBOutlet private weak var hideAvatars: NSButton!
-	@IBOutlet private weak var showSeparateApiServersInMenu: NSButton!
-	@IBOutlet private weak var displayRepositoryNames: NSButton!
-	@IBOutlet private weak var hideCountsOnMenubar: NSButton!
-	@IBOutlet private weak var showLabels: NSButton!
-	@IBOutlet private weak var showRelativeDates: NSButton!
-	@IBOutlet private weak var displayMilestones: NSButton!
-	@IBOutlet private weak var displayNumbersForItems: NSButton!
-    @IBOutlet private weak var draftHandlingPolicy: NSPopUpButton!
-    @IBOutlet private weak var markUnmergeablePrs: NSButton!
-    @IBOutlet private weak var showPrLines: NSButton!
+	@IBOutlet private var grayOutWhenRefreshing: NSButton!
+	@IBOutlet private var assignedPrHandlingPolicy: NSPopUpButton!
+	@IBOutlet private var refreshItemsLabel: NSTextField!
+	@IBOutlet private var showCreationDates: NSButton!
+	@IBOutlet private var hideAvatars: NSButton!
+	@IBOutlet private var showSeparateApiServersInMenu: NSButton!
+	@IBOutlet private var displayRepositoryNames: NSButton!
+	@IBOutlet private var hideCountsOnMenubar: NSButton!
+	@IBOutlet private var showLabels: NSButton!
+	@IBOutlet private var showRelativeDates: NSButton!
+	@IBOutlet private var displayMilestones: NSButton!
+	@IBOutlet private var displayNumbersForItems: NSButton!
+    @IBOutlet private var draftHandlingPolicy: NSPopUpButton!
+    @IBOutlet private var markUnmergeablePrs: NSButton!
+    @IBOutlet private var showPrLines: NSButton!
 
 	// Servers
-	@IBOutlet private weak var serverList: NSTableView!
-	@IBOutlet private weak var apiServerName: NSTextField!
-	@IBOutlet private weak var apiServerApiPath: NSTextField!
-    @IBOutlet private weak var apiServerGraphQLPath: NSTextField!
+	@IBOutlet private var serverList: NSTableView!
+	@IBOutlet private var apiServerName: NSTextField!
+	@IBOutlet private var apiServerApiPath: NSTextField!
+    @IBOutlet private var apiServerGraphQLPath: NSTextField!
     
-	@IBOutlet private weak var apiServerWebPath: NSTextField!
-	@IBOutlet private weak var apiServerAuthToken: NSTextField!
-	@IBOutlet private weak var apiServerSelectedBox: NSBox!
-	@IBOutlet private weak var apiServerTestButton: NSButton!
-	@IBOutlet private weak var apiServerDeleteButton: NSButton!
-	@IBOutlet private weak var apiServerReportError: NSButton!
-    @IBOutlet private weak var v4ApiSwitch: NSButton!
+	@IBOutlet private var apiServerWebPath: NSTextField!
+	@IBOutlet private var apiServerAuthToken: NSTextField!
+	@IBOutlet private var apiServerSelectedBox: NSBox!
+	@IBOutlet private var apiServerTestButton: NSButton!
+	@IBOutlet private var apiServerDeleteButton: NSButton!
+	@IBOutlet private var apiServerReportError: NSButton!
+    @IBOutlet private var v4ApiSwitch: NSButton!
     
 	// Snoozing
-	@IBOutlet private weak var snoozePresetsList: NSTableView!
-	@IBOutlet private weak var snoozeTypeDuration: NSButton!
-	@IBOutlet private weak var snoozeTypeDateTime: NSButton!
-	@IBOutlet private weak var snoozeDurationDays: NSPopUpButton!
-	@IBOutlet private weak var snoozeDurationHours: NSPopUpButton!
-	@IBOutlet private weak var snoozeDurationMinutes: NSPopUpButton!
-	@IBOutlet private weak var snoozeDateTimeDay: NSPopUpButton!
-	@IBOutlet private weak var snoozeDateTimeHour: NSPopUpButton!
-	@IBOutlet private weak var snoozeDateTimeMinute: NSPopUpButton!
-	@IBOutlet private weak var snoozeDeletePreset: NSButton!
-	@IBOutlet private weak var snoozeUp: NSButton!
-	@IBOutlet private weak var snoozeDown: NSButton!
-	@IBOutlet private weak var snoozeWakeOnComment: NSButton!
-	@IBOutlet private weak var snoozeWakeOnMention: NSButton!
-	@IBOutlet private weak var snoozeWakeOnStatusUpdate: NSButton!
-	@IBOutlet private weak var hideSnoozedItems: NSButton!
-	@IBOutlet private weak var snoozeWakeLabel: NSTextField!
-	@IBOutlet private weak var countSnoozedItems: NSButton!
+	@IBOutlet private var snoozePresetsList: NSTableView!
+	@IBOutlet private var snoozeTypeDuration: NSButton!
+	@IBOutlet private var snoozeTypeDateTime: NSButton!
+	@IBOutlet private var snoozeDurationDays: NSPopUpButton!
+	@IBOutlet private var snoozeDurationHours: NSPopUpButton!
+	@IBOutlet private var snoozeDurationMinutes: NSPopUpButton!
+	@IBOutlet private var snoozeDateTimeDay: NSPopUpButton!
+	@IBOutlet private var snoozeDateTimeHour: NSPopUpButton!
+	@IBOutlet private var snoozeDateTimeMinute: NSPopUpButton!
+	@IBOutlet private var snoozeDeletePreset: NSButton!
+	@IBOutlet private var snoozeUp: NSButton!
+	@IBOutlet private var snoozeDown: NSButton!
+	@IBOutlet private var snoozeWakeOnComment: NSButton!
+	@IBOutlet private var snoozeWakeOnMention: NSButton!
+	@IBOutlet private var snoozeWakeOnStatusUpdate: NSButton!
+	@IBOutlet private var hideSnoozedItems: NSButton!
+	@IBOutlet private var snoozeWakeLabel: NSTextField!
+	@IBOutlet private var countSnoozedItems: NSButton!
 
-	@IBOutlet private weak var autoSnoozeSelector: NSStepper!
-	@IBOutlet private weak var autoSnoozeLabel: NSTextField!
+	@IBOutlet private var autoSnoozeSelector: NSStepper!
+	@IBOutlet private var autoSnoozeLabel: NSTextField!
 
 	// Misc
-	@IBOutlet private weak var repeatLastExportAutomatically: NSButton!
-	@IBOutlet private weak var lastExportReport: NSTextField!
-	@IBOutlet private weak var dumpApiResponsesToConsole: NSButton!
-	@IBOutlet private weak var defaultOpenApp: NSTextField!
-	@IBOutlet private weak var defaultOpenLinks: NSTextField!
-    @IBOutlet private weak var reloadAllData: NSButton!
-    @IBOutlet private weak var reloadAllDataHelp: NSTextField!
+	@IBOutlet private var repeatLastExportAutomatically: NSButton!
+	@IBOutlet private var lastExportReport: NSTextField!
+	@IBOutlet private var dumpApiResponsesToConsole: NSButton!
+	@IBOutlet private var defaultOpenApp: NSTextField!
+	@IBOutlet private var defaultOpenLinks: NSTextField!
+    @IBOutlet private var reloadAllData: NSButton!
+    @IBOutlet private var reloadAllDataHelp: NSTextField!
     
 	// Keyboard
-	@IBOutlet private weak var hotkeyEnable: NSButton!
-	@IBOutlet private weak var hotkeyCommandModifier: NSButton!
-	@IBOutlet private weak var hotkeyOptionModifier: NSButton!
-	@IBOutlet private weak var hotkeyShiftModifier: NSButton!
-	@IBOutlet private weak var hotkeyLetter: NSPopUpButton!
-	@IBOutlet private weak var hotKeyHelp: NSTextField!
-	@IBOutlet private weak var hotKeyContainer: NSBox!
-	@IBOutlet private weak var hotkeyControlModifier: NSButton!
+	@IBOutlet private var hotkeyEnable: NSButton!
+	@IBOutlet private var hotkeyCommandModifier: NSButton!
+	@IBOutlet private var hotkeyOptionModifier: NSButton!
+	@IBOutlet private var hotkeyShiftModifier: NSButton!
+	@IBOutlet private var hotkeyLetter: NSPopUpButton!
+	@IBOutlet private var hotKeyHelp: NSTextField!
+	@IBOutlet private var hotKeyContainer: NSBox!
+	@IBOutlet private var hotkeyControlModifier: NSButton!
 
 	// Watchlist
-	@IBOutlet private weak var allPrsSetting: NSPopUpButton!
-	@IBOutlet private weak var allIssuesSetting: NSPopUpButton!
-	@IBOutlet private weak var allHidingSetting: NSPopUpButton!
-	@IBOutlet private weak var allNewPrsSetting: NSPopUpButton!
-	@IBOutlet private weak var allNewIssuesSetting: NSPopUpButton!
+	@IBOutlet private var allPrsSetting: NSPopUpButton!
+	@IBOutlet private var allIssuesSetting: NSPopUpButton!
+	@IBOutlet private var allHidingSetting: NSPopUpButton!
+	@IBOutlet private var allNewPrsSetting: NSPopUpButton!
+	@IBOutlet private var allNewIssuesSetting: NSPopUpButton!
 
 	// Reviews
-	@IBOutlet private weak var assignedReviewHandlingPolicy: NSPopUpButton!
-	@IBOutlet private weak var notifyOnChangeRequests: NSButton!
-	@IBOutlet private weak var notifyOnAcceptances: NSButton!
-	@IBOutlet private weak var notifyOnReviewDismissals: NSButton!
-	@IBOutlet private weak var notifyOnReviewAssignments: NSButton!
-	@IBOutlet private weak var notifyOnAllChangeRequests: NSButton!
-	@IBOutlet private weak var notifyOnAllAcceptances: NSButton!
-	@IBOutlet private weak var notifyOnAllReviewDismissals: NSButton!
-	@IBOutlet private weak var supportReviews: NSButton!
-    @IBOutlet private weak var showRequestedTeamReviews: NSButton!
+	@IBOutlet private var assignedReviewHandlingPolicy: NSPopUpButton!
+	@IBOutlet private var notifyOnChangeRequests: NSButton!
+	@IBOutlet private var notifyOnAcceptances: NSButton!
+	@IBOutlet private var notifyOnReviewDismissals: NSButton!
+	@IBOutlet private var notifyOnReviewAssignments: NSButton!
+	@IBOutlet private var notifyOnAllChangeRequests: NSButton!
+	@IBOutlet private var notifyOnAllAcceptances: NSButton!
+	@IBOutlet private var notifyOnAllReviewDismissals: NSButton!
+	@IBOutlet private var supportReviews: NSButton!
+    @IBOutlet private var showRequestedTeamReviews: NSButton!
     
 	// Reactions
-	@IBOutlet private weak var notifyOnItemReactions: NSButton!
-	@IBOutlet private weak var notifyOnCommentReactions: NSButton!
-	@IBOutlet private weak var reactionIntervalLabel: NSTextField!
-	@IBOutlet private weak var reactionIntervalStepper: NSStepper!
+	@IBOutlet private var notifyOnItemReactions: NSButton!
+	@IBOutlet private var notifyOnCommentReactions: NSButton!
+	@IBOutlet private var reactionIntervalLabel: NSTextField!
+	@IBOutlet private var reactionIntervalStepper: NSStepper!
 
 	// Tabs
 	@IBOutlet weak var tabs: NSTabView!
@@ -205,7 +212,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		reloadSettings()
 
 		versionNumber.stringValue = versionString
-
+        
 		let selectedIndex = min(tabs.numberOfTabViewItems-1, Settings.lastPreferencesTabSelectedOSX)
 		tabs.selectTabViewItem(tabs.tabViewItem(at: selectedIndex))
 
@@ -273,7 +280,22 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
         Settings.showPrLines = sender.integerValue == 1
         deferredUpdateTimer.push()
     }
-    
+
+    @IBAction private func listStatusesGreenSelected(_ sender: NSButton) {
+        Settings.showStatusesGreen = !Settings.showStatusesGreen
+        deferredUpdateTimer.push()
+    }
+
+    @IBAction private func listStatusesYellowSelected(_ sender: NSButton) {
+        Settings.showStatusesYellow = !Settings.showStatusesYellow
+        deferredUpdateTimer.push()
+    }
+
+    @IBAction private func listStatusesRedSelected(_ sender: NSButton) {
+        Settings.showStatusesRed = !Settings.showStatusesRed
+        deferredUpdateTimer.push()
+    }
+
     @IBAction private func markUnmergeablePrsSelected(_ sender: NSButton) {
         Settings.markUnmergeablePrs = sender.integerValue == 1
         deferredUpdateTimer.push()
@@ -528,6 +550,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		API.updateLimitsFromServer()
 		updateStatusTermPreferenceControls()
 		commentAuthorBlacklist.objectValue = Settings.commentAuthorBlacklist
+        labelFilteringBlacklist.objectValue = Settings.labelBlacklist
+        itemFilteringBlacklist.objectValue = Settings.itemAuthorBlacklist
 
 		setupSortMethodMenu()
 		sortModeSelect.selectItem(at: Settings.sortMethod)
@@ -1051,6 +1075,9 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		hidePrsThatDontPass.alphaValue = enable ? 1.0 : 0.5
 		hidePrsThatDontPass.isEnabled = enable
 		showStatusesForAll.isEnabled = enable
+        showStatusesGreen.isEnabled = enable
+        showStatusesYellow.isEnabled = enable
+        showStatusesRed.isEnabled = enable
 		hidePrsThatDontPassOnlyInAll.isEnabled = enable && Settings.hidePrsThatArentPassing
 		notifyOnStatusUpdatesForAllPrs.isEnabled = enable && Settings.notifyOnStatusUpdates
 
@@ -1497,21 +1524,34 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
             updateAllItemSettingButtons()
 
         } else if obj===statusTermsField {
-            let existingTokens = Settings.statusFilteringTerms
             let newTokens = statusTermsField.objectValue as! [String]
-            if existingTokens != newTokens {
+            if Settings.statusFilteringTerms != newTokens {
                 Settings.statusFilteringTerms = newTokens
                 deferredUpdateTimer.push()
             }
             
         } else if obj===commentAuthorBlacklist {
-            let existingTokens = Settings.commentAuthorBlacklist
             let newTokens = commentAuthorBlacklist.objectValue as! [String]
-            if existingTokens != newTokens {
+            if Settings.commentAuthorBlacklist != newTokens {
                 Settings.commentAuthorBlacklist = newTokens
+                deferredUpdateTimer.push()
+            }
+            
+        } else if obj===itemFilteringBlacklist {
+            let newTokens = itemFilteringBlacklist.objectValue as! [String]
+            if Settings.itemAuthorBlacklist != newTokens {
+                Settings.itemAuthorBlacklist = newTokens
+                deferredUpdateTimer.push()
+            }
+            
+        } else if obj===labelFilteringBlacklist {
+            let newTokens = labelFilteringBlacklist.objectValue as! [String]
+            if Settings.labelBlacklist != newTokens {
+                Settings.labelBlacklist = newTokens
+                deferredUpdateTimer.push()
             }
         }
-	}
+    }
 
 	///////////// Tabs
 

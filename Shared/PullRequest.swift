@@ -241,7 +241,22 @@ final class PullRequest: ListableItem {
 	var displayedStatuses: [PRStatus] {
 
 		var contexts = [String : PRStatus]()
-		let sortedStatuses = statuses.sorted { $1.createdBefore($0) }
+        let red = Settings.showStatusesRed
+        let yellow = Settings.showStatusesYellow
+        let green = Settings.showStatusesGreen
+        let filteredStatuses: Set<PRStatus>
+        if red && yellow && green {
+            filteredStatuses = statuses
+        } else {
+            filteredStatuses = statuses.filter {
+                let c = $0.colorForDisplay
+                if c == .appRed { return red }
+                if c == .appYellow { return yellow }
+                if c == .appGreen { return green }
+                return false
+            }
+        }
+		let sortedStatuses = filteredStatuses.sorted { $1.createdBefore($0) }
 		for s in sortedStatuses {
 			let context = s.context ?? "//NO CONTEXT/-/"
 			if let latestStatusInContext = contexts[context] {

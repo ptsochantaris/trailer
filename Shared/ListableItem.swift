@@ -991,10 +991,20 @@ class ListableItem: DataItem {
 				}
 			}
 		}
-
+        
 		if Settings.hideUncommentedItems {
 			andPredicates.append(itemType.includeInUnreadPredicate)
 		}
+
+        let excludeLabels = Settings.labelBlacklist
+        if !excludeLabels.isEmpty {
+            andPredicates.append(NSPredicate(format: "SUBQUERY(labels, $label, $label.name IN[cd] %@).@count == 0", excludeLabels))
+        }
+
+        let excludeAuthors = Settings.itemAuthorBlacklist
+        if !excludeAuthors.isEmpty {
+            andPredicates.append(NSPredicate(format: "NOT (userLogin IN[cd] %@)", excludeAuthors))
+        }
 
 		var sortDescriptors = [NSSortDescriptor]()
 		sortDescriptors.append(NSSortDescriptor(key: "sectionIndex", ascending: true))
@@ -1009,7 +1019,7 @@ class ListableItem: DataItem {
 				sortDescriptors.append(NSSortDescriptor(key: fieldName, ascending: !Settings.sortDescending))
 			}
 		}
-
+        
 		//DLog("%@", andPredicates)
 
 		let f = NSFetchRequest<T>(entityName: String(describing: itemType))
