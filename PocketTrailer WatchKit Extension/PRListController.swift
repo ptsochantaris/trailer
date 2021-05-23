@@ -4,8 +4,8 @@ import WatchConnectivity
 
 final class PRListController: CommonController {
 
-	@IBOutlet private weak var table: WKInterfaceTable!
-	@IBOutlet private weak var statusLabel: WKInterfaceLabel!
+	@IBOutlet private var table: WKInterfaceTable!
+	@IBOutlet private var statusLabel: WKInterfaceLabel!
 
 	private var sectionIndex: Int64!
 	private var type: String!

@@ -8,13 +8,13 @@ final class WatchlistSettingsViewController: UITableViewController, PickerViewCo
 		updateState()
 	}
 
-	@IBOutlet private weak var rescanCell: UITableViewCell!
-	@IBOutlet private weak var autoAddCell: UITableViewCell!
-	@IBOutlet private weak var autoRemoveCell: UITableViewCell!
-	@IBOutlet private weak var hideArchivedCell: UITableViewCell!
+	@IBOutlet private var rescanCell: UITableViewCell!
+	@IBOutlet private var autoAddCell: UITableViewCell!
+	@IBOutlet private var autoRemoveCell: UITableViewCell!
+	@IBOutlet private var hideArchivedCell: UITableViewCell!
     
-    @IBOutlet private weak var queryPrsInAllReposCell: UITableViewCell!
-    @IBOutlet private weak var queryIssuesInAllReposCell: UITableViewCell!
+    @IBOutlet private var queryPrsInAllReposCell: UITableViewCell!
+    @IBOutlet private var queryIssuesInAllReposCell: UITableViewCell!
 
 	override func viewDidLoad() {
 		super.viewDidLoad()

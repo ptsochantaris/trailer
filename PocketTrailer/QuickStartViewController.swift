@@ -3,13 +3,13 @@ import SafariServices
 
 final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 
-	@IBOutlet private weak var testButton: UIButton!
+	@IBOutlet private var testButton: UIButton!
 	@IBOutlet private var otherViews: [UIView]!
-	@IBOutlet private weak var spinner: UIActivityIndicatorView!
-	@IBOutlet private weak var feedback: UILabel!
-	@IBOutlet private weak var skip: UIBarButtonItem!
-	@IBOutlet private weak var importer: UIBarButtonItem!
-	@IBOutlet private weak var link: UIButton!
+	@IBOutlet private var spinner: UIActivityIndicatorView!
+	@IBOutlet private var feedback: UILabel!
+	@IBOutlet private var skip: UIBarButtonItem!
+	@IBOutlet private var importer: UIBarButtonItem!
+	@IBOutlet private var link: UIButton!
 
 	private let newServer = ApiServer.allApiServers(in: DataManager.main).first!
 	private var token = ""

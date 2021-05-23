@@ -4,7 +4,7 @@ import UIKit
 final class CustomReposViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 	
 	var repos = [Repo]()
-	@IBOutlet private weak var table: UITableView!
+	@IBOutlet private var table: UITableView!
 	
 	@objc private func updateRepos() {
 		repos = Repo.allItems(of: Repo.self, in: DataManager.main).filter { $0.manuallyAdded }
@@ -59,7 +59,7 @@ final class CustomReposViewController: UIViewController, UITableViewDelegate, UI
 		                                     verticalFittingPriority: UILayoutPriority.fittingSizeLevel).height
 	}
 	
-	@IBOutlet private weak var addButton: UIBarButtonItem!
+	@IBOutlet private var addButton: UIBarButtonItem!
 	@IBAction private func addSelected(_ sender: Any) {
 		
 		let v = UIAlertController(title: "Add Custom Repository", message: "Please paste the full URL of the repository you wish to add.\n\nTo add all repos for a given user or org, user a star (*) as the name of the repo instead.", preferredStyle: .alert)

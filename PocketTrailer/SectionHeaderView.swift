@@ -3,8 +3,8 @@ import UIKit
 
 class SectionHeaderView: UITableViewHeaderFooterView {
 
-	@IBOutlet weak var title: UILabel!
-	@IBOutlet weak var action: UIButton!
+	@IBOutlet var title: UILabel!
+	@IBOutlet var action: UIButton!
 
 	var callback: Completion?
 

@@ -1,17 +1,17 @@
 
 final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 
-	@IBOutlet private weak var refreshReposLabel: NSTextField!
-	@IBOutlet private weak var refreshButton: NSButton!
-	@IBOutlet private weak var activityDisplay: NSProgressIndicator!
-	@IBOutlet private weak var repoCheckStepper: NSStepper!
+	@IBOutlet private var refreshReposLabel: NSTextField!
+	@IBOutlet private var refreshButton: NSButton!
+	@IBOutlet private var activityDisplay: NSProgressIndicator!
+	@IBOutlet private var repoCheckStepper: NSStepper!
 
-	@IBOutlet private weak var autoAddRepos: NSButton!
-	@IBOutlet private weak var autoRemoveRepos: NSButton!
-	@IBOutlet private weak var hideArchivedRepos: NSButton!
+	@IBOutlet private var autoAddRepos: NSButton!
+	@IBOutlet private var autoRemoveRepos: NSButton!
+	@IBOutlet private var hideArchivedRepos: NSButton!
 
-    @IBOutlet private weak var syncAuthoredPrs: NSButton!
-    @IBOutlet private weak var syncAuthoredIssues: NSButton!
+    @IBOutlet private var syncAuthoredPrs: NSButton!
+    @IBOutlet private var syncAuthoredIssues: NSButton!
 
 	weak var prefs: PreferencesWindow?
 
@@ -149,11 +149,11 @@ final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 		DataManager.saveDB()
 	}
 
-	@IBOutlet private weak var serverPicker: NSPopUpButton!
-	@IBOutlet private weak var newRepoOwner: NSTextField!
-	@IBOutlet private weak var newRepoName: NSTextField!
-	@IBOutlet private weak var newRepoSpinner: NSProgressIndicator!
-	@IBOutlet private weak var addButton: NSButton!
+	@IBOutlet private var serverPicker: NSPopUpButton!
+	@IBOutlet private var newRepoOwner: NSTextField!
+	@IBOutlet private var newRepoName: NSTextField!
+	@IBOutlet private var newRepoSpinner: NSProgressIndicator!
+	@IBOutlet private var addButton: NSButton!
 
 	@IBAction private func addSelected(_ sender: NSButton) {
 		let name = newRepoName.stringValue.trim
@@ -230,8 +230,8 @@ final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 		}
 	}
 
-	@IBOutlet private weak var removeRepoList: NSPopUpButtonCell!
-	@IBOutlet private weak var removeButton: NSButton!
+	@IBOutlet private var removeRepoList: NSPopUpButtonCell!
+	@IBOutlet private var removeButton: NSButton!
 	@IBAction private func removeSelected(_ sender: NSButton) {
 		guard let repo = removeRepoList.selectedItem?.representedObject as? Repo else { return }
 		DataManager.main.delete(repo)

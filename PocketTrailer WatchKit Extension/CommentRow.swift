@@ -2,11 +2,11 @@
 import WatchKit
 
 final class CommentRow: NSObject {
-    @IBOutlet private weak var usernameL: WKInterfaceLabel!
-	@IBOutlet private weak var dateL: WKInterfaceLabel!
-    @IBOutlet private weak var commentL: WKInterfaceLabel!
-	@IBOutlet private weak var usernameBackground: WKInterfaceGroup!
-	@IBOutlet private weak var margin: WKInterfaceGroup!
+    @IBOutlet private var usernameL: WKInterfaceLabel!
+	@IBOutlet private var dateL: WKInterfaceLabel!
+    @IBOutlet private var commentL: WKInterfaceLabel!
+	@IBOutlet private var usernameBackground: WKInterfaceGroup!
+	@IBOutlet private var margin: WKInterfaceGroup!
 	var commentId: String?
 
 	func set(comment: [AnyHashable : Any], unreadCount: Int, unreadIndex: inout Int) {

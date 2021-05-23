@@ -23,8 +23,8 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 	private var currentSortOptions = [SortOption.name]
 	private var _fetchedResultsController: NSFetchedResultsController<Repo>?
 
-	@IBOutlet private weak var actionsButton: UIBarButtonItem!
-	@IBOutlet weak var setAllPrsItem: UIBarButtonItem!
+	@IBOutlet private var actionsButton: UIBarButtonItem!
+	@IBOutlet var setAllPrsItem: UIBarButtonItem!
 
 	@IBAction private func done(_ sender: UIBarButtonItem) {
         presentedViewController?.dismiss(animated: false)

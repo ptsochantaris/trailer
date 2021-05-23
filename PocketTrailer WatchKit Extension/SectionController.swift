@@ -6,8 +6,8 @@ final class SectionController: CommonController {
 
 	////////////////////// List
 
-	@IBOutlet private weak var table: WKInterfaceTable!
-	@IBOutlet private weak var statusLabel: WKInterfaceLabel!
+	@IBOutlet private var table: WKInterfaceTable!
+	@IBOutlet private var statusLabel: WKInterfaceLabel!
     
 	private var rowControllers = [PopulatableRow]()
 

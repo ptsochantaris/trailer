@@ -1,15 +1,15 @@
 
 final class SetupAssistant: NSWindow, NSWindowDelegate, NSControlTextEditingDelegate {
 
-	@IBOutlet private weak var quickstart: NSTextField!
-	@IBOutlet private weak var buttonLink: NSButton!
-	@IBOutlet private weak var buttonDescription: NSTextField!
-	@IBOutlet private weak var tokenHolder: NSTextField!
-	@IBOutlet private weak var startAtLogin: NSButton!
-	@IBOutlet private weak var completeSetup: NSButton!
-	@IBOutlet private weak var spinner: NSProgressIndicator!
-	@IBOutlet private weak var welcomeLabel: NSTextField!
-	@IBOutlet private weak var importButton: NSButton!
+	@IBOutlet private var quickstart: NSTextField!
+	@IBOutlet private var buttonLink: NSButton!
+	@IBOutlet private var buttonDescription: NSTextField!
+	@IBOutlet private var tokenHolder: NSTextField!
+	@IBOutlet private var startAtLogin: NSButton!
+	@IBOutlet private var completeSetup: NSButton!
+	@IBOutlet private var spinner: NSProgressIndicator!
+	@IBOutlet private var welcomeLabel: NSTextField!
+	@IBOutlet private var importButton: NSButton!
 
 	private let newServer = ApiServer.allApiServers(in: DataManager.main).first!
 	private var checkTimer: Timer?

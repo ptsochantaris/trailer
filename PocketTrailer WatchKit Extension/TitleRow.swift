@@ -17,7 +17,7 @@ final class TitleRow: NSObject, PopulatableRow {
 		}
 	}
     	
-    @IBOutlet private weak var titleL: WKInterfaceLabel!
-    @IBOutlet private weak var prIcon: WKInterfaceImage!
-    @IBOutlet private weak var issueIcon: WKInterfaceImage!
+    @IBOutlet private var titleL: WKInterfaceLabel!
+    @IBOutlet private var prIcon: WKInterfaceImage!
+    @IBOutlet private var issueIcon: WKInterfaceImage!
 }

@@ -33,8 +33,8 @@ final class SectionRow: NSObject, PopulatableRow {
 		}
 	}
 	
-	@IBOutlet private weak var titleL: WKInterfaceLabel!
-	@IBOutlet private weak var countL: WKInterfaceLabel!
-	@IBOutlet private weak var countHolder: WKInterfaceGroup!
-	@IBOutlet private weak var group: WKInterfaceGroup!
+	@IBOutlet private var titleL: WKInterfaceLabel!
+	@IBOutlet private var countL: WKInterfaceLabel!
+	@IBOutlet private var countHolder: WKInterfaceGroup!
+	@IBOutlet private var group: WKInterfaceGroup!
 }

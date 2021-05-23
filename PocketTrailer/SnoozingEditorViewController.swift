@@ -3,13 +3,13 @@ import UIKit
 
 final class SnoozingEditorViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIPickerViewDataSource, UIPickerViewDelegate {
 
-	@IBOutlet private weak var table: UITableView!
-	@IBOutlet private weak var descriptionLabel: UILabel!
+	@IBOutlet private var table: UITableView!
+	@IBOutlet private var descriptionLabel: UILabel!
 
 	var snoozeItem: SnoozePreset?
 	var isNew = false
 
-	@IBOutlet private weak var typeSelector: UISegmentedControl!
+	@IBOutlet private var typeSelector: UISegmentedControl!
 
 	@IBAction private func deleteSelected(_ sender: UIBarButtonItem) {
 
@@ -270,10 +270,10 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 
 	////////////////////////// Picker
 
-	@IBOutlet private weak var pickerBottom: NSLayoutConstraint!
-	@IBOutlet private weak var pickerShield: UIView!
-	@IBOutlet private weak var pickerNavBar: UINavigationBar!
-	@IBOutlet private weak var picker: UIPickerView!
+	@IBOutlet private var pickerBottom: NSLayoutConstraint!
+	@IBOutlet private var pickerShield: UIView!
+	@IBOutlet private var pickerNavBar: UINavigationBar!
+	@IBOutlet private var picker: UIPickerView!
 
 	private enum SnoozePickerMode {
 		case Day

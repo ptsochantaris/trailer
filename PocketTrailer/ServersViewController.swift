@@ -7,7 +7,7 @@ final class ServersViewController: UITableViewController {
 	private var selectedServerId: NSManagedObjectID?
 	private var allServers = [ApiServer]()
 
-    @IBOutlet weak var apiSwitch: UIBarButtonItem!
+    @IBOutlet var apiSwitch: UIBarButtonItem!
     
     @IBAction private func doneSelected() {
 		dismiss(animated: true)

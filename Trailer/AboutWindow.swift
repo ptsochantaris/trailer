@@ -1,7 +1,7 @@
 
 final class AboutWindow: NSWindow, NSWindowDelegate {
 
-	@IBOutlet weak var version: NSTextField!
+	@IBOutlet var version: NSTextField!
 
 	@IBAction private func gitHubLinkSelected(_ sender: NSButton) {
 		openLink(URL(string: "https://github.com/ptsochantaris/trailer")!)

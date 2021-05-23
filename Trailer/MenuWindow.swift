@@ -1,11 +1,11 @@
 
 final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
 
-	@IBOutlet weak var scrollView: NSScrollView!
-	@IBOutlet private weak var header: ViewAllowsVibrancy!
-	@IBOutlet weak var table: PrTable!
-	@IBOutlet weak var filter: NSSearchField!
-	@IBOutlet weak var refreshMenuItem: NSMenuItem!
+	@IBOutlet var scrollView: NSScrollView!
+	@IBOutlet private var header: ViewAllowsVibrancy!
+	@IBOutlet var table: PrTable!
+	@IBOutlet var filter: NSSearchField!
+	@IBOutlet var refreshMenuItem: NSMenuItem!
 
 	var statusItem: NSStatusItem?
 

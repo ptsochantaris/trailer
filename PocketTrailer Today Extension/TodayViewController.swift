@@ -5,11 +5,11 @@ import NotificationCenter
 
 final class TodayViewController: UIViewController, NCWidgetProviding {
 
-	@IBOutlet private weak var prLabel: UILabel!
-	@IBOutlet private weak var issuesLabel: UILabel!
-	@IBOutlet private weak var updatedLabel: UILabel!
-	@IBOutlet private weak var prImage: UIImageView!
-	@IBOutlet private weak var issueImage: UIImageView!
+	@IBOutlet private var prLabel: UILabel!
+	@IBOutlet private var issuesLabel: UILabel!
+	@IBOutlet private var updatedLabel: UILabel!
+	@IBOutlet private var prImage: UIImageView!
+	@IBOutlet private var issueImage: UIImageView!
 
 	private var linkButton = UIButton(type: .custom)
 	private let paragraph = NSMutableParagraphStyle()

@@ -20,11 +20,11 @@ final class PRCell: UITableViewCell {
 	private var failedToLoadImage: String?
 	private var waitingForImageInPath: String?
 
-	@IBOutlet private weak var _image: UIImageView!
-	@IBOutlet private weak var _title: UILabel!
-	@IBOutlet private weak var _labels: UILabel!
-    @IBOutlet private weak var _description: UILabel!
-	@IBOutlet private weak var _statuses: UILabel!
+	@IBOutlet private var _image: UIImageView!
+	@IBOutlet private var _title: UILabel!
+	@IBOutlet private var _labels: UILabel!
+    @IBOutlet private var _description: UILabel!
+	@IBOutlet private var _statuses: UILabel!
 
 	override func awakeFromNib() {
 

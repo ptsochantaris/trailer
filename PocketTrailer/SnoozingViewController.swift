@@ -12,7 +12,7 @@ final class PreferencesTabBarController: UITabBarController {
 
 final class SnoozingViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, PickerViewControllerDelegate {
 
-	@IBOutlet private weak var table: UITableView!
+	@IBOutlet private var table: UITableView!
 
 	private var settingsChangedTimer: PopTimer!
 

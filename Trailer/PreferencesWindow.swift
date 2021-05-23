@@ -196,7 +196,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet private var reactionIntervalStepper: NSStepper!
 
 	// Tabs
-	@IBOutlet weak var tabs: NSTabView!
+	@IBOutlet var tabs: NSTabView!
 
 	override func awakeFromNib() {
 		super.awakeFromNib()

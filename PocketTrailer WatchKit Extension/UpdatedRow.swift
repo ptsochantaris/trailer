@@ -7,5 +7,5 @@ final class UpdatedRow: NSObject, PopulatableRow {
         updatedLabel.setText((other as? UpdatedRow)?.label)
     }
 
-    @IBOutlet private weak var updatedLabel: WKInterfaceLabel!
+    @IBOutlet private var updatedLabel: WKInterfaceLabel!
 }
