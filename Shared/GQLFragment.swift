@@ -15,13 +15,7 @@ final class GQLFragment: GQLScanning, Hashable {
 		return "fragment \(name) on \(type) { __typename " + elements.map({$0.queryText}).joined(separator: " ") + " }"
 	}
 
-	var fragments: [GQLFragment] {
-		var res = [self]
-		for e in elements {
-			res.append(contentsOf: e.fragments)
-		}
-		return res
-	}
+	var fragments: [GQLFragment] { elements.reduce([self]) { $0 + $1.fragments } }
 
 	init(on type: String, elements: [GQLElement]) {
         self.name = type.lowercased() + "Fragment"

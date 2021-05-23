@@ -2,26 +2,34 @@ import Foundation
 import CoreData
 
 final class GraphQL {
+    
+    private static let idField = GQLField(name: "id")
+    
+    private static let nameWithOwnerField = GQLField(name: "nameWithOwner")
         
     private static let userFragment = GQLFragment(on: "User", elements: [
-        GQLField(name: "id"),
+        idField,
         GQLField(name: "login"),
         GQLField(name: "avatarUrl")
     ])
 
+    private static let userIdFragment = GQLFragment(on: "User", elements: [
+        idField,
+    ])
+
     private static let mannequinFragment = GQLFragment(on: "Mannequin", elements: [
-        GQLField(name: "id"),
+        idField,
         GQLField(name: "login"),
         GQLField(name: "avatarUrl")
     ])
     
     private static let teamFragment = GQLFragment(on: "Team", elements: [
-        GQLField(name: "id"),
+        idField,
         GQLField(name: "slug")
     ])
     
     private static let commentFields: [GQLElement] = [
-        GQLField(name: "id"),
+        idField,
         GQLField(name: "body"),
         GQLField(name: "url"),
         GQLField(name: "createdAt"),
@@ -48,14 +56,14 @@ final class GraphQL {
     static func update<T: ListableItem>(for items: [T], of type: T.Type, in moc: NSManagedObjectContext, steps: API.SyncSteps, callback: @escaping (Error?) -> Void) {
         let typeName = String(describing: T.self)
         
-        var elements: [GQLElement] = [GQLField(name: "id")]
+        var elements: [GQLElement] = [idField]
         var elementTypes = [String]()
         
         if let prs = items as? [PullRequest] {
             if steps.contains(.reviewRequests) {
                 elementTypes.append("ReviewRequest")
                 let requestFragment = GQLFragment(on: "ReviewRequest", elements: [
-                    GQLField(name: "id"),
+                    idField,
                     GQLGroup(name: "requestedReviewer", fields: [userFragment, teamFragment, mannequinFragment]),
                 ])
                 elements.append(GQLGroup(name: "reviewRequests", fields: [requestFragment], pageSize: 100))
@@ -70,7 +78,7 @@ final class GraphQL {
                 
                 elementTypes.append("PullRequestReview")
                 let reviewFragment = GQLFragment(on: "PullRequestReview", elements: [
-                    GQLField(name: "id"),
+                    idField,
                     GQLField(name: "body"),
                     GQLField(name: "state"),
                     GQLField(name: "createdAt"),
@@ -91,7 +99,7 @@ final class GraphQL {
                 
                 elementTypes.append("StatusContext")
                 let statusFragment = GQLFragment(on: "StatusContext", elements: [
-                    GQLField(name: "id"),
+                    idField,
                     GQLField(name: "context"),
                     GQLField(name: "description"),
                     GQLField(name: "state"),
@@ -119,7 +127,7 @@ final class GraphQL {
             
             elementTypes.append("Reaction")
             let reactionFragment = GQLFragment(on: "Reaction", elements: [
-                GQLField(name: "id"),
+                idField,
                 GQLField(name: "content"),
                 GQLField(name: "createdAt"),
                 GQLGroup(name: "user", fields: [userFragment])
@@ -146,14 +154,14 @@ final class GraphQL {
     
     static func updateReactions(for comments: [PRComment], moc: NSManagedObjectContext, callback: @escaping (Error?) -> Void) {
         let reactionFragment = GQLFragment(on: "Reaction", elements: [
-            GQLField(name: "id"),
+            idField,
             GQLField(name: "content"),
             GQLField(name: "createdAt"),
             GQLGroup(name: "user", fields: [userFragment])
         ])
 
         let itemFragment = GQLFragment(on: "IssueComment", elements: [
-            GQLField(name: "id"),
+            idField,
             GQLGroup(name: "reactions", fields: [reactionFragment], pageSize: 100)
             ])
         
@@ -164,7 +172,7 @@ final class GraphQL {
         let commentFragment = GQLFragment(on: "PullRequestReviewComment", elements: commentFields)
         
         let itemFragment = GQLFragment(on: "PullRequestReview", elements: [
-            GQLField(name: "id"),
+            idField,
             GQLGroup(name: "comments", fields: [commentFragment], pageSize: 100)
         ])
 
@@ -239,7 +247,7 @@ final class GraphQL {
     
     private static var labelFragment: GQLFragment {
         return GQLFragment(on: "Label", elements: [
-            GQLField(name: "id"),
+            idField,
             GQLField(name: "name"),
             GQLField(name: "color"),
             GQLField(name: "createdAt"),
@@ -249,7 +257,7 @@ final class GraphQL {
     
     private static var repositoryFragment: GQLFragment {
         return GQLFragment(on: "Repository", elements: [
-            GQLField(name: "id"),
+            idField,
             GQLField(name: "createdAt"),
             GQLField(name: "updatedAt"),
             GQLField(name: "isFork"),
@@ -257,13 +265,13 @@ final class GraphQL {
             GQLField(name: "nameWithOwner"),
             GQLField(name: "url"),
             GQLField(name: "isPrivate"),
-            GQLGroup(name: "owner", fields: [GQLField(name: "id")])
+            GQLGroup(name: "owner", fields: [idField])
         ])
     }
-
+    
     private static func prFragment(assigneesAndLabelPageSize: Int, includeRepo: Bool) -> GQLFragment {
         var elements: [GQLElement] = [
-            GQLField(name: "id"),
+            idField,
             GQLField(name: "bodyText"),
             GQLField(name: "state"),
             GQLField(name: "createdAt"),
@@ -280,8 +288,11 @@ final class GraphQL {
             GQLField(name: "additions"),
             GQLField(name: "deletions"),
             GQLField(name: "headRefName"),
+            GQLField(name: "baseRefName"),
             GQLField(name: "isDraft"),
-            GQLGroup(name: "mergedBy", fields: [userFragment])
+            GQLGroup(name: "mergedBy", fields: [userIdFragment]),
+            GQLGroup(name: "baseRepository", fields: [nameWithOwnerField]),
+            GQLGroup(name: "headRepository", fields: [nameWithOwnerField])
         ]
         if includeRepo {
             elements.append(GQLGroup(name: "repository", fields: [repositoryFragment]))
@@ -291,7 +302,7 @@ final class GraphQL {
     
     private static func issueFragment(assigneesAndLabelPageSize: Int, includeRepo: Bool) -> GQLFragment {
         var elements: [GQLElement] = [
-            GQLField(name: "id"),
+            idField,
             GQLField(name: "bodyText"),
             GQLField(name: "state"),
             GQLField(name: "createdAt"),
@@ -366,22 +377,22 @@ final class GraphQL {
     static func fetchAllSubscribedItems(from repos: [Repo], group: DispatchGroup) {
         
         let latestPrsFragment = GQLFragment(on: "Repository", elements: [
-            GQLField(name: "id"),
+            idField,
             GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["orderBy": "{direction: DESC, field: UPDATED_AT}"], pageSize: 10),
             ])
 
         let latestIssuesFragment = GQLFragment(on: "Repository", elements: [
-            GQLField(name: "id"),
+            idField,
             GQLGroup(name: "issues", fields: [issueFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["orderBy": "{direction: DESC, field: UPDATED_AT}"], pageSize: 20)
             ])
         
         let allOpenPrsFragment = GQLFragment(on: "Repository", elements: [
-            GQLField(name: "id"),
+            idField,
             GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["states": "OPEN"], pageSize: 50),
             ])
 
         let allOpenIssuesFragment = GQLFragment(on: "Repository", elements: [
-            GQLField(name: "id"),
+            idField,
             GQLGroup(name: "issues", fields: [issueFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["states": "OPEN"], pageSize: 50)
             ])
 

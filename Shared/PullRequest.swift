@@ -17,6 +17,8 @@ final class PullRequest: ListableItem {
     @NSManaged var linesRemoved: Int64
     @NSManaged var isMergeable: Bool
     @NSManaged var headRefName: String?
+    @NSManaged var headLabel: String?
+    @NSManaged var baseLabel: String?
 
 	@NSManaged var statuses: Set<PRStatus>
 	@NSManaged var reviews: Set<Review>
@@ -48,9 +50,25 @@ final class PullRequest: ListableItem {
             pr.linesAdded = json["additions"] as? Int64 ?? 0
             pr.linesRemoved = json["deletions"] as? Int64 ?? 0
             pr.mergeCommitSha = json["headRefOid"] as? String
-            pr.headRefName = json["headRefName"] as? String
             pr.mergedByNodeId = (json["mergedBy"] as? [AnyHashable: Any])?["id"] as? String
             pr.baseNodeSync(nodeJson: json, parent: parent)
+            
+            let headRefName = json["headRefName"] as? String
+            if let headRefName = headRefName,
+               let headRepoName = (json["headRepository"] as? [AnyHashable: Any])?["nameWithOwner"] as? String {
+                pr.headLabel = headRepoName + ":" + headRefName
+            } else {
+                pr.headLabel = nil
+            }
+            pr.headRefName = headRefName
+
+            let baseRefName = json["baseRefName"] as? String
+            if let baseRefName = baseRefName,
+               let baseRepoName = (json["baseRepository"] as? [AnyHashable: Any])?["nameWithOwner"] as? String {
+                pr.baseLabel = baseRepoName + ":" + baseRefName
+            } else {
+                pr.baseLabel = nil
+            }
         }
     }
 
@@ -69,9 +87,13 @@ final class PullRequest: ListableItem {
 			if isNewOrUpdated {
 
 				item.baseSync(from: info, in: repo)
-                
+
+                let baseInfo = info["base"] as? [AnyHashable: Any]
+                item.baseLabel = baseInfo?["label"] as? String
+
                 let headInfo = info["head"] as? [AnyHashable: Any]
                 item.headRefName = headInfo?["ref"] as? String
+                item.headLabel = headInfo?["label"] as? String
 
                 if
                     let newHeadCommitSha = headInfo?["sha"] as? String,

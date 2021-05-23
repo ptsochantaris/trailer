@@ -28,14 +28,7 @@ final class GQLBatchGroup: GQLScanning {
 		}
 	}
 
-	var fragments: [GQLFragment] {
-		var fragments = [GQLFragment]()
-		for f in idsToGroups.values {
-			let newFragments = f.fragments
-			fragments.append(contentsOf: newFragments)
-		}
-		return fragments
-	}
+	var fragments: [GQLFragment] { idsToGroups.values.reduce([]) { $0 + $1.fragments } }
 
 	private var pageOfIds: [String] {
 		let k = idsToGroups.keys.sorted()

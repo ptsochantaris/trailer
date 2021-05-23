@@ -39,10 +39,7 @@ final class GQLQuery {
     }
     
     private var fragmentQueryText: String {
-        var fragments = Set<GQLFragment>()
-        rootElement.fragments.forEach {
-            fragments.insert($0)
-        }
+        let fragments = Set(rootElement.fragments)
         return fragments.map { $0.declaration }.joined(separator: " ")
     }
     
@@ -118,7 +115,7 @@ final class GQLQuery {
                 }
                 return
             }
-                        
+            
             let r = self.rootElement
             guard let topData = data[r.name] else {
                 doneWithError("No data in JSON", nil, shouldRetry: false, apiStats: apiStats)

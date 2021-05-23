@@ -64,13 +64,7 @@ final class GQLGroup: GQLScanning {
 		return query
 	}
 	
-	var fragments: [GQLFragment] {
-		var res = [GQLFragment]()
-		for f in fields {
-			res.append(contentsOf: f.fragments)
-		}
-		return res
-	}
+	var fragments: [GQLFragment] { fields.reduce([]) { $0 + $1.fragments } }
     
     private static let nodeCallbackLock = NSLock()
 
