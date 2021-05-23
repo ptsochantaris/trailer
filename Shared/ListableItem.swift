@@ -759,7 +759,50 @@ class ListableItem: DataItem {
 		var darkSubtitle = lightSubtitle
 		darkSubtitle[NSAttributedString.Key.foregroundColor] = darkColor
 
-		if Settings.showReposInName, let n = repo.fullName {
+        if Settings.showBaseAndHeadBranches, let p = self as? PullRequest, let b = p.baseLabel, let h = p.headLabel {
+            let splitB = b.components(separatedBy: ":")
+            let splitH = h.components(separatedBy: ":")
+            let repoB, repoH, branchB, branchH: String?
+            if splitB.count == 2 && splitH.count == 2 {
+                repoB = splitB.first ?? repo.fullName
+                if splitB.first == splitH.first { // same repo
+                    repoH = nil
+                } else {
+                    repoH = splitH.first
+                }
+            } else {
+                repoH = splitH.first
+                repoB = splitB.first
+            }
+            branchB = splitB.last
+            branchH = splitH.last
+
+            if let repoB = repoB {
+                _subtitle.append(NSAttributedString(string: repoB, attributes: darkSubtitle))
+                if branchB != nil {
+                    _subtitle.append(NSAttributedString(string: ":", attributes: lightSubtitle))
+                }
+            }
+            if let branchB = branchB {
+                _subtitle.append(NSAttributedString(string: branchB, attributes: lightSubtitle))
+            }
+            
+            if repoH != nil || branchH != nil {
+                _subtitle.append(NSAttributedString(string: " ← ", attributes: lightSubtitle))
+            }
+            
+            if let repoH = repoH {
+                _subtitle.append(NSAttributedString(string: repoH, attributes: lightSubtitle))
+                if branchH != nil {
+                    _subtitle.append(NSAttributedString(string: ":", attributes: lightSubtitle))
+                }
+            }
+            if let branchH = branchH {
+                _subtitle.append(NSAttributedString(string: branchH, attributes: lightSubtitle))
+            }
+            _subtitle.append(separatorString)
+            
+        } else if Settings.showReposInName, let n = repo.fullName {
 			_subtitle.append(NSAttributedString(string: n, attributes: darkSubtitle))
 			_subtitle.append(separatorString)
 		}

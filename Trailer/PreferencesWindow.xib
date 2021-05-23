@@ -78,7 +78,7 @@
                                                                 </textFieldCell>
                                                                 <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                             </tableColumn>
-                                                            <tableColumn identifier="api_use" editable="NO" width="53" minWidth="10" maxWidth="3.4028234663852886e+38" id="pbE-pE-euq">
+                                                            <tableColumn identifier="api_use" editable="NO" width="24" minWidth="10" maxWidth="3.4028234663852886e+38" id="pbE-pE-euq">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="API use">
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
@@ -128,7 +128,7 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="k1C-rR-Wxu">
-                                                        <rect key="frame" x="199" y="7" width="80" height="32"/>
+                                                        <rect key="frame" x="198" y="7" width="80" height="32"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                         <buttonCell key="cell" type="push" title="Delete" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="y4c-TX-UeH">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -139,7 +139,7 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Tu3-cb-beM">
-                                                        <rect key="frame" x="16" y="7" width="66" height="32"/>
+                                                        <rect key="frame" x="15" y="7" width="66" height="32"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                         <buttonCell key="cell" type="push" title="Test" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="QdL-bA-0NX">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -258,7 +258,7 @@ Token</string>
                                                         </connections>
                                                     </textField>
                                                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="q1S-M3-nh6">
-                                                        <rect key="frame" x="242" y="52" width="130" height="17"/>
+                                                        <rect key="frame" x="241" y="52" width="130" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                         <buttonCell key="cell" type="inline" title="Existing Tokens" bezelStyle="inline" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="OhE-A7-jdY">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -350,7 +350,7 @@ Token</string>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <clipView key="contentView" id="hCD-zR-3bF">
                                                 <rect key="frame" x="1" y="1" width="869" height="318"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" rowHeight="20" headerView="qia-ub-v1J" id="6pK-a1-URw">
                                                         <rect key="frame" x="0.0" y="0.0" width="869" height="301"/>
@@ -359,7 +359,7 @@ Token</string>
                                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                         <tableColumns>
-                                                            <tableColumn identifier="repos" editable="NO" width="389" minWidth="100" maxWidth="10000" id="nW5-Ng-D0l">
+                                                            <tableColumn identifier="repos" editable="NO" width="369" minWidth="100" maxWidth="10000" id="nW5-Ng-D0l">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Watched Repository">
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.33333298560000002" alpha="1" colorSpace="calibratedWhite"/>
@@ -625,11 +625,11 @@ Token</string>
                                                         </subviews>
                                                     </view>
                                                 </box>
-                                                <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="16" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" fixedFrame="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TRE-eo-aLK">
-                                                    <rect key="frame" x="18" y="24" width="334" height="368"/>
+                                                <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="14" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" fixedFrame="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TRE-eo-aLK">
+                                                    <rect key="frame" x="18" y="46" width="395" height="346"/>
                                                     <subviews>
                                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="Efg-Id-lOP">
-                                                            <rect key="frame" x="-2" y="351" width="336" height="18"/>
+                                                            <rect key="frame" x="-2" y="329" width="336" height="18"/>
                                                             <buttonCell key="cell" type="check" title="Display item creation times instead of update times" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="yUS-qR-eV4">
                                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                 <font key="font" metaFont="system"/>
@@ -638,18 +638,41 @@ Token</string>
                                                                 <action selector="showCreationSelected:" target="vQH-WF-vh2" id="ie4-88-nBp"/>
                                                             </connections>
                                                         </button>
-                                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="yK4-xL-QRu">
-                                                            <rect key="frame" x="-2" y="319" width="168" height="18"/>
-                                                            <buttonCell key="cell" type="check" title="Show repository names" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="oZY-hH-Udu">
-                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                <font key="font" metaFont="system"/>
-                                                            </buttonCell>
-                                                            <connections>
-                                                                <action selector="displayRepositoryNameSelected:" target="vQH-WF-vh2" id="PMz-8Z-bde"/>
-                                                            </connections>
-                                                        </button>
+                                                        <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yLm-V6-e9K">
+                                                            <rect key="frame" x="0.0" y="300" width="395" height="16"/>
+                                                            <subviews>
+                                                                <button translatesAutoresizingMaskIntoConstraints="NO" id="yK4-xL-QRu">
+                                                                    <rect key="frame" x="-2" y="-1" width="168" height="18"/>
+                                                                    <buttonCell key="cell" type="check" title="Show repository names" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="oZY-hH-Udu">
+                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                        <font key="font" metaFont="system"/>
+                                                                    </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="displayRepositoryNameSelected:" target="vQH-WF-vh2" id="PMz-8Z-bde"/>
+                                                                    </connections>
+                                                                </button>
+                                                                <button translatesAutoresizingMaskIntoConstraints="NO" id="xW2-Xd-Qws">
+                                                                    <rect key="frame" x="166" y="-1" width="231" height="18"/>
+                                                                    <buttonCell key="cell" type="check" title="…including base &amp; head branches" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="CCA-1K-c5D">
+                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                        <font key="font" metaFont="system"/>
+                                                                    </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="showBaseAndHeadBranchesSelected:" target="vQH-WF-vh2" id="wei-ea-OsP"/>
+                                                                    </connections>
+                                                                </button>
+                                                            </subviews>
+                                                            <visibilityPriorities>
+                                                                <integer value="1000"/>
+                                                                <integer value="1000"/>
+                                                            </visibilityPriorities>
+                                                            <customSpacing>
+                                                                <real value="3.4028234663852886e+38"/>
+                                                                <real value="3.4028234663852886e+38"/>
+                                                            </customSpacing>
+                                                        </stackView>
                                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="onl-1T-RTg">
-                                                            <rect key="frame" x="-2" y="287" width="275" height="18"/>
+                                                            <rect key="frame" x="-2" y="269" width="275" height="18"/>
                                                             <buttonCell key="cell" type="check" title="Display relative instead of absolute dates" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="Mtr-gs-YsM">
                                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                 <font key="font" metaFont="system"/>
@@ -659,7 +682,7 @@ Token</string>
                                                             </connections>
                                                         </button>
                                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="3CV-9S-gLw">
-                                                            <rect key="frame" x="-2" y="255" width="145" height="18"/>
+                                                            <rect key="frame" x="-2" y="239" width="145" height="18"/>
                                                             <buttonCell key="cell" type="check" title="Hide author avatars" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="UOs-3D-XyL">
                                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                 <font key="font" metaFont="system"/>
@@ -669,7 +692,7 @@ Token</string>
                                                             </connections>
                                                         </button>
                                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="VrU-mc-Czw">
-                                                            <rect key="frame" x="-2" y="223" width="330" height="18"/>
+                                                            <rect key="frame" x="-2" y="209" width="330" height="18"/>
                                                             <buttonCell key="cell" type="check" title="Separate each API server in its own menu bar item" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="C7K-xS-315">
                                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                 <font key="font" metaFont="system"/>
@@ -679,7 +702,7 @@ Token</string>
                                                             </connections>
                                                         </button>
                                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="9fQ-lN-76c">
-                                                            <rect key="frame" x="-2" y="191" width="230" height="18"/>
+                                                            <rect key="frame" x="-2" y="179" width="230" height="18"/>
                                                             <buttonCell key="cell" type="check" title="Hide item count in menubar items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="mAZ-e8-NLS">
                                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                 <font key="font" metaFont="system"/>
@@ -689,7 +712,7 @@ Token</string>
                                                             </connections>
                                                         </button>
                                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="TdQ-hP-A3t">
-                                                            <rect key="frame" x="-2" y="159" width="225" height="18"/>
+                                                            <rect key="frame" x="-2" y="149" width="225" height="18"/>
                                                             <buttonCell key="cell" type="check" title="Sync and display labels for items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="5sv-cq-odI">
                                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                 <font key="font" metaFont="system"/>
@@ -699,7 +722,7 @@ Token</string>
                                                             </connections>
                                                         </button>
                                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="fsA-E5-SRy">
-                                                            <rect key="frame" x="-2" y="127" width="251" height="18"/>
+                                                            <rect key="frame" x="-2" y="119" width="251" height="18"/>
                                                             <buttonCell key="cell" type="check" title="Highlight PRs that have new commits" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="T2C-n7-dIU">
                                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                 <font key="font" metaFont="system"/>
@@ -709,7 +732,7 @@ Token</string>
                                                             </connections>
                                                         </button>
                                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="GMt-gT-i3d">
-                                                            <rect key="frame" x="-2" y="95" width="169" height="18"/>
+                                                            <rect key="frame" x="-2" y="89" width="169" height="18"/>
                                                             <buttonCell key="cell" type="check" title="Display item milestones" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="fnW-oB-nHX">
                                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                 <font key="font" metaFont="system"/>
@@ -719,7 +742,7 @@ Token</string>
                                                             </connections>
                                                         </button>
                                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="CjN-R7-2iD">
-                                                            <rect key="frame" x="-2" y="63" width="251" height="18"/>
+                                                            <rect key="frame" x="-2" y="59" width="251" height="18"/>
                                                             <buttonCell key="cell" type="check" title="Prefix PR/Issue numbers in item titles" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="A3t-GS-DJr">
                                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                 <font key="font" metaFont="system"/>
@@ -729,7 +752,7 @@ Token</string>
                                                             </connections>
                                                         </button>
                                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="qXS-9a-Cpn">
-                                                            <rect key="frame" x="-2" y="31" width="261" height="18"/>
+                                                            <rect key="frame" x="-2" y="29" width="261" height="18"/>
                                                             <buttonCell key="cell" type="check" title="Mark non-mergeable PRs (v4 API only)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="lKz-ia-ofo">
                                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                 <font key="font" metaFont="system"/>
@@ -1846,7 +1869,7 @@ Tip: Reactions are treated like comments, i.e. the rules about being notified on
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" heightSizable="YES"/>
                                             <clipView key="contentView" id="Fou-QI-zfT">
                                                 <rect key="frame" x="1" y="1" width="377" height="383"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="20" id="EjH-yo-GqO">
                                                         <rect key="frame" x="0.0" y="0.0" width="377" height="383"/>
@@ -1855,7 +1878,7 @@ Tip: Reactions are treated like comments, i.e. the rules about being notified on
                                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                         <tableColumns>
-                                                            <tableColumn width="365" minWidth="40" maxWidth="1000" id="PkK-PU-9s3">
+                                                            <tableColumn width="336" minWidth="40" maxWidth="1000" id="PkK-PU-9s3">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
@@ -2660,6 +2683,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="scanClosedAndMergedItems" destination="yWZ-ok-Fkz" id="pw9-Ka-yxd"/>
                 <outlet property="serverList" destination="wPh-gi-N9t" id="B6u-Jh-imO"/>
                 <outlet property="showAllComments" destination="UGp-d4-lNW" id="nt3-bL-T3b"/>
+                <outlet property="showBaseAndHeadBranches" destination="xW2-Xd-Qws" id="Zbc-nI-Wmo"/>
                 <outlet property="showCreationDates" destination="Efg-Id-lOP" id="cZu-0h-5hD"/>
                 <outlet property="showLabels" destination="TdQ-hP-A3t" id="Y6e-2v-YKf"/>
                 <outlet property="showPrLines" destination="yQr-zH-RGb" id="EqE-gE-Ixf"/>

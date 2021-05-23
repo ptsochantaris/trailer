@@ -113,7 +113,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
     @IBOutlet private var draftHandlingPolicy: NSPopUpButton!
     @IBOutlet private var markUnmergeablePrs: NSButton!
     @IBOutlet private var showPrLines: NSButton!
-
+    @IBOutlet private var showBaseAndHeadBranches: NSButton!
+    
 	// Servers
 	@IBOutlet private var serverList: NSTableView!
 	@IBOutlet private var apiServerName: NSTextField!
@@ -277,23 +278,28 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
+    @IBAction private func showBaseAndHeadBranchesSelected(_ sender: NSButton) {
+        Settings.showBaseAndHeadBranches = sender.integerValue == 1
+        deferredUpdateTimer.push()
+    }
+    
     @IBAction private func showPrLinesSelected(_ sender: NSButton) {
         Settings.showPrLines = sender.integerValue == 1
         deferredUpdateTimer.push()
     }
 
     @IBAction private func listStatusesGreenSelected(_ sender: NSButton) {
-        Settings.showStatusesGreen = !Settings.showStatusesGreen
+        Settings.showStatusesGreen = sender.integerValue ==  1
         deferredUpdateTimer.push()
     }
 
     @IBAction private func listStatusesYellowSelected(_ sender: NSButton) {
-        Settings.showStatusesYellow = !Settings.showStatusesYellow
+        Settings.showStatusesYellow = sender.integerValue ==  1
         deferredUpdateTimer.push()
     }
 
     @IBAction private func listStatusesRedSelected(_ sender: NSButton) {
-        Settings.showStatusesRed = !Settings.showStatusesRed
+        Settings.showStatusesRed = sender.integerValue ==  1
         deferredUpdateTimer.push()
     }
 
@@ -513,6 +519,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
         markUnmergeablePrs.toolTip = Settings.markUnmergeablePrsHelp
         showPrLines.toolTip = Settings.showPrLinesHelp
         reloadAllDataHelp.stringValue = Settings.reloadAllDataHelp
+        showBaseAndHeadBranches.toolTip = Settings.showBaseAndHeadBranchesHelp
 	}
 
 	private func updateAllItemSettingButtons() {
@@ -608,7 +615,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
         markUnmergeablePrs.integerValue = Settings.markUnmergeablePrs ? 1 : 0
         showPrLines.integerValue = Settings.showPrLines ? 1 : 0
         showRequestedTeamReviews.integerValue = Settings.showRequestedTeamReviews ? 1 : 0
-                
+        showBaseAndHeadBranches.integerValue = Settings.showBaseAndHeadBranches ? 1: 0
+        
 		defaultOpenApp.stringValue = Settings.defaultAppForOpeningItems
 		defaultOpenLinks.stringValue = Settings.defaultAppForOpeningWeb
 
