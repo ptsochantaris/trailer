@@ -110,4 +110,7 @@ extension String {
             return appending(pathComponent)
         }
     }
+    var comparableForm: String {
+        self.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
+    }
 }

@@ -225,6 +225,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
         n.addObserver(self, selector: #selector(updateImportExportSettings), name: .SettingsExported, object: nil)
 
 		deferredUpdateTimer = PopTimer(timeInterval: 1) { [weak self] in
+            DataManager.postProcessAllItems()
 			if let s = self, s.serversDirty {
 				s.serversDirty = false
 				DataManager.saveDB()
@@ -364,14 +365,12 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBAction private func assignedReviewHandlingPolicySelected(_ sender: NSPopUpButton) {
 		let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
 		Settings.assignedReviewHandlingPolicy = sender.index(of: sender.selectedItem!)
-		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 		showOptionalReviewAssignmentWarning(previousSync: previousShouldSync)
 	}
     
     @IBAction private func draftHandlingPolicy(_ sender: NSPopUpButton) {
         Settings.draftHandlingPolicy = sender.index(of: sender.selectedItem!)
-        DataManager.postProcessAllItems()
         deferredUpdateTimer.push()
     }
 
@@ -717,30 +716,25 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBAction private func notifyOnItemReactionsSelected(_ sender: NSButton) {
 		Settings.notifyOnItemReactions = sender.integerValue == 1
 		updateReactionItemOptions()
-		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
 	@IBAction private func notifyOnCommentReactionsSelected(_ sender: NSButton) {
 		Settings.notifyOnCommentReactions = sender.integerValue == 1
 		updateReactionItemOptions()
-		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
 	@IBAction private func newMentionMovePolicySelected(_ sender: NSPopUpButton) {
 		Settings.newMentionMovePolicy = sender.indexOfSelectedItem
-		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 	@IBAction private func teamMentionMovePolicySelected(_ sender: NSPopUpButton) {
 		Settings.teamMentionMovePolicy = sender.indexOfSelectedItem
-		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 	@IBAction private func newItemInOwnedRepoMovePolicySelected(_ sender: NSPopUpButton) {
 		Settings.newItemInOwnedRepoMovePolicy = sender.indexOfSelectedItem
-		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
@@ -875,7 +869,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction private func assumeAllCommentsBeforeMineAreReadSelected(_ sender: NSButton) {
 		Settings.assumeReadItemIfUserHasNewerComments = (sender.integerValue==1)
-		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
@@ -919,7 +912,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction private func hidePrsThatDontPassOnlyInAllSelected(_ sender: NSButton) {
 		Settings.hidePrsThatDontPassOnlyInAll = (sender.integerValue==1)
-		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
@@ -934,13 +926,11 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBAction private func hidePrsThatDontPassSelected(_ sender: NSButton) {
 		Settings.hidePrsThatArentPassing = (sender.integerValue==1)
 		updateStatusItemsOptions()
-		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
 	@IBAction private func hideAvatarsSelected(_ sender: NSButton) {
 		Settings.hideAvatars = (sender.integerValue==1)
-		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
@@ -1002,7 +992,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	private func updateDisplayIssuesSetting() {
-		DataManager.postProcessAllItems()
 		preferencesDirty = true
 		serversDirty = true
 		deferredUpdateTimer.push()
@@ -1018,20 +1007,17 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction private func hideUncommentedRequestsSelected(_ sender: NSButton) {
 		Settings.hideUncommentedItems = (sender.integerValue==1)
-		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
 	@IBAction private func showAllCommentsSelected(_ sender: NSButton) {
 		Settings.showCommentsEverywhere = (sender.integerValue==1)
-		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
 	@IBAction private func sortOrderSelected(_ sender: NSButton) {
 		Settings.sortDescending = (sender.integerValue==1)
 		setupSortMethodMenu()
-		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
@@ -1041,7 +1027,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction private func sortMethodChanged(_ sender: NSMenuItem) {
 		Settings.sortMethod = sortModeSelect.indexOfSelectedItem
-		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
@@ -1121,7 +1106,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction private func showCreationSelected(_ sender: NSButton) {
 		Settings.showCreatedInsteadOfUpdated = (sender.integerValue==1)
-		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
@@ -1132,7 +1116,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction private func assignedPrHandlingPolicySelected(_ sender: NSPopUpButton) {
 		Settings.assignedPrHandlingPolicy = sender.indexOfSelectedItem
-		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
@@ -1800,7 +1783,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		for i in DataItem.allItems(of: Issue.self, in: DataManager.main) {
 			i.wakeIfAutoSnoozed()
 		}
-		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 

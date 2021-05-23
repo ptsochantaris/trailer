@@ -525,6 +525,27 @@ class ListableItem: DataItem {
             targetSection = .none
 		}
         
+        
+        if targetSection != .none {
+            let excludeLabels = Settings.labelBlacklist
+            if !excludeLabels.isEmpty {
+                let excluded = Set(excludeLabels.map { $0.comparableForm })
+                let mine = Set(labels.compactMap { $0.name?.comparableForm })
+                if !excluded.isDisjoint(with: mine) {
+                    targetSection = .none
+                }
+            }
+        }
+        
+        if targetSection != .none {
+            let excludeAuthors = Settings.itemAuthorBlacklist.map { $0.comparableForm }
+            if !excludeAuthors.isEmpty, let login = userLogin?.comparableForm {
+                if excludeAuthors.contains(login) {
+                    targetSection = .none
+                }
+            }
+        }
+        
         if targetSection != .none && shouldMoveToSnoozing {
             targetSection = .snoozed
         }
@@ -548,6 +569,10 @@ class ListableItem: DataItem {
             catchUpCommentDate()
 			unreadComments = 0
 		}
+
+        if Settings.hideUncommentedItems, unreadComments == 0 {
+            targetSection = .none
+        }
 
 		if snoozeUntil != nil, let p = self as? PullRequest, shouldWakeOnComment, p.hasNewCommits { // we wake on comments and have a new commit alarm
 			wakeUp() // re-process as awake item
@@ -992,20 +1017,6 @@ class ListableItem: DataItem {
 			}
 		}
         
-		if Settings.hideUncommentedItems {
-			andPredicates.append(itemType.includeInUnreadPredicate)
-		}
-
-        let excludeLabels = Settings.labelBlacklist
-        if !excludeLabels.isEmpty {
-            andPredicates.append(NSPredicate(format: "SUBQUERY(labels, $label, $label.name IN[cd] %@).@count == 0", excludeLabels))
-        }
-
-        let excludeAuthors = Settings.itemAuthorBlacklist
-        if !excludeAuthors.isEmpty {
-            andPredicates.append(NSPredicate(format: "NOT (userLogin IN[cd] %@)", excludeAuthors))
-        }
-
 		var sortDescriptors = [NSSortDescriptor]()
 		sortDescriptors.append(NSSortDescriptor(key: "sectionIndex", ascending: true))
 		if Settings.groupByRepo {
