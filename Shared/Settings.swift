@@ -369,11 +369,13 @@ struct Settings {
 		set { set("COMMENT_AUTHOR_BLACKLIST", newValue) }
 	}
 
+    static let itemAuthorBlacklistHelp = "Items from the specified usernames will be hidden."
     static var itemAuthorBlacklist: [String] {
         get { return get("ITEM_AUTHOR_BLACKLIST") as? [String] ?? [] }
         set { set("ITEM_AUTHOR_BLACKLIST", newValue) }
     }
 
+    static let labelBlacklistHelp = "Items containing the specified labels will be hidden."
     static var labelBlacklist: [String] {
         get { return get("LABEL_BLACKLIST") as? [String] ?? [] }
         set { set("LABEL_BLACKLIST", newValue) }
@@ -771,16 +773,19 @@ struct Settings {
 		set { set("INCLUDE_STATUSES_IN_FILTER", newValue) }
 	}
     
+    static let showStatusesGreenHelp = "Include green statuses in an item's status list"
     static var showStatusesGreen: Bool {
         get { return get("SHOW_STATUSES_GREEN") as? Bool ?? true }
         set { set("SHOW_STATUSES_GREEN", newValue) }
     }
 
+    static let showStatusesYellowHelp = "Include yellow statuses in an item's status list"
     static var showStatusesYellow: Bool {
         get { return get("SHOW_STATUSES_YELLOW") as? Bool ?? true }
         set { set("SHOW_STATUSES_YELLOW", newValue) }
     }
 
+    static let showStatusesRedHelp = "Include red statuses in an item's status list"
     static var showStatusesRed: Bool {
         get { return get("SHOW_STATUSES_RED") as? Bool ?? true }
         set { set("SHOW_STATUSES_RED", newValue) }

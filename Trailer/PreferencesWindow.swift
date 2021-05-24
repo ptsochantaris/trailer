@@ -520,6 +520,9 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
         showPrLines.toolTip = Settings.showPrLinesHelp
         reloadAllDataHelp.stringValue = Settings.reloadAllDataHelp
         showBaseAndHeadBranches.toolTip = Settings.showBaseAndHeadBranchesHelp
+        showStatusesGreen.toolTip = Settings.showStatusesGreenHelp
+        showStatusesYellow.toolTip = Settings.showStatusesYellowHelp
+        showStatusesRed.toolTip = Settings.showStatusesRedHelp
 	}
 
 	private func updateAllItemSettingButtons() {

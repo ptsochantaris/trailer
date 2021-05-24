@@ -1,7 +1,7 @@
 
 import UIKit
 
-protocol PickerViewControllerDelegate: class {
+protocol PickerViewControllerDelegate: AnyObject {
     func pickerViewController(picker: PickerViewController, didSelectIndexPath: IndexPath, info: PickerViewController.Info)
 }
 

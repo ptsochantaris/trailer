@@ -54,6 +54,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		        title: "Display repository names",
 		        description: Settings.showReposInNameHelp,
 		        valueDisplayed: { Settings.showReposInName ? "✓" : " " }),
+        Setting(section: .Display,
+                title: "…including base and head branches",
+                description: Settings.showBaseAndHeadBranchesHelp,
+                valueDisplayed: { Settings.showBaseAndHeadBranches ? "✓" : " " }),
 		Setting(section: .Display,
 		        title: "Separate API servers into their own groups",
 		        description: Settings.showSeparateApiServersInMenuHelp,
@@ -119,7 +123,15 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		        title: "Include assignee names",
 		        description: Settings.includeAssigneeInFilterHelp,
 		        valueDisplayed: { Settings.includeAssigneeNamesInFilter ? "✓" : " " }),
-
+        Setting(section: .Filtering,
+                title: "Hide items created by these usernames…",
+                description: Settings.itemAuthorBlacklistHelp,
+                valueDisplayed: { ">" }),
+        Setting(section: .Filtering,
+                title: "Hide items that contain these labels…",
+                description: Settings.itemAuthorBlacklistHelp,
+                valueDisplayed: { ">" }),
+        
 		Setting(section: .AppleWatch,
 		        title: "Prefer issues instead of PRs in Apple Watch complications",
 		        description: Settings.preferIssuesInWatchHelp,
@@ -257,6 +269,19 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		        title: "…only in the 'All' section",
 		        description: Settings.hidePrsThatDontPassOnlyInAllHelp,
 		        valueDisplayed: { Settings.hidePrsThatDontPassOnlyInAll ? "✓" : " " }),
+        Setting(section: .Stauses,
+                title: "Show green statuses",
+                description: Settings.showStatusesGreenHelp,
+                valueDisplayed: { Settings.showStatusesGreen ? "✓" : " " }),
+        Setting(section: .Stauses,
+                title: "Show yellow statuses",
+                description: Settings.showStatusesYellowHelp,
+                valueDisplayed: { Settings.showStatusesYellow ? "✓" : " " }),
+        Setting(section: .Stauses,
+                title: "Show red statuses",
+                description: Settings.showStatusesRedHelp,
+                valueDisplayed: { Settings.showStatusesRed ? "✓" : " " }),
+
 
 		Setting(section: .History,
 		        title: "When something is merged",
@@ -564,28 +589,31 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			case 4:
 				Settings.showReposInName = !Settings.showReposInName
 				settingsChangedTimer.push()
-			case 5:
+            case 5:
+                Settings.showBaseAndHeadBranches = !Settings.showBaseAndHeadBranches
+                settingsChangedTimer.push()
+			case 6:
 				Settings.showSeparateApiServersInMenu = !Settings.showSeparateApiServersInMenu
 				DispatchQueue.main.async {
 					popupManager.masterController.updateStatus(becauseOfChanges: true)
 				}
 				settingsChangedTimer.push()
-			case 6:
+			case 7:
                 Settings.markPrsAsUnreadOnNewCommits = !Settings.markPrsAsUnreadOnNewCommits
                 settingsChangedTimer.push()
-			case 7:
+			case 8:
 				Settings.showMilestones = !Settings.showMilestones
 				settingsChangedTimer.push()
-			case 8:
+			case 9:
 				Settings.displayNumbersForItems = !Settings.displayNumbersForItems
 				settingsChangedTimer.push()
-            case 9:
+            case 10:
                 let v = PickerViewController.Info(title: setting.title, values: DraftHandlingPolicy.labels, selectedIndex: Settings.draftHandlingPolicy, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
                 performSegue(withIdentifier: "showPicker", sender: v)
-            case 10:
+            case 11:
                 Settings.markUnmergeablePrs = !Settings.markUnmergeablePrs
                 settingsChangedTimer.push()
-            case 11:
+            case 12:
                 Settings.showPrLines = !Settings.showPrLines
                 settingsChangedTimer.push()
 			default: break
@@ -611,6 +639,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				Settings.includeMilestonesInFilter = !Settings.includeMilestonesInFilter
 			case 8:
 				Settings.includeAssigneeNamesInFilter = !Settings.includeAssigneeNamesInFilter
+            case 9:
+                performSegue(withIdentifier: "showBlacklist", sender: CommentBlacklistViewController.Mode.itemAuthors)
+            case 10:
+                performSegue(withIdentifier: "showBlacklist", sender: CommentBlacklistViewController.Mode.labels)
 			default: break
 			}
 			settingsChangedTimer.push()
@@ -642,7 +674,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			case 5:
 				Settings.openPrAtFirstUnreadComment = !Settings.openPrAtFirstUnreadComment
 			case 6:
-				performSegue(withIdentifier: "showBlacklist", sender: nil)
+                performSegue(withIdentifier: "showBlacklist", sender: CommentBlacklistViewController.Mode.commentAuthors)
 			case 7:
 				Settings.disableAllCommentNotifications = !Settings.disableAllCommentNotifications
 			case 8:
@@ -776,7 +808,17 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			case 6:
 				Settings.hidePrsThatDontPassOnlyInAll = !Settings.hidePrsThatDontPassOnlyInAll
 				settingsChangedTimer.push()
-			default: break
+            case 7:
+                Settings.showStatusesGreen = !Settings.showStatusesGreen
+                settingsChangedTimer.push()
+            case 8:
+                Settings.showStatusesYellow = !Settings.showStatusesYellow
+                settingsChangedTimer.push()
+            case 9:
+                Settings.showStatusesRed = !Settings.showStatusesRed
+                settingsChangedTimer.push()
+			default:
+                break
 			}
 
 		} else if section == SettingsSection.History {
@@ -866,7 +908,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
         if let p = segue.destination as? PickerViewController, let i = sender as? PickerViewController.Info {
             p.info = i
             p.delegate = self
-		}
+            
+        } else if let p = segue.destination as? CommentBlacklistViewController, let m = sender as? CommentBlacklistViewController.Mode {
+            p.mode = m
+        }
 	}
 
     func pickerViewController(picker: PickerViewController, didSelectIndexPath: IndexPath, info: PickerViewController.Info) {

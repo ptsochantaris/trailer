@@ -41,7 +41,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 UITabBarControllerDelegate, UITabBarDelegate, UISearchResultsUpdating,
 UITableViewDragDelegate {
 
-	private var fetchedResultsController: NSFetchedResultsController<ListableItem>!
+	private var fetchedResultsController: NSFetchedResultsController<ListableItem>?
 
 	// Tabs
 	private var tabs = UITabBar()
@@ -136,7 +136,7 @@ UITableViewDragDelegate {
 	}
 
 	private func markAllAsRead() {
-		for i in fetchedResultsController.fetchedObjects ?? [] {
+		for i in fetchedResultsController?.fetchedObjects ?? [] {
 			i.catchUpWithComments()
 		}
 	}
@@ -212,14 +212,18 @@ UITableViewDragDelegate {
 	}
 
 	func tableView(_ tableView: UITableView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
-		let p = fetchedResultsController.object(at: indexPath)
-		return [p.dragItemForUrl]
+        if let p = fetchedResultsController?.object(at: indexPath) {
+            return [p.dragItemForUrl]
+        }
+        return []
 	}
 
 	func tableView(_ tableView: UITableView, itemsForAddingTo session: UIDragSession, at indexPath: IndexPath, point: CGPoint) -> [UIDragItem] {
-		let p = fetchedResultsController.object(at: indexPath)
-		let dragItem = p.dragItemForUrl
-		return session.items.contains(dragItem) ? [] : [dragItem]
+		let p = fetchedResultsController?.object(at: indexPath)
+        if let dragItem = p?.dragItemForUrl {
+            return session.items.contains(dragItem) ? [] : [dragItem]
+        }
+        return []
 	}
 
 	@objc private func dataUpdated(_ notification: Notification) {
@@ -253,7 +257,7 @@ UITableViewDragDelegate {
 
 	@objc private func refreshEnded() {
         refreshControl?.endRefreshing()
-        if fetchedResultsController.sections?.count ?? 0 == 0 {
+        if fetchedResultsController?.sections?.count ?? 0 == 0 {
             self.updateStatus(becauseOfChanges: false)
         }
 	}
@@ -318,7 +322,9 @@ UITableViewDragDelegate {
 	}
 
     private func canIssueKeyForIndexPath(action: ListableItem.MenuAction, indexPath: IndexPath) -> Bool {
-        let actions = fetchedResultsController.object(at: indexPath).contextActions
+        guard let actions = fetchedResultsController?.object(at: indexPath).contextActions else {
+            return false
+        }
         if actions.contains(action) {
             return true
         } else {
@@ -329,7 +335,9 @@ UITableViewDragDelegate {
 
 	@objc private func keyToggleSnooze() {
 		if let ip = tableView.indexPathForSelectedRow {
-			let i = fetchedResultsController.object(at: ip)
+            guard let i = fetchedResultsController?.object(at: ip) else {
+                return
+            }
 			if i.isSnoozing {
                 if canIssueKeyForIndexPath(action: .wake(date: i.snoozeUntil), indexPath: ip) {
 					i.wakeUp()
@@ -345,7 +353,9 @@ UITableViewDragDelegate {
 
 	@objc private func keyToggleRead() {
 		if let ip = tableView.indexPathForSelectedRow {
-			let i = fetchedResultsController.object(at: ip)
+            guard let i = fetchedResultsController?.object(at: ip) else {
+                return
+            }
 			if i.hasUnreadCommentsOrAlert {
                 if canIssueKeyForIndexPath(action: .markRead, indexPath: ip) {
 					markItemAsRead(itemUri: i.objectID.uriRepresentation().absoluteString)
@@ -359,8 +369,7 @@ UITableViewDragDelegate {
 	}
 
 	@objc private func keyToggleMute() {
-		if let ip = tableView.indexPathForSelectedRow {
-			let i = fetchedResultsController.object(at: ip)
+		if let ip = tableView.indexPathForSelectedRow, let i = fetchedResultsController?.object(at: ip) {
 			let isMuted = i.muted
             if (!isMuted && canIssueKeyForIndexPath(action: .mute, indexPath: ip)) || (isMuted && canIssueKeyForIndexPath(action: .unmute, indexPath: ip)) {
 				i.setMute(to: !isMuted)
@@ -480,7 +489,7 @@ UITableViewDragDelegate {
 	}
 
     private func selectInCurrentTab(item: ListableItem, overrideUrl: String?, andOpen: Bool) {
-		guard let ip = fetchedResultsController.indexPath(forObject: item) else { return }
+		guard let ip = fetchedResultsController?.indexPath(forObject: item) else { return }
         
         tableView.selectRow(at: ip, animated: false, scrollPosition: .middle)
         if andOpen {
@@ -519,12 +528,12 @@ UITableViewDragDelegate {
 
 	private func updateSearch() {
 
-		let r = Range(uncheckedBounds: (lower: 0, upper: fetchedResultsController.sections?.count ?? 0))
+		let r = Range(uncheckedBounds: (lower: 0, upper: fetchedResultsController?.sections?.count ?? 0))
 		let currentIndexes = IndexSet(integersIn: r)
 
 		updateQuery(newFetchRequest: itemFetchRequest)
 
-		let r2 = Range(uncheckedBounds: (lower: 0, upper: fetchedResultsController.sections?.count ?? 0))
+		let r2 = Range(uncheckedBounds: (lower: 0, upper: fetchedResultsController?.sections?.count ?? 0))
 		let dataIndexes = IndexSet(integersIn: r2)
 
 		let removedIndexes = currentIndexes.filter { !dataIndexes.contains($0) }
@@ -548,18 +557,19 @@ UITableViewDragDelegate {
 
 	private func updateQuery(newFetchRequest: NSFetchRequest<ListableItem>) {
 
-		if fetchedResultsController == nil || fetchedResultsController.fetchRequest.entityName != newFetchRequest.entityName {
+		if fetchedResultsController == nil || fetchedResultsController?.fetchRequest.entityName != newFetchRequest.entityName {
 			let c = NSFetchedResultsController(fetchRequest: newFetchRequest, managedObjectContext: DataManager.main, sectionNameKeyPath: "sectionName", cacheName: nil)
 			fetchedResultsController = c
 			try! c.performFetch()
 			c.delegate = self
-		} else {
-			let fr = fetchedResultsController.fetchRequest
-			fr.relationshipKeyPathsForPrefetching = newFetchRequest.relationshipKeyPathsForPrefetching
-			fr.sortDescriptors = newFetchRequest.sortDescriptors
-			fr.predicate = newFetchRequest.predicate
-			try! fetchedResultsController.performFetch()
-		}
+            
+        } else if let f = fetchedResultsController {
+            let fr = f.fetchRequest
+            fr.relationshipKeyPathsForPrefetching = newFetchRequest.relationshipKeyPathsForPrefetching
+            fr.sortDescriptors = newFetchRequest.sortDescriptors
+            fr.predicate = newFetchRequest.predicate
+            try! f.performFetch()
+        }
 	}
 
 	private func updateTabItems(animated: Bool) {
@@ -628,7 +638,7 @@ UITableViewDragDelegate {
 			updateQuery(newFetchRequest: itemFetchRequest)
 			tableView.reloadData()
 		} else {
-			let latestFetchRequest = fetchedResultsController.fetchRequest
+			let latestFetchRequest = fetchedResultsController?.fetchRequest
 			let newFetchRequest = itemFetchRequest
 			let newCount = tabs.items?.count ?? 0
 			if newCount != lastTabCount || latestFetchRequest != newFetchRequest {
@@ -801,17 +811,18 @@ UITableViewDragDelegate {
     }
 
 	override func numberOfSections(in tableView: UITableView) -> Int {
-		return fetchedResultsController.sections?.count ?? 0
+		return fetchedResultsController?.sections?.count ?? 0
 	}
 
 	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		return fetchedResultsController.sections?[section].numberOfObjects ?? 0
+		return fetchedResultsController?.sections?[section].numberOfObjects ?? 0
 	}
 
 	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
-		let o = fetchedResultsController.object(at: indexPath)
-		configureCell(cell: cell, withObject: o)
+        if let o = fetchedResultsController?.object(at: indexPath) {
+            configureCell(cell: cell, withObject: o)
+        }
 		return cell
 	}
 
@@ -821,8 +832,7 @@ UITableViewDragDelegate {
 			becomeFirstResponder()
 		}
 
-		let p = fetchedResultsController.object(at: indexPath)
-		if let u = p.urlForOpening, let url = URL(string: u) {
+		if let p = fetchedResultsController?.object(at: indexPath), let u = p.urlForOpening, let url = URL(string: u) {
 			showDetail(url: url, objectId: p.objectID)
 		}
         
@@ -838,7 +848,7 @@ UITableViewDragDelegate {
 
 	override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
 		let v = tableView.dequeueReusableHeaderFooterView(withIdentifier: "SectionHeaderView") as! SectionHeaderView
-		let name = S(fetchedResultsController.sections?[section].name)
+		let name = S(fetchedResultsController?.sections?[section].name)
 		v.title.text = name.uppercased()
 		if viewingPrs {
 			if name == Section.closed.prMenuName {
@@ -942,7 +952,7 @@ UITableViewDragDelegate {
     }
     
     override func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
-        let item = fetchedResultsController.object(at: indexPath)
+        guard let item = fetchedResultsController?.object(at: indexPath) else { return nil }
         
         return UIContextMenuConfiguration(identifier: item.objectID, previewProvider: nil) { [weak self] _ in
             return self?.createShortcutActions(for: item)
@@ -995,8 +1005,8 @@ UITableViewDragDelegate {
 
 	private var itemFetchRequest: NSFetchRequest<ListableItem> {
 		let type: ListableItem.Type = viewingPrs ? PullRequest.self : Issue.self
-		let searchBar = navigationItem.searchController!.searchBar
-		return ListableItem.requestForItems(of: type, withFilter: searchBar.text, sectionIndex: -1, criterion: currentTabBarSet?.viewCriterion)
+        let text = navigationItem.searchController?.searchBar.text
+		return ListableItem.requestForItems(of: type, withFilter: text, sectionIndex: -1, criterion: currentTabBarSet?.viewCriterion)
 	}
 
 	private var animatedUpdates = false
@@ -1080,6 +1090,9 @@ UITableViewDragDelegate {
 	private var viewingPrs = true
 
 	func updateStatus(becauseOfChanges: Bool, updateItems: Bool = false) {
+        guard self.isViewLoaded else {
+            return
+        }
 
 		if becauseOfChanges || updateItems {
             if becauseOfChanges {
@@ -1094,9 +1107,9 @@ UITableViewDragDelegate {
 	}
 
 	private func updateFooter() {
-		if (fetchedResultsController.fetchedObjects?.count ?? 0) == 0 {
+		if (fetchedResultsController?.fetchedObjects?.count ?? 0) == 0 {
 			let reasonForEmpty: NSAttributedString
-			let searchBarText = navigationItem.searchController!.searchBar.text
+			let searchBarText = navigationItem.searchController?.searchBar.text
 			if viewingPrs {
 				reasonForEmpty = PullRequest.reasonForEmpty(with: searchBarText, criterion: currentTabBarSet?.viewCriterion)
 			} else {
@@ -1140,9 +1153,9 @@ UITableViewDragDelegate {
 
 	@objc func focusFilter(terms: String?) {
 		tableView.contentOffset = CGPoint(x: 0, y: -tableView.contentInset.top)
-		let searchBar = navigationItem.searchController!.searchBar
-		searchBar.becomeFirstResponder()
-		searchBar.text = terms
+		let searchBar = navigationItem.searchController?.searchBar
+		searchBar?.becomeFirstResponder()
+		searchBar?.text = terms
 		searchTimer.push()
 	}
 
