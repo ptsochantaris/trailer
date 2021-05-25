@@ -917,5 +917,5 @@ struct Settings {
         set { set("USE_V4_API", newValue) }
     }
     
-    static let reloadAllDataHelp = "Chosing this option will remove all synced data and reload everything from scratch. This can take a while and use up a large amount of API quota, so only use it if things seem broken."
+    static let reloadAllDataHelp = "Choosing this option will remove all synced data and reload everything from scratch. This can take a while and use up a large amount of API quota, so only use it if things seem broken."
 }
