@@ -1,7 +1,7 @@
 
 import UIKit
 
-class SectionHeaderView: UITableViewHeaderFooterView {
+final class SectionHeaderView: UITableViewHeaderFooterView {
 
 	@IBOutlet var title: UILabel!
 	@IBOutlet var action: UIButton!

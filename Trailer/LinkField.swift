@@ -2,7 +2,7 @@
 extension NSColor {
     var highlighted: NSColor {
         if app.theme == .light {
-            if #available(OSX 10.14, *) {
+            if #available(macOS 10.14, *) {
                 return .controlAccentColor
             } else {
                 return .blue

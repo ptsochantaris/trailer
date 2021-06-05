@@ -10,7 +10,7 @@ import WatchKit
 import WatchConnectivity
 import ClockKit
 
-class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
+final class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 	
 	private let session = WCSession.default
 	private var requestedUpdate = false

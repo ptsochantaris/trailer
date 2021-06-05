@@ -1,6 +1,6 @@
 Privacy Policy
 
-TL;DR All information is kept locally inside your installation
+TL;DR All information is kept in your local installation
 of Trailer, nothing is ever sent or processed beyond that.
 
 API Key
@@ -11,14 +11,3 @@ URLs for using Enterprise GitHub API servers.  This info is
 stored locally on your device and never sent or otherwise
 processed in any way, beyond being used inside the locally
 executing app to construct the required API calls to GitHub.
-
-GitHub Login
-
-The iOS version of Trailer, specifically, displays an
-inline web-view so you can directly browse your items
-inside the app.  In order to view your private items you may
-need to provide login information to GitHub's web interface.
-This is done directly inside the web-view and Trailer never
-reads, intercepts, or stores any of that information, beyond
-what may be done at a lower level by the system web view
-control, to which Trailer has no access to.

@@ -6,7 +6,7 @@
 import UIKit
 import CoreData
 
-weak var app: iOS_AppDelegate!
+weak var app: iOSAppDelegate!
 
 let GLOBAL_SCREEN_SCALE = UIScreen.main.scale
 let DISABLED_FADE: CGFloat = 0.3
@@ -24,7 +24,7 @@ let compactTraits = UITraitCollection(horizontalSizeClass: .compact)
 
 #elseif os(OSX)
 
-weak var app: OSX_AppDelegate!
+weak var app: MacAppDelegate!
 
 let AVATAR_SIZE: CGFloat = 26
 let AVATAR_PADDING: CGFloat = 8

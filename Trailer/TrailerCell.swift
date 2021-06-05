@@ -1,15 +1,22 @@
 
-class TrailerCell: NSTableCellView {
+final class TrailerCell: NSTableCellView {
 
 	private static let statusAttributes: [NSAttributedString.Key : Any] = {
 
 		let paragraphStyle = NSMutableParagraphStyle()
 		paragraphStyle.headIndent = 17
 
-		return [
-			.font: NSFont(name: "Monaco", size: 9)!,
-			.paragraphStyle: paragraphStyle
-		]
+        if #available(macOS 10.15, *) {
+            return [
+                .font: NSFont.monospacedSystemFont(ofSize: 9, weight: .regular),
+                .paragraphStyle: paragraphStyle
+            ]
+        } else {
+            return [
+                .font: NSFont(name: "Monaco", size: 9)!,
+                .paragraphStyle: paragraphStyle
+            ]
+        }
 	}()
 
     private let detailFont = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
@@ -421,7 +428,7 @@ class TrailerCell: NSTableCellView {
         case .dark:
             color = on ? .black : NSColor(red: 0.94, green: 0.94, blue: 0.94, alpha: 1.0)
             newBackground?.backgroundColor = NSColor(red: 1.0, green: 0.1, blue: 0.1, alpha: 1.0)
-            if #available(OSX 10.14, *) {
+            if #available(macOS 10.14, *) {
                 c.backgroundColor = on ? NSColor.white.withAlphaComponent(DISABLED_FADE) : NSColor.controlShadowColor
             } else {
                 c.backgroundColor = on ? NSColor.white.withAlphaComponent(0.1) : NSColor.black

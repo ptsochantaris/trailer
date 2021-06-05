@@ -24,7 +24,7 @@ struct Settings {
 			"REMOVE_RELATED_NOTIFICATIONS_ON_ITEM_REMOVE", "HIDE_SNOOZED_ITEMS", "INCLUDE_MILESTONES_IN_FILTER", "INCLUDE_ASSIGNEE_NAMES_IN_FILTER", "API_SERVERS_IN_SEPARATE_MENUS", "ASSUME_READ_ITEM_IF_USER_HAS_NEWER_COMMENTS",
             "AUTO_SNOOZE_DAYS", "HIDE_MENUBAR_COUNTS", "AUTO_ADD_NEW_REPOS", "AUTO_REMOVE_DELETED_REPOS", "MARK_PRS_AS_UNREAD_ON_NEW_COMMITS", "SHOW_LABELS", "DISPLAY_REVIEW_CHANGE_REQUESTS", "SHOW_RELATIVE_DATES", "QUERY_AUTHORED_PRS", "QUERY_AUTHORED_ISSUES",
 			"DISPLAY_MILESTONES", "DEFAULT_APP_FOR_OPENING_WEB", "DEFAULT_APP_FOR_OPENING_ITEMS", "HIDE_ARCHIVED_REPOS", "DRAFT_HANDLING_POLICY", "MARK_UNMERGEABLE_ITEMS", "SHOW_PR_LINES", "SCAN_CLOSED_AND_MERGED", "USE_V4_API", "REQUESTED_TEAM_REVIEWS",
-            "SHOW_STATUSES_GREEN", "SHOW_STATUSES_YELLOW", "SHOW_STATUSES_RED", "SHOW_BASE_AND_HEAD_BRANCHES"]
+            "SHOW_STATUSES_GREEN", "SHOW_STATUSES_YELLOW", "SHOW_STATUSES_RED", "SHOW_BASE_AND_HEAD_BRANCHES", "PERSISTED_TAB_FILTERS"]
 	}
 
     static func checkMigration() {
@@ -146,7 +146,7 @@ struct Settings {
         }
     }
     #endif
-    
+        
 	private static func set(_ key: String, _ value: Any?) {
 
 		let previousValue = sharedDefaults.object(forKey: key)
@@ -918,4 +918,30 @@ struct Settings {
     }
     
     static let reloadAllDataHelp = "Choosing this option will remove all synced data and reload everything from scratch. This can take a while and use up a large amount of API quota, so only use it if things seem broken."
+    
+    //////////////////////// Filters
+    
+    private static var filterLookup: [String: String] = {
+        if let data = sharedDefaults.data(forKey: "PERSISTED_TAB_FILTERS"),
+           let dict = try? JSONDecoder().decode([String: String].self, from: data) {
+            return dict
+        } else {
+            return [:]
+        }
+    }()
+        
+    static func filter(for key: String) -> String? {
+        return filterLookup[key]
+    }
+    
+    static func setFilter(to text: String, for key: String) {
+        let new = text.isEmpty ? nil : text
+        if new != filterLookup[key] {
+            filterLookup[key] = new
+            if let data = try? JSONEncoder().encode(filterLookup) {
+                DLog("Persisting filters for menus")
+                sharedDefaults.setValue(data, forKey: "PERSISTED_TAB_FILTERS")
+            }
+        }
+    }
 }

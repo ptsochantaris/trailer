@@ -1,7 +1,11 @@
 
+protocol StatusItemViewDelegate: AnyObject {
+    func statusItemViewSelected(_ statusItemView: StatusItemView)
+}
+
 final class StatusItemView: NSView {
 
-	private let tappedCallback: Completion
+    weak var delegate: StatusItemViewDelegate?
 
 	var icon: NSImage!
 	var textAttributes = [NSAttributedString.Key : Any]()
@@ -25,8 +29,8 @@ final class StatusItemView: NSView {
 		}
 	}
 
-	init(callback: @escaping Completion) {
-		tappedCallback = callback
+	init(delegate: StatusItemViewDelegate?) {
+        self.delegate = delegate
 		super.init(frame: NSZeroRect)
 	}
 
@@ -35,11 +39,11 @@ final class StatusItemView: NSView {
 	}
 
 	override func mouseDown(with theEvent: NSEvent) {
-		tappedCallback()
+        delegate?.statusItemViewSelected(self)
 	}
 
     static private let padding: CGFloat = {
-        if #available(OSX 11.0, *) {
+        if #available(macOS 11.0, *) {
             return 0
         } else {
             return 1
@@ -53,9 +57,9 @@ final class StatusItemView: NSView {
 		frame = CGRect(x: 0, y: 0, width: itemWidth, height: H)
 		needsDisplay = true
 	}
-        
+    
     private var isDark: Bool {
-        if #available(OSX 10.14, *) {
+        if #available(macOS 10.14, *) {
             return self.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
         } else {
             return app.theme == .dark

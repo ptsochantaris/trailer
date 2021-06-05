@@ -8,7 +8,7 @@ enum Theme {
 }
 
 @NSApplicationMain
-final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUserNotificationCenterDelegate, NSOpenSavePanelDelegate, NSControlTextEditingDelegate {
+final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUserNotificationCenterDelegate, NSOpenSavePanelDelegate, NSControlTextEditingDelegate {
 
 	// Globals
 	var refreshTimer: Timer?
@@ -879,10 +879,10 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
 					var i = w.table.selectedRow + 1
 					if i < w.table.numberOfRows {
-						while w.itemDelegate.itemAtRow(i) == nil { i += 1 }
+						while w.dataSource.itemAtRow(i) == nil { i += 1 }
 					} else if w.table.numberOfRows > 0 {
 						i = 0
-						while w.itemDelegate.itemAtRow(i) == nil { i += 1 }
+						while w.dataSource.itemAtRow(i) == nil { i += 1 }
 					}
 					S.scrollTo(index: i, inMenu: w)
 					return nil
@@ -894,7 +894,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
 					var i = w.table.selectedRow - 1
 					if i > 0 && w.table.numberOfRows > 0 {
-						while w.itemDelegate.itemAtRow(i) == nil { i -= 1 }
+						while w.dataSource.itemAtRow(i) == nil { i -= 1 }
 					} else {
 						i = w.table.numberOfRows - 1
 					}
@@ -981,7 +981,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		if maxRowIndex >= 0 {
 			var i = index + (preferDown ? 0 : 1)
 			i = min(maxRowIndex, max(0, i))
-			if window.itemDelegate.itemAtRow(i) == nil {
+			if window.dataSource.itemAtRow(i) == nil {
 				i += preferDown ? -1 : 1
 				i = min(maxRowIndex, max(0, i))
 			}
@@ -1179,7 +1179,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
         let autoSwitching = d.bool(forKey: "AppleInterfaceStyleSwitchesAutomatically")
         let interfaceStyle = d.string(forKey: "AppleInterfaceStyle")
         if autoSwitching && interfaceStyle == nil {
-            if #available(OSX 10.14, *) {
+            if #available(macOS 10.14, *) {
                 let isDark = NSApplication.shared.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
                 return isDark ? .dark : .light
             } else {

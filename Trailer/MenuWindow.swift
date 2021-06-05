@@ -1,5 +1,4 @@
-
-final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
+final class MenuWindow: NSWindow, NSControlTextEditingDelegate, StatusItemViewDelegate {
 
 	@IBOutlet var scrollView: NSScrollView!
 	@IBOutlet private var header: ViewAllowsVibrancy!
@@ -20,10 +19,13 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
 		}
 	}
 
-	var itemDelegate: ItemDelegate! {
+	var dataSource: DataSource! {
 		didSet {
-			table.dataSource = itemDelegate
-			table.delegate = itemDelegate
+            if let newFilter = Settings.filter(for: dataSource.uniqueIdentifier) {
+                filter.stringValue = newFilter
+            }
+			table.dataSource = dataSource
+			table.delegate = dataSource
 		}
 	}
 
@@ -32,7 +34,7 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
 
 		contentView?.wantsLayer = true
 
-		if #available(OSX 10.13, *) {
+		if #available(macOS 10.13, *) {
 			isOpaque = false
 			backgroundColor = .clear
 			contentView?.layer?.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMinYCorner]
@@ -57,7 +59,7 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
 		case .light:
 			appearance = NSAppearance(named: .vibrantLight)
 		case .dark:
-			if #available(OSX 10.14, *) {
+			if #available(macOS 10.14, *) {
 				appearance = NSAppearance(named: .darkAqua)
             } else {
                 appearance = NSAppearance(named: .vibrantDark)
@@ -68,13 +70,18 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
 	var showStatusItem: StatusItemView {
 		if statusItem == nil {
 			statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-			statusItem!.view = StatusItemView { [weak self] in
-				guard let s = self else { return }
-				if s.isVisible { s.closeMenu() } else { app.show(menu: s) }
-			}
+			statusItem!.view = StatusItemView(delegate: self)
 		}
 		return statusItem!.view as! StatusItemView
 	}
+    
+    func statusItemViewSelected(_ statusItemView: StatusItemView) {
+       if isVisible {
+        closeMenu()
+       } else {
+        app.show(menu: self)
+       }
+    }
 
 	func hideStatusItem() {
 		if let s = statusItem {
@@ -150,7 +157,7 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
 		}
 
         var menuWidth = MENU_WIDTH
-        if #available(OSX 11.0, *) {
+        if #available(macOS 11.0, *) {
             if rowCount > 0 {
                 menuWidth += table.layoutMarginsGuide.frame.origin.x * 2
                 menuHeight += 24
@@ -180,7 +187,7 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
 			level = .floating
 			makeKeyAndOrderFront(self)
 			NSApp.activate(ignoringOtherApps: true)
-			app.openingWindow = false
+			app.openingWindow = false            
             
 		} else if statusItem == nil {
 			closeMenu()
@@ -189,8 +196,10 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
 
 	func reload() {
 		messageView = nil
-		itemDelegate.reloadData(filter: filter.stringValue)
+        let filterString = filter.stringValue
+		dataSource.reloadData(filter: filterString)
 		table.reloadData()
+        Settings.setFilter(to: filterString, for: dataSource.uniqueIdentifier)
 	}
 
 	func closeMenu() {
@@ -207,7 +216,7 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
 		let row = table.selectedRow
 		var i: ListableItem?
 		if row >= 0 {
-			i = itemDelegate.itemAtRow(row)
+			i = dataSource.itemAtRow(row)
             if blink {
                 table.deselectAll(nil)
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in

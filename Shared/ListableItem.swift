@@ -1167,7 +1167,7 @@ class ListableItem: DataItem {
     }
 
     private final func indexForSpotlight(uri: String) {
-        if #available(OSX 10.13, iOS 13.0, *) {
+        if #available(macOS 10.13, iOS 13.0, *) {
             #if canImport(CoreSpotlight)
             guard CSSearchableIndex.isIndexingAvailable() else { return }
             

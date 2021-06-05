@@ -31,11 +31,11 @@ final class MenuBarSet {
 		self.viewCriterion = viewCriterion
 		
 		prMenu = prMenuController.window as! MenuWindow
-		prMenu.itemDelegate = ItemDelegate(type: PullRequest.self, sections: Section.prMenuTitles, removeButtonsInSections: [Section.merged.prMenuName, Section.closed.prMenuName], viewCriterion: viewCriterion)
+        prMenu.dataSource = MenuWindow.DataSource(type: PullRequest.self, sections: Section.prMenuTitles, removeButtonsInSections: [Section.merged.prMenuName, Section.closed.prMenuName], viewCriterion: viewCriterion)
 		prMenu.delegate = delegate
 		
 		issuesMenu = issuesMenuController.window as! MenuWindow
-		issuesMenu.itemDelegate = ItemDelegate(type: Issue.self, sections: Section.issueMenuTitles, removeButtonsInSections: [Section.closed.issuesMenuName], viewCriterion: viewCriterion)
+        issuesMenu.dataSource = MenuWindow.DataSource(type: Issue.self, sections: Section.issueMenuTitles, removeButtonsInSections: [Section.closed.issuesMenuName], viewCriterion: viewCriterion)
 		issuesMenu.delegate = delegate
 	}
 	
