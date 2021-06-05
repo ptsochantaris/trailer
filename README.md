@@ -7,7 +7,7 @@ For maintained binaries and/or more info:
 
 - [Latest iOS version](https://itunes.apple.com/app/id806104975?mt=8)
 
-- [Trailer for the command-line and Linux](https://github.com/ptsochantaris/trailer-cli)
+- [Trailer CLI for Mac, Linux and Windows](https://github.com/ptsochantaris/trailer-cli)
 
 - [Trailer for Android](https://github.com/amencarini/droidtrailer)
 
