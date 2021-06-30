@@ -56,7 +56,11 @@ final class GQLGroup: GQLScanning {
 		let fieldsText = "__typename " + fields.map({$0.queryText}).joined(separator: " ")
 		
 		if pageSize > 0 {
-			query += " { edges { node { " + fieldsText + " } cursor } pageInfo { hasNextPage } }"
+            if onlyLast {
+                query += " { edges { node { " + fieldsText + " } } }"
+            } else {
+                query += " { edges { node { " + fieldsText + " } cursor } pageInfo { hasNextPage } }"
+            }
 		} else {
 			query += " { " + fieldsText + " }"
 		}

@@ -8,6 +8,8 @@ final class PRStatus: DataItem {
     @NSManaged var targetUrl: String?
 
 	@NSManaged var pullRequest: PullRequest
+    
+    override var alternateCreationDate: Bool { true }
 
 	static func syncStatuses(from data: [[AnyHashable : Any]]?, pullRequest: PullRequest) {
 		items(with: data, type: PRStatus.self, server: pullRequest.apiServer) { item, info, isNewOrUpdated in
@@ -40,11 +42,16 @@ final class PRStatus: DataItem {
             }
             
             let info = node.jsonPayload
-            status.state = (info["state"] as? String)?.lowercased()
-            status.context = info["context"] as? String
-            status.targetUrl = info["targetUrl"] as? String
-            if let ds = info["description"] as? String {
-                status.descriptionText = ds.trim
+            if node.elementType == "CheckRun" {
+                status.state = (info["conclusion"] as? String)?.lowercased()
+                status.context = node.id
+                status.targetUrl = info["permalink"] as? String
+                status.descriptionText = info["name"] as? String
+            } else {
+                status.state = (info["state"] as? String)?.lowercased()
+                status.context = info["context"] as? String
+                status.targetUrl = info["targetUrl"] as? String
+                status.descriptionText = info["description"] as? String
             }
         }
     }
@@ -53,7 +60,7 @@ final class PRStatus: DataItem {
 		switch S(state) {
 		case "pending", "expected":
             return .appYellow
-		case "success":
+		case "success", "skipped", "neutral":
             return .appGreen
 		default:
             return .appRed
@@ -64,16 +71,28 @@ final class PRStatus: DataItem {
 		var text: String
 
 		switch S(state) {
-		case "pending", "expected":
+		case "pending", "expected", "":
 			text = "⚡️ "
+        case "skipped":
+            text = "⏭ "
+        case "neutral":
+            text = "😐 "
+        case "action_required":
+            text = "⚠️ "
+        case "cancelled":
+            text = "⛔️ "
 		case "success":
 			text = "✅ "
 		default:
 			text = "❌ "
 		}
 
-		if let c = context, !c.isEmpty {
-			text += c
+        if let c = context, !c.isEmpty {
+            if c == nodeId, let createdAt = createdAt {
+                text += shortDateFormatter.string(from: createdAt)
+            } else {
+                text += c
+            }
 		}
 
 		if let t = descriptionText, !t.isEmpty {

@@ -9,6 +9,8 @@ class DataItem: NSManagedObject {
 	@NSManaged var updatedAt: Date?
 	@NSManaged var apiServer: ApiServer
 
+    var alternateCreationDate: Bool { false }
+
 	func resetSyncState() {
 		updatedAt = updatedAt?.addingTimeInterval(-1) ?? .distantPast
 		apiServer.resetSyncState()
@@ -276,14 +278,22 @@ class DataItem: NSManagedObject {
         let t = mktime(&timeData)
         return Date(timeIntervalSince1970: TimeInterval(t))
     }
-    
+        
     private func populate<T: DataItem>(type: T.Type, node: GQLNode, perItemCallback: (T, GQLNode) -> Void) {
         let info = node.jsonPayload
         let entityName = String(describing: type)
         
+        let alternativeDate = alternateCreationDate
+        
         if node.created {
             nodeId = node.id
-            createdAt = DataItem.parseGH8601(info["createdAt"] as? String)!
+            if !alternativeDate, let created = info["createdAt"] as? String {
+                createdAt = DataItem.parseGH8601(created)!
+            }
+        }
+        
+        if alternativeDate, let created = (info["completedAt"] ?? info["startedAt"]) as? String {
+            createdAt = DataItem.parseGH8601(created)
         }
         
         if let updated = DataItem.parseGH8601(info["updatedAt"] as? String) {
@@ -293,10 +303,9 @@ class DataItem: NSManagedObject {
                     node.updated = true
                 }
             }
-        } else {
-            if node.created {
-                updatedAt = createdAt
-            }
+            
+        } else if node.created {
+            updatedAt = createdAt
         }
 
         if node.created {

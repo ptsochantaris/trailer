@@ -37,6 +37,24 @@ final class GraphQL {
         GQLGroup(name: "author", fields: [userFragment])
     ]
     
+    private static let statusFragment = GQLFragment(on: "StatusContext", elements: [
+        idField,
+        GQLField(name: "context"),
+        GQLField(name: "description"),
+        GQLField(name: "state"),
+        GQLField(name: "targetUrl"),
+        GQLField(name: "createdAt"),
+    ])
+
+    private static let checkFragment = GQLFragment(on: "CheckRun", elements: [
+        idField,
+        GQLField(name: "name"),
+        GQLField(name: "conclusion"),
+        GQLField(name: "startedAt"),
+        GQLField(name: "completedAt"),
+        GQLField(name: "permalink")
+    ])
+
     static func testApi(to apiServer: ApiServer, completion: @escaping (Bool, Error?) -> Void) {
         var gotUserNode = false
         let testQuery = GQLQuery(name: "Testing", rootElement: GQLGroup(name: "viewer", fields: [userFragment])) { node in
@@ -98,21 +116,16 @@ final class GraphQL {
                 }
                 
                 elementTypes.append("StatusContext")
-                let statusFragment = GQLFragment(on: "StatusContext", elements: [
-                    idField,
-                    GQLField(name: "context"),
-                    GQLField(name: "description"),
-                    GQLField(name: "state"),
-                    GQLField(name: "targetUrl"),
-                    GQLField(name: "createdAt"),
-                ])
                 elements.append(GQLGroup(name: "commits", fields: [
                     GQLGroup(name: "commit", fields: [
+                        GQLGroup(name: "checkSuites", fields: [
+                            GQLGroup(name: "checkRuns", fields: [checkFragment], pageSize: 50)
+                        ], pageSize: 5),
                         GQLGroup(name: "status", fields: [
                             GQLGroup(name: "contexts", fields: [statusFragment])
                         ])
                     ])
-                ], pageSize: 100, onlyLast: true))
+                ], pageSize: 1, onlyLast: true))
             }
         }
         
@@ -558,6 +571,9 @@ final class GraphQL {
                     Review.sync(from: nodeList, on: server)
                 }
                 if let nodeList = nodes["StatusContext"] {
+                    PRStatus.sync(from: nodeList, on: server)
+                }
+                if let nodeList = nodes["CheckRun"] {
                     PRStatus.sync(from: nodeList, on: server)
                 }
                 
