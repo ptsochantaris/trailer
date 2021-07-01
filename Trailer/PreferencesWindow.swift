@@ -618,8 +618,11 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
         markUnmergeablePrs.integerValue = Settings.markUnmergeablePrs ? 1 : 0
         showPrLines.integerValue = Settings.showPrLines ? 1 : 0
         showRequestedTeamReviews.integerValue = Settings.showRequestedTeamReviews ? 1 : 0
-        showBaseAndHeadBranches.integerValue = Settings.showBaseAndHeadBranches ? 1: 0
-        
+        showBaseAndHeadBranches.integerValue = Settings.showBaseAndHeadBranches ? 1 : 0
+        showStatusesGreen.integerValue = Settings.showStatusesGreen ? 1 : 0
+        showStatusesYellow.integerValue = Settings.showStatusesYellow ? 1 : 0
+        showStatusesRed.integerValue = Settings.showStatusesRed ? 1 : 0
+
 		defaultOpenApp.stringValue = Settings.defaultAppForOpeningItems
 		defaultOpenLinks.stringValue = Settings.defaultAppForOpeningWeb
 
