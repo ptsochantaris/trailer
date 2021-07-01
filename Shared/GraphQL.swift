@@ -119,8 +119,8 @@ final class GraphQL {
                 elements.append(GQLGroup(name: "commits", fields: [
                     GQLGroup(name: "commit", fields: [
                         GQLGroup(name: "checkSuites", fields: [
-                            GQLGroup(name: "checkRuns", fields: [checkFragment], pageSize: 50)
-                        ], pageSize: 5),
+                            GQLGroup(name: "checkRuns", fields: [checkFragment], pageSize: 100, noPaging: true)
+                        ], pageSize: 100, noPaging: true),
                         GQLGroup(name: "status", fields: [
                             GQLGroup(name: "contexts", fields: [statusFragment])
                         ])

@@ -76,7 +76,7 @@ final class PRStatus: DataItem {
         case "skipped":
             text = "⏭ "
         case "neutral":
-            text = "😐 "
+            text = "ℹ️ "
         case "action_required":
             text = "⚠️ "
         case "cancelled":
