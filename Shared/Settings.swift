@@ -13,7 +13,7 @@ struct Settings {
 		return [
 			"SORT_METHOD_KEY", "STATUS_FILTERING_METHOD_KEY", "LAST_PREFS_TAB_SELECTED", "STATUS_ITEM_REFRESH_BATCH", "UPDATE_CHECK_INTERVAL_KEY", "ASSIGNED_REVIEW_HANDLING_POLICY", "NOTIFY_ON_REVIEW_CHANGE_REQUESTS", "NOTIFY_ON_ALL_REVIEW_CHANGE_REQUESTS",
 			"STATUS_FILTERING_TERMS_KEY", "COMMENT_AUTHOR_BLACKLIST", "HOTKEY_LETTER", "REFRESH_PERIOD_KEY", "IOS_BACKGROUND_REFRESH_PERIOD_KEY", "NEW_REPO_CHECK_PERIOD", "LAST_SUCCESSFUL_REFRESH", "LABEL_BLACKLIST",
-			"LAST_RUN_VERSION_KEY", "UPDATE_CHECK_AUTO_KEY", "HIDE_UNCOMMENTED_PRS_KEY", "SHOW_COMMENTS_EVERYWHERE_KEY", "SORT_ORDER_KEY", "SHOW_UPDATED_KEY", "DONT_KEEP_MY_PRS_KEY", "HIDE_AVATARS_KEY",
+			"LAST_RUN_VERSION_KEY", "UPDATE_CHECK_AUTO_KEY", "HIDE_UNCOMMENTED_PRS_KEY", "SHOW_COMMENTS_EVERYWHERE_KEY", "SORT_ORDER_KEY", "SHOW_UPDATED_KEY", "DONT_KEEP_MY_PRS_KEY", "HIDE_AVATARS_KEY", "HIDE_NOTIFICATION_AVATARS_KEY",
 			"DONT_ASK_BEFORE_WIPING_MERGED", "DONT_ASK_BEFORE_WIPING_CLOSED", "HIDE_NEW_REPOS_KEY", "GROUP_BY_REPO", "HIDE_ALL_SECTION", "SHOW_STATUS_ITEMS", "NOTIFY_ON_REVIEW_ACCEPTANCES", "NOTIFY_ON_ALL_REVIEW_ACCEPTANCES", "NOTIFY_ON_REVIEW_ASSIGNMENTS",
 			"MAKE_STATUS_ITEMS_SELECTABLE", "COUNT_ONLY_LISTED_PRS", "OPEN_PR_AT_FIRST_UNREAD_COMMENT_KEY", "LOG_ACTIVITY_TO_CONSOLE_KEY", "NOTIFY_ON_REVIEW_DISMISSALS", "NOTIFY_ON_ALL_REVIEW_DISMISSALS",
 			"HOTKEY_ENABLE", "HOTKEY_CONTROL_MODIFIER", "DISABLE_ALL_COMMENT_NOTIFICATIONS", "NOTIFY_ON_STATUS_UPDATES", "NOTIFY_ON_STATUS_UPDATES_ALL", "SHOW_REPOS_IN_NAME", "INCLUDE_REPOS_IN_FILTER", "SHOW_STATUSES_EVERYWHERE",
@@ -115,6 +115,11 @@ struct Settings {
 			}
 			sharedDefaults.removeObject(forKey: "HIDE_ALL_SECTION")
 		}
+        
+        if sharedDefaults.object(forKey: "HIDE_NOTIFICATION_AVATARS_KEY") == nil {
+            let existingHidingSetting = sharedDefaults.bool(forKey: "HIDE_AVATARS_KEY")
+            sharedDefaults.setValue(existingHidingSetting, forKey: "HIDE_NOTIFICATION_AVATARS_KEY")
+        }
 
 		for repo in Repo.allItems(of: Repo.self, in: DataManager.main) where repo.value(forKey: "archived") == nil {
 			repo.archived = false
@@ -490,11 +495,17 @@ struct Settings {
 		set { set("DONT_KEEP_MY_PRS_KEY", newValue) }
 	}
 
-	static let hideAvatarsHelp = "Hide the image of the author's avatar which is usually shown on the left of listed items"
+	static let hideAvatarsHelp = "Hide the image of the author's avatar on the left of listed items"
 	static var hideAvatars: Bool {
 		get { return get("HIDE_AVATARS_KEY") as? Bool ?? false }
 		set { set("HIDE_AVATARS_KEY", newValue) }
 	}
+
+    static let hideAvatarsInNotificationsHelp = "Hide the image of the author's avatar in the notifications that Trailer posts"
+    static var hideAvatarsInNotifications: Bool {
+        get { return get("HIDE_NOTIFICATION_AVATARS_KEY") as? Bool ?? false }
+        set { set("HIDE_NOTIFICATION_AVATARS_KEY", newValue) }
+    }
 
 	static let dontAskBeforeWipingMergedHelp = "Don't ask for confirmation when you select 'Remove all merged items'. Please note there is no confirmation when selecting this from the Apple Watch, irrespective of this setting."
 	static var dontAskBeforeWipingMerged: Bool {

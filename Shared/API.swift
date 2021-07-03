@@ -229,11 +229,11 @@ final class API {
 		}
 	}
 
-    private static func md5(_ input: String) -> Data {
+    private static func sha1(_ input: String) -> Data {
         return input.utf8CString.withUnsafeBytes { bytes -> Data in
-            let len = Int(CC_MD5_DIGEST_LENGTH)
+            let len = Int(CC_SHA1_DIGEST_LENGTH)
             var digest = [UInt8](repeating: 0, count: len)
-            CC_MD5(bytes.baseAddress, CC_LONG(bytes.count), &digest)
+            CC_SHA1(bytes.baseAddress, CC_LONG(bytes.count), &digest)
             return Data(bytes: digest, count: len)
         }
     }
@@ -261,8 +261,8 @@ final class API {
 
 		let connector = path.contains("?") ? "&" : "?"
         let absolutePath = "\(path)\(connector)s=128"
-        let md5 = md5("\(absolutePath) \(currentAppVersion)").base64EncodedString()
-		let cachePath = cacheDirectory.appending(pathComponent: "imgc-\(md5)")
+        let hash = sha1("\(absolutePath) \(currentAppVersion)").base64EncodedString()
+		let cachePath = cacheDirectory.appending(pathComponent: "imgc-\(hash)")
 
         let fileManager = FileManager.default
         if fileManager.fileExists(atPath: cachePath) {

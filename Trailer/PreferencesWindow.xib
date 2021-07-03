@@ -638,8 +638,18 @@ Token</string>
                                                                 <action selector="showCreationSelected:" target="vQH-WF-vh2" id="ie4-88-nBp"/>
                                                             </connections>
                                                         </button>
+                                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="onl-1T-RTg">
+                                                            <rect key="frame" x="-2" y="299" width="275" height="18"/>
+                                                            <buttonCell key="cell" type="check" title="Display relative instead of absolute dates" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="Mtr-gs-YsM">
+                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                <font key="font" metaFont="system"/>
+                                                            </buttonCell>
+                                                            <connections>
+                                                                <action selector="showRelativeDatesSelected:" target="vQH-WF-vh2" id="XEh-sO-gUY"/>
+                                                            </connections>
+                                                        </button>
                                                         <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yLm-V6-e9K">
-                                                            <rect key="frame" x="0.0" y="300" width="395" height="16"/>
+                                                            <rect key="frame" x="0.0" y="270" width="395" height="16"/>
                                                             <subviews>
                                                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="yK4-xL-QRu">
                                                                     <rect key="frame" x="-2" y="-1" width="168" height="18"/>
@@ -671,26 +681,39 @@ Token</string>
                                                                 <real value="3.4028234663852886e+38"/>
                                                             </customSpacing>
                                                         </stackView>
-                                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="onl-1T-RTg">
-                                                            <rect key="frame" x="-2" y="269" width="275" height="18"/>
-                                                            <buttonCell key="cell" type="check" title="Display relative instead of absolute dates" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="Mtr-gs-YsM">
-                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                <font key="font" metaFont="system"/>
-                                                            </buttonCell>
-                                                            <connections>
-                                                                <action selector="showRelativeDatesSelected:" target="vQH-WF-vh2" id="XEh-sO-gUY"/>
-                                                            </connections>
-                                                        </button>
-                                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="3CV-9S-gLw">
-                                                            <rect key="frame" x="-2" y="239" width="145" height="18"/>
-                                                            <buttonCell key="cell" type="check" title="Hide author avatars" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="UOs-3D-XyL">
-                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                <font key="font" metaFont="system"/>
-                                                            </buttonCell>
-                                                            <connections>
-                                                                <action selector="hideAvatarsSelected:" target="vQH-WF-vh2" id="45w-QA-Tcd"/>
-                                                            </connections>
-                                                        </button>
+                                                        <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4W0-So-h8a">
+                                                            <rect key="frame" x="0.0" y="240" width="337" height="16"/>
+                                                            <subviews>
+                                                                <button translatesAutoresizingMaskIntoConstraints="NO" id="3CV-9S-gLw">
+                                                                    <rect key="frame" x="-2" y="-1" width="203" height="18"/>
+                                                                    <buttonCell key="cell" type="check" title="Hide author avatars in menus" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="UOs-3D-XyL">
+                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                        <font key="font" metaFont="system"/>
+                                                                    </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="hideAvatarsSelected:" target="vQH-WF-vh2" id="45w-QA-Tcd"/>
+                                                                    </connections>
+                                                                </button>
+                                                                <button translatesAutoresizingMaskIntoConstraints="NO" id="rz2-cs-wau">
+                                                                    <rect key="frame" x="201" y="-1" width="138" height="18"/>
+                                                                    <buttonCell key="cell" type="check" title="…and notifications" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="lwX-9R-ZIr">
+                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                        <font key="font" metaFont="system"/>
+                                                                    </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="hideAvatarsInNotificationsSelected:" target="vQH-WF-vh2" id="kME-Xb-4ji"/>
+                                                                    </connections>
+                                                                </button>
+                                                            </subviews>
+                                                            <visibilityPriorities>
+                                                                <integer value="1000"/>
+                                                                <integer value="1000"/>
+                                                            </visibilityPriorities>
+                                                            <customSpacing>
+                                                                <real value="3.4028234663852886e+38"/>
+                                                                <real value="3.4028234663852886e+38"/>
+                                                            </customSpacing>
+                                                        </stackView>
                                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="VrU-mc-Czw">
                                                             <rect key="frame" x="-2" y="209" width="330" height="18"/>
                                                             <buttonCell key="cell" type="check" title="Separate each API server in its own menu bar item" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="C7K-xS-315">
@@ -721,24 +744,24 @@ Token</string>
                                                                 <action selector="showLabelsSelected:" target="vQH-WF-vh2" id="qDj-Oe-xbz"/>
                                                             </connections>
                                                         </button>
+                                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="GMt-gT-i3d">
+                                                            <rect key="frame" x="-2" y="119" width="228" height="18"/>
+                                                            <buttonCell key="cell" type="check" title="Sync and display item milestones" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="fnW-oB-nHX">
+                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                <font key="font" metaFont="system"/>
+                                                            </buttonCell>
+                                                            <connections>
+                                                                <action selector="displayMilestonesSelected:" target="vQH-WF-vh2" id="sId-Th-WpZ"/>
+                                                            </connections>
+                                                        </button>
                                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="fsA-E5-SRy">
-                                                            <rect key="frame" x="-2" y="119" width="251" height="18"/>
+                                                            <rect key="frame" x="-2" y="89" width="251" height="18"/>
                                                             <buttonCell key="cell" type="check" title="Highlight PRs that have new commits" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="T2C-n7-dIU">
                                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                 <font key="font" metaFont="system"/>
                                                             </buttonCell>
                                                             <connections>
                                                                 <action selector="highlightItemsWithNewCommitsSelected:" target="vQH-WF-vh2" id="ccI-te-cRo"/>
-                                                            </connections>
-                                                        </button>
-                                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="GMt-gT-i3d">
-                                                            <rect key="frame" x="-2" y="89" width="169" height="18"/>
-                                                            <buttonCell key="cell" type="check" title="Display item milestones" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="fnW-oB-nHX">
-                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                <font key="font" metaFont="system"/>
-                                                            </buttonCell>
-                                                            <connections>
-                                                                <action selector="displayMilestonesSelected:" target="vQH-WF-vh2" id="sId-Th-WpZ"/>
                                                             </connections>
                                                         </button>
                                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="CjN-R7-2iD">
@@ -752,8 +775,8 @@ Token</string>
                                                             </connections>
                                                         </button>
                                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="qXS-9a-Cpn">
-                                                            <rect key="frame" x="-2" y="29" width="261" height="18"/>
-                                                            <buttonCell key="cell" type="check" title="Mark non-mergeable PRs (v4 API only)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="lKz-ia-ofo">
+                                                            <rect key="frame" x="-2" y="29" width="291" height="18"/>
+                                                            <buttonCell key="cell" type="check" title="Mark PRs with merge conflicts (v4 API only)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="lKz-ia-ofo">
                                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                 <font key="font" metaFont="system"/>
                                                             </buttonCell>
@@ -2635,6 +2658,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="grayOutWhenRefreshing" destination="ueT-Kq-j9E" id="0DE-vy-hy2"/>
                 <outlet property="groupByRepo" destination="TqD-G8-E24" id="nQt-v1-4Mx"/>
                 <outlet property="hideAvatars" destination="3CV-9S-gLw" id="KZR-Gl-2lg"/>
+                <outlet property="hideAvatarsInNotifications" destination="rz2-cs-wau" id="1Va-yu-7ca"/>
                 <outlet property="hideCountsOnMenubar" destination="9fQ-lN-76c" id="CvS-dx-QCd"/>
                 <outlet property="hidePrsThatDontPass" destination="5WZ-7z-gJ2" id="egh-ZU-iS8"/>
                 <outlet property="hidePrsThatDontPassOnlyInAll" destination="ByB-sN-fU6" id="3fP-Sd-ouM"/>

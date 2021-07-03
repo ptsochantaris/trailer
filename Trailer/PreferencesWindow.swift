@@ -104,6 +104,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet private var refreshItemsLabel: NSTextField!
 	@IBOutlet private var showCreationDates: NSButton!
 	@IBOutlet private var hideAvatars: NSButton!
+    @IBOutlet private var hideAvatarsInNotifications: NSButton!
 	@IBOutlet private var showSeparateApiServersInMenu: NSButton!
 	@IBOutlet private var displayRepositoryNames: NSButton!
 	@IBOutlet private var hideCountsOnMenubar: NSButton!
@@ -448,6 +449,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		highlightItemsWithNewCommits.toolTip = Settings.markPrsAsUnreadOnNewCommitsHelp
 		displayRepositoryNames.toolTip = Settings.showReposInNameHelp
 		hideAvatars.toolTip = Settings.hideAvatarsHelp
+        hideAvatarsInNotifications.toolTip = Settings.hideAvatarsInNotificationsHelp
 		showSeparateApiServersInMenu.toolTip = Settings.showSeparateApiServersInMenuHelp
 		hideCountsOnMenubar.toolTip = Settings.hideMenubarCountsHelp
 		sortModeSelect.toolTip = Settings.sortMethodHelp
@@ -591,6 +593,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		hideUncommentedPrs.integerValue = Settings.hideUncommentedItems ? 1 : 0
 		assumeCommentsBeforeMineAreRead.integerValue = Settings.assumeReadItemIfUserHasNewerComments ? 1 : 0
 		hideAvatars.integerValue = Settings.hideAvatars ? 1 : 0
+        hideAvatarsInNotifications.integerValue = Settings.hideAvatarsInNotifications ? 1 : 0
 		hideCountsOnMenubar.integerValue = Settings.hideMenubarCounts ? 1 : 0
 		showSeparateApiServersInMenu.integerValue = Settings.showSeparateApiServersInMenu ? 1 : 0
 		dontKeepPrsMergedByMe.integerValue = Settings.dontKeepPrsMergedByMe ? 1 : 0
@@ -955,6 +958,10 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		Settings.hideAvatars = (sender.integerValue==1)
 		deferredUpdateTimer.push()
 	}
+
+    @IBAction private func hideAvatarsInNotificationsSelected(_ sender: NSButton) {
+        Settings.hideAvatarsInNotifications = (sender.integerValue==1)
+    }
 
 	@IBAction private func showSeparateApiServersInMenuSelected(_ sender: NSButton) {
 		Settings.showSeparateApiServersInMenu = (sender.integerValue==1)

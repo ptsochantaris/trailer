@@ -363,15 +363,12 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 			}
 		}
 
-		let t = S(notification.title)
-		let s = S(notification.subtitle)
-		let i = S(notification.informativeText)
-		notification.identifier = "\(t) - \(s) - \(i)"
+        notification.identifier = [notification.title, notification.subtitle, notification.informativeText].compactMap { $0 }.joined(separator: " - ")
 
 		notification.userInfo = DataManager.info(for: item)
 
         let group = DispatchGroup()
-		if let c = item as? PRComment, let url = c.avatarUrl, !Settings.hideAvatars {
+		if !Settings.hideAvatarsInNotifications, let url = (item as? PRComment)?.avatarUrl ?? (item as? ListableItem)?.userAvatarUrl {
             group.enter()
 			API.haveCachedAvatar(from: url) { image, _ in
 				notification.contentImage = image

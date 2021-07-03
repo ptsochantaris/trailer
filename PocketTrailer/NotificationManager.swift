@@ -207,23 +207,22 @@ final class NotificationManager {
 			}
 		}
 
-		let identifier = "\(S(notification.title)) - \(S(notification.subtitle)) - \(S(notification.body))"
-
 		notification.userInfo = DataManager.info(for: item)
         
         let group = DispatchGroup()
 
-		if let c = item as? PRComment, let url = c.avatarUrl, !Settings.hideAvatars {
+        if !Settings.hideAvatarsInNotifications, let url = (item as? PRComment)?.avatarUrl ?? (item as? ListableItem)?.userAvatarUrl {
             group.enter()
-			API.haveCachedAvatar(from: url) { image, cachePath in
-				if image != nil, let attachment = try? UNNotificationAttachment(identifier: cachePath, url: URL(fileURLWithPath: cachePath), options: nil) {
-					notification.attachments = [attachment]
-                    group.leave()
-				}
-			}
-		}
+            API.haveCachedAvatar(from: url) { image, cachePath in
+                if image != nil, let attachment = try? UNNotificationAttachment(identifier: cachePath, url: URL(fileURLWithPath: cachePath), options: nil) {
+                    notification.attachments = [attachment]
+                }
+                group.leave()
+            }
+        }
         
         group.notify(queue: .main) {
+            let identifier = [notification.title, notification.subtitle, notification.body].map { $0 }.joined(separator: " - ")
             let request = UNNotificationRequest(identifier: identifier, content: notification, trigger: nil)
             UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
         }
