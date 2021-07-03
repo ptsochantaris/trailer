@@ -1,4 +1,3 @@
-
 final class Reaction: DataItem {
 
 	@NSManaged var content: String?

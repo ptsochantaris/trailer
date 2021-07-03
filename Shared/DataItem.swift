@@ -1,4 +1,3 @@
-
 import CoreData
 
 class DataItem: NSManagedObject {

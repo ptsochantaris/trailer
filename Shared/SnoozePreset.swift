@@ -1,4 +1,3 @@
-
 import CoreData
 
 final class SnoozePreset: NSManagedObject {

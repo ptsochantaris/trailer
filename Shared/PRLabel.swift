@@ -1,4 +1,3 @@
-
 import CoreData
 #if os(iOS)
 	import UIKit
