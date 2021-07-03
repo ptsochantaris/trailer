@@ -80,12 +80,17 @@ let itemDateFormatter: DateFormatter = {
 
 func DLog(_ message: String, _ arg1: @autoclosure ()->Any? = nil, _ arg2: @autoclosure ()->Any? = nil, _ arg3: @autoclosure ()->Any? = nil, _ arg4: @autoclosure ()->Any? = nil, _ arg5: @autoclosure ()->Any? = nil) {
 	if Settings.logActivityToConsole {
-		NSLog(message,
-		      String(describing: arg1() ?? "(nil)"),
-		      String(describing: arg2() ?? "(nil)"),
-		      String(describing: arg3() ?? "(nil)"),
-		      String(describing: arg4() ?? "(nil)"),
-		      String(describing: arg5() ?? "(nil)"))
+        let message = String(format: message,
+                             String(describing: arg1() ?? "(nil)"),
+                             String(describing: arg2() ?? "(nil)"),
+                             String(describing: arg3() ?? "(nil)"),
+                             String(describing: arg4() ?? "(nil)"),
+                             String(describing: arg5() ?? "(nil)"))
+        #if DEBUG
+        print(">>>", message)
+        #else
+        NSLog(message)
+        #endif
 	}
 }
 

@@ -17,7 +17,15 @@ class DataItem: NSManagedObject {
 	}
 
 	final func createdBefore(_ item: DataItem) -> Bool {
-        return (createdAt ?? .distantPast) < (item.createdAt ?? .distantPast) || objectID.uriRepresentation().absoluteString < item.objectID.uriRepresentation().absoluteString
+        let a = createdAt ?? .distantPast
+        let b = item.createdAt ?? .distantPast
+        if a < b {
+            return true
+        } else if a == b {
+            return objectID.uriRepresentation().absoluteString < item.objectID.uriRepresentation().absoluteString
+        } else {
+            return false
+        }
 	}
 
 	static func allItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext, prefetchRelationships: [String]? = nil) -> [T] {

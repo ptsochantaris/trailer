@@ -47,7 +47,8 @@ final class Review: DataItem {
             let parent = DataItem.item(of: PullRequest.self, with: parentId, in: moc) else {
                 continue
             }
-            parent.checkAndStoreReviewAssignments(prIdsToAssignedUsers[parentId] ?? [], prIdsToAssignedTeams[parentId] ?? [])
+            parent.checkAndStoreReviewAssignments(prIdsToAssignedUsers[parentId] ?? [],
+                                                  prIdsToAssignedTeams[parentId] ?? [])
         }
     }
 
@@ -55,7 +56,7 @@ final class Review: DataItem {
         syncItems(of: Review.self, from: nodes, on: server) { review, node in
 
             let info = node.jsonPayload
-            if info.count == 3 { // this node is a container (id, comments, typename)
+            if info.count == 3 { // this node is a blank container (id, comments, typename)
                 return
             }
             let newState = info["state"] as? String

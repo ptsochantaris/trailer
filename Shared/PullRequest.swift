@@ -52,6 +52,8 @@ final class PullRequest: ListableItem {
             pr.mergeCommitSha = json["headRefOid"] as? String
             pr.mergedByNodeId = (json["mergedBy"] as? [AnyHashable: Any])?["id"] as? String
             pr.baseNodeSync(nodeJson: json, parent: parent)
+            pr.reviewers = "" // will be populated by the review request API calls
+            pr.teamReviewers = "" // will be populated by the review request API calls
             
             let headRefName = json["headRefName"] as? String
             if let headRefName = headRefName,
@@ -377,8 +379,11 @@ final class PullRequest: ListableItem {
         }
         
         var latestReviewByUser = [String: Review]()
-        for r in reviews.filter({ $0.affectsBottomLine }).sorted(by: { $0.createdBefore($1) }) {
-            latestReviewByUser[S(r.username)] = r
+        reviews.filter { $0.affectsBottomLine }.sorted { $0.createdBefore($1) }.forEach {
+            if let userName = $0.username {
+                // Do not take any review state into account if the user is still marked as a reviewer
+                latestReviewByUser[userName] = reviewers.contains(userName) ? nil : $0
+            }
         }
 
         if !latestReviewByUser.isEmpty || !reviewers.isEmpty {
