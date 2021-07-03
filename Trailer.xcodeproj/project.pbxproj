@@ -193,8 +193,6 @@
 		16F0BAD723A53EBF002EC348 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F0BAD523A53EB4002EC348 /* Colors.swift */; };
 		16F0BAD823A53EC0002EC348 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F0BAD523A53EB4002EC348 /* Colors.swift */; };
 		16F413701BA5850A006B0195 /* RepoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F4136F1BA5850A006B0195 /* RepoCell.swift */; };
-		16F70CC11EDC99A000B17E9F /* md5.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F70CC01EDC99A000B17E9F /* md5.swift */; };
-		16F70CC21EDC99A000B17E9F /* md5.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F70CC01EDC99A000B17E9F /* md5.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -485,7 +483,6 @@
 		16F0BAD923A644C9002EC348 /* Trailer 41.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 41.xcdatamodel"; sourceTree = "<group>"; };
 		16F4136F1BA5850A006B0195 /* RepoCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RepoCell.swift; sourceTree = "<group>"; };
 		16F51FA019DE8C78007B0BB1 /* PRIVACY */ = {isa = PBXFileReference; lastKnownFileType = text; lineEnding = 0; path = PRIVACY; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = "<none>"; };
-		16F70CC01EDC99A000B17E9F /* md5.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = md5.swift; path = Shared/md5.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -934,7 +931,6 @@
 		16F70CBF1EDC996500B17E9F /* External */ = {
 			isa = PBXGroup;
 			children = (
-				16F70CC01EDC99A000B17E9F /* md5.swift */,
 				16B3B14E1F366F790060A394 /* compression.swift */,
 			);
 			name = External;
@@ -1273,7 +1269,6 @@
 				160CA03923A65152003FA0D8 /* GQLBatchGroup.swift in Sources */,
 				169205661E34DACA00FB9547 /* WatchlistSettingsViewController.swift in Sources */,
 				16F0BAD723A53EBF002EC348 /* Colors.swift in Sources */,
-				16F70CC21EDC99A000B17E9F /* md5.swift in Sources */,
 				16C9A27A1A44DD0200EE54EC /* CommentBlacklistViewController.swift in Sources */,
 				166ADEC81CCB009A001BA61F /* SnoozingEditorViewController.swift in Sources */,
 				165C49101BA63B45006BBCF5 /* AdvancedSettingsCell.swift in Sources */,
@@ -1398,7 +1393,6 @@
 				161C959E1A3A36020019A577 /* MenuWindow.swift in Sources */,
 				16A69EDA1AC83020008231F9 /* ListableItem.swift in Sources */,
 				16CBE1C51A2DFBA500485053 /* Settings.swift in Sources */,
-				16F70CC11EDC99A000B17E9F /* md5.swift in Sources */,
 				16D2B875251FA54E00D86C89 /* Enums+Settings.swift in Sources */,
 				16DC40FC1A3F591200BB361A /* TrailerCell.swift in Sources */,
 				168FD00E1A2A7AD1005929CB /* MessageView.swift in Sources */,

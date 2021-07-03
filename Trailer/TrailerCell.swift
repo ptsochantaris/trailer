@@ -43,7 +43,7 @@ final class TrailerCell: NSTableCellView {
 		let showUnpin = item.condition != ItemCondition.open.rawValue
 		if showUnpin { W -= REMOVE_BUTTON_WIDTH } else { W -= 4 }
 
-		let showAvatar = !(S(item.userAvatarUrl).isEmpty || Settings.hideAvatars)
+		let showAvatar = !Settings.hideAvatars
 		let shift: CGFloat = showAvatar ? AVATAR_SIZE + AVATAR_PADDING : -4
 		W -= shift
 
@@ -94,7 +94,7 @@ final class TrailerCell: NSTableCellView {
 
 		if showAvatar {
             let avatarRect = CGRect(x: LEFTPADDING, y: accesoryCenterY - AVATAR_SIZE * 0.5, width: AVATAR_SIZE, height: AVATAR_SIZE)
-			let userImage = AvatarView(frame: avatarRect, url: S(item.userAvatarUrl))
+			let userImage = AvatarView(frame: avatarRect, url: item.userAvatarUrl)
 			userImage.alphaValue = faded ? DISABLED_FADE : 1.0
 			addSubview(userImage)
 		}

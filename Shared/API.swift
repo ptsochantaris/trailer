@@ -3,6 +3,7 @@ import CoreData
 #if os(iOS)
 	import UIKit
 #endif
+import CommonCrypto
 
 final class API {
 
@@ -215,21 +216,27 @@ final class API {
 	private static func expireOldImageCacheEntries() {
 		let now = Date()
 		let fileManager = FileManager.default
-		for f in try! fileManager.contentsOfDirectory(atPath: cacheDirectory) {
-			if f.hasPrefix("imgcache-") {
-				do {
-					let path = cacheDirectory.appending(pathComponent: f)
-					let attributes = try fileManager.attributesOfItem(atPath: path)
-					let date = attributes[.creationDate] as! Date
-					if now.timeIntervalSince(date) > (3600.0*24.0) {
-						try? fileManager.removeItem(atPath: path)
-					}
-				} catch {
-					DLog("File error when cleaning old cached image: %@", error.localizedDescription)
-				}
-			}
+		for f in try! fileManager.contentsOfDirectory(atPath: cacheDirectory) where f.hasPrefix("imgc-") {
+            do {
+                let path = cacheDirectory.appending(pathComponent: f)
+                let attributes = try fileManager.attributesOfItem(atPath: path)
+                if let date = attributes[.creationDate] as? Date, now.timeIntervalSince(date) > 3600 * 24 {
+                    try? fileManager.removeItem(atPath: path)
+                }
+            } catch {
+                DLog("File error when removing old cached image: %@", error.localizedDescription)
+            }
 		}
 	}
+
+    private static func md5(_ input: String) -> Data {
+        return input.utf8CString.withUnsafeBytes { bytes -> Data in
+            let len = Int(CC_MD5_DIGEST_LENGTH)
+            var digest = [UInt8](repeating: 0, count: len)
+            CC_MD5(bytes.baseAddress, CC_LONG(bytes.count), &digest)
+            return Data(bytes: digest, count: len)
+        }
+    }
 
 	@discardableResult
 	static func haveCachedAvatar(from path: String, callback: @escaping (IMAGE_CLASS?, String) -> Void) -> Bool {
@@ -253,8 +260,8 @@ final class API {
 		}
 
 		let connector = path.contains("?") ? "&" : "?"
-        let absolutePath = "\(path)\(connector)s=256"
-		let md5 = MD5Hashing.md5(str: "\(absolutePath) \(currentAppVersion)")
+        let absolutePath = "\(path)\(connector)s=128"
+        let md5 = md5("\(absolutePath) \(currentAppVersion)").base64EncodedString()
 		let cachePath = cacheDirectory.appending(pathComponent: "imgc-\(md5)")
 
         let fileManager = FileManager.default

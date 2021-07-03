@@ -1,8 +1,20 @@
 
 final class AvatarView: NSImageView {
 	
-	init(frame frameRect: NSRect, url: String) {
+	init(frame frameRect: NSRect, url: String?) {
 		super.init(frame: frameRect)
+        
+        guard let url = url else {
+            let size = NSSize(width: AVATAR_SIZE, height: AVATAR_SIZE)
+            let img = NSImage(size: size)
+            img.lockFocus()
+            NSColor.appTertiaryLabel.setFill()
+            NSGraphicsContext.current?.cgContext.fill(NSRect(origin: .zero, size: size))
+            img.unlockFocus()
+            self.image = img
+            return
+        }
+        
 		imageAlignment = .alignCenter
 		imageScaling = .scaleProportionallyUpOrDown
 		
@@ -14,7 +26,7 @@ final class AvatarView: NSImageView {
 			spinner?.stopAnimation(nil)
 			spinner?.removeFromSuperview()
 			}) {
-			let s = NSProgressIndicator(frame: bounds.insetBy(dx: 6.0, dy: 6.0))
+			let s = NSProgressIndicator(frame: bounds.insetBy(dx: 6, dy: 6))
 			s.style = .spinning
 			addSubview(s)
 			s.startAnimation(self)
@@ -25,7 +37,7 @@ final class AvatarView: NSImageView {
 	override func draw(_ dirtyRect: NSRect) {
 		let radius = floor(AVATAR_SIZE/2.0)
 		let path = NSBezierPath(roundedRect: dirtyRect, xRadius: radius, yRadius: radius)
-		path.addClip()
+		path.setClip()
 		super.draw(dirtyRect)
 	}
 	
