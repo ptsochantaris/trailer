@@ -96,6 +96,9 @@ final class PullRequest: ListableItem {
                 let headInfo = info["head"] as? [AnyHashable: Any]
                 item.headRefName = headInfo?["ref"] as? String
                 item.headLabel = headInfo?["label"] as? String
+                
+                item.reviewers = ""
+                item.teamReviewers = ""
 
                 if
                     let newHeadCommitSha = headInfo?["sha"] as? String,
