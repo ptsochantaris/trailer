@@ -266,8 +266,9 @@ final class PullRequest: ListableItem {
         let red = Settings.showStatusesRed
         let yellow = Settings.showStatusesYellow
         let green = Settings.showStatusesGreen
+        let gray = Settings.showStatusesGray
         let filteredStatuses: Set<PRStatus>
-        if red && yellow && green {
+        if red && yellow && green && gray {
             filteredStatuses = statuses
         } else {
             filteredStatuses = statuses.filter {
@@ -275,6 +276,7 @@ final class PullRequest: ListableItem {
                 if c == .appRed { return red }
                 if c == .appYellow { return yellow }
                 if c == .appGreen { return green }
+                if c == .appSecondaryLabel { return gray }
                 return false
             }
         }

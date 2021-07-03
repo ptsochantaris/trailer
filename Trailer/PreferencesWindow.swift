@@ -75,6 +75,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
     @IBOutlet private var showStatusesRed: NSButton!
     @IBOutlet private var showStatusesYellow: NSButton!
     @IBOutlet private var showStatusesGreen: NSButton!
+    @IBOutlet private var showStatusesNeutral: NSButton!
 
     // Filtering
     @IBOutlet private var includeRepositoriesInFiltering: NSButton!
@@ -285,6 +286,11 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
     
     @IBAction private func showPrLinesSelected(_ sender: NSButton) {
         Settings.showPrLines = sender.integerValue == 1
+        deferredUpdateTimer.push()
+    }
+
+    @IBAction private func listStatusesNeutralSelected(_ sender: NSButton) {
+        Settings.showStatusesGray = sender.integerValue ==  1
         deferredUpdateTimer.push()
     }
 
@@ -523,6 +529,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
         showStatusesGreen.toolTip = Settings.showStatusesGreenHelp
         showStatusesYellow.toolTip = Settings.showStatusesYellowHelp
         showStatusesRed.toolTip = Settings.showStatusesRedHelp
+        showStatusesNeutral.toolTip = Settings.showStatusesGrayHelp
 	}
 
 	private func updateAllItemSettingButtons() {
@@ -622,7 +629,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
         showStatusesGreen.integerValue = Settings.showStatusesGreen ? 1 : 0
         showStatusesYellow.integerValue = Settings.showStatusesYellow ? 1 : 0
         showStatusesRed.integerValue = Settings.showStatusesRed ? 1 : 0
-
+        showStatusesNeutral.integerValue = Settings.showStatusesGray ? 1 : 0
+        
 		defaultOpenApp.stringValue = Settings.defaultAppForOpeningItems
 		defaultOpenLinks.stringValue = Settings.defaultAppForOpeningWeb
 
@@ -1077,6 +1085,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
         showStatusesGreen.isEnabled = enable
         showStatusesYellow.isEnabled = enable
         showStatusesRed.isEnabled = enable
+        showStatusesNeutral.isEnabled = enable
 		hidePrsThatDontPassOnlyInAll.isEnabled = enable && Settings.hidePrsThatArentPassing
 		notifyOnStatusUpdatesForAllPrs.isEnabled = enable && Settings.notifyOnStatusUpdates
 

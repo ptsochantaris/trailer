@@ -1755,12 +1755,22 @@ Tip: Reactions are treated like comments, i.e. the rules about being notified on
                                                             <rect key="frame" x="3" y="3" width="150" height="101"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" fixedFrame="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cam-gt-1yf">
-                                                                    <rect key="frame" x="20" y="22" width="63" height="64"/>
+                                                                <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" fixedFrame="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cam-gt-1yf">
+                                                                    <rect key="frame" x="12" y="11" width="75" height="79"/>
                                                                     <subviews>
+                                                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2m4-V1-HTR">
+                                                                            <rect key="frame" x="-2" y="62" width="71" height="18"/>
+                                                                            <buttonCell key="cell" type="check" title="Neutral" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="n6A-IE-fWT">
+                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                                <font key="font" metaFont="system"/>
+                                                                            </buttonCell>
+                                                                            <connections>
+                                                                                <action selector="listStatusesNeutralSelected:" target="vQH-WF-vh2" id="nnm-7N-dn4"/>
+                                                                            </connections>
+                                                                        </button>
                                                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="u0P-kb-vqH">
-                                                                            <rect key="frame" x="-2" y="47" width="63" height="18"/>
-                                                                            <buttonCell key="cell" type="check" title="Green" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Clk-qX-fmL">
+                                                                            <rect key="frame" x="-2" y="41" width="77" height="18"/>
+                                                                            <buttonCell key="cell" type="check" title="Success" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Clk-qX-fmL">
                                                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                                 <font key="font" metaFont="system"/>
                                                                             </buttonCell>
@@ -1769,8 +1779,8 @@ Tip: Reactions are treated like comments, i.e. the rules about being notified on
                                                                             </connections>
                                                                         </button>
                                                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gor-jg-5li">
-                                                                            <rect key="frame" x="-2" y="23" width="65" height="18"/>
-                                                                            <buttonCell key="cell" type="check" title="Yellow" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="ZqG-sy-Ebj">
+                                                                            <rect key="frame" x="-2" y="20" width="76" height="18"/>
+                                                                            <buttonCell key="cell" type="check" title="Warning" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="ZqG-sy-Ebj">
                                                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                                 <font key="font" metaFont="system"/>
                                                                             </buttonCell>
@@ -1779,8 +1789,8 @@ Tip: Reactions are treated like comments, i.e. the rules about being notified on
                                                                             </connections>
                                                                         </button>
                                                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ut3-On-loN">
-                                                                            <rect key="frame" x="-2" y="-1" width="50" height="18"/>
-                                                                            <buttonCell key="cell" type="check" title="Red" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="6In-bf-TLe">
+                                                                            <rect key="frame" x="-2" y="-1" width="66" height="18"/>
+                                                                            <buttonCell key="cell" type="check" title="Failure" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="6In-bf-TLe">
                                                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                                 <font key="font" metaFont="system"/>
                                                                             </buttonCell>
@@ -1793,8 +1803,10 @@ Tip: Reactions are treated like comments, i.e. the rules about being notified on
                                                                         <integer value="1000"/>
                                                                         <integer value="1000"/>
                                                                         <integer value="1000"/>
+                                                                        <integer value="1000"/>
                                                                     </visibilityPriorities>
                                                                     <customSpacing>
+                                                                        <real value="3.4028234663852886e+38"/>
                                                                         <real value="3.4028234663852886e+38"/>
                                                                         <real value="3.4028234663852886e+38"/>
                                                                         <real value="3.4028234663852886e+38"/>
@@ -2693,6 +2705,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="showStatusItems" destination="ANN-xo-ud5" id="z7y-d1-UkL"/>
                 <outlet property="showStatusesForAll" destination="lmu-JQ-ZK1" id="z9f-vO-M63"/>
                 <outlet property="showStatusesGreen" destination="u0P-kb-vqH" id="6GF-PG-dvT"/>
+                <outlet property="showStatusesNeutral" destination="2m4-V1-HTR" id="1rx-Gl-R03"/>
                 <outlet property="showStatusesRed" destination="Ut3-On-loN" id="MPI-tc-c9x"/>
                 <outlet property="showStatusesYellow" destination="gor-jg-5li" id="N00-FS-CBc"/>
                 <outlet property="snoozeDateTimeDay" destination="51F-wD-jRc" id="7l4-x6-WVo"/>

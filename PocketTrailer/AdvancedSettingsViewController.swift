@@ -270,6 +270,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		        description: Settings.hidePrsThatDontPassOnlyInAllHelp,
 		        valueDisplayed: { Settings.hidePrsThatDontPassOnlyInAll ? "✓" : " " }),
         Setting(section: .Stauses,
+                title: "Show neutral statuses",
+                description: Settings.showStatusesGrayHelp,
+                valueDisplayed: { Settings.showStatusesGray ? "✓" : " " }),
+        Setting(section: .Stauses,
                 title: "Show green statuses",
                 description: Settings.showStatusesGreenHelp,
                 valueDisplayed: { Settings.showStatusesGreen ? "✓" : " " }),
@@ -281,7 +285,6 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
                 title: "Show red statuses",
                 description: Settings.showStatusesRedHelp,
                 valueDisplayed: { Settings.showStatusesRed ? "✓" : " " }),
-
 
 		Setting(section: .History,
 		        title: "When something is merged",
@@ -809,12 +812,15 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				Settings.hidePrsThatDontPassOnlyInAll = !Settings.hidePrsThatDontPassOnlyInAll
 				settingsChangedTimer.push()
             case 7:
-                Settings.showStatusesGreen = !Settings.showStatusesGreen
+                Settings.showStatusesGray = !Settings.showStatusesGray
                 settingsChangedTimer.push()
             case 8:
-                Settings.showStatusesYellow = !Settings.showStatusesYellow
+                Settings.showStatusesGreen = !Settings.showStatusesGreen
                 settingsChangedTimer.push()
             case 9:
+                Settings.showStatusesYellow = !Settings.showStatusesYellow
+                settingsChangedTimer.push()
+            case 10:
                 Settings.showStatusesRed = !Settings.showStatusesRed
                 settingsChangedTimer.push()
 			default:

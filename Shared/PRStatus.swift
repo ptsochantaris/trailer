@@ -58,9 +58,11 @@ final class PRStatus: DataItem {
     
 	var colorForDisplay: COLOR_CLASS {
 		switch S(state) {
+        case "", "skipped", "neutral":
+            return .appSecondaryLabel
 		case "pending", "expected":
             return .appYellow
-		case "success", "skipped", "neutral":
+		case "success":
             return .appGreen
 		default:
             return .appRed
@@ -71,7 +73,9 @@ final class PRStatus: DataItem {
 		var text: String
 
 		switch S(state) {
-		case "pending", "expected", "":
+        case "":
+            text = "⏺ "
+		case "pending", "expected":
 			text = "⚡️ "
         case "skipped":
             text = "⏭ "

@@ -24,7 +24,7 @@ struct Settings {
 			"REMOVE_RELATED_NOTIFICATIONS_ON_ITEM_REMOVE", "HIDE_SNOOZED_ITEMS", "INCLUDE_MILESTONES_IN_FILTER", "INCLUDE_ASSIGNEE_NAMES_IN_FILTER", "API_SERVERS_IN_SEPARATE_MENUS", "ASSUME_READ_ITEM_IF_USER_HAS_NEWER_COMMENTS",
             "AUTO_SNOOZE_DAYS", "HIDE_MENUBAR_COUNTS", "AUTO_ADD_NEW_REPOS", "AUTO_REMOVE_DELETED_REPOS", "MARK_PRS_AS_UNREAD_ON_NEW_COMMITS", "SHOW_LABELS", "DISPLAY_REVIEW_CHANGE_REQUESTS", "SHOW_RELATIVE_DATES", "QUERY_AUTHORED_PRS", "QUERY_AUTHORED_ISSUES",
 			"DISPLAY_MILESTONES", "DEFAULT_APP_FOR_OPENING_WEB", "DEFAULT_APP_FOR_OPENING_ITEMS", "HIDE_ARCHIVED_REPOS", "DRAFT_HANDLING_POLICY", "MARK_UNMERGEABLE_ITEMS", "SHOW_PR_LINES", "SCAN_CLOSED_AND_MERGED", "USE_V4_API", "REQUESTED_TEAM_REVIEWS",
-            "SHOW_STATUSES_GREEN", "SHOW_STATUSES_YELLOW", "SHOW_STATUSES_RED", "SHOW_BASE_AND_HEAD_BRANCHES", "PERSISTED_TAB_FILTERS"]
+            "SHOW_STATUSES_GREEN", "SHOW_STATUSES_GRAY", "SHOW_STATUSES_YELLOW", "SHOW_STATUSES_RED", "SHOW_BASE_AND_HEAD_BRANCHES", "PERSISTED_TAB_FILTERS"]
 	}
 
     static func checkMigration() {
@@ -772,7 +772,13 @@ struct Settings {
 		get { return get("INCLUDE_STATUSES_IN_FILTER") as? Bool ?? true }
 		set { set("INCLUDE_STATUSES_IN_FILTER", newValue) }
 	}
-    
+
+    static let showStatusesGrayHelp = "Include neutral statuses in an item's status list"
+    static var showStatusesGray: Bool {
+        get { return get("SHOW_STATUSES_GRAY") as? Bool ?? true }
+        set { set("SHOW_STATUSES_GRAY", newValue) }
+    }
+
     static let showStatusesGreenHelp = "Include green statuses in an item's status list"
     static var showStatusesGreen: Bool {
         get { return get("SHOW_STATUSES_GREEN") as? Bool ?? true }
