@@ -7,6 +7,30 @@
 		<language>en</language>
 
         <item>
+            <title>Version 1.7.6</title>
+            <sparkle:minimumSystemVersion>10.11.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[<font face="sans-serif" size="3"><ul>
+                <li>New filtering section in preferences to hide items from specific authors, or items that contain specific labels.</li>
+                <li>New options to select which type of status items to list or hide for listed items.</li>
+                <li>Typed-in filters are now persisted in each menu between app restarts.</li>
+                <li>Support for displaying checks in item status lists (v4 API only.)</li>
+                <li>Improved layout for items which do not have an author avatar.</li>
+                <li>New option to display base branch info for PRs.</li>
+                <li>General round of minor bug fixing and optimisations, including:</li>
+                <li>Corrections to display of reviews and statuses.</li>
+                <li>App will no longer appear over the menubar if auto-hiding of the menubar is turned on.</li>
+                <li>Option to hide avatars in the posted notifications, independently from whether they are shown on the item lists.</li></ul>
+                </font>]]></description>
+            <pubDate>Mon, 19 Jul 2021 16:00:00 +0000</pubDate>
+            <enclosure
+            url="https://github.com/ptsochantaris/trailer/releases/download/1.7.6/Trailer-176.zip"
+            sparkle:version="1584"
+            sparkle:shortVersionString="1.7.6"
+            sparkle:dsaSignature="MCwCFEpbLtZTHQVS7g/7/DwvQbRaz/RuAhRN0IWZA4g29t6h+qDAP3OHoKpHug=="
+            type="application/octet-stream"/>
+        </item>
+        
+        <item>
             <title>Version 1.7.5</title>
             <sparkle:minimumSystemVersion>10.11.0</sparkle:minimumSystemVersion>
             <description><![CDATA[<font face="sans-serif" size="3">
