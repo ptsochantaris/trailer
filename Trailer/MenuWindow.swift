@@ -143,7 +143,13 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate, StatusItemViewDe
 
 		var menuHeight: CGFloat = 28
 		let rowCount = table.numberOfRows
-		let screenHeight = screen.visibleFrame.size.height
+        let screenFrame = screen.visibleFrame
+		var screenHeight = screenFrame.size.height
+        
+        if NSApp.presentationOptions.contains(.autoHideMenuBar) {
+            screenHeight -= 25
+        }
+        
 		if rowCount == 0 {
 			menuHeight += 95
 		} else {
@@ -163,15 +169,15 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate, StatusItemViewDe
                 menuHeight += 24
             }
         }
-        
+                
         var menuLeft = windowFrame.origin.x
-        let rightSide = screen.visibleFrame.origin.x + screen.visibleFrame.size.width
+        let rightSide = screenFrame.origin.x + screenFrame.size.width
         let overflow = (menuLeft + menuWidth) - rightSide
         if overflow > 0 {
             menuLeft -= overflow
         }
 
-        var bottom = screen.visibleFrame.origin.y
+        var bottom = screenFrame.origin.y
         if menuHeight < screenHeight {
             bottom += screenHeight - menuHeight
         } else {
@@ -184,7 +190,7 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate, StatusItemViewDe
 			siv.highlighted = true
 			table.deselectAll(nil)
 			app.openingWindow = true
-			level = .floating
+			level = .mainMenu
 			makeKeyAndOrderFront(self)
 			NSApp.activate(ignoringOtherApps: true)
 			app.openingWindow = false            
