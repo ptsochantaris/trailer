@@ -38,39 +38,44 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 
 	@IBAction private func testSelected(_ sender: UIButton) {
 		testMode()
-		API.testApi(to: newServer) { [weak self] error in
-			guard let s = self else { return }
-			if let e = error {
-				showMessage("Testing the token failed - please check that you have pasted your token correctly", e.localizedDescription)
-				s.normalMode()
-			} else {
-				s.feedback.text = "\nFetching your watchlist. This will take a moment…"
-				Settings.lastSuccessfulRefresh = nil
-				app.startRefreshIfItIsDue()
-				s.checkTimer = Timer(repeats: true, interval: 1) {
-					s.checkRefreshDone()
-				}
-			}
-		}
+        
+        Task {
+            do {
+                if newServer.graphQLPath != nil {
+                    DLog("Checking GraphQL interface on \(S(newServer.graphQLPath))")
+                    try await GraphQL.testApi(to: newServer)
+                }
+                try await API.testApi(to: newServer)
+                feedback.text = "\nFetching your watchlist. This will take a moment…"
+                Settings.lastSuccessfulRefresh = nil
+                app.startRefreshIfItIsDue()
+                await checkRefreshDone()
+
+            } catch {
+                showMessage("Testing the token failed - please check that you have pasted your token correctly", error.localizedDescription)
+                normalMode()
+                sender.isEnabled = true
+            }                    
+        }
 	}
 
-	private func checkRefreshDone() {
-        if API.isRefreshing {
-			feedback.text = "\nFetching your watchlist. This will take a moment…"
-		} else {
-			checkTimer = nil
-			if newServer.lastSyncSucceeded {
-				dismiss(animated: true) {
-					popupManager.masterController.resetView(becauseOfChanges: true)
-					Settings.lastPreferencesTabSelected = 1 // repos
-					popupManager.masterController.performSegue(withIdentifier: "showPreferences", sender: self)
-					showMessage("Setup complete!", "This is the 'Repos' tab that displays your current GitHub watchlist. By default everything is hidden. Be sure to enable only the repos you need, in order to keep API (and data & battery) usage low.\n\nYou can tweak options & behaviour from the 'Advanced' tab. When you're done, just close this settings view from the top-left.\n\nTrailer has read-only access to your GitHub data, so feel free to experiment, you can't damage your data or settings on GitHub.")
-				}
-			} else {
-				showMessage("Syncing with this server failed - please check that your network connection is working and that you have pasted your token correctly", nil)
-				normalMode()
-			}
-		}
+	private func checkRefreshDone() async {
+        while API.isRefreshing {
+            try? await Task.sleep(nanoseconds: 1 * NSEC_PER_SEC)
+        }
+
+        checkTimer = nil
+        if newServer.lastSyncSucceeded {
+            dismiss(animated: true) {
+                popupManager.masterController.resetView(becauseOfChanges: true)
+                Settings.lastPreferencesTabSelected = 1 // repos
+                popupManager.masterController.performSegue(withIdentifier: "showPreferences", sender: self)
+                showMessage("Setup complete!", "This is the 'Repos' tab that displays your current GitHub watchlist. By default everything is hidden. Be sure to enable only the repos you need, in order to keep API (and data & battery) usage low.\n\nYou can tweak options & behaviour from the 'Advanced' tab. When you're done, just close this settings view from the top-left.\n\nTrailer has read-only access to your GitHub data, so feel free to experiment, you can't damage your data or settings on GitHub.")
+            }
+        } else {
+            showMessage("Syncing with this server failed - please check that your network connection is working and that you have pasted your token correctly", nil)
+            normalMode()
+        }
 	}
 
 	func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {

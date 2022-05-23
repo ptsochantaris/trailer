@@ -660,17 +660,19 @@ extension API {
             for p in prs {
                 let apiServer = p.apiServer
                 if let issueLink = p.issueUrl {
-                    do {
-                        let (data, _, resultCode) = try await RestAccess.getData(in: issueLink, from: apiServer)
-                        if resultCode == 200 || resultCode == 404 || resultCode == 410 {
-                            if let d = data as? [AnyHashable : Any] {
-                                p.processAssignmentStatus(from: d, idField: "node_id")
+                    group.addTask {
+                        do {
+                            let (data, _, resultCode) = try await RestAccess.getData(in: issueLink, from: apiServer)
+                            if resultCode == 200 || resultCode == 404 || resultCode == 410 {
+                                if let d = data as? [AnyHashable : Any] {
+                                    p.processAssignmentStatus(from: d, idField: "node_id")
+                                }
+                            } else {
+                                apiServer.lastSyncSucceeded = false
                             }
-                        } else {
+                        } catch {
                             apiServer.lastSyncSucceeded = false
                         }
-                    } catch {
-                        apiServer.lastSyncSucceeded = false
                     }
                 }
             }

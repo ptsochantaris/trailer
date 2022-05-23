@@ -9,7 +9,7 @@ import Foundation
 
 final class HTTP {
     
-    final actor GateKeeper {
+    private final actor GateKeeper {
         private var counter: Int
         init(entries: Int) {
             counter = entries

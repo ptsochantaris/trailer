@@ -6,7 +6,7 @@ final class BackgroundTask {
 
     private static func endTask() {
         if bgTask == .invalid { return }
-        log("BG Task done")
+        DLog("BG Task done")
         UIApplication.shared.endBackgroundTask(bgTask)
         bgTask = .invalid
     }
@@ -22,7 +22,7 @@ final class BackgroundTask {
         assert(Thread.isMainThread)
         appInBackground = true
         if globalBackgroundCount != 0 && bgTask == .invalid {
-            log("BG Task starting")
+            DLog("BG Task starting")
             bgTask = UIApplication.shared.beginBackgroundTask {
                 endTask()
             }

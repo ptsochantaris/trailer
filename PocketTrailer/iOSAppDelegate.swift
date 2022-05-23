@@ -25,7 +25,7 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
 	}
 
 	func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-		completionHandler([.alert, .badge, .sound])
+        completionHandler([.badge, .banner, .list, .sound])
 	}
 
 	func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
@@ -38,7 +38,9 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
 		DataManager.postProcessAllItems()
 
 		if ApiServer.someServersHaveAuthTokens(in: DataManager.main) {
-			API.updateLimitsFromServer()
+            Task {
+                await API.updateLimitsFromServer()
+            }
 		}
 
         UIToolbar.appearance().tintColor = UIColor(named: "apptint")
@@ -172,8 +174,10 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
 			return .noConfiguredServers
 		}
 
-		API.performSync()
-
+        Task {
+            await API.performSync()
+        }
+        
 		return .started
 	}
     

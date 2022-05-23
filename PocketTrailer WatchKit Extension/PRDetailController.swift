@@ -45,15 +45,16 @@ final class PRDetailController: CommonController {
 		requestData(command: "openItem")
 	}
 
-	override func update(from response: [AnyHashable : Any]) {
-		guard let compressedData = response["result"] as? Data,
-			let uncompressedData = compressedData.data(operation: .decompress),
-			let itemInfo = NSKeyedUnarchiver.unarchiveObject(with: uncompressedData) as? [AnyHashable : Any]
-			else { return }
-		DispatchQueue.main.async { [weak self] in
-			self?.completeUpdate(from: itemInfo)
-		}
-	}
+    override func update(from response: [AnyHashable : Any]) {
+        guard let compressedData = response["result"] as? Data,
+              let uncompressedData = compressedData.data(operation: .decompress),
+              let itemInfo = try? NSKeyedUnarchiver.unarchivedObject(ofClass: NSDictionary.self, from: uncompressedData)
+        else { return }
+        let item = itemInfo as Dictionary
+        DispatchQueue.main.async { [weak self] in
+            self?.completeUpdate(from: item)
+        }
+    }
 
 	private func completeUpdate(from itemInfo: [AnyHashable : Any]) {
 

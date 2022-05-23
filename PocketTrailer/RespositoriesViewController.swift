@@ -139,34 +139,34 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 
         API.isRefreshing = true
 		let tempContext = DataManager.buildChildContext()
-		API.fetchRepositories(to: tempContext) { [weak self] in
-			if ApiServer.shouldReportRefreshFailure(in: tempContext) {
-				var errorServers = [String]()
-				for apiServer in ApiServer.allApiServers(in: tempContext) {
-					if apiServer.goodToGo && !apiServer.lastSyncSucceeded {
-						errorServers.append(S(apiServer.label))
-					}
-				}
-				let serverNames = errorServers.joined(separator: ", ")
-				showMessage("Error", "Could not refresh repository list from \(serverNames), please ensure that the tokens you are using are valid")
-				NotificationQueue.clear()
-			} else {
-				DataItem.nukeDeletedItems(in: tempContext)
+        Task {
+            await API.fetchRepositories(to: tempContext)
+            if ApiServer.shouldReportRefreshFailure(in: tempContext) {
+                var errorServers = [String]()
+                for apiServer in ApiServer.allApiServers(in: tempContext) {
+                    if apiServer.goodToGo && !apiServer.lastSyncSucceeded {
+                        errorServers.append(S(apiServer.label))
+                    }
+                }
+                let serverNames = errorServers.joined(separator: ", ")
+                showMessage("Error", "Could not refresh repository list from \(serverNames), please ensure that the tokens you are using are valid")
+                NotificationQueue.clear()
+            } else {
+                DataItem.nukeDeletedItems(in: tempContext)
                 if tempContext.hasChanges {
                     try? tempContext.save()
                 }
                 DataManager.saveDB()
                 NotificationQueue.commit(moc: DataManager.main)
-			}
-			preferencesDirty = true
-			guard let s = self  else { return }
-			s.navigationItem.title = originalName
-			s.actionsButton.isEnabled = ApiServer.someServersHaveAuthTokens(in: DataManager.main)
-			s.tableView.alpha = 1.0
-			s.tableView.isUserInteractionEnabled = true
-			s.navigationItem.rightBarButtonItem?.isEnabled = true
+            }
+            preferencesDirty = true
+            navigationItem.title = originalName
+            actionsButton.isEnabled = ApiServer.someServersHaveAuthTokens(in: DataManager.main)
+            tableView.alpha = 1.0
+            tableView.isUserInteractionEnabled = true
+            navigationItem.rightBarButtonItem?.isEnabled = true
             API.isRefreshing = false
-		}
+        }
 	}
 
 	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

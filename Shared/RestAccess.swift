@@ -40,6 +40,10 @@ final class RestAccess {
     @MainActor
     static func getData(in path: String, from server: ApiServer, attemptCount: Int = 0) async throws -> (Any?, Bool, Int) {
         var attemptCount = attemptCount
+        API.currentOperationCount += 1
+        defer {
+            API.currentOperationCount -= 1
+        }
         while(true) {
             do {
                 let (code, headers, data) = try await start(call: path, on: server, triggeredByUser: false)

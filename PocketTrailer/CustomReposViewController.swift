@@ -110,46 +110,48 @@ final class CustomReposViewController: UIViewController, UITableViewDelegate, UI
 		addButton.customView = a
 
 		if repoName == "*" {
-			API.fetchAllRepos(owner: ownerName, from: server) { error in
-				a.stopAnimating()
-				self.addButton.customView = nil
-
-				if let e = error {
-					showMessage("Fetching Repository Information Failed", e.localizedDescription)
-				} else {
-					let addedCount = Repo.newItems(of: Repo.self, in: DataManager.main).count
-					if Settings.displayPolicyForNewPrs == Int(RepoDisplayPolicy.hide.rawValue) && Settings.displayPolicyForNewIssues == Int(RepoDisplayPolicy.hide.rawValue) {
-						showMessage("Repositories added", "WARNING: While \(addedCount) repositories have been added successfully to your list, your default settings specify that they should be hidden. You probably want to change their visibility in the main repositories list.")
-					} else {
-						showMessage("Repositories added", "\(addedCount) new repositories have been added to your local list. Trailer will refresh after you close preferences to fetch any items from them.")
-					}
-					DataManager.saveDB()
-					DispatchQueue.main.async {
-						popupManager.masterController.updateStatus(becauseOfChanges: true)
-					}
-					self.updateRepos()
-				}
-			}
+            Task {
+                do {
+                    try await API.fetchAllRepos(owner: ownerName, from: server)
+                    
+                    let addedCount = Repo.newItems(of: Repo.self, in: DataManager.main).count
+                    if Settings.displayPolicyForNewPrs == Int(RepoDisplayPolicy.hide.rawValue) && Settings.displayPolicyForNewIssues == Int(RepoDisplayPolicy.hide.rawValue) {
+                        showMessage("Repositories added", "WARNING: While \(addedCount) repositories have been added successfully to your list, your default settings specify that they should be hidden. You probably want to change their visibility in the main repositories list.")
+                    } else {
+                        showMessage("Repositories added", "\(addedCount) new repositories have been added to your local list. Trailer will refresh after you close preferences to fetch any items from them.")
+                    }
+                    DataManager.saveDB()
+                    DispatchQueue.main.async {
+                        popupManager.masterController.updateStatus(becauseOfChanges: true)
+                    }
+                    self.updateRepos()
+                } catch {
+                    showMessage("Fetching Repository Information Failed", error.localizedDescription)
+                }
+                a.stopAnimating()
+                self.addButton.customView = nil
+            }
 		} else {
-			API.fetchRepo(named: repoName, owner: ownerName, from: server) { error in
-				a.stopAnimating()
-				self.addButton.customView = nil
-
-				if let e = error {
-					showMessage("Fetching Repository Information Failed", e.localizedDescription)
-				} else {
-					if Settings.displayPolicyForNewPrs == Int(RepoDisplayPolicy.hide.rawValue) && Settings.displayPolicyForNewIssues == Int(RepoDisplayPolicy.hide.rawValue) {
-						showMessage("Repository added", "WARNING: While the repository has been added successfully to your list, your default settings specify that it should be hidden. You probably want to change its visibility in the main repositories list.")
-					} else {
-						showMessage("Repository added", "The new repository has been added to your local list. Trailer will refresh after you close preferences to fetch any items from it.")
-					}
-					DataManager.saveDB()
-					DispatchQueue.main.async {
-						popupManager.masterController.updateStatus(becauseOfChanges: true)
-					}
-					self.updateRepos()
-				}
-			}
-		}
+            Task {
+                do {
+                    try await API.fetchRepo(named: repoName, owner: ownerName, from: server)
+                                
+                    if Settings.displayPolicyForNewPrs == Int(RepoDisplayPolicy.hide.rawValue) && Settings.displayPolicyForNewIssues == Int(RepoDisplayPolicy.hide.rawValue) {
+                        showMessage("Repository added", "WARNING: While the repository has been added successfully to your list, your default settings specify that it should be hidden. You probably want to change its visibility in the main repositories list.")
+                    } else {
+                        showMessage("Repository added", "The new repository has been added to your local list. Trailer will refresh after you close preferences to fetch any items from it.")
+                    }
+                    DataManager.saveDB()
+                    DispatchQueue.main.async {
+                        popupManager.masterController.updateStatus(becauseOfChanges: true)
+                    }
+                    self.updateRepos()
+                } catch {
+                    showMessage("Fetching Repository Information Failed", error.localizedDescription)
+                }
+                a.stopAnimating()
+                self.addButton.customView = nil
+            }
+        }
 	}
 }

@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="D5t-dR-eFB">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="D5t-dR-eFB">
     <device id="retina6_1" orientation="portrait" appearance="dark"/>
     <dependencies>
-        <deployment version="4864" identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -21,37 +20,37 @@
                         <color key="tintColor" name="apptint"/>
                         <prototypes>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="Cell" rowHeight="103" id="iKr-zg-lam" customClass="RepoCell" customModule="PocketTrailer" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="24.5" width="414" height="103"/>
+                                <rect key="frame" x="0.0" y="44.5" width="414" height="103"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="iKr-zg-lam" id="bgw-3g-6tl">
-                                    <rect key="frame" x="0.0" y="0.0" width="384.5" height="103"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="385.5" height="103"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="X5f-oi-V1t">
-                                            <rect key="frame" x="20" y="14" width="279.5" height="69.5"/>
+                                            <rect key="frame" x="20" y="14" width="280.5" height="69.5"/>
                                             <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" horizontalCompressionResistancePriority="1000" text="PRs Label" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8Jg-Ke-drL">
-                                            <rect key="frame" x="311.5" y="28" width="70" height="14.5"/>
+                                            <rect key="frame" x="312.5" y="28" width="70" height="14.5"/>
                                             <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="252" horizontalCompressionResistancePriority="1000" text="Issues Label" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gUI-6X-Umg">
-                                            <rect key="frame" x="311.5" y="44.5" width="70" height="14.5"/>
+                                            <rect key="frame" x="312.5" y="44.5" width="70" height="14.5"/>
                                             <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="252" horizontalCompressionResistancePriority="1000" text="Hiding Label" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hRe-my-dR9">
-                                            <rect key="frame" x="310.5" y="61" width="71" height="14.5"/>
+                                            <rect key="frame" x="311.5" y="61" width="71" height="14.5"/>
                                             <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="249" verticalHuggingPriority="1000" verticalCompressionResistancePriority="751" text="Fork" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Wue-ao-kxI">
-                                            <rect key="frame" x="20" y="83.5" width="279.5" height="13.5"/>
+                                            <rect key="frame" x="20" y="83.5" width="280.5" height="13.5"/>
                                             <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
                                             <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             <nil key="highlightedColor"/>
@@ -145,7 +144,7 @@
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="CustomRepoCellId" id="3VL-Gt-eZv" customClass="CustomRepoCell" customModule="PocketTrailer" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="24.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="44.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="3VL-Gt-eZv" id="Ap3-WO-j1e">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -211,7 +210,7 @@
                         <color key="backgroundColor" systemColor="groupTableViewBackgroundColor"/>
                         <prototypes>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="Cell" id="nWv-dn-x38">
-                                <rect key="frame" x="0.0" y="49.5" width="414" height="44"/>
+                                <rect key="frame" x="0.0" y="32" width="414" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="nWv-dn-x38" id="YwR-ML-Nxf">
                                     <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -420,7 +419,7 @@
                     <toolbarItems/>
                     <navigationItem key="navigationItem" title="Edit" id="pWy-SZ-aD1">
                         <rightBarButtonItems>
-                            <barButtonItem image="bin.xmark" catalog="system" id="DAd-j7-giv">
+                            <barButtonItem image="xmark.bin" catalog="system" id="DAd-j7-giv">
                                 <connections>
                                     <action selector="deleteSelected:" destination="hkd-74-v5I" id="hyQ-Ih-2ky"/>
                                 </connections>
@@ -463,10 +462,10 @@
                             <tableViewSection headerTitle="Watchlists &amp; Teams" id="vWX-Ch-PIa">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" textLabel="OVt-so-Jse" detailTextLabel="zQo-8Z-w4h" style="IBUITableViewCellStyleSubtitle" id="pVc-nc-ZeK">
-                                        <rect key="frame" x="0.0" y="49.5" width="414" height="50"/>
+                                        <rect key="frame" x="0.0" y="32" width="414" height="50"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="pVc-nc-ZeK" id="vja-3f-cYu">
-                                            <rect key="frame" x="0.0" y="0.0" width="384.5" height="50"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="385.5" height="50"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Re-scan every X hours" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="OVt-so-Jse">
@@ -491,7 +490,7 @@
                             <tableViewSection headerTitle="Tracking Remote Watchlists" id="Iv7-An-a5D">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="checkmark" indentationWidth="10" textLabel="l8i-Bw-KUD" detailTextLabel="yBa-cH-j4C" style="IBUITableViewCellStyleSubtitle" id="Vn6-eI-MkB">
-                                        <rect key="frame" x="0.0" y="149.5" width="414" height="50"/>
+                                        <rect key="frame" x="0.0" y="132" width="414" height="50"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Vn6-eI-MkB" id="4Tp-cD-1IV">
                                             <rect key="frame" x="0.0" y="0.0" width="373.5" height="50"/>
@@ -515,7 +514,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="checkmark" indentationWidth="10" textLabel="pdq-J7-iBk" detailTextLabel="Mfh-ye-RJL" style="IBUITableViewCellStyleSubtitle" id="who-aQ-2rP">
-                                        <rect key="frame" x="0.0" y="199.5" width="414" height="50"/>
+                                        <rect key="frame" x="0.0" y="182" width="414" height="50"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="who-aQ-2rP" id="9Xg-Oc-RFT">
                                             <rect key="frame" x="0.0" y="0.0" width="373.5" height="50"/>
@@ -539,7 +538,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="checkmark" indentationWidth="10" textLabel="tlK-MW-ZIV" detailTextLabel="Siw-3B-qy5" style="IBUITableViewCellStyleSubtitle" id="N6n-y3-0fF">
-                                        <rect key="frame" x="0.0" y="249.5" width="414" height="50"/>
+                                        <rect key="frame" x="0.0" y="232" width="414" height="50"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="N6n-y3-0fF" id="vbf-95-K5G">
                                             <rect key="frame" x="0.0" y="0.0" width="373.5" height="50"/>
@@ -567,7 +566,7 @@
                             <tableViewSection headerTitle="Items created by me in any repository" id="RO7-d4-eRF">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="checkmark" indentationWidth="10" textLabel="w8o-Uj-9R5" detailTextLabel="tLT-1J-zTw" style="IBUITableViewCellStyleSubtitle" id="ai9-eH-GBE">
-                                        <rect key="frame" x="0.0" y="349.5" width="414" height="50"/>
+                                        <rect key="frame" x="0.0" y="332" width="414" height="50"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="ai9-eH-GBE" id="X8p-bN-WXb">
                                             <rect key="frame" x="0.0" y="0.0" width="373.5" height="50"/>
@@ -591,7 +590,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="checkmark" indentationWidth="10" textLabel="6bt-EC-z64" detailTextLabel="a2s-cc-wj3" style="IBUITableViewCellStyleSubtitle" id="XQZ-qu-9Vy">
-                                        <rect key="frame" x="0.0" y="399.5" width="414" height="50"/>
+                                        <rect key="frame" x="0.0" y="382" width="414" height="50"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="XQZ-qu-9Vy" id="brO-A2-dmX">
                                             <rect key="frame" x="0.0" y="0.0" width="373.5" height="50"/>
@@ -647,7 +646,7 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <prototypes>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="UsernameCell" id="bVb-rg-8Gf">
-                                <rect key="frame" x="0.0" y="24.5" width="414" height="60"/>
+                                <rect key="frame" x="0.0" y="44.5" width="414" height="60"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="bVb-rg-8Gf" id="d2I-KH-d4T">
                                     <rect key="frame" x="0.0" y="0.0" width="414" height="60"/>
@@ -683,7 +682,7 @@
                         <inset key="separatorInset" minX="15" minY="0.0" maxX="0.0" maxY="0.0"/>
                         <prototypes>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="default" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" rowHeight="84" id="0IG-O1-8fc" customClass="AdvancedSettingsCell" customModule="PocketTrailer" customModuleProvider="target">
-                                <rect key="frame" x="20" y="49.5" width="374" height="84"/>
+                                <rect key="frame" x="20" y="32" width="374" height="84"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="0IG-O1-8fc" id="Cde-Zq-FvG">
                                     <rect key="frame" x="0.0" y="0.0" width="374" height="84"/>
@@ -783,10 +782,10 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <prototypes>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="default" accessoryType="detailDisclosureButton" indentationWidth="10" reuseIdentifier="ServerCell" textLabel="RhO-A3-sX5" detailTextLabel="auG-wa-r5e" style="IBUITableViewCellStyleSubtitle" id="TLs-yk-Rpp">
-                                <rect key="frame" x="0.0" y="24.5" width="414" height="70"/>
+                                <rect key="frame" x="0.0" y="44.5" width="414" height="70"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="TLs-yk-Rpp" id="T3l-gc-8wR">
-                                    <rect key="frame" x="0.0" y="0.0" width="356" height="70"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="357" height="70"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="RhO-A3-sX5">
@@ -1017,7 +1016,7 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
                         </barButtonItem>
                     </toolbarItems>
                     <navigationItem key="navigationItem" title="API Server Details" id="WuN-oo-IBq">
-                        <barButtonItem key="rightBarButtonItem" image="bin.xmark" catalog="system" id="uhq-Gt-M9L">
+                        <barButtonItem key="rightBarButtonItem" image="xmark.bin" catalog="system" id="uhq-Gt-M9L">
                             <connections>
                                 <action selector="deleteSelected:" destination="iSf-H9-TPW" id="yQC-jA-dGI"/>
                             </connections>
@@ -1051,7 +1050,7 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
                         <color key="backgroundColor" systemColor="groupTableViewBackgroundColor"/>
                         <prototypes>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" id="RgZ-W8-AF8">
-                                <rect key="frame" x="0.0" y="49.5" width="414" height="44"/>
+                                <rect key="frame" x="0.0" y="32" width="414" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="RgZ-W8-AF8" id="dyt-lc-eEA">
                                     <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -1373,7 +1372,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
         <image name="TeamOctopusLogo" width="862" height="862"/>
         <image name="arrow.down" catalog="system" width="120" height="128"/>
         <image name="arrow.up" catalog="system" width="120" height="128"/>
-        <image name="bin.xmark" catalog="system" width="128" height="93"/>
         <image name="checkmark.circle.fill" catalog="system" width="128" height="121"/>
         <image name="chevron.right" catalog="system" width="96" height="128"/>
         <image name="clock" catalog="system" width="128" height="121"/>
@@ -1386,6 +1384,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
         <image name="list.dash" catalog="system" width="128" height="85"/>
         <image name="plus" catalog="system" width="128" height="113"/>
         <image name="showHelp" width="22" height="13"/>
+        <image name="xmark.bin" catalog="system" width="128" height="93"/>
         <image name="xmark.circle" catalog="system" width="128" height="121"/>
         <namedColor name="apptint">
             <color red="0.20299999415874481" green="0.43000000715255737" blue="0.71799999475479126" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

@@ -55,6 +55,7 @@ final class GraphQL {
         GQLField(name: "permalink")
     ])
 
+    @MainActor
     static func testApi(to apiServer: ApiServer) async throws {
         var gotUserNode = false
         let testQuery = GQLQuery(name: "Testing", rootElement: GQLGroup(name: "viewer", fields: [userFragment])) { node in

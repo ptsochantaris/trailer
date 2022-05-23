@@ -58,7 +58,6 @@ final class GQLQuery {
         return "(GQL '\(name)') "
     }
 
-    @MainActor
     func run(for url: String, authToken: String, attempt: Int) async throws -> ApiStats? {
         
         let Q = queryText
@@ -72,8 +71,10 @@ final class GQLQuery {
 		r.httpBody = try! JSONEncoder().encode(["query": Q])
         r.setValue("bearer \(authToken)", forHTTPHeaderField: "Authorization")
 
-        API.currentOperationName = name
-
+        Task { @MainActor in
+            API.currentOperationName = name
+        }
+        
         var apiStats: ApiStats?
         var shouldRetry = false
         do {
@@ -130,18 +131,8 @@ final class GQLQuery {
             }
         }
 	}
-    
-    static private let gateKeeper = HTTP.GateKeeper(entries: 1)
-    
-    @MainActor
+        
     static func runQueries(queries: [GQLQuery], on path: String, token: String) async throws -> ApiStats? {
-        await gateKeeper.waitForGate()
-        defer {
-            Task {
-                await gateKeeper.signalGate()
-            }
-        }
-        assert(Thread.isMainThread)
         return try await withThrowingTaskGroup(of: ApiStats?.self, returning: ApiStats?.self) { group in
             for query in queries {
                 group.addTask {

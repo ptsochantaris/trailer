@@ -203,27 +203,17 @@ final class PRCell: UITableViewCell {
 
 	private func loadImageAtPath(imagePath: String?) {
 		waitingForImageInPath = imagePath
+        _image.image = UIImage(named: "avatarPlaceHolder")
+        failedToLoadImage = nil
 		if let path = imagePath {
-			if (!API.haveCachedAvatar(from: path) { [weak self] image, _ in
-				if self?.waitingForImageInPath == path {
-					if image != nil {
-						// image loaded
-						self?._image.image = image
-						self?.failedToLoadImage = nil
-					} else {
-						// load failed / no image
-						self?._image.image = UIImage(named: "avatarPlaceHolder")
-						self?.failedToLoadImage = imagePath
-					}
-					self?.waitingForImageInPath = nil
+            Task {
+                let image = try? await API.avatar(from: path).0
+				if waitingForImageInPath == path {
+                    _image.image = image
+                    failedToLoadImage = image == nil ? imagePath : nil
+					waitingForImageInPath = nil
 				}
-			}) {
-				// prepare UI for over-the-network load
-				_image.image = UIImage(named: "avatarPlaceHolder")
-				failedToLoadImage = nil
 			}
-		} else {
-			failedToLoadImage = nil
 		}
 	}
 

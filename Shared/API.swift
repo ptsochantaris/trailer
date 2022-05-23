@@ -1,8 +1,5 @@
 
 import CoreData
-#if os(iOS)
-	import UIKit
-#endif
 import CommonCrypto
 
 final class API {
@@ -69,26 +66,24 @@ final class API {
             NotificationCenter.default.post(name: .SyncProgressUpdate, object: nil)
         }
     }
-    private static var currentOperationCount = 0 {
+    static var currentOperationCount = 0 {
         didSet {
             let newValue = currentOperationCount
-            DispatchQueue.main.async {
-                if oldValue == 0 && newValue > 0 {
-                    #if os(iOS)
-                    BackgroundTask.registerForBackground()
-                    #endif
-                } else if oldValue > 0 && newValue == 0 {
-                    #if os(iOS)
-                    BackgroundTask.unregisterForBackground()
-                    #endif
-                }
-                
-                if isRefreshing && currentOperationName.hasPrefix("Fetching…") {
-                    if newValue > 1 {
-                        currentOperationName = "Fetching… (\(newValue) calls queued)"
-                    } else {
-                        currentOperationName = "Fetching…"
-                    }
+            if oldValue == 0 && newValue > 0 {
+                #if os(iOS)
+                BackgroundTask.registerForBackground()
+                #endif
+            } else if oldValue > 0 && newValue == 0 {
+                #if os(iOS)
+                BackgroundTask.unregisterForBackground()
+                #endif
+            }
+            
+            if isRefreshing && currentOperationName.hasPrefix("Fetching…") {
+                if newValue > 1 {
+                    currentOperationName = "Fetching… (\(newValue) calls queued)"
+                } else {
+                    currentOperationName = "Fetching…"
                 }
             }
         }

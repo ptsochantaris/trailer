@@ -136,7 +136,6 @@ final class ServersViewController: UITableViewController {
             a.resetSyncState()
         }
         DataManager.saveDB()
-        RestAccess.clearAllBadLinks()
         DataManager.postProcessAllItems()
         app.startRefresh()
     }
