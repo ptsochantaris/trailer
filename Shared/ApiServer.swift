@@ -75,7 +75,6 @@ final class ApiServer: NSManagedObject {
 		}
 		if app != nil {
 			preferencesDirty = true
-			RestAccess.clearAllBadLinks()
 		}
 	}
 
@@ -299,36 +298,13 @@ final class ApiServer: NSManagedObject {
     
     // MARK: GraphQL
         
-    func run(queries: [GQLQuery], completion: @escaping (Error?)->Void) {
+    func run(queries: [GQLQuery]) async throws {
         let path = self.graphQLPath ?? ""
         let token = self.authToken ?? ""
-        ApiServer.runQueries(queries: queries, on: path, token: token) { error, newStats in
-            if let newStats = newStats {
-                self.updateApiStats(newStats)
-            }
-            completion(error)
-        }
-    }
-    
-    static func runQueries(queries: [GQLQuery], on path: String, token: String, completion: @escaping (Error?, ApiStats?)->Void) {
-        var finalError: Error?
-        var updatedStats: ApiStats?
         
-        let group = DispatchGroup()
-        for query in queries {
-            group.enter()
-            query.run(for: path, authToken: token, attempt: 10) { err, apiStats in
-                if let apiStats = apiStats {
-                    updatedStats = apiStats
-                }
-                if let err = err {
-                    finalError = err
-                }
-                group.leave()
-            }
-        }
-        group.notify(queue: .main) {
-            completion(finalError, updatedStats)
+        let newStats = try await GQLQuery.runQueries(queries: queries, on: path, token: token)
+        if let newStats = newStats {
+            self.updateApiStats(newStats)
         }
     }
 }

@@ -3,34 +3,22 @@ import UIKit
 typealias COLOR_CLASS = UIColor
 
 #elseif os(OSX)
-import Foundation
+import Cocoa
 typealias COLOR_CLASS = NSColor
 
 #endif
 
 extension COLOR_CLASS {
     static var appGreen: COLOR_CLASS {
-        if #available(macOS 10.13, iOS 13, *) {
-            return COLOR_CLASS(named: "appGreen")!
-        } else {
-            return COLOR_CLASS(red: 0.3, green: 0.6, blue: 0.2, alpha: 1.0)
-        }
+        return COLOR_CLASS(named: "appGreen")!
     }
 
     static var appYellow: COLOR_CLASS {
-        if #available(macOS 10.13, iOS 13, *) {
-            return COLOR_CLASS(named: "appYellow")!
-        } else {
-            return COLOR_CLASS(red: 0.6, green: 0.6, blue: 0.0, alpha: 1.0)
-        }
+        return COLOR_CLASS(named: "appYellow")!
     }
     
     static var appRed: COLOR_CLASS {
-        if #available(macOS 10.13, iOS 13, *) {
-            return COLOR_CLASS(named: "appRed")!
-        } else {
-            return COLOR_CLASS(red: 0.7, green: 0.2, blue: 0.2, alpha: 1.0)
-        }
+        return COLOR_CLASS(named: "appRed")!
     }
     
     static var appLabel: COLOR_CLASS {

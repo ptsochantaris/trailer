@@ -1,3 +1,4 @@
+import Cocoa
 
 protocol StatusItemViewDelegate: AnyObject {
     func statusItemViewSelected(_ statusItemView: StatusItemView)
@@ -59,11 +60,7 @@ final class StatusItemView: NSView {
 	}
     
     private var isDark: Bool {
-        if #available(macOS 10.14, *) {
-            return self.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
-        } else {
-            return app.theme == .dark
-        }
+        return self.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
     }
 
 	override func draw(_ dirtyRect: NSRect) {

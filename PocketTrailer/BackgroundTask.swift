@@ -4,38 +4,65 @@ final class BackgroundTask {
 
     private static var bgTask = UIBackgroundTaskIdentifier.invalid
 
-    private static func end() {
+    private static func endTask() {
         if bgTask == .invalid { return }
-        DLog("BG Task done")
+        log("BG Task done")
         UIApplication.shared.endBackgroundTask(bgTask)
         bgTask = .invalid
     }
 
     private static var globalBackgroundCount = 0
+    private static var appInBackground = false
 
     private static let endTimer = PopTimer(timeInterval: 3) {
-        end()
+        endTask()
     }
-
-    static func registerForBackground() {
+    
+    static func appBackgrounded() {
         assert(Thread.isMainThread)
-        if endTimer.isRunning {
-            endTimer.abort()
-        }
-        if globalBackgroundCount == 0 && bgTask == .invalid {
-            DLog("BG Task starting")
+        appInBackground = true
+        if globalBackgroundCount != 0 && bgTask == .invalid {
+            log("BG Task starting")
             bgTask = UIApplication.shared.beginBackgroundTask {
-                end()
+                endTask()
             }
         }
-        globalBackgroundCount += 1
+    }
+    
+    static func appForegrounded() {
+        assert(Thread.isMainThread)
+        endTimer.abort()
+        appInBackground = false
+        endTask()
+    }
+    
+    private static func onMainThread(completion: () -> Void) {
+        if Thread.isMainThread {
+            completion()
+        } else {
+            DispatchQueue.main.sync {
+                completion()
+            }
+        }
+    }
+    
+    static func registerForBackground() {
+        onMainThread {
+            endTimer.abort()
+            let count = globalBackgroundCount
+            globalBackgroundCount = count + 1
+            if appInBackground, bgTask == .invalid, count == 0 {
+                appBackgrounded()
+            }
+        }
     }
 
     static func unregisterForBackground() {
-        assert(Thread.isMainThread)
-        globalBackgroundCount -= 1
-        if globalBackgroundCount == 0 && bgTask != .invalid {
-            endTimer.push()
+        onMainThread {
+            globalBackgroundCount -= 1
+            if globalBackgroundCount == 0 && bgTask != .invalid {
+                endTimer.push()
+            }
         }
     }
 }

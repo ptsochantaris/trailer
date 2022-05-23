@@ -39,7 +39,8 @@ extension API {
         }
     }
     
-    static func v4Sync(to moc: NSManagedObjectContext, newOrUpdatedPrs: [PullRequest], newOrUpdatedIssues: [Issue], with group: DispatchGroup) {
+    @MainActor
+    static func v4Sync(to moc: NSManagedObjectContext, newOrUpdatedPrs: [PullRequest], newOrUpdatedIssues: [Issue]) async {
         var steps: SyncSteps = [.comments]
 
         if shouldSyncReviewAssignments {
@@ -69,80 +70,43 @@ extension API {
             }
         }
         
-        v4_sync(to: moc, prs: newOrUpdatedPrs, issues: newOrUpdatedIssues, steps: steps) { error in
-            if Settings.notifyOnCommentReactions {
-                let comments = PRComment.commentsThatNeedReactionsToBeRefreshed(in: moc)
-                for c in comments {
-                    c.pendingReactionScan = false
-                    for r in c.reactions {
-                        r.postSyncAction = PostSyncAction.delete.rawValue
-                    }
+        try? await v4_sync(to: moc, prs: newOrUpdatedPrs, issues: newOrUpdatedIssues, steps: steps)
+        if Settings.notifyOnCommentReactions {
+            let comments = PRComment.commentsThatNeedReactionsToBeRefreshed(in: moc)
+            for c in comments {
+                c.pendingReactionScan = false
+                for r in c.reactions {
+                    r.postSyncAction = PostSyncAction.delete.rawValue
                 }
-                GraphQL.updateReactions(for: comments, moc: moc) { error in
-                    group.leave()
-                }
-                
-            } else {
-                group.leave()
             }
+            try? await GraphQL.updateReactions(for: comments, moc: moc)
         }
     }
-        
-    private static func v4_sync(to moc: NSManagedObjectContext, prs: [PullRequest], issues: [Issue], steps: SyncSteps, callback: @escaping (Error?)->Void) {
+    
+    @MainActor
+    private static func v4_sync(to moc: NSManagedObjectContext, prs: [PullRequest], issues: [Issue], steps: SyncSteps) async throws {
         var steps = steps
         
-        let group = DispatchGroup()
-        var finalError: Error?
-        
         if steps.contains(.statuses) {
-            group.enter()
             let prs = PullRequest.statusCheckBatch(in: moc)
-            GraphQL.update(for: prs, of: PullRequest.self, in: moc, steps: [.statuses]) { error in
-                if let error = error { finalError = error }
-                group.leave()
-            }
+            try await GraphQL.update(for: prs, of: PullRequest.self, in: moc, steps: [.statuses])
             steps.remove(.statuses)
         }
         
         if steps.contains(.reactions) {
             let rp = PullRequest.reactionCheckBatch(for: PullRequest.self, in: moc)
-            group.enter()
-            GraphQL.update(for: rp, of: PullRequest.self, in: moc, steps: [.reactions]) { error in
-                if let error = error { finalError = error }
-                group.leave()
-            }
-            
+            try await GraphQL.update(for: rp, of: PullRequest.self, in: moc, steps: [.reactions])
+
             let ri = Issue.reactionCheckBatch(for: Issue.self, in: moc)
-            group.enter()
-            GraphQL.update(for: ri, of: Issue.self, in: moc, steps: [.reactions]) { error in
-                if let error = error { finalError = error }
-                group.leave()
-            }
+            try await GraphQL.update(for: ri, of: Issue.self, in: moc, steps: [.reactions])
             steps.remove(.reactions)
         }
 
-        group.enter()
-        GraphQL.update(for: prs, of: PullRequest.self, in: moc, steps: steps) { error in
-            if let error = error {
-                finalError = error
-                group.leave()
-            } else {
-                let reviews = DataItem.newOrUpdatedItems(of: Review.self, in: moc, fromSuccessfulSyncOnly: true)
-                GraphQL.updateComments(for: reviews, moc: moc) { error in // must run after fetching reviews
-                    if let error = error { finalError = error }
-                    group.leave()
-                }
-            }
-        }
+        try await GraphQL.update(for: prs, of: PullRequest.self, in: moc, steps: steps)
         
-        group.enter()
-        GraphQL.update(for: issues, of: Issue.self, in: moc, steps: steps) { error in
-            if let error = error { finalError = error }
-            group.leave()
-        }
+        let reviews = DataItem.newOrUpdatedItems(of: Review.self, in: moc, fromSuccessfulSyncOnly: true)
+        try await GraphQL.updateComments(for: reviews, moc: moc)// must run after fetching reviews
         
-        group.notify(queue: .main) {
-            callback(finalError)
-        }
+        try await GraphQL.update(for: issues, of: Issue.self, in: moc, steps: steps)
     }
 }

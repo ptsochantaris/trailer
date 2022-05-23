@@ -1,3 +1,4 @@
+import Cocoa
 
 final class AvatarView: NSImageView {
 	
@@ -18,19 +19,15 @@ final class AvatarView: NSImageView {
 		imageAlignment = .alignCenter
 		imageScaling = .scaleProportionallyUpOrDown
 		
-		var spinner: NSProgressIndicator?
-		
-		if (!API.haveCachedAvatar(from: url) { [weak self] img, _ in
-			guard let s = self else { return }
-			s.image = img
-			spinner?.stopAnimation(nil)
-			spinner?.removeFromSuperview()
-			}) {
-			let s = NSProgressIndicator(frame: bounds.insetBy(dx: 6, dy: 6))
-			s.style = .spinning
-			addSubview(s)
-			s.startAnimation(self)
-			spinner = s
+        let spinner = NSProgressIndicator(frame: bounds.insetBy(dx: 6, dy: 6))
+        spinner.style = .spinning
+        addSubview(spinner)
+        spinner.startAnimation(self)
+
+        Task {
+			image = try? await API.avatar(from: url).0
+			spinner.stopAnimation(nil)
+			spinner.removeFromSuperview()
 		}
 	}
 	

@@ -1,3 +1,4 @@
+import Cocoa
 
 extension NSTextField {
 	@objc final func trailerUndo() {

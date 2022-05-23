@@ -4,19 +4,19 @@ import Dispatch
 final class GQLQuery {
     
 	let name: String
-    let perNodeCallback: ((GQLNode)->Bool)?
+    let perNodeCallback: ((GQLNode) async -> Bool)?
 
 	private let rootElement: GQLScanning
 	private let parent: GQLNode?
     
-    init(name: String, rootElement: GQLScanning, parent: GQLNode? = nil, perNodeCallback: ((GQLNode)->Bool)? = nil) {
+    init(name: String, rootElement: GQLScanning, parent: GQLNode? = nil, perNodeCallback: ((GQLNode) async -> Bool)? = nil) {
 		self.rootElement = rootElement
 		self.parent = parent
 		self.name = name
         self.perNodeCallback = perNodeCallback
 	}
 
-    static func batching(_ name: String, fields: [GQLElement], idList: ContiguousArray<String>, batchSize: Int, perNodeCallback: ((GQLNode)->Bool)? = nil) -> [GQLQuery] {
+    static func batching(_ name: String, fields: [GQLElement], idList: ContiguousArray<String>, batchSize: Int, perNodeCallback: ((GQLNode) async -> Bool)? = nil) -> [GQLQuery] {
 		var list = idList
         var queries = [GQLQuery]()
 		while !list.isEmpty {
@@ -54,7 +54,12 @@ final class GQLQuery {
         return q
     }()
 
-    func run(for url: String, authToken: String, attempt: Int, completion: @escaping (Error?, ApiStats?)->Void) {
+    var logPrefix: String {
+        return "(GQL '\(name)') "
+    }
+
+    @MainActor
+    func run(for url: String, authToken: String, attempt: Int) async throws -> ApiStats? {
         
         let Q = queryText
         if Settings.dumpAPIResponsesInConsole {
@@ -67,79 +72,83 @@ final class GQLQuery {
 		r.httpBody = try! JSONEncoder().encode(["query": Q])
         r.setValue("bearer \(authToken)", forHTTPHeaderField: "Authorization")
 
-        let task = API.task(for: r) { info, response, error in
+        API.currentOperationName = name
 
-            func doneWithError(_ message: String, _ error: Error?, shouldRetry: Bool, apiStats: ApiStats?) {
-                DLog("\(self.logPrefix) Error: \(message)")
-                if shouldRetry && attempt > 0 {
-                    DLog("\(self.logPrefix) Pausing for retry, attempt \(attempt)")
-                    Thread.sleep(forTimeInterval: 2)
-                    self.run(for: url, authToken: authToken, attempt: attempt - 1, completion: completion)
-                } else {
-                    let e = error ?? NSError(domain: "com.housetrip.Trailer.gqlError", code: 1, userInfo: [NSLocalizedDescriptionKey: "message"])
-                    completion(e, apiStats)
-                }
-            }
-
-			guard let info = info, let json = (try? JSONSerialization.jsonObject(with: info, options: [])) as? [AnyHashable : Any] else {
-                
-                if let error = error {
-                    doneWithError("Network error: \(error.localizedDescription)", error, shouldRetry: false, apiStats: nil)
-                } else {
-                    doneWithError("No JSON in response", nil, shouldRetry: false, apiStats: nil)
-                }
-                return
+        var apiStats: ApiStats?
+        var shouldRetry = false
+        do {
+            let (info, response) = try await HTTP.getData(for: r)
+            guard let json = try JSONSerialization.jsonObject(with: info, options: []) as? [AnyHashable : Any] else {
+                throw API.apiError("Invalid JSON")
             }
 
             if Settings.dumpAPIResponsesInConsole {
                 DLog("API data from %@: %@", url, String(bytes: info, encoding: .utf8))
             }
-            
-            let apiStats = ApiStats.fromV4(json: json["data"] as? [AnyHashable : Any])
+
+            apiStats = ApiStats.fromV4(json: json["data"] as? [AnyHashable : Any])
             if let s = apiStats {
                 DLog("\(self.logPrefix)Received page (Cost: \(s.cost), Remaining: \(s.remaining)/\(s.limit) - Node Count: \(s.nodeCount))")
             } else {
                 DLog("\(self.logPrefix)Received page (No stats)")
             }
-            
+
             let allData = json["data"] as? [AnyHashable : Any]
             guard let data = (self.parent == nil) ? allData : allData?["node"] as? [AnyHashable : Any] else {
-                let code = (response as? HTTPURLResponse)?.statusCode
-                let shouldRetry = code == 403 || code == 502 || code == 503 // pause to retry in case of throttle or ongoing GH deployment
+                let code = response.statusCode
+                shouldRetry = code == 403 || code == 502 || code == 503 || code == -1001 // pause to retry in case of throttle or ongoing GH deployment or timeout
                 if let errors = json["errors"] as? [[AnyHashable:Any]] {
                     let msg = errors.first?["message"] as? String ?? "Unspecified server error: \(json)"
-                    doneWithError("Failed with error: '\(msg)'", nil, shouldRetry: shouldRetry, apiStats: apiStats)
+                    throw API.apiError(msg)
                 } else {
                     let msg = json["message"] as? String ?? "Unspecified server error: \(json)"
-                    doneWithError("Failed with error: '\(msg)'", nil, shouldRetry: shouldRetry, apiStats: apiStats)
+                    throw API.apiError(msg)
                 }
-                return
             }
             
             let r = self.rootElement
             guard let topData = data[r.name] else {
-                doneWithError("No data in JSON", nil, shouldRetry: false, apiStats: apiStats)
-                return
+                throw API.apiError("No data in JSON")
             }
             
-            let extraQueries = r.scan(query: self, pageData: topData, parent: self.parent)
+            let extraQueries = await r.scan(query: self, pageData: topData, parent: self.parent)
             if extraQueries.isEmpty {
-                completion(nil, apiStats)
+                return apiStats
             } else {
                 DLog("\(self.logPrefix)Needs more page data")
-                ApiServer.runQueries(queries: extraQueries, on: url, token: authToken, completion: completion)
+                return try await GQLQuery.runQueries(queries: extraQueries, on: url, token: authToken)
             }
-        }
-        
-        let capturedName = name
-        API.submitDataTask(task, on: GQLQuery.qlQueue) {
-            DispatchQueue.main.async {
-                API.currentOperationName = capturedName
+            
+        } catch {
+            DLog("\(self.logPrefix) Error: \(error.localizedDescription)")
+            if shouldRetry && attempt > 0 {
+                DLog("\(self.logPrefix) Pausing for retry, attempt \(attempt)")
+                try? await Task.sleep(nanoseconds: 2 * NSEC_PER_SEC)
+                return try await run(for: url, authToken: authToken, attempt: attempt - 1)
+            } else {
+                throw error
             }
         }
 	}
     
-    var logPrefix: String {
-        return "(GQL '\(name)') "
-    }    
+    static private let gateKeeper = HTTP.GateKeeper(entries: 1)
+    
+    @MainActor
+    static func runQueries(queries: [GQLQuery], on path: String, token: String) async throws -> ApiStats? {
+        await gateKeeper.waitForGate()
+        defer {
+            Task {
+                await gateKeeper.signalGate()
+            }
+        }
+        assert(Thread.isMainThread)
+        return try await withThrowingTaskGroup(of: ApiStats?.self, returning: ApiStats?.self) { group in
+            for query in queries {
+                group.addTask {
+                    return try await query.run(for: path, authToken: token, attempt: 10)
+                }
+            }
+            return try await group.reduce(nil) { $1 ?? $0 }
+        }
+    }
 }

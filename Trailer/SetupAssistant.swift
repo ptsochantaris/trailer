@@ -1,3 +1,4 @@
+import Cocoa
 
 final class SetupAssistant: NSWindow, NSWindowDelegate, NSControlTextEditingDelegate {
 
@@ -59,24 +60,24 @@ final class SetupAssistant: NSWindow, NSWindowDelegate, NSControlTextEditingDele
 			}
 		} else {
 			testingState()
-			API.testApi(to: newServer) { [weak self] error in
-				guard let s = self else { return }
-				if let e = error {
-					let alert = NSAlert()
-					alert.messageText = "Testing the token failed - please check that you have pasted your token correctly"
-					alert.informativeText = e.localizedDescription
-					alert.addButton(withTitle: "OK")
-					alert.beginSheetModal(for: s) { response in
-						s.normalState()
-					}
-				} else {
-					s.quickstart.stringValue = "\nFetching your watchlist. This will take a moment…"
-					Settings.lastSuccessfulRefresh = nil
-					app.startRefreshIfItIsDue()
-					s.checkTimer = Timer(repeats: true, interval: 0.5) {
-						s.checkRefreshDone()
-					}
-				}
+            Task {
+                do {
+                    try await API.testApi(to: newServer)
+                    quickstart.stringValue = "\nFetching your watchlist. This will take a moment…"
+                    Settings.lastSuccessfulRefresh = nil
+                    app.startRefreshIfItIsDue()
+                    checkTimer = Timer(repeats: true, interval: 0.5) { [weak self] in
+                        self?.checkRefreshDone()
+                    }
+                } catch {
+                    let alert = NSAlert()
+                    alert.messageText = "Testing the token failed - please check that you have pasted your token correctly"
+                    alert.informativeText = error.localizedDescription
+                    alert.addButton(withTitle: "OK")
+                    alert.beginSheetModal(for: self) { [weak self] response in
+                        self?.normalState()
+                    }
+                }
 			}
 		}
 	}
@@ -144,7 +145,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate, NSControlTextEditingDele
 		o.isExtensionHidden = false
 		o.allowedFileTypes = ["trailerSettings"]
 		o.beginSheetModal(for: self) { response in
-			if response.rawValue == NSFileHandlingPanelOKButton, let url = o.url {
+            if response == .OK, let url = o.url {
                 DispatchQueue.main.async { [weak self] in
 					if app.tryLoadSettings(from: url, skipConfirm: Settings.dontConfirmSettingsImport) {
 						self?.close()

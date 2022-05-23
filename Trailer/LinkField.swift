@@ -1,12 +1,9 @@
+import Cocoa
 
 extension NSColor {
     var highlighted: NSColor {
         if app.theme == .light {
-            if #available(macOS 10.14, *) {
-                return .controlAccentColor
-            } else {
-                return .blue
-            }
+            return .controlAccentColor
         }
         guard let c = self.cgColor.components, c.count > 2 else {
             return self

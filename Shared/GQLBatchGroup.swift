@@ -36,7 +36,7 @@ final class GQLBatchGroup: GQLScanning {
 		return Array(k[0 ..< max])
 	}
 
-	func scan(query: GQLQuery, pageData: Any, parent: GQLNode?) -> [GQLQuery] {
+	func scan(query: GQLQuery, pageData: Any, parent: GQLNode?) async -> [GQLQuery] {
         //DLog("\(query.logPrefix)Scanning batch group \(name)")
 		guard let nodes = pageData as? [Any] else { return [] }
 
@@ -51,7 +51,7 @@ final class GQLBatchGroup: GQLScanning {
 
 		for n in nodes {
 			if let n = n as? [AnyHashable : Any], let id = n["id"] as? String, let group = idsToGroups[id] {
-				let newQueries = group.scan(query: query, pageData: n, parent: parent)
+				let newQueries = await group.scan(query: query, pageData: n, parent: parent)
 				extraQueries.append(contentsOf: newQueries)
 			}
 		}

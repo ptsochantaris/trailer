@@ -1,3 +1,4 @@
+import Cocoa
 
 // from: https://stackoverflow.com/questions/11949250/how-to-resize-nsimage/42915296#42915296
 extension NSImage {

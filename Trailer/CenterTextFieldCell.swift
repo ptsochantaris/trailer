@@ -1,3 +1,4 @@
+import Cocoa
 
 final class CenterTextFieldCell: NSTextFieldCell {
 	override func drawingRect(forBounds theRect: NSRect) -> NSRect {

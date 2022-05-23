@@ -33,6 +33,8 @@ let MENU_WIDTH: CGFloat = 500
 let REMOVE_BUTTON_WIDTH: CGFloat = 80
 let DISABLED_FADE: CGFloat = 0.4
 
+import Cocoa
+
 typealias FONT_CLASS = NSFont
 typealias IMAGE_CLASS = NSImage
 

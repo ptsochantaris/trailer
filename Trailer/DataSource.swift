@@ -1,3 +1,5 @@
+import Cocoa
+
 extension MenuWindow {
     
     final class DataSource: NSObject, NSTableViewDelegate, NSTableViewDataSource {

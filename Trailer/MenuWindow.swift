@@ -1,3 +1,5 @@
+import Cocoa
+
 final class MenuWindow: NSWindow, NSControlTextEditingDelegate, StatusItemViewDelegate {
 
 	@IBOutlet var scrollView: NSScrollView!
@@ -34,12 +36,10 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate, StatusItemViewDe
 
 		contentView?.wantsLayer = true
 
-		if #available(macOS 10.13, *) {
-			isOpaque = false
-			backgroundColor = .clear
-			contentView?.layer?.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMinYCorner]
-			contentView?.layer?.cornerRadius = 5
-		}
+        isOpaque = false
+        backgroundColor = .clear
+        contentView?.layer?.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMinYCorner]
+        contentView?.layer?.cornerRadius = 5
         
 		let w = NSVisualEffectView(frame: header.bounds)
 		w.autoresizingMask = [.height, .width]
@@ -59,11 +59,7 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate, StatusItemViewDe
 		case .light:
 			appearance = NSAppearance(named: .vibrantLight)
 		case .dark:
-			if #available(macOS 10.14, *) {
-				appearance = NSAppearance(named: .darkAqua)
-            } else {
-                appearance = NSAppearance(named: .vibrantDark)
-            }
+            appearance = NSAppearance(named: .darkAqua)
 		}
 	}
 

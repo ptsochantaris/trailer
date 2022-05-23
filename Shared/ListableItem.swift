@@ -1,13 +1,13 @@
 import CoreData
 
-#if canImport(CoreSpotlight)
 import CoreSpotlight
-#endif
 
 #if os(iOS)
 	import UIKit
 	import MobileCoreServices
 	import UserNotifications
+#else
+    import Cocoa
 #endif
 
 class ListableItem: DataItem {
@@ -66,6 +66,7 @@ class ListableItem: DataItem {
         return issueUrl?.appending(pathComponent: "reactions")
     }
     
+    @MainActor
     static func reactionCheckBatch<T: ListableItem>(for type: T.Type, in moc: NSManagedObjectContext) -> [T] {
         let entityName = String(describing: type)
         let f = NSFetchRequest<T>(entityName: entityName)
@@ -1159,44 +1160,34 @@ class ListableItem: DataItem {
     final func handleSpotlight() {
         let uri = objectID.uriRepresentation().absoluteString
         if isVisibleOnMenu {
-            indexForSpotlight(uri: uri)
+            Task {
+                await indexForSpotlight(uri: uri)
+            }
         } else {
             hideFromSpotlightAndNotifications(uri: uri)
         }
     }
 
-    private final func indexForSpotlight(uri: String) {
-        if #available(macOS 10.13, iOS 13.0, *) {
-            #if canImport(CoreSpotlight)
-            guard CSSearchableIndex.isIndexingAvailable() else { return }
-            
-            let s = CSSearchableItemAttributeSet(itemContentType: kUTTypeText as String)
-            
-            let group = DispatchGroup()
-            
-            if let i = userAvatarUrl, !Settings.hideAvatars {
-                group.enter()
-                API.haveCachedAvatar(from: i) { _, cachePath in
-                    s.thumbnailURL = URL(fileURLWithPath: cachePath)
-                    group.leave()
-                }
-            }
-            
-            let titleSuffix = labels.compactMap { $0.name }.reduce("") { $0 + " [\($1)]" }
-            s.title = "#\(number) - \(S(title))\(titleSuffix)"
-            
-            s.contentCreationDate = createdAt
-            s.contentModificationDate = updatedAt
-            s.keywords = searchKeywords
-            s.creator = userLogin
-            s.contentDescription = "\(S(repo.fullName)) @\(S(userLogin)) - \(S(body?.trim))"
-            
-            group.notify(queue: .main) {
-                let i = CSSearchableItem(uniqueIdentifier: uri, domainIdentifier: nil, attributeSet: s)
-                CSSearchableIndex.default().indexSearchableItems([i], completionHandler: nil)
-            }
-            #endif
+    private final func indexForSpotlight(uri: String) async {
+        guard CSSearchableIndex.isIndexingAvailable() else { return }
+        
+        let s = CSSearchableItemAttributeSet(itemContentType: kUTTypeText as String)
+                
+        if let i = userAvatarUrl, !Settings.hideAvatars, let cachePath = try? await API.avatar(from: i).1 {
+            s.thumbnailURL = URL(fileURLWithPath: cachePath)
         }
+        
+        let titleSuffix = labels.compactMap { $0.name }.reduce("") { $0 + " [\($1)]" }
+        s.title = "#\(number) - \(S(title))\(titleSuffix)"
+        
+        s.contentCreationDate = createdAt
+        s.contentModificationDate = updatedAt
+        s.keywords = searchKeywords
+        s.creator = userLogin
+        s.contentDescription = "\(S(repo.fullName)) @\(S(userLogin)) - \(S(body?.trim))"
+        
+        let i = CSSearchableItem(uniqueIdentifier: uri, domainIdentifier: nil, attributeSet: s)
+        try? await CSSearchableIndex.default().indexSearchableItems([i])
     }
 
     override final class func shouldCreate(from node: GQLNode) -> Bool {

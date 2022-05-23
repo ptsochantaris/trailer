@@ -2,7 +2,7 @@ import Foundation
 
 final class RestAccess {
 
-    typealias ApiCompletion = (_ code: Int64?, _ headers: [AnyHashable : Any]?, _ data: Any?, _ error: Error?, _ shouldRetry: Bool) -> Void
+    typealias ApiCompletion = (Int, [AnyHashable : Any]?, Any?)
 
     private struct UrlBackOffEntry {
         var nextAttemptAt: Date
@@ -14,113 +14,82 @@ final class RestAccess {
         from server: ApiServer,
         startingFrom page: Int = 1,
         perPageCallback: @escaping (_ data: [[AnyHashable : Any]]?, _ lastPage: Bool) -> Bool,
-        finalCallback: @escaping (_ success: Bool, _ resultCode: Int64) -> Void) {
-
-        if path.isEmpty {
-            // handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
-            finalCallback(true, -1)
-            return
-        }
-
-        let p = page > 1 ? "\(path)?page=\(page)&per_page=100" : "\(path)?per_page=100"
-        getData(in: p, from: server) { data, lastPage, resultCode in
-
-            if let d = data as? [[AnyHashable : Any]] {
-                if perPageCallback(d, lastPage) || lastPage {
-                    finalCallback(true, resultCode)
-                } else {
-                    getPagedData(at: path, from: server, startingFrom: page+1, perPageCallback: perPageCallback, finalCallback: finalCallback)
+        finalCallback: @escaping (_ success: Bool, _ resultCode: Int) async -> Void) {
+                        
+            Task {
+                if path.isEmpty {
+                    // handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
+                    await finalCallback(true, -1)
+                    return
                 }
-            } else {
-                finalCallback(false, resultCode)
+
+                do {
+                    let p = page > 1 ? "\(path)?page=\(page)&per_page=100" : "\(path)?per_page=100"
+                    let (data, lastPage, resultCode) = try await getData(in: p, from: server)
+                    if perPageCallback(data as? [[AnyHashable: Any]], lastPage) || lastPage {
+                        await finalCallback(true, resultCode)
+                    } else {
+                        getPagedData(at: path, from: server, startingFrom: page+1, perPageCallback: perPageCallback, finalCallback: finalCallback)
+                    }
+                } catch {
+                    await finalCallback(false, (error as NSError).code)
+                }
             }
         }
-    }
 
-    static func getData(
-        in path: String,
-        from server: ApiServer,
-        attemptCount: Int = 0,
-        callback: @escaping (_ data: Any?, _ lastPage: Bool, _ resultCode: Int64) -> Void) {
-
-        start(call: path, on: server, triggeredByUser: false) { code, headers, data, error, shouldRetry in
-
-            if error == nil {
+    @MainActor
+    static func getData(in path: String, from server: ApiServer, attemptCount: Int = 0) async throws -> (Any?, Bool, Int) {
+        var attemptCount = attemptCount
+        while(true) {
+            do {
+                let (code, headers, data) = try await start(call: path, on: server, triggeredByUser: false)
                 var lastPage = true
                 if let allHeaders = headers {
-
+                    
                     let latestLimits = ApiStats.fromV3(headers: allHeaders)
                     server.updateApiStats(latestLimits)
-
+                    
                     if let linkHeader = allHeaders["Link"] as? String {
                         lastPage = !linkHeader.contains("rel=\"next\"")
                     }
                 }
-                callback(data, lastPage, code ?? 0)
-            } else {
-                if shouldRetry && attemptCount < 3 { // timeout, truncation, connection issue, etc
-                    let nextAttemptCount = attemptCount+1
-                    DLog("(%@) Will retry failed API call to %@ (attempt #%@)", S(server.label), path, nextAttemptCount)
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                        getData(in: path, from: server, attemptCount: nextAttemptCount, callback: callback)
-                    }
-                } else {
-                    if shouldRetry {
-                        DLog("(%@) Giving up on failed API call to %@", S(server.label), path)
-                    }
-                    callback(nil, false, code ?? 0)
+                return (data, lastPage, code)
+            } catch {
+                let error = error as NSError
+                let code = error.code
+                let shouldRetry = (code == 502 || code == 503 || code == -1001) // retry in case GH is deploying, or timeout
+                if !shouldRetry || attemptCount > 2 {
+                    DLog("(%@) Giving up on failed API call to %@", S(server.label), path)
+                    throw error
                 }
             }
+            attemptCount += 1
+            DLog("(%@) Will retry failed API call to %@ (attempt #%@)", S(server.label), path, attemptCount)
+            try? await Task.sleep(nanoseconds: 3 * NSEC_PER_SEC)
         }
     }
     
-    static func getRawData(
-        at path: String,
-        from server: ApiServer,
-        callback: @escaping (_ data: Any?, _ resultCode: Int64) -> Void) {
-
+    @MainActor
+    static func getRawData(at path: String, from server: ApiServer) async throws -> (Any?, Int) {
         if path.isEmpty {
             // handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
-            callback(nil, -1)
-            return
+            return (nil, -1)
         }
 
-        getData(in: "\(path)?per_page=100", from: server) { data, lastPage, resultCode in
-            callback(data, resultCode)
-        }
+        let (data, _, resultCode) = try await getData(in: "\(path)?per_page=100", from: server)
+        return (data, resultCode)
     }
     
-    private static let backOffIncrement: TimeInterval = 120
-    private static var badLinks = [String : UrlBackOffEntry]()
-    
-    static func clearAllBadLinks() {
-        badLinks.removeAll(keepingCapacity: false)
-    }
-
-    private static let restQueue: OperationQueue = {
-        let q = OperationQueue()
-        q.maxConcurrentOperationCount = 2
-        q.qualityOfService = .background
-        return q
-    }()
-
-    static func start(call path: String, on server: ApiServer, triggeredByUser: Bool, completion: @escaping ApiCompletion) {
+    @MainActor
+    static func start(call path: String, on server: ApiServer, triggeredByUser: Bool) async throws -> ApiCompletion {
         
         let apiServerLabel: String
         if server.lastSyncSucceeded || triggeredByUser {
             apiServerLabel = S(server.label)
         } else {
-            DispatchQueue.main.async {
-                let e = API.apiError("Sync has failed, skipping this call")
-                completion(nil, nil, nil, e, false)
-            }
-            return
+            throw API.apiError("Sync has failed, skipping this call")
         }
         
-        if triggeredByUser {
-            clearAllBadLinks()
-        }
-
         let expandedPath = path.hasPrefix("/") ? S(server.apiPath).appending(pathComponent: path) : path
         let url = URL(string: expandedPath)!
 
@@ -139,82 +108,24 @@ final class RestAccess {
             request.setValue("token \(a)", forHTTPHeaderField: "Authorization")
         }
 
-        ////////////////////////// preempt with error backoff algorithm
-        let existingBackOff = badLinks[expandedPath]
-        if let eb = existingBackOff {
-            if eb.nextAttemptAt.timeIntervalSinceNow > 0 {
-                // report failure and return
-                DLog("(%@) Preempted fetch to previously broken link %@, won't actually access this URL until %@", apiServerLabel, expandedPath, eb.nextAttemptAt)
-                DispatchQueue.main.async {
-                    let e = API.apiError("Preempted fetch because of throttling")
-                    completion(nil, nil, nil, e, false)
-                }
-                return
-            }
-            else {
-                badLinks.removeValue(forKey: expandedPath)
-            }
-        }
-
-        let task = API.task(for: request) { data, res, e in
-
-            let response = res as? HTTPURLResponse
-            let error: Error?
-            let shouldRetry: Bool
-            var parsedData: Any?
-            let code = Int64(response?.statusCode ?? 0)
-            let headers = response?.allHeaderFields
-
-            if code > 299 {
-                error = API.apiError("Server responded with error \(code)")
-                shouldRetry = (code == 502 || code == 503) // retry in case GH is deploying
-            } else if code == 0 {
-                error = API.apiError("Server did not respond")
-                shouldRetry = (e as NSError?)?.code == -1001 // retry if it was a timeout
-            } else if Int64(data?.count ?? 0) < (response?.expectedContentLength ?? 0) {
-                error = API.apiError("Server data was truncated")
-                shouldRetry = true // transfer truncation, try again
-            } else {
-                DLog("(%@) GET %@ - RESULT: %@", apiServerLabel, expandedPath, code)
-                error = e as NSError?
-                shouldRetry = false
-                if let d = data {
-                    parsedData = try? JSONSerialization.jsonObject(with: d, options: [])
-                }
-            }
+        let capturedRequest = request
+        do {
+            let (data, response) = try await HTTP.getData(for: capturedRequest)
+            let headers = response.allHeaderFields
+            let code = response.statusCode
             
-            if let e = error {
-                if code > 399 && !shouldRetry {
-                    if var backoff = existingBackOff {
-                        DLog("(%@) Extending backoff for already throttled URL %@ by %@ seconds", apiServerLabel, expandedPath, backOffIncrement)
-                        if backoff.nextIncrement < 3600.0 {
-                            backoff.nextIncrement += backOffIncrement
-                        }
-                        backoff.nextAttemptAt = Date(timeIntervalSinceNow: backoff.nextIncrement)
-                        DispatchQueue.main.async {
-                            badLinks[expandedPath] = backoff
-                        }
-                    } else {
-                        DLog("(%@) Placing URL %@ on the throttled list", apiServerLabel, expandedPath)
-                        let newEntry = UrlBackOffEntry(
-                            nextAttemptAt: Date(timeIntervalSinceNow: backOffIncrement),
-                            nextIncrement: backOffIncrement)
-                        DispatchQueue.main.async {
-                            badLinks[expandedPath] = newEntry
-                        }
-                    }
-                }
-                DLog("(%@) GET %@ - FAILED: (code %@) %@", apiServerLabel, expandedPath, code, e.localizedDescription)
+            DLog("(%@) GET %@ - RESULT: %@", apiServerLabel, expandedPath, code)
+            let parsedData = try? JSONSerialization.jsonObject(with: data, options: [])
+            
+            if Settings.dumpAPIResponsesInConsole {
+                DLog("API data from %@: %@", expandedPath, String(bytes: data, encoding: .utf8))
             }
+            return (code, headers, parsedData)
 
-            if Settings.dumpAPIResponsesInConsole, let d = data {
-                DLog("API data from %@: %@", expandedPath, String(bytes: d, encoding: .utf8))
-            }
-
-            DispatchQueue.main.async {
-                completion(code, headers, parsedData, error, shouldRetry)
-            }
+        } catch {
+            let error = error as NSError
+            DLog("(%@) GET %@ - FAILED: (code %@) %@", apiServerLabel, expandedPath, error.code, error.localizedDescription)
+            throw error
         }
-        API.submitDataTask(task, on: restQueue)
     }
 }

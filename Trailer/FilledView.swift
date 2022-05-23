@@ -1,3 +1,4 @@
+import Cocoa
 
 final class FilledView: NSView {
 	

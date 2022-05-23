@@ -1,7 +1,6 @@
 
-#if canImport(CoreSpotlight)
 import CoreSpotlight
-#endif
+import Cocoa
 
 enum Theme {
 	case light, dark
@@ -86,7 +85,9 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 
         theme = getTheme() // also sets up windows
 
-		API.updateLimitsFromServer()
+        Task {
+            await API.updateLimitsFromServer()
+        }
 
 		let nc = NSUserNotificationCenter.default
 		nc.delegate = self
@@ -367,15 +368,11 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 
 		notification.userInfo = DataManager.info(for: item)
 
-        let group = DispatchGroup()
-		if !Settings.hideAvatarsInNotifications, let url = (item as? PRComment)?.avatarUrl ?? (item as? ListableItem)?.userAvatarUrl {
-            group.enter()
-			API.haveCachedAvatar(from: url) { image, _ in
-				notification.contentImage = image
-                group.leave()
-			}
-		}
-        group.notify(queue: .main) {
+        Task {
+            if !Settings.hideAvatarsInNotifications, let url = (item as? PRComment)?.avatarUrl ?? (item as? ListableItem)?.userAvatarUrl {
+                let image = try? await API.avatar(from: url).0
+                notification.contentImage = image
+            }
             NSUserNotificationCenter.default.deliver(notification)
         }
 	}
@@ -780,7 +777,9 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 			return
 		}
 
-		API.performSync()
+        Task {
+            await API.performSync()
+        }
 	}
     
 	private func refreshTimerDone() {
@@ -1176,12 +1175,8 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         let autoSwitching = d.bool(forKey: "AppleInterfaceStyleSwitchesAutomatically")
         let interfaceStyle = d.string(forKey: "AppleInterfaceStyle")
         if autoSwitching && interfaceStyle == nil {
-            if #available(macOS 10.14, *) {
-                let isDark = NSApplication.shared.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
-                return isDark ? .dark : .light
-            } else {
-                return .dark
-            }
+            let isDark = NSApplication.shared.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+            return isDark ? .dark : .light
         }
         return (interfaceStyle == "Dark") ? .dark : .light
 	}

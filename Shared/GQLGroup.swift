@@ -76,16 +76,16 @@ final class GQLGroup: GQLScanning {
     private static let nodeCallbackLock = NSLock()
 
     @discardableResult
-    private func scanNode(_ node: [AnyHashable: Any], query: GQLQuery, parent: GQLNode?, extraQueries: inout [GQLQuery]) -> Bool {
+    private func scanNode(_ node: [AnyHashable: Any], query: GQLQuery, parent: GQLNode?, extraQueries: inout [GQLQuery]) async -> Bool {
         
         let thisObject: GQLNode?
         
         if let typeName = node["__typename"] as? String, let id = node["id"] as? String {
             let o = GQLNode(id: id, elementType: typeName, jsonPayload: node, parent: parent)
             thisObject = o
-            if let c = query.perNodeCallback {
+            if let pnc = query.perNodeCallback {
                 GQLGroup.nodeCallbackLock.lock()
-                let keepGoing = c(o)
+                let keepGoing = await pnc(o)
                 GQLGroup.nodeCallbackLock.unlock()
                 if !keepGoing {
                     if let parent = parent {
@@ -102,19 +102,19 @@ final class GQLGroup: GQLScanning {
         
         for field in fields {
             if let fragment = field as? GQLFragment {
-                extraQueries += fragment.scan(query: query, pageData: node, parent: thisObject)
+                extraQueries += await fragment.scan(query: query, pageData: node, parent: thisObject)
                 
             } else if let ingestable = field as? GQLScanning, let fieldData = node[field.name] {
-                extraQueries += ingestable.scan(query: query, pageData: fieldData, parent: thisObject)
+                extraQueries += await ingestable.scan(query: query, pageData: fieldData, parent: thisObject)
             }
         }
         
         return true
     }
     
-    private func scanPage(_ edges: [[AnyHashable: Any]], pageInfo: [AnyHashable: Any]?, query: GQLQuery, parent: GQLNode?, extraQueries: inout [GQLQuery]) {
+    private func scanPage(_ edges: [[AnyHashable: Any]], pageInfo: [AnyHashable: Any]?, query: GQLQuery, parent: GQLNode?, extraQueries: inout [GQLQuery]) async {
         for e in edges {
-            if let node = e["node"] as? [AnyHashable : Any], !scanNode(node, query: query, parent: parent, extraQueries: &extraQueries) {
+            if let node = e["node"] as? [AnyHashable : Any], !(await scanNode(node, query: query, parent: parent, extraQueries: &extraQueries)) {
                 return
             }
         }
@@ -126,20 +126,24 @@ final class GQLGroup: GQLScanning {
         }
     }
 
-	func scan(query: GQLQuery, pageData: Any, parent: GQLNode?) -> [GQLQuery] {
+	func scan(query: GQLQuery, pageData: Any, parent: GQLNode?) async -> [GQLQuery] {
 
 		var extraQueries = [GQLQuery]()
                 
 		if let hash = pageData as? [AnyHashable : Any] {
 			if let edges = hash["edges"] as? [[AnyHashable : Any]] {
-                scanPage(edges, pageInfo: hash["pageInfo"] as? [AnyHashable : Any], query: query, parent: parent, extraQueries: &extraQueries)
+                await scanPage(edges, pageInfo: hash["pageInfo"] as? [AnyHashable : Any], query: query, parent: parent, extraQueries: &extraQueries)
 
 			} else {
-                scanNode(hash, query: query, parent: parent, extraQueries: &extraQueries)
+                await scanNode(hash, query: query, parent: parent, extraQueries: &extraQueries)
 			}
 			
 		} else if let nodes = pageData as? [[AnyHashable : Any]] {
-            nodes.forEach { scanNode($0, query: query, parent: parent, extraQueries: &extraQueries) }
+            await withTaskGroup(of: Void.self) { group in
+                for node in nodes {
+                    await scanNode(node, query: query, parent: parent, extraQueries: &extraQueries)
+                }
+            }
 		}
 		
 		if !extraQueries.isEmpty {

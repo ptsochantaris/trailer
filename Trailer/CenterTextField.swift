@@ -1,3 +1,4 @@
+import Cocoa
 
 class CenterTextField: NSTextField {
 

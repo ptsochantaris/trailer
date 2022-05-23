@@ -2,7 +2,8 @@ import Foundation
 import CoreData
 
 extension API {
-    private static func v3_handleRepoSyncFailure(repo: Repo, resultCode: Int64) {
+    @MainActor
+    private static func v3_handleRepoSyncFailure(repo: Repo, resultCode: Int) {
         if resultCode == 404 { // repo disabled
             repo.inaccessible = true
             repo.postSyncAction = PostSyncAction.doNothing.rawValue
@@ -19,7 +20,8 @@ extension API {
         }
     }
 
-    static func v3_fetchItems(for repos: [Repo], to moc: NSManagedObjectContext, group: DispatchGroup) {        
+    @MainActor
+    static func v3_fetchItems(for repos: [Repo], to moc: NSManagedObjectContext) async {        
         for r in repos {
             for p in r.pullRequests {
                 if p.condition == ItemCondition.open.rawValue {
@@ -36,100 +38,111 @@ extension API {
             let apiServer = r.apiServer
             guard apiServer.lastSyncSucceeded else { continue }
 
-            if r.displayPolicyForPrs != RepoDisplayPolicy.hide.rawValue {
-                let repoFullName = S(r.fullName)
-                group.enter()
-                RestAccess.getPagedData(at: "/repos/\(repoFullName)/pulls", from: apiServer, perPageCallback: { data, lastPage in
-                    PullRequest.syncPullRequests(from: data, in: r)
-                    return false
-                }) { success, resultCode in
-                    if !success {
-                        v3_handleRepoSyncFailure(repo: r, resultCode: resultCode)
-                    }
-                    group.leave()
-                }
-            }
-
-            if r.displayPolicyForIssues != RepoDisplayPolicy.hide.rawValue {
-                let repoFullName = S(r.fullName)
-                group.enter()
-                RestAccess.getPagedData(at: "/repos/\(repoFullName)/issues", from: apiServer, perPageCallback: { data, lastPage in
-                    Issue.syncIssues(from: data, in: r)
-                    return false
-                }) { success, resultCode in
-                    if !success {
-                        v3_handleRepoSyncFailure(repo: r, resultCode: resultCode)
-                    }
-                    group.leave()
-                }
-            }
-        }
-    }
-    
-    static func V3_markExtraUpdatedItems(from repos: [Repo], to moc: NSManagedObjectContext, callback: @escaping Completion) {
-
-        let group = DispatchGroup()
-
-        for r in repos {
-            let repoFullName = S(r.fullName)
-            let lastLocalEvent = r.lastScannedIssueEventId
-            let isFirstEventSync = lastLocalEvent == 0
-            r.lastScannedIssueEventId = 0
-            group.enter()
-            RestAccess.getPagedData(at: "/repos/\(repoFullName)/issues/events", from: r.apiServer, perPageCallback: { data, lastPage in
-                guard let data = data, !data.isEmpty else { return true }
-
-                if isFirstEventSync {
-
-                    DLog("First event check for this repo. Let's ensure all items are marked as updated")
-                    for i in r.pullRequests { i.setToUpdatedIfIdle() }
-                    for i in r.issues { i.setToUpdatedIfIdle() }
-                    r.lastScannedIssueEventId = data.first!["id"] as? Int64 ?? 0
-                    return true
-
-                } else {
-
-                    var numbers = Set<Int64>()
-                    var reasons = Set<String>()
-                    var foundLastEvent = false
-                    for event in data {
-                        if let eventId = event["id"] as? Int64, let issue = event["issue"] as? [AnyHashable:Any], let issueNumber = issue["number"] as? Int64 {
-                            if r.lastScannedIssueEventId == 0 {
-                                r.lastScannedIssueEventId = eventId
-                            }
-                            if eventId == lastLocalEvent {
-                                foundLastEvent = true
-                                DLog("Parsed all repo issue events up to the one we already have");
-                                break // we're done
-                            }
-                            if let reason = event["event"] as? String {
-                                numbers.insert(issueNumber)
-                                reasons.insert(reason)
+            await withTaskGroup(of: Void.self) { group  in
+                if r.displayPolicyForPrs != RepoDisplayPolicy.hide.rawValue {
+                    let repoFullName = S(r.fullName)
+                    group.addTask {
+                        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+                            RestAccess.getPagedData(at: "/repos/\(repoFullName)/pulls", from: apiServer) { data, lastPage in
+                                PullRequest.syncPullRequests(from: data, in: r)
+                                return false
+                            } finalCallback: { success, resultCode in
+                                if !success {
+                                    await v3_handleRepoSyncFailure(repo: r, resultCode: resultCode)
+                                }
+                                continuation.resume()
                             }
                         }
                     }
-                    if r.lastScannedIssueEventId == 0 {
-                        r.lastScannedIssueEventId = lastLocalEvent
-                    }
-                    if !numbers.isEmpty {
-                        r.markItemsAsUpdated(with: numbers, reasons: reasons)
-                    }
-                    return foundLastEvent
-
                 }
 
-            }) { success, resultCode in
-                if !success {
-                    r.apiServer.lastSyncSucceeded = false
+                if r.displayPolicyForIssues != RepoDisplayPolicy.hide.rawValue {
+                    let repoFullName = S(r.fullName)
+                    group.addTask {
+                        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+                            RestAccess.getPagedData(at: "/repos/\(repoFullName)/issues", from: apiServer) { data, lastPage in
+                                Issue.syncIssues(from: data, in: r)
+                                return false
+                            } finalCallback: { success, resultCode in
+                                if !success {
+                                    await v3_handleRepoSyncFailure(repo: r, resultCode: resultCode)
+                                }
+                                continuation.resume()
+                            }
+                        }
+                    }
                 }
-                group.leave()
             }
         }
-        
-        group.notify(queue: .main, execute: callback)
     }
     
-    static func v3Sync(to moc: NSManagedObjectContext, newOrUpdatedPrs: [PullRequest], newOrUpdatedIssues: [Issue], with group: DispatchGroup) {
+    @MainActor
+    static func V3_markExtraUpdatedItems(from repos: [Repo], to moc: NSManagedObjectContext) async {
+        await withTaskGroup(of: Void.self) { group in
+            for r in repos {
+                let repoFullName = S(r.fullName)
+                let lastLocalEvent = r.lastScannedIssueEventId
+                let isFirstEventSync = lastLocalEvent == 0
+                r.lastScannedIssueEventId = 0
+                group.addTask {
+                    await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+                        RestAccess.getPagedData(at: "/repos/\(repoFullName)/issues/events", from: r.apiServer) { data, lastPage in
+                            guard let data = data, !data.isEmpty else { return true }
+
+                            if isFirstEventSync {
+
+                                DLog("First event check for this repo. Let's ensure all items are marked as updated")
+                                for i in r.pullRequests { i.setToUpdatedIfIdle() }
+                                for i in r.issues { i.setToUpdatedIfIdle() }
+                                r.lastScannedIssueEventId = data.first!["id"] as? Int64 ?? 0
+                                return true
+
+                            } else {
+
+                                var numbers = Set<Int64>()
+                                var reasons = Set<String>()
+                                var foundLastEvent = false
+                                for event in data {
+                                    if let eventId = event["id"] as? Int64, let issue = event["issue"] as? [AnyHashable:Any], let issueNumber = issue["number"] as? Int64 {
+                                        if r.lastScannedIssueEventId == 0 {
+                                            r.lastScannedIssueEventId = eventId
+                                        }
+                                        if eventId == lastLocalEvent {
+                                            foundLastEvent = true
+                                            DLog("Parsed all repo issue events up to the one we already have");
+                                            break // we're done
+                                        }
+                                        if let reason = event["event"] as? String {
+                                            numbers.insert(issueNumber)
+                                            reasons.insert(reason)
+                                        }
+                                    }
+                                }
+                                if r.lastScannedIssueEventId == 0 {
+                                    r.lastScannedIssueEventId = lastLocalEvent
+                                }
+                                if !numbers.isEmpty {
+                                    r.markItemsAsUpdated(with: numbers, reasons: reasons)
+                                }
+                                return foundLastEvent
+
+                            }
+                        } finalCallback: { success, resultCode in
+                            if !success {
+                                r.apiServer.lastSyncSucceeded = false
+                            }
+                            continuation.resume()
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    @MainActor
+    static func v3Sync(to moc: NSManagedObjectContext, newOrUpdatedPrs: [PullRequest], newOrUpdatedIssues: [Issue]) async {
+        
+        let group = DispatchGroup()
         
         if Settings.showStatusItems {
             group.enter()
@@ -199,21 +212,20 @@ extension API {
             commentGroup.leave()
         }
         
-        group.enter()
-        V3_checkPrClosures(in: moc) {
-            group.leave()
-        }
+        var tasks = [Task<Void, Never>]()
+
+        tasks.append(Task {
+            await V3_checkPrClosures(in: moc)
+        })
         
-        group.enter()
-        V3_detectAssignedPullRequests(in: moc, for: newOrUpdatedPrs) {
-            group.leave()
-        }
+        tasks.append(Task {
+            await V3_detectAssignedPullRequests(in: moc, for: newOrUpdatedPrs)
+        })
         
         if shouldSyncReviewAssignments {
-            group.enter()
-            V3_fetchReviewAssignmentsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs) {
-                group.leave()
-            }
+            tasks.append(Task {
+                await V3_fetchReviewAssignmentsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
+            })
         }
         
         group.enter()
@@ -226,10 +238,19 @@ extension API {
                 group.leave()
             }
         }
+
+        for task in tasks {
+            _ = await task.value
+        }
         
-        group.leave() // the one passed-in is already entered
+        await withCheckedContinuation { continuation in
+            group.notify(queue: .main) {
+                continuation.resume()
+            }
+        }
     }
     
+    @MainActor
     private static func V3_checkIssueClosures(in moc: NSManagedObjectContext) {
         let f = NSFetchRequest<Issue>(entityName: "Issue")
         f.predicate =
@@ -249,6 +270,7 @@ extension API {
         }
     }
 
+    @MainActor
     private static func V3_fetchCommentReactionsIfNeeded(to moc: NSManagedObjectContext, callback: @escaping Completion) {
         let comments = PRComment.commentsThatNeedReactionsToBeRefreshed(in: moc)
 
@@ -282,6 +304,7 @@ extension API {
         group.notify(queue: .main, execute: callback)
     }
 
+    @MainActor
     private static func V3_fetchItemReactionsIfNeeded<T: ListableItem>(for type: T.Type, to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
         let items = T.reactionCheckBatch(for: type, in: moc)
@@ -317,6 +340,7 @@ extension API {
         group.notify(queue: .main, execute: callback)
     }
     
+    @MainActor
     private static func V3_fetchCommentsForCurrentPullRequests(to moc: NSManagedObjectContext, for prs: [PullRequest], callback: @escaping Completion) {
         if prs.isEmpty {
             callback()
@@ -363,6 +387,7 @@ extension API {
         group.notify(queue: .main, execute: callback)
     }
 
+    @MainActor
     private static func V3_fetchCommentsForCurrentIssues(to moc: NSManagedObjectContext, for issues: [Issue], callback: @escaping Completion) {
         if issues.isEmpty {
             callback()
@@ -395,6 +420,7 @@ extension API {
         group.notify(queue: .main, execute: callback)
     }
 
+    @MainActor
     private static func V3_fetchReviewsForForCurrentPullRequests(to moc: NSManagedObjectContext, for prs: [PullRequest], callback: @escaping Completion) {
         if prs.isEmpty {
             callback()
@@ -421,14 +447,15 @@ extension API {
         group.notify(queue: .main, execute: callback)
     }
 
-    private static func V3_investigatePrClosure(for pullRequest: PullRequest, callback: @escaping Completion) {
+    @MainActor
+    private static func V3_investigatePrClosure(for pullRequest: PullRequest) async {
         DLog("Checking closed PR to see if it was merged: %@", pullRequest.title)
 
         let repoFullName = S(pullRequest.repo.fullName)
         let path = "/repos/\(repoFullName)/pulls/\(pullRequest.number)"
 
-        RestAccess.getData(in: path, from: pullRequest.apiServer) { data, lastPage, resultCode in
-
+        do {
+            let (data, _, _) = try await RestAccess.getData(in: path, from: pullRequest.apiServer)
             if let d = data as? [AnyHashable : Any] {
                 if let mergeInfo = d["merged_by"] as? [AnyHashable : Any], let mergeUserId = mergeInfo["node_id"] as? String {
                     pullRequest.mergedByNodeId = mergeUserId
@@ -440,7 +467,10 @@ extension API {
                     pullRequest.postSyncAction = PostSyncAction.isUpdated.rawValue // let handleClosing() decide
 
                 }
-            } else if resultCode == 404 || resultCode == 410 { // PR gone for good
+            }
+        } catch {
+            let resultCode = (error as NSError).code
+            if resultCode == 404 || resultCode == 410 { // PR gone for good
                 pullRequest.stateChanged = ListableItem.StateChange.closed.rawValue
                 pullRequest.postSyncAction = PostSyncAction.isUpdated.rawValue // let handleClosing() decide
 
@@ -448,11 +478,11 @@ extension API {
                 pullRequest.postSyncAction = PostSyncAction.doNothing.rawValue // keep since we don't know what's going on here
                 pullRequest.apiServer.lastSyncSucceeded = false
             }
-            callback()
         }
     }
 
-    private static func V3_checkPrClosures(in moc: NSManagedObjectContext, callback: @escaping Completion) {
+    @MainActor
+    private static func V3_checkPrClosures(in moc: NSManagedObjectContext) async {
         let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
         f.predicate = NSCompoundPredicate(type: .and, subpredicates: [PostSyncAction.delete.matchingPredicate, ItemCondition.open.matchingPredicate])
         f.returnsObjectsAsFaults = false
@@ -460,59 +490,51 @@ extension API {
 
         let prsToCheck = try! moc.fetch(f).filter { $0.shouldCheckForClosing }
 
-        let group = DispatchGroup()
-        for r in prsToCheck {
-            group.enter()
-            V3_investigatePrClosure(for: r) {
-                group.leave()
-            }
-        }
-        group.notify(queue: .main, execute: callback)
-    }
-
-    private static func V3_fetchReviewAssignmentsForCurrentPullRequests(to moc: NSManagedObjectContext, for prs: [PullRequest], callback: @escaping Completion) {
-        if prs.isEmpty {
-            callback()
-            return
-        }
-                
-        let group = DispatchGroup()
-        for p in prs {
-
-            let repoFullName = S(p.repo.fullName)
-            group.enter()
-            RestAccess.getRawData(at: "/repos/\(repoFullName)/pulls/\(p.number)/requested_reviewers", from: p.apiServer) { data, resultCode in
-
-                var reviewUsers = Set<String>()
-                var reviewTeams = Set<String>()
-
-                if let userList = data as? [[AnyHashable: Any]] {
-                    // Legacy API results
-                    for userName in userList.compactMap({ $0["login"] as? String }) {
-                        reviewUsers.insert(userName)
-                    }
-                    p.checkAndStoreReviewAssignments(reviewUsers, reviewTeams)
-
-                } else if let data = data as? [AnyHashable: Any], let userList = data["users"] as? [[AnyHashable: Any]], let teamList = data["teams"] as? [[AnyHashable: Any]] {
-                    // New API results
-                    for userName in userList.compactMap({ $0["login"] as? String }) {
-                        reviewUsers.insert(userName)
-                    }
-                    for teamName in teamList.compactMap({ $0["slug"] as? String }) {
-                        reviewTeams.insert(teamName)
-                    }
-                    p.checkAndStoreReviewAssignments(reviewUsers, reviewTeams)
-                } else {
-                    p.apiServer.lastSyncSucceeded = false
+        await withTaskGroup(of: Void.self) { group in
+            for r in prsToCheck {
+                group.addTask {
+                    await V3_investigatePrClosure(for: r)
                 }
-
-                group.leave() // getRawData
             }
         }
-        
-        group.notify(queue: .main, execute: callback)
     }
 
+    @MainActor
+    private static func V3_fetchReviewAssignmentsForCurrentPullRequests(to moc: NSManagedObjectContext, for prs: [PullRequest]) async {
+        await withThrowingTaskGroup(of: Void.self) { group in
+            for p in prs {
+                group.addTask {
+                    let repoFullName = S(p.repo.fullName)
+                    let (data, _) = try await RestAccess.getRawData(at: "/repos/\(repoFullName)/pulls/\(p.number)/requested_reviewers", from: p.apiServer)
+                    var reviewUsers = Set<String>()
+                    var reviewTeams = Set<String>()
+                    
+                    if let userList = data as? [[AnyHashable: Any]] {
+                        // Legacy API results
+                        for userName in userList.compactMap({ $0["login"] as? String }) {
+                            reviewUsers.insert(userName)
+                        }
+                        p.checkAndStoreReviewAssignments(reviewUsers, reviewTeams)
+                        
+                    } else if let data = data as? [AnyHashable: Any], let userList = data["users"] as? [[AnyHashable: Any]], let teamList = data["teams"] as? [[AnyHashable: Any]] {
+                        // New API results
+                        for userName in userList.compactMap({ $0["login"] as? String }) {
+                            reviewUsers.insert(userName)
+                        }
+                        for teamName in teamList.compactMap({ $0["slug"] as? String }) {
+                            reviewTeams.insert(teamName)
+                        }
+                        p.checkAndStoreReviewAssignments(reviewUsers, reviewTeams)
+                        
+                    } else {
+                        p.apiServer.lastSyncSucceeded = false
+                    }
+                }
+            }
+        }
+    }
+
+    @MainActor
     private static func V3_fetchLabelsForCurrentPullRequests(to moc: NSManagedObjectContext, for prs: [PullRequest], callback: @escaping Completion) {
         if prs.isEmpty {
             callback()
@@ -548,6 +570,7 @@ extension API {
         group.notify(queue: .main, execute: callback)
     }
 
+    @MainActor
     private static func V3_fetchLabelsForCurrentIssues(to moc: NSManagedObjectContext, for issues: [Issue], callback: @escaping Completion) {
         if issues.isEmpty {
             callback()
@@ -583,6 +606,7 @@ extension API {
         group.notify(queue: .main, execute: callback)
     }
 
+    @MainActor
     private static func V3_fetchStatusesForCurrentPullRequests(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
         let prs = PullRequest.statusCheckBatch(in: moc)
@@ -630,29 +654,26 @@ extension API {
         group.notify(queue: .main, execute: callback)
     }
     
-    private static func V3_detectAssignedPullRequests(in moc: NSManagedObjectContext, for prs: [PullRequest], callback: @escaping Completion) {
-        if prs.isEmpty {
-            callback()
-            return
-        }
-                
-        let group = DispatchGroup()
-        for p in prs {
-            let apiServer = p.apiServer
-            if let issueLink = p.issueUrl {
-                group.enter()
-                RestAccess.getData(in: issueLink, from: apiServer) { data, lastPage, resultCode in
-                    if resultCode == 200 || resultCode == 404 || resultCode == 410 {
-                        if let d = data as? [AnyHashable : Any] {
-                            p.processAssignmentStatus(from: d, idField: "node_id")
+    @MainActor
+    private static func V3_detectAssignedPullRequests(in moc: NSManagedObjectContext, for prs: [PullRequest]) async {
+        await withTaskGroup(of: Void.self) { group in
+            for p in prs {
+                let apiServer = p.apiServer
+                if let issueLink = p.issueUrl {
+                    do {
+                        let (data, _, resultCode) = try await RestAccess.getData(in: issueLink, from: apiServer)
+                        if resultCode == 200 || resultCode == 404 || resultCode == 410 {
+                            if let d = data as? [AnyHashable : Any] {
+                                p.processAssignmentStatus(from: d, idField: "node_id")
+                            }
+                        } else {
+                            apiServer.lastSyncSucceeded = false
                         }
-                    } else {
+                    } catch {
                         apiServer.lastSyncSucceeded = false
                     }
-                    group.leave()
                 }
             }
         }
-        group.notify(queue: .main, execute: callback)
     }
 }

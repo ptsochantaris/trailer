@@ -1,3 +1,4 @@
+import Cocoa
 
 final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 
@@ -173,57 +174,55 @@ final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 
 		newRepoSpinner.startAnimation(nil)
 		addButton.isEnabled = false
+        defer {
+            self.newRepoSpinner.stopAnimation(nil)
+            self.addButton.isEnabled = true
+        }
 
 		if name == "*" {
-			API.fetchAllRepos(owner: owner, from: server) { error in
-				self.newRepoSpinner.stopAnimation(nil)
-				self.addButton.isEnabled = true
-				preferencesDirty = true
-
-				let alert = NSAlert()
-				if let e = error {
-					alert.messageText = "Fetching Repository Information Failed"
-					alert.informativeText = e.localizedDescription
-				} else {
-					let addedCount = Repo.newItems(of: Repo.self, in: DataManager.main).count
-					alert.messageText = "\(addedCount) repositories added for '\(owner)'"
-					if Settings.displayPolicyForNewPrs == Int(RepoDisplayPolicy.hide.rawValue) && Settings.displayPolicyForNewIssues == Int(RepoDisplayPolicy.hide.rawValue) {
-						alert.informativeText = "WARNING: While \(addedCount) repositories have been added successfully to your list, your default settings specify that they should be hidden. You probably want to change their visibility from the repositories list."
-					} else {
-						alert.informativeText = "The new repositories have been added to your local list. Trailer will refresh after you close preferences to fetch any items from them."
-					}
-					DataManager.saveDB()
-					self.prefs?.reloadRepositories()
-					self.updateRemovableRepos()
-					app.updateAllMenus()
-				}
-				alert.addButton(withTitle: "OK")
-				alert.beginSheetModal(for: self, completionHandler: nil)
-
-			}
+            Task {
+                let alert = NSAlert()
+                do {
+                    try await API.fetchAllRepos(owner: owner, from: server)
+                    preferencesDirty = true
+                    let addedCount = Repo.newItems(of: Repo.self, in: DataManager.main).count
+                    alert.messageText = "\(addedCount) repositories added for '\(owner)'"
+                    if Settings.displayPolicyForNewPrs == Int(RepoDisplayPolicy.hide.rawValue) && Settings.displayPolicyForNewIssues == Int(RepoDisplayPolicy.hide.rawValue) {
+                        alert.informativeText = "WARNING: While \(addedCount) repositories have been added successfully to your list, your default settings specify that they should be hidden. You probably want to change their visibility from the repositories list."
+                    } else {
+                        alert.informativeText = "The new repositories have been added to your local list. Trailer will refresh after you close preferences to fetch any items from them."
+                    }
+                    DataManager.saveDB()
+                    self.prefs?.reloadRepositories()
+                    self.updateRemovableRepos()
+                    app.updateAllMenus()
+                } catch {
+                    alert.messageText = "Fetching Repository Information Failed"
+                    alert.informativeText = error.localizedDescription
+                }
+                alert.addButton(withTitle: "OK")
+                alert.beginSheetModal(for: self, completionHandler: nil)
+            }
 		} else {
-			API.fetchRepo(named: name, owner: owner, from: server) { error in
-
-				self.newRepoSpinner.stopAnimation(nil)
-				self.addButton.isEnabled = true
-				preferencesDirty = true
-
-				let alert = NSAlert()
-				if let e = error {
-					alert.messageText = "Fetching Repository Information Failed"
-					alert.informativeText = e.localizedDescription
-				} else {
-					alert.messageText = "Repository added"
-					if Settings.displayPolicyForNewPrs == Int(RepoDisplayPolicy.hide.rawValue) && Settings.displayPolicyForNewIssues == Int(RepoDisplayPolicy.hide.rawValue) {
-						alert.informativeText = "WARNING: While the repository has been added successfully to your list, your default settings specify that it should be hidden. You probably want to change its visibility from the repositories list."
-					} else {
-						alert.informativeText = "The new repository has been added to your local list. Trailer will refresh after you close preferences to fetch any items from it."
-					}
-					DataManager.saveDB()
-					self.prefs?.reloadRepositories()
-					self.updateRemovableRepos()
-					app.updateAllMenus()
-				}
+            Task {
+                let alert = NSAlert()
+                do {
+                    try await API.fetchRepo(named: name, owner: owner, from: server)
+                    preferencesDirty = true
+                    alert.messageText = "Repository added"
+                    if Settings.displayPolicyForNewPrs == Int(RepoDisplayPolicy.hide.rawValue) && Settings.displayPolicyForNewIssues == Int(RepoDisplayPolicy.hide.rawValue) {
+                        alert.informativeText = "WARNING: While the repository has been added successfully to your list, your default settings specify that it should be hidden. You probably want to change its visibility from the repositories list."
+                    } else {
+                        alert.informativeText = "The new repository has been added to your local list. Trailer will refresh after you close preferences to fetch any items from it."
+                    }
+                    DataManager.saveDB()
+                    self.prefs?.reloadRepositories()
+                    self.updateRemovableRepos()
+                    app.updateAllMenus()
+                } catch {
+                    alert.messageText = "Fetching Repository Information Failed"
+                    alert.informativeText = error.localizedDescription
+                }
 				alert.addButton(withTitle: "OK")
 				alert.beginSheetModal(for: self, completionHandler: nil)
 			}

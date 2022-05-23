@@ -1,5 +1,5 @@
-
 import Foundation
+import Cocoa
 
 final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate, NSTableViewDataSource, NSTabViewDelegate, NSControlTextEditingDelegate {
 
@@ -565,7 +565,9 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		fillServerApiFormFromSelectedServer()
 		fillSnoozeFormFromSelectedPreset()
 
-		API.updateLimitsFromServer()
+        Task {
+            await API.updateLimitsFromServer()
+        }
 		updateStatusTermPreferenceControls()
 		commentAuthorBlacklist.objectValue = Settings.commentAuthorBlacklist
         labelFilteringBlacklist.objectValue = Settings.labelBlacklist
@@ -718,7 +720,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
             a.resetSyncState()
         }
         DataManager.saveDB()
-        RestAccess.clearAllBadLinks()
         app.updateAllMenus()
         app.startRefresh()
     }
@@ -808,7 +809,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		o.isExtensionHidden = true
 		o.allowedFileTypes = ["app"]
 		o.beginSheetModal(for: self) { [weak self] response in
-			if response.rawValue == NSFileHandlingPanelOKButton, let url = o.url {
+            if response == .OK, let url = o.url {
 				Settings.defaultAppForOpeningItems = url.path
 				self?.defaultOpenApp.stringValue = url.path
 			}
@@ -824,7 +825,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		o.isExtensionHidden = true
 		o.allowedFileTypes = ["app"]
 		o.beginSheetModal(for: self) { [weak self] response in
-			if response.rawValue == NSFileHandlingPanelOKButton, let url = o.url {
+            if response == .OK, let url = o.url {
 				Settings.defaultAppForOpeningWeb = url.path
 				self?.defaultOpenLinks.stringValue = url.path
 			}
@@ -1178,29 +1179,29 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	func refreshRepos() {
         API.isRefreshing = true
 		let tempContext = DataManager.buildChildContext()
-		API.fetchRepositories(to: tempContext) {
-
-			if ApiServer.shouldReportRefreshFailure(in: tempContext) {
-				var errorServers = [String]()
-				for apiServer in ApiServer.allApiServers(in: tempContext) {
-					if apiServer.goodToGo && !apiServer.lastSyncSucceeded {
-						errorServers.append(S(apiServer.label))
-					}
-				}
-
-				let serverNames = errorServers.joined(separator: ", ")
-
-				let alert = NSAlert()
-				alert.messageText = "Error"
-				alert.informativeText = "Could not refresh repository list from \(serverNames), please ensure that the tokens you are using are valid"
-				alert.addButton(withTitle: "OK")
-				alert.runModal()
+        Task {
+            await API.fetchRepositories(to: tempContext)
+            if ApiServer.shouldReportRefreshFailure(in: tempContext) {
+                var errorServers = [String]()
+                for apiServer in ApiServer.allApiServers(in: tempContext) {
+                    if apiServer.goodToGo && !apiServer.lastSyncSucceeded {
+                        errorServers.append(S(apiServer.label))
+                    }
+                }
+                
+                let serverNames = errorServers.joined(separator: ", ")
+                
+                let alert = NSAlert()
+                alert.messageText = "Error"
+                alert.informativeText = "Could not refresh repository list from \(serverNames), please ensure that the tokens you are using are valid"
+                alert.addButton(withTitle: "OK")
+                alert.runModal()
             } else if tempContext.hasChanges {
                 try? tempContext.save()
-			}
-			DataItem.nukeDeletedItems(in: DataManager.main)
+            }
+            DataItem.nukeDeletedItems(in: DataManager.main)
             API.isRefreshing = false
-		}
+        }
 	}
 
 	private var selectedServer: ApiServer? {
@@ -1253,7 +1254,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		s.nameFieldStringValue = "Trailer Settings"
 		s.allowedFileTypes = ["trailerSettings"]
 		s.beginSheetModal(for: self) { response in
-			if response.rawValue == NSFileHandlingPanelOKButton, let url = s.url {
+            if response == .OK, let url = s.url {
 				Settings.writeToURL(url)
 				DLog("Exported settings to %@", url.absoluteString)
 			}
@@ -1269,7 +1270,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		o.isExtensionHidden = false
 		o.allowedFileTypes = ["trailerSettings"]
 		o.beginSheetModal(for: self) { response in
-			if response.rawValue == NSFileHandlingPanelOKButton, let url = o.url {
+            if response == .OK, let url = o.url {
                 DispatchQueue.main.async {
 					app.tryLoadSettings(from: url, skipConfirm: Settings.dontConfirmSettingsImport)
 				}
@@ -1373,57 +1374,36 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBAction private func testApiServerSelected(_ sender: NSButton) {
 		sender.isEnabled = false
 		let apiServer = selectedServer!
-        let group = DispatchGroup()
 
-        var finalSuccess = true
-        var finalError: Error?
-        var failedPath: String?
-        
-        if apiServer.graphQLPath != nil {
-            DLog("Checking GraphQL interface on \(S(apiServer.graphQLPath))")
-            group.enter()
-            GraphQL.testApi(to: apiServer) { success, error in
-                if let e = error {
-                    finalError = e
-                    finalSuccess = false
-                    failedPath = apiServer.graphQLPath
-                } else if !success {
-                    finalSuccess = false
-                    failedPath = apiServer.graphQLPath
-                }
-                group.leave()
-            }
-        }
-        
-        group.enter()
-		API.testApi(to: apiServer) { error in
-            if let e = error {
-                finalError = e
-                finalSuccess = false
-                failedPath = apiServer.apiPath
-            }
-            group.leave()
-		}
-        
-        group.notify(queue: .main) {
+        Task {
             let alert = NSAlert()
-            if let e = finalError {
-                alert.messageText = "The test failed for \(S(failedPath))"
-                alert.informativeText = e.localizedDescription
-            } else if !finalSuccess {
-                alert.messageText = "The test failed for \(S(failedPath))"
-                alert.informativeText = "There was no network error"
-            } else {
-                alert.messageText = "This API server seems OK!"
+            alert.messageText = "This API server seems OK!"
+
+            if apiServer.graphQLPath != nil {
+                DLog("Checking GraphQL interface on \(S(apiServer.graphQLPath))")
+                                
+                do {
+                    try await GraphQL.testApi(to: apiServer)
+                } catch {
+                    alert.messageText = "The test failed for \(S(apiServer.graphQLPath))"
+                    alert.informativeText = error.localizedDescription
+                }
             }
+            
+            do {
+                try await API.testApi(to: apiServer)
+            } catch {
+                alert.messageText = "The test failed for \(S(apiServer.apiPath))"
+                alert.informativeText = error.localizedDescription
+            }
+            
             alert.addButton(withTitle: "OK")
             alert.runModal()
             sender.isEnabled = true
         }
 	}
 
-	@IBAction private func apiRestoreDefaultsSelected(_ sender: NSButton)
-	{
+	@IBAction private func apiRestoreDefaultsSelected(_ sender: NSButton) {
 		if let apiServer = selectedServer {
 			apiServer.resetToGithub()
 			fillServerApiFormFromSelectedServer()

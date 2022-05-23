@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -104,7 +104,7 @@
                                                 <rect key="frame" x="224" y="17" width="15" height="102"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
-                                            <tableHeaderView key="headerView" id="GLY-La-oaP">
+                                            <tableHeaderView key="headerView" wantsLayer="YES" id="GLY-La-oaP">
                                                 <rect key="frame" x="0.0" y="0.0" width="238" height="17"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </tableHeaderView>
@@ -350,7 +350,7 @@ Token</string>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <clipView key="contentView" id="hCD-zR-3bF">
                                                 <rect key="frame" x="1" y="1" width="869" height="318"/>
-                                                <autoresizingMask key="autoresizingMask"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" rowHeight="20" headerView="qia-ub-v1J" id="6pK-a1-URw">
                                                         <rect key="frame" x="0.0" y="0.0" width="869" height="301"/>
@@ -359,7 +359,7 @@ Token</string>
                                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                         <tableColumns>
-                                                            <tableColumn identifier="repos" editable="NO" width="369" minWidth="100" maxWidth="10000" id="nW5-Ng-D0l">
+                                                            <tableColumn identifier="repos" editable="NO" width="389" minWidth="100" maxWidth="10000" id="nW5-Ng-D0l">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Watched Repository">
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.33333298560000002" alpha="1" colorSpace="calibratedWhite"/>
@@ -447,7 +447,7 @@ Token</string>
                                                 <rect key="frame" x="224" y="17" width="15" height="102"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
-                                            <tableHeaderView key="headerView" id="qia-ub-v1J">
+                                            <tableHeaderView key="headerView" wantsLayer="YES" id="qia-ub-v1J">
                                                 <rect key="frame" x="0.0" y="0.0" width="869" height="17"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </tableHeaderView>
@@ -626,7 +626,7 @@ Token</string>
                                                     </view>
                                                 </box>
                                                 <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="14" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" fixedFrame="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TRE-eo-aLK">
-                                                    <rect key="frame" x="18" y="46" width="395" height="346"/>
+                                                    <rect key="frame" x="18" y="45" width="395" height="346"/>
                                                     <subviews>
                                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="Efg-Id-lOP">
                                                             <rect key="frame" x="-2" y="329" width="336" height="18"/>
@@ -880,7 +880,7 @@ Token</string>
                                                         </subviews>
                                                     </view>
                                                 </box>
-                                                <box autoresizesSubviews="NO" fixedFrame="YES" boxType="secondary" borderType="line" title="Refreshing" translatesAutoresizingMaskIntoConstraints="NO" id="zpr-xa-Rug">
+                                                <box autoresizesSubviews="NO" fixedFrame="YES" borderType="line" title="Refreshing" translatesAutoresizingMaskIntoConstraints="NO" id="zpr-xa-Rug">
                                                     <rect key="frame" x="502" y="16" width="346" height="104"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                                     <view key="contentView" id="LeE-vI-Qal">
@@ -954,7 +954,7 @@ Token</string>
                                                         </subviews>
                                                     </view>
                                                 </box>
-                                                <box autoresizesSubviews="NO" fixedFrame="YES" boxType="secondary" borderType="line" title="When searching, check…" translatesAutoresizingMaskIntoConstraints="NO" id="qj6-v4-SsR">
+                                                <box autoresizesSubviews="NO" fixedFrame="YES" borderType="bezel" title="When searching, check…" translatesAutoresizingMaskIntoConstraints="NO" id="qj6-v4-SsR">
                                                     <rect key="frame" x="433" y="87" width="162" height="274"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                     <view key="contentView" id="Cga-gV-Gct">
@@ -1904,7 +1904,7 @@ Tip: Reactions are treated like comments, i.e. the rules about being notified on
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" heightSizable="YES"/>
                                             <clipView key="contentView" id="Fou-QI-zfT">
                                                 <rect key="frame" x="1" y="1" width="377" height="383"/>
-                                                <autoresizingMask key="autoresizingMask"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="20" id="EjH-yo-GqO">
                                                         <rect key="frame" x="0.0" y="0.0" width="377" height="383"/>
@@ -2762,7 +2762,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
             </connections>
             <point key="canvasLocation" x="221" y="164"/>
         </window>
-        <customObject id="cxZ-vL-Iwq" customClass="SUUpdater"/>
+        <customObject id="cxZ-vL-Iwq" customClass="SPUStandardUpdaterController"/>
         <userDefaultsController representsSharedInstance="YES" id="GWg-nl-JjT"/>
     </objects>
 </document>

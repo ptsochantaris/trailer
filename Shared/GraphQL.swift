@@ -55,7 +55,7 @@ final class GraphQL {
         GQLField(name: "permalink")
     ])
 
-    static func testApi(to apiServer: ApiServer, completion: @escaping (Bool, Error?) -> Void) {
+    static func testApi(to apiServer: ApiServer) async throws {
         var gotUserNode = false
         let testQuery = GQLQuery(name: "Testing", rootElement: GQLGroup(name: "viewer", fields: [userFragment])) { node in
             DLog("Got a node, type: \(node.elementType), id: \(node.id)")
@@ -64,14 +64,14 @@ final class GraphQL {
             }
             return true
         }
-        testQuery.run(for: apiServer.graphQLPath ?? "", authToken: apiServer.authToken ?? "", attempt: 0) { error, updatedStats in
-            DispatchQueue.main.async {
-                completion(gotUserNode, error)
-            }
+        _ = try await testQuery.run(for: apiServer.graphQLPath ?? "", authToken: apiServer.authToken ?? "", attempt: 0)
+        if !gotUserNode {
+            throw API.apiError("Could not read a valid user record from this endpoint")
         }
     }
 
-    static func update<T: ListableItem>(for items: [T], of type: T.Type, in moc: NSManagedObjectContext, steps: API.SyncSteps, callback: @escaping (Error?) -> Void) {
+    @MainActor
+    static func update<T: ListableItem>(for items: [T], of type: T.Type, in moc: NSManagedObjectContext, steps: API.SyncSteps) async throws {
         let typeName = String(describing: T.self)
         
         var elements: [GQLElement] = [idField]
@@ -162,10 +162,10 @@ final class GraphQL {
         
         let fields = [GQLFragment(on: typeName, elements: elements)]
 
-        process(name: steps.toString, elementTypes: elementTypes, items: items, parentType: T.self, fields: fields, callback: callback)
+        try await process(name: steps.toString, elementTypes: elementTypes, items: items, parentType: T.self, fields: fields)
     }
     
-    static func updateReactions(for comments: [PRComment], moc: NSManagedObjectContext, callback: @escaping (Error?) -> Void) {
+    static func updateReactions(for comments: [PRComment], moc: NSManagedObjectContext) async throws {
         let reactionFragment = GQLFragment(on: "Reaction", elements: [
             idField,
             GQLField(name: "content"),
@@ -178,10 +178,10 @@ final class GraphQL {
             GQLGroup(name: "reactions", fields: [reactionFragment], pageSize: 100)
             ])
         
-        process(name: "Comment Reactions", elementTypes: ["Reaction"], items: comments, fields: [itemFragment], callback: callback)
+        try await process(name: "Comment Reactions", elementTypes: ["Reaction"], items: comments, fields: [itemFragment])
     }
 
-    static func updateComments(for reviews: [Review], moc: NSManagedObjectContext, callback: @escaping (Error?) -> Void) {
+    static func updateComments(for reviews: [Review], moc: NSManagedObjectContext) async throws {
         let commentFragment = GQLFragment(on: "PullRequestReviewComment", elements: commentFields)
         
         let itemFragment = GQLFragment(on: "PullRequestReview", elements: [
@@ -189,17 +189,13 @@ final class GraphQL {
             GQLGroup(name: "comments", fields: [commentFragment], pageSize: 100)
         ])
 
-        process(name: "Review Comments", elementTypes: ["PullRequestReviewComment"], items: reviews, fields: [itemFragment], callback: callback)
+        try await process(name: "Review Comments", elementTypes: ["PullRequestReviewComment"], items: reviews, fields: [itemFragment])
     }
 
-    private static func process<T: ListableItem>(name: String, elementTypes: [String], items: [DataItem], parentType: T.Type? = nil, fields: [GQLElement], callback: @escaping (Error?)->Void) {
+    private static func process<T: ListableItem>(name: String, elementTypes: [String], items: [DataItem], parentType: T.Type? = nil, fields: [GQLElement]) async throws {
         if items.isEmpty {
-            callback(nil)
             return
         }
-        
-        let group = DispatchGroup()
-        var finalError: Error?
         
         let itemsByServer = Dictionary(grouping: items) { $0.apiServer }
         var count = 0
@@ -221,33 +217,20 @@ final class GraphQL {
                 count += 1
                 if count > 1999 {
                     count = 0
-                    group.enter()
-                    processItems(nodes, server.objectID, parentMoc: server.managedObjectContext, parentType: parentType, group: group)
+                    await processItems(nodes, server.objectID, parentMoc: server.managedObjectContext, parentType: parentType)
                     nodes.removeAll()
                 }
                 return true
             }
-            group.enter()
-            server.run(queries: queries) { error in
-                if count > 0 || error != nil {
-                    DispatchQueue.main.async { // needed in order to be sure this is queued after the node callback
-                        if let error = error {
-                            finalError = error
-                            server.lastSyncSucceeded = false
-                            group.leave()
-                        } else {
-                            processItems(nodes, server.objectID, parentMoc: server.managedObjectContext, parentType: parentType, group: group)
-                        }
-                    }
-                } else {
-                    group.leave()
+            
+            do {
+                try await server.run(queries: queries)
+                if count > 0 {
+                    await processItems(nodes, server.objectID, parentMoc: server.managedObjectContext, parentType: parentType)
                 }
-            }
-        }
-        
-        group.notify(queue: .main) {
-            DispatchQueue.main.async { // needed in order to be sure this is queued after the node callback
-                callback(finalError)
+            } catch {
+                server.lastSyncSucceeded = false
+                throw error
             }
         }
     }
@@ -334,7 +317,7 @@ final class GraphQL {
         return GQLFragment(on: "Issue", elements: elements)
     }
     
-    static func fetchAllAuthoredItems(from servers: [ApiServer], group: DispatchGroup) {
+    static func fetchAllAuthoredItems(from servers: [ApiServer]) async {
 
         for server in servers {
             var authorFields = [GQLGroup]()
@@ -368,26 +351,22 @@ final class GraphQL {
                 count += 1
                 if count > 1999 {
                     count = 0
-                    group.enter()
-                    self.processItems(nodes, server.objectID, parentMoc: server.managedObjectContext, group: group)
+                    await self.processItems(nodes, server.objectID, parentMoc: server.managedObjectContext)
                     nodes.removeAll()
                 }
                 
                 return true
             }
-            group.enter()
-            server.run(queries: [authoredItemsQuery]) { error in
-                if error != nil {
-                    server.lastSyncSucceeded = false
-                    group.leave()
-                } else {
-                    self.processItems(nodes, server.objectID, parentMoc: server.managedObjectContext, group: group)
-                }
+            do {
+                try await server.run(queries: [authoredItemsQuery])
+                await self.processItems(nodes, server.objectID, parentMoc: server.managedObjectContext)
+            } catch {
+                server.lastSyncSucceeded = false
             }
         }
     }
     
-    static func fetchAllSubscribedItems(from repos: [Repo], group: DispatchGroup) {
+    static func fetchAllSubscribedItems(from repos: [Repo]) async {
         
         let latestPrsFragment = GQLFragment(on: "Repository", elements: [
             idField,
@@ -463,8 +442,7 @@ final class GraphQL {
                 count += 1
                 if count > 1999 {
                     count = 0
-                    group.enter()
-                    self.processItems(nodes, server.objectID, parentMoc: server.managedObjectContext, group: group)
+                    await self.processItems(nodes, server.objectID, parentMoc: server.managedObjectContext)
                     nodes.removeAll()
                 }
                 
@@ -513,21 +491,17 @@ final class GraphQL {
                 queriesForServer.append(contentsOf: q)
             }
             
-            group.enter()
-            server.run(queries: queriesForServer) { error in
-                if error != nil {
-                    server.lastSyncSucceeded = false
-                    group.leave()
-                } else {
-                    self.processItems(nodes, server.objectID, parentMoc: server.managedObjectContext, group: group)
-                }
+            do {
+                try await server.run(queries: queriesForServer)
+                await self.processItems(nodes, server.objectID, parentMoc: server.managedObjectContext)
+            } catch {
+                server.lastSyncSucceeded = false
             }
         }
     }
         
-    private static func processItems<T: ListableItem>(_ nodes: [String: ContiguousArray<GQLNode>], _ serverId: NSManagedObjectID, parentMoc: NSManagedObjectContext?, parentType: T.Type? = nil, group: DispatchGroup) {
+    private static func processItems<T: ListableItem>(_ nodes: [String: ContiguousArray<GQLNode>], _ serverId: NSManagedObjectID, parentMoc: NSManagedObjectContext?, parentType: T.Type? = nil) async {
         if nodes.isEmpty {
-            group.leave()
             return
         }
     
@@ -535,50 +509,53 @@ final class GraphQL {
         processMoc.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
         processMoc.parent = parentMoc ?? DataManager.main
         processMoc.undoManager = nil
-        processMoc.perform {
-            if let server = try? processMoc.existingObject(with: serverId) as? ApiServer {
-                
-                // Order must be fixed, since labels may refer to PRs or Issues, ensure they are created first
+        
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            processMoc.perform {
+                if let server = try? processMoc.existingObject(with: serverId) as? ApiServer {
+                    
+                    // Order must be fixed, since labels may refer to PRs or Issues, ensure they are created first
 
-                if let nodeList = nodes["Repository"] {
-                    Repo.sync(from: nodeList, on: server)
+                    if let nodeList = nodes["Repository"] {
+                        Repo.sync(from: nodeList, on: server)
+                    }
+                    if let nodeList = nodes["Issue"] {
+                        Issue.sync(from: nodeList, on: server)
+                    }
+                    if let nodeList = nodes["PullRequest"] {
+                        PullRequest.sync(from: nodeList, on: server)
+                    }
+                    if let nodeList = nodes["Label"] {
+                        PRLabel.sync(from: nodeList, on: server)
+                    }
+                    if let nodeList = nodes["CommentReaction"] {
+                        Reaction.sync(from: nodeList, for: PRComment.self, on: server)
+                    }
+                    if let nodeList = nodes["IssueComment"] {
+                        PRComment.sync(from: nodeList, on: server)
+                    }
+                    if let nodeList = nodes["PullRequestReviewComment"] {
+                        PRComment.sync(from: nodeList, on: server)
+                    }
+                    if let nodeList = nodes["Reaction"], let parentType = parentType {
+                        Reaction.sync(from: nodeList, for: parentType, on: server)
+                    }
+                    if let nodeList = nodes["ReviewRequest"] {
+                        Review.syncRequests(from: nodeList, on: server)
+                    }
+                    if let nodeList = nodes["PullRequestReview"] {
+                        Review.sync(from: nodeList, on: server)
+                    }
+                    if let nodeList = nodes["StatusContext"] {
+                        PRStatus.sync(from: nodeList, on: server)
+                    }
+                    if let nodeList = nodes["CheckRun"] {
+                        PRStatus.sync(from: nodeList, on: server)
+                    }
+                    
+                    try? processMoc.save()
+                    continuation.resume()
                 }
-                if let nodeList = nodes["Issue"] {
-                    Issue.sync(from: nodeList, on: server)
-                }
-                if let nodeList = nodes["PullRequest"] {
-                    PullRequest.sync(from: nodeList, on: server)
-                }
-                if let nodeList = nodes["Label"] {
-                    PRLabel.sync(from: nodeList, on: server)
-                }
-                if let nodeList = nodes["CommentReaction"] {
-                    Reaction.sync(from: nodeList, for: PRComment.self, on: server)
-                }
-                if let nodeList = nodes["IssueComment"] {
-                    PRComment.sync(from: nodeList, on: server)
-                }
-                if let nodeList = nodes["PullRequestReviewComment"] {
-                    PRComment.sync(from: nodeList, on: server)
-                }
-                if let nodeList = nodes["Reaction"], let parentType = parentType {
-                    Reaction.sync(from: nodeList, for: parentType, on: server)
-                }
-                if let nodeList = nodes["ReviewRequest"] {
-                    Review.syncRequests(from: nodeList, on: server)
-                }
-                if let nodeList = nodes["PullRequestReview"] {
-                    Review.sync(from: nodeList, on: server)
-                }
-                if let nodeList = nodes["StatusContext"] {
-                    PRStatus.sync(from: nodeList, on: server)
-                }
-                if let nodeList = nodes["CheckRun"] {
-                    PRStatus.sync(from: nodeList, on: server)
-                }
-                
-                try? processMoc.save()
-                group.leave()
             }
         }
     }

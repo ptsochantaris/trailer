@@ -1,3 +1,4 @@
+import Cocoa
 
 private final class TextFieldCellTextView: NSTextView, NSTextViewDelegate {
 	override func keyDown(with event: NSEvent) {
