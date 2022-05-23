@@ -1,6 +1,6 @@
 
-import Foundation
 import UIKit
+import UniformTypeIdentifiers
 
 final class ImportExport: NSObject, UIDocumentPickerDelegate {
 
@@ -15,7 +15,7 @@ final class ImportExport: NSObject, UIDocumentPickerDelegate {
 	@objc func importSelected(sender: UIBarButtonItem) {
 		tempUrl = nil
 
-		let menu = UIDocumentPickerViewController(documentTypes: ["com.housetrip.mobile.trailer.ios.settings"], in: .import)
+        let menu = UIDocumentPickerViewController(forOpeningContentTypes: [UTType("com.housetrip.mobile.trailer.ios.settings")!])
 		menu.delegate = self
 		popupManager.showPopoverFromViewController(parentViewController: parentVC, fromItem: sender, viewController: menu)
 	}
@@ -25,7 +25,7 @@ final class ImportExport: NSObject, UIDocumentPickerDelegate {
 		tempUrl = URL(fileURLWithPath: tempFilePath)
 		Settings.writeToURL(tempUrl!)
 
-		let menu = UIDocumentPickerViewController(url: tempUrl!, in: .exportToService)
+        let menu = UIDocumentPickerViewController(forExporting: [tempUrl!])
 		menu.delegate = self
 		popupManager.showPopoverFromViewController(parentViewController: parentVC, fromItem: sender, viewController: menu)
 	}
