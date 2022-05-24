@@ -9,33 +9,26 @@ final class RestAccess {
         var nextIncrement: TimeInterval
     }
     
-    static func getPagedData(
-        at path: String,
-        from server: ApiServer,
-        startingFrom page: Int = 1,
-        perPageCallback: @escaping (_ data: [[AnyHashable : Any]]?, _ lastPage: Bool) -> Bool,
-        finalCallback: @escaping (_ success: Bool, _ resultCode: Int) async -> Void) {
-                        
-            Task {
-                if path.isEmpty {
-                    // handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
-                    await finalCallback(true, -1)
-                    return
-                }
-
-                do {
-                    let p = page > 1 ? "\(path)?page=\(page)&per_page=100" : "\(path)?per_page=100"
-                    let (data, lastPage, resultCode) = try await getData(in: p, from: server)
-                    if perPageCallback(data as? [[AnyHashable: Any]], lastPage) || lastPage {
-                        await finalCallback(true, resultCode)
-                    } else {
-                        getPagedData(at: path, from: server, startingFrom: page+1, perPageCallback: perPageCallback, finalCallback: finalCallback)
-                    }
-                } catch {
-                    await finalCallback(false, (error as NSError).code)
-                }
-            }
+    @MainActor
+    static func getPagedData(at path: String, from server: ApiServer, startingFrom page: Int = 1, perPageCallback: @escaping ([[AnyHashable : Any]]? ,Bool) -> Bool) async -> (Bool, Int) {
+        
+        if path.isEmpty {
+            // handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
+            return (true, -1)
         }
+        
+        do {
+            let p = page > 1 ? "\(path)?page=\(page)&per_page=100" : "\(path)?per_page=100"
+            let (data, lastPage, resultCode) = try await getData(in: p, from: server)
+            if perPageCallback(data as? [[AnyHashable: Any]], lastPage) || lastPage {
+                return (true, resultCode)
+            } else {
+                return await getPagedData(at: path, from: server, startingFrom: page+1, perPageCallback: perPageCallback)
+            }
+        } catch {
+            return (false, (error as NSError).code)
+        }
+    }
 
     @MainActor
     static func getData(in path: String, from server: ApiServer, attemptCount: Int = 0) async throws -> (Any?, Bool, Int) {

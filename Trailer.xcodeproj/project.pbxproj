@@ -31,10 +31,7 @@
 		161504601A4651CB001CF50C /* MasterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1615045F1A4651CB001CF50C /* MasterViewController.swift */; };
 		16154E2F19C43E8E00E49139 /* Launch.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 16154E2E19C43E8E00E49139 /* Launch.storyboard */; };
 		1618527D1AB2CB9000526D81 /* NotificationCenter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1618527C1AB2CB9000526D81 /* NotificationCenter.framework */; };
-		161852821AB2CB9000526D81 /* TodayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 161852811AB2CB9000526D81 /* TodayViewController.swift */; };
-		161852841AB2CB9000526D81 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 161852831AB2CB9000526D81 /* MainInterface.storyboard */; };
 		161852871AB2CB9000526D81 /* PocketTrailer Today Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 1618527B1AB2CB9000526D81 /* PocketTrailer Today Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		1618528C1AB2CC8200526D81 /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1618528B1AB2CC8200526D81 /* Media.xcassets */; };
 		161B851C1AB8E12C00AD4C5D /* Team.swift in Sources */ = {isa = PBXBuildFile; fileRef = 161B851B1AB8E12C00AD4C5D /* Team.swift */; };
 		161B851D1AB8E12C00AD4C5D /* Team.swift in Sources */ = {isa = PBXBuildFile; fileRef = 161B851B1AB8E12C00AD4C5D /* Team.swift */; };
 		161C959E1A3A36020019A577 /* MenuWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 161C959D1A3A36020019A577 /* MenuWindow.swift */; };
@@ -195,6 +192,11 @@
 		16F0BAD723A53EBF002EC348 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F0BAD523A53EB4002EC348 /* Colors.swift */; };
 		16F0BAD823A53EC0002EC348 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F0BAD523A53EB4002EC348 /* Colors.swift */; };
 		16F413701BA5850A006B0195 /* RepoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F4136F1BA5850A006B0195 /* RepoCell.swift */; };
+		16FEB782283C4E320029FB0F /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16FEB781283C4E320029FB0F /* WidgetKit.framework */; };
+		16FEB784283C4E320029FB0F /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16FEB783283C4E320029FB0F /* SwiftUI.framework */; };
+		16FEB787283C4E320029FB0F /* PocketTrailer_Widget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FEB786283C4E320029FB0F /* PocketTrailer_Widget.swift */; };
+		16FEB789283C4E330029FB0F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 16FEB788283C4E330029FB0F /* Assets.xcassets */; };
+		16FEB78D283C4E330029FB0F /* PocketTrailer WidgetExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 16FEB780283C4E320029FB0F /* PocketTrailer WidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -226,6 +228,13 @@
 			remoteGlobalIDString = 16DEA921235C6D7C004589B3;
 			remoteInfo = TrailerLauncher;
 		};
+		16FEB78B283C4E330029FB0F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 168BC6A217EC2DF000BC4584 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 16FEB77F283C4E320029FB0F;
+			remoteInfo = "PocketTrailer WidgetExtension";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -236,6 +245,7 @@
 			dstSubfolderSpec = 13;
 			files = (
 				161852871AB2CB9000526D81 /* PocketTrailer Today Extension.appex in Embed App Extensions */,
+				16FEB78D283C4E330029FB0F /* PocketTrailer WidgetExtension.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -309,11 +319,6 @@
 		161852761AB25DFB00526D81 /* Trailer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Trailer.entitlements; sourceTree = "<group>"; };
 		1618527B1AB2CB9000526D81 /* PocketTrailer Today Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "PocketTrailer Today Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1618527C1AB2CB9000526D81 /* NotificationCenter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NotificationCenter.framework; path = System/Library/Frameworks/NotificationCenter.framework; sourceTree = SDKROOT; };
-		161852801AB2CB9000526D81 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		161852811AB2CB9000526D81 /* TodayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = TodayViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		161852831AB2CB9000526D81 /* MainInterface.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = MainInterface.storyboard; sourceTree = "<group>"; };
-		1618528B1AB2CC8200526D81 /* Media.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Media.xcassets; sourceTree = "<group>"; };
-		1618529B1AB2D43C00526D81 /* PocketTrailer Today Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "PocketTrailer Today Extension.entitlements"; sourceTree = "<group>"; };
 		161983301ECD3FFB007ABF9E /* Trailer 36.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 36.xcdatamodel"; sourceTree = "<group>"; };
 		161B851B1AB8E12C00AD4C5D /* Team.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = Team.swift; path = ../Shared/Team.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		161C959D1A3A36020019A577 /* MenuWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = MenuWindow.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -486,6 +491,12 @@
 		16F0BAD923A644C9002EC348 /* Trailer 41.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 41.xcdatamodel"; sourceTree = "<group>"; };
 		16F4136F1BA5850A006B0195 /* RepoCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RepoCell.swift; sourceTree = "<group>"; };
 		16F51FA019DE8C78007B0BB1 /* PRIVACY */ = {isa = PBXFileReference; lastKnownFileType = text; lineEnding = 0; path = PRIVACY; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = "<none>"; };
+		16FEB780283C4E320029FB0F /* PocketTrailer WidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "PocketTrailer WidgetExtension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		16FEB781283C4E320029FB0F /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		16FEB783283C4E320029FB0F /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		16FEB786283C4E320029FB0F /* PocketTrailer_Widget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PocketTrailer_Widget.swift; sourceTree = "<group>"; };
+		16FEB788283C4E330029FB0F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		16FEB78A283C4E330029FB0F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -528,6 +539,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		16FEB77D283C4E320029FB0F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				16FEB784283C4E320029FB0F /* SwiftUI.framework in Frameworks */,
+				16FEB782283C4E320029FB0F /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -546,27 +566,6 @@
 				16878B8123C50D8A00F2213B /* GQLScanning.swift */,
 			);
 			name = V4API;
-			sourceTree = "<group>";
-		};
-		1618527E1AB2CB9000526D81 /* Today Extension */ = {
-			isa = PBXGroup;
-			children = (
-				161852811AB2CB9000526D81 /* TodayViewController.swift */,
-				161852831AB2CB9000526D81 /* MainInterface.storyboard */,
-				1618528B1AB2CC8200526D81 /* Media.xcassets */,
-				1618527F1AB2CB9000526D81 /* Supporting Files */,
-			);
-			name = "Today Extension";
-			path = "PocketTrailer Today Extension";
-			sourceTree = "<group>";
-		};
-		1618527F1AB2CB9000526D81 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				1618529B1AB2D43C00526D81 /* PocketTrailer Today Extension.entitlements */,
-				161852801AB2CB9000526D81 /* Info.plist */,
-			);
-			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 		162002CE1A2A3E0100FF95F3 /* Core */ = {
@@ -695,9 +694,9 @@
 			isa = PBXGroup;
 			children = (
 				1628A6BA18789E73005EDA69 /* App */,
+				16FEB785283C4E320029FB0F /* PocketTrailer Widget */,
 				16522D711AB03AE500B1C3FB /* WatchKit Extension */,
 				16522D801AB03AE500B1C3FB /* WatchKit App */,
-				1618527E1AB2CB9000526D81 /* Today Extension */,
 			);
 			name = "Pocket Trailer";
 			sourceTree = "<group>";
@@ -785,6 +784,7 @@
 				16522D7C1AB03AE500B1C3FB /* PocketTrailer WatchKit App.app */,
 				1618527B1AB2CB9000526D81 /* PocketTrailer Today Extension.appex */,
 				16DEA922235C6D7C004589B3 /* TrailerLauncher.app */,
+				16FEB780283C4E320029FB0F /* PocketTrailer WidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -796,6 +796,8 @@
 				1644E8E4214E8E2F00EAE523 /* ClockKit.framework */,
 				1618527C1AB2CB9000526D81 /* NotificationCenter.framework */,
 				16BF6738283B1A1A0028EC13 /* Sparkle.framework */,
+				16FEB781283C4E320029FB0F /* WidgetKit.framework */,
+				16FEB783283C4E320029FB0F /* SwiftUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -965,6 +967,16 @@
 			name = Settings;
 			sourceTree = "<group>";
 		};
+		16FEB785283C4E320029FB0F /* PocketTrailer Widget */ = {
+			isa = PBXGroup;
+			children = (
+				16FEB786283C4E320029FB0F /* PocketTrailer_Widget.swift */,
+				16FEB788283C4E330029FB0F /* Assets.xcassets */,
+				16FEB78A283C4E330029FB0F /* Info.plist */,
+			);
+			path = "PocketTrailer Widget";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1000,6 +1012,7 @@
 			dependencies = (
 				16D780471B77E00D00A4D0BE /* PBXTargetDependency */,
 				16D780451B77E00500A4D0BE /* PBXTargetDependency */,
+				16FEB78C283C4E330029FB0F /* PBXTargetDependency */,
 			);
 			name = PocketTrailer;
 			productName = PocketTrailer;
@@ -1077,6 +1090,23 @@
 			productReference = 16DEA922235C6D7C004589B3 /* TrailerLauncher.app */;
 			productType = "com.apple.product-type.application";
 		};
+		16FEB77F283C4E320029FB0F /* PocketTrailer WidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 16FEB790283C4E330029FB0F /* Build configuration list for PBXNativeTarget "PocketTrailer WidgetExtension" */;
+			buildPhases = (
+				16FEB77C283C4E320029FB0F /* Sources */,
+				16FEB77D283C4E320029FB0F /* Frameworks */,
+				16FEB77E283C4E320029FB0F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "PocketTrailer WidgetExtension";
+			productName = "PocketTrailer WidgetExtension";
+			productReference = 16FEB780283C4E320029FB0F /* PocketTrailer WidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -1084,7 +1114,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftMigration = 0700;
-				LastSwiftUpdateCheck = 1110;
+				LastSwiftUpdateCheck = 1340;
 				LastUpgradeCheck = 1200;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
@@ -1141,6 +1171,10 @@
 						CreatedOnToolsVersion = 11.1;
 						ProvisioningStyle = Automatic;
 					};
+					16FEB77F283C4E320029FB0F = {
+						CreatedOnToolsVersion = 13.4;
+						ProvisioningStyle = Automatic;
+					};
 				};
 			};
 			buildConfigurationList = 168BC6A517EC2DF000BC4584 /* Build configuration list for PBXProject "Trailer" */;
@@ -1162,6 +1196,7 @@
 				1618527A1AB2CB9000526D81 /* PocketTrailer Today Extension */,
 				16522D7B1AB03AE500B1C3FB /* PocketTrailer WatchKit App */,
 				16522D6F1AB03AE500B1C3FB /* PocketTrailer WatchKit Extension */,
+				16FEB77F283C4E320029FB0F /* PocketTrailer WidgetExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -1171,8 +1206,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1618528C1AB2CC8200526D81 /* Media.xcassets in Resources */,
-				161852841AB2CB9000526D81 /* MainInterface.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1236,6 +1269,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		16FEB77E283C4E320029FB0F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				16FEB789283C4E330029FB0F /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -1245,7 +1286,6 @@
 			files = (
 				162C44291F37BC6500FD95E2 /* Enums.swift in Sources */,
 				16F0BAD823A53EC0002EC348 /* Colors.swift in Sources */,
-				161852821AB2CB9000526D81 /* TodayViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1426,6 +1466,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		16FEB77C283C4E320029FB0F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				16FEB787283C4E320029FB0F /* PocketTrailer_Widget.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -1448,6 +1496,11 @@
 			isa = PBXTargetDependency;
 			target = 16DEA921235C6D7C004589B3 /* TrailerLauncher */;
 			targetProxy = 16DEA93A235C6F17004589B3 /* PBXContainerItemProxy */;
+		};
+		16FEB78C283C4E330029FB0F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 16FEB77F283C4E320029FB0F /* PocketTrailer WidgetExtension */;
+			targetProxy = 16FEB78B283C4E330029FB0F /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1537,6 +1590,7 @@
 		1628A6EA18789E74005EDA69 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = PocketTrailer/PocketTrailer.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -1555,6 +1609,7 @@
 		1628A6EB18789E74005EDA69 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = PocketTrailer/PocketTrailer.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -1692,7 +1747,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1585;
+				CURRENT_PROJECT_VERSION = 1586;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -1751,7 +1806,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1585;
+				CURRENT_PROJECT_VERSION = 1586;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEPLOYMENT_POSTPROCESSING = YES;
@@ -1903,6 +1958,84 @@
 			};
 			name = Release;
 		};
+		16FEB78E283C4E330029FB0F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = X727JSJUGJ;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "PocketTrailer Widget/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "PocketTrailer Widget";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.housetrip.mobile.trailer.ios.PocketTrailer.PocketTrailer-Widget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		16FEB78F283C4E330029FB0F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = X727JSJUGJ;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "PocketTrailer Widget/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "PocketTrailer Widget";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.housetrip.mobile.trailer.ios.PocketTrailer.PocketTrailer-Widget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1965,6 +2098,15 @@
 			buildConfigurations = (
 				16DEA930235C6D7E004589B3 /* Debug */,
 				16DEA931235C6D7E004589B3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		16FEB790283C4E330029FB0F /* Build configuration list for PBXNativeTarget "PocketTrailer WidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				16FEB78E283C4E330029FB0F /* Debug */,
+				16FEB78F283C4E330029FB0F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

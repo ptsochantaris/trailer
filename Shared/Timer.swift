@@ -5,7 +5,7 @@ final class Timer {
 
 	private let timer = DispatchSource.makeTimerSource(flags: [], queue: .main)
 
-	init(repeats: Bool, interval: TimeInterval, block: @escaping Completion) {
+	init(repeats: Bool, interval: TimeInterval, block: @escaping () -> Void) {
 
 		if repeats {
 			timer.schedule(deadline: .now() + interval, repeating: interval)

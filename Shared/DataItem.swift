@@ -286,7 +286,7 @@ class DataItem: NSManagedObject {
         return Date(timeIntervalSince1970: TimeInterval(t))
     }
         
-    private func populate<T: DataItem>(type: T.Type, node: GQLNode, perItemCallback: (T, GQLNode) -> Void) {
+    private func populate<T: DataItem>(type: T.Type, node: GQLNode) {
         let info = node.jsonPayload
         let entityName = String(describing: type)
         
@@ -329,8 +329,6 @@ class DataItem: NSManagedObject {
         } //else {
             //DLog("Ignoring \(entityName) ID: %@", node.id)
         //}
-        
-        perItemCallback(self as! T, node)
     }
     
     static func syncItems<T: DataItem>(of type: T.Type, from nodes: ContiguousArray<GQLNode>, on server: ApiServer, perItemCallback: (T, GQLNode) -> Void) {
@@ -350,13 +348,15 @@ class DataItem: NSManagedObject {
         for node in validNodes {
             if let existingItem = existingItems.first(where: { $0.nodeId == node.id }) {
                 // there can be multiple updates for an item, because of multiple parents
-                existingItem.populate(type: T.self, node: node, perItemCallback: perItemCallback)
+                existingItem.populate(type: T.self, node: node)
+                perItemCallback(existingItem, node)
             } else if shouldCreate(from: node) {
                 // but only one creation
                 node.created = true
                 let item = NSEntityDescription.insertNewObject(forEntityName: entityName, into: moc) as! T
                 item.apiServer = server
-                item.populate(type: T.self, node: node, perItemCallback: perItemCallback)
+                item.populate(type: T.self, node: node)
+                perItemCallback(item, node)
                 existingItems.append(item)
             }
         }

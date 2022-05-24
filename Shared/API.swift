@@ -331,16 +331,12 @@ final class API {
 			t.postSyncAction = PostSyncAction.delete.rawValue
 		}
 
-        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
-            RestAccess.getPagedData(at: "/user/teams", from: server) { data, lastPage in
-                Team.syncTeams(from: data, server: server)
-                return false
-            } finalCallback: { success, resultCode in
-                if !success {
-                    server.lastSyncSucceeded = false
-                }
-                continuation.resume()
-            }
+        let (success, _) = await RestAccess.getPagedData(at: "/user/teams", from: server) { data, lastPage in
+            Team.syncTeams(from: data, server: server)
+            return false
+        }
+        if !success {
+            server.lastSyncSucceeded = false
         }
 	}
 
@@ -455,26 +451,22 @@ final class API {
 	}
 
     @MainActor
-	private static func syncWatchedRepos(from server: ApiServer) async {
-		if !server.lastSyncSucceeded {
-			return
-		}
-
-        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
-            let createNewRepos = Settings.automaticallyRemoveDeletedReposFromWatchlist
-            RestAccess.getPagedData(at: "/user/subscriptions", from: server) { data, lastPage in
-                Repo.syncRepos(from: data, server: server, addNewRepos: createNewRepos, manuallyAdded: false)
-                return false
-            } finalCallback: { success, resultCode in
-                if !success {
-                    server.lastSyncSucceeded = false
-                } else if !Settings.automaticallyRemoveDeletedReposFromWatchlist { // Ignore any missing repos in all cases if deleteGoneRepos is false
-                    let reposThatWouldBeDeleted = Repo.items(of: Repo.self, surviving: false, in: server.managedObjectContext!)
-                    for r in reposThatWouldBeDeleted {
-                        r.postSyncAction = PostSyncAction.doNothing.rawValue
-                    }
-                }
-                continuation.resume()
+    private static func syncWatchedRepos(from server: ApiServer) async {
+        if !server.lastSyncSucceeded {
+            return
+        }
+        
+        let createNewRepos = Settings.automaticallyRemoveDeletedReposFromWatchlist
+        let (success, _) = await RestAccess.getPagedData(at: "/user/subscriptions", from: server) { data, lastPage in
+            Repo.syncRepos(from: data, server: server, addNewRepos: createNewRepos, manuallyAdded: false)
+            return false
+        }
+        if !success {
+            server.lastSyncSucceeded = false
+        } else if !Settings.automaticallyRemoveDeletedReposFromWatchlist { // Ignore any missing repos in all cases if deleteGoneRepos is false
+            let reposThatWouldBeDeleted = Repo.items(of: Repo.self, surviving: false, in: server.managedObjectContext!)
+            for r in reposThatWouldBeDeleted {
+                r.postSyncAction = PostSyncAction.doNothing.rawValue
             }
         }
 	}
@@ -497,44 +489,36 @@ final class API {
 	static func fetchAllRepos(owner: String, from server: ApiServer) async throws {
 
         let userPath = "\(server.apiPath ?? "")/users/\(owner)/repos"
-        
-        let userTask = Task {
-            return try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<[[AnyHashable: Any]], Error>) in
-                var userList = [[AnyHashable : Any]]()
-                RestAccess.getPagedData(at: userPath, from: server) { data, lastPage -> Bool in
-                    if let data = data {
-                        userList.append(contentsOf: data)
-                    }
-                    return false
-                } finalCallback: { success, resultCode in
-                    if success {
-                        continuation.resume(returning: userList)
-                    } else {
-                        continuation.resume(throwing: apiError("Operation failed with code \(resultCode)"))
-                    }
+        let userTask = Task { () -> [[AnyHashable : Any]] in
+            var userList = [[AnyHashable : Any]]()
+            let (success, resultCode) = await RestAccess.getPagedData(at: userPath, from: server) { data, lastPage -> Bool in
+                if let data = data {
+                    userList.append(contentsOf: data)
                 }
+                return false
+            }
+            if success {
+                return userList
+            } else {
+                throw apiError("Operation failed with code \(resultCode)")
             }
         }
         
         let orgPath = "\(server.apiPath ?? "")/orgs/\(owner)/repos"
-        let orgTask = Task {
-            return try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<[[AnyHashable: Any]], Error>) in
-                var orgList = [[AnyHashable : Any]]()
-                RestAccess.getPagedData(at: orgPath, from: server) { data, lastPage -> Bool in
-                    if let data = data {
-                        orgList.append(contentsOf: data)
-                    }
-                    return false
-                } finalCallback: { success, resultCode in
-                    if success {
-                        continuation.resume(returning: orgList)
-                    } else {
-                        continuation.resume(throwing: apiError("Operation failed with code \(resultCode)"))
-                    }
+        let orgTask = Task { () -> [[AnyHashable : Any]] in
+            var orgList = [[AnyHashable : Any]]()
+            let (success, resultCode) = await RestAccess.getPagedData(at: orgPath, from: server) { data, lastPage -> Bool in
+                if let data = data {
+                    orgList.append(contentsOf: data)
                 }
+                return false
+            }
+            if success {
+                return orgList
+            } else {
+                throw apiError("Operation failed with code \(resultCode)")
             }
         }
-
 
         let userList = try await userTask.value
         let orgList = try await orgTask.value
