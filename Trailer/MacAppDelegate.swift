@@ -116,13 +116,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         dn.addObserver(self, selector: #selector(themeCheck), name: Notification.Name("AppleInterfaceThemeChangedNotification"), object: nil)
 
 		addHotKeySupport()
-
-        if let updater = SUUpdater.shared() {
-            setUpdateCheckParameters()
-            if !updater.updateInProgress && Settings.checkForUpdatesAutomatically {
-                updater.checkForUpdatesInBackground()
-            }
-        }
+        setUpdateCheckParameters()
         
 		let wn = NSWorkspace.shared.notificationCenter
 		wn.addObserver(self, selector: #selector(systemWillSleep), name: NSWorkspace.willSleepNotification, object: nil)
@@ -149,18 +143,19 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 			self?.startRefreshIfItIsDue()
 		}
 	}
-
-	func setUpdateCheckParameters() {
-		if let s = SUUpdater.shared() {
-			let autoCheck = Settings.checkForUpdatesAutomatically
-			s.automaticallyChecksForUpdates = autoCheck
-			if autoCheck {
-				s.updateCheckInterval = TimeInterval(3600)*TimeInterval(Settings.checkForUpdatesInterval)
-			}
-			DLog("Check for updates set to %@, every %@ seconds", autoCheck, s.updateCheckInterval)
-		}
-	}
-
+    
+    func performUpdateCheck() {
+        self.updater.updater.checkForUpdates()
+    }
+    
+    func setUpdateCheckParameters() {
+        self.updater.updater.updateCheckInterval = TimeInterval(Settings.checkForUpdatesInterval)
+    }
+    
+    private lazy var updater: SPUStandardUpdaterController = {
+        return SPUStandardUpdaterController(startingUpdater: Settings.checkForUpdatesAutomatically, updaterDelegate: self, userDriverDelegate: nil)
+    }()
+    
 	func userNotificationCenter(_ center: NSUserNotificationCenter, shouldPresent notification: NSUserNotification) -> Bool {
 		return false
 	}
@@ -1191,4 +1186,16 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 		}
 		return nil
 	}
+}
+
+extension MacAppDelegate: SPUUpdaterDelegate {
+    func updaterDidNotFindUpdate(_ updater: SPUUpdater) {
+        DLog("No app updates available")
+    }
+    func updaterDidNotFindUpdate(_ updater: SPUUpdater, error: Error) {
+        DLog("Could not look for update: \(error.localizedDescription)")
+    }
+    func updater(_ updater: SPUUpdater, didFindValidUpdate item: SUAppcastItem) {
+        DLog("Found update")
+    }
 }

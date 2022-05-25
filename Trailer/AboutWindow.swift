@@ -12,6 +12,10 @@ final class AboutWindow: NSWindow, NSWindowDelegate {
 		super.init(contentRect: contentRect, styleMask: style, backing: bufferingType, defer: flag)
 		delegate = self
 	}
+    
+    @IBAction func checkForUpdates(sender: NSButton) {
+        app.performUpdateCheck()
+    }
 
 	func windowWillClose(_ notification: Notification) {
 		app.closedAboutWindow()

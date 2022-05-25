@@ -258,7 +258,7 @@ Token</string>
                                                         </connections>
                                                     </textField>
                                                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="q1S-M3-nh6">
-                                                        <rect key="frame" x="240" y="52" width="130" height="17"/>
+                                                        <rect key="frame" x="239" y="52" width="130" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                         <buttonCell key="cell" type="inline" title="Existing Tokens" bezelStyle="inline" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="OhE-A7-jdY">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -350,7 +350,7 @@ Token</string>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <clipView key="contentView" id="hCD-zR-3bF">
                                                 <rect key="frame" x="1" y="1" width="869" height="318"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" rowHeight="20" headerView="qia-ub-v1J" id="6pK-a1-URw">
                                                         <rect key="frame" x="0.0" y="0.0" width="869" height="301"/>
@@ -1904,7 +1904,7 @@ Tip: Reactions are treated like comments, i.e. the rules about being notified on
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" heightSizable="YES"/>
                                             <clipView key="contentView" id="Fou-QI-zfT">
                                                 <rect key="frame" x="1" y="1" width="377" height="383"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="20" id="EjH-yo-GqO">
                                                         <rect key="frame" x="0.0" y="0.0" width="377" height="383"/>
@@ -2361,7 +2361,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" borderType="none" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="YKc-0b-31j">
-                                            <rect key="frame" x="99" y="14" width="724" height="399"/>
+                                            <rect key="frame" x="98" y="14" width="724" height="399"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <view key="contentView" id="J19-q6-ceE">
                                                 <rect key="frame" x="0.0" y="0.0" width="724" height="399"/>
@@ -2494,7 +2494,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                                         <font key="font" metaFont="system"/>
                                                                     </buttonCell>
                                                                     <connections>
-                                                                        <action selector="checkForUpdates:" target="cxZ-vL-Iwq" id="oT4-Z9-cGz"/>
+                                                                        <action selector="checkForUpdatesWithSender:" target="vQH-WF-vh2" id="gmU-Lu-xQg"/>
                                                                     </connections>
                                                                 </button>
                                                             </subviews>
@@ -2762,7 +2762,5 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
             </connections>
             <point key="canvasLocation" x="221" y="164"/>
         </window>
-        <customObject id="cxZ-vL-Iwq" customClass="SPUStandardUpdaterController"/>
-        <userDefaultsController representsSharedInstance="YES" id="GWg-nl-JjT"/>
     </objects>
 </document>

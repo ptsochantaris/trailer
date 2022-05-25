@@ -1468,6 +1468,10 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		app.setUpdateCheckParameters()
 		app.closedPreferencesWindow()
 	}
+    
+    @IBAction func checkForUpdates(sender: NSButton) {
+        app.performUpdateCheck()
+    }
 
 	func controlTextDidChange(_ n: Notification) {
 		guard let obj = n.object as? NSTextField else {
