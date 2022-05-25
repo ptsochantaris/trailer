@@ -798,10 +798,10 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 	var statusItemList: [NSStatusItem] {
 		var list = [NSStatusItem]()
 		for s in menuBarSets {
-			if let i = s.prMenu.statusItem, let v = i.view, v.frame.size.width > 0 {
+			if let i = s.prMenu.statusItem, i.statusView.frame.size.width > 0 {
 				list.append(i)
 			}
-			if let i = s.issuesMenu.statusItem, let v = i.view, v.frame.size.width > 0 {
+			if let i = s.issuesMenu.statusItem, i.statusView.frame.size.width > 0 {
 				list.append(i)
 			}
 		}
@@ -1123,8 +1123,8 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 
 	func statusItem(for view: NSView) -> NSStatusItem? {
 		for d in menuBarSets {
-			if d.prMenu.statusItem?.view === view { return d.prMenu.statusItem }
-			if d.issuesMenu.statusItem?.view === view { return d.issuesMenu.statusItem }
+			if d.prMenu.statusItem?.statusView === view { return d.prMenu.statusItem }
+			if d.issuesMenu.statusItem?.statusView === view { return d.issuesMenu.statusItem }
 		}
 		return nil
 	}

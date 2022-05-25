@@ -1,18 +1,16 @@
 import Cocoa
 
-protocol StatusItemViewDelegate: AnyObject {
-    func statusItemViewSelected(_ statusItemView: StatusItemView)
-}
-
 final class StatusItemView: NSView {
-
-    weak var delegate: StatusItemViewDelegate?
 
 	var icon: NSImage!
 	var textAttributes = [NSAttributedString.Key : Any]()
 	var statusLabel = ""
 	var labelOffset: CGFloat = 0
 	var title: String?
+    
+    override func hitTest(_ point: NSPoint) -> NSView? {
+        return nil
+    }
 
 	var grayOut = false {
 		didSet {
@@ -29,19 +27,10 @@ final class StatusItemView: NSView {
 			}
 		}
 	}
-
-	init(delegate: StatusItemViewDelegate?) {
-        self.delegate = delegate
-		super.init(frame: NSZeroRect)
-	}
-
-	required init?(coder: NSCoder) {
-		fatalError("init(coder:) has not been implemented")
-	}
-
-	override func mouseDown(with theEvent: NSEvent) {
-        delegate?.statusItemViewSelected(self)
-	}
+    
+    override var tag: Int {
+        return 1947
+    }
 
     static private let padding: CGFloat = {
         if #available(macOS 11.0, *) {
@@ -64,20 +53,14 @@ final class StatusItemView: NSView {
     }
 
 	override func draw(_ dirtyRect: NSRect) {
-
-		app.statusItem(for: self)?.drawStatusBarBackground(in: dirtyRect, withHighlight: highlighted)
-
 		var countAttributes = textAttributes
 		let foreground: NSColor
 
-        let dark = isDark
-        
 		if highlighted {
 			foreground = .selectedMenuItemTextColor
-			countAttributes[.foregroundColor] = foreground
-        } else if dark {
+        } else if isDark {
 			foreground = .selectedMenuItemTextColor
-			if countAttributes[.foregroundColor] as! NSColor == NSColor.controlTextColor {
+            if countAttributes[.foregroundColor] as! NSColor == .labelColor {
 				countAttributes[.foregroundColor] = foreground
 			}
 		} else {
@@ -85,7 +68,7 @@ final class StatusItemView: NSView {
 		}
 
 		if grayOut {
-			if dark {
+			if isDark {
 				countAttributes[.foregroundColor] = NSColor.secondaryLabelColor
 			} else {
 				countAttributes[.foregroundColor] = NSColor.disabledControlTextColor

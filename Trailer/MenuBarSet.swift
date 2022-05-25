@@ -71,13 +71,13 @@ final class MenuBarSet {
 			updatePrMenu()
 		}
 		prMenu.refreshMenuItem.title = " Refreshing…"
-		(prMenu.statusItem?.view as? StatusItemView)?.grayOut = grayOut
+		prMenu.statusItem?.statusView.grayOut = grayOut
 		
 		if issuesMenu.messageView != nil {
 			updateIssuesMenu()
 		}
 		issuesMenu.refreshMenuItem.title = " Refreshing…"
-		(issuesMenu.statusItem?.view as? StatusItemView)?.grayOut = grayOut
+		issuesMenu.statusItem?.statusView.grayOut = grayOut
 	}
 	
 	var allowRefresh = false {
@@ -127,10 +127,8 @@ final class MenuBarSet {
 
             DLog("Updating \(type) menu, \(countString) total items")
             
-            let siv = menu.showStatusItem
-
+            let siv = StatusItemView()
 			if siv.grayOut != shouldGray || siv.statusLabel != countString || !compare(dictionary: siv.textAttributes, to: attributes) {
-				// Info has changed, update
 				DLog("Updating \(type) status item")
                 if let img = NSImage(named: NSImage.Name("\(type)Icon")) {
                     var size = img.size
@@ -147,6 +145,12 @@ final class MenuBarSet {
 				siv.title = viewCriterion?.label
 				siv.sizeToFit()
 			}
+            
+            menu.statusItem = NSStatusBar.system.statusItem(withLength: siv.frame.width)
+            menu.statusItem!.button!.addSubview(siv)
+            menu.statusItem!.button!.target = menu
+            menu.statusItem!.button!.action = #selector(MenuWindow.buttonSelected)
+
         } else {
             menu.hideStatusItem()
         }

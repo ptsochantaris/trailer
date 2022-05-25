@@ -359,7 +359,7 @@ final class DataManager {
 		let storeOptions: [AnyHashable : Any] = [
 			NSMigratePersistentStoresAutomaticallyOption: true,
 			NSInferMappingModelAutomaticallyOption: true,
-			NSSQLitePragmasOption: ["synchronous":"NORMAL"]
+			NSSQLitePragmasOption: ["synchronous":"OFF"]
 		]
 
 		let modelPath = Bundle.main.url(forResource: "Trailer", withExtension: "momd")!

@@ -6,7 +6,7 @@ final class SectionHeaderView: UITableViewHeaderFooterView {
 	@IBOutlet var title: UILabel!
 	@IBOutlet var action: UIButton!
 
-	var callback: Completion?
+	var callback: (() -> Void)?
 
 	@IBAction private func buttonSelected(_ sender: UIButton) {
 		callback?()

@@ -1,6 +1,12 @@
 import Cocoa
 
-final class MenuWindow: NSWindow, NSControlTextEditingDelegate, StatusItemViewDelegate {
+extension NSStatusItem {
+    var statusView: StatusItemView {
+        return button!.viewWithTag(1947) as! StatusItemView
+    }
+}
+
+final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
 
 	@IBOutlet var scrollView: NSScrollView!
 	@IBOutlet private var header: ViewAllowsVibrancy!
@@ -49,6 +55,14 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate, StatusItemViewDe
         
         NotificationCenter.default.addObserver(self, selector: #selector(refreshUpdate), name: .SyncProgressUpdate, object: nil)
 	}
+    
+    @objc func buttonSelected() {
+        if isVisible {
+            closeMenu()
+        } else {
+            app.show(menu: self)
+        }
+    }
 
 	func controlTextDidChange(_ obj: Notification) {
 		app.controlTextDidChange(obj)
@@ -63,14 +77,6 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate, StatusItemViewDe
 		}
 	}
 
-	var showStatusItem: StatusItemView {
-		if statusItem == nil {
-			statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-			statusItem!.view = StatusItemView(delegate: self)
-		}
-		return statusItem!.view as! StatusItemView
-	}
-    
     func statusItemViewSelected(_ statusItemView: StatusItemView) {
        if isVisible {
         closeMenu()
@@ -132,7 +138,7 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate, StatusItemViewDe
 
 	func size(andShow makeVisible: Bool) {
 
-		guard let siv = statusItem?.view as? StatusItemView,
+		guard let siv = statusItem?.statusView,
               let windowFrame = siv.window?.frame,
               let screen = NSScreen.screens.first(where: { $0.frame.contains(windowFrame) })
         else { return }
@@ -206,7 +212,7 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate, StatusItemViewDe
 
 	func closeMenu() {
 		if isVisible {
-			if let siv = statusItem?.view as? StatusItemView {
+			if let siv = statusItem?.statusView {
 				siv.highlighted = false
 			}
 			table.deselectAll(nil)

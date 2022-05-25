@@ -517,7 +517,7 @@ UITableViewDragDelegate {
 		tabbing(tabBar, didSelect: item, completion: nil)
 	}
 
-	private func tabbing(_ tabBar: UITabBar, didSelect item: UITabBarItem, completion: Completion?) {
+	private func tabbing(_ tabBar: UITabBar, didSelect item: UITabBarItem, completion: (() -> Void)?) {
 		safeScrollToTop { [weak self] in
 			guard let S = self else { return }
 			S.lastTabIndex = tabBar.items?.firstIndex(of: item) ?? 0
@@ -1138,7 +1138,7 @@ UITableViewDragDelegate {
 		searchTimer.push()
 	}
 
-	private func safeScrollToTop(completion: Completion?) {
+	private func safeScrollToTop(completion: (() -> Void)?) {
 		tableView.contentOffset = tableView.contentOffset // halt any inertial scrolling
         DispatchQueue.main.async { [weak self] in
             guard let S = self else { return }

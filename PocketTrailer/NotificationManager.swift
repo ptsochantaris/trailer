@@ -35,7 +35,7 @@ final class NotificationManager {
 
 		let n = UNUserNotificationCenter.current()
 		n.setNotificationCategories([itemCategory, repoCategory])
-		n.requestAuthorization(options: [.alert, .badge, .sound]) { success, error in
+		n.requestAuthorization(options: .provisional) { success, error in
 			if success {
 				DLog("Successfully registered for local notifications")
 			} else {
