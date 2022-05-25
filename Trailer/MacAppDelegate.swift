@@ -1,6 +1,7 @@
 
 import CoreSpotlight
 import Cocoa
+import Sparkle
 
 enum Theme {
 	case light, dark

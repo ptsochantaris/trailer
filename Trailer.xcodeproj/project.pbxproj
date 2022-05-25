@@ -335,7 +335,6 @@
 		163E45881CD3EB6000B0E2BE /* Trailer 26.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 26.xcdatamodel"; sourceTree = "<group>"; };
 		1644E8E4214E8E2F00EAE523 /* ClockKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ClockKit.framework; path = Platforms/WatchOS.platform/Developer/SDKs/WatchOS5.0.sdk/System/Library/Frameworks/ClockKit.framework; sourceTree = DEVELOPER_DIR; };
 		164785A91A2CE7BD00297764 /* Globals.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = Globals.swift; path = Shared/Globals.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		164785B31A2CE80800297764 /* Trailer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Trailer-Bridging-Header.h"; sourceTree = "<group>"; };
 		164840BE1ACFEA45009E6383 /* AboutWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AboutWindow.xib; sourceTree = "<group>"; };
 		164840C01ACFEA5A009E6383 /* AboutWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutWindow.swift; sourceTree = "<group>"; };
 		164840C21ACFEFA9009E6383 /* MenuWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MenuWindow.xib; sourceTree = "<group>"; };
@@ -553,7 +552,6 @@
 		162002CE1A2A3E0100FF95F3 /* Core */ = {
 			isa = PBXGroup;
 			children = (
-				164785B31A2CE80800297764 /* Trailer-Bridging-Header.h */,
 				162002CF1A2A3E2100FF95F3 /* Application.swift */,
 				16A0B0361A48AC7900B3452D /* MacAppDelegate.swift */,
 				16358F3A1CF138190055F849 /* DataSource.swift */,
@@ -1660,6 +1658,7 @@
 				OTHER_SWIFT_FLAGS = "-D DEBUG";
 				STRIP_INSTALLED_PRODUCT = NO;
 				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = "debug-only";
+				SWIFT_INSTALL_OBJC_HEADER = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				WATCHOS_DEPLOYMENT_TARGET = 7.5;
@@ -1718,6 +1717,7 @@
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_DISABLE_SAFETY_CHECKS = YES;
 				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = off;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
 				SWIFT_REFLECTION_METADATA_LEVEL = none;
 				SWIFT_VERSION = 5.0;
 				WATCHOS_DEPLOYMENT_TARGET = 7.5;
@@ -1746,7 +1746,6 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
-				SWIFT_OBJC_BRIDGING_HEADER = "Trailer/Trailer-Bridging-Header.h";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -1773,7 +1772,6 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
-				SWIFT_OBJC_BRIDGING_HEADER = "Trailer/Trailer-Bridging-Header.h";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
