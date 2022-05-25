@@ -78,112 +78,106 @@ final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
 
 		switch complication.family {
 		case .modularSmall:
-			let t = CLKComplicationTemplateModularSmallStackImage()
-			t.line1ImageProvider = CLKImageProvider(onePieceImage: UIImage(named: issues ? "ComplicationIssues" : "ComplicationPrs")!)
-			t.line2TextProvider = CLKSimpleTextProvider(text: count(issues ? issueCount : prCount, unit: nil))
-			return t
+			return CLKComplicationTemplateModularSmallStackImage(
+                line1ImageProvider: CLKImageProvider(onePieceImage: UIImage(named: issues ? "ComplicationIssues" : "ComplicationPrs")!),
+                line2TextProvider: CLKSimpleTextProvider(text: count(issues ? issueCount : prCount, unit: nil)))
 
 		case .modularLarge:
-			let t = CLKComplicationTemplateModularLargeStandardBody()
-			t.headerImageProvider = CLKImageProvider(onePieceImage: UIImage(named: "ComplicationPrs")!)
-			t.headerTextProvider = CLKSimpleTextProvider(text: count(commentCount, unit: "Comment"))
-			t.body1TextProvider = CLKSimpleTextProvider(text: count(prCount, unit: "Pull Request"))
-			t.body2TextProvider = CLKSimpleTextProvider(text: count(issueCount, unit: "Issue"))
-			return t
+			return CLKComplicationTemplateModularLargeStandardBody(
+                headerImageProvider: CLKImageProvider(onePieceImage: UIImage(named: "ComplicationPrs")!),
+                headerTextProvider: CLKSimpleTextProvider(text: count(commentCount, unit: "Comment")),
+                body1TextProvider: CLKSimpleTextProvider(text: count(prCount, unit: "Pull Request")),
+                body2TextProvider: CLKSimpleTextProvider(text: count(issueCount, unit: "Issue")))
 
-		case .extraLarge:
-			let t = CLKComplicationTemplateExtraLargeColumnsText()
-			t.row1Column2TextProvider = CLKSimpleTextProvider(text: "\(issues ? (issueCount ?? 0) : (prCount ?? 0))")
-			t.row1Column1TextProvider = CLKSimpleTextProvider(text: issues ? "Iss" : "PRs")
-			t.row2Column2TextProvider = CLKSimpleTextProvider(text: commentCount == 0 ? "-" : "\(commentCount)")
-			t.row2Column1TextProvider = CLKSimpleTextProvider(text: "Com")
-			t.column2Alignment = .trailing
-			t.highlightColumn2 = commentCount > 0
-			return t
-
+        case .extraLarge:
+            let t =  CLKComplicationTemplateExtraLargeColumnsText(
+                row1Column1TextProvider: CLKSimpleTextProvider(text: issues ? "Iss" : "PRs"),
+                row1Column2TextProvider: CLKSimpleTextProvider(text: "\(issues ? (issueCount ?? 0) : (prCount ?? 0))"),
+                row2Column1TextProvider: CLKSimpleTextProvider(text: "Com"),
+                row2Column2TextProvider: CLKSimpleTextProvider(text: commentCount == 0 ? "-" : "\(commentCount)"))
+            t.column2Alignment = .trailing
+            t.highlightColumn2 = commentCount > 0
+            return t
+            
 		case .utilitarianSmallFlat, .utilitarianSmall:
-			let t = CLKComplicationTemplateUtilitarianSmallFlat()
-			t.imageProvider = CLKImageProvider(onePieceImage: UIImage(named: issues ? "ComplicationIssues" : "ComplicationPrs")!)
-			t.textProvider = CLKSimpleTextProvider(text: count(issues ? issueCount : prCount, unit: nil))
-			return t
+			return CLKComplicationTemplateUtilitarianSmallFlat(
+                textProvider: CLKSimpleTextProvider(text: count(issues ? issueCount : prCount, unit: nil)),
+                imageProvider: CLKImageProvider(onePieceImage: UIImage(named: issues ? "ComplicationIssues" : "ComplicationPrs")!))
 
 		case .utilitarianLarge:
-			let t = CLKComplicationTemplateUtilitarianLargeFlat()
 			if commentCount > 0 {
-				t.textProvider = CLKSimpleTextProvider(text: count(commentCount, unit: "New Comment"))
+                return CLKComplicationTemplateUtilitarianLargeFlat(textProvider: CLKSimpleTextProvider(text: count(commentCount, unit: "New Comment")))
 			} else if issues {
-				t.textProvider = CLKSimpleTextProvider(text: count(issueCount, unit: "Issue"))
+                return CLKComplicationTemplateUtilitarianLargeFlat(textProvider: CLKSimpleTextProvider(text: count(issueCount, unit: "Issue")))
 			} else {
-				t.textProvider = CLKSimpleTextProvider(text: count(prCount, unit: "Pull Request"))
+                return CLKComplicationTemplateUtilitarianLargeFlat(textProvider: CLKSimpleTextProvider(text: count(prCount, unit: "Pull Request")))
 			}
-			return t
 
 		case .circularSmall:
-			let t = CLKComplicationTemplateCircularSmallStackImage()
-			t.line1ImageProvider = CLKImageProvider(onePieceImage: UIImage(named: issues ? "ComplicationIssues" : "ComplicationPrs")!)
-			t.line2TextProvider = CLKSimpleTextProvider(text: count(issues ? issueCount : prCount, unit: nil))
-			return t
-
-		case .graphicCorner:
-            let t = CLKComplicationTemplateGraphicCornerTextImage()
-            t.imageProvider = CLKFullColorImageProvider(fullColorImage: UIImage(named: issues ? "IssuesCorner" : "PrsCorner")!)
+            return CLKComplicationTemplateCircularSmallStackImage(
+                line1ImageProvider: CLKImageProvider(onePieceImage: UIImage(named: issues ? "ComplicationIssues" : "ComplicationPrs")!),
+                line2TextProvider: CLKSimpleTextProvider(text: count(issues ? issueCount : prCount, unit: nil)))
+            
+        case .graphicCorner:
             if commentCount > 0 {
-                t.textProvider = CLKSimpleTextProvider(text: count(commentCount, unit: "Comment"))
-                t.textProvider.tintColor = .red
+                let p = CLKSimpleTextProvider(text: count(commentCount, unit: "Comment"))
+                p.tintColor = .red
+                return CLKComplicationTemplateGraphicCornerTextImage(
+                    textProvider: p,
+                    imageProvider: CLKFullColorImageProvider(fullColorImage: UIImage(named: issues ? "IssuesCorner" : "PrsCorner")!))
             } else if issues {
-                t.textProvider = CLKSimpleTextProvider(text: count(issueCount, unit: "Issue"))
+                return CLKComplicationTemplateGraphicCornerTextImage(
+                    textProvider: CLKSimpleTextProvider(text: count(issueCount, unit: "Issue")),
+                    imageProvider: CLKFullColorImageProvider(fullColorImage: UIImage(named: issues ? "IssuesCorner" : "PrsCorner")!))
             } else {
-                t.textProvider = CLKSimpleTextProvider(text: count(prCount, unit: "PR"))
+                return CLKComplicationTemplateGraphicCornerTextImage(
+                    textProvider: CLKSimpleTextProvider(text: count(prCount, unit: "PR")),
+                    imageProvider: CLKFullColorImageProvider(fullColorImage: UIImage(named: issues ? "IssuesCorner" : "PrsCorner")!))
             }
-            return t
 
 		case .graphicBezel:
-            let t = CLKComplicationTemplateGraphicBezelCircularText()
-            let img = CLKComplicationTemplateGraphicCircularImage()
-            img.imageProvider = CLKFullColorImageProvider(fullColorImage: UIImage(named: issues ? "ComplicationIssues" : "ComplicationPrs")!)
+            let textProvider: CLKSimpleTextProvider
             if commentCount > 0 {
-                t.textProvider = CLKSimpleTextProvider(text: count(commentCount, unit: "New Comment"))
+                textProvider = CLKSimpleTextProvider(text: count(commentCount, unit: "New Comment"))
             } else if issues {
-                t.textProvider = CLKSimpleTextProvider(text: count(issueCount, unit: "Issue"))
+                textProvider = CLKSimpleTextProvider(text: count(issueCount, unit: "Issue"))
             } else {
-                t.textProvider = CLKSimpleTextProvider(text: count(prCount, unit: "Pull Request"))
+                textProvider = CLKSimpleTextProvider(text: count(prCount, unit: "Pull Request"))
             }
-            t.circularTemplate = img
-            return t
+            let img = CLKComplicationTemplateGraphicCircularImage(
+                imageProvider: CLKFullColorImageProvider(fullColorImage: UIImage(named: issues ? "ComplicationIssues" : "ComplicationPrs")!)
+            )
+            return CLKComplicationTemplateGraphicBezelCircularText(circularTemplate: img, textProvider: textProvider)
 
 		case .graphicCircular:
-            let t = CLKComplicationTemplateGraphicCircularClosedGaugeText()
-            var fill = false
+            let gaugeProvider: CLKSimpleGaugeProvider
+            let centerTextProvider: CLKSimpleTextProvider
             if commentCount > 0 {
-                fill = true
-                t.centerTextProvider = CLKSimpleTextProvider(text: String(commentCount))
-                t.centerTextProvider.tintColor = .red
+                centerTextProvider = CLKSimpleTextProvider(text: String(commentCount))
+                centerTextProvider.tintColor = .red
+                gaugeProvider = CLKSimpleGaugeProvider(style: .fill, gaugeColor: .red, fillFraction: 1)
             } else if issues {
-                t.centerTextProvider = CLKSimpleTextProvider(text: String(issueCount ?? 0))
+                centerTextProvider = CLKSimpleTextProvider(text: String(issueCount ?? 0))
+                gaugeProvider = CLKSimpleGaugeProvider(style: .fill, gaugeColor: .white, fillFraction: 0)
             } else {
-                t.centerTextProvider = CLKSimpleTextProvider(text: String(prCount ?? 0))
+                centerTextProvider = CLKSimpleTextProvider(text: String(prCount ?? 0))
+                gaugeProvider = CLKSimpleGaugeProvider(style: .fill, gaugeColor: .white, fillFraction: 0)
             }
-            if fill {
-                t.gaugeProvider = CLKSimpleGaugeProvider(style: .fill, gaugeColor: .red, fillFraction: 1)
-            } else {
-                t.gaugeProvider = CLKSimpleGaugeProvider(style: .fill, gaugeColor: .white, fillFraction: 0)
-            }
-            return t
+            return CLKComplicationTemplateGraphicCircularClosedGaugeText(gaugeProvider: gaugeProvider, centerTextProvider: centerTextProvider)
 
 		case .graphicRectangular:
-            let t = CLKComplicationTemplateGraphicRectangularStandardBody()
-            t.headerImageProvider = CLKFullColorImageProvider(fullColorImage: UIImage(named: "ComplicationPrs")!)
-            t.headerTextProvider = CLKSimpleTextProvider(text: count(commentCount, unit: "Comment"))
-            t.headerTextProvider.tintColor = commentCount > 0 ? .red : .white
-            t.body1TextProvider = CLKSimpleTextProvider(text: count(prCount, unit: "Pull Request"))
-            t.body2TextProvider = CLKSimpleTextProvider(text: count(issueCount, unit: "Issue"))
-            return t
+            let headerTextProvider = CLKSimpleTextProvider(text: count(commentCount, unit: "Comment"))
+                headerTextProvider.tintColor = commentCount > 0 ? .red : .white
+            return CLKComplicationTemplateGraphicRectangularStandardBody(
+                headerImageProvider: CLKFullColorImageProvider(fullColorImage: UIImage(named: "ComplicationPrs")!),
+                headerTextProvider: headerTextProvider,
+                body1TextProvider: CLKSimpleTextProvider(text: count(prCount, unit: "Pull Request")),
+                body2TextProvider: CLKSimpleTextProvider(text: count(issueCount, unit: "Issue")))
 
         case .graphicExtraLarge:
-            let t = CLKComplicationTemplateGraphicExtraLargeCircularStackText()
-            t.line1TextProvider = CLKSimpleTextProvider(text: "\(issues ? (issueCount ?? 0) : (prCount ?? 0)) \(issues ? "Iss" : "PRs")")
-            t.line2TextProvider = CLKSimpleTextProvider(text: commentCount == 0 ? "- Com" : "\(commentCount) Com")
-            return t
+            return CLKComplicationTemplateGraphicExtraLargeCircularStackText(
+                line1TextProvider: CLKSimpleTextProvider(text: "\(issues ? (issueCount ?? 0) : (prCount ?? 0)) \(issues ? "Iss" : "PRs")"),
+                line2TextProvider: CLKSimpleTextProvider(text: commentCount == 0 ? "- Com" : "\(commentCount) Com"))
             
         @unknown default:
 			abort()
