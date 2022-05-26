@@ -142,16 +142,14 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
 	}
     
     private func wrapBackgroundProcessing(success: Bool) {
-        popupManager.masterController.watchManager.waitForUpdate {
-            if success {
-                DLog("Background fetch completed")
-            } else {
-                DLog("Background fetch FAILED")
-            }
-            self.scheduleRefreshTask()
-            self.backgroundProcessing?.setTaskCompleted(success: success)
-            self.backgroundProcessing = nil
+        if success {
+            DLog("Background fetch completed")
+        } else {
+            DLog("Background fetch FAILED")
         }
+        self.scheduleRefreshTask()
+        self.backgroundProcessing?.setTaskCompleted(success: success)
+        self.backgroundProcessing = nil
     }
     
     private var backgroundTask = UIBackgroundTaskIdentifier.invalid

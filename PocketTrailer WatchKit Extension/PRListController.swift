@@ -7,6 +7,8 @@ final class PRListController: CommonController {
 	@IBOutlet private var table: WKInterfaceTable!
 	@IBOutlet private var statusLabel: WKInterfaceLabel!
 
+    @IBOutlet private var markReeadButton: WKInterfaceButton!
+    
 	private var sectionIndex: Int64!
 	private var type: String!
 	private var selectedIndex: Int?
@@ -68,6 +70,13 @@ final class PRListController: CommonController {
 			loading = true
 		}
 	}
+    
+    override func show(status: String, hideTable: Bool) {
+        if hideTable {
+            markReeadButton.setHidden(true)
+        }
+        super.show(status: status, hideTable: hideTable)
+    }
 
 	private func _requestData(_ command: String?) {
 
@@ -136,17 +145,23 @@ final class PRListController: CommonController {
 
 			if loadingBuffer.isEmpty {
 				show(status: "There are no items in this section", hideTable: true)
+                markReeadButton.setHidden(true)
 
 			} else {
 
 				var index = 0
+                var showRead = false
 				for itemData in loadingBuffer {
 					if let c = table.rowController(at: index) as? PRRow {
 						c.populate(from: itemData)
+                        if c.hasUnread {
+                            showRead = true
+                        }
 					}
 					index += 1
 				}
 
+                markReeadButton.setHidden(!showRead)
 				show(status: "", hideTable: false)
 
 				if let s = selectedIndex {
@@ -157,18 +172,14 @@ final class PRListController: CommonController {
 
 			loadingBuffer.removeAll(keepingCapacity: false)
 		}
+        
+        table.setHidden(false)
 	}
 
 	@IBAction private func markAllReadSelected() {
 		loading = false
 		show(status: "Marking items as read", hideTable: true)
 		requestData(command: "markItemsRead")
-	}
-
-	@IBAction private func refreshSelected() {
-		loading = false
-		show(status: "Starting refresh", hideTable: true)
-		requestData(command: "refresh")
 	}
 
 	override func table(_ table: WKInterfaceTable, didSelectRowAt rowIndex: Int) {

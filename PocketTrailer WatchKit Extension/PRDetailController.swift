@@ -10,8 +10,11 @@ final class PRDetailController: CommonController {
 	private var rowControllers = [PopulatableRow]()
 	private var itemId: String!
 	private var loading = false
-
-	override func awake(withContext context: Any?) {
+    
+    @IBOutlet private var openInAppButton: WKInterfaceButton!
+    @IBOutlet private var markReadButton: WKInterfaceButton!
+    
+    override func awake(withContext context: Any?) {
 		_statusLabel = statusLabel
 		_table = table
 
@@ -54,6 +57,14 @@ final class PRDetailController: CommonController {
         DispatchQueue.main.async { [weak self] in
             self?.completeUpdate(from: item)
         }
+    }
+    
+    override func show(status: String, hideTable: Bool) {
+        if hideTable {
+            markReadButton.setHidden(true)
+            openInAppButton.setHidden(true)
+        }
+        super.show(status: status, hideTable: hideTable)
     }
 
 	private func completeUpdate(from itemInfo: [AnyHashable : Any]) {
@@ -113,13 +124,17 @@ final class PRDetailController: CommonController {
 				}
 				rowCount += 1
 			}
+            markReadButton.setHidden(unreadCount > 0)
 		} else {
 			setTitle("Details")
+            markReadButton.setHidden(true)
 		}
 
 		while table.numberOfRows > rowCount {
 			table.removeRows(at: IndexSet(integer: rowCount))
 		}
+        
+        openInAppButton.setHidden(false)
 
 		show(status: "", hideTable: false)
 	}

@@ -9,7 +9,13 @@ final class SectionController: CommonController {
 	@IBOutlet private var table: WKInterfaceTable!
 	@IBOutlet private var statusLabel: WKInterfaceLabel!
     
-	private var rowControllers = [PopulatableRow]()
+    @IBOutlet private var clearMergedButton: WKInterfaceButton!
+    @IBOutlet private var clearClosedButton: WKInterfaceButton!
+    @IBOutlet private var markReeadButton: WKInterfaceButton!
+    @IBOutlet private var startRefreshButton: WKInterfaceButton!
+    @IBOutlet private var updatedLabel: WKInterfaceLabel!
+    
+    private var rowControllers = [PopulatableRow]()
 
 	override func awake(withContext context: Any?) {
 		_statusLabel = statusLabel
@@ -22,33 +28,11 @@ final class SectionController: CommonController {
 		return false
 	}
 
-	@IBAction private func clearMergedSelected() {
-		show(status: "Clearing merged", hideTable: true)
-		requestData(command: "clearAllMerged")
-	}
-
-	@IBAction private func clearClosedSelected() {
-		show(status: "Clearing closed", hideTable: true)
-		requestData(command: "clearAllClosed")
-	}
-
-	@IBAction private func markAllReadSelected() {
-		show(status: "Marking all as read", hideTable: true)
-		requestData(command: "markEverythingRead")
-	}
-
-	@IBAction private func refreshSelected() {
-		show(status: "Starting refresh", hideTable: true)
-		requestData(command: "refresh")
-	}
-
 	override func requestData(command: String?) {
 		if let c = command {
 			send(request: ["command": c])
-		} else if WCSession.default.receivedApplicationContext.keys.contains("overview") {
-			updateUI()
 		} else {
-			requestData(command: "needsOverview")
+            send(request: ["command": "overview", "list": "overview"])
 		}
 	}
 
@@ -65,7 +49,13 @@ final class SectionController: CommonController {
 
 	override func update(from response: [AnyHashable : Any]) {
 		DispatchQueue.main.async { [weak self] in
-			self?.updateUI()
+            guard let self = self else { return }
+            if let overview = response["result"] as? [AnyHashable: Any] {
+                ExtensionDelegate.storedOverview = overview
+            }
+            self.updateUI()
+            self.startRefreshButton.setHidden(false)
+            self.updatedLabel.setHidden(false)
 		}
 	}
 
@@ -86,6 +76,8 @@ final class SectionController: CommonController {
 		func addSectionsFor(_ entry: [AnyHashable : Any], itemType: String, label: String, apiServerUri: String, showEmptyDescriptions: Bool) {
 			let items = entry[itemType] as! [AnyHashable : Any]
 			let totalItems = items["total"] as! Int
+            var showClearClosed = false
+            var showClearMerged = false
 			if totalItems > 0 {
 				let pt = TitleRow()
                 pt.prRelated = itemType == "prs"
@@ -93,7 +85,15 @@ final class SectionController: CommonController {
 				rowControllers.append(pt)
 				var totalUnread = 0
 				for itemSection in Section.apiTitles {
-					if itemSection == Section.none.apiName { continue }
+                    switch itemSection {
+                    case Section.none.apiName:
+                        continue
+                    case Section.closed.apiName:
+                        showClearClosed = true
+                    case Section.merged.apiName:
+                        showClearMerged = true
+                    default: break
+                    }
 
 					if let section = items[itemSection] as? [AnyHashable : Any], let count = section["total"] as? Int, let unread = section["unread"] as? Int, count > 0 {
 						let s = SectionRow()
@@ -118,19 +118,27 @@ final class SectionController: CommonController {
 					s.apiServerUri = apiServerUri
 					rowControllers.append(s)
 				}
+                markReeadButton.setHidden(totalUnread == 0)
 
 			} else if showEmptyDescriptions {
 				let error = (items["error"] as? String) ?? ""
 				let pt = TitleRow()
                 pt.label = "\(label): \(error)"
 				rowControllers.append(pt)
-			}
+                markReeadButton.setHidden(true)
+                
+            } else {
+                markReeadButton.setHidden(true)
+            }
+            
+            clearMergedButton.setHidden(!showClearMerged)
+            clearClosedButton.setHidden(!showClearClosed)
 		}
 
 		let session = WCSession.default
-		guard let result = session.receivedApplicationContext["overview"] as? [AnyHashable : Any] else {
+        guard let result = ExtensionDelegate.storedOverview else {
 			if session.iOSDeviceNeedsUnlockAfterRebootForReachability {
-				show(status: "Can't connect: To re-establish your secure connection, please unlock your iOS device.", hideTable: true)
+				show(status: "To re-establish your connection, please unlock your iOS device.", hideTable: true)
 			} else {
 				switch session.activationState {
 				case .inactive:
@@ -152,9 +160,8 @@ final class SectionController: CommonController {
 		}
         
         if let update = result["lastUpdated"] as? Date {
-            let u = UpdatedRow()
-            u.label = agoFormat(prefix: "Updated", since: update)
-            rowControllers.append(u)
+            let agoString = agoFormat(prefix: "Updated", since: update)
+            updatedLabel.setText(agoString)
         }
 		
 		let showEmptyDescriptions = views.count == 1
@@ -180,4 +187,35 @@ final class SectionController: CommonController {
 
 		show(status: "", hideTable: false)
 	}
+    
+    override func show(status: String, hideTable: Bool) {
+        if hideTable {
+            startRefreshButton.setHidden(true)
+            clearMergedButton.setHidden(true)
+            markReeadButton.setHidden(true)
+            clearClosedButton.setHidden(true)
+            updatedLabel.setHidden(true)
+        }
+        super.show(status: status, hideTable: hideTable)
+    }
+    
+    @IBAction private func clearMergedSelected() {
+        show(status: "Clearing merged", hideTable: true)
+        requestData(command: "clearAllMerged")
+    }
+
+    @IBAction private func clearClosedSelected() {
+        show(status: "Clearing closed", hideTable: true)
+        requestData(command: "clearAllClosed")
+    }
+
+    @IBAction private func markAllReadSelected() {
+        show(status: "Marking all as read", hideTable: true)
+        requestData(command: "markEverythingRead")
+    }
+
+    @IBAction private func refreshSelected() {
+        show(status: "Starting refresh", hideTable: true)
+        requestData(command: "refresh")
+    }
 }

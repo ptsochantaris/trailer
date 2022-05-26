@@ -19,7 +19,7 @@ final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
 	}
 
 	private func entriesFor(_ complication: CLKComplication, _ handler: @escaping ([CLKComplicationTimelineEntry]?) -> Void) {
-		if let overview = WCSession.default.receivedApplicationContext["overview"] as? [AnyHashable : Any] {
+        if let overview = ExtensionDelegate.storedOverview {
 			processOverview(for: complication, overview, handler)
 		} else {
 			handler(nil)

@@ -4,7 +4,7 @@ import CoreData
 import WatchConnectivity
 
 final class WatchManager : NSObject, WCSessionDelegate {
-
+    
 	private var session: WCSession?
 
 	override init() {
@@ -16,65 +16,11 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		}
 	}
 
-	func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
-		if session.isPaired, session.isWatchAppInstalled, activationState == .activated {
-            DispatchQueue.main.async { [weak self] in
-                guard let S = self else { return }
-				S.sendOverview()
-			}
-		}
-	}
-
-	func sessionReachabilityDidChange(_ session: WCSession) {
-		if session.isPaired, session.isWatchAppInstalled, session.activationState == .activated, session.isReachable {
-            DispatchQueue.main.async { [weak self] in
-                guard let S = self else { return }
-				S.sendOverview()
-			}
-		}
-	}
+    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {}
 
 	func sessionDidDeactivate(_ session: WCSession) {}
 
 	func sessionDidBecomeInactive(_ session: WCSession) {}
-
-	private func sendOverview() {
-
-        guard let session = session,
-            session.isPaired,
-            session.isWatchAppInstalled,
-            session.activationState == .activated,
-            let overview = NSDictionary(contentsOf: overviewPath)
-            else { return }
-        
-        do {
-            try session.updateApplicationContext(["overview": overview])
-        } catch {
-            DLog("Error updating watch session: %@", error.localizedDescription)
-        }
-    }
-
-    private var updateGroup: DispatchGroup?
-    func updateContext() {
-        let u = DispatchGroup()
-        u.enter()
-        updateGroup = u
-        BackgroundTask.registerForBackground()
-		buildOverview { overview in
-			(overview as NSDictionary).write(to: self.overviewPath, atomically: true)
-			self.sendOverview()
-            u.leave()
-            self.updateGroup = nil
-            BackgroundTask.unregisterForBackground()
-		}
-	}
-    func waitForUpdate(callback: @escaping ()->Void) {
-        if let u = updateGroup {
-            u.notify(queue: .main, execute: callback)
-        } else {
-            callback()
-        }
-    }
 
 	private var overviewPath: URL {
 		return DataManager.dataFilesDirectory.appendingPathComponent("overview.plist")
@@ -86,6 +32,12 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			S.handle(message: message, replyHandler: replyHandler)
 		}
 	}
+    
+    func updateContext() {
+        if let session = session, session.isReachable {
+            session.sendMessage(["newInfoAvailable": true], replyHandler: nil)
+        }
+    }
 
 	private func handle(message: [String : Any], replyHandler: @escaping ([String : Any]) -> Void) {
 
@@ -103,6 +55,9 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			case .noConfiguredServers:
 				reportFailure(reason: "Can't refresh, there are no configured servers.", result: [:], replyHandler: replyHandler)
 			}
+            
+        case "overview":
+            processList(message: message, replyHandler: replyHandler)
 
 		case "openItem":
 			if let itemId = message["localId"] as? String {
@@ -149,10 +104,6 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				}
 			}
 			processList(message: message, replyHandler: replyHandler)
-
-		case "needsOverview":
-			sendOverview()
-			reportSuccess(result: [:], replyHandler: replyHandler)
 
 		default:
 			processList(message: message, replyHandler: replyHandler)
