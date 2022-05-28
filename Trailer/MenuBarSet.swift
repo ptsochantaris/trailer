@@ -111,7 +111,6 @@ final class MenuBarSet {
     private func updateMenu(of type: ListableItem.Type,
                             menu: MenuWindow,
                             forceVisible: Bool,
-                            lengthOffset: CGFloat,
                             hasUnread: Bool,
                             reasonForEmpty: @escaping (String) -> NSAttributedString) {
 		
@@ -123,33 +122,29 @@ final class MenuBarSet {
 
             let excludeSnoozed = !Settings.countVisibleSnoozedItems
             let f = ListableItem.requestForItems(of: type, withFilter: menu.filter.stringValue, sectionIndex: -1, criterion: viewCriterion, excludeSnoozed: excludeSnoozed)
-            let countString = somethingFailed ? "X" : String(try! DataManager.main.count(for: f))
+            let countString = somethingFailed ? "X" : (Settings.hideMenubarCounts ? "" : String(try! DataManager.main.count(for: f)))
 
             DLog("Updating \(type) menu, \(countString) total items")
             
             let siv = StatusItemView()
-			if siv.grayOut != shouldGray || siv.statusLabel != countString || !compare(dictionary: siv.textAttributes, to: attributes) {
-				DLog("Updating \(type) status item")
-                if let img = NSImage(named: NSImage.Name("\(type)Icon")) {
-                    var size = img.size
-                    let scale = 16.0 / size.height
-                    size.width *= scale
-                    size.height *= scale
-                    siv.icon = img.resized(to: size, offset: NSPoint(x: 3, y: 3))
-                }
-				siv.textAttributes = attributes
-				siv.labelOffset = lengthOffset
-				siv.highlighted = menu.isVisible
-				siv.grayOut = shouldGray
-				siv.statusLabel = countString
-				siv.title = viewCriterion?.label
-				siv.sizeToFit()
-			}
+            siv.textAttributes = attributes
+            siv.highlighted = menu.isVisible
+            siv.grayOut = shouldGray
+            siv.countLabel = countString
+            siv.title = viewCriterion?.label
+            siv.icon = type == PullRequest.self ? StatusItemView.prIcon : StatusItemView.issueIcon
+            siv.sizeToFit()
             
-            menu.statusItem = NSStatusBar.system.statusItem(withLength: siv.frame.width)
-            menu.statusItem!.button!.addSubview(siv)
-            menu.statusItem!.button!.target = menu
-            menu.statusItem!.button!.action = #selector(MenuWindow.buttonSelected)
+            if let existingItem = menu.statusItem {
+                existingItem.length = siv.frame.width
+                existingItem.button!.viewWithTag(siv.tag)?.removeFromSuperview()
+            } else {
+                menu.statusItem = NSStatusBar.system.statusItem(withLength: siv.frame.width)
+            }
+            let button = menu.statusItem!.button!
+            button.addSubview(siv)
+            button.target = menu
+            button.action = #selector(MenuWindow.buttonSelected)
 
         } else {
             menu.hideStatusItem()
@@ -170,7 +165,7 @@ final class MenuBarSet {
 		if forceVisible || Repo.mayProvideIssuesForDisplay(fromServerWithId: viewCriterion?.apiServerId) {
 			
             let hasUnread = Issue.badgeCount(in: DataManager.main, criterion: viewCriterion) > 0
-            updateMenu(of: Issue.self, menu: issuesMenu, forceVisible: forceVisible, lengthOffset: 1.5, hasUnread: hasUnread) {
+            updateMenu(of: Issue.self, menu: issuesMenu, forceVisible: forceVisible, hasUnread: hasUnread) {
                 Issue.reasonForEmpty(with: $0, criterion: self.viewCriterion)
 			}
 			
@@ -184,7 +179,7 @@ final class MenuBarSet {
 		if forceVisible || Repo.mayProvidePrsForDisplay(fromServerWithId: sid) || !Repo.mayProvideIssuesForDisplay(fromServerWithId: sid) {
 			
             let hasUnread = PullRequest.badgeCount(in: DataManager.main, criterion: viewCriterion) > 0
-            updateMenu(of: PullRequest.self, menu: prMenu, forceVisible: forceVisible, lengthOffset: -2, hasUnread: hasUnread) {
+            updateMenu(of: PullRequest.self, menu: prMenu, forceVisible: forceVisible, hasUnread: hasUnread) {
                 PullRequest.reasonForEmpty(with: $0, criterion: self.viewCriterion)
 			}
 			

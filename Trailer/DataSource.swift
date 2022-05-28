@@ -17,7 +17,7 @@ extension MenuWindow {
             iodD.expressionResultType = .objectIDAttributeType
             
             let sectionIndexD = NSExpressionDescription()
-            sectionIndexD.name = "sectionIndex"
+            sectionIndexD.name = "si"
             sectionIndexD.expression = NSExpression(format: "sectionIndex")
             sectionIndexD.expressionResultType = .integer16AttributeType
             
@@ -65,11 +65,11 @@ extension MenuWindow {
             itemIds.reserveCapacity(allItems.count + sections.count)
             
             if let firstItem = allItems.first {
-                var lastSection = firstItem["sectionIndex"] as! Int
+                var lastSection = firstItem["si"] as! Int
                 itemIds.append(sections[lastSection])
                 
                 for item in allItems {
-                    let i = item["sectionIndex"] as! Int
+                    let i = item["si"] as! Int
                     if lastSection < i {
                         itemIds.append(sections[i])
                         lastSection = i

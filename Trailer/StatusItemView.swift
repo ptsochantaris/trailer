@@ -4,8 +4,7 @@ final class StatusItemView: NSView {
 
 	var icon: NSImage!
 	var textAttributes = [NSAttributedString.Key: Any]()
-	var statusLabel = ""
-	var labelOffset: CGFloat = 0
+	var countLabel = ""
 	var title: String?
     
     override func hitTest(_ point: NSPoint) -> NSView? {
@@ -31,21 +30,56 @@ final class StatusItemView: NSView {
     override var tag: Int {
         return 1947
     }
+    
+    static let prIcon: NSImage = {
+        let img = NSImage(named: NSImage.Name("PullRequestIcon"))!
+        var size = img.size
+        let scale = 16.0 / size.height
+        size.width *= scale
+        size.height *= scale
+        return img.resized(to: size, offset: NSPoint(x: 3, y: 3))
+    }()
 
-    static private let padding: CGFloat = {
-        if #available(macOS 11.0, *) {
-            return 0
-        } else {
-            return 1
-        }
+    static let issueIcon: NSImage = {
+        let img = NSImage(named: NSImage.Name("IssueIcon"))!
+        var size = img.size
+        let scale = 16.0 / size.height
+        size.width *= scale
+        size.height *= scale
+        return img.resized(to: size, offset: NSPoint(x: 3, y: 3))
     }()
     
+    private func titleAttributes(foregorund: NSColor) -> [NSAttributedString.Key: Any] {
+        let p = NSMutableParagraphStyle()
+        p.alignment = .center
+        p.lineBreakMode = .byTruncatingMiddle
+        return [
+            .foregroundColor: foregorund,
+            .font: NSFont.menuFont(ofSize: 6),
+            .paragraphStyle: p
+        ]
+    }
+    
+    private let labelSpacing: CGFloat = 2
+    
 	func sizeToFit() {
-		let width = Settings.hideMenubarCounts ? (title == nil ? 0 : 4) : statusLabel.size(withAttributes: textAttributes).width
-		let H = NSStatusBar.system.thickness
-		let itemWidth = (H + width + StatusItemView.padding * 3) + labelOffset
-		frame = CGRect(x: 0, y: 0, width: itemWidth, height: H)
-		needsDisplay = true
+        let H = NSStatusBar.system.thickness
+        var itemWidth: CGFloat = 0
+        if let title = title {
+            itemWidth = icon.size.width - 6
+            let titleWidth = title.size(withAttributes: titleAttributes(foregorund: .appLabel)).width
+            itemWidth = max(itemWidth, titleWidth)
+        } else {
+            itemWidth = icon.size.width
+        }
+        
+        if !countLabel.isEmpty {
+            let countWidth = countLabel.size(withAttributes: textAttributes).width
+            let extra = title == nil ? 0 : labelSpacing
+            itemWidth = max(itemWidth, countWidth + icon.size.width + extra)
+        }
+        
+        frame = CGRect(x: 0, y: 0, width: itemWidth, height: H)
 	}
     
     private var isDark: Bool {
@@ -75,77 +109,31 @@ final class StatusItemView: NSView {
 			}
 		}
 
-		if Settings.hideMenubarCounts {
-			drawIconOnly(titleColor: foreground, countAttributes: countAttributes, inRect: dirtyRect)
-		} else {
-			drawStandard(titleColor: foreground, countAttributes: countAttributes, inRect: dirtyRect)
-		}
-	}
-
-	private func drawStandard(titleColor: NSColor, countAttributes: [NSAttributedString.Key: Any], inRect: NSRect) {
-
-		let imagePoint = CGPoint(x: StatusItemView.padding, y: 0)
-		var labelRect = CGRect(x: bounds.size.height + labelOffset, y: -5, width: bounds.size.width, height: bounds.size.height)
-		let img = tintedImage(from: icon, tint: titleColor)
+		let tintedIcon = tintedImage(from: icon, tint: foreground)
 
 		if let t = title {
-			labelRect = labelRect.offsetBy(dx: -3, dy: -3)
+			let r = CGRect(x: 0, y: dirtyRect.height-7, width: dirtyRect.width, height: 7)
+			t.draw(in: r, withAttributes: titleAttributes(foregorund: foreground))
 
-			let r = CGRect(x: 1, y: inRect.height-7, width: inRect.width-2, height: 7)
-			let p = NSMutableParagraphStyle()
-			p.alignment = .center
-			p.lineBreakMode = .byTruncatingMiddle
-			t.draw(in: r, withAttributes: [
-				NSAttributedString.Key.foregroundColor: titleColor,
-				NSAttributedString.Key.font: NSFont.menuFont(ofSize: 6),
-				NSAttributedString.Key.paragraphStyle: p
-				])
+            let iconWidth = tintedIcon.size.width - 6
+            let countLabelWidth = countLabel.size(withAttributes: textAttributes).width
+            let startX = ((dirtyRect.width - (iconWidth + labelSpacing + countLabelWidth)) * 0.5).rounded(.up)
 
-			img.draw(in: CGRect(x: imagePoint.x+3, y: imagePoint.y, width: img.size.width-6, height: img.size.height-6))
-            
+            tintedIcon.draw(in: CGRect(x: startX, y: 0, width: iconWidth, height: tintedIcon.size.height - 6))
+
+            let countLabelRect = CGRect(x: startX + iconWidth + labelSpacing, y: -8, width: countLabelWidth, height: bounds.size.height)
+            countLabel.draw(in: countLabelRect, withAttributes: countAttributes)
+
 		} else {
-            img.draw(at: imagePoint, from: .zero, operation: .sourceOver, fraction: 1.0)
-		}
+            tintedIcon.draw(at: .zero, from: .zero, operation: .sourceOver, fraction: 1)
 
-		statusLabel.draw(in: labelRect, withAttributes: countAttributes)
-	}
-
-	private func drawIconOnly(titleColor: NSColor, countAttributes: [NSAttributedString.Key: Any], inRect: NSRect) {
-
-		let foreground = countAttributes[NSAttributedString.Key.foregroundColor] as! NSColor
-
-		if let t = title {
-
-			let r = CGRect(x: 1, y: inRect.height-7, width: inRect.width-2, height: 7)
-			let p = NSMutableParagraphStyle()
-			p.alignment = .center
-			p.lineBreakMode = .byTruncatingMiddle
-			t.draw(in: r, withAttributes: [
-				NSAttributedString.Key.foregroundColor: titleColor,
-				NSAttributedString.Key.font: NSFont.menuFont(ofSize: 6),
-				NSAttributedString.Key.paragraphStyle: p
-				])
-			
-			if statusLabel == "X" {
-				let w = statusLabel.size(withAttributes: countAttributes).width
-				let rect = CGRect(x: (inRect.width - w)*0.5, y: -4, width: w, height: inRect.size.height - 4)
-				statusLabel.draw(in: rect, withAttributes: countAttributes)
-			} else {
-				let img = tintedImage(from: icon, tint: foreground)
-				let w = img.size.width - 6
-				let rect = CGRect(x: (inRect.width - w)*0.5, y: 0, width: w, height: img.size.height - 6)
-				img.draw(in: rect)
-			}
-		} else {
-
-			if statusLabel == "X" {
-				let s = statusLabel.size(withAttributes: countAttributes)
-				let rect = CGRect(x: (inRect.width - s.width)*0.5, y: (inRect.height - s.height)*0.5, width: s.width, height: s.height)
-				statusLabel.draw(in: rect, withAttributes: countAttributes)
-			} else {
-				let img = tintedImage(from: icon, tint: foreground)
-                img.draw(at: CGPoint(x: (inRect.width - img.size.width)*0.5, y: 0), from: .zero, operation: .sourceOver, fraction: 1.0)
-			}
+            let countLabelRect: CGRect
+            if icon === StatusItemView.prIcon {
+                countLabelRect = CGRect(x: bounds.size.height - 2, y: -5, width: bounds.size.width, height: bounds.size.height)
+            } else {
+                countLabelRect = CGRect(x: bounds.size.height - 0, y: -5, width: bounds.size.width, height: bounds.size.height)
+            }
+            countLabel.draw(in: countLabelRect, withAttributes: countAttributes)
 		}
 	}
 
