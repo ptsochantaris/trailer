@@ -1165,7 +1165,7 @@ class ListableItem: DataItem {
     private final func indexForSpotlight(uri: String) async {
         guard CSSearchableIndex.isIndexingAvailable() else { return }
         
-        let s = CSSearchableItemAttributeSet(itemContentType: kUTTypeText as String)
+        let s = CSSearchableItemAttributeSet(itemContentType: UTType.text.identifier)
                 
         if let i = userAvatarUrl, !Settings.hideAvatars, let cachePath = try? await API.avatar(from: i).1 {
             s.thumbnailURL = URL(fileURLWithPath: cachePath)

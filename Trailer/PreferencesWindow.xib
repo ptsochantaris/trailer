@@ -16,7 +16,7 @@
         <window title="Trailer Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="vQH-WF-vh2" customClass="PreferencesWindow" customModule="Trailer" customModuleProvider="target">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" resizable="YES"/>
             <rect key="contentRect" x="335" y="390" width="944" height="520"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1415"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1728" height="1079"/>
             <value key="minSize" type="size" width="880" height="520"/>
             <view key="contentView" id="nDu-sJ-Klg">
                 <rect key="frame" x="0.0" y="0.0" width="944" height="520"/>
@@ -504,20 +504,8 @@ Token</string>
                                                 </subviews>
                                             </view>
                                         </box>
-                                        <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mZx-Vy-AUF">
-                                            <rect key="frame" x="651" y="71" width="120" height="26"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                                            <popUpButtonCell key="cell" type="bevel" bezelStyle="regularSquare" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ovF-8L-cM3">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="menu"/>
-                                                <menu key="menu" title="State" showsStateColumn="NO" id="hlb-wI-4bK"/>
-                                            </popUpButtonCell>
-                                            <connections>
-                                                <action selector="allPrsPolicySelected:" target="vQH-WF-vh2" id="ePN-ey-nO0"/>
-                                            </connections>
-                                        </popUpButton>
                                         <searchField wantsLayer="YES" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Qfh-lH-HFg">
-                                            <rect key="frame" x="22" y="73" width="472" height="22"/>
+                                            <rect key="frame" x="22" y="73" width="441" height="22"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                             <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" placeholderString="Filter…" usesSingleLineMode="YES" bezelStyle="round" id="dZ4-dF-dkV">
                                                 <font key="font" metaFont="cellTitle"/>
@@ -528,30 +516,6 @@ Token</string>
                                                 <outlet property="delegate" destination="vQH-WF-vh2" id="wSo-04-QiJ"/>
                                             </connections>
                                         </searchField>
-                                        <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gC3-is-WyN">
-                                            <rect key="frame" x="775" y="71" width="120" height="26"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                                            <popUpButtonCell key="cell" type="bevel" bezelStyle="regularSquare" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="t23-3c-Lhx">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="menu"/>
-                                                <menu key="menu" title="State" showsStateColumn="NO" id="9Lk-Xv-uvP"/>
-                                            </popUpButtonCell>
-                                            <connections>
-                                                <action selector="allIssuesPolicySelected:" target="vQH-WF-vh2" id="5Ps-b5-xSR"/>
-                                            </connections>
-                                        </popUpButton>
-                                        <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8qH-xP-gTK">
-                                            <rect key="frame" x="500" y="71" width="147" height="26"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                                            <popUpButtonCell key="cell" type="bevel" bezelStyle="regularSquare" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="J36-7q-zgd">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="menu"/>
-                                                <menu key="menu" title="State" showsStateColumn="NO" id="wgs-wx-ojZ"/>
-                                            </popUpButtonCell>
-                                            <connections>
-                                                <action selector="allHidingPolicySelected:" target="vQH-WF-vh2" id="Ntp-YN-OWp"/>
-                                            </connections>
-                                        </popUpButton>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="job-mY-WCa">
                                             <rect key="frame" x="783" y="10" width="112" height="32"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
@@ -563,6 +527,42 @@ Token</string>
                                                 <action selector="advancedSelected:" target="vQH-WF-vh2" id="oUW-kJ-sxc"/>
                                             </connections>
                                         </button>
+                                        <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mZx-Vy-AUF">
+                                            <rect key="frame" x="621" y="70" width="136" height="26"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                            <popUpButtonCell key="cell" type="bevel" bezelStyle="regularSquare" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ovF-8L-cM3">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="menu"/>
+                                                <menu key="menu" title="State" showsStateColumn="NO" id="hlb-wI-4bK"/>
+                                            </popUpButtonCell>
+                                            <connections>
+                                                <action selector="allPrsPolicySelected:" target="vQH-WF-vh2" id="ePN-ey-nO0"/>
+                                            </connections>
+                                        </popUpButton>
+                                        <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gC3-is-WyN">
+                                            <rect key="frame" x="759" y="70" width="137" height="26"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                            <popUpButtonCell key="cell" type="bevel" bezelStyle="regularSquare" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="t23-3c-Lhx">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="menu"/>
+                                                <menu key="menu" title="State" showsStateColumn="NO" id="9Lk-Xv-uvP"/>
+                                            </popUpButtonCell>
+                                            <connections>
+                                                <action selector="allIssuesPolicySelected:" target="vQH-WF-vh2" id="5Ps-b5-xSR"/>
+                                            </connections>
+                                        </popUpButton>
+                                        <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8qH-xP-gTK">
+                                            <rect key="frame" x="468" y="70" width="151" height="26"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                            <popUpButtonCell key="cell" type="bevel" bezelStyle="regularSquare" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="J36-7q-zgd">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="menu"/>
+                                                <menu key="menu" title="State" showsStateColumn="NO" id="wgs-wx-ojZ"/>
+                                            </popUpButtonCell>
+                                            <connections>
+                                                <action selector="allHidingPolicySelected:" target="vQH-WF-vh2" id="Ntp-YN-OWp"/>
+                                            </connections>
+                                        </popUpButton>
                                     </subviews>
                                 </view>
                             </tabViewItem>

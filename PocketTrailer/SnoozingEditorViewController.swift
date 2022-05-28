@@ -370,7 +370,7 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 			UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut) {
 				self.pickerShield.alpha = 0.0
 				self.view.layoutIfNeeded()
-            } completion: {
+            } completion: { _ in
 				self.pickerShield.isUserInteractionEnabled = false
 			}
 		} else {
