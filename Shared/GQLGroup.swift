@@ -73,8 +73,6 @@ final class GQLGroup: GQLScanning {
 	
 	var fragments: [GQLFragment] { fields.reduce([]) { $0 + $1.fragments } }
     
-    private static let nodeCallbackLock = NSLock()
-
     @discardableResult
     private func scanNode(_ node: [AnyHashable: Any], query: GQLQuery, parent: GQLNode?) async throws -> [GQLQuery] {
         
@@ -82,13 +80,7 @@ final class GQLGroup: GQLScanning {
         
         if let typeName = node["__typename"] as? String, let id = node["id"] as? String {
             let o = GQLNode(id: id, elementType: typeName, jsonPayload: node, parent: parent)
-            if let pnc = query.perNodeCallback {
-                GQLGroup.nodeCallbackLock.lock()
-                defer {
-                    GQLGroup.nodeCallbackLock.unlock()
-                }
-                try await pnc(o)
-            }
+            try await query.perNodeCallback?(o)
             thisObject = o
             
         } else { // we're a container, not an object, unwrap this level and recurse into it

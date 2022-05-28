@@ -1,6 +1,11 @@
 import Foundation
 import CoreData
 
+@globalActor
+private final actor NodeActor {
+    static let shared = NodeActor()
+}
+
 final class GraphQL {
     
     private static let idField = GQLField(name: "id")
@@ -202,7 +207,7 @@ final class GraphQL {
             let ids = ContiguousArray(items.compactMap { $0.nodeId })
             var nodes = [String: ContiguousArray<GQLNode>]()
             let serverName = server.label ?? "<no label>"
-            let queries = GQLQuery.batching("\(serverName): \(name)", fields: fields, idList: ids, batchSize: 100) { node in
+            let queries = GQLQuery.batching("\(serverName): \(name)", fields: fields, idList: ids, batchSize: 100) { @NodeActor node in
                 let type = node.elementType
                 if var existingList = nodes[type] {
                     existingList.append(node)
@@ -223,9 +228,7 @@ final class GraphQL {
             
             do {
                 try await server.run(queries: queries)
-                if count > 0 {
-                    await processItems(nodes, server.objectID, parentMoc: server.managedObjectContext, parentType: parentType)
-                }
+                await processItems(nodes, server.objectID, parentMoc: server.managedObjectContext, parentType: parentType)
             } catch {
                 server.lastSyncSucceeded = false
                 throw error
@@ -315,6 +318,7 @@ final class GraphQL {
         return GQLFragment(on: "Issue", elements: elements)
     }
     
+    @MainActor
     static func fetchAllAuthoredItems(from servers: [ApiServer]) async {
 
         for server in servers {
@@ -334,7 +338,7 @@ final class GraphQL {
 
             var count = 0
             var nodes = [String: ContiguousArray<GQLNode>]()
-            let authoredItemsQuery = GQLQuery(name: "Authored Items", rootElement: GQLGroup(name: "viewer", fields: authorFields)) { (node: GQLNode) in
+            let authoredItemsQuery = GQLQuery(name: "Authored Items", rootElement: GQLGroup(name: "viewer", fields: authorFields)) { @NodeActor node in
                 let type = node.elementType
                 if var existingList = nodes[type] {
                     existingList.append(node)
@@ -364,6 +368,7 @@ final class GraphQL {
     
     private static let alreadyParsed = NSError(domain: "com.housetrip.Trailer.parsing", code: 1, userInfo: [NSLocalizedDescriptionKey: "Node already parsed in previous sync"])
     
+    @MainActor
     static func fetchAllSubscribedItems(from repos: [Repo]) async {
         
         let latestPrsFragment = GQLFragment(on: "Repository", elements: [
@@ -387,7 +392,6 @@ final class GraphQL {
             ])
 
         let reposByServer = Dictionary(grouping: repos) { $0.apiServer }
-        var count = 0
         
         var prRepoIdToLatestExistingUpdate = [String: Date]()
         var issueRepoIdToLatestExistingUpdate = [String: Date]()
@@ -406,6 +410,7 @@ final class GraphQL {
 
         for (server, reposInThisServer) in reposByServer {
 
+            var count = 0
             var nodes = [String: ContiguousArray<GQLNode>]()
 
             let perNodeCallback = { (node: GQLNode) -> Void in
