@@ -80,7 +80,7 @@ final class GQLGroup: GQLScanning {
         
         if let typeName = node["__typename"] as? String, let id = node["id"] as? String {
             let o = GQLNode(id: id, elementType: typeName, jsonPayload: node, parent: parent)
-            try await query.perNodeCallback?(o)
+            try await query.perNodeBlock?(o)
             thisObject = o
             
         } else { // we're a container, not an object, unwrap this level and recurse into it
@@ -111,7 +111,7 @@ final class GQLGroup: GQLScanning {
         if let latestCursor = edges.last?["cursor"] as? String,
             let pageInfo = pageInfo, pageInfo["hasNextPage"] as? Bool == true {
             let newGroup = GQLGroup(group: self, lastCursor: latestCursor)
-            let nextPage = GQLQuery(name: query.name, rootElement: newGroup, parent: parent, perNodeCallback: query.perNodeCallback)
+            let nextPage = GQLQuery(name: query.name, rootElement: newGroup, parent: parent, perNode: query.perNodeBlock)
             extraQueries.append(nextPage)
         }
         return extraQueries

@@ -2,15 +2,13 @@ import Foundation
 
 final class RestAccess {
 
-    typealias ApiCompletion = (Int, [AnyHashable: Any]?, Any?)
-
     private struct UrlBackOffEntry {
         var nextAttemptAt: Date
         var nextIncrement: TimeInterval
     }
     
     @MainActor
-    static func getPagedData(at path: String, from server: ApiServer, startingFrom page: Int = 1, perPageCallback: @escaping ([[AnyHashable: Any]]?, Bool) -> Bool) async -> (Bool, Int) {
+    static func getPagedData(at path: String, from server: ApiServer, startingFrom page: Int = 1, perPage: @escaping ([[AnyHashable: Any]]?, Bool) -> Bool) async -> (Bool, Int) {
         
         if path.isEmpty {
             // handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
@@ -20,10 +18,10 @@ final class RestAccess {
         do {
             let p = page > 1 ? "\(path)?page=\(page)&per_page=100" : "\(path)?per_page=100"
             let (data, lastPage, resultCode) = try await getData(in: p, from: server)
-            if perPageCallback(data as? [[AnyHashable: Any]], lastPage) || lastPage {
+            if perPage(data as? [[AnyHashable: Any]], lastPage) || lastPage {
                 return (true, resultCode)
             } else {
-                return await getPagedData(at: path, from: server, startingFrom: page+1, perPageCallback: perPageCallback)
+                return await getPagedData(at: path, from: server, startingFrom: page+1, perPage: perPage)
             }
         } catch {
             return (false, (error as NSError).code)
@@ -78,7 +76,7 @@ final class RestAccess {
     }
     
     @MainActor
-    static func start(call path: String, on server: ApiServer, triggeredByUser: Bool) async throws -> ApiCompletion {
+    static func start(call path: String, on server: ApiServer, triggeredByUser: Bool) async throws -> (Int, [AnyHashable: Any]?, Any?) {
         
         let apiServerLabel: String
         if server.lastSyncSucceeded || triggeredByUser {

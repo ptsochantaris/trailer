@@ -413,7 +413,7 @@ final class GraphQL {
             var count = 0
             var nodes = [String: ContiguousArray<GQLNode>]()
 
-            let perNodeCallback = { (node: GQLNode) -> Void in
+            let perNodeBlock = { (node: GQLNode) -> Void in
 
                 let type = node.elementType
                 if var existingList = nodes[type] {
@@ -473,22 +473,22 @@ final class GraphQL {
             }
             
             if !idsForReposInThisServerWantingLatestIssues.isEmpty {
-                let q = GQLQuery.batching("\(serverLabel): Updated Issues", fields: [latestIssuesFragment], idList: idsForReposInThisServerWantingLatestIssues, batchSize: 10, perNodeCallback: perNodeCallback)
+                let q = GQLQuery.batching("\(serverLabel): Updated Issues", fields: [latestIssuesFragment], idList: idsForReposInThisServerWantingLatestIssues, batchSize: 10, perNode: perNodeBlock)
                 queriesForServer.append(contentsOf: q)
             }
 
             if !idsForReposInThisServerWantingAllOpenIssues.isEmpty {
-                let q = GQLQuery.batching("\(serverLabel): Open Issues", fields: [allOpenIssuesFragment], idList: idsForReposInThisServerWantingAllOpenIssues, batchSize: 100, perNodeCallback: perNodeCallback)
+                let q = GQLQuery.batching("\(serverLabel): Open Issues", fields: [allOpenIssuesFragment], idList: idsForReposInThisServerWantingAllOpenIssues, batchSize: 100, perNode: perNodeBlock)
                 queriesForServer.append(contentsOf: q)
             }
 
             if !idsForReposInThisServerWantingLatestPrs.isEmpty {
-                let q = GQLQuery.batching("\(serverLabel): Updated PRs", fields: [latestPrsFragment], idList: idsForReposInThisServerWantingLatestPrs, batchSize: 10, perNodeCallback: perNodeCallback)
+                let q = GQLQuery.batching("\(serverLabel): Updated PRs", fields: [latestPrsFragment], idList: idsForReposInThisServerWantingLatestPrs, batchSize: 10, perNode: perNodeBlock)
                 queriesForServer.append(contentsOf: q)
             }
 
             if !idsForReposInThisServerWantingAllOpenPrs.isEmpty {
-                let q = GQLQuery.batching("\(serverLabel): Open PRs", fields: [allOpenPrsFragment], idList: idsForReposInThisServerWantingAllOpenPrs, batchSize: 100, perNodeCallback: perNodeCallback)
+                let q = GQLQuery.batching("\(serverLabel): Open PRs", fields: [allOpenPrsFragment], idList: idsForReposInThisServerWantingAllOpenPrs, batchSize: 100, perNode: perNodeBlock)
                 queriesForServer.append(contentsOf: q)
             }
             

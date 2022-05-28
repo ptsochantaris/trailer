@@ -4,19 +4,19 @@ import Dispatch
 final class GQLQuery {
     
 	let name: String
-    let perNodeCallback: ((GQLNode) async throws -> Void)?
+    let perNodeBlock: ((GQLNode) async throws -> Void)?
 
 	private let rootElement: GQLScanning
 	private let parent: GQLNode?
     
-    init(name: String, rootElement: GQLScanning, parent: GQLNode? = nil, perNodeCallback: ((GQLNode) async throws -> Void)? = nil) {
+    init(name: String, rootElement: GQLScanning, parent: GQLNode? = nil, perNode: ((GQLNode) async throws -> Void)? = nil) {
 		self.rootElement = rootElement
 		self.parent = parent
 		self.name = name
-        self.perNodeCallback = perNodeCallback
+        self.perNodeBlock = perNode
 	}
 
-    static func batching(_ name: String, fields: [GQLElement], idList: ContiguousArray<String>, batchSize: Int, perNodeCallback: ((GQLNode) async throws -> Void)? = nil) -> [GQLQuery] {
+    static func batching(_ name: String, fields: [GQLElement], idList: ContiguousArray<String>, batchSize: Int, perNode: ((GQLNode) async throws -> Void)? = nil) -> [GQLQuery] {
 		var list = idList
         var queries = [GQLQuery]()
 		while !list.isEmpty {
@@ -24,7 +24,7 @@ final class GQLQuery {
             list.removeFirst(segment.count)
 
             let batchGroup = GQLBatchGroup(templateGroup: GQLGroup(name: "items", fields: fields), idList: Array(segment), batchSize: batchSize)
-            let query = GQLQuery(name: name, rootElement: batchGroup, perNodeCallback: perNodeCallback)
+            let query = GQLQuery(name: name, rootElement: batchGroup, perNode: perNode)
             queries.append(query)
 		}
         return queries

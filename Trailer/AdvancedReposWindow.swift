@@ -168,7 +168,7 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
 				alert.messageText = "Missing Information"
 				alert.informativeText = "Please select a server, provide an owner/org name, and the name of the repo (or a star for all repos). Usually this info is part of the repository's URL, like https://github.com/owner_or_org/repo_name"
 				alert.addButton(withTitle: "OK")
-				alert.beginSheetModal(for: self, completionHandler: nil)
+				alert.beginSheetModal(for: self)
 				return
 		}
 
@@ -201,7 +201,7 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
                     alert.informativeText = error.localizedDescription
                 }
                 alert.addButton(withTitle: "OK")
-                alert.beginSheetModal(for: self, completionHandler: nil)
+                await alert.beginSheetModal(for: self)
             }
 		} else {
             Task {
@@ -224,7 +224,7 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
                     alert.informativeText = error.localizedDescription
                 }
 				alert.addButton(withTitle: "OK")
-				alert.beginSheetModal(for: self, completionHandler: nil)
+				await alert.beginSheetModal(for: self)
 			}
 		}
 	}

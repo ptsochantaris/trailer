@@ -390,7 +390,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
 	private func showLongSyncWarning() {
 		let a = NSAlert()
 		a.messageText = "The next sync may take a while, because everything will need to be fully re-synced. This will be needed only once: Subsequent syncs will be fast again."
-		a.beginSheetModal(for: self, completionHandler: nil)
+		a.beginSheetModal(for: self)
 	}
     
     @IBAction private func v4APISwitchChanged(_ sender: NSButton) {
@@ -399,7 +399,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
             let a = NSAlert()
             a.messageText = Settings.v4title
             a.informativeText = error
-            a.beginSheetModal(for: self, completionHandler: nil)
+            a.beginSheetModal(for: self)
         } else {
             confirmApiSwitch(sender: sender)
         }
@@ -796,7 +796,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
 				alert.informativeText = "Logging is a feature meant for error reporting, having it constantly enabled will cause this app to be less responsive, use more power, and constitute a security risk"
 			#endif
 			alert.addButton(withTitle: "OK")
-			alert.beginSheetModal(for: self, completionHandler: nil)
+			alert.beginSheetModal(for: self)
 		}
 	}
 
@@ -839,7 +839,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
 			alert.messageText = "Warning"
 			alert.informativeText = "This is a feature meant for error reporting, having it constantly enabled will cause this app to be less responsive, use more power, and constitute a security risk"
 			alert.addButton(withTitle: "OK")
-			alert.beginSheetModal(for: self, completionHandler: nil)
+			alert.beginSheetModal(for: self)
 		}
 	}
 
