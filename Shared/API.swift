@@ -154,7 +154,7 @@ final class API {
 
 		let connector = path.contains("?") ? "&" : "?"
         let absolutePath = "\(path)\(connector)s=128"
-        let hash = sha1("\(absolutePath) \(currentAppVersion)").base64EncodedString()
+        let hash = sha1("\(absolutePath) \(currentAppVersion)").base64EncodedString().replacingOccurrences(of: "/", with: "-")
 		let cachePath = cacheDirectory.appending(pathComponent: "imgc-\(hash)")
 
         let fileManager = FileManager.default
