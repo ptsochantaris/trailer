@@ -1,4 +1,3 @@
-
 import CoreSpotlight
 import Cocoa
 import Sparkle
@@ -173,13 +172,13 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 			switch notification.activationType {
 			case .additionalActionClicked:
 				if notification.additionalActivationAction?.identifier == "mute" {
-					if let (_,i) = ListableItem.relatedItems(from: userInfo) {
+					if let (_, i) = ListableItem.relatedItems(from: userInfo) {
 						i.setMute(to: true)
 						saveAndRefresh(i)
 					}
 					break
 				} else if notification.additionalActivationAction?.identifier == "read" {
-					if let (_,i) = ListableItem.relatedItems(from: userInfo) {
+					if let (_, i) = ListableItem.relatedItems(from: userInfo) {
 						i.catchUpWithComments()
 						saveAndRefresh(i)
 					}
@@ -188,7 +187,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 			case .actionButtonClicked, .contentsClicked:
 				var urlToOpen = userInfo[NOTIFICATION_URL_KEY] as? String
 				if urlToOpen == nil {
-					if let (c,i) = ListableItem.relatedItems(from: userInfo) {
+					if let (c, i) = ListableItem.relatedItems(from: userInfo) {
 						urlToOpen = c?.webUrl ?? i.webUrl
 						i.catchUpWithComments()
 						saveAndRefresh(i)
@@ -716,7 +715,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 	}
 
 	private func relatedMenus(for i: ListableItem) -> [MenuBarSet] {
-		return menuBarSets.compactMap{ ($0.viewCriterion?.isRelated(to: i) ?? true) ? $0 : nil }
+		return menuBarSets.compactMap { ($0.viewCriterion?.isRelated(to: i) ?? true) ? $0 : nil }
 	}
 
 	func application(_ application: NSApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([NSUserActivityRestoring]) -> Void) -> Bool {
@@ -835,7 +834,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 			}
 
 			if let w = incomingEvent.window as? MenuWindow {
-				//DLog("Keycode: %@", incomingEvent.keyCode)
+				// DLog("Keycode: %@", incomingEvent.keyCode)
 
 				switch incomingEvent.keyCode {
 				case 123, 124: // left, right
@@ -951,12 +950,12 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 		item.wakeUp()
 		DataManager.saveDB()
 		app.updateRelatedMenus(for: item)
-		scrollToNearest(index: oldIndex, window: window, preferDown : false)
+		scrollToNearest(index: oldIndex, window: window, preferDown: false)
 	}
 
 	private func snooze(item: ListableItem, snoozeIndex: Int, window: MenuWindow) -> Bool {
 		let s = SnoozePreset.allSnoozePresets(in: DataManager.main)
-		if s.count > snoozeIndex  {
+		if s.count > snoozeIndex {
 			let oldIndex = window.table.selectedRow
 			item.snooze(using: s[snoozeIndex])
 			DataManager.saveDB()
@@ -1021,7 +1020,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 			"T": 17, "U": 32, "V": 9, "W": 13, "X": 7, "Y": 16, "Z": 6,
 			"1": 18, "2": 19, "3": 20, "4": 21, "5": 23, "6": 22, "7": 26,
 			"8": 28, "9": 25, "0": 29, "=": 24, "-": 27, "]": 30, "[": 33,
-			"'": 39, ";": 41, ",": 43, "/": 44, ".": 47, "`": 50, "\\": 42,
+			"'": 39, ";": 41, ",": 43, "/": 44, ".": 47, "`": 50, "\\": 42
 			]
 
 		if check == 4, let n = keyMap[Settings.hotkeyLetter], incomingEvent.keyCode == UInt16(n) {
@@ -1068,7 +1067,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 	private var startupAssistantController: NSWindowController?
 	private func startupAssistant() {
 		if startupAssistantController == nil {
-			startupAssistantController = NSWindowController(windowNibName:NSNib.Name("SetupAssistant"))
+			startupAssistantController = NSWindowController(windowNibName: NSNib.Name("SetupAssistant"))
 			if let w = startupAssistantController!.window as? SetupAssistant {
 				w.level = .floating
 				w.center()
@@ -1083,7 +1082,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 	private var aboutWindowController: NSWindowController?
 	func showAboutWindow() {
 		if aboutWindowController == nil {
-			aboutWindowController = NSWindowController(windowNibName:NSNib.Name("AboutWindow"))
+			aboutWindowController = NSWindowController(windowNibName: NSNib.Name("AboutWindow"))
 		}
 		if let w = aboutWindowController!.window as? AboutWindow {
 			w.level = .floating
@@ -1100,7 +1099,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 	private var preferencesWindow: PreferencesWindow?
 	func showPreferencesWindow(andSelect selectTab: Int?) {
 		if preferencesWindowController == nil {
-			preferencesWindowController = NSWindowController(windowNibName:NSNib.Name("PreferencesWindow"))
+			preferencesWindowController = NSWindowController(windowNibName: NSNib.Name("PreferencesWindow"))
 		}
 		if let w = preferencesWindowController!.window as? PreferencesWindow {
 			w.level = .floating

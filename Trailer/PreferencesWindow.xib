@@ -350,7 +350,7 @@ Token</string>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <clipView key="contentView" id="hCD-zR-3bF">
                                                 <rect key="frame" x="1" y="1" width="869" height="318"/>
-                                                <autoresizingMask key="autoresizingMask"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" rowHeight="20" headerView="qia-ub-v1J" id="6pK-a1-URw">
                                                         <rect key="frame" x="0.0" y="0.0" width="869" height="301"/>
@@ -408,7 +408,7 @@ Token</string>
                                                                 </popUpButtonCell>
                                                                 <sortDescriptor key="sortDescriptorPrototype" selector="compare:" sortKey="displayPolicyForPrs" ascending="NO"/>
                                                             </tableColumn>
-                                                            <tableColumn identifier="issues" editable="NO" width="110" minWidth="40" maxWidth="1000" id="P1T-D7-Rnp" userLabel="Issues">
+                                                            <tableColumn identifier="issues" editable="NO" width="102" minWidth="40" maxWidth="1000" id="P1T-D7-Rnp" userLabel="Issues">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Issues">
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.33333298560000002" alpha="1" colorSpace="calibratedWhite"/>
@@ -420,7 +420,7 @@ Token</string>
                                                                 </popUpButtonCell>
                                                                 <sortDescriptor key="sortDescriptorPrototype" selector="compare:" sortKey="displayPolicyForIssues" ascending="NO"/>
                                                             </tableColumn>
-                                                            <tableColumn identifier="fork" editable="NO" width="24" minWidth="10" maxWidth="3.4028234663852886e+38" id="RB5-FQ-ycS" userLabel="Forked">
+                                                            <tableColumn identifier="fork" editable="NO" width="32" minWidth="10" maxWidth="3.4028234663852886e+38" id="RB5-FQ-ycS" userLabel="Forked">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Fork">
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -440,7 +440,7 @@ Token</string>
                                                 </subviews>
                                             </clipView>
                                             <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="SMx-sS-Tdd">
-                                                <rect key="frame" x="1" y="303" width="805" height="16"/>
+                                                <rect key="frame" x="1" y="303" width="869" height="16"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
                                             <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="IrO-ah-oEe">

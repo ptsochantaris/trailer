@@ -2,7 +2,7 @@ import Foundation
 
 final class RestAccess {
 
-    typealias ApiCompletion = (Int, [AnyHashable : Any]?, Any?)
+    typealias ApiCompletion = (Int, [AnyHashable: Any]?, Any?)
 
     private struct UrlBackOffEntry {
         var nextAttemptAt: Date
@@ -10,7 +10,7 @@ final class RestAccess {
     }
     
     @MainActor
-    static func getPagedData(at path: String, from server: ApiServer, startingFrom page: Int = 1, perPageCallback: @escaping ([[AnyHashable : Any]]? ,Bool) -> Bool) async -> (Bool, Int) {
+    static func getPagedData(at path: String, from server: ApiServer, startingFrom page: Int = 1, perPageCallback: @escaping ([[AnyHashable: Any]]?, Bool) -> Bool) async -> (Bool, Int) {
         
         if path.isEmpty {
             // handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
@@ -37,7 +37,7 @@ final class RestAccess {
         defer {
             API.currentOperationCount -= 1
         }
-        while(true) {
+        while true {
             do {
                 let (code, headers, data) = try await start(call: path, on: server, triggeredByUser: false)
                 var lastPage = true

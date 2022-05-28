@@ -123,11 +123,11 @@ final class SnoozePreset: NSManagedObject {
 		}
 	}
 
-	static var archivedPresets: [[String : NSObject]] {
-		var archivedData = [[String : NSObject]]()
+	static var archivedPresets: [[String: NSObject]] {
+		var archivedData = [[String: NSObject]]()
 		for a in SnoozePreset.allSnoozePresets(in: DataManager.main) {
-			var presetData = [String : NSObject]()
-			for (k , _) in a.entity.attributesByName {
+			var presetData = [String: NSObject]()
+			for (k, _) in a.entity.attributesByName {
 				if let v = a.value(forKey: k) as? NSObject {
 					presetData[k] = v
 				}
@@ -137,7 +137,7 @@ final class SnoozePreset: NSManagedObject {
 		return archivedData
 	}
 
-	static func configure(from archive: [[String : NSObject]]) -> Bool {
+	static func configure(from archive: [[String: NSObject]]) -> Bool {
 
 		let tempMoc = DataManager.buildChildContext()
 
@@ -148,7 +148,7 @@ final class SnoozePreset: NSManagedObject {
 		for presetData in archive {
 			let a = newSnoozePreset(in: tempMoc)
 			let attributes = Array(a.entity.attributesByName.keys)
-			for (k,v) in presetData {
+			for (k, v) in presetData {
 				if attributes.contains(k) {
 					a.setValue(v, forKey: k)
 				}

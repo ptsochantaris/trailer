@@ -1,9 +1,8 @@
-
 import UIKit
 import CoreData
 import WatchConnectivity
 
-final class WatchManager : NSObject, WCSessionDelegate {
+final class WatchManager: NSObject, WCSessionDelegate {
     
 	private var session: WCSession?
 
@@ -26,11 +25,11 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		return DataManager.dataFilesDirectory.appendingPathComponent("overview.plist")
 	}
 
-	func session(_ session: WCSession, didReceiveMessage message: [String : Any], replyHandler: @escaping ([String : Any]) -> Void) {
-        DispatchQueue.main.async { [weak self] in
-            guard let S = self else { return }
-			S.handle(message: message, replyHandler: replyHandler)
-		}
+	func session(_ session: WCSession, didReceiveMessage message: [String: Any], replyHandler: @escaping ([String: Any]) -> Void) {
+        Task {
+            let reply = await handle(message: message)
+            replyHandler(reply)
+        }
 	}
     
     func updateContext() {
@@ -39,128 +38,127 @@ final class WatchManager : NSObject, WCSessionDelegate {
         }
     }
 
-	private func handle(message: [String : Any], replyHandler: @escaping ([String : Any]) -> Void) {
-
-		switch(S(message["command"] as? String)) {
-
-		case "refresh":
-			let status = app.startRefresh()
-			switch status {
-			case .started:
-				reportSuccess(result: [:], replyHandler: replyHandler)
-			case .noNetwork:
-				reportFailure(reason: "Can't refresh, check your Internet connection.", result: [:], replyHandler: replyHandler)
-			case .alreadyRefreshing:
-				reportFailure(reason: "Already refreshing, please wait.", result: [:], replyHandler: replyHandler)
-			case .noConfiguredServers:
-				reportFailure(reason: "Can't refresh, there are no configured servers.", result: [:], replyHandler: replyHandler)
-			}
+    @MainActor
+    private func handle(message: [String: Any]) async -> [String: Any] {
+        
+        switch S(message["command"] as? String) {
+            
+        case "refresh":
+            let status = app.startRefresh()
+            switch status {
+            case .started:
+                return reportSuccess(result: [:])
+            case .noNetwork:
+                return reportFailure(reason: "Can't refresh, check your Internet connection.", result: [:])
+            case .alreadyRefreshing:
+                return reportFailure(reason: "Already refreshing, please wait.", result: [:])
+            case .noConfiguredServers:
+                return reportFailure(reason: "Can't refresh, there are no configured servers.", result: [:])
+            }
             
         case "overview":
-            processList(message: message, replyHandler: replyHandler)
+            return await processList(message: message)
+            
+        case "openItem":
+            if let itemId = message["localId"] as? String {
+                popupManager.masterController.highightItemWithUriPath(uriPath: itemId)
+            }
+            return await processList(message: message)
+            
+        case "opencomment":
+            if let itemId = message["id"] as? String {
+                popupManager.masterController.openCommentWithId(cId: itemId)
+            }
+            return await processList(message: message)
+            
+        case "clearAllMerged":
+            app.clearAllMerged()
+            return await processList(message: message)
+            
+        case "clearAllClosed":
+            app.clearAllClosed()
+            return await processList(message: message)
+            
+        case "markEverythingRead":
+            app.markEverythingRead()
+            return await processList(message: message)
+            
+        case "markItemsRead":
+            if let
+                uri = message["localId"] as? String,
+               let oid = DataManager.id(for: uri),
+               let dataItem = existingObject(with: oid) as? ListableItem,
+               dataItem.hasUnreadCommentsOrAlert {
+                
+                dataItem.catchUpWithComments()
+                
+            } else if let uris = message["itemUris"] as? [String] {
+                for uri in uris {
+                    if let
+                        oid = DataManager.id(for: uri),
+                       let dataItem = existingObject(with: oid) as? ListableItem,
+                       dataItem.hasUnreadCommentsOrAlert {
+                        
+                        dataItem.catchUpWithComments()
+                    }
+                }
+            }
+            return await processList(message: message)
+            
+        default:
+            return await processList(message: message)
+        }
+    }
+    
+    private func processList(message: [String: Any]) async -> [String: Any] {
+        
+        var result = [String: Any]()
+        
+        switch S(message["list"] as? String) {
+            
+        case "overview":
+            result["result"] = await buildOverview()
+            return reportSuccess(result: result)
+            
+        case "item_list":
+            return await buildItemList(
+                type: message["type"] as! String,
+                sectionIndex: message["sectionIndex"] as! Int64,
+                from: message["from"] as! Int,
+                apiServerUri: message["apiUri"] as! String,
+                group: message["group"] as! String,
+                count: message["count"] as! Int,
+                onlyUnread: message["onlyUnread"] as! Bool)
+            
+        case "item_detail":
+            if let lid = message["localId"] as? String, let details = buildItemDetail(localId: lid) {
+                result["result"] = details
+                return reportSuccess(result: result)
+            } else {
+                return reportFailure(reason: "Item Not Found", result: result)
+            }
+            
+        default:
+            return reportSuccess(result: result)
+        }
+    }
 
-		case "openItem":
-			if let itemId = message["localId"] as? String {
-				popupManager.masterController.highightItemWithUriPath(uriPath: itemId)
-			}
-			processList(message: message, replyHandler: replyHandler)
-
-		case "opencomment":
-			if let itemId = message["id"] as? String {
-				popupManager.masterController.openCommentWithId(cId: itemId)
-			}
-			processList(message: message, replyHandler: replyHandler)
-
-		case "clearAllMerged":
-			app.clearAllMerged()
-			processList(message: message, replyHandler: replyHandler)
-
-		case "clearAllClosed":
-			app.clearAllClosed()
-			processList(message: message, replyHandler: replyHandler)
-
-		case "markEverythingRead":
-			app.markEverythingRead()
-			processList(message: message, replyHandler: replyHandler)
-
-		case "markItemsRead":
-			if let
-				uri = message["localId"] as? String,
-				let oid = DataManager.id(for: uri),
-				let dataItem = existingObject(with: oid) as? ListableItem,
-				dataItem.hasUnreadCommentsOrAlert {
-
-				dataItem.catchUpWithComments()
-
-			} else if let uris = message["itemUris"] as? [String] {
-				for uri in uris {
-					if let
-						oid = DataManager.id(for: uri),
-						let dataItem = existingObject(with: oid) as? ListableItem,
-						dataItem.hasUnreadCommentsOrAlert {
-
-						dataItem.catchUpWithComments()
-					}
-				}
-			}
-			processList(message: message, replyHandler: replyHandler)
-
-		default:
-			processList(message: message, replyHandler: replyHandler)
-		}
-	}
-
-	private func processList(message: [String : Any], replyHandler: @escaping ([String : Any]) -> Void) {
-
-		var result = [String : Any]()
-
-		switch(S(message["list"] as? String)) {
-
-		case "overview":
-			buildOverview { [weak self] overview in
-				result["result"] = overview
-				self?.reportSuccess(result: result, replyHandler: replyHandler)
-			}
-
-		case "item_list":
-			buildItemList(type: message["type"] as! String,
-			              sectionIndex: message["sectionIndex"] as! Int64,
-			              from: message["from"] as! Int,
-			              apiServerUri: message["apiUri"] as! String,
-			              group: message["group"] as! String,
-			              count: message["count"] as! Int,
-			              onlyUnread: message["onlyUnread"] as! Bool,
-			              replyHandler: replyHandler)
-
-		case "item_detail":
-			if let lid = message["localId"] as? String, let details = buildItemDetail(localId: lid) {
-				result["result"] = details
-				reportSuccess(result: result, replyHandler: replyHandler)
-			} else {
-				reportFailure(reason: "Item Not Found", result: result, replyHandler: replyHandler)
-			}
-
-		default:
-			reportSuccess(result: result, replyHandler: replyHandler)
-		}
-	}
-
-	private func reportFailure(reason: String, result: [String : Any], replyHandler: ([String : Any]) -> Void) {
+    private func reportFailure(reason: String, result: [String: Any]) -> [String: Any] {
 		var r = result
 		r["error"] = true
 		r["status"] = reason
-		replyHandler(r)
+        return r
 	}
 
-	private func reportSuccess(result: [String : Any], replyHandler: ([String : Any]) -> Void) {
+	private func reportSuccess(result: [String: Any]) -> [String: Any] {
 		var r = result
 		r["status"] = "Success"
-		replyHandler(r)
+        return r
 	}
 
 	////////////////////////////
 
-	private func buildItemList(type: String, sectionIndex: Int64, from: Int, apiServerUri: String, group: String, count: Int, onlyUnread: Bool, replyHandler: @escaping ([String : Any]) -> Void) {
+	private func buildItemList(type: String, sectionIndex: Int64, from: Int, apiServerUri: String, group: String, count: Int, onlyUnread: Bool) async -> [String: Any] {
 
 		let showLabels = Settings.showLabels
 		let entity: ListableItem.Type
@@ -187,26 +185,27 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		let tempMoc = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 		tempMoc.undoManager = nil
 		tempMoc.persistentStoreCoordinator = DataManager.main.persistentStoreCoordinator
-		tempMoc.perform { [weak self] in
-			let items = try! tempMoc.fetch(f).map { self?.baseDataForItem(item: $0, showLabels: showLabels) }
-			let compressedData = (try? NSKeyedArchiver.archivedData(withRootObject: items, requiringSecureCoding: false).data(operation: .compress)) ?? Data()
-			replyHandler(["result" : compressedData])
+		return await tempMoc.perform { [weak self] in
+            guard let self = self else { return [:] }
+			let items = try! tempMoc.fetch(f).map { self.baseDataForItem(item: $0, showLabels: showLabels) }
+            let compressedData = (try? NSKeyedArchiver.archivedData(withRootObject: items, requiringSecureCoding: false).data(operation: .compress)) ?? Data()
+            return ["result": compressedData]
 		}
 	}
 
-	private func baseDataForItem(item: ListableItem, showLabels: Bool) -> [String : Any] {
+	private func baseDataForItem(item: ListableItem, showLabels: Bool) -> [String: Any] {
 
 		let font = UIFont.systemFont(ofSize: UIFont.systemFontSize)
 		let smallFont = UIFont.systemFont(ofSize: UIFont.systemFontSize-4)
 
-		var itemData: [String : Any] = [
+		var itemData: [String: Any] = [
 			"commentCount": item.totalComments,
 			"unreadCount": item.unreadComments,
 			"localId": item.objectID.uriRepresentation().absoluteString,
-            "title" : item.title(with: font, labelFont: font, titleColor: .white, numberColor: .gray),
-            "subtitle" : item.subtitle(with: smallFont, lightColor: .lightGray, darkColor: .gray, separator: "\n"),
-            "labels" : item.labelsAttributedString(labelFont: smallFont) ?? emptyAttributedString,
-            "reviews" : (item as? PullRequest)?.reviewsAttributedString(labelFont: smallFont) ?? emptyAttributedString,
+            "title": item.title(with: font, labelFont: font, titleColor: .white, numberColor: .gray),
+            "subtitle": item.subtitle(with: smallFont, lightColor: .lightGray, darkColor: .gray, separator: "\n"),
+            "labels": item.labelsAttributedString(labelFont: smallFont) ?? emptyAttributedString,
+            "reviews": (item as? PullRequest)?.reviewsAttributedString(labelFont: smallFont) ?? emptyAttributedString
 			]
 
 		if showLabels {
@@ -218,8 +217,8 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		return itemData
 	}
 
-	private func labelsForItem(item: ListableItem) -> [[String : Any]] {
-		var labels = [[String : Any]]()
+	private func labelsForItem(item: ListableItem) -> [[String: Any]] {
+		var labels = [[String: Any]]()
 		for l in item.labels {
 			labels.append([
 				"color": l.colorForDisplay,
@@ -229,8 +228,8 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		return labels
 	}
 
-	private func statusLinesForPr(pr: PullRequest) -> [[String : Any]] {
-		var statusLines = [[String : Any]]()
+	private func statusLinesForPr(pr: PullRequest) -> [[String: Any]] {
+		var statusLines = [[String: Any]]()
 		for status in pr.displayedStatuses {
 			statusLines.append([
 				"color": status.colorForDisplay,
@@ -253,8 +252,8 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		return nil
 	}
 
-	private func commentsForItem(item: ListableItem) -> [[String : Any]] {
-		var comments = [[String : Any]]()
+	private func commentsForItem(item: ListableItem) -> [[String: Any]] {
+		var comments = [[String: Any]]()
 		for comment in item.sortedComments(using: .orderedDescending) {
 			comments.append([
 				"user": S(comment.userName),
@@ -268,23 +267,20 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	//////////////////////////////
 
-	private func buildOverview(completion: @escaping ([String:Any])->Void) {
+	private func buildOverview() async -> [String: Any] {
 
-		//DLog("Building remote overview")
-
-        let allViewCriteria = popupManager.masterController.allTabSets.map { $0.viewCriterion }
+        let allViewCriteria = await popupManager.masterController.allTabSets.map { $0.viewCriterion }
 
 		let tempMoc = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 		tempMoc.undoManager = nil
         tempMoc.parent = DataManager.main
-		tempMoc.perform {
 
-			var views = [[String : Any]]()
+		return await tempMoc.perform {
+            var views = [[String: Any]]()
+            var totalUnreadPrCount = 0
+            var totalUnreadIssueCount = 0
 
-			var totalUnreadPrCount = 0
-			var totalUnreadIssueCount = 0
-
-			for c in allViewCriteria {
+            for c in allViewCriteria {
 
 				let myPrs = WatchManager.counts(for: PullRequest.self, in: .mine, criterion: c, moc: tempMoc)
 				let participatedPrs = WatchManager.counts(for: PullRequest.self, in: .participated, criterion: c, moc: tempMoc)
@@ -327,21 +323,17 @@ final class WatchManager : NSObject, WCSessionDelegate {
 						"error": totalIssues == 0 ? Issue.reasonForEmpty(with: nil, criterion: c).string : ""
 					]])
 			}
-
-            DLog("Remote overview updated")
-
-			DispatchQueue.main.async {
-				completion([
-					"views": views,
-					"preferIssues": Settings.preferIssuesInWatch,
-					"lastUpdated": Settings.lastSuccessfulRefresh ?? .distantPast
-					])
-				UIApplication.shared.applicationIconBadgeNumber = totalUnreadPrCount + totalUnreadIssueCount
-			}
+            // TODO
+            // UIApplication.shared.applicationIconBadgeNumber = totalUnreadPrCount + totalUnreadIssueCount
+            return [
+                "views": views,
+                "preferIssues": Settings.preferIssuesInWatch,
+                "lastUpdated": Settings.lastSuccessfulRefresh ?? .distantPast
+                ]
 		}
 	}
 
-	private static func counts<T: ListableItem>(for type: T.Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> [String : Int] {
+	private static func counts<T: ListableItem>(for type: T.Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> [String: Int] {
 		return ["total": countItems(of: type, in: section, criterion: criterion, moc: moc),
 		        "unread": badgeCount(for: type, in: section, criterion: criterion, moc: moc)]
 	}

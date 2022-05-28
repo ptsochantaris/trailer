@@ -1,6 +1,3 @@
-
-////////////////////// Global variables
-
 #if os(iOS)
 
 import UIKit
@@ -113,7 +110,7 @@ func bootUp() {
 enum ItemCondition: Int64 {
 	case open, closed, merged
 
-	static private var predicateMatchCache = [ItemCondition : NSPredicate]()
+	static private var predicateMatchCache = [ItemCondition: NSPredicate]()
 	var matchingPredicate: NSPredicate {
 		if let predicate = ItemCondition.predicateMatchCache[self] {
 			return predicate
@@ -122,7 +119,7 @@ enum ItemCondition: Int64 {
 		ItemCondition.predicateMatchCache[self] = predicate
 		return predicate
 	}
-	static private var predicateExcludeCache = [ItemCondition : NSPredicate]()
+	static private var predicateExcludeCache = [ItemCondition: NSPredicate]()
 	var excludingPredicate: NSPredicate {
 		if let predicate = ItemCondition.predicateExcludeCache[self] {
 			return predicate
@@ -140,7 +137,7 @@ enum StatusFilter: Int {
 enum PostSyncAction: Int64 {
 	case doNothing, delete, isNew, isUpdated
 
-	static private var predicateMatchCache = [PostSyncAction : NSPredicate]()
+	static private var predicateMatchCache = [PostSyncAction: NSPredicate]()
 	var matchingPredicate: NSPredicate {
 		if let predicate = PostSyncAction.predicateMatchCache[self] {
 			return predicate
@@ -149,7 +146,7 @@ enum PostSyncAction: Int64 {
 		PostSyncAction.predicateMatchCache[self] = predicate
 		return predicate
 	}
-	static private var predicateExcludeCache = [PostSyncAction : NSPredicate]()
+	static private var predicateExcludeCache = [PostSyncAction: NSPredicate]()
 	var excludingPredicate: NSPredicate {
 		if let predicate = PostSyncAction.predicateExcludeCache[self] {
 			return predicate
@@ -181,15 +178,15 @@ enum SortingMethod: Int {
 		return SortingMethod.reverseTitles[rawValue]
 	}
 
-	var field: String? {
-		switch self {
-		case .creationDate: return "createdAt"
-		case .recentActivity: return "updatedAt"
-		case .title: return "title"
+    var field: String? {
+        switch self {
+        case .creationDate: return "createdAt"
+        case .recentActivity: return "updatedAt"
+        case .title: return "title"
         case .linesAdded: return "linesAdded"
         case .linesRemoved: return "linesRemoved"
-		}
-	}
+        }
+    }
 }
 
 enum HandlingPolicy: Int {
@@ -329,7 +326,7 @@ struct ApiStats {
 	let nodeCount, cost, remaining, limit: Int64
 	let resetAt: Date?
 
-	static func fromV3(headers: [AnyHashable : Any]) -> ApiStats {
+	static func fromV3(headers: [AnyHashable: Any]) -> ApiStats {
 		let date: Date?
 		if let epochSeconds = headers["X-RateLimit-Reset"] as? String, let t = TimeInterval(epochSeconds) {
 			date = Date(timeIntervalSince1970: t)
@@ -343,7 +340,7 @@ struct ApiStats {
                              resetAt: date)
 	}
     
-    static func fromV4(json: [AnyHashable : Any]?) -> ApiStats? {
+    static func fromV4(json: [AnyHashable: Any]?) -> ApiStats? {
         guard let info = json?["rateLimit"] as? [AnyHashable: Any] else { return nil }
         let date = apiDateFormatter.date(from: info["resetAt"] as? String ?? "")
         return ApiStats(nodeCount: info["nodeCount"] as? Int64 ?? 0,

@@ -4,19 +4,19 @@ import Dispatch
 final class GQLQuery {
     
 	let name: String
-    let perNodeCallback: ((GQLNode) async -> Bool)?
+    let perNodeCallback: ((GQLNode) async throws -> Void)?
 
 	private let rootElement: GQLScanning
 	private let parent: GQLNode?
     
-    init(name: String, rootElement: GQLScanning, parent: GQLNode? = nil, perNodeCallback: ((GQLNode) async -> Bool)? = nil) {
+    init(name: String, rootElement: GQLScanning, parent: GQLNode? = nil, perNodeCallback: ((GQLNode) async throws -> Void)? = nil) {
 		self.rootElement = rootElement
 		self.parent = parent
 		self.name = name
         self.perNodeCallback = perNodeCallback
 	}
 
-    static func batching(_ name: String, fields: [GQLElement], idList: ContiguousArray<String>, batchSize: Int, perNodeCallback: ((GQLNode) async -> Bool)? = nil) -> [GQLQuery] {
+    static func batching(_ name: String, fields: [GQLElement], idList: ContiguousArray<String>, batchSize: Int, perNodeCallback: ((GQLNode) async throws -> Void)? = nil) -> [GQLQuery] {
 		var list = idList
         var queries = [GQLQuery]()
 		while !list.isEmpty {
@@ -79,7 +79,7 @@ final class GQLQuery {
         var shouldRetry = false
         do {
             let (info, response) = try await HTTP.getData(for: r)
-            guard let json = try JSONSerialization.jsonObject(with: info, options: []) as? [AnyHashable : Any] else {
+            guard let json = try JSONSerialization.jsonObject(with: info, options: []) as? [AnyHashable: Any] else {
                 throw API.apiError("Invalid JSON")
             }
 
@@ -87,18 +87,18 @@ final class GQLQuery {
                 DLog("API data from %@: %@", url, String(bytes: info, encoding: .utf8))
             }
 
-            apiStats = ApiStats.fromV4(json: json["data"] as? [AnyHashable : Any])
+            apiStats = ApiStats.fromV4(json: json["data"] as? [AnyHashable: Any])
             if let s = apiStats {
                 DLog("\(self.logPrefix)Received page (Cost: \(s.cost), Remaining: \(s.remaining)/\(s.limit) - Node Count: \(s.nodeCount))")
             } else {
                 DLog("\(self.logPrefix)Received page (No stats)")
             }
 
-            let allData = json["data"] as? [AnyHashable : Any]
-            guard let data = (self.parent == nil) ? allData : allData?["node"] as? [AnyHashable : Any] else {
+            let allData = json["data"] as? [AnyHashable: Any]
+            guard let data = (self.parent == nil) ? allData : allData?["node"] as? [AnyHashable: Any] else {
                 let code = response.statusCode
                 shouldRetry = code == 403 || code == 502 || code == 503 || code == -1001 // pause to retry in case of throttle or ongoing GH deployment or timeout
-                if let errors = json["errors"] as? [[AnyHashable:Any]] {
+                if let errors = json["errors"] as? [[AnyHashable: Any]] {
                     let msg = errors.first?["message"] as? String ?? "Unspecified server error: \(json)"
                     throw API.apiError(msg)
                 } else {
@@ -112,14 +112,17 @@ final class GQLQuery {
                 throw API.apiError("No data in JSON")
             }
             
-            let extraQueries = await r.scan(query: self, pageData: topData, parent: self.parent)
-            if extraQueries.isEmpty {
-                return apiStats
-            } else {
-                DLog("\(self.logPrefix)Needs more page data")
-                return try await GQLQuery.runQueries(queries: extraQueries, on: url, token: authToken)
+            do {
+                let extraQueries = try await r.scan(query: self, pageData: topData, parent: self.parent)
+                if !extraQueries.isEmpty {
+                    DLog("\(self.logPrefix)Needs more page data (\(extraQueries.count) queries)")
+                    return try await GQLQuery.runQueries(queries: extraQueries, on: url, token: authToken)
+                }
+            } catch {
+                DLog("\(self.logPrefix)No more page data needed: \(error.localizedDescription)")
             }
-            
+            return apiStats
+
         } catch {
             DLog("\(self.logPrefix) Error: \(error.localizedDescription)")
             if shouldRetry && attempt > 0 {
@@ -131,7 +134,7 @@ final class GQLQuery {
             }
         }
 	}
-        
+    
     static func runQueries(queries: [GQLQuery], on path: String, token: String) async throws -> ApiStats? {
         return try await withThrowingTaskGroup(of: ApiStats?.self, returning: ApiStats?.self) { group in
             for query in queries {

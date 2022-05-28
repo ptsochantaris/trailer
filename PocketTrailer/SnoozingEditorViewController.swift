@@ -1,4 +1,3 @@
-
 import UIKit
 
 final class SnoozingEditorViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIPickerViewDataSource, UIPickerViewDelegate {
@@ -22,11 +21,11 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 				                          preferredStyle: .alert)
 
 				a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-				a.addAction(UIAlertAction(title: "Wake Them Up", style: .destructive) { action in
+				a.addAction(UIAlertAction(title: "Wake Them Up", style: .destructive) { _ in
 					s.wakeUpAllAssociatedItems()
 					self.deletePreset()
 				})
-				a.addAction(UIAlertAction(title: "Keep Them Snoozed", style: .destructive) { action in
+				a.addAction(UIAlertAction(title: "Keep Them Snoozed", style: .destructive) { _ in
 					self.deletePreset()
 				})
 
@@ -39,7 +38,7 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 				                          preferredStyle: .alert)
 
 				a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-				a.addAction(UIAlertAction(title: "Delete", style: .destructive) { action in
+				a.addAction(UIAlertAction(title: "Delete", style: .destructive) { _ in
 					self.deletePreset()
 				})
 				
@@ -356,10 +355,10 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 		picker.reloadAllComponents()
 		picker.selectRow(indexForPicker, inComponent: 0, animated: false)
 		pickerBottom.constant = tabBarController?.tabBar.frame.size.height ?? 0
-		UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: {
+		UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut) {
 			self.pickerShield.alpha = 1.0
 			self.view.layoutIfNeeded()
-		}) { finished in
+        } completion: { _ in
 			self.pickerShield.isUserInteractionEnabled = true
 		}
 	}
@@ -368,10 +367,10 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 		pickerBottom.constant = -(picker.frame.size.height+pickerNavBar.frame.size.height)
 
 		if animate {
-			UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: {
+			UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut) {
 				self.pickerShield.alpha = 0.0
 				self.view.layoutIfNeeded()
-			}) { finished in
+            } completion: {
 				self.pickerShield.isUserInteractionEnabled = false
 			}
 		} else {

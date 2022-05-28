@@ -1,4 +1,3 @@
-
 import UIKit
 
 final class CustomReposViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
@@ -67,7 +66,7 @@ final class CustomReposViewController: UIViewController, UITableViewDelegate, UI
 			field.placeholder = "http://github.com/owner_or_org/repo_name"
 		}
 		let cancel = UIAlertAction(title: "Cancel", style: .cancel)
-		let ok = UIAlertAction(title: "Add", style: .default) { a in
+		let ok = UIAlertAction(title: "Add", style: .default) { _ in
 			self.addRepo(url: v.textFields?.first!.text)
 		}
 		v.addAction(cancel)

@@ -1,4 +1,3 @@
-
 import SafariServices
 
 final class AboutTrailerViewController: UIViewController {

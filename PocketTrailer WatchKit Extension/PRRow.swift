@@ -1,4 +1,3 @@
-
 import WatchKit
 
 final class PRRow: NSObject {
@@ -17,7 +16,7 @@ final class PRRow: NSObject {
 	var itemId: String?
 	var hasUnread: Bool!
 
-	func populate(from itemData: [AnyHashable : Any]) {
+	func populate(from itemData: [AnyHashable: Any]) {
 
 		let title =  itemData["title"] as! NSAttributedString
 		titleL.setAttributedText(title)

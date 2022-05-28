@@ -1,4 +1,3 @@
-
 import UIKit
 
 final class CommentBlacklistViewController: UITableViewController {
@@ -107,7 +106,7 @@ final class CommentBlacklistViewController: UITableViewController {
             textField.placeholder = self.mode.placeholder
 		}
 		a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-		a.addAction(UIAlertAction(title: "Block", style: .default) { action in
+		a.addAction(UIAlertAction(title: "Block", style: .default) { _ in
 
 			guard let tf = a.textFields?.first, let n = tf.text?.trim else {
                 return

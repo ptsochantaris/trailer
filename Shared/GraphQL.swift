@@ -14,7 +14,7 @@ final class GraphQL {
     ])
 
     private static let userIdFragment = GQLFragment(on: "User", elements: [
-        idField,
+        idField
     ])
 
     private static let mannequinFragment = GQLFragment(on: "Mannequin", elements: [
@@ -43,7 +43,7 @@ final class GraphQL {
         GQLField(name: "description"),
         GQLField(name: "state"),
         GQLField(name: "targetUrl"),
-        GQLField(name: "createdAt"),
+        GQLField(name: "createdAt")
     ])
 
     private static let checkFragment = GQLFragment(on: "CheckRun", elements: [
@@ -63,7 +63,6 @@ final class GraphQL {
             if node.elementType == "User" {
                 gotUserNode = true
             }
-            return true
         }
         _ = try await testQuery.run(for: apiServer.graphQLPath ?? "", authToken: apiServer.authToken ?? "", attempt: 0)
         if !gotUserNode {
@@ -83,7 +82,7 @@ final class GraphQL {
                 elementTypes.append("ReviewRequest")
                 let requestFragment = GQLFragment(on: "ReviewRequest", elements: [
                     idField,
-                    GQLGroup(name: "requestedReviewer", fields: [userFragment, teamFragment, mannequinFragment]),
+                    GQLGroup(name: "requestedReviewer", fields: [userFragment, teamFragment, mannequinFragment])
                 ])
                 elements.append(GQLGroup(name: "reviewRequests", fields: [requestFragment], pageSize: 100))
             }
@@ -160,7 +159,6 @@ final class GraphQL {
             elements.append(GQLGroup(name: "comments", fields: [commentFragment], pageSize: 100))
         }
 
-        
         let fields = [GQLFragment(on: typeName, elements: elements)]
 
         try await process(name: steps.toString, elementTypes: elementTypes, items: items, parentType: T.self, fields: fields)
@@ -221,7 +219,6 @@ final class GraphQL {
                     await processItems(nodes, server.objectID, parentMoc: server.managedObjectContext, parentType: parentType)
                     nodes.removeAll()
                 }
-                return true
             }
             
             do {
@@ -337,7 +334,7 @@ final class GraphQL {
 
             var count = 0
             var nodes = [String: ContiguousArray<GQLNode>]()
-            let authoredItemsQuery = GQLQuery(name: "Authored Items", rootElement: GQLGroup(name: "viewer", fields: authorFields)) { (node: GQLNode) -> Bool in
+            let authoredItemsQuery = GQLQuery(name: "Authored Items", rootElement: GQLGroup(name: "viewer", fields: authorFields)) { (node: GQLNode) in
                 let type = node.elementType
                 if var existingList = nodes[type] {
                     existingList.append(node)
@@ -355,8 +352,6 @@ final class GraphQL {
                     await self.processItems(nodes, server.objectID, parentMoc: server.managedObjectContext)
                     nodes.removeAll()
                 }
-                
-                return true
             }
             do {
                 try await server.run(queries: [authoredItemsQuery])
@@ -367,11 +362,13 @@ final class GraphQL {
         }
     }
     
+    private static let alreadyParsed = NSError(domain: "com.housetrip.Trailer.parsing", code: 1, userInfo: [NSLocalizedDescriptionKey: "Node already parsed in previous sync"])
+    
     static func fetchAllSubscribedItems(from repos: [Repo]) async {
         
         let latestPrsFragment = GQLFragment(on: "Repository", elements: [
             idField,
-            GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["orderBy": "{direction: DESC, field: UPDATED_AT}"], pageSize: 10),
+            GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["orderBy": "{direction: DESC, field: UPDATED_AT}"], pageSize: 10)
             ])
 
         let latestIssuesFragment = GQLFragment(on: "Repository", elements: [
@@ -381,7 +378,7 @@ final class GraphQL {
         
         let allOpenPrsFragment = GQLFragment(on: "Repository", elements: [
             idField,
-            GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["states": "OPEN"], pageSize: 50),
+            GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["states": "OPEN"], pageSize: 50)
             ])
 
         let allOpenIssuesFragment = GQLFragment(on: "Repository", elements: [
@@ -411,7 +408,7 @@ final class GraphQL {
 
             var nodes = [String: ContiguousArray<GQLNode>]()
 
-            let perNodeCallback = { (node: GQLNode) -> Bool in
+            let perNodeCallback = { (node: GQLNode) -> Void in
 
                 let type = node.elementType
                 if var existingList = nodes[type] {
@@ -429,7 +426,7 @@ final class GraphQL {
                     let updatedAt = node.jsonPayload["updatedAt"] as? String,
                     let d = DataItem.parseGH8601(updatedAt),
                     d < prRepoIdToLatestExistingUpdate[repo.id]! {
-                    return false
+                    throw GraphQL.alreadyParsed
                 }
 
                 if type == "Issue",
@@ -437,7 +434,7 @@ final class GraphQL {
                     let updatedAt = node.jsonPayload["updatedAt"] as? String,
                     let d = DataItem.parseGH8601(updatedAt),
                     d < issueRepoIdToLatestExistingUpdate[repo.id]! {
-                    return false
+                    throw GraphQL.alreadyParsed
                 }
 
                 count += 1
@@ -446,8 +443,6 @@ final class GraphQL {
                     await self.processItems(nodes, server.objectID, parentMoc: server.managedObjectContext)
                     nodes.removeAll()
                 }
-                
-                return true
             }
             
             var queriesForServer = [GQLQuery]()

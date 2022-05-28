@@ -46,7 +46,7 @@ final class Repo: DataItem {
                 repo.webUrl = json["url"] as? String
                 repo.inaccessible = false
                 repo.archived = json["isArchived"] as? Bool ?? false
-                repo.ownerNodeId = (json["owner"] as? [AnyHashable : Any])?["id"] as? String
+                repo.ownerNodeId = (json["owner"] as? [AnyHashable: Any])?["id"] as? String
                 if node.created {
                     repo.displayPolicyForPrs = Int64(Settings.displayPolicyForNewPrs)
                     repo.displayPolicyForIssues = Int64(Settings.displayPolicyForNewIssues)
@@ -62,10 +62,10 @@ final class Repo: DataItem {
         }
     }
     
-	static func syncRepos(from data: [[AnyHashable : Any]]?, server: ApiServer, addNewRepos: Bool, manuallyAdded: Bool) {
+	static func syncRepos(from data: [[AnyHashable: Any]]?, server: ApiServer, addNewRepos: Bool, manuallyAdded: Bool) {
 		let filteredData = data?.filter { info -> Bool in
 			if info["private"] as? Bool ?? false {
-				if let permissions = info["permissions"] as? [AnyHashable : Any] {
+				if let permissions = info["permissions"] as? [AnyHashable: Any] {
 
 					let pull = permissions["pull"] as? Bool ?? false
 					let push = permissions["push"] as? Bool ?? false
@@ -90,7 +90,7 @@ final class Repo: DataItem {
 				item.webUrl = info["html_url"] as? String
 				item.inaccessible = false
 				item.archived = info["archived"] as? Bool ?? false
-				item.ownerNodeId = (info["owner"] as? [AnyHashable : Any])?["node_id"] as? String
+				item.ownerNodeId = (info["owner"] as? [AnyHashable: Any])?["node_id"] as? String
 				item.manuallyAdded = manuallyAdded
 				if item.postSyncAction == PostSyncAction.isNew.rawValue {
 					item.displayPolicyForPrs = Int64(Settings.displayPolicyForNewPrs)
@@ -248,13 +248,13 @@ final class Repo: DataItem {
 
 		let predicate = NSPredicate(format: "(number IN %@) AND (repo == %@)", numbers, self)
 
-		func mark<T>(type: T.Type) where T : ListableItem {
+		func mark<T>(type: T.Type) where T: ListableItem {
 			let f = NSFetchRequest<T>(entityName: String(describing: type))
 			f.returnsObjectsAsFaults = false
 			f.includesSubentities = false
 			f.predicate = predicate
 			for i in try! managedObjectContext!.fetch(f) {
-				//DLog("Ensuring item '%@' in repo '%@' is marked as updated - reasons: %@", S(i.title), S(i.repo.fullName), reasons.joined(separator: ", "))
+				// DLog("Ensuring item '%@' in repo '%@' is marked as updated - reasons: %@", S(i.title), S(i.repo.fullName), reasons.joined(separator: ", "))
 				i.setToUpdatedIfIdle()
 			}
 		}

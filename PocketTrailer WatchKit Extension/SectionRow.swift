@@ -1,4 +1,3 @@
-
 import WatchKit
 
 protocol PopulatableRow {

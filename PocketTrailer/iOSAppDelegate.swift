@@ -1,4 +1,3 @@
-
 import UIKit
 import UserNotifications
 import BackgroundTasks
@@ -10,7 +9,7 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
 
     private var backgroundProcessing: BGProcessingTask?
 
-	func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+	func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
 
 		app = self
 		bootUp()
@@ -33,7 +32,7 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
 		completionHandler()
 	}
 
-	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
 
 		DataManager.postProcessAllItems()
 
@@ -79,7 +78,7 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
 		}
 	}
 
-	func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+	func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
 		guard let c = URLComponents(url: url, resolvingAgainstBaseURL: false), let scheme = c.scheme else {
 			return false
 		}

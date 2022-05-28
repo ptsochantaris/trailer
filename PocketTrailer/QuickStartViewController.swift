@@ -1,4 +1,3 @@
-
 import SafariServices
 
 final class QuickStartViewController: UIViewController, UITextFieldDelegate {

@@ -75,16 +75,16 @@ final class Review: DataItem {
             }
             
             review.body = info["body"] as? String
-            review.username = (info["author"] as? [AnyHashable : Any])?["login"] as? String
+            review.username = (info["author"] as? [AnyHashable: Any])?["login"] as? String
         }
     }
     
-	static func syncReviews(from data: [[AnyHashable : Any]]?, withParent: PullRequest) {
+	static func syncReviews(from data: [[AnyHashable: Any]]?, withParent: PullRequest) {
 		items(with: data, type: Review.self, server: withParent.apiServer) { item, info, isNewOrUpdated in
 			if isNewOrUpdated {
 				item.pullRequest = withParent
 				item.body = info["body"] as? String
-				item.username = (info["user"] as? [AnyHashable : Any])?["login"] as? String
+				item.username = (info["user"] as? [AnyHashable: Any])?["login"] as? String
 			}
             let newState = info["state"] as? String
             item.check(newState: newState)

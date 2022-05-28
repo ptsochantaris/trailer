@@ -1,4 +1,3 @@
-
 #if os(iOS)
 	import UIKit
 #else
@@ -159,7 +158,7 @@ struct Settings {
 
 		if let v = value {
 			let vString = String(describing: v)
-			if let p = previousValue, String(describing : p) == vString {
+			if let p = previousValue, String(describing: p) == vString {
 				DLog("Setting %@ to identical value (%@), skipping", key, vString)
 				return
 			} else {
@@ -246,8 +245,8 @@ struct Settings {
 					sharedDefaults.set(v, forKey: k)
 				}
 			}
-			return ApiServer.configure(from: settings["DB_CONFIG_OBJECTS"] as! [String : [String : NSObject]])
-			&& SnoozePreset.configure(from: settings["DB_SNOOZE_OBJECTS"] as! [[String : NSObject]])
+			return ApiServer.configure(from: settings["DB_CONFIG_OBJECTS"] as! [String: [String: NSObject]])
+			&& SnoozePreset.configure(from: settings["DB_SNOOZE_OBJECTS"] as! [[String: NSObject]])
 		}
 		return false
 	}
@@ -705,8 +704,7 @@ struct Settings {
 		get { return get("SHOW_STATUSES_EVERYWHERE") as? Bool ?? false }
 		set { set("SHOW_STATUSES_EVERYWHERE", newValue) }
 	}
-
-
+    
 	static let checkForUpdatesAutomaticallyHelp = "Check for updates to Trailer automatically. It is generally a very good idea to keep this selected, unless you are using an external package manager to manage the updates."
 	static var checkForUpdatesAutomatically: Bool {
 		get { return get("UPDATE_CHECK_AUTO_KEY") as? Bool ?? true }

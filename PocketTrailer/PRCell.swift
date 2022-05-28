@@ -1,7 +1,6 @@
-
 import UIKit
 
-let statusAttributes: [NSAttributedString.Key : Any] = {
+let statusAttributes: [NSAttributedString.Key: Any] = {
 	let paragraphStyle = NSMutableParagraphStyle()
 	paragraphStyle.paragraphSpacing = 6.0
 	paragraphStyle.lineSpacing = 1
@@ -116,7 +115,7 @@ final class PRCell: UITableViewCell {
 		let muted = pullRequest.muted
 		setCountsImageAndFade(item: pullRequest, muted: muted)
 
-		var statusText : NSMutableAttributedString?
+		var statusText: NSMutableAttributedString?
         var totalStatuses = 0
         if pullRequest.section.shouldListStatuses {
 			let statusItems = pullRequest.displayedStatuses

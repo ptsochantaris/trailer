@@ -1,4 +1,3 @@
-
 let SECTION_KEY = "INDEX_KEY"
 let ITEM_KEY = "ITEM_KEY"
 let TYPE_KEY = "TYPE_KEY"
@@ -35,7 +34,7 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate 
     		
 	func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {}
     
-    func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
+    func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
         if message["newInfoAvailable"] as? Bool == true {
             potentialUpdate()
         }

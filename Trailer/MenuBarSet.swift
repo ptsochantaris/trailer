@@ -108,12 +108,12 @@ final class MenuBarSet {
         return try! DataManager.main.count(for: fc) > 0
     }
     
-	private func updateMenu(of type: ListableItem.Type,
-	                        menu: MenuWindow,
+    private func updateMenu(of type: ListableItem.Type,
+                            menu: MenuWindow,
                             forceVisible: Bool,
-	                        lengthOffset: CGFloat,
-	                        hasUnread: Bool,
-	                        reasonForEmpty: @escaping (String) -> NSAttributedString) {
+                            lengthOffset: CGFloat,
+                            hasUnread: Bool,
+                            reasonForEmpty: @escaping (String) -> NSAttributedString) {
 		
         if forceVisible || shouldShow(type: type) {
 			let shouldGray = Settings.grayOutWhenRefreshing && API.isRefreshing
@@ -193,7 +193,7 @@ final class MenuBarSet {
         }
 	}
 	
-	private func compare(dictionary from: [AnyHashable : Any], to: [AnyHashable : Any]) -> Bool {
+	private func compare(dictionary from: [AnyHashable: Any], to: [AnyHashable: Any]) -> Bool {
 		for (key, value) in from {
 			if let v = to[key] {
 				if String(describing: v) != String(describing: value) {

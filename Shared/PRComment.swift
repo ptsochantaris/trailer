@@ -47,7 +47,7 @@ final class PRComment: DataItem {
             comment.body = info["body"] as? String
             comment.webUrl = info["url"] as? String
 
-            if let userInfo = info["author"] as? [AnyHashable : Any] {
+            if let userInfo = info["author"] as? [AnyHashable: Any] {
                 comment.userName = userInfo["login"] as? String
                 comment.userNodeId = userInfo["id"] as? String
                 comment.avatarUrl = userInfo["avatarUrl"] as? String
@@ -55,7 +55,7 @@ final class PRComment: DataItem {
         }
     }
 
-	static func syncComments(from data: [[AnyHashable : Any]]?, parent: ListableItem) {
+	static func syncComments(from data: [[AnyHashable: Any]]?, parent: ListableItem) {
 		items(with: data, type: PRComment.self, server: parent.apiServer) { item, info, newOrUpdated in
 			if newOrUpdated {
 				item.pullRequest = parent as? PullRequest
@@ -104,7 +104,7 @@ final class PRComment: DataItem {
 		}
 	}
 
-	private func fill(from info: [AnyHashable : Any]) {
+	private func fill(from info: [AnyHashable: Any]) {
 		body = info["body"] as? String
 
 		if let id = info["pull_request_review_id"] as? Int64, let moc = managedObjectContext, let r = Review.review(with: id, in: moc) {
@@ -113,7 +113,7 @@ final class PRComment: DataItem {
 			review = nil
 		}
 
-		if let userInfo = info["user"] as? [AnyHashable : Any] {
+		if let userInfo = info["user"] as? [AnyHashable: Any] {
 			userName = userInfo["login"] as? String
 			avatarUrl = userInfo["avatar_url"] as? String
             userNodeId = userInfo["node_id"] as? String
@@ -122,8 +122,8 @@ final class PRComment: DataItem {
 		if let href = info["html_url"] as? String {
 			webUrl = href
 
-		} else if let links = info["_links"] as? [AnyHashable : Any],
-			let html = links["html"] as? [AnyHashable : Any],
+		} else if let links = info["_links"] as? [AnyHashable: Any],
+			let html = links["html"] as? [AnyHashable: Any],
 			let href = html["href"] as? String {
 
 			webUrl = href

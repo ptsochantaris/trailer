@@ -1,4 +1,3 @@
-
 import WatchKit
 
 final class CommentRow: NSObject {
@@ -9,13 +8,13 @@ final class CommentRow: NSObject {
 	@IBOutlet private var margin: WKInterfaceGroup!
 	var commentId: String?
 
-	func set(comment: [AnyHashable : Any], unreadCount: Int, unreadIndex: inout Int) {
+	func set(comment: [AnyHashable: Any], unreadCount: Int, unreadIndex: inout Int) {
 
 		let username = S(comment["user"] as? String)
 		usernameL.setText("@\(username)")
 		dateL.setText(shortDateFormatter.string(from: comment["date"] as! Date))
 		commentL.setText(comment["text"] as? String)
-		if(comment["mine"] as! Bool) {
+		if comment["mine"] as? Bool == true {
 			usernameBackground.setBackgroundColor(.gray)
 			commentL.setTextColor(.lightGray)
 			margin.setBackgroundColor(.darkGray)

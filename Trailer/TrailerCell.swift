@@ -2,7 +2,7 @@ import Cocoa
 
 final class TrailerCell: NSTableCellView {
 
-	private static let statusAttributes: [NSAttributedString.Key : Any] = {
+	private static let statusAttributes: [NSAttributedString.Key: Any] = {
 
 		let paragraphStyle = NSMutableParagraphStyle()
 		paragraphStyle.headIndent = 17
@@ -337,7 +337,7 @@ final class TrailerCell: NSTableCellView {
 
 		if let mouseLocation = window?.mouseLocationOutsideOfEventStream {
 			let localLocation = convert(mouseLocation, to: self)
-			if NSPointInRect(localLocation, bounds) && !selected {
+            if bounds.contains(localLocation) && !selected {
 				mouseEntered(with: nil)
 			} else if selected {
 				mouseExited(with: nil)

@@ -40,7 +40,7 @@ class CommonController: WKInterfaceController {
 	}
 
 	private var loading = 0
-	func send(request: [String : Any]) {
+	func send(request: [String: Any]) {
 		if loading == 0 {
 			if showLoadingFeedback {
 				show(status: "Loading…", hideTable: false)
@@ -49,11 +49,11 @@ class CommonController: WKInterfaceController {
 		}
 	}
 
-	private func attempt(request: [String : Any]) {
+	private func attempt(request: [String: Any]) {
 
 		loading += 1
 
-		WCSession.default.sendMessage(request, replyHandler: { [weak self] response in
+		WCSession.default.sendMessage(request) { [weak self] response in
 			guard let S = self else { return }
 			if let errorIndicator = response["error"] as? Bool, errorIndicator == true {
 				DispatchQueue.main.async {
@@ -66,7 +66,7 @@ class CommonController: WKInterfaceController {
 				}
 				S.update(from: response)
 			}
-		}) { error in
+        } errorHandler: { error in
             DispatchQueue.main.async { [weak self] in
                 guard let S = self else { return }
 				if S.loading==5 {
@@ -89,7 +89,7 @@ class CommonController: WKInterfaceController {
 		}
 	}
 
-	func update(from response: [AnyHashable : Any]) {
+	func update(from response: [AnyHashable: Any]) {
 		// for subclassing
 	}
 

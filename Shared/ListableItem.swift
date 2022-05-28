@@ -96,7 +96,7 @@ class ListableItem: DataItem {
         number = info["number"] as? Int64 ?? 0
         title = info["title"] as? String ?? "(No title)"
         body = info["bodyText"] as? String
-        milestone = (info["milestone"] as? [AnyHashable : Any])?["title"] as? String
+        milestone = (info["milestone"] as? [AnyHashable: Any])?["title"] as? String
         draft = info["isDraft"] as? Bool ?? false
         
         let newCondition: Int64
@@ -119,7 +119,7 @@ class ListableItem: DataItem {
 
         condition = newCondition
 
-        if let user = info["author"] as? [AnyHashable:Any] {
+        if let user = info["author"] as? [AnyHashable: Any] {
             userLogin = user["login"] as? String
             userAvatarUrl = user["avatarUrl"] as? String
             userNodeId = user["id"] as? String
@@ -137,16 +137,16 @@ class ListableItem: DataItem {
         mutableSetValue(forKey: "labels").removeAllObjects()
     }
 
-	final func baseSync(from info: [AnyHashable : Any], in parentRepo: Repo) {
+	final func baseSync(from info: [AnyHashable: Any], in parentRepo: Repo) {
 		repo = parentRepo
 		url = info["url"] as? String
 		number = info["number"] as? Int64 ?? 0
 		title = info["title"] as? String ?? "(No title)"
 		body = info["body"] as? String
-		milestone = (info["milestone"] as? [AnyHashable : Any])?["title"] as? String
+		milestone = (info["milestone"] as? [AnyHashable: Any])?["title"] as? String
         draft = info["draft"] as? Bool ?? false
 
-		if let userInfo = info["user"] as? [AnyHashable : Any] {
+		if let userInfo = info["user"] as? [AnyHashable: Any] {
 			userLogin = userInfo["login"] as? String
 			userAvatarUrl = userInfo["avatar_url"] as? String
             userNodeId = userInfo["node_id"] as? String
@@ -159,12 +159,12 @@ class ListableItem: DataItem {
         return Section(rawValue: sectionIndex) ?? .none
     }
 
-    final func processAssignmentStatus(from info: [AnyHashable : Any]?, idField: String) {
+    final func processAssignmentStatus(from info: [AnyHashable: Any]?, idField: String) {
 
 		let myIdOnThisRepo = repo.apiServer.userNodeId
 		var assigneeNames = [String]()
 
-		func checkAndStoreAssigneeName(from assignee: [AnyHashable : Any]) -> Bool {
+		func checkAndStoreAssigneeName(from assignee: [AnyHashable: Any]) -> Bool {
 
 			if let name = assignee["login"] as? String, let assigneeId = assignee[idField] as? String {
 				let shouldBeAssignedToMe = assigneeId == myIdOnThisRepo
@@ -177,13 +177,13 @@ class ListableItem: DataItem {
 
 		var foundAssignmentToMe = false
 
-		if let assignees = info?["assignees"] as? [[AnyHashable : Any]], !assignees.isEmpty {
+		if let assignees = info?["assignees"] as? [[AnyHashable: Any]], !assignees.isEmpty {
 			for assignee in assignees {
 				if checkAndStoreAssigneeName(from: assignee) {
 					foundAssignmentToMe = true
 				}
 			}
-		} else if let assignee = info?["assignee"] as? [AnyHashable : Any] {
+		} else if let assignee = info?["assignee"] as? [AnyHashable: Any] {
 			foundAssignmentToMe = checkAndStoreAssigneeName(from: assignee)
 		}
 
@@ -203,7 +203,7 @@ class ListableItem: DataItem {
 		}
 	}
 
-	static func active<T>(of type: T.Type, in moc: NSManagedObjectContext, visibleOnly: Bool) -> [T] where T : ListableItem {
+	static func active<T>(of type: T.Type, in moc: NSManagedObjectContext, visibleOnly: Bool) -> [T] where T: ListableItem {
 		let f = NSFetchRequest<T>(entityName: String(describing: type))
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false
@@ -340,12 +340,7 @@ class ListableItem: DataItem {
 	}
 
 	final private var commentedByMe: Bool {
-		for c in comments {
-			if c.isMine {
-				return true
-			}
-		}
-		return false
+        return comments.contains { $0.isMine }
 	}
 
 	var reviewedByMe: Bool {
@@ -494,13 +489,13 @@ class ListableItem: DataItem {
 		////////// Apply visibility policies
         
 		if targetSection != .none {
-			switch self is Issue ? repo.displayPolicyForIssues : repo.displayPolicyForPrs {
+            switch self is Issue ? repo.displayPolicyForIssues : repo.displayPolicyForPrs {
             case RepoDisplayPolicy.hide.rawValue,
-			     RepoDisplayPolicy.mine.rawValue where targetSection == .all || targetSection == .participated || targetSection == .mentioned,
-			     RepoDisplayPolicy.mineAndPaticipated.rawValue where targetSection == .all:
-				targetSection = .none
-			default: break
-			}
+                RepoDisplayPolicy.mine.rawValue where targetSection == .all || targetSection == .participated || targetSection == .mentioned,
+                RepoDisplayPolicy.mineAndPaticipated.rawValue where targetSection == .all:
+                targetSection = .none
+            default: break
+            }
 		}
 
 		if targetSection != .none {
@@ -524,7 +519,6 @@ class ListableItem: DataItem {
             p.displayedStatuses.contains(where: { $0.state != "success" }) {
             targetSection = .none
 		}
-        
         
         if targetSection != .none {
             let excludeLabels = Settings.labelBlacklist
@@ -926,25 +920,25 @@ class ListableItem: DataItem {
 			let negative = term.hasPrefix("!")
 			let T = negative ? String(term.dropFirst()) : term
 
-			let P: NSPredicate
-			switch T {
-			case "open":
-				P = ItemCondition.open.matchingPredicate
-			case "closed":
-				P = ItemCondition.closed.matchingPredicate
-			case "merged":
-				P = ItemCondition.merged.matchingPredicate
-			case "unread":
-				P = includeInUnreadPredicate
-			case "snoozed":
-				P = isSnoozingPredicate
+            let P: NSPredicate
+            switch T {
+            case "open":
+                P = ItemCondition.open.matchingPredicate
+            case "closed":
+                P = ItemCondition.closed.matchingPredicate
+            case "merged":
+                P = ItemCondition.merged.matchingPredicate
+            case "unread":
+                P = includeInUnreadPredicate
+            case "snoozed":
+                P = isSnoozingPredicate
             case "draft":
                 P = isDraftPredicate
             case "conflict":
                 P = isUnmergeablePredicate
-			default:
-				continue
-			}
+            default:
+                continue
+            }
 
 			if negative {
 				notTerms.append(NSCompoundPredicate(notPredicateWithSubpredicate: P))
@@ -957,9 +951,9 @@ class ListableItem: DataItem {
 
 	private static func predicate(notTerms: [NSPredicate], orTerms: [NSPredicate]) -> NSPredicate? {
 		if !notTerms.isEmpty && !orTerms.isEmpty {
-			let n = NSCompoundPredicate(andPredicateWithSubpredicates: notTerms)
-			let o = NSCompoundPredicate(orPredicateWithSubpredicates: orTerms)
-			return NSCompoundPredicate(andPredicateWithSubpredicates: [n,o])
+            return NSCompoundPredicate(andPredicateWithSubpredicates:
+                                        [NSCompoundPredicate(andPredicateWithSubpredicates: notTerms),
+                                         NSCompoundPredicate(orPredicateWithSubpredicates: orTerms)])
         } else if !notTerms.isEmpty {
 			return NSCompoundPredicate(andPredicateWithSubpredicates: notTerms)
 		} else if !orTerms.isEmpty {
@@ -1018,18 +1012,18 @@ class ListableItem: DataItem {
 				} while(foundOne)
 			}
 
-			check(forTag: "title")       	{ predicate(from: $0, termAt: $1, format: filterTitlePredicate, numeric: false) }
-			check(forTag: "repo")        	{ predicate(from: $0, termAt: $1, format: filterRepoPredicate, numeric: false) }
-			check(forTag: "server")        	{ predicate(from: $0, termAt: $1, format: filterServerPredicate, numeric: false) }
-			check(forTag: "user")        	{ predicate(from: $0, termAt: $1, format: filterUserPredicate, numeric: false) }
-			check(forTag: "number")        	{ predicate(from: $0, termAt: $1, format: filterNumberPredicate, numeric: true) }
-			check(forTag: "milestone")    	{ predicate(from: $0, termAt: $1, format: filterMilestonePredicate, numeric: false) }
-			check(forTag: "assignee")    	{ predicate(from: $0, termAt: $1, format: filterAssigneePredicate, numeric: false) }
-			check(forTag: "label")        	{ predicate(from: $0, termAt: $1, format: filterLabelPredicate, numeric: false) }
+			check(forTag: "title") { predicate(from: $0, termAt: $1, format: filterTitlePredicate, numeric: false) }
+			check(forTag: "repo") { predicate(from: $0, termAt: $1, format: filterRepoPredicate, numeric: false) }
+            check(forTag: "server") { predicate(from: $0, termAt: $1, format: filterServerPredicate, numeric: false) }
+			check(forTag: "user") { predicate(from: $0, termAt: $1, format: filterUserPredicate, numeric: false) }
+			check(forTag: "number") { predicate(from: $0, termAt: $1, format: filterNumberPredicate, numeric: true) }
+			check(forTag: "milestone") { predicate(from: $0, termAt: $1, format: filterMilestonePredicate, numeric: false) }
+			check(forTag: "assignee") { predicate(from: $0, termAt: $1, format: filterAssigneePredicate, numeric: false) }
+			check(forTag: "label") { predicate(from: $0, termAt: $1, format: filterLabelPredicate, numeric: false) }
 			if itemType.self == PullRequest.self {
-				check(forTag: "status")        	{ predicate(from: $0, termAt: $1, format: filterStatusPredicate, numeric: false) }
+				check(forTag: "status") { predicate(from: $0, termAt: $1, format: filterStatusPredicate, numeric: false) }
 			}
-			check(forTag: "state")			{ statePredicate(from: $0, termAt: $1) }
+			check(forTag: "state") { statePredicate(from: $0, termAt: $1) }
 
 			if !fi.isEmpty {
 				var predicates = [NSPredicate]()
@@ -1074,7 +1068,7 @@ class ListableItem: DataItem {
 			}
 		}
         
-		//DLog("%@", andPredicates)
+		// DLog("%@", andPredicates)
 
 		let f = NSFetchRequest<T>(entityName: String(describing: itemType))
 		f.fetchBatchSize = 50
@@ -1098,7 +1092,7 @@ class ListableItem: DataItem {
 
     private static let isUnmergeablePredicate = NSPredicate(format: "isMergeable == false")
     
-	static func relatedItems(from notificationUserInfo: [AnyHashable : Any]) -> (PRComment?, ListableItem)? {
+	static func relatedItems(from notificationUserInfo: [AnyHashable: Any]) -> (PRComment?, ListableItem)? {
 		var item: ListableItem?
 		var comment: PRComment?
 		if let cid = notificationUserInfo[COMMENT_ID_KEY] as? String, let itemId = DataManager.id(for: cid), let c = existingObject(with: itemId) as? PRComment {

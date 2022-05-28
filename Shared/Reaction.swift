@@ -29,7 +29,7 @@ final class Reaction: DataItem {
             let info = node.jsonPayload
             reaction.content = info["content"] as? String
 
-            if let user = info["user"] as? [AnyHashable:Any] {
+            if let user = info["user"] as? [AnyHashable: Any] {
                 reaction.userName = user["login"] as? String
                 reaction.avatarUrl = user["avatarUrl"] as? String
                 reaction.userNodeId = user["id"] as? String
@@ -37,7 +37,7 @@ final class Reaction: DataItem {
         }
     }
         
-	static func syncReactions(from data: [[AnyHashable : Any]]?, comment: PRComment) {
+	static func syncReactions(from data: [[AnyHashable: Any]]?, comment: PRComment) {
 		items(with: data, type: Reaction.self, server: comment.apiServer) { item, info, isNewOrUpdated in
 			if isNewOrUpdated {
                 item.pullRequest = nil
@@ -48,7 +48,7 @@ final class Reaction: DataItem {
 		}
 	}
 
-	static func syncReactions(from data: [[AnyHashable : Any]]?, parent: ListableItem) {
+	static func syncReactions(from data: [[AnyHashable: Any]]?, parent: ListableItem) {
 		items(with: data, type: Reaction.self, server: parent.apiServer) { item, info, isNewOrUpdated in
 			if isNewOrUpdated {
 				item.pullRequest = parent as? PullRequest
@@ -59,9 +59,9 @@ final class Reaction: DataItem {
 		}
 	}
 
-	private func fill(from info: [AnyHashable : Any]) {
+	private func fill(from info: [AnyHashable: Any]) {
 		content = info["content"] as? String
-		if let user = info["user"] as? [AnyHashable:Any] {
+		if let user = info["user"] as? [AnyHashable: Any] {
 			userName = user["login"] as? String
 			avatarUrl = user["avatar_url"] as? String
 			userNodeId = user["node_id"] as? String
@@ -83,8 +83,8 @@ final class Reaction: DataItem {
         return userNodeId == apiServer.userNodeId || userNodeId == apiServer.userNodeId
 	}
 
-	static func changesDetected(in reactions: Set<Reaction>, from info: [AnyHashable : Any]) -> String? {
-		var counts = [String:Int]()
+	static func changesDetected(in reactions: Set<Reaction>, from info: [AnyHashable: Any]) -> String? {
+		var counts = [String: Int]()
 		for r in reactions {
 			if let c = r.content {
 				if let existingCount = counts[c] {
@@ -108,15 +108,15 @@ final class Reaction: DataItem {
 
 	var displaySymbol: String {
         switch S(content).lowercased() {
-		case "+1", "thumbs_up": return "👍"
-		case "-1", "thumbs_down": return "👎"
-		case "laugh": return "😄"
-		case "confused": return "😕"
-		case "heart": return "❤️"
-		case "hooray": return "🎉"
+        case "+1", "thumbs_up": return "👍"
+        case "-1", "thumbs_down": return "👎"
+        case "laugh": return "😄"
+        case "confused": return "😕"
+        case "heart": return "❤️"
+        case "hooray": return "🎉"
         case "rocket": return "🚀"
         case "eyes": return "👀"
-		default: return "<unknown>"
-		}
+        default: return "<unknown>"
+        }
 	}
 }

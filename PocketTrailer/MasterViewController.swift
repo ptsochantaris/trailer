@@ -1,4 +1,3 @@
-
 import UIKit
 import CoreData
 import UserNotifications
@@ -71,11 +70,11 @@ UITableViewDragDelegate {
 
 		let a = UIAlertController(title: promptTitle, message: nil, preferredStyle: .actionSheet)
         a.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-		a.addAction(UIAlertAction(title: "Mark All As Read", style: .default) { action in
+		a.addAction(UIAlertAction(title: "Mark All As Read", style: .default) { _ in
 			self.markAllAsRead()
 		})
         if (tabs.items?.count ?? 0) > 1 {
-            a.addAction(UIAlertAction(title: "On Other Tabs Too", style: .destructive) { action in
+            a.addAction(UIAlertAction(title: "On Other Tabs Too", style: .destructive) { _ in
                 app.markEverythingRead()
             })
         }
@@ -91,7 +90,7 @@ UITableViewDragDelegate {
 			} else {
 				let a = UIAlertController(title: "Sure?", message: "Remove all \(S.pluralNameForItems) in the Merged section?", preferredStyle: .alert)
 				a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-				a.addAction(UIAlertAction(title: "Remove", style: .destructive) { [weak S] action in
+				a.addAction(UIAlertAction(title: "Remove", style: .destructive) { [weak S] _ in
 					S?.removeAllMergedConfirmed()
 				})
 				S.present(a, animated: true)
@@ -107,7 +106,7 @@ UITableViewDragDelegate {
 			} else {
 				let a = UIAlertController(title: "Sure?", message: "Remove all \(S.pluralNameForItems) in the Closed section?", preferredStyle: .alert)
 				a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-				a.addAction(UIAlertAction(title: "Remove", style: .destructive) { [weak S] action in
+				a.addAction(UIAlertAction(title: "Remove", style: .destructive) { [weak S] _ in
 					S?.removeAllClosedConfirmed()
 				})
 				S.present(a, animated: true)
@@ -231,7 +230,7 @@ UITableViewDragDelegate {
 		guard let relatedMoc = notification.object as? NSManagedObjectContext, relatedMoc === DataManager.main else { return }
 
 		if let items = notification.userInfo?[NSInsertedObjectsKey] as? Set<NSManagedObject>, items.contains(where: { $0 is ListableItem }) {
-			//DLog(">>>>>>>>>>>>>>> detected inserted items")
+			// DLog(">>>>>>>>>>>>>>> detected inserted items")
             DispatchQueue.main.async {
                 self.updateStatus(becauseOfChanges: true)
             }
@@ -239,7 +238,7 @@ UITableViewDragDelegate {
 		}
 
 		if let items = notification.userInfo?[NSDeletedObjectsKey] as? Set<NSManagedObject>, items.contains(where: { $0 is ListableItem }) {
-			//DLog(">>>>>>>>>>>>>>> detected deleted items")
+			// DLog(">>>>>>>>>>>>>>> detected deleted items")
             DispatchQueue.main.async {
                 self.updateStatus(becauseOfChanges: true)
             }
@@ -247,7 +246,7 @@ UITableViewDragDelegate {
 		}
 
 		if let items = notification.userInfo?[NSUpdatedObjectsKey] as? Set<NSManagedObject>, items.contains(where: { ($0 as? ListableItem)?.hasPersistentChangedValues ?? false }) {
-			//DLog(">>>>>>>>>>>>>>> detected permanently changed items")
+			// DLog(">>>>>>>>>>>>>>> detected permanently changed items")
             DispatchQueue.main.async {
                 self.updateStatus(becauseOfChanges: true)
             }
@@ -583,12 +582,10 @@ UITableViewDragDelegate {
 		}
 
 		if Settings.showSeparateApiServersInMenu {
-			for a in ApiServer.allApiServers(in: DataManager.main) {
-				if a.goodToGo {
-					let c = GroupingCriterion(apiServerId: a.objectID)
-					let s = TabBarSet(viewCriterion: c)
-					tabBarSets.append(s)
-				}
+			for a in ApiServer.allApiServers(in: DataManager.main) where a.goodToGo {
+                let c = GroupingCriterion(apiServerId: a.objectID)
+                let s = TabBarSet(viewCriterion: c)
+                tabBarSets.append(s)
 			}
 		} else {
 			let s = TabBarSet(viewCriterion: nil)
@@ -720,7 +717,7 @@ UITableViewDragDelegate {
             b.heightAnchor.constraint(equalToConstant: 0.5),
             b.bottomAnchor.constraint(equalTo: ts.topAnchor),
             b.leadingAnchor.constraint(equalTo: ts.leadingAnchor),
-            b.trailingAnchor.constraint(equalTo: ts.trailingAnchor),
+            b.trailingAnchor.constraint(equalTo: ts.trailingAnchor)
         ])
     }
     
@@ -738,7 +735,7 @@ UITableViewDragDelegate {
         tabs.removeFromSuperview()
     }
     
-	func localNotificationSelected(userInfo: [AnyHashable : Any], action: String) {
+	func localNotificationSelected(userInfo: [AnyHashable: Any], action: String) {
 		var urlToOpen = userInfo[NOTIFICATION_URL_KEY] as? String
 		var relatedItem: ListableItem?
 
@@ -995,7 +992,7 @@ UITableViewDragDelegate {
 		                          message: hasPresets ? S(i.title) : "You do not currently have any snoozing presets configured. Please add some in the relevant preferences tab.",
 		                          preferredStyle: .alert)
 		for preset in snoozePresets {
-			a.addAction(UIAlertAction(title: preset.listDescription, style: .default) { action in
+			a.addAction(UIAlertAction(title: preset.listDescription, style: .default) { _ in
 				i.snooze(using: preset)
 			})
 		}
@@ -1025,7 +1022,7 @@ UITableViewDragDelegate {
 
 		guard animatedUpdates else { return }
 
-		switch(type) {
+		switch type {
 		case .insert:
 			tableView.insertSections(IndexSet(integer: sectionIndex), with: .fade)
 		case .delete:
@@ -1043,7 +1040,7 @@ UITableViewDragDelegate {
 
 		guard animatedUpdates else { return }
 
-		switch(type) {
+		switch type {
 		case .insert:
 			if let n = newIndexPath {
 				tableView.insertRows(at: [n], with: .fade)

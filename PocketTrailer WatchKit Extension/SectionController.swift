@@ -1,4 +1,3 @@
-
 import WatchKit
 import WatchConnectivity
 
@@ -47,7 +46,7 @@ final class SectionController: CommonController {
 			API_URI_KEY: r.apiServerUri! ] )
 	}
 
-	override func update(from response: [AnyHashable : Any]) {
+	override func update(from response: [AnyHashable: Any]) {
 		DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             if let overview = response["result"] as? [AnyHashable: Any] {
@@ -73,8 +72,8 @@ final class SectionController: CommonController {
 
 		rowControllers.removeAll(keepingCapacity: false)
 
-		func addSectionsFor(_ entry: [AnyHashable : Any], itemType: String, label: String, apiServerUri: String, showEmptyDescriptions: Bool) {
-			let items = entry[itemType] as! [AnyHashable : Any]
+		func addSectionsFor(_ entry: [AnyHashable: Any], itemType: String, label: String, apiServerUri: String, showEmptyDescriptions: Bool) {
+			let items = entry[itemType] as! [AnyHashable: Any]
 			let totalItems = items["total"] as! Int
             var showClearClosed = false
             var showClearMerged = false
@@ -95,7 +94,7 @@ final class SectionController: CommonController {
                     default: break
                     }
 
-					if let section = items[itemSection] as? [AnyHashable : Any], let count = section["total"] as? Int, let unread = section["unread"] as? Int, count > 0 {
+					if let section = items[itemSection] as? [AnyHashable: Any], let count = section["total"] as? Int, let unread = section["unread"] as? Int, count > 0 {
 						let s = SectionRow()
 						s.section = sectionFrom(apiName: itemSection)
 						s.totalCount = count
@@ -154,7 +153,7 @@ final class SectionController: CommonController {
 			return
 		}
         
-		guard let views = result["views"] as? [[AnyHashable : Any]] else {
+		guard let views = result["views"] as? [[AnyHashable: Any]] else {
 			show(status: "There is no data from Trailer on your iOS device yet. Please launch it once and configure your settings.", hideTable: true)
 			return
 		}

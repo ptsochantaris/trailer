@@ -48,15 +48,15 @@ struct TypeSection: View {
 
         error = info["error"] as? String ?? "No items"
         
-        for r in info["views"] as! [[AnyHashable : Any]] {
-            if let v = r[type] as? [AnyHashable : Any] {
-                totalMine += (v[Section.mine.apiName] as? [AnyHashable : Any])?["total"] as? Int ?? 0
-                totalParticipated += (v[Section.participated.apiName] as? [AnyHashable : Any])?["total"] as? Int ?? 0
-                totalMentioned += (v[Section.mentioned.apiName] as? [AnyHashable : Any])?["total"] as? Int ?? 0
-                totalSnoozed += (v[Section.snoozed.apiName] as? [AnyHashable : Any])?["total"] as? Int ?? 0
-                totalOther += (v[Section.all.apiName] as? [AnyHashable : Any])?["total"] as? Int ?? 0
-                totalMerged += (v[Section.merged.apiName] as? [AnyHashable : Any])?["total"] as? Int ?? 0
-                totalClosed += (v[Section.closed.apiName] as? [AnyHashable : Any])?["total"] as? Int ?? 0
+        for r in info["views"] as! [[AnyHashable: Any]] {
+            if let v = r[type] as? [AnyHashable: Any] {
+                totalMine += (v[Section.mine.apiName] as? [AnyHashable: Any])?["total"] as? Int ?? 0
+                totalParticipated += (v[Section.participated.apiName] as? [AnyHashable: Any])?["total"] as? Int ?? 0
+                totalMentioned += (v[Section.mentioned.apiName] as? [AnyHashable: Any])?["total"] as? Int ?? 0
+                totalSnoozed += (v[Section.snoozed.apiName] as? [AnyHashable: Any])?["total"] as? Int ?? 0
+                totalOther += (v[Section.all.apiName] as? [AnyHashable: Any])?["total"] as? Int ?? 0
+                totalMerged += (v[Section.merged.apiName] as? [AnyHashable: Any])?["total"] as? Int ?? 0
+                totalClosed += (v[Section.closed.apiName] as? [AnyHashable: Any])?["total"] as? Int ?? 0
                 totalUnread += v["unread"] as? Int ?? 0
                 totalOpen += v["total_open"] as? Int ?? 0
             }
@@ -72,7 +72,7 @@ struct TypeSection: View {
                 Text("\(totalCount): ").font(.caption)
                 CommentCount(count: totalUnread)
             }
-            //if extensionContext?.widgetActiveDisplayMode == .compact {
+//          if extensionContext?.widgetActiveDisplayMode == .compact {
 //            } else {
 //                append(a, count: totalMine, section: .mine)
 //                append(a, count: totalParticipated, section: .participated)
@@ -90,7 +90,7 @@ struct TypeSection: View {
     }
 }
 
-struct MainView : View {
+struct MainView: View {
     var entry: Summary
     
     var body: some View {

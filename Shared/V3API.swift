@@ -23,16 +23,12 @@ extension API {
     @MainActor
     static func v3_fetchItems(for repos: [Repo], to moc: NSManagedObjectContext) async {        
         for r in repos {
-            for p in r.pullRequests {
-                if p.condition == ItemCondition.open.rawValue {
-                    p.postSyncAction = PostSyncAction.delete.rawValue
-                }
+            for p in r.pullRequests where p.condition == ItemCondition.open.rawValue {
+                p.postSyncAction = PostSyncAction.delete.rawValue
             }
 
-            for i in r.issues {
-                if i.condition == ItemCondition.open.rawValue {
-                    i.postSyncAction = PostSyncAction.delete.rawValue
-                }
+            for i in r.issues where i.condition == ItemCondition.open.rawValue {
+                i.postSyncAction = PostSyncAction.delete.rawValue
             }
 
             let apiServer = r.apiServer
@@ -42,7 +38,7 @@ extension API {
                 if r.displayPolicyForPrs != RepoDisplayPolicy.hide.rawValue {
                     let repoFullName = S(r.fullName)
                     group.addTask {
-                        let (success, resultCode) = await RestAccess.getPagedData(at: "/repos/\(repoFullName)/pulls", from: apiServer) { data, lastPage in
+                        let (success, resultCode) = await RestAccess.getPagedData(at: "/repos/\(repoFullName)/pulls", from: apiServer) { data, _ in
                             PullRequest.syncPullRequests(from: data, in: r)
                             return false
                         }
@@ -55,7 +51,7 @@ extension API {
                 if r.displayPolicyForIssues != RepoDisplayPolicy.hide.rawValue {
                     let repoFullName = S(r.fullName)
                     group.addTask {
-                        let (success, resultCode) = await RestAccess.getPagedData(at: "/repos/\(repoFullName)/issues", from: apiServer) { data, lastPage in
+                        let (success, resultCode) = await RestAccess.getPagedData(at: "/repos/\(repoFullName)/issues", from: apiServer) { data, _ in
                             Issue.syncIssues(from: data, in: r)
                             return false
                         }
@@ -78,7 +74,7 @@ extension API {
                 let isFirstEventSync = lastLocalEvent == 0
                 r.lastScannedIssueEventId = 0
                 group.addTask {
-                    let (success, _) = await RestAccess.getPagedData(at: "/repos/\(repoFullName)/issues/events", from: r.apiServer) { data, lastPage in
+                    let (success, _) = await RestAccess.getPagedData(at: "/repos/\(repoFullName)/issues/events", from: r.apiServer) { data, _ in
                         guard let data = data, !data.isEmpty else { return true }
                         
                         if isFirstEventSync {
@@ -95,13 +91,13 @@ extension API {
                             var reasons = Set<String>()
                             var foundLastEvent = false
                             for event in data {
-                                if let eventId = event["id"] as? Int64, let issue = event["issue"] as? [AnyHashable:Any], let issueNumber = issue["number"] as? Int64 {
+                                if let eventId = event["id"] as? Int64, let issue = event["issue"] as? [AnyHashable: Any], let issueNumber = issue["number"] as? Int64 {
                                     if r.lastScannedIssueEventId == 0 {
                                         r.lastScannedIssueEventId = eventId
                                     }
                                     if eventId == lastLocalEvent {
                                         foundLastEvent = true
-                                        DLog("Parsed all repo issue events up to the one we already have");
+                                        DLog("Parsed all repo issue events up to the one we already have")
                                         break // we're done
                                     }
                                     if let reason = event["event"] as? String {
@@ -227,7 +223,7 @@ extension API {
                 ItemCondition.closed.matchingPredicate,
                 NSCompoundPredicate(type: .or, subpredicates: [
                     PostSyncAction.isUpdated.matchingPredicate,
-                    PostSyncAction.delete.matchingPredicate,
+                    PostSyncAction.delete.matchingPredicate
                 ])
             ])
         f.returnsObjectsAsFaults = false
@@ -254,7 +250,7 @@ extension API {
                 }
                 guard let reactionUrl = c.reactionsUrl else { continue }
                 group.addTask {
-                    let (success, _) = await RestAccess.getPagedData(at: reactionUrl, from: c.apiServer) { data, lastPage in
+                    let (success, _) = await RestAccess.getPagedData(at: reactionUrl, from: c.apiServer) { data, _ in
                         Reaction.syncReactions(from: data, comment: c)
                         return false
                     }
@@ -287,7 +283,7 @@ extension API {
                     continue
                 }
                 group.addTask {
-                    let (success, _) = await RestAccess.getPagedData(at: reactionsUrl, from: i.apiServer) { data, lastPage in
+                    let (success, _) = await RestAccess.getPagedData(at: reactionsUrl, from: i.apiServer) { data, _ in
                         Reaction.syncReactions(from: data, parent: i)
                         return false
                     }
@@ -311,13 +307,14 @@ extension API {
             }
         }
         
-        func _fetchComments(for pullRequests: [PullRequest], issues: Bool, in moc: NSManagedObjectContext) async {
+        @Sendable func _fetchComments(issues: Bool) async {
             await withTaskGroup(of: Void.self) { group in
-                for p in pullRequests {
+                assert(Thread.isMainThread)
+                for p in prs {
                     if let link = (issues ? p.commentsLink : p.reviewCommentLink) {
                         let apiServer = p.apiServer
                         group.addTask {
-                            let (success, _) = await RestAccess.getPagedData(at: link, from: apiServer) { data, lastPage in
+                            let (success, _) = await RestAccess.getPagedData(at: link, from: apiServer) { data, _ in
                                 PRComment.syncComments(from: data, parent: p)
                                 return false
                             }
@@ -331,8 +328,12 @@ extension API {
         }
 
         await withTaskGroup(of: Void.self) { group in
-            await _fetchComments(for: prs, issues: true, in: moc)
-            await _fetchComments(for: prs, issues: false, in: moc)
+            group.addTask {
+                await _fetchComments(issues: true)
+            }
+            group.addTask {
+                await _fetchComments(issues: false)
+            }
         }
     }
 
@@ -352,7 +353,7 @@ extension API {
                     let apiServer = i.apiServer
 
                     group.addTask {
-                        let (success, _) = await RestAccess.getPagedData(at: link, from: apiServer) { data, lastPage in
+                        let (success, _) = await RestAccess.getPagedData(at: link, from: apiServer) { data, _ in
                             PRComment.syncComments(from: data, parent: i)
                             return false
                         }
@@ -378,7 +379,7 @@ extension API {
                 }
                 let repoFullName = S(p.repo.fullName)
                 group.addTask {
-                    let (success, _) = await RestAccess.getPagedData(at: "/repos/\(repoFullName)/pulls/\(p.number)/reviews", from: p.apiServer) { data, lastPage in
+                    let (success, _) = await RestAccess.getPagedData(at: "/repos/\(repoFullName)/pulls/\(p.number)/reviews", from: p.apiServer) { data, _ in
                         Review.syncReviews(from: data, withParent: p)
                         return false
                     }
@@ -399,8 +400,8 @@ extension API {
 
         do {
             let (data, _, _) = try await RestAccess.getData(in: path, from: pullRequest.apiServer)
-            if let d = data as? [AnyHashable : Any] {
-                if let mergeInfo = d["merged_by"] as? [AnyHashable : Any], let mergeUserId = mergeInfo["node_id"] as? String {
+            if let d = data as? [AnyHashable: Any] {
+                if let mergeInfo = d["merged_by"] as? [AnyHashable: Any], let mergeUserId = mergeInfo["node_id"] as? String {
                     pullRequest.mergedByNodeId = mergeUserId
                     pullRequest.stateChanged = ListableItem.StateChange.merged.rawValue
                     pullRequest.postSyncAction = PostSyncAction.isUpdated.rawValue // let handleMerging() decide
@@ -494,7 +495,7 @@ extension API {
                 }
                 
                 group.addTask {
-                    let (success, resultCode) = await RestAccess.getPagedData(at: link, from: p.apiServer) { data, lastPage in
+                    let (success, resultCode) = await RestAccess.getPagedData(at: link, from: p.apiServer) { data, _ in
                         PRLabel.syncLabels(from: data, withParent: p)
                         return false
                     }
@@ -526,7 +527,7 @@ extension API {
                 }
                 
                 group.addTask {
-                    let (success, resultCode) = await RestAccess.getPagedData(at: link, from: i.apiServer) { data, lastPage in
+                    let (success, resultCode) = await RestAccess.getPagedData(at: link, from: i.apiServer) { data, _ in
                         PRLabel.syncLabels(from: data, withParent: i)
                         return false
                     }
@@ -560,7 +561,7 @@ extension API {
                 
                 if let statusLink = p.statusesLink {
                     group.addTask {
-                        let (success, resultCode) = await RestAccess.getPagedData(at: statusLink, from: apiServer) { data, lastPage in
+                        let (success, resultCode) = await RestAccess.getPagedData(at: statusLink, from: apiServer) { data, _ in
                             PRStatus.syncStatuses(from: data, pullRequest: p)
                             return false
                         }
@@ -594,7 +595,7 @@ extension API {
                         do {
                             let (data, _, resultCode) = try await RestAccess.getData(in: issueLink, from: apiServer)
                             if resultCode == 200 || resultCode == 404 || resultCode == 410 {
-                                if let d = data as? [AnyHashable : Any] {
+                                if let d = data as? [AnyHashable: Any] {
                                     p.processAssignmentStatus(from: d, idField: "node_id")
                                 }
                             } else {

@@ -1,4 +1,3 @@
-
 import UIKit
 import CoreData
 
@@ -255,12 +254,12 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 	}
 
 	private var sizer: RepoCell?
-	private var heightCache = [IndexPath : CGFloat]()
+	private var heightCache = [IndexPath: CGFloat]()
 	override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
 		if sizer == nil {
 			sizer = tableView.dequeueReusableCell(withIdentifier: "Cell") as? RepoCell
 		} else if let h = heightCache[indexPath] {
-			//DLog("using cached height for %@ - %@", indexPath.section, indexPath.row)
+			// DLog("using cached height for %@ - %@", indexPath.section, indexPath.row)
 			return h
 		}
 		configureCell(sizer!, atIndexPath: indexPath)
@@ -292,12 +291,12 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 	private func groupTitleForRepo(repo: Repo) -> NSAttributedString {
 		if let l = repo.groupLabel {
 			return NSAttributedString(string: "Group: \(l)", attributes: [
-				.foregroundColor : UIColor.secondaryLabel,
+				.foregroundColor: UIColor.secondaryLabel,
 				.font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)
 				])
 		} else {
 			return NSAttributedString(string: "Ungrouped", attributes: [
-				.foregroundColor : UIColor.tertiaryLabel,
+				.foregroundColor: UIColor.tertiaryLabel,
 				.font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)
 				])
 		}
@@ -309,14 +308,14 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 		return NSAttributedString(string: policy.name, attributes: attributes(for: policy))
 	}
 
-	private func attributes(for policy: RepoDisplayPolicy) -> [NSAttributedString.Key : Any] {
+	private func attributes(for policy: RepoDisplayPolicy) -> [NSAttributedString.Key: Any] {
 		return [
 			.font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize-1.0),
 			.foregroundColor: policy.color
 		]
 	}
 
-	private func attributes(for policy: RepoHidingPolicy) -> [NSAttributedString.Key : Any] {
+	private func attributes(for policy: RepoHidingPolicy) -> [NSAttributedString.Key: Any] {
 		return [
 			.font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize-1.0),
 			.foregroundColor: policy.color
@@ -344,7 +343,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 			tableView.deleteSections(IndexSet(removedIndexes), with: .fade)
 		}
 		if !untouchedIndexes.isEmpty {
-			tableView.reloadSections(IndexSet(untouchedIndexes), with:.fade)
+			tableView.reloadSections(IndexSet(untouchedIndexes), with: .fade)
 		}
 		if !addedIndexes.isEmpty {
 			tableView.insertSections(IndexSet(addedIndexes), with: .fade)

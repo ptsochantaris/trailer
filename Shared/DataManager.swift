@@ -1,4 +1,3 @@
-
 import CoreData
 
 final class DataManager {
@@ -64,7 +63,7 @@ final class DataManager {
 			var legacyWebHost = S(d.object(forKey: "API_FRONTEND_SERVER") as? String)
 			if legacyWebHost.isEmpty { legacyWebHost = "github.com" }
 
-			let actualApiPath = "\(legacyApiHost)/\(legacyApiPath)".replacingOccurrences(of: "//", with:"/")
+			let actualApiPath = "\(legacyApiHost)/\(legacyApiPath)".replacingOccurrences(of: "//", with: "/")
 
 			let newApiServer = ApiServer.addDefaultGithub(in: main)
 			newApiServer.apiPath = "https://\(actualApiPath)"
@@ -123,10 +122,8 @@ final class DataManager {
 			}
 		}
 
-		for s in DataItem.allItems(of: PRStatus.self, in: DataManager.main) {
-			if s.context == nil {
-				s.resetSyncState()
-			}
+		for s in DataItem.allItems(of: PRStatus.self, in: DataManager.main) where s.context == nil {
+            s.resetSyncState()
 		}
 	}
 
@@ -256,7 +253,7 @@ final class DataManager {
 		return c
 	}
 
-	static func info(for item: DataItem) -> [String : Any] {
+	static func info(for item: DataItem) -> [String: Any] {
 
 		if let item = item as? PRComment {
 			let uri = item.objectID.uriRepresentation().absoluteString
@@ -341,7 +338,7 @@ final class DataManager {
 		do {
 			for file in try fm.contentsOfDirectory(atPath: documentsDirectory) {
 				if file.contains("Trailer.sqlite") {
-					DLog("Removing old database file: %@",file)
+					DLog("Removing old database file: %@", file)
 					try! fm.removeItem(atPath: documentsDirectory.appending(pathComponent: file))
 				}
 			}
@@ -356,10 +353,10 @@ final class DataManager {
 
 	private static var persistentStoreCoordinator: NSPersistentStoreCoordinator? = {
 
-		let storeOptions: [AnyHashable : Any] = [
+		let storeOptions: [AnyHashable: Any] = [
 			NSMigratePersistentStoresAutomaticallyOption: true,
 			NSInferMappingModelAutomaticallyOption: true,
-			NSSQLitePragmasOption: ["synchronous":"OFF"]
+			NSSQLitePragmasOption: ["synchronous": "OFF"]
 		]
 
 		let modelPath = Bundle.main.url(forResource: "Trailer", withExtension: "momd")!

@@ -9,7 +9,7 @@ private final class TextFieldCellTextView: NSTextView, NSTextViewDelegate {
 			let selected = range.length > 0
 			let keyCode = event.keyCode
 
-			if keyCode == 6 { //command + Z
+			if keyCode == 6 { // command + Z
 				if let undoManager = textView.undoManager {
 					if modifiers.contains(.shift) {
 						if undoManager.canRedo {

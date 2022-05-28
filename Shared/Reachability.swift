@@ -1,4 +1,3 @@
-
 import Foundation
 import SystemConfiguration
 
@@ -32,8 +31,8 @@ final class Reachability {
 	func startNotifier() {
 		var context = SCNetworkReachabilityContext(version: 0, info: nil, retain: nil, release: nil, copyDescription: nil)
 
-		if (SCNetworkReachabilitySetCallback(reachability, ReachabilityCallback, &context)) {
-			if (SCNetworkReachabilityScheduleWithRunLoop(reachability, CFRunLoopGetCurrent(), CFRunLoopMode.commonModes.rawValue)) {
+		if SCNetworkReachabilitySetCallback(reachability, ReachabilityCallback, &context) {
+			if SCNetworkReachabilityScheduleWithRunLoop(reachability, CFRunLoopGetCurrent(), CFRunLoopMode.commonModes.rawValue) {
 				DLog("Reachability monitoring active")
 				return
 			}

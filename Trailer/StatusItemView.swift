@@ -3,7 +3,7 @@ import Cocoa
 final class StatusItemView: NSView {
 
 	var icon: NSImage!
-	var textAttributes = [NSAttributedString.Key : Any]()
+	var textAttributes = [NSAttributedString.Key: Any]()
 	var statusLabel = ""
 	var labelOffset: CGFloat = 0
 	var title: String?
@@ -82,7 +82,7 @@ final class StatusItemView: NSView {
 		}
 	}
 
-	private func drawStandard(titleColor: NSColor, countAttributes: [NSAttributedString.Key : Any], inRect: NSRect) {
+	private func drawStandard(titleColor: NSColor, countAttributes: [NSAttributedString.Key: Any], inRect: NSRect) {
 
 		let imagePoint = CGPoint(x: StatusItemView.padding, y: 0)
 		var labelRect = CGRect(x: bounds.size.height + labelOffset, y: -5, width: bounds.size.width, height: bounds.size.height)
@@ -104,13 +104,13 @@ final class StatusItemView: NSView {
 			img.draw(in: CGRect(x: imagePoint.x+3, y: imagePoint.y, width: img.size.width-6, height: img.size.height-6))
             
 		} else {
-			img.draw(at: imagePoint, from: NSZeroRect, operation: .sourceOver, fraction: 1.0)
+            img.draw(at: imagePoint, from: .zero, operation: .sourceOver, fraction: 1.0)
 		}
 
 		statusLabel.draw(in: labelRect, withAttributes: countAttributes)
 	}
 
-	private func drawIconOnly(titleColor: NSColor, countAttributes: [NSAttributedString.Key : Any], inRect: NSRect) {
+	private func drawIconOnly(titleColor: NSColor, countAttributes: [NSAttributedString.Key: Any], inRect: NSRect) {
 
 		let foreground = countAttributes[NSAttributedString.Key.foregroundColor] as! NSColor
 
@@ -144,7 +144,7 @@ final class StatusItemView: NSView {
 				statusLabel.draw(in: rect, withAttributes: countAttributes)
 			} else {
 				let img = tintedImage(from: icon, tint: foreground)
-				img.draw(at: CGPoint(x: (inRect.width - img.size.width)*0.5, y: 0), from: NSZeroRect, operation: .sourceOver, fraction: 1.0)
+                img.draw(at: CGPoint(x: (inRect.width - img.size.width)*0.5, y: 0), from: .zero, operation: .sourceOver, fraction: 1.0)
 			}
 		}
 	}
@@ -156,7 +156,7 @@ final class StatusItemView: NSView {
 		tinted.lockFocus()
 		tint.set()
 
-		let imageRect = NSRect(origin: NSZeroPoint, size: image.size)
+        let imageRect = NSRect(origin: .zero, size: image.size)
 		imageRect.fill(using: .sourceAtop)
 
 		tinted.unlockFocus()

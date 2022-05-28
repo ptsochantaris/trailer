@@ -1,4 +1,3 @@
-
 import UIKit
 
 final class AdvancedSettingsViewController: UITableViewController, PickerViewControllerDelegate, UISearchResultsUpdating {
@@ -13,7 +12,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		let section: SettingsSection
 		let title: String
 		let description: String
-		var valueDisplayed: ()->String?
+		var valueDisplayed: () -> String?
 
 		func isRelevant(to searchText: String?, showingHelp: Bool) -> Bool {
 			if let s = searchText, !s.isEmpty {
@@ -445,7 +444,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			attributes: [
 				NSAttributedString.Key.font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize),
                 NSAttributedString.Key.foregroundColor: UIColor.tertiaryLabel,
-				NSAttributedString.Key.paragraphStyle: p,
+				NSAttributedString.Key.paragraphStyle: p
 				])
 		l.numberOfLines = 0
 		return l
@@ -547,69 +546,69 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			var values = [String]()
 			var count=0
             var previousIndex: Int?
-			switch originalIndex {
-			case 0:
-				// minutes
+            switch originalIndex {
+            case 0:
+                // minutes
                 let period = Int(Settings.backgroundRefreshPeriod / 60)
                 for f in 2 ..< 1000 {
-					if f == period { previousIndex = count }
-					values.append("\(f) minutes")
-					count += 1
-				}
-			case 1:
-				// hours
+                    if f == period { previousIndex = count }
+                    values.append("\(f) minutes")
+                    count += 1
+                }
+            case 1:
+                // hours
                 let period = Int(Settings.newRepoCheckPeriod)
-				for f in 2 ..< 100 {
-					if f == period { previousIndex = count }
-					values.append("\(f) hours")
-					count += 1
-				}
-			default: break
-			}
+                for f in 2 ..< 100 {
+                    if f == period { previousIndex = count }
+                    values.append("\(f) hours")
+                    count += 1
+                }
+            default: break
+            }
             let v = PickerViewController.Info(title: setting.title, values: values, selectedIndex: previousIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
-			performSegue(withIdentifier: "showPicker", sender: v)
-
-		} else if section == SettingsSection.Display {
-			switch originalIndex {
-			case 0:
-				let wasOff = !Settings.showLabels
-				Settings.showLabels = !Settings.showLabels
-				if wasOff && Settings.showLabels {
-					ApiServer.resetSyncOfEverything()
-					preferencesDirty = true
-					showLongSyncWarning()
-				}
-				settingsChangedTimer.push()
-			case 1:
-				Settings.showCreatedInsteadOfUpdated = !Settings.showCreatedInsteadOfUpdated
-				settingsChangedTimer.push()
-			case 2:
-				Settings.showRelativeDates = !Settings.showRelativeDates
-				settingsChangedTimer.push()
-			case 3:
+            performSegue(withIdentifier: "showPicker", sender: v)
+            
+        } else if section == SettingsSection.Display {
+            switch originalIndex {
+            case 0:
+                let wasOff = !Settings.showLabels
+                Settings.showLabels = !Settings.showLabels
+                if wasOff && Settings.showLabels {
+                    ApiServer.resetSyncOfEverything()
+                    preferencesDirty = true
+                    showLongSyncWarning()
+                }
+                settingsChangedTimer.push()
+            case 1:
+                Settings.showCreatedInsteadOfUpdated = !Settings.showCreatedInsteadOfUpdated
+                settingsChangedTimer.push()
+            case 2:
+                Settings.showRelativeDates = !Settings.showRelativeDates
+                settingsChangedTimer.push()
+            case 3:
                 let v = PickerViewController.Info(title: setting.title, values: AssignmentPolicy.labels, selectedIndex: Settings.assignedPrHandlingPolicy, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
-				performSegue(withIdentifier: "showPicker", sender: v)
-			case 4:
-				Settings.showReposInName = !Settings.showReposInName
-				settingsChangedTimer.push()
+                performSegue(withIdentifier: "showPicker", sender: v)
+            case 4:
+                Settings.showReposInName = !Settings.showReposInName
+                settingsChangedTimer.push()
             case 5:
                 Settings.showBaseAndHeadBranches = !Settings.showBaseAndHeadBranches
                 settingsChangedTimer.push()
-			case 6:
-				Settings.showSeparateApiServersInMenu = !Settings.showSeparateApiServersInMenu
-				DispatchQueue.main.async {
-					popupManager.masterController.updateStatus(becauseOfChanges: true)
-				}
-				settingsChangedTimer.push()
-			case 7:
+            case 6:
+                Settings.showSeparateApiServersInMenu = !Settings.showSeparateApiServersInMenu
+                DispatchQueue.main.async {
+                    popupManager.masterController.updateStatus(becauseOfChanges: true)
+                }
+                settingsChangedTimer.push()
+            case 7:
                 Settings.markPrsAsUnreadOnNewCommits = !Settings.markPrsAsUnreadOnNewCommits
                 settingsChangedTimer.push()
-			case 8:
-				Settings.showMilestones = !Settings.showMilestones
-				settingsChangedTimer.push()
-			case 9:
-				Settings.displayNumbersForItems = !Settings.displayNumbersForItems
-				settingsChangedTimer.push()
+            case 8:
+                Settings.showMilestones = !Settings.showMilestones
+                settingsChangedTimer.push()
+            case 9:
+                Settings.displayNumbersForItems = !Settings.displayNumbersForItems
+                settingsChangedTimer.push()
             case 10:
                 let v = PickerViewController.Info(title: setting.title, values: DraftHandlingPolicy.labels, selectedIndex: Settings.draftHandlingPolicy, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
                 performSegue(withIdentifier: "showPicker", sender: v)
@@ -619,35 +618,35 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
             case 12:
                 Settings.showPrLines = !Settings.showPrLines
                 settingsChangedTimer.push()
-			default: break
+            default: break
 			}
 
-		} else if section == SettingsSection.Filtering {
-			switch originalIndex {
-			case 0:
-				Settings.includeTitlesInFilter = !Settings.includeTitlesInFilter
-			case 1:
-				Settings.includeReposInFilter = !Settings.includeReposInFilter
-			case 2:
-				Settings.includeLabelsInFilter = !Settings.includeLabelsInFilter
-			case 3:
-				Settings.includeStatusesInFilter = !Settings.includeStatusesInFilter
-			case 4:
-				Settings.includeServersInFilter = !Settings.includeServersInFilter
-			case 5:
-				Settings.includeUsersInFilter = !Settings.includeUsersInFilter
-			case 6:
-				Settings.includeNumbersInFilter = !Settings.includeNumbersInFilter
-			case 7:
-				Settings.includeMilestonesInFilter = !Settings.includeMilestonesInFilter
-			case 8:
-				Settings.includeAssigneeNamesInFilter = !Settings.includeAssigneeNamesInFilter
+        } else if section == SettingsSection.Filtering {
+            switch originalIndex {
+            case 0:
+                Settings.includeTitlesInFilter = !Settings.includeTitlesInFilter
+            case 1:
+                Settings.includeReposInFilter = !Settings.includeReposInFilter
+            case 2:
+                Settings.includeLabelsInFilter = !Settings.includeLabelsInFilter
+            case 3:
+                Settings.includeStatusesInFilter = !Settings.includeStatusesInFilter
+            case 4:
+                Settings.includeServersInFilter = !Settings.includeServersInFilter
+            case 5:
+                Settings.includeUsersInFilter = !Settings.includeUsersInFilter
+            case 6:
+                Settings.includeNumbersInFilter = !Settings.includeNumbersInFilter
+            case 7:
+                Settings.includeMilestonesInFilter = !Settings.includeMilestonesInFilter
+            case 8:
+                Settings.includeAssigneeNamesInFilter = !Settings.includeAssigneeNamesInFilter
             case 9:
                 performSegue(withIdentifier: "showBlacklist", sender: CommentBlacklistViewController.Mode.itemAuthors)
             case 10:
                 performSegue(withIdentifier: "showBlacklist", sender: CommentBlacklistViewController.Mode.labels)
-			default: break
-			}
+            default: break
+            }
 			settingsChangedTimer.push()
 
 		} else if section == SettingsSection.AppleWatch {
@@ -685,64 +684,64 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			default: break
 			}
 
-		} else if section == SettingsSection.Reviews {
-
-			switch originalIndex {
-			case 0:
-				let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
-				Settings.displayReviewsOnItems = !Settings.displayReviewsOnItems
-				showOptionalReviewWarning(previousSync: previousShouldSync)
-
+        } else if section == SettingsSection.Reviews {
+            
+            switch originalIndex {
+            case 0:
+                let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
+                Settings.displayReviewsOnItems = !Settings.displayReviewsOnItems
+                showOptionalReviewWarning(previousSync: previousShouldSync)
+                
             case 1:
                 let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
                 Settings.showRequestedTeamReviews = !Settings.showRequestedTeamReviews
                 showOptionalReviewWarning(previousSync: previousShouldSync)
                 
-			case 2:
+            case 2:
                 let v = PickerViewController.Info(title: setting.title, values: Section.movePolicyNames, selectedIndex: Settings.assignedReviewHandlingPolicy, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
-				performSegue(withIdentifier: "showPicker", sender: v)
-
-			case 3:
-				let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
-				Settings.notifyOnReviewChangeRequests = !Settings.notifyOnReviewChangeRequests
-				showOptionalReviewWarning(previousSync: previousShouldSync)
-
-			case 4:
-				Settings.notifyOnAllReviewChangeRequests = !Settings.notifyOnAllReviewChangeRequests
-
-			case 5:
-				let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
-				Settings.notifyOnReviewAcceptances = !Settings.notifyOnReviewAcceptances
-				showOptionalReviewWarning(previousSync: previousShouldSync)
-
-			case 6:
-				Settings.notifyOnAllReviewAcceptances = !Settings.notifyOnAllReviewAcceptances
-
-			case 7:
-				let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
-				Settings.notifyOnReviewDismissals = !Settings.notifyOnReviewDismissals
-				showOptionalReviewWarning(previousSync: previousShouldSync)
-
-			case 8:
-				Settings.notifyOnAllReviewDismissals = !Settings.notifyOnAllReviewDismissals
-
-			case 9:
-				let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
-				Settings.notifyOnReviewAssignments = !Settings.notifyOnReviewAssignments
-				showOptionalReviewWarning(previousSync: previousShouldSync)
-
-			default: break
-			}
-
-			if !Settings.notifyOnReviewChangeRequests {
-				Settings.notifyOnAllReviewChangeRequests = false
-			}
-			if !Settings.notifyOnReviewDismissals {
-				Settings.notifyOnAllReviewDismissals = false
-			}
-			if !Settings.notifyOnReviewAcceptances {
-				Settings.notifyOnAllReviewAcceptances = false
-			}
+                performSegue(withIdentifier: "showPicker", sender: v)
+                
+            case 3:
+                let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
+                Settings.notifyOnReviewChangeRequests = !Settings.notifyOnReviewChangeRequests
+                showOptionalReviewWarning(previousSync: previousShouldSync)
+                
+            case 4:
+                Settings.notifyOnAllReviewChangeRequests = !Settings.notifyOnAllReviewChangeRequests
+                
+            case 5:
+                let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
+                Settings.notifyOnReviewAcceptances = !Settings.notifyOnReviewAcceptances
+                showOptionalReviewWarning(previousSync: previousShouldSync)
+                
+            case 6:
+                Settings.notifyOnAllReviewAcceptances = !Settings.notifyOnAllReviewAcceptances
+                
+            case 7:
+                let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
+                Settings.notifyOnReviewDismissals = !Settings.notifyOnReviewDismissals
+                showOptionalReviewWarning(previousSync: previousShouldSync)
+                
+            case 8:
+                Settings.notifyOnAllReviewDismissals = !Settings.notifyOnAllReviewDismissals
+                
+            case 9:
+                let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
+                Settings.notifyOnReviewAssignments = !Settings.notifyOnReviewAssignments
+                showOptionalReviewWarning(previousSync: previousShouldSync)
+                
+            default: break
+            }
+            
+            if !Settings.notifyOnReviewChangeRequests {
+                Settings.notifyOnAllReviewChangeRequests = false
+            }
+            if !Settings.notifyOnReviewDismissals {
+                Settings.notifyOnAllReviewDismissals = false
+            }
+            if !Settings.notifyOnReviewAcceptances {
+                Settings.notifyOnAllReviewAcceptances = false
+            }
 
 		} else if section == SettingsSection.Reactions {
 
@@ -778,39 +777,39 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			}
             let v = PickerViewController.Info(title: setting.title, values: RepoDisplayPolicy.labels, selectedIndex: previousIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
 			performSegue(withIdentifier: "showPicker", sender: v)
-			
-		} else if section == SettingsSection.Stauses {
-			switch originalIndex {
-			case 0:
-				Settings.showStatusItems = !Settings.showStatusItems
-				settingsChangedTimer.push()
-				if Settings.showStatusItems {
-					preferencesDirty = true
-				}
-			case 1:
-				Settings.showStatusesOnAllItems = !Settings.showStatusesOnAllItems
-				settingsChangedTimer.push()
-				if Settings.showStatusesOnAllItems {
-					preferencesDirty = true
-				}
-			case 2:
-				var values = [String]()
-				values.append("1 item per refresh")
-				for f in 2 ..< 999 {
-					values.append("\(f) items per refresh")
-				}
+            
+        } else if section == SettingsSection.Stauses {
+            switch originalIndex {
+            case 0:
+                Settings.showStatusItems = !Settings.showStatusItems
+                settingsChangedTimer.push()
+                if Settings.showStatusItems {
+                    preferencesDirty = true
+                }
+            case 1:
+                Settings.showStatusesOnAllItems = !Settings.showStatusesOnAllItems
+                settingsChangedTimer.push()
+                if Settings.showStatusesOnAllItems {
+                    preferencesDirty = true
+                }
+            case 2:
+                var values = [String]()
+                values.append("1 item per refresh")
+                for f in 2 ..< 999 {
+                    values.append("\(f) items per refresh")
+                }
                 let v = PickerViewController.Info(title: setting.title, values: values, selectedIndex: Settings.statusItemRefreshBatchSize - 1, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
-				performSegue(withIdentifier: "showPicker", sender: v)
-			case 3:
-				Settings.notifyOnStatusUpdates = !Settings.notifyOnStatusUpdates
-			case 4:
-				Settings.notifyOnStatusUpdatesForAllPrs = !Settings.notifyOnStatusUpdatesForAllPrs
-			case 5:
-				Settings.hidePrsThatArentPassing = !Settings.hidePrsThatArentPassing
-				settingsChangedTimer.push()
-			case 6:
-				Settings.hidePrsThatDontPassOnlyInAll = !Settings.hidePrsThatDontPassOnlyInAll
-				settingsChangedTimer.push()
+                performSegue(withIdentifier: "showPicker", sender: v)
+            case 3:
+                Settings.notifyOnStatusUpdates = !Settings.notifyOnStatusUpdates
+            case 4:
+                Settings.notifyOnStatusUpdatesForAllPrs = !Settings.notifyOnStatusUpdatesForAllPrs
+            case 5:
+                Settings.hidePrsThatArentPassing = !Settings.hidePrsThatArentPassing
+                settingsChangedTimer.push()
+            case 6:
+                Settings.hidePrsThatDontPassOnlyInAll = !Settings.hidePrsThatDontPassOnlyInAll
+                settingsChangedTimer.push()
             case 7:
                 Settings.showStatusesGray = !Settings.showStatusesGray
                 settingsChangedTimer.push()
@@ -823,26 +822,26 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
             case 10:
                 Settings.showStatusesRed = !Settings.showStatusesRed
                 settingsChangedTimer.push()
-			default:
+            default:
                 break
-			}
+            }
 
 		} else if section == SettingsSection.History {
-			switch originalIndex {
-			case 0:
+            switch originalIndex {
+            case 0:
                 let v = PickerViewController.Info(title: setting.title, values: HandlingPolicy.labels, selectedIndex: Settings.mergeHandlingPolicy, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
-				performSegue(withIdentifier: "showPicker", sender: v)
-			case 1:
+                performSegue(withIdentifier: "showPicker", sender: v)
+            case 1:
                 let v = PickerViewController.Info(title: setting.title, values: HandlingPolicy.labels, selectedIndex: Settings.closeHandlingPolicy, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
-				performSegue(withIdentifier: "showPicker", sender: v)
-			case 2:
-				Settings.dontKeepPrsMergedByMe = !Settings.dontKeepPrsMergedByMe
-			case 3:
-				Settings.removeNotificationsWhenItemIsRemoved = !Settings.removeNotificationsWhenItemIsRemoved
+                performSegue(withIdentifier: "showPicker", sender: v)
+            case 2:
+                Settings.dontKeepPrsMergedByMe = !Settings.dontKeepPrsMergedByMe
+            case 3:
+                Settings.removeNotificationsWhenItemIsRemoved = !Settings.removeNotificationsWhenItemIsRemoved
             case 4:
                 Settings.scanClosedAndMergedItems = !Settings.scanClosedAndMergedItems
-			default: break
-			}
+            default: break
+            }
 
 		} else if section == SettingsSection.Confirm {
 			switch originalIndex {
@@ -893,18 +892,17 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		return filteredSections[section].title
 	}
 
-
 	override func numberOfSections(in tableView: UITableView) -> Int {
 		return filteredSections.count
 	}
 
 	private func filteredItemsForTableSection(section: Int) -> [Setting] {
 		let sec = filteredSections[section]
-		return settings.filter{ $0.section == sec && $0.isRelevant(to: searchText, showingHelp: showHelp) }
+		return settings.filter { $0.section == sec && $0.isRelevant(to: searchText, showingHelp: showHelp) }
 	}
 
 	private var filteredSections: [SettingsSection] {
-		let matchingSettings = settings.filter{ $0.isRelevant(to: searchText, showingHelp: showHelp) }
+		let matchingSettings = settings.filter { $0.isRelevant(to: searchText, showingHelp: showHelp) }
 		var matchingSections = Set<SettingsSection>()
 		matchingSettings.forEach { matchingSections.insert($0.section) }
 		return matchingSections.sorted { $0.rawValue < $1.rawValue }

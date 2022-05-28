@@ -1,4 +1,3 @@
-
 import CoreData
 import CommonCrypto
 
@@ -6,7 +5,7 @@ final class API {
 
 	static var currentNetworkStatus = NetworkStatus.NotReachable
     
-    static let cacheDirectory = { ()->String in
+    static let cacheDirectory: String = {
 		let fileManager = FileManager.default
 		let appSupportURL = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!
 		return appSupportURL.appendingPathComponent("com.housetrip.Trailer").path
@@ -29,7 +28,7 @@ final class API {
 			try! fileManager.createDirectory(atPath: cacheDirectory, withIntermediateDirectories: true, attributes: nil)
 		}
 
-		NotificationCenter.default.addObserver(forName: ReachabilityChangedNotification, object: nil, queue: .main) { n in
+		NotificationCenter.default.addObserver(forName: ReachabilityChangedNotification, object: nil, queue: .main) { _ in
 			checkNetworkAvailability()
 			if currentNetworkStatus != .NotReachable {
 				app.startRefreshIfItIsDue()
@@ -331,7 +330,7 @@ final class API {
 			t.postSyncAction = PostSyncAction.delete.rawValue
 		}
 
-        let (success, _) = await RestAccess.getPagedData(at: "/user/teams", from: server) { data, lastPage in
+        let (success, _) = await RestAccess.getPagedData(at: "/user/teams", from: server) { data, _ in
             Team.syncTeams(from: data, server: server)
             return false
         }
@@ -374,10 +373,8 @@ final class API {
         
         assert(Thread.isMainThread)
         if Settings.hideArchivedRepos { Repo.hideArchivedRepos(in: moc) }
-        for r in DataItem.newItems(of: Repo.self, in: moc) {
-            if r.shouldSync {
-                NotificationQueue.add(type: .newRepoAnnouncement, for: r)
-            }
+        for r in DataItem.newItems(of: Repo.self, in: moc) where r.shouldSync {
+            NotificationQueue.add(type: .newRepoAnnouncement, for: r)
         }
         lastRepoCheck = Date()
         assert(Thread.isMainThread)
@@ -457,7 +454,7 @@ final class API {
         }
         
         let createNewRepos = Settings.automaticallyRemoveDeletedReposFromWatchlist
-        let (success, _) = await RestAccess.getPagedData(at: "/user/subscriptions", from: server) { data, lastPage in
+        let (success, _) = await RestAccess.getPagedData(at: "/user/subscriptions", from: server) { data, _ in
             Repo.syncRepos(from: data, server: server, addNewRepos: createNewRepos, manuallyAdded: false)
             return false
         }
@@ -476,7 +473,7 @@ final class API {
 		let path = "\(server.apiPath ?? "")/repos/\(fullName)"
         do {
             let (data, _, _) = try await RestAccess.getData(in: path, from: server)
-            if let repoData = data as? [AnyHashable : Any] {
+            if let repoData = data as? [AnyHashable: Any] {
                 Repo.syncRepos(from: [repoData], server: server, addNewRepos: true, manuallyAdded: true)
             }
         } catch {
@@ -489,9 +486,9 @@ final class API {
 	static func fetchAllRepos(owner: String, from server: ApiServer) async throws {
 
         let userPath = "\(server.apiPath ?? "")/users/\(owner)/repos"
-        let userTask = Task { () -> [[AnyHashable : Any]] in
-            var userList = [[AnyHashable : Any]]()
-            let (success, resultCode) = await RestAccess.getPagedData(at: userPath, from: server) { data, lastPage -> Bool in
+        let userTask = Task { () -> [[AnyHashable: Any]] in
+            var userList = [[AnyHashable: Any]]()
+            let (success, resultCode) = await RestAccess.getPagedData(at: userPath, from: server) { data, _ -> Bool in
                 if let data = data {
                     userList.append(contentsOf: data)
                 }
@@ -505,9 +502,9 @@ final class API {
         }
         
         let orgPath = "\(server.apiPath ?? "")/orgs/\(owner)/repos"
-        let orgTask = Task { () -> [[AnyHashable : Any]] in
-            var orgList = [[AnyHashable : Any]]()
-            let (success, resultCode) = await RestAccess.getPagedData(at: orgPath, from: server) { data, lastPage -> Bool in
+        let orgTask = Task { () -> [[AnyHashable: Any]] in
+            var orgList = [[AnyHashable: Any]]()
+            let (success, resultCode) = await RestAccess.getPagedData(at: orgPath, from: server) { data, _ -> Bool in
                 if let data = data {
                     orgList.append(contentsOf: data)
                 }
@@ -541,7 +538,7 @@ final class API {
                     do {
                         let (data, _, _) = try await RestAccess.getData(in: "/user", from: apiServer)
                         assert(Thread.isMainThread)
-                        if let d = data as? [AnyHashable : Any] {
+                        if let d = data as? [AnyHashable: Any] {
                             apiServer.userName = d["login"] as? String
                             apiServer.userNodeId = d["node_id"] as? String
                         } else {
@@ -558,7 +555,7 @@ final class API {
     @MainActor
 	static func testApi(to apiServer: ApiServer) async throws {
         let (_, _, data) = try await RestAccess.start(call: "/user", on: apiServer, triggeredByUser: true)
-        if let d = data as? [AnyHashable : Any], let userName = d["login"] as? String, let userId = d["id"] as? Int64 {
+        if let d = data as? [AnyHashable: Any], let userName = d["login"] as? String, let userId = d["id"] as? Int64 {
             if userName.isEmpty || userId <= 0 {
                 let localError = apiError("Could not read a valid user record from this endpoint")
                 throw localError

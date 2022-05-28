@@ -1,4 +1,3 @@
-
 import WatchKit
 import WatchConnectivity
 
@@ -20,13 +19,13 @@ final class PRListController: CommonController {
 	private var apiServerUri: String?
 
 	private var onlyUnread = false
-	private var loadingBuffer = [[AnyHashable : Any]]()
+	private var loadingBuffer = [[AnyHashable: Any]]()
 	private var loading = false
 	private var sleeping = false
 
 	override func awake(withContext context: Any?) {
 
-		let c = context as! [AnyHashable : Any]
+		let c = context as! [AnyHashable: Any]
 		sectionIndex = (c[SECTION_KEY] as! Int64)
 		type = (c[TYPE_KEY] as! String)
 		onlyUnread = (c[UNREAD_KEY] as! Bool)
@@ -112,17 +111,17 @@ final class PRListController: CommonController {
 		loadingBuffer.removeAll(keepingCapacity: false)
 	}
 
-	override func update(from response: [AnyHashable : Any]) {
+	override func update(from response: [AnyHashable: Any]) {
 		guard let compressedData = response["result"] as? Data,
 			let uncompressedData = compressedData.data(operation: .decompress),
-			let page = NSKeyedUnarchiver.unarchiveObject(with: uncompressedData) as? [[AnyHashable : Any]]
+			let page = NSKeyedUnarchiver.unarchiveObject(with: uncompressedData) as? [[AnyHashable: Any]]
 			else { return }
 		DispatchQueue.main.async { [weak self] in
 			self?.completeUpdate(from: page)
 		}
 	}
 
-	private func completeUpdate(from page: [[AnyHashable : Any]]) {
+	private func completeUpdate(from page: [[AnyHashable: Any]]) {
 
 		loadingBuffer.append(contentsOf: page)
 

@@ -81,7 +81,7 @@ final class PullRequest: ListableItem {
         return repo.apiUrl?.appending(pathComponent: "statuses").appending(pathComponent: mergeCommitSha ?? "")
     }
     
-	static func syncPullRequests(from data: [[AnyHashable : Any]]?, in repo: Repo) {
+	static func syncPullRequests(from data: [[AnyHashable: Any]]?, in repo: Repo) {
         let apiServer = repo.apiServer
         let apiServerUserId = apiServer.userNodeId
 		items(with: data, type: PullRequest.self, server: apiServer) { item, info, isNewOrUpdated in
@@ -128,12 +128,7 @@ final class PullRequest: ListableItem {
 	}
 
 	override var reviewedByMe: Bool {
-		for r in reviews {
-			if r.isMine {
-				return true
-			}
-		}
-		return false
+        return reviews.contains { $0.isMine }
 	}
     
 	func checkAndStoreReviewAssignments(_ reviewerNames: Set<String>, _ reviewerTeams: Set<String>) {
@@ -250,7 +245,7 @@ final class PullRequest: ListableItem {
         f.predicate = NSPredicate(format: "apiServer.lastSyncSucceeded == YES")
         f.sortDescriptors = [
             NSSortDescriptor(key: "lastStatusScan", ascending: true),
-            NSSortDescriptor(key: "updatedAt", ascending: false),
+            NSSortDescriptor(key: "updatedAt", ascending: false)
         ]
         let prs = try! moc.fetch(f)
             .filter { $0.section.shouldCheckStatuses }
@@ -266,7 +261,7 @@ final class PullRequest: ListableItem {
     
 	var displayedStatuses: [PRStatus] {
 
-		var contexts = [String : PRStatus]()
+		var contexts = [String: PRStatus]()
         let red = Settings.showStatusesRed
         let yellow = Settings.showStatusesYellow
         let green = Settings.showStatusesGreen

@@ -1,6 +1,6 @@
 import Cocoa
 
-final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
+final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
 
 	@IBOutlet private var refreshReposLabel: NSTextField!
 	@IBOutlet private var refreshButton: NSButton!

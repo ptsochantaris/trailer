@@ -1,4 +1,3 @@
-
 import Foundation
 
 enum Section: Int64 {
@@ -102,7 +101,7 @@ extension String {
         let firstSlash = pathComponent.hasPrefix("/")
         if endSlash && firstSlash {
             return appending(pathComponent.dropFirst())
-        } else if (!endSlash && !firstSlash) {
+        } else if !endSlash && !firstSlash {
             return appending("/\(pathComponent)")
         } else {
             return appending(pathComponent)

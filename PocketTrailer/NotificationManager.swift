@@ -1,4 +1,3 @@
-
 import UIKit
 import UserNotifications
 import CoreSpotlight
@@ -48,7 +47,7 @@ final class NotificationManager {
 	static func postNotification(type: NotificationType, for item: DataItem) {
 		let notification = UNMutableNotificationContent()
 
-		switch (type) {
+		switch type {
 		case .newMention:
 			guard let c = item as? PRComment, let parent = c.parent, !parent.shouldSkipNotifications else { return }
 			notification.title = "@\(S(c.userName)) mentioned you:"

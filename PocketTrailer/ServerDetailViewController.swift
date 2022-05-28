@@ -1,4 +1,3 @@
-
 import SafariServices
 import CoreData
 
@@ -171,7 +170,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 		                          preferredStyle: .alert)
 
 		a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-		a.addAction(UIAlertAction(title: "Delete", style: .destructive) { action in
+		a.addAction(UIAlertAction(title: "Delete", style: .destructive) { _ in
 			self.deleteServer()
 		})
 

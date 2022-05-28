@@ -1,4 +1,3 @@
-
 import WatchKit
 import Foundation
 
@@ -18,7 +17,7 @@ final class PRDetailController: CommonController {
 		_statusLabel = statusLabel
 		_table = table
 
-		let c = context as! [AnyHashable : Any]
+		let c = context as! [AnyHashable: Any]
 		itemId = (c[ITEM_KEY] as! String)
 
 		super.awake(withContext: context)
@@ -48,7 +47,7 @@ final class PRDetailController: CommonController {
 		requestData(command: "openItem")
 	}
 
-    override func update(from response: [AnyHashable : Any]) {
+    override func update(from response: [AnyHashable: Any]) {
         guard let compressedData = response["result"] as? Data,
               let uncompressedData = compressedData.data(operation: .decompress),
               let itemInfo = try? NSKeyedUnarchiver.unarchivedObject(ofClass: NSDictionary.self, from: uncompressedData)
@@ -67,7 +66,7 @@ final class PRDetailController: CommonController {
         super.show(status: status, hideTable: hideTable)
     }
 
-	private func completeUpdate(from itemInfo: [AnyHashable : Any]) {
+	private func completeUpdate(from itemInfo: [AnyHashable: Any]) {
 
 		loading = false
 
@@ -75,7 +74,7 @@ final class PRDetailController: CommonController {
 
 		var rowCount = 0
 
-		if let statuses = itemInfo["statuses"] as? [[AnyHashable : Any]] {
+		if let statuses = itemInfo["statuses"] as? [[AnyHashable: Any]] {
 			for status in statuses {
 				if !(table.rowController(at: rowCount) is StatusRow) {
 					table.insertRows(at: IndexSet(integer: rowCount), withRowType: "StatusRow")
@@ -103,7 +102,7 @@ final class PRDetailController: CommonController {
 			rowCount += 1
 		}
 
-		if let comments = itemInfo["comments"] as? [[AnyHashable : Any]] {
+		if let comments = itemInfo["comments"] as? [[AnyHashable: Any]] {
 			if comments.isEmpty {
 				setTitle("\(comments.count) Comments")
 			} else {

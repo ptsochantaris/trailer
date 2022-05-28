@@ -3,7 +3,7 @@ import Foundation
 final class GQLBatchGroup: GQLScanning {
 	let name = "nodes"
 
-	private var idsToGroups = [String : GQLGroup]()
+	private var idsToGroups = [String: GQLGroup]()
 	private let originalTemplate: GQLGroup
 	private let nextCount: Int
     private let batchSize: Int
@@ -36,8 +36,8 @@ final class GQLBatchGroup: GQLScanning {
 		return Array(k[0 ..< max])
 	}
 
-	func scan(query: GQLQuery, pageData: Any, parent: GQLNode?) async -> [GQLQuery] {
-        //DLog("\(query.logPrefix)Scanning batch group \(name)")
+	func scan(query: GQLQuery, pageData: Any, parent: GQLNode?) async throws -> [GQLQuery] {
+        // DLog("\(query.logPrefix)Scanning batch group \(name)")
 		guard let nodes = pageData as? [Any] else { return [] }
 
 		var extraQueries = [GQLQuery]()
@@ -50,14 +50,14 @@ final class GQLBatchGroup: GQLScanning {
 		}
 
 		for n in nodes {
-			if let n = n as? [AnyHashable : Any], let id = n["id"] as? String, let group = idsToGroups[id] {
-				let newQueries = await group.scan(query: query, pageData: n, parent: parent)
+			if let n = n as? [AnyHashable: Any], let id = n["id"] as? String, let group = idsToGroups[id] {
+				let newQueries = try await group.scan(query: query, pageData: n, parent: parent)
 				extraQueries.append(contentsOf: newQueries)
 			}
 		}
 
 		if !extraQueries.isEmpty {
-			DLog("\(query.logPrefix)\(name) - Will need further paging")
+			DLog("\(query.logPrefix)(Group: \(name)) - Will need further paging")
 		}
 		return extraQueries
 	}

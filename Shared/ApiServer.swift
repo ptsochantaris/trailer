@@ -96,10 +96,8 @@ final class ApiServer: NSManagedObject {
 	}
 
 	static func resetSyncSuccess(in moc: NSManagedObjectContext) {
-		for apiServer in allApiServers(in: moc) {
-			if apiServer.goodToGo {
-				apiServer.lastSyncSucceeded = true
-			}
+		for apiServer in allApiServers(in: moc) where apiServer.goodToGo {
+            apiServer.lastSyncSucceeded = true
 		}
 	}
 
@@ -152,7 +150,7 @@ final class ApiServer: NSManagedObject {
 	}
 
 	func rollBackAllUpdates(in moc: NSManagedObjectContext) {
-		DLog("Rolling back changes for failed sync on API server '%@'",label)
+		DLog("Rolling back changes for failed sync on API server '%@'", label)
 		for set in [repos, pullRequests, comments, statuses, labels, issues, teams, reviews, reactions] as [Set<DataItem>] {
 			var i = set.makeIterator()
 			while let dataItem = i.next() {
@@ -218,12 +216,12 @@ final class ApiServer: NSManagedObject {
 		return nil
 	}
 
-	static var archivedApiServers: [AnyHashable : [AnyHashable : Any]] {
-		var archivedData = [AnyHashable : [AnyHashable : Any]]()
+	static var archivedApiServers: [AnyHashable: [AnyHashable: Any]] {
+		var archivedData = [AnyHashable: [AnyHashable: Any]]()
 		for a in ApiServer.allApiServers(in: DataManager.main) {
 			if let authToken = a.authToken, !authToken.isEmpty {
-				var apiServerData = [AnyHashable : Any]()
-				for (k , _) in a.entity.attributesByName {
+				var apiServerData = [AnyHashable: Any]()
+				for (k, _) in a.entity.attributesByName {
 					if let v = a.value(forKey: k) as? NSObject {
 						apiServerData[k] = v
 					}
@@ -235,11 +233,11 @@ final class ApiServer: NSManagedObject {
 		return archivedData
 	}
 
-	var archivedRepos: [AnyHashable : [AnyHashable : Any]] {
-		var archivedData = [AnyHashable : [AnyHashable : Any]]()
+	var archivedRepos: [AnyHashable: [AnyHashable: Any]] {
+		var archivedData = [AnyHashable: [AnyHashable: Any]]()
 		for r in repos {
-			var repoData = [AnyHashable : Any]()
-			for (k , _) in r.entity.attributesByName {
+			var repoData = [AnyHashable: Any]()
+			for (k, _) in r.entity.attributesByName {
 				if let v = r.value(forKey: k) as? NSObject {
 					repoData[k] = v
 				}
@@ -250,7 +248,7 @@ final class ApiServer: NSManagedObject {
 		return archivedData
 	}
 
-	static func configure(from archive: [String : [String : NSObject]]) -> Bool {
+	static func configure(from archive: [String: [String: NSObject]]) -> Bool {
 
 		let tempMoc = DataManager.buildChildContext()
 
@@ -260,9 +258,9 @@ final class ApiServer: NSManagedObject {
 
 		for (_, apiServerData) in archive {
 			let a = insertNewServer(in: tempMoc)
-			for (k,v) in apiServerData {
+			for (k, v) in apiServerData {
 				if k == "repos" {
-					let archive = v as! [String : [String : NSObject]]
+					let archive = v as! [String: [String: NSObject]]
 					a.configureRepos(from: archive)
 				} else {
 					if a.entity.attributesByName.keys.contains(k) {
@@ -281,11 +279,11 @@ final class ApiServer: NSManagedObject {
 		}
 	}
 
-	func configureRepos(from archive: [String : [String : NSObject]]) {
+	func configureRepos(from archive: [String: [String: NSObject]]) {
 		guard let moc = managedObjectContext else { return }
 		for (_, repoData) in archive {
 			let r = NSEntityDescription.insertNewObject(forEntityName: "Repo", into: moc) as! Repo
-			for (k,v) in repoData {
+			for (k, v) in repoData {
 				if r.entity.attributesByName.keys.contains(k) {
 					r.setValue(v, forKey: k)
 				}

@@ -11,7 +11,7 @@ final class PRStatus: DataItem {
     
     override var alternateCreationDate: Bool { true }
 
-	static func syncStatuses(from data: [[AnyHashable : Any]]?, pullRequest: PullRequest) {
+	static func syncStatuses(from data: [[AnyHashable: Any]]?, pullRequest: PullRequest) {
 		items(with: data, type: PRStatus.self, server: pullRequest.apiServer) { item, info, isNewOrUpdated in
 			if isNewOrUpdated {
 				item.state = info["state"] as? String
@@ -56,27 +56,27 @@ final class PRStatus: DataItem {
         }
     }
     
-	var colorForDisplay: COLOR_CLASS {
-		switch S(state) {
+    var colorForDisplay: COLOR_CLASS {
+        switch S(state) {
         case "", "skipped", "neutral":
             return .appSecondaryLabel
-		case "pending", "expected":
+        case "pending", "expected":
             return .appYellow
-		case "success":
+        case "success":
             return .appGreen
-		default:
+        default:
             return .appRed
-		}
-	}
+        }
+    }
 
-	var displayText: String {
-		var text: String
-
-		switch S(state) {
+    var displayText: String {
+        var text: String
+        
+        switch S(state) {
         case "":
             text = "⏺ "
-		case "pending", "expected":
-			text = "⚡️ "
+        case "pending", "expected":
+            text = "⚡️ "
         case "skipped":
             text = "⏭ "
         case "neutral":
@@ -85,11 +85,11 @@ final class PRStatus: DataItem {
             text = "⚠️ "
         case "cancelled":
             text = "⛔️ "
-		case "success":
-			text = "✅ "
-		default:
-			text = "❌ "
-		}
+        case "success":
+            text = "✅ "
+        default:
+            text = "❌ "
+        }
 
         if let c = context, !c.isEmpty {
             if c == nodeId, let createdAt = createdAt {

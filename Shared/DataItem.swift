@@ -42,18 +42,18 @@ class DataItem: NSManagedObject {
 		return try! server.managedObjectContext!.fetch(f)
 	}
 
-	static func items<T: DataItem>(with data: [[AnyHashable : Any]]?,
-	                       type: T.Type,
-	                       server: ApiServer,
-	                       prefetchRelationships: [String]? = nil,
-	                       createNewItems: Bool = true,
-	                       postProcessCallback: (T, [AnyHashable : Any], Bool) -> Void) {
+    static func items<T: DataItem>(with data: [[AnyHashable: Any]]?,
+                                   type: T.Type,
+                                   server: ApiServer,
+                                   prefetchRelationships: [String]? = nil,
+                                   createNewItems: Bool = true,
+                                   postProcessCallback: (T, [AnyHashable: Any], Bool) -> Void) {
 
 		guard let infos = data, !infos.isEmpty else { return }
 
         var legacyIdsToNodeIds = [Int64: String]()
         
-		var nodeIdsToInfo = [String : [AnyHashable : Any]]()
+		var nodeIdsToInfo = [String: [AnyHashable: Any]]()
 		for info in infos {
 			let nodeId = info["node_id"] as! String
             nodeIdsToInfo[nodeId] = info
@@ -71,7 +71,7 @@ class DataItem: NSManagedObject {
 		f.includesSubentities = false
 
         let legacyServerIds = legacyIdsToNodeIds.map { k, _ in k }
-        f.predicate = NSPredicate(format:"serverId in %@ and apiServer == %@", legacyServerIds, server)
+        f.predicate = NSPredicate(format: "serverId in %@ and apiServer == %@", legacyServerIds, server)
         for item in try! server.managedObjectContext?.fetch(f) ?? [] {
             if let legacyId = item.value(forKey: "serverId") as? Int64 {
                 if let nodeId = legacyIdsToNodeIds[legacyId] {
@@ -87,7 +87,7 @@ class DataItem: NSManagedObject {
         }
         
         var nodeIdsOfItems = Set(nodeIdsToInfo.map { k, _ in k })
-        f.predicate = NSPredicate(format:"nodeId in %@ and apiServer == %@", nodeIdsOfItems, server)
+        f.predicate = NSPredicate(format: "nodeId in %@ and apiServer == %@", nodeIdsOfItems, server)
 		let existingItems = try! server.managedObjectContext?.fetch(f) ?? []
 
 		let now = Date()
@@ -101,7 +101,7 @@ class DataItem: NSManagedObject {
                     i.updatedAt = updatedDate
 					postProcessCallback(i, info, true)
 				} else {
-					//DLog("Skipping %@: %@",type,serverId)
+					// DLog("Skipping %@: %@",type,serverId)
 					i.postSyncAction = PostSyncAction.doNothing.rawValue
 					postProcessCallback(i, info, false)
 				}
@@ -324,11 +324,11 @@ class DataItem: NSManagedObject {
             postSyncAction = PostSyncAction.isUpdated.rawValue
             
         } else if postSyncAction == PostSyncAction.delete.rawValue {
-            DLog("Keeping \(entityName) ID: %@", node.id)
+            // DLog("Keeping \(entityName) ID: %@", node.id)
             postSyncAction = PostSyncAction.doNothing.rawValue
-        } //else {
-            //DLog("Ignoring \(entityName) ID: %@", node.id)
-        //}
+        } // else {
+            // DLog("Ignoring \(entityName) ID: %@", node.id)
+        // }
     }
     
     static func syncItems<T: DataItem>(of type: T.Type, from nodes: ContiguousArray<GQLNode>, on server: ApiServer, perItemCallback: (T, GQLNode) -> Void) {

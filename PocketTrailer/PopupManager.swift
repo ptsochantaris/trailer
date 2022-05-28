@@ -1,4 +1,3 @@
-
 import UIKit
 
 let popupManager = PopupManager()
@@ -34,4 +33,3 @@ final class PopupManager: NSObject {
 		return s.viewControllers.first as! MasterViewController
 	}
 }
-

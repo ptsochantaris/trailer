@@ -44,7 +44,7 @@ final class HTTP {
 
         let config = URLSessionConfiguration.default
         config.httpShouldUsePipelining = true
-        config.httpAdditionalHeaders = ["User-Agent" : userAgent]
+        config.httpAdditionalHeaders = ["User-Agent": userAgent]
         config.urlCache = URLCache(memoryCapacity: 32 * 1024 * 1024, diskCapacity: 1024 * 1024 * 1024, diskPath: API.cacheDirectory)
         return config
     }

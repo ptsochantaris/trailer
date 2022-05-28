@@ -1,7 +1,7 @@
 import Foundation
 import Cocoa
 
-final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate, NSTableViewDataSource, NSTabViewDelegate, NSControlTextEditingDelegate {
+final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, NSTableViewDataSource, NSTabViewDelegate, NSControlTextEditingDelegate {
 
 	private var deferredUpdateTimer: PopTimer!
 	private var serversDirty = false
@@ -832,7 +832,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
-
 	@IBAction private func dumpApiResponsesToConsoleSelected(_ sender: NSButton) {
 		Settings.dumpAPIResponsesInConsole = (sender.integerValue==1)
 		if Settings.dumpAPIResponsesInConsole {
@@ -1355,9 +1354,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		if mode != 0 {
 			statusTermsField.isEnabled = true
 			statusTermsField.alphaValue = 1.0
-		}
-		else
-		{
+		} else {
 			statusTermsField.isEnabled = false
 			statusTermsField.alphaValue = 0.5
 		}
@@ -1608,7 +1605,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 						let m = NSMenuItem()
 						m.attributedTitle = NSAttributedString(string: policy.name, attributes: [
                             .font: policy.bold ? NSFont.boldSystemFont(ofSize: fontSize) : NSFont.systemFont(ofSize: fontSize),
-							.foregroundColor: policy.color,
+							.foregroundColor: policy.color
 							])
 						menuCell.menu?.addItem(m)
 					}
@@ -1624,7 +1621,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
                         let name = policy == .hide ? hiddenName : policy.name
 						m.attributedTitle = NSAttributedString(string: name, attributes: [
 							.font: policy.bold ? NSFont.boldSystemFont(ofSize: fontSize) : NSFont.systemFont(ofSize: fontSize),
-							.foregroundColor: policy.color,
+							.foregroundColor: policy.color
 							])
 						menuCell.menu?.addItem(m)
 					}
@@ -1979,7 +1976,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	private var advancedReposWindow: AdvancedReposWindow?
 	@IBAction private func advancedSelected(_ sender: NSButton) {
 		if advancedReposWindowController == nil {
-			advancedReposWindowController = NSWindowController(windowNibName:NSNib.Name("AdvancedReposWindow"))
+			advancedReposWindowController = NSWindowController(windowNibName: NSNib.Name("AdvancedReposWindow"))
 		}
 		if let w = advancedReposWindowController?.window as? AdvancedReposWindow {
 			w.prefs = self

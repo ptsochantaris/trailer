@@ -10,7 +10,7 @@ extension MenuWindow {
         private let removalSections: Set<String>
         private let viewCriterion: GroupingCriterion?
         
-        private static let propertiesToFetch = { ()->[NSExpressionDescription] in
+        private static let propertiesToFetch = { () -> [NSExpressionDescription] in
             let iodD = NSExpressionDescription()
             iodD.name = "objectID"
             iodD.expression = NSExpression.expressionForEvaluatedObject()

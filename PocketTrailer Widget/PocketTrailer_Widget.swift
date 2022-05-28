@@ -23,13 +23,13 @@ struct Provider: TimelineProvider {
         return Summary(data: data as Dictionary?)
     }
 
-    func getSnapshot(in context: Context, completion: @escaping (Summary) -> ()) {
+    func getSnapshot(in context: Context, completion: @escaping (Summary) -> Void) {
         let data = NSDictionary(contentsOf: FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.Trailer")!.appendingPathComponent("overview.plist"))
         let entry = Summary(data: data as Dictionary?)
         completion(entry)
     }
 
-    func getTimeline(in context: Context, completion: @escaping (Timeline<Summary>) -> ()) {
+    func getTimeline(in context: Context, completion: @escaping (Timeline<Summary>) -> Void) {
         let timeline = Timeline(entries: [currentEntry], policy: .never)
         completion(timeline)
     }
