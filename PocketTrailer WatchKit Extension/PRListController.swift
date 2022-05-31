@@ -112,10 +112,11 @@ final class PRListController: CommonController {
 	}
 
 	override func update(from response: [AnyHashable: Any]) {
-		guard let compressedData = response["result"] as? Data,
-			let uncompressedData = compressedData.data(operation: .decompress),
-			let page = NSKeyedUnarchiver.unarchiveObject(with: uncompressedData) as? [[AnyHashable: Any]]
-			else { return }
+        guard let compressedData = response["result"] as? Data,
+              let uncompressedData = compressedData.data(operation: .decompress),
+              let pageArray = try? NSKeyedUnarchiver.unarchivedObject(ofClass: NSArray.self, from: uncompressedData),
+              let page = pageArray as? [[AnyHashable: Any]]
+        else { return }
 		DispatchQueue.main.async { [weak self] in
 			self?.completeUpdate(from: page)
 		}
