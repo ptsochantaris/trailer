@@ -127,91 +127,88 @@ extension API {
     @MainActor
     static func v3Sync(to moc: NSManagedObjectContext, newOrUpdatedPrs: [PullRequest], newOrUpdatedIssues: [Issue]) async {
         
-        var tasks = [Task<Void, Never>]()
+        await withTaskGroup(of: Void.self) { group in
 
-        if Settings.showStatusItems {
-            tasks.append(Task {
-                await V3_fetchStatusesForCurrentPullRequests(to: moc)
-            })
-        } else {
-            for p in DataItem.allItems(of: PullRequest.self, in: moc) {
-                p.lastStatusScan = nil
-                p.statuses.forEach {
-                    $0.postSyncAction = PostSyncAction.delete.rawValue
+            if Settings.showStatusItems {
+                group.addTask {
+                    await V3_fetchStatusesForCurrentPullRequests(to: moc)
+                }
+            } else {
+                for p in DataItem.allItems(of: PullRequest.self, in: moc) {
+                    p.lastStatusScan = nil
+                    p.statuses.forEach {
+                        $0.postSyncAction = PostSyncAction.delete.rawValue
+                    }
                 }
             }
-        }
 
-        if Settings.notifyOnItemReactions {
-            tasks.append(Task {
-                await V3_fetchItemReactionsIfNeeded(for: PullRequest.self, to: moc)
+            if Settings.notifyOnItemReactions {
+                group.addTask {
+                    await V3_fetchItemReactionsIfNeeded(for: PullRequest.self, to: moc)
+                }
+                
+                group.addTask {
+                    await V3_fetchItemReactionsIfNeeded(for: Issue.self, to: moc)
+                }
+            }
+            
+            if Settings.showLabels {
+                group.addTask {
+                    await V3_fetchLabelsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
+                }
+                group.addTask {
+                    await V3_fetchLabelsForCurrentIssues(to: moc, for: newOrUpdatedIssues)
+                }
+            } else {
+                for l in DataItem.allItems(of: PRLabel.self, in: moc) {
+                    l.postSyncAction = PostSyncAction.delete.rawValue
+                }
+            }
+            
+            var commentTasks = [Task<Void, Never>]()
+            
+            if shouldSyncReviews {
+                commentTasks.append(Task {
+                    await V3_fetchReviewsForForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
+                    await V3_fetchCommentsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
+                })
+            } else {
+                for r in DataItem.allItems(of: Review.self, in: moc) {
+                    r.postSyncAction = PostSyncAction.delete.rawValue
+                }
+                commentTasks.append(Task {
+                    await V3_fetchCommentsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
+                })
+            }
+            
+            commentTasks.append(Task {
+                await V3_fetchCommentsForCurrentIssues(to: moc, for: newOrUpdatedIssues)
+                V3_checkIssueClosures(in: moc)
             })
             
-            tasks.append(Task {
-                await V3_fetchItemReactionsIfNeeded(for: Issue.self, to: moc)
-            })
-        }
-        
-        if Settings.showLabels {
-            tasks.append(Task {
-                await V3_fetchLabelsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
-            })
-            tasks.append(Task {
-                await V3_fetchLabelsForCurrentIssues(to: moc, for: newOrUpdatedIssues)
-            })
-        } else {
-            for l in DataItem.allItems(of: PRLabel.self, in: moc) {
-                l.postSyncAction = PostSyncAction.delete.rawValue
+            group.addTask {
+                await V3_checkPrClosures(in: moc)
             }
-        }
-        
-        var commentTasks = [Task<Void, Never>]()
-        
-        if shouldSyncReviews {
-            commentTasks.append(Task {
-                await V3_fetchReviewsForForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
-                await V3_fetchCommentsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
-            })
-        } else {
-            for r in DataItem.allItems(of: Review.self, in: moc) {
-                r.postSyncAction = PostSyncAction.delete.rawValue
+            
+            group.addTask {
+                await V3_detectAssignedPullRequests(in: moc, for: newOrUpdatedPrs)
             }
-            commentTasks.append(Task {
-                await V3_fetchCommentsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
-            })
-        }
-        
-        commentTasks.append(Task {
-            await V3_fetchCommentsForCurrentIssues(to: moc, for: newOrUpdatedIssues)
-            V3_checkIssueClosures(in: moc)
-        })
-        
-        tasks.append(Task {
-            await V3_checkPrClosures(in: moc)
-        })
-        
-        tasks.append(Task {
-            await V3_detectAssignedPullRequests(in: moc, for: newOrUpdatedPrs)
-        })
-        
-        if shouldSyncReviewAssignments {
-            tasks.append(Task {
-                await V3_fetchReviewAssignmentsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
-            })
-        }
+            
+            if shouldSyncReviewAssignments {
+                group.addTask {
+                    await V3_fetchReviewAssignmentsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
+                }
+            }
 
-        for task in commentTasks {
-            _ = await task.value
-        }
+            for task in commentTasks {
+                _ = await task.value
+            }
 
-        if Settings.notifyOnCommentReactions {
-            tasks.append(Task {
-                await V3_fetchCommentReactionsIfNeeded(to: moc)
-            })
-        }
-
-        for task in tasks {
-            _ = await task.value
+            if Settings.notifyOnCommentReactions {
+                group.addTask {
+                    await V3_fetchCommentReactionsIfNeeded(to: moc)
+                }
+            }
         }
     }
     

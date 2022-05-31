@@ -500,7 +500,7 @@ final class GraphQL {
             }
         }
     }
-        
+    
     private static func processItems<T: ListableItem>(_ nodes: [String: ContiguousArray<GQLNode>], _ serverId: NSManagedObjectID, parentMoc: NSManagedObjectContext?, parentType: T.Type? = nil) async {
         if nodes.isEmpty {
             return

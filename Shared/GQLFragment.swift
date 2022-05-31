@@ -23,14 +23,14 @@ final class GQLFragment: GQLScanning, Hashable {
 		self.elements = elements
 	}
 	
-	func scan(query: GQLQuery, pageData: Any, parent: GQLNode?) async throws -> [GQLQuery] {
+	func scan(query: GQLQuery, pageData: Any, parent: GQLNode?) async -> [GQLQuery] {
 		// DLog("\(query.logPrefix)Scanning fragment \(name)")
 		guard let hash = pageData as? [AnyHashable: Any] else { return [] }
 
 		var extraQueries = [GQLQuery]()
 		for element in elements {
 			if let element = element as? GQLScanning, let elementData = hash[element.name] {
-				let newQueries = try await element.scan(query: query, pageData: elementData, parent: parent)
+				let newQueries = await element.scan(query: query, pageData: elementData, parent: parent)
 				extraQueries.append(contentsOf: newQueries)
 			}
 		}

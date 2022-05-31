@@ -1,5 +1,5 @@
 import Foundation
 
 protocol GQLScanning: GQLElement {
-    func scan(query: GQLQuery, pageData: Any, parent: GQLNode?) async throws -> [GQLQuery]
+    func scan(query: GQLQuery, pageData: Any, parent: GQLNode?) async -> [GQLQuery]
 }

@@ -40,19 +40,11 @@ extension API {
     }
     
     @MainActor
-    static func v4Sync(to moc: NSManagedObjectContext, newOrUpdatedPrs: [PullRequest], newOrUpdatedIssues: [Issue]) async {
-        var steps: SyncSteps = [.comments]
-
-        if shouldSyncReviewAssignments {
-            steps.insert(.reviewRequests)
-        }
-
-        if Settings.notifyOnItemReactions {
-            steps.insert(.reactions)
-        }
-
+    static func v4Sync(to moc: NSManagedObjectContext, newOrUpdatedPrs: [PullRequest], newOrUpdatedIssues: [Issue]) async throws {
+        
         if Settings.showStatusItems {
-            steps.insert(.statuses)
+            let prs = PullRequest.statusCheckBatch(in: moc)
+            try await GraphQL.update(for: prs, of: PullRequest.self, in: moc, steps: [.statuses])
         } else {
             for p in DataItem.allItems(of: PullRequest.self, in: moc) {
                 p.lastStatusScan = nil
@@ -62,6 +54,20 @@ extension API {
             }
         }
         
+        if Settings.notifyOnItemReactions {
+            let rp = PullRequest.reactionCheckBatch(for: PullRequest.self, in: moc)
+            try await GraphQL.update(for: rp, of: PullRequest.self, in: moc, steps: [.reactions])
+
+            let ri = Issue.reactionCheckBatch(for: Issue.self, in: moc)
+            try await GraphQL.update(for: ri, of: Issue.self, in: moc, steps: [.reactions])
+        }
+
+        var steps: SyncSteps = [.comments]
+
+        if shouldSyncReviewAssignments {
+            steps.insert(.reviewRequests)
+        }
+
         if shouldSyncReviews {
             steps.insert(.reviews)
         } else {
@@ -69,8 +75,14 @@ extension API {
                 r.postSyncAction = PostSyncAction.delete.rawValue
             }
         }
+
+        try await GraphQL.update(for: newOrUpdatedPrs, of: PullRequest.self, in: moc, steps: steps)
         
-        try? await v4_sync(to: moc, prs: newOrUpdatedPrs, issues: newOrUpdatedIssues, steps: steps)
+        let reviews = DataItem.newOrUpdatedItems(of: Review.self, in: moc, fromSuccessfulSyncOnly: true)
+        try await GraphQL.updateComments(for: reviews, moc: moc)// must run after fetching reviews
+        
+        try await GraphQL.update(for: newOrUpdatedIssues, of: Issue.self, in: moc, steps: steps)
+        
         if Settings.notifyOnCommentReactions {
             let comments = PRComment.commentsThatNeedReactionsToBeRefreshed(in: moc)
             for c in comments {
@@ -79,34 +91,7 @@ extension API {
                     r.postSyncAction = PostSyncAction.delete.rawValue
                 }
             }
-            try? await GraphQL.updateReactions(for: comments, moc: moc)
+            try await GraphQL.updateReactions(for: comments, moc: moc)
         }
-    }
-    
-    @MainActor
-    private static func v4_sync(to moc: NSManagedObjectContext, prs: [PullRequest], issues: [Issue], steps: SyncSteps) async throws {
-        var steps = steps
-        
-        if steps.contains(.statuses) {
-            let prs = PullRequest.statusCheckBatch(in: moc)
-            try await GraphQL.update(for: prs, of: PullRequest.self, in: moc, steps: [.statuses])
-            steps.remove(.statuses)
-        }
-        
-        if steps.contains(.reactions) {
-            let rp = PullRequest.reactionCheckBatch(for: PullRequest.self, in: moc)
-            try await GraphQL.update(for: rp, of: PullRequest.self, in: moc, steps: [.reactions])
-
-            let ri = Issue.reactionCheckBatch(for: Issue.self, in: moc)
-            try await GraphQL.update(for: ri, of: Issue.self, in: moc, steps: [.reactions])
-            steps.remove(.reactions)
-        }
-
-        try await GraphQL.update(for: prs, of: PullRequest.self, in: moc, steps: steps)
-        
-        let reviews = DataItem.newOrUpdatedItems(of: Review.self, in: moc, fromSuccessfulSyncOnly: true)
-        try await GraphQL.updateComments(for: reviews, moc: moc)// must run after fetching reviews
-        
-        try await GraphQL.update(for: issues, of: Issue.self, in: moc, steps: steps)
     }
 }

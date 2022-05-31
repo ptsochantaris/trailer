@@ -80,11 +80,11 @@ final class GQLQuery {
         do {
             let (info, response) = try await HTTP.getData(for: r)
             guard let json = try JSONSerialization.jsonObject(with: info, options: []) as? [AnyHashable: Any] else {
-                throw API.apiError("Invalid JSON")
+                throw API.apiError("\(self.logPrefix)Invalid JSON")
             }
 
             if Settings.dumpAPIResponsesInConsole {
-                DLog("API data from %@: %@", url, String(bytes: info, encoding: .utf8))
+                DLog("\(self.logPrefix)API data from %@: %@", url, String(bytes: info, encoding: .utf8))
             }
 
             apiStats = ApiStats.fromV4(json: json["data"] as? [AnyHashable: Any])
@@ -103,18 +103,20 @@ final class GQLQuery {
                     throw API.apiError(msg)
                 } else {
                     let msg = json["message"] as? String ?? "Unspecified server error: \(json)"
-                    throw API.apiError(msg)
+                    throw API.apiError("\(self.logPrefix)" + msg)
                 }
             }
             
             let r = self.rootElement
             guard let topData = data[r.name] else {
-                throw API.apiError("No data in JSON")
+                throw API.apiError("\(self.logPrefix)No data in JSON")
             }
             
             do {
-                let extraQueries = try await r.scan(query: self, pageData: topData, parent: self.parent)
-                if !extraQueries.isEmpty {
+                let extraQueries = await r.scan(query: self, pageData: topData, parent: self.parent)
+                if extraQueries.isEmpty {
+                    DLog("\(self.logPrefix)Parsed all pages")
+                } else {
                     DLog("\(self.logPrefix)Needs more page data (\(extraQueries.count) queries)")
                     return try await GQLQuery.runQueries(queries: extraQueries, on: url, token: authToken)
                 }

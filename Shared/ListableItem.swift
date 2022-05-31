@@ -485,9 +485,7 @@ class ListableItem: DataItem {
 		}
 
         var targetSection = preferredSection(evaluateConditionToo: true)
-        
-		////////// Apply visibility policies
-        
+                
 		if targetSection != .none {
             switch self is Issue ? repo.displayPolicyForIssues : repo.displayPolicyForPrs {
             case RepoDisplayPolicy.hide.rawValue,
@@ -543,8 +541,6 @@ class ListableItem: DataItem {
         if targetSection != .none && shouldMoveToSnoozing {
             targetSection = .snoozed
         }
-
-		/////////// Comment counting
         
         if canBadge(in: targetSection) {
 			var latestDate = latestReadCommentDate ?? .distantPast

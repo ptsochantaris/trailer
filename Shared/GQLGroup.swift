@@ -91,24 +91,31 @@ final class GQLGroup: GQLScanning {
         
         for field in fields {
             if let fragment = field as? GQLFragment {
-                extraQueries += try await fragment.scan(query: query, pageData: node, parent: thisObject)
+                extraQueries += await fragment.scan(query: query, pageData: node, parent: thisObject)
                 
             } else if let ingestable = field as? GQLScanning, let fieldData = node[field.name] {
-                extraQueries += try await ingestable.scan(query: query, pageData: fieldData, parent: thisObject)
+                extraQueries += await ingestable.scan(query: query, pageData: fieldData, parent: thisObject)
             }
         }
         
         return extraQueries
     }
     
-    private func scanPage(_ edges: [[AnyHashable: Any]], pageInfo: [AnyHashable: Any]?, query: GQLQuery, parent: GQLNode?) async throws -> [GQLQuery] {
+    private func scanPage(_ edges: [[AnyHashable: Any]], pageInfo: [AnyHashable: Any]?, query: GQLQuery, parent: GQLNode?) async -> [GQLQuery] {
         var extraQueries = [GQLQuery]()
+        var stop = false
         for e in edges {
             if let node = e["node"] as? [AnyHashable: Any] {
-                extraQueries += try await scanNode(node, query: query, parent: parent)
+                do {
+                    extraQueries += try await scanNode(node, query: query, parent: parent)
+                } catch {
+                    stop = true
+                    break
+                }
             }
         }
-        if let latestCursor = edges.last?["cursor"] as? String,
+        if !stop,
+            let latestCursor = edges.last?["cursor"] as? String,
             let pageInfo = pageInfo, pageInfo["hasNextPage"] as? Bool == true {
             let newGroup = GQLGroup(group: self, lastCursor: latestCursor)
             let nextPage = GQLQuery(name: query.name, rootElement: newGroup, parent: parent, perNode: query.perNodeBlock)
@@ -117,31 +124,25 @@ final class GQLGroup: GQLScanning {
         return extraQueries
     }
 
-	func scan(query: GQLQuery, pageData: Any, parent: GQLNode?) async throws -> [GQLQuery] {
+	func scan(query: GQLQuery, pageData: Any, parent: GQLNode?) async -> [GQLQuery] {
 
-        let extraQueries: [GQLQuery]
+        var extraQueries = [GQLQuery]()
                 
 		if let hash = pageData as? [AnyHashable: Any] {
 			if let edges = hash["edges"] as? [[AnyHashable: Any]] {
-                extraQueries = try await scanPage(edges, pageInfo: hash["pageInfo"] as? [AnyHashable: Any], query: query, parent: parent)
+                extraQueries = await scanPage(edges, pageInfo: hash["pageInfo"] as? [AnyHashable: Any], query: query, parent: parent)
 			} else {
-                extraQueries = try await scanNode(hash, query: query, parent: parent)
+                extraQueries = (try? await scanNode(hash, query: query, parent: parent)) ?? []
 			}
 			
 		} else if let nodes = pageData as? [[AnyHashable: Any]] {
-            extraQueries = try await withThrowingTaskGroup(of: [GQLQuery].self) { group in
-                for node in nodes {
-                    group.addTask { [weak self] in
-                        guard let self = self else { return [] }
-                        return try await self.scanNode(node, query: query, parent: parent)
-                    }
-                }
-                return try await group.reduce([GQLQuery]()) { partialResult, new in
-                    return partialResult + new
+            for node in nodes {
+                do {
+                    extraQueries += try await self.scanNode(node, query: query, parent: parent)
+                } catch {
+                    break
                 }
             }
-        } else {
-            extraQueries = []
         }
         
         guard extraQueries.isEmpty else {

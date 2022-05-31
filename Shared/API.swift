@@ -231,7 +231,6 @@ final class API {
         let repos = Repo.syncableRepos(in: moc)
         let v4Mode = Settings.useV4API
 
-        assert(Thread.isMainThread)
         await withTaskGroup(of: Void.self) { group in
             if v4Mode {
                 let servers = ApiServer.allApiServers(in: moc).filter { $0.goodToGo }
@@ -256,19 +255,31 @@ final class API {
         if v4Mode {
             let newOrUpdatedPrs = DataItem.newOrUpdatedItems(of: PullRequest.self, in: moc, fromSuccessfulSyncOnly: true)
             let newOrUpdatedIssues = DataItem.newOrUpdatedItems(of: Issue.self, in: moc, fromSuccessfulSyncOnly: true)
-            await v4Sync(to: moc, newOrUpdatedPrs: newOrUpdatedPrs, newOrUpdatedIssues: newOrUpdatedIssues)
+            do {
+                try await v4Sync(to: moc, newOrUpdatedPrs: newOrUpdatedPrs, newOrUpdatedIssues: newOrUpdatedIssues)
+            } catch {
+                DLog("Sync aborted due to error")
+            }
         } else {
             await V3_markExtraUpdatedItems(from: reposWithSomeItems, to: moc)
             let newOrUpdatedPrs = DataItem.newOrUpdatedItems(of: PullRequest.self, in: moc, fromSuccessfulSyncOnly: true)
             let newOrUpdatedIssues = DataItem.newOrUpdatedItems(of: Issue.self, in: moc, fromSuccessfulSyncOnly: true)
             await v3Sync(to: moc, newOrUpdatedPrs: newOrUpdatedPrs, newOrUpdatedIssues: newOrUpdatedIssues)
         }
-            
-        completeSync(in: moc)
+        
+        // Transfer done, process
+        
+        let total = moc.updatedObjects.count + moc.insertedObjects.count + moc.deletedObjects.count
+        if total > 1, let totalText = numberFormatter.string(for: total) {
+            currentOperationName = "Processing \(totalText) items…"
+        } else {
+            currentOperationName = "Processing update…"
+        }
+        
+        processSync(in: moc)
 	}
-
-	private static func completeSync(in moc: NSManagedObjectContext) {
-
+    
+    private static func processSync(in moc: NSManagedObjectContext) {
         let processMoc = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         processMoc.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
         processMoc.undoManager = nil
@@ -286,21 +297,12 @@ final class API {
                 try? processMoc.save()
             }
             DispatchQueue.main.async {
-                completeSync2(in: moc)
+                completeSync(in: moc)
             }
         }
-
-        let total = moc.updatedObjects.count + moc.insertedObjects.count + moc.deletedObjects.count
-        if total > 1, let totalText = numberFormatter.string(for: total) {
-            currentOperationName = "Processing \(totalText) items…"
-        } else {
-            currentOperationName = "Processing update…"
-        }
-        DLog("Caching \(numberFormatter.string(for: URLCache.shared.currentMemoryUsage) ?? "") bytes in memory")
-        DLog("Caching \(numberFormatter.string(for: URLCache.shared.currentDiskUsage) ?? "") bytes on disk")
-	}
+    }
     
-    private static func completeSync2(in moc: NSManagedObjectContext) {
+    private static func completeSync(in moc: NSManagedObjectContext) {
         do {
             if moc.hasChanges {
                 DLog("Committing synced data")
@@ -317,6 +319,9 @@ final class API {
         currentOperationCount -= 1
         
         DataManager.sendNotificationsIndexAndSave()
+        
+        DLog("Caching \(numberFormatter.string(for: URLCache.shared.currentMemoryUsage) ?? "") bytes in memory")
+        DLog("Caching \(numberFormatter.string(for: URLCache.shared.currentDiskUsage) ?? "") bytes on disk")
     }
     
     static var lastSuccessfulSyncAt: String {
