@@ -298,6 +298,7 @@ extension API {
             }
         }
 
+        @MainActor
         @Sendable func _fetchComments(issues: Bool) async {
             await withTaskGroup(of: Void.self) { group in
                 assert(Thread.isMainThread)

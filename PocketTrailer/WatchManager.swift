@@ -12,6 +12,12 @@ final class WatchManager: NSObject, WCSessionDelegate {
             session?.delegate = self
             session?.activate()
         }
+        
+        NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: .main) { [weak self] _ in
+            Task { [weak self] in
+                _ = await self?.buildOverview()
+            }
+        }
     }
 
     func session(_: WCSession, activationDidCompleteWith _: WCSessionActivationState, error _: Error?) {}
@@ -259,8 +265,9 @@ final class WatchManager: NSObject, WCSessionDelegate {
 
     //////////////////////////////
 
+    @MainActor
     private func buildOverview() async -> [String: Any] {
-        let allViewCriteria = await popupManager.masterController.allTabSets.map(\.viewCriterion)
+        let allViewCriteria = popupManager.masterController.allTabSets.map(\.viewCriterion)
 
         let tempMoc = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         tempMoc.undoManager = nil
@@ -314,8 +321,10 @@ final class WatchManager: NSObject, WCSessionDelegate {
                     ]
                 ])
             }
-            // TODO: needs implementing
-            // UIApplication.shared.applicationIconBadgeNumber = totalUnreadPrCount + totalUnreadIssueCount
+            let badgeCount = totalUnreadPrCount + totalUnreadIssueCount
+            DispatchQueue.main.async {
+                UIApplication.shared.applicationIconBadgeNumber = badgeCount
+            }
             return [
                 "views": views,
                 "preferIssues": Settings.preferIssuesInWatch,

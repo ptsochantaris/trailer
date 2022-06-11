@@ -45,6 +45,9 @@ final class RestAccess {
                         lastPage = !linkHeader.contains("rel=\"next\"")
                     }
                 }
+                if code >= 400 {
+                    throw API.apiError("Server returned error code \(code)")
+                }
                 return (data, lastPage, code)
             } catch {
                 let error = error as NSError
