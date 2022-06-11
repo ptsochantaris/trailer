@@ -1,5 +1,5 @@
-import Foundation
 import CoreData
+import Foundation
 
 extension API {
     @MainActor
@@ -13,7 +13,7 @@ extension API {
             for i in repo.issues {
                 i.postSyncAction = PostSyncAction.delete.rawValue
             }
-        } else if resultCode==410 { // repo gone for good
+        } else if resultCode == 410 { // repo gone for good
             repo.postSyncAction = PostSyncAction.delete.rawValue
         } else { // fetch problem
             repo.apiServer.lastSyncSucceeded = false
@@ -21,7 +21,7 @@ extension API {
     }
 
     @MainActor
-    static func v3_fetchItems(for repos: [Repo], to moc: NSManagedObjectContext) async {        
+    static func v3_fetchItems(for repos: [Repo], to _: NSManagedObjectContext) async {
         for r in repos {
             for p in r.pullRequests where p.condition == ItemCondition.open.rawValue {
                 p.postSyncAction = PostSyncAction.delete.rawValue
@@ -34,7 +34,7 @@ extension API {
             let apiServer = r.apiServer
             guard apiServer.lastSyncSucceeded else { continue }
 
-            await withTaskGroup(of: Void.self) { group  in
+            await withTaskGroup(of: Void.self) { group in
                 if r.displayPolicyForPrs != RepoDisplayPolicy.hide.rawValue {
                     let repoFullName = S(r.fullName)
                     group.addTask {
@@ -58,15 +58,14 @@ extension API {
                         if !success {
                             await v3_handleRepoSyncFailure(repo: r, resultCode: resultCode)
                         }
-                        
                     }
                 }
             }
         }
     }
-    
+
     @MainActor
-    static func V3_markExtraUpdatedItems(from repos: [Repo], to moc: NSManagedObjectContext) async {
+    static func V3_markExtraUpdatedItems(from repos: [Repo], to _: NSManagedObjectContext) async {
         await withTaskGroup(of: Void.self) { group in
             for r in repos {
                 let repoFullName = S(r.fullName)
@@ -76,17 +75,15 @@ extension API {
                 group.addTask {
                     let (success, _) = await RestAccess.getPagedData(at: "/repos/\(repoFullName)/issues/events", from: r.apiServer) { data, _ in
                         guard let data = data, !data.isEmpty else { return true }
-                        
+
                         if isFirstEventSync {
-                            
                             DLog("First event check for this repo. Let's ensure all items are marked as updated")
                             for i in r.pullRequests { i.setToUpdatedIfIdle() }
                             for i in r.issues { i.setToUpdatedIfIdle() }
                             r.lastScannedIssueEventId = data.first!["id"] as? Int64 ?? 0
                             return true
-                            
+
                         } else {
-                            
                             var numbers = Set<Int64>()
                             var reasons = Set<String>()
                             var foundLastEvent = false
@@ -113,7 +110,6 @@ extension API {
                                 r.markItemsAsUpdated(with: numbers, reasons: reasons)
                             }
                             return foundLastEvent
-                            
                         }
                     }
                     if !success {
@@ -123,10 +119,9 @@ extension API {
             }
         }
     }
-    
+
     @MainActor
     static func v3Sync(to moc: NSManagedObjectContext, newOrUpdatedPrs: [PullRequest], newOrUpdatedIssues: [Issue]) async {
-        
         await withTaskGroup(of: Void.self) { group in
 
             if Settings.showStatusItems {
@@ -146,12 +141,12 @@ extension API {
                 group.addTask {
                     await V3_fetchItemReactionsIfNeeded(for: PullRequest.self, to: moc)
                 }
-                
+
                 group.addTask {
                     await V3_fetchItemReactionsIfNeeded(for: Issue.self, to: moc)
                 }
             }
-            
+
             if Settings.showLabels {
                 group.addTask {
                     await V3_fetchLabelsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
@@ -164,9 +159,9 @@ extension API {
                     l.postSyncAction = PostSyncAction.delete.rawValue
                 }
             }
-            
+
             var commentTasks = [Task<Void, Never>]()
-            
+
             if shouldSyncReviews {
                 commentTasks.append(Task {
                     await V3_fetchReviewsForForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
@@ -180,20 +175,20 @@ extension API {
                     await V3_fetchCommentsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
                 })
             }
-            
+
             commentTasks.append(Task {
                 await V3_fetchCommentsForCurrentIssues(to: moc, for: newOrUpdatedIssues)
                 V3_checkIssueClosures(in: moc)
             })
-            
+
             group.addTask {
                 await V3_checkPrClosures(in: moc)
             }
-            
+
             group.addTask {
                 await V3_detectAssignedPullRequests(in: moc, for: newOrUpdatedPrs)
             }
-            
+
             if shouldSyncReviewAssignments {
                 group.addTask {
                     await V3_fetchReviewAssignmentsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
@@ -211,7 +206,7 @@ extension API {
             }
         }
     }
-    
+
     @MainActor
     private static func V3_checkIssueClosures(in moc: NSManagedObjectContext) {
         let f = NSFetchRequest<Issue>(entityName: "Issue")
@@ -226,7 +221,7 @@ extension API {
         f.returnsObjectsAsFaults = false
         f.includesSubentities = false
         let items = try! moc.fetch(f)
-        for i in items.filter({ $0.shouldCheckForClosing }) {
+        for i in items.filter(\.shouldCheckForClosing) {
             i.stateChanged = ListableItem.StateChange.closed.rawValue
             i.postSyncAction = PostSyncAction.isUpdated.rawValue // let handleClosing() decide
         }
@@ -239,7 +234,7 @@ extension API {
         if comments.isEmpty {
             return
         }
-                
+
         await withTaskGroup(of: Void.self) { group in
             for c in comments {
                 for r in c.reactions {
@@ -263,7 +258,6 @@ extension API {
 
     @MainActor
     private static func V3_fetchItemReactionsIfNeeded<T: ListableItem>(for type: T.Type, to moc: NSManagedObjectContext) async {
-
         let items = T.reactionCheckBatch(for: type, in: moc)
         if items.isEmpty {
             return
@@ -291,19 +285,19 @@ extension API {
             }
         }
     }
-    
+
     @MainActor
-    private static func V3_fetchCommentsForCurrentPullRequests(to moc: NSManagedObjectContext, for prs: [PullRequest]) async {
+    private static func V3_fetchCommentsForCurrentPullRequests(to _: NSManagedObjectContext, for prs: [PullRequest]) async {
         if prs.isEmpty {
             return
         }
-        
+
         for p in prs {
             for c in p.comments {
                 c.postSyncAction = PostSyncAction.delete.rawValue
             }
         }
-        
+
         @Sendable func _fetchComments(issues: Bool) async {
             await withTaskGroup(of: Void.self) { group in
                 assert(Thread.isMainThread)
@@ -335,11 +329,11 @@ extension API {
     }
 
     @MainActor
-    private static func V3_fetchCommentsForCurrentIssues(to moc: NSManagedObjectContext, for issues: [Issue]) async {
+    private static func V3_fetchCommentsForCurrentIssues(to _: NSManagedObjectContext, for issues: [Issue]) async {
         if issues.isEmpty {
             return
         }
-        
+
         await withTaskGroup(of: Void.self) { group in
             for i in issues {
                 for c in i.comments {
@@ -364,7 +358,7 @@ extension API {
     }
 
     @MainActor
-    private static func V3_fetchReviewsForForCurrentPullRequests(to moc: NSManagedObjectContext, for prs: [PullRequest]) async {
+    private static func V3_fetchReviewsForForCurrentPullRequests(to _: NSManagedObjectContext, for prs: [PullRequest]) async {
         if prs.isEmpty {
             return
         }
@@ -406,7 +400,6 @@ extension API {
                 } else {
                     pullRequest.stateChanged = ListableItem.StateChange.closed.rawValue
                     pullRequest.postSyncAction = PostSyncAction.isUpdated.rawValue // let handleClosing() decide
-
                 }
             }
         } catch {
@@ -429,7 +422,7 @@ extension API {
         f.returnsObjectsAsFaults = false
         f.includesSubentities = false
 
-        let prsToCheck = try! moc.fetch(f).filter { $0.shouldCheckForClosing }
+        let prsToCheck = try! moc.fetch(f).filter(\.shouldCheckForClosing)
 
         await withTaskGroup(of: Void.self) { group in
             for r in prsToCheck {
@@ -441,7 +434,7 @@ extension API {
     }
 
     @MainActor
-    private static func V3_fetchReviewAssignmentsForCurrentPullRequests(to moc: NSManagedObjectContext, for prs: [PullRequest]) async {
+    private static func V3_fetchReviewAssignmentsForCurrentPullRequests(to _: NSManagedObjectContext, for prs: [PullRequest]) async {
         await withThrowingTaskGroup(of: Void.self) { group in
             for p in prs {
                 group.addTask {
@@ -449,14 +442,14 @@ extension API {
                     let (data, _) = try await RestAccess.getRawData(at: "/repos/\(repoFullName)/pulls/\(p.number)/requested_reviewers", from: p.apiServer)
                     var reviewUsers = Set<String>()
                     var reviewTeams = Set<String>()
-                    
+
                     if let userList = data as? [[AnyHashable: Any]] {
                         // Legacy API results
                         for userName in userList.compactMap({ $0["login"] as? String }) {
                             reviewUsers.insert(userName)
                         }
                         p.checkAndStoreReviewAssignments(reviewUsers, reviewTeams)
-                        
+
                     } else if let data = data as? [AnyHashable: Any], let userList = data["users"] as? [[AnyHashable: Any]], let teamList = data["teams"] as? [[AnyHashable: Any]] {
                         // New API results
                         for userName in userList.compactMap({ $0["login"] as? String }) {
@@ -466,7 +459,7 @@ extension API {
                             reviewTeams.insert(teamName)
                         }
                         p.checkAndStoreReviewAssignments(reviewUsers, reviewTeams)
-                        
+
                     } else {
                         p.apiServer.lastSyncSucceeded = false
                     }
@@ -476,7 +469,7 @@ extension API {
     }
 
     @MainActor
-    private static func V3_fetchLabelsForCurrentPullRequests(to moc: NSManagedObjectContext, for prs: [PullRequest]) async {
+    private static func V3_fetchLabelsForCurrentPullRequests(to _: NSManagedObjectContext, for prs: [PullRequest]) async {
         if prs.isEmpty {
             return
         }
@@ -490,7 +483,7 @@ extension API {
                 guard let link = p.labelsLink else {
                     continue
                 }
-                
+
                 group.addTask {
                     let (success, resultCode) = await RestAccess.getPagedData(at: link, from: p.apiServer) { data, _ in
                         PRLabel.syncLabels(from: data, withParent: p)
@@ -508,7 +501,7 @@ extension API {
     }
 
     @MainActor
-    private static func V3_fetchLabelsForCurrentIssues(to moc: NSManagedObjectContext, for issues: [Issue]) async {
+    private static func V3_fetchLabelsForCurrentIssues(to _: NSManagedObjectContext, for issues: [Issue]) async {
         if issues.isEmpty {
             return
         }
@@ -522,7 +515,7 @@ extension API {
                 guard let link = i.labelsLink else {
                     continue
                 }
-                
+
                 group.addTask {
                     let (success, resultCode) = await RestAccess.getPagedData(at: link, from: i.apiServer) { data, _ in
                         PRLabel.syncLabels(from: data, withParent: i)
@@ -530,7 +523,7 @@ extension API {
                     }
                     if !success {
                         // 404/410 means the label has been deleted
-                        if !(resultCode==404 || resultCode==410) {
+                        if !(resultCode == 404 || resultCode == 410) {
                             i.apiServer.lastSyncSucceeded = false
                         }
                     }
@@ -545,7 +538,7 @@ extension API {
         if prs.isEmpty {
             return
         }
-        
+
         let now = Date()
         await withTaskGroup(of: Void.self) { group in
 
@@ -553,9 +546,9 @@ extension API {
                 for s in p.statuses {
                     s.postSyncAction = PostSyncAction.delete.rawValue
                 }
-                
+
                 let apiServer = p.apiServer
-                
+
                 if let statusLink = p.statusesLink {
                     group.addTask {
                         let (success, resultCode) = await RestAccess.getPagedData(at: statusLink, from: apiServer) { data, _ in
@@ -581,9 +574,9 @@ extension API {
             }
         }
     }
-    
+
     @MainActor
-    private static func V3_detectAssignedPullRequests(in moc: NSManagedObjectContext, for prs: [PullRequest]) async {
+    private static func V3_detectAssignedPullRequests(in _: NSManagedObjectContext, for prs: [PullRequest]) async {
         await withTaskGroup(of: Void.self) { group in
             for p in prs {
                 let apiServer = p.apiServer

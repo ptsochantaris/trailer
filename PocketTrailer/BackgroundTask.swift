@@ -1,7 +1,6 @@
 import UIKit
 
 final class BackgroundTask {
-
     private static var bgTask = UIBackgroundTaskIdentifier.invalid
 
     private static func endTask() {
@@ -17,25 +16,25 @@ final class BackgroundTask {
     private static let endTimer = PopTimer(timeInterval: 3) {
         endTask()
     }
-    
+
     static func appBackgrounded() {
         assert(Thread.isMainThread)
         appInBackground = true
-        if globalBackgroundCount != 0 && bgTask == .invalid {
+        if globalBackgroundCount != 0, bgTask == .invalid {
             DLog("BG Task starting")
             bgTask = UIApplication.shared.beginBackgroundTask {
                 endTask()
             }
         }
     }
-    
+
     static func appForegrounded() {
         assert(Thread.isMainThread)
         endTimer.abort()
         appInBackground = false
         endTask()
     }
-    
+
     private static func onMainThread(completion: () -> Void) {
         if Thread.isMainThread {
             completion()
@@ -45,7 +44,7 @@ final class BackgroundTask {
             }
         }
     }
-    
+
     static func registerForBackground() {
         onMainThread {
             endTimer.abort()
@@ -60,7 +59,7 @@ final class BackgroundTask {
     static func unregisterForBackground() {
         onMainThread {
             globalBackgroundCount -= 1
-            if globalBackgroundCount == 0 && bgTask != .invalid {
+            if globalBackgroundCount == 0, bgTask != .invalid {
                 endTimer.push()
             }
         }

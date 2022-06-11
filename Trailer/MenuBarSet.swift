@@ -17,106 +17,103 @@ extension NSImage {
 }
 
 final class MenuBarSet {
-	
-	private let prMenuController = NSWindowController(windowNibName: NSNib.Name("MenuWindow"))
-	private let issuesMenuController = NSWindowController(windowNibName: NSNib.Name("MenuWindow"))
-	
-	let prMenu: MenuWindow
-	let issuesMenu: MenuWindow
-	let viewCriterion: GroupingCriterion?
-	
-	var prFilterTimer: PopTimer!
-	var issuesFilterTimer: PopTimer!
-		
-	init(viewCriterion: GroupingCriterion?, delegate: NSWindowDelegate) {
-		self.viewCriterion = viewCriterion
-		
-		prMenu = prMenuController.window as! MenuWindow
+    private let prMenuController = NSWindowController(windowNibName: NSNib.Name("MenuWindow"))
+    private let issuesMenuController = NSWindowController(windowNibName: NSNib.Name("MenuWindow"))
+
+    let prMenu: MenuWindow
+    let issuesMenu: MenuWindow
+    let viewCriterion: GroupingCriterion?
+
+    var prFilterTimer: PopTimer!
+    var issuesFilterTimer: PopTimer!
+
+    init(viewCriterion: GroupingCriterion?, delegate: NSWindowDelegate) {
+        self.viewCriterion = viewCriterion
+
+        prMenu = prMenuController.window as! MenuWindow
         prMenu.dataSource = MenuWindow.DataSource(type: PullRequest.self, sections: Section.prMenuTitles, removeButtonsInSections: [Section.merged.prMenuName, Section.closed.prMenuName], viewCriterion: viewCriterion)
-		prMenu.delegate = delegate
-		
-		issuesMenu = issuesMenuController.window as! MenuWindow
+        prMenu.delegate = delegate
+
+        issuesMenu = issuesMenuController.window as! MenuWindow
         issuesMenu.dataSource = MenuWindow.DataSource(type: Issue.self, sections: Section.issueMenuTitles, removeButtonsInSections: [Section.closed.issuesMenuName], viewCriterion: viewCriterion)
-		issuesMenu.delegate = delegate
-	}
-	
-	func throwAway() {
-		prMenu.hideStatusItem()
-		prMenu.close()
-		issuesMenu.hideStatusItem()
-		issuesMenu.close()
-	}
-	
-	func setTimers() {
-		prFilterTimer = PopTimer(timeInterval: 0.2) { [weak self] in
-			guard let s = self else { return }
-			s.updatePrMenu()
-			s.prMenu.scrollToTop()
-		}
-		
-		issuesFilterTimer = PopTimer(timeInterval: 0.2) { [weak self] in
-			guard let s = self else { return }
-			s.updateIssuesMenu()
-			s.issuesMenu.scrollToTop()
-		}
-	}
-	
-	func prepareForRefresh() {
-		
+        issuesMenu.delegate = delegate
+    }
+
+    func throwAway() {
+        prMenu.hideStatusItem()
+        prMenu.close()
+        issuesMenu.hideStatusItem()
+        issuesMenu.close()
+    }
+
+    func setTimers() {
+        prFilterTimer = PopTimer(timeInterval: 0.2) { [weak self] in
+            guard let s = self else { return }
+            s.updatePrMenu()
+            s.prMenu.scrollToTop()
+        }
+
+        issuesFilterTimer = PopTimer(timeInterval: 0.2) { [weak self] in
+            guard let s = self else { return }
+            s.updateIssuesMenu()
+            s.issuesMenu.scrollToTop()
+        }
+    }
+
+    func prepareForRefresh() {
         allowRefresh = false
-        
-		let grayOut = Settings.grayOutWhenRefreshing
-		
-		if prMenu.messageView != nil {
-			updatePrMenu()
-		}
-		prMenu.refreshMenuItem.title = " Refreshing…"
-		prMenu.statusItem?.statusView.grayOut = grayOut
-		
-		if issuesMenu.messageView != nil {
-			updateIssuesMenu()
-		}
-		issuesMenu.refreshMenuItem.title = " Refreshing…"
-		issuesMenu.statusItem?.statusView.grayOut = grayOut
-	}
-	
-	var allowRefresh = false {
-		didSet {
-			if allowRefresh {
-				prMenu.refreshMenuItem.target = prMenu
-				prMenu.refreshMenuItem.action = #selector(prMenu.refreshSelected)
-				issuesMenu.refreshMenuItem.target = issuesMenu
-				issuesMenu.refreshMenuItem.action = #selector(issuesMenu.refreshSelected)
-			} else {
-				prMenu.refreshMenuItem.action = nil
-				prMenu.refreshMenuItem.target = nil
-				issuesMenu.refreshMenuItem.action = nil
-				issuesMenu.refreshMenuItem.target = nil
-			}
-		}
-	}
-	
-	private static let redText = [ NSAttributedString.Key.font: NSFont.boldSystemFont(ofSize: 10),
-	                               NSAttributedString.Key.foregroundColor: NSColor(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0) ]
-	
-	private static let normalText = [ NSAttributedString.Key.font: NSFont.menuBarFont(ofSize: 10),
-	                                  NSAttributedString.Key.foregroundColor: NSColor.controlTextColor ]
-	
+
+        let grayOut = Settings.grayOutWhenRefreshing
+
+        if prMenu.messageView != nil {
+            updatePrMenu()
+        }
+        prMenu.refreshMenuItem.title = " Refreshing…"
+        prMenu.statusItem?.statusView.grayOut = grayOut
+
+        if issuesMenu.messageView != nil {
+            updateIssuesMenu()
+        }
+        issuesMenu.refreshMenuItem.title = " Refreshing…"
+        issuesMenu.statusItem?.statusView.grayOut = grayOut
+    }
+
+    var allowRefresh = false {
+        didSet {
+            if allowRefresh {
+                prMenu.refreshMenuItem.target = prMenu
+                prMenu.refreshMenuItem.action = #selector(prMenu.refreshSelected)
+                issuesMenu.refreshMenuItem.target = issuesMenu
+                issuesMenu.refreshMenuItem.action = #selector(issuesMenu.refreshSelected)
+            } else {
+                prMenu.refreshMenuItem.action = nil
+                prMenu.refreshMenuItem.target = nil
+                issuesMenu.refreshMenuItem.action = nil
+                issuesMenu.refreshMenuItem.target = nil
+            }
+        }
+    }
+
+    private static let redText = [NSAttributedString.Key.font: NSFont.boldSystemFont(ofSize: 10),
+                                  NSAttributedString.Key.foregroundColor: NSColor(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)]
+
+    private static let normalText = [NSAttributedString.Key.font: NSFont.menuBarFont(ofSize: 10),
+                                     NSAttributedString.Key.foregroundColor: NSColor.controlTextColor]
+
     private func shouldShow(type: ListableItem.Type) -> Bool {
         let fc = ListableItem.requestForItems(of: type, withFilter: nil, sectionIndex: -1, criterion: viewCriterion)
         fc.fetchLimit = 1
         return try! DataManager.main.count(for: fc) > 0
     }
-    
+
     private func updateMenu(of type: ListableItem.Type,
                             menu: MenuWindow,
                             forceVisible: Bool,
                             hasUnread: Bool,
                             reasonForEmpty: @escaping (String) -> NSAttributedString) {
-		
         if forceVisible || shouldShow(type: type) {
-			let shouldGray = Settings.grayOutWhenRefreshing && API.isRefreshing
-						
+            let shouldGray = Settings.grayOutWhenRefreshing && API.isRefreshing
+
             let somethingFailed = ApiServer.shouldReportRefreshFailure(in: DataManager.main) && (viewCriterion?.relatedServerFailed ?? true)
             let attributes = somethingFailed || hasUnread ? MenuBarSet.redText : MenuBarSet.normalText
 
@@ -125,7 +122,7 @@ final class MenuBarSet {
             let countString = somethingFailed ? "X" : (Settings.hideMenubarCounts ? "" : String(try! DataManager.main.count(for: f)))
 
             DLog("Updating \(type) menu, \(countString) total items")
-            
+
             let siv = StatusItemView()
             siv.textAttributes = attributes
             siv.highlighted = menu.isVisible
@@ -134,7 +131,7 @@ final class MenuBarSet {
             siv.title = viewCriterion?.label
             siv.icon = type == PullRequest.self ? StatusItemView.prIcon : StatusItemView.issueIcon
             siv.sizeToFit()
-            
+
             if let existingItem = menu.statusItem {
                 existingItem.length = siv.frame.width
                 existingItem.button!.viewWithTag(siv.tag)?.removeFromSuperview()
@@ -149,55 +146,53 @@ final class MenuBarSet {
         } else {
             menu.hideStatusItem()
         }
-		
+
         DispatchQueue.main.async {
             menu.reload()
-            
+
             if menu.table.numberOfRows == 0 {
                 menu.messageView = MessageView(frame: CGRect(x: 0, y: 0, width: MENU_WIDTH, height: 100), message: reasonForEmpty(menu.filter.stringValue))
             }
-            
+
             menu.size(andShow: false)
         }
-	}
-	
-	func updateIssuesMenu(forceVisible: Bool = false) {
-		if forceVisible || Repo.mayProvideIssuesForDisplay(fromServerWithId: viewCriterion?.apiServerId) {
-			
+    }
+
+    func updateIssuesMenu(forceVisible: Bool = false) {
+        if forceVisible || Repo.mayProvideIssuesForDisplay(fromServerWithId: viewCriterion?.apiServerId) {
             let hasUnread = Issue.badgeCount(in: DataManager.main, criterion: viewCriterion) > 0
             updateMenu(of: Issue.self, menu: issuesMenu, forceVisible: forceVisible, hasUnread: hasUnread) {
                 Issue.reasonForEmpty(with: $0, criterion: self.viewCriterion)
-			}
-			
-		} else {
-			issuesMenu.hideStatusItem()
-		}
-	}
-	
+            }
+
+        } else {
+            issuesMenu.hideStatusItem()
+        }
+    }
+
     func updatePrMenu(forceVisible: Bool = false) {
-		let sid = viewCriterion?.apiServerId
-		if forceVisible || Repo.mayProvidePrsForDisplay(fromServerWithId: sid) || !Repo.mayProvideIssuesForDisplay(fromServerWithId: sid) {
-			
+        let sid = viewCriterion?.apiServerId
+        if forceVisible || Repo.mayProvidePrsForDisplay(fromServerWithId: sid) || !Repo.mayProvideIssuesForDisplay(fromServerWithId: sid) {
             let hasUnread = PullRequest.badgeCount(in: DataManager.main, criterion: viewCriterion) > 0
             updateMenu(of: PullRequest.self, menu: prMenu, forceVisible: forceVisible, hasUnread: hasUnread) {
                 PullRequest.reasonForEmpty(with: $0, criterion: self.viewCriterion)
-			}
-			
-		} else {
-			prMenu.hideStatusItem()
+            }
+
+        } else {
+            prMenu.hideStatusItem()
         }
-	}
-	
-	private func compare(dictionary from: [AnyHashable: Any], to: [AnyHashable: Any]) -> Bool {
-		for (key, value) in from {
-			if let v = to[key] {
-				if String(describing: v) != String(describing: value) {
-					return false
-				}
-			} else {
-				return false
-			}
-		}
-		return true
-	}
+    }
+
+    private func compare(dictionary from: [AnyHashable: Any], to: [AnyHashable: Any]) -> Bool {
+        for (key, value) in from {
+            if let v = to[key] {
+                if String(describing: v) != String(describing: value) {
+                    return false
+                }
+            } else {
+                return false
+            }
+        }
+        return true
+    }
 }

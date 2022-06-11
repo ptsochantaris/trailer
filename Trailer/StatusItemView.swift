@@ -1,36 +1,35 @@
 import Cocoa
 
 final class StatusItemView: NSView {
+    var icon: NSImage!
+    var textAttributes = [NSAttributedString.Key: Any]()
+    var countLabel = ""
+    var title: String?
 
-	var icon: NSImage!
-	var textAttributes = [NSAttributedString.Key: Any]()
-	var countLabel = ""
-	var title: String?
-    
-    override func hitTest(_ point: NSPoint) -> NSView? {
-        return nil
+    override func hitTest(_: NSPoint) -> NSView? {
+        nil
     }
 
-	var grayOut = false {
-		didSet {
-			if grayOut != oldValue {
-				needsDisplay = true
-			}
-		}
-	}
+    var grayOut = false {
+        didSet {
+            if grayOut != oldValue {
+                needsDisplay = true
+            }
+        }
+    }
 
-	var highlighted = false {
-		didSet {
-			if highlighted != oldValue {
-				needsDisplay = true
-			}
-		}
-	}
-    
+    var highlighted = false {
+        didSet {
+            if highlighted != oldValue {
+                needsDisplay = true
+            }
+        }
+    }
+
     override var tag: Int {
-        return 1947
+        1947
     }
-    
+
     static let prIcon: NSImage = {
         let img = NSImage(named: NSImage.Name("PullRequestIcon"))!
         var size = img.size
@@ -48,7 +47,7 @@ final class StatusItemView: NSView {
         size.height *= scale
         return img.resized(to: size, offset: NSPoint(x: 3, y: 3))
     }()
-    
+
     private func titleAttributes(foregorund: NSColor) -> [NSAttributedString.Key: Any] {
         let p = NSMutableParagraphStyle()
         p.alignment = .center
@@ -59,10 +58,10 @@ final class StatusItemView: NSView {
             .paragraphStyle: p
         ]
     }
-    
+
     private let labelSpacing: CGFloat = 2
-    
-	func sizeToFit() {
+
+    func sizeToFit() {
         let H = NSStatusBar.system.thickness
         var itemWidth: CGFloat = 0
         if let title = title {
@@ -72,48 +71,48 @@ final class StatusItemView: NSView {
         } else {
             itemWidth = icon.size.width
         }
-        
+
         if !countLabel.isEmpty {
             let countWidth = countLabel.size(withAttributes: textAttributes).width
             let extra = title == nil ? 0 : labelSpacing
             itemWidth = max(itemWidth, countWidth + icon.size.width + extra)
         }
-        
+
         frame = CGRect(x: 0, y: 0, width: itemWidth, height: H)
-	}
-    
-    private var isDark: Bool {
-        return self.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
     }
 
-	override func draw(_ dirtyRect: NSRect) {
-		var countAttributes = textAttributes
-		let foreground: NSColor
+    private var isDark: Bool {
+        self.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+    }
 
-		if highlighted {
-			foreground = .selectedMenuItemTextColor
+    override func draw(_ dirtyRect: NSRect) {
+        var countAttributes = textAttributes
+        let foreground: NSColor
+
+        if highlighted {
+            foreground = .selectedMenuItemTextColor
         } else if isDark {
-			foreground = .selectedMenuItemTextColor
+            foreground = .selectedMenuItemTextColor
             if countAttributes[.foregroundColor] as! NSColor == .labelColor {
-				countAttributes[.foregroundColor] = foreground
-			}
-		} else {
-			foreground = .controlTextColor
-		}
+                countAttributes[.foregroundColor] = foreground
+            }
+        } else {
+            foreground = .controlTextColor
+        }
 
-		if grayOut {
-			if isDark {
-				countAttributes[.foregroundColor] = NSColor.secondaryLabelColor
-			} else {
-				countAttributes[.foregroundColor] = NSColor.disabledControlTextColor
-			}
-		}
+        if grayOut {
+            if isDark {
+                countAttributes[.foregroundColor] = NSColor.secondaryLabelColor
+            } else {
+                countAttributes[.foregroundColor] = NSColor.disabledControlTextColor
+            }
+        }
 
-		let tintedIcon = tintedImage(from: icon, tint: foreground)
+        let tintedIcon = tintedImage(from: icon, tint: foreground)
 
-		if let t = title {
-			let r = CGRect(x: 0, y: dirtyRect.height-7, width: dirtyRect.width, height: 7)
-			t.draw(in: r, withAttributes: titleAttributes(foregorund: foreground))
+        if let t = title {
+            let r = CGRect(x: 0, y: dirtyRect.height - 7, width: dirtyRect.width, height: 7)
+            t.draw(in: r, withAttributes: titleAttributes(foregorund: foreground))
 
             let iconWidth = tintedIcon.size.width - 6
             let countLabelWidth = countLabel.size(withAttributes: textAttributes).width
@@ -124,7 +123,7 @@ final class StatusItemView: NSView {
             let countLabelRect = CGRect(x: startX + iconWidth + labelSpacing, y: -8, width: countLabelWidth, height: bounds.size.height)
             countLabel.draw(in: countLabelRect, withAttributes: countAttributes)
 
-		} else {
+        } else {
             tintedIcon.draw(at: .zero, from: .zero, operation: .sourceOver, fraction: 1)
 
             let countLabelRect: CGRect
@@ -134,20 +133,19 @@ final class StatusItemView: NSView {
                 countLabelRect = CGRect(x: bounds.size.height - 0, y: -5, width: bounds.size.width, height: bounds.size.height)
             }
             countLabel.draw(in: countLabelRect, withAttributes: countAttributes)
-		}
-	}
+        }
+    }
 
-	// With thanks to http://stackoverflow.com/questions/1413135/tinting-a-grayscale-nsimage-or-ciimage
-	private func tintedImage(from image: NSImage, tint: NSColor) -> NSImage {
-
-		let tinted = image.copy() as! NSImage
-		tinted.lockFocus()
-		tint.set()
+    // With thanks to http://stackoverflow.com/questions/1413135/tinting-a-grayscale-nsimage-or-ciimage
+    private func tintedImage(from image: NSImage, tint: NSColor) -> NSImage {
+        let tinted = image.copy() as! NSImage
+        tinted.lockFocus()
+        tint.set()
 
         let imageRect = NSRect(origin: .zero, size: image.size)
-		imageRect.fill(using: .sourceAtop)
+        imageRect.fill(using: .sourceAtop)
 
-		tinted.unlockFocus()
-		return tinted
-	}
+        tinted.unlockFocus()
+        return tinted
+    }
 }

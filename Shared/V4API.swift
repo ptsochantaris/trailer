@@ -1,5 +1,5 @@
-import Foundation
 import CoreData
+import Foundation
 
 extension API {
     static func canUseV4API(for moc: NSManagedObjectContext) -> String? {
@@ -8,7 +8,7 @@ extension API {
             DLog("Warning: Some servers have a blank v4 API path")
             return Settings.v4DAPIessage
         }
-        
+
         if DataItem.nullNodeIdItems(of: Repo.self, in: moc) > 0 {
             DLog("Warning: Some repos still have a null node ID")
             return Settings.v4DBMessage
@@ -16,32 +16,31 @@ extension API {
 
         return nil
     }
-    
+
     // MARK: V4 API
-    
+
     struct SyncSteps: OptionSet {
         let rawValue: Int
-        
-        static let reactions         = SyncSteps(rawValue: 1 << 0)
-        static let reviews           = SyncSteps(rawValue: 1 << 1)
-        static let comments          = SyncSteps(rawValue: 1 << 2)
-        static let reviewRequests    = SyncSteps(rawValue: 1 << 3)
-        static let statuses          = SyncSteps(rawValue: 1 << 4)
-        
+
+        static let reactions = SyncSteps(rawValue: 1 << 0)
+        static let reviews = SyncSteps(rawValue: 1 << 1)
+        static let comments = SyncSteps(rawValue: 1 << 2)
+        static let reviewRequests = SyncSteps(rawValue: 1 << 3)
+        static let statuses = SyncSteps(rawValue: 1 << 4)
+
         var toString: String {
             var ret = [String]()
-            if self.contains(.reactions) { ret.append("Reactions") }
-            if self.contains(.reviews) { ret.append("Reviews") }
-            if self.contains(.comments) { ret.append("Comments") }
-            if self.contains(.reviewRequests) { ret.append("Requests") }
-            if self.contains(.statuses) { ret.append("Statuses") }
+            if contains(.reactions) { ret.append("Reactions") }
+            if contains(.reviews) { ret.append("Reviews") }
+            if contains(.comments) { ret.append("Comments") }
+            if contains(.reviewRequests) { ret.append("Requests") }
+            if contains(.statuses) { ret.append("Statuses") }
             return ret.joined(separator: ", ")
         }
     }
-    
+
     @MainActor
     static func v4Sync(to moc: NSManagedObjectContext, newOrUpdatedPrs: [PullRequest], newOrUpdatedIssues: [Issue]) async throws {
-        
         if Settings.showStatusItems {
             let prs = PullRequest.statusCheckBatch(in: moc)
             try await GraphQL.update(for: prs, of: PullRequest.self, in: moc, steps: [.statuses])
@@ -53,7 +52,7 @@ extension API {
                 }
             }
         }
-        
+
         if Settings.notifyOnItemReactions {
             let rp = PullRequest.reactionCheckBatch(for: PullRequest.self, in: moc)
             try await GraphQL.update(for: rp, of: PullRequest.self, in: moc, steps: [.reactions])
@@ -77,12 +76,12 @@ extension API {
         }
 
         try await GraphQL.update(for: newOrUpdatedPrs, of: PullRequest.self, in: moc, steps: steps)
-        
+
         let reviews = DataItem.newOrUpdatedItems(of: Review.self, in: moc, fromSuccessfulSyncOnly: true)
-        try await GraphQL.updateComments(for: reviews, moc: moc)// must run after fetching reviews
-        
+        try await GraphQL.updateComments(for: reviews, moc: moc) // must run after fetching reviews
+
         try await GraphQL.update(for: newOrUpdatedIssues, of: Issue.self, in: moc, steps: steps)
-        
+
         if Settings.notifyOnCommentReactions {
             let comments = PRComment.commentsThatNeedReactionsToBeRefreshed(in: moc)
             for c in comments {

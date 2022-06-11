@@ -2,60 +2,59 @@ import Cocoa
 
 extension NSStatusItem {
     var statusView: StatusItemView {
-        return button!.viewWithTag(1947) as! StatusItemView
+        button!.viewWithTag(1947) as! StatusItemView
     }
 }
 
 final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
+    @IBOutlet var scrollView: NSScrollView!
+    @IBOutlet private var header: ViewAllowsVibrancy!
+    @IBOutlet var table: PrTable!
+    @IBOutlet var filter: NSSearchField!
+    @IBOutlet var refreshMenuItem: NSMenuItem!
 
-	@IBOutlet var scrollView: NSScrollView!
-	@IBOutlet private var header: ViewAllowsVibrancy!
-	@IBOutlet var table: PrTable!
-	@IBOutlet var filter: NSSearchField!
-	@IBOutlet var refreshMenuItem: NSMenuItem!
+    var statusItem: NSStatusItem?
 
-	var statusItem: NSStatusItem?
+    var messageView: MessageView? {
+        didSet {
+            if let p = oldValue {
+                p.removeFromSuperview()
+            }
+            if let m = messageView {
+                contentView?.addSubview(m)
+            }
+        }
+    }
 
-	var messageView: MessageView? {
-		didSet {
-			if let p = oldValue {
-				p.removeFromSuperview()
-			}
-			if let m = messageView {
-				contentView?.addSubview(m)
-			}
-		}
-	}
-
-	var dataSource: DataSource! {
-		didSet {
+    var dataSource: DataSource! {
+        didSet {
             if let newFilter = Settings.filter(for: dataSource.uniqueIdentifier) {
                 filter.stringValue = newFilter
             }
-			table.dataSource = dataSource
-			table.delegate = dataSource
-		}
-	}
+            table.dataSource = dataSource
+            table.delegate = dataSource
+        }
+    }
 
-	override func awakeFromNib() {
-		super.awakeFromNib()
+    override func awakeFromNib() {
+        super.awakeFromNib()
 
-		contentView?.wantsLayer = true
+        contentView?.wantsLayer = true
 
         isOpaque = false
         backgroundColor = .clear
         contentView?.layer?.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMinYCorner]
         contentView?.layer?.cornerRadius = 5
-        
-		let w = NSVisualEffectView(frame: header.bounds)
-		w.autoresizingMask = [.height, .width]
-		w.blendingMode = .behindWindow
-		w.state = .active
-		header.addSubview(w, positioned: .below, relativeTo: filter)
-        
+
+        let w = NSVisualEffectView(frame: header.bounds)
+        w.autoresizingMask = [.height, .width]
+        w.blendingMode = .behindWindow
+        w.state = .active
+        header.addSubview(w, positioned: .below, relativeTo: filter)
+
         NotificationCenter.default.addObserver(self, selector: #selector(refreshUpdate), name: .SyncProgressUpdate, object: nil)
-	}
-    
+    }
+
     @objc func buttonSelected() {
         if isVisible {
             closeMenu()
@@ -64,105 +63,104 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
         }
     }
 
-	func controlTextDidChange(_ obj: Notification) {
-		app.controlTextDidChange(obj)
-	}
-
-	func updateVibrancy() {
-		switch app.theme {
-		case .light:
-			appearance = NSAppearance(named: .vibrantLight)
-		case .dark:
-            appearance = NSAppearance(named: .darkAqua)
-		}
-	}
-
-    func statusItemViewSelected(_ statusItemView: StatusItemView) {
-       if isVisible {
-        closeMenu()
-       } else {
-        app.show(menu: self)
-       }
+    func controlTextDidChange(_ obj: Notification) {
+        app.controlTextDidChange(obj)
     }
 
-	func hideStatusItem() {
-		if let s = statusItem {
-			s.statusBar?.removeStatusItem(s)
-			statusItem = nil
-		}
-	}
+    func updateVibrancy() {
+        switch app.theme {
+        case .light:
+            appearance = NSAppearance(named: .vibrantLight)
+        case .dark:
+            appearance = NSAppearance(named: .darkAqua)
+        }
+    }
 
-	override var canBecomeKey: Bool {
-		return true
-	}
+    func statusItemViewSelected(_: StatusItemView) {
+        if isVisible {
+            closeMenu()
+        } else {
+            app.show(menu: self)
+        }
+    }
 
-	@objc private func menuWillOpen(_ menu: NSMenu) {
-		if API.isRefreshing {
-			refreshUpdate()
-		} else {
+    func hideStatusItem() {
+        if let s = statusItem {
+            s.statusBar?.removeStatusItem(s)
+            statusItem = nil
+        }
+    }
+
+    override var canBecomeKey: Bool {
+        true
+    }
+
+    @objc private func menuWillOpen(_: NSMenu) {
+        if API.isRefreshing {
+            refreshUpdate()
+        } else {
             refreshMenuItem.title = " Refresh (\(API.lastSuccessfulSyncAt))"
-		}
-	}
+        }
+    }
 
-	@objc private func refreshUpdate() {
-		refreshMenuItem.title = " Refresh: " + API.currentOperationName
-	}
+    @objc private func refreshUpdate() {
+        refreshMenuItem.title = " Refresh: " + API.currentOperationName
+    }
 
-	func scrollToTop() {
-		table.scrollToBeginningOfDocument(nil)
-	}
+    func scrollToTop() {
+        table.scrollToBeginningOfDocument(nil)
+    }
 
-	deinit {
-		NotificationCenter.default.removeObserver(self)
-	}
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
 
-	@IBAction private func markAllReadSelected(_ sender: NSMenuItem) {
-		app.markAllReadSelected(from: self)
-	}
+    @IBAction private func markAllReadSelected(_: NSMenuItem) {
+        app.markAllReadSelected(from: self)
+    }
 
-	@IBAction private func preferencesSelected(_ sender: NSMenuItem) {
-		app.preferencesSelected()
-	}
+    @IBAction private func preferencesSelected(_: NSMenuItem) {
+        app.preferencesSelected()
+    }
 
-	@IBAction func refreshSelected(_ sender: NSMenuItem) {
-		if Repo.countItems(of: Repo.self, in: DataManager.main) == 0 {
-			app.preferencesSelected()
-			return
-		}
-		app.startRefresh()
-	}
+    @IBAction func refreshSelected(_: NSMenuItem) {
+        if Repo.countItems(of: Repo.self, in: DataManager.main) == 0 {
+            app.preferencesSelected()
+            return
+        }
+        app.startRefresh()
+    }
 
-	@IBAction private func aboutSelected(_ sender: NSMenuItem) {
-		app.showAboutWindow()
-	}
+    @IBAction private func aboutSelected(_: NSMenuItem) {
+        app.showAboutWindow()
+    }
 
-	func size(andShow makeVisible: Bool) {
-
-		guard let siv = statusItem?.statusView,
+    func size(andShow makeVisible: Bool) {
+        guard let siv = statusItem?.statusView,
               let windowFrame = siv.window?.frame,
               let screen = NSScreen.screens.first(where: { $0.frame.contains(windowFrame) })
         else { return }
 
-		var menuHeight: CGFloat = 28
-		let rowCount = table.numberOfRows
+        var menuHeight: CGFloat = 28
+        let rowCount = table.numberOfRows
         let screenFrame = screen.visibleFrame
-		var screenHeight = screenFrame.size.height
-        
+        var screenHeight = screenFrame.size.height
+
         if NSApp.presentationOptions.contains(.autoHideMenuBar) {
             screenHeight -= 25
         }
-        
-		if rowCount == 0 {
-			menuHeight += 95
-		} else {
-			for f in 0..<rowCount {
-				let rowView = table.view(atColumn: 0, row: f, makeIfNecessary: true)!
-				menuHeight += rowView.frame.size.height + 2
-				if menuHeight >= screenHeight {
-					break
-				}
-			}
-		}
+
+        if rowCount == 0 {
+            menuHeight += 95
+        } else {
+            for f in 0 ..< rowCount {
+                let rowView = table.view(atColumn: 0, row: f, makeIfNecessary: true)!
+                menuHeight += rowView.frame.size.height + 2
+                if menuHeight >= screenHeight {
+                    break
+                }
+            }
+        }
 
         var menuWidth = MENU_WIDTH
         if #available(macOS 11.0, *) {
@@ -171,7 +169,7 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
                 menuHeight += 24
             }
         }
-                
+
         var menuLeft = windowFrame.origin.x
         let rightSide = screenFrame.origin.x + screenFrame.size.width
         let overflow = (menuLeft + menuWidth) - rightSide
@@ -186,45 +184,45 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
             menuHeight = screenHeight
         }
 
-		setFrame(CGRect(x: menuLeft, y: bottom, width: menuWidth, height: menuHeight), display: false, animate: false)
+        setFrame(CGRect(x: menuLeft, y: bottom, width: menuWidth, height: menuHeight), display: false, animate: false)
 
-		if makeVisible {
-			siv.highlighted = true
-			table.deselectAll(nil)
-			app.openingWindow = true
-			level = .mainMenu
-			makeKeyAndOrderFront(self)
-			NSApp.activate(ignoringOtherApps: true)
-			app.openingWindow = false            
-            
-		} else if statusItem == nil {
-			closeMenu()
-		}
-	}
+        if makeVisible {
+            siv.highlighted = true
+            table.deselectAll(nil)
+            app.openingWindow = true
+            level = .mainMenu
+            makeKeyAndOrderFront(self)
+            NSApp.activate(ignoringOtherApps: true)
+            app.openingWindow = false
 
-	func reload() {
-		messageView = nil
+        } else if statusItem == nil {
+            closeMenu()
+        }
+    }
+
+    func reload() {
+        messageView = nil
         let filterString = filter.stringValue
-		dataSource.reloadData(filter: filterString)
-		table.reloadData()
+        dataSource.reloadData(filter: filterString)
+        table.reloadData()
         Settings.setFilter(to: filterString, for: dataSource.uniqueIdentifier)
-	}
+    }
 
-	func closeMenu() {
-		if isVisible {
-			if let siv = statusItem?.statusView {
-				siv.highlighted = false
-			}
-			table.deselectAll(nil)
-			orderOut(nil)
-		}
-	}
+    func closeMenu() {
+        if isVisible {
+            if let siv = statusItem?.statusView {
+                siv.highlighted = false
+            }
+            table.deselectAll(nil)
+            orderOut(nil)
+        }
+    }
 
-	func focusedItem(blink: Bool) -> ListableItem? {
-		let row = table.selectedRow
-		var i: ListableItem?
-		if row >= 0 {
-			i = dataSource.itemAtRow(row)
+    func focusedItem(blink: Bool) -> ListableItem? {
+        let row = table.selectedRow
+        var i: ListableItem?
+        if row >= 0 {
+            i = dataSource.itemAtRow(row)
             if blink {
                 table.deselectAll(nil)
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
@@ -233,7 +231,7 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
                     S.table.selectRowIndexes(i, byExtendingSelection: false)
                 }
             }
-		}
-		return i
-	}
+        }
+        return i
+    }
 }

@@ -1,37 +1,36 @@
 import Foundation
 
 final class PRStatus: DataItem {
-
     @NSManaged var descriptionText: String?
     @NSManaged var state: String?
-	@NSManaged var context: String?
+    @NSManaged var context: String?
     @NSManaged var targetUrl: String?
 
-	@NSManaged var pullRequest: PullRequest
-    
+    @NSManaged var pullRequest: PullRequest
+
     override var alternateCreationDate: Bool { true }
 
-	static func syncStatuses(from data: [[AnyHashable: Any]]?, pullRequest: PullRequest) {
-		items(with: data, type: PRStatus.self, server: pullRequest.apiServer) { item, info, isNewOrUpdated in
-			if isNewOrUpdated {
-				item.state = info["state"] as? String
-				item.context = info["context"] as? String
-				item.targetUrl = info["target_url"] as? String
-				item.pullRequest = pullRequest
+    static func syncStatuses(from data: [[AnyHashable: Any]]?, pullRequest: PullRequest) {
+        items(with: data, type: PRStatus.self, server: pullRequest.apiServer) { item, info, isNewOrUpdated in
+            if isNewOrUpdated {
+                item.state = info["state"] as? String
+                item.context = info["context"] as? String
+                item.targetUrl = info["target_url"] as? String
+                item.pullRequest = pullRequest
 
-				if let ds = info["description"] as? String {
-					item.descriptionText = ds.trim
-				}
-			}
-		}
-	}
-    
+                if let ds = info["description"] as? String {
+                    item.descriptionText = ds.trim
+                }
+            }
+        }
+    }
+
     static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer) {
         syncItems(of: PRStatus.self, from: nodes, on: server) { status, node in
             guard node.created || node.updated,
-                let parentId = node.parent?.id,
-                let moc = server.managedObjectContext
-                else { return }
+                  let parentId = node.parent?.id,
+                  let moc = server.managedObjectContext
+            else { return }
 
             if node.created {
                 if let parent = DataItem.item(of: PullRequest.self, with: parentId, in: moc) {
@@ -40,7 +39,7 @@ final class PRStatus: DataItem {
                     DLog("Warning: PRStatus without parent")
                 }
             }
-            
+
             let info = node.jsonPayload
             if node.elementType == "CheckRun" {
                 status.state = (info["conclusion"] as? String)?.lowercased()
@@ -55,12 +54,12 @@ final class PRStatus: DataItem {
             }
         }
     }
-    
+
     var colorForDisplay: COLOR_CLASS {
         switch S(state) {
-        case "", "skipped", "neutral":
+        case "", "neutral", "skipped":
             return .appSecondaryLabel
-        case "pending", "expected":
+        case "expected", "pending":
             return .appYellow
         case "success":
             return .appGreen
@@ -71,11 +70,11 @@ final class PRStatus: DataItem {
 
     var displayText: String {
         var text: String
-        
+
         switch S(state) {
         case "":
             text = "⏺ "
-        case "pending", "expected":
+        case "expected", "pending":
             text = "⚡️ "
         case "skipped":
             text = "⏭ "
@@ -97,12 +96,12 @@ final class PRStatus: DataItem {
             } else {
                 text += c
             }
-		}
+        }
 
-		if let t = descriptionText, !t.isEmpty {
-			text += " - \(t)"
-		}
+        if let t = descriptionText, !t.isEmpty {
+            text += " - \(t)"
+        }
 
-		return text
-	}
+        return text
+    }
 }

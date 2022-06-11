@@ -31,7 +31,7 @@ struct CommentCount: View {
 
 struct TypeSection: View {
     let type: String
-    
+
     private var totalOpen = 0
     private var totalUnread = 0
     private var totalMine = 0
@@ -42,12 +42,12 @@ struct TypeSection: View {
     private var totalClosed = 0
     private var totalOther = 0
     private var error: String
-    
+
     init(type: String, info: [AnyHashable: Any]) {
         self.type = type
 
         error = info["error"] as? String ?? "No items"
-        
+
         for r in info["views"] as! [[AnyHashable: Any]] {
             if let v = r[type] as? [AnyHashable: Any] {
                 totalMine += (v[Section.mine.apiName] as? [AnyHashable: Any])?["total"] as? Int ?? 0
@@ -64,7 +64,7 @@ struct TypeSection: View {
     }
 
     var body: some View {
-        let totalCount = totalMerged+totalMine+totalParticipated+totalClosed+totalMentioned+totalSnoozed+totalOther
+        let totalCount = totalMerged + totalMine + totalParticipated + totalClosed + totalMentioned + totalSnoozed + totalOther
 
         if totalCount > 0 {
             // titleAttributes
@@ -92,7 +92,7 @@ struct TypeSection: View {
 
 struct MainView: View {
     var entry: Summary
-    
+
     var body: some View {
         let imageSize = 18
         if let result = entry.data {
@@ -108,7 +108,7 @@ struct MainView: View {
                 let updated = agoFormat(prefix: "updated", since: result["lastUpdated"] as? Date).capitalFirstLetter
                 Text(updated).font(.caption2).foregroundColor(Color("dimText"))
             }
-            
+
         } else {
             VStack(spacing: 16) {
                 HStack(alignment: .top) {

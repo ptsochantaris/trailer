@@ -1,30 +1,29 @@
 import CoreData
 
 final class Review: DataItem {
+    @NSManaged var body: String?
+    @NSManaged var username: String?
+    @NSManaged var state: String?
 
-	@NSManaged var body: String?
-	@NSManaged var username: String?
-	@NSManaged var state: String?
+    @NSManaged var pullRequest: PullRequest
+    @NSManaged var comments: Set<PRComment>
 
-	@NSManaged var pullRequest: PullRequest
-	@NSManaged var comments: Set<PRComment>
-
-	enum State: String {
-		case CHANGES_REQUESTED
-		case APPROVED
-		case DISMISSED
-	}
+    enum State: String {
+        case CHANGES_REQUESTED
+        case APPROVED
+        case DISMISSED
+    }
 
     static func syncRequests(from nodes: ContiguousArray<GQLNode>, on server: ApiServer) {
         var prIdsToAssignedUsers = [String: Set<String>]()
         var prIdsToAssignedTeams = [String: Set<String>]()
-        
+
         for node in nodes {
             guard node.elementType == "ReviewRequest",
-                let parentId = node.parent?.id else {
-                    continue
+                  let parentId = node.parent?.id else {
+                continue
             }
-            
+
             if let reviewerJson = node.jsonPayload["requestedReviewer"] as? [AnyHashable: Any] {
                 if let login = reviewerJson["login"] as? String {
                     var previous = prIdsToAssignedUsers[parentId]
@@ -38,12 +37,12 @@ final class Review: DataItem {
                 }
             }
         }
-        
+
         for node in nodes {
-        guard node.elementType == "ReviewRequest",
-            let parentId = node.parent?.id,
-            let moc = server.managedObjectContext,
-            let parent = DataItem.item(of: PullRequest.self, with: parentId, in: moc) else {
+            guard node.elementType == "ReviewRequest",
+                  let parentId = node.parent?.id,
+                  let moc = server.managedObjectContext,
+                  let parent = DataItem.item(of: PullRequest.self, with: parentId, in: moc) else {
                 continue
             }
             parent.checkAndStoreReviewAssignments(prIdsToAssignedUsers[parentId] ?? [],
@@ -62,9 +61,9 @@ final class Review: DataItem {
             review.check(newState: newState)
 
             guard node.created || node.updated,
-                let parentId = node.parent?.id,
-                let moc = server.managedObjectContext
-                else { return }
+                  let parentId = node.parent?.id,
+                  let moc = server.managedObjectContext
+            else { return }
 
             if node.created {
                 if let parent = DataItem.item(of: PullRequest.self, with: parentId, in: moc) {
@@ -73,24 +72,24 @@ final class Review: DataItem {
                     DLog("Warning Review without parent")
                 }
             }
-            
+
             review.body = info["body"] as? String
             review.username = (info["author"] as? [AnyHashable: Any])?["login"] as? String
         }
     }
-    
-	static func syncReviews(from data: [[AnyHashable: Any]]?, withParent: PullRequest) {
-		items(with: data, type: Review.self, server: withParent.apiServer) { item, info, isNewOrUpdated in
-			if isNewOrUpdated {
-				item.pullRequest = withParent
-				item.body = info["body"] as? String
-				item.username = (info["user"] as? [AnyHashable: Any])?["login"] as? String
-			}
+
+    static func syncReviews(from data: [[AnyHashable: Any]]?, withParent: PullRequest) {
+        items(with: data, type: Review.self, server: withParent.apiServer) { item, info, isNewOrUpdated in
+            if isNewOrUpdated {
+                item.pullRequest = withParent
+                item.body = info["body"] as? String
+                item.username = (info["user"] as? [AnyHashable: Any])?["login"] as? String
+            }
             let newState = info["state"] as? String
             item.check(newState: newState)
-		}
-	}
-    
+        }
+    }
+
     private func check(newState: String?) {
         if state != newState { // state change doesn't change API date, so we need to check for this every time
             state = newState
@@ -99,12 +98,12 @@ final class Review: DataItem {
             }
         }
     }
-    
+
     func processNotifications() {
         guard !isMine, pullRequest.canBadge, let newState = State(rawValue: state ?? "") else {
             return
         }
-                
+
         switch newState {
         case .CHANGES_REQUESTED:
             if Settings.notifyOnAllReviewChangeRequests || (Settings.notifyOnReviewChangeRequests && pullRequest.createdByMe) {
@@ -121,38 +120,38 @@ final class Review: DataItem {
         }
     }
 
-	static func review(with id: Int64, in moc: NSManagedObjectContext) -> Review? {
-		let f = NSFetchRequest<Review>(entityName: "Review")
-		f.returnsObjectsAsFaults = false
-		f.includesSubentities = false
+    static func review(with id: Int64, in moc: NSManagedObjectContext) -> Review? {
+        let f = NSFetchRequest<Review>(entityName: "Review")
+        f.returnsObjectsAsFaults = false
+        f.includesSubentities = false
         f.fetchLimit = 1
-		f.predicate = NSPredicate(format: "serverId == %lld", id)
-		return try! moc.fetch(f).first
-	}
+        f.predicate = NSPredicate(format: "serverId == %lld", id)
+        return try! moc.fetch(f).first
+    }
 
-	var isMine: Bool {
-		return username == apiServer.userName
-	}
+    var isMine: Bool {
+        username == apiServer.userName
+    }
 
-	var affectsBottomLine: Bool {
+    var affectsBottomLine: Bool {
         let s = state
-		return s == State.CHANGES_REQUESTED.rawValue || s == State.APPROVED.rawValue || s == State.DISMISSED.rawValue
-	}
+        return s == State.CHANGES_REQUESTED.rawValue || s == State.APPROVED.rawValue || s == State.DISMISSED.rawValue
+    }
 }
 
 /*
-	PENDING
-	A review that has not yet been submitted.
-	
-	COMMENTED
-	An informational review.
-	
-	APPROVED
-	A review allowing the pull request to merge.
-	
-	CHANGES_REQUESTED
-	A review blocking the pull request from merging.
-	
-	DISMISSED
-	A review that has been dismissed.
-*/
+ PENDING
+ A review that has not yet been submitted.
+
+ COMMENTED
+ An informational review.
+
+ APPROVED
+ A review allowing the pull request to merge.
+
+ CHANGES_REQUESTED
+ A review blocking the pull request from merging.
+
+ DISMISSED
+ A review that has been dismissed.
+ */

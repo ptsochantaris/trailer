@@ -9,7 +9,7 @@ extension Section {
             return Settings.scanClosedAndMergedItems
         case .mentioned, .mine, .participated:
             return true
-        case .snoozed, .none:
+        case .none, .snoozed:
             return false
         }
     }
@@ -30,7 +30,7 @@ extension Section {
             return Settings.showStatusesOnAllItems
         case .mentioned, .mine, .participated:
             return true
-        case .snoozed, .none:
+        case .none, .snoozed:
             return false
         }
     }

@@ -4,16 +4,15 @@ extension Notification.Name {
     static let KillHelper = Notification.Name("KillTrailerLauncher")
 }
 
-final class LauncherCommon {
-
+enum LauncherCommon {
     static let helperAppId = "com.housetrip.Trailer.Launcher"
     static var isHelperRunning: Bool {
-        return NSWorkspace.shared.runningApplications.contains { $0.bundleIdentifier == helperAppId }
+        NSWorkspace.shared.runningApplications.contains { $0.bundleIdentifier == helperAppId }
     }
 
     static let mainAppId = "com.housetrip.Trailer"
     static var isMainAppRunning: Bool {
-        return NSWorkspace.shared.runningApplications.contains { $0.bundleIdentifier == mainAppId }
+        NSWorkspace.shared.runningApplications.contains { $0.bundleIdentifier == mainAppId }
     }
 
     static func killHelper() {

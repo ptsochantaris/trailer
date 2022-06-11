@@ -2,9 +2,9 @@ import Foundation
 
 final class GQLField: GQLElement {
     let name: String
-    var queryText: String { return name }
-    var fragments: [GQLFragment] { return [] }
-    
+    var queryText: String { name }
+    var fragments: [GQLFragment] { [] }
+
     init(name: String) {
         self.name = name
     }

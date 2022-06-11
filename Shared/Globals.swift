@@ -1,41 +1,41 @@
 #if os(iOS)
 
-import UIKit
-import CoreData
+    import CoreData
+    import UIKit
 
-weak var app: iOSAppDelegate!
+    weak var app: iOSAppDelegate!
 
-let GLOBAL_SCREEN_SCALE = UIScreen.main.scale
-let DISABLED_FADE: CGFloat = 0.3
+    let GLOBAL_SCREEN_SCALE = UIScreen.main.scale
+    let DISABLED_FADE: CGFloat = 0.3
 
-typealias FONT_CLASS = UIFont
-typealias IMAGE_CLASS = UIImage
+    typealias FONT_CLASS = UIFont
+    typealias IMAGE_CLASS = UIImage
 
-let stringDrawingOptions: NSStringDrawingOptions = [.usesLineFragmentOrigin, .usesFontLeading]
+    let stringDrawingOptions: NSStringDrawingOptions = [.usesLineFragmentOrigin, .usesFontLeading]
 
-func makeKeyCommand(input: String, modifierFlags: UIKeyModifierFlags, action: Selector, discoverabilityTitle: String) -> UIKeyCommand {
-    return UIKeyCommand(title: discoverabilityTitle, image: nil, action: action, input: input, modifierFlags: modifierFlags, propertyList: nil, alternates: [], discoverabilityTitle: nil, attributes: [], state: .off)
-}
+    func makeKeyCommand(input: String, modifierFlags: UIKeyModifierFlags, action: Selector, discoverabilityTitle: String) -> UIKeyCommand {
+        UIKeyCommand(title: discoverabilityTitle, image: nil, action: action, input: input, modifierFlags: modifierFlags, propertyList: nil, alternates: [], discoverabilityTitle: nil, attributes: [], state: .off)
+    }
 
-let compactTraits = UITraitCollection(horizontalSizeClass: .compact)
+    let compactTraits = UITraitCollection(horizontalSizeClass: .compact)
 
 #elseif os(OSX)
 
-weak var app: MacAppDelegate!
+    weak var app: MacAppDelegate!
 
-let AVATAR_SIZE: CGFloat = 26
-let AVATAR_PADDING: CGFloat = 8
-let LEFTPADDING: CGFloat = 44
-let MENU_WIDTH: CGFloat = 500
-let REMOVE_BUTTON_WIDTH: CGFloat = 80
-let DISABLED_FADE: CGFloat = 0.4
+    let AVATAR_SIZE: CGFloat = 26
+    let AVATAR_PADDING: CGFloat = 8
+    let LEFTPADDING: CGFloat = 44
+    let MENU_WIDTH: CGFloat = 500
+    let REMOVE_BUTTON_WIDTH: CGFloat = 80
+    let DISABLED_FADE: CGFloat = 0.4
 
-import Cocoa
+    import Cocoa
 
-typealias FONT_CLASS = NSFont
-typealias IMAGE_CLASS = NSImage
+    typealias FONT_CLASS = NSFont
+    typealias IMAGE_CLASS = NSImage
 
-let stringDrawingOptions: NSString.DrawingOptions = [.usesLineFragmentOrigin, .usesFontLeading]
+    let stringDrawingOptions: NSString.DrawingOptions = [.usesLineFragmentOrigin, .usesFontLeading]
 
 #endif
 
@@ -50,35 +50,35 @@ let NOTIFICATION_URL_KEY = "urlKey"
 
 #if os(iOS)
 
-	func showMessage(_ title: String, _ message: String?) {
-		var viewController = app.window?.rootViewController
-		while viewController?.presentedViewController != nil {
-			viewController = viewController?.presentedViewController
-		}
+    func showMessage(_ title: String, _ message: String?) {
+        var viewController = app.window?.rootViewController
+        while viewController?.presentedViewController != nil {
+            viewController = viewController?.presentedViewController
+        }
 
-		let a = UIAlertController(title: title, message: message, preferredStyle: .alert)
-		a.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-		viewController?.present(a, animated: true)
-	}
+        let a = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        a.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        viewController?.present(a, animated: true)
+    }
 
 #endif
 
 let emptyAttributedString = NSAttributedString()
 
 func existingObject(with id: NSManagedObjectID) -> NSManagedObject? {
-	return try? DataManager.main.existingObject(with: id)
+    try? DataManager.main.existingObject(with: id)
 }
 
 let itemDateFormatter: DateFormatter = {
-	let f = DateFormatter()
-	f.dateStyle = .medium
-	f.timeStyle = .short
-	f.doesRelativeDateFormatting = true
-	return f
+    let f = DateFormatter()
+    f.dateStyle = .medium
+    f.timeStyle = .short
+    f.doesRelativeDateFormatting = true
+    return f
 }()
 
-func DLog(_ message: String, _ arg1: @autoclosure ()->Any? = nil, _ arg2: @autoclosure ()->Any? = nil, _ arg3: @autoclosure ()->Any? = nil, _ arg4: @autoclosure ()->Any? = nil, _ arg5: @autoclosure ()->Any? = nil) {
-	if Settings.logActivityToConsole {
+func DLog(_ message: String, _ arg1: @autoclosure () -> Any? = nil, _ arg2: @autoclosure () -> Any? = nil, _ arg3: @autoclosure () -> Any? = nil, _ arg4: @autoclosure () -> Any? = nil, _ arg5: @autoclosure () -> Any? = nil) {
+    if Settings.logActivityToConsole {
         let message = String(format: message,
                              String(describing: arg1() ?? "(nil)"),
                              String(describing: arg2() ?? "(nil)"),
@@ -86,97 +86,99 @@ func DLog(_ message: String, _ arg1: @autoclosure ()->Any? = nil, _ arg2: @autoc
                              String(describing: arg4() ?? "(nil)"),
                              String(describing: arg5() ?? "(nil)"))
         #if DEBUG
-        print(">>>", message)
+            print(">>>", message)
         #else
-        NSLog(message)
+            NSLog(message)
         #endif
-	}
+    }
 }
 
 let numberFormatter: NumberFormatter = {
-	let n = NumberFormatter()
-	n.numberStyle = .decimal
-	return n
+    let n = NumberFormatter()
+    n.numberStyle = .decimal
+    return n
 }()
 
 func bootUp() {
-	Settings.checkMigration()
-	DataManager.checkMigration()
-	API.setup()
+    Settings.checkMigration()
+    DataManager.checkMigration()
+    API.setup()
 }
 
 //////////////////////// Enums
 
 enum ItemCondition: Int64 {
-	case open, closed, merged
+    case open, closed, merged
 
-	static private var predicateMatchCache = [ItemCondition: NSPredicate]()
-	var matchingPredicate: NSPredicate {
-		if let predicate = ItemCondition.predicateMatchCache[self] {
-			return predicate
-		}
-		let predicate = NSPredicate(format: "condition == \(rawValue)")
-		ItemCondition.predicateMatchCache[self] = predicate
-		return predicate
-	}
-	static private var predicateExcludeCache = [ItemCondition: NSPredicate]()
-	var excludingPredicate: NSPredicate {
-		if let predicate = ItemCondition.predicateExcludeCache[self] {
-			return predicate
-		}
-		let predicate = NSPredicate(format: "condition != \(rawValue)")
-		ItemCondition.predicateExcludeCache[self] = predicate
-		return predicate
-	}
+    private static var predicateMatchCache = [ItemCondition: NSPredicate]()
+    var matchingPredicate: NSPredicate {
+        if let predicate = ItemCondition.predicateMatchCache[self] {
+            return predicate
+        }
+        let predicate = NSPredicate(format: "condition == \(rawValue)")
+        ItemCondition.predicateMatchCache[self] = predicate
+        return predicate
+    }
+
+    private static var predicateExcludeCache = [ItemCondition: NSPredicate]()
+    var excludingPredicate: NSPredicate {
+        if let predicate = ItemCondition.predicateExcludeCache[self] {
+            return predicate
+        }
+        let predicate = NSPredicate(format: "condition != \(rawValue)")
+        ItemCondition.predicateExcludeCache[self] = predicate
+        return predicate
+    }
 }
 
 enum StatusFilter: Int {
-	case all, include, exclude
+    case all, include, exclude
 }
 
 enum PostSyncAction: Int64 {
-	case doNothing, delete, isNew, isUpdated
+    case doNothing, delete, isNew, isUpdated
 
-	static private var predicateMatchCache = [PostSyncAction: NSPredicate]()
-	var matchingPredicate: NSPredicate {
-		if let predicate = PostSyncAction.predicateMatchCache[self] {
-			return predicate
-		}
-		let predicate = NSPredicate(format: "postSyncAction == %lld", rawValue)
-		PostSyncAction.predicateMatchCache[self] = predicate
-		return predicate
-	}
-	static private var predicateExcludeCache = [PostSyncAction: NSPredicate]()
-	var excludingPredicate: NSPredicate {
-		if let predicate = PostSyncAction.predicateExcludeCache[self] {
-			return predicate
-		}
-		let predicate = NSPredicate(format: "postSyncAction != %lld", rawValue)
-		PostSyncAction.predicateExcludeCache[self] = predicate
-		return predicate
-	}
+    private static var predicateMatchCache = [PostSyncAction: NSPredicate]()
+    var matchingPredicate: NSPredicate {
+        if let predicate = PostSyncAction.predicateMatchCache[self] {
+            return predicate
+        }
+        let predicate = NSPredicate(format: "postSyncAction == %lld", rawValue)
+        PostSyncAction.predicateMatchCache[self] = predicate
+        return predicate
+    }
+
+    private static var predicateExcludeCache = [PostSyncAction: NSPredicate]()
+    var excludingPredicate: NSPredicate {
+        if let predicate = PostSyncAction.predicateExcludeCache[self] {
+            return predicate
+        }
+        let predicate = NSPredicate(format: "postSyncAction != %lld", rawValue)
+        PostSyncAction.predicateExcludeCache[self] = predicate
+        return predicate
+    }
 }
 
 enum NotificationType: Int {
-	case newComment, newPr, prMerged, prReopened, newMention, prClosed, newRepoSubscribed, newRepoAnnouncement, newPrAssigned, newStatus, newIssue, issueClosed, newIssueAssigned, issueReopened, assignedForReview, changesRequested, changesApproved, changesDismissed, newReaction
+    case newComment, newPr, prMerged, prReopened, newMention, prClosed, newRepoSubscribed, newRepoAnnouncement, newPrAssigned, newStatus, newIssue, issueClosed, newIssueAssigned, issueReopened, assignedForReview, changesRequested, changesApproved, changesDismissed, newReaction
 }
 
 enum SortingMethod: Int {
-	case creationDate, recentActivity, title, linesAdded, linesRemoved
+    case creationDate, recentActivity, title, linesAdded, linesRemoved
     static let reverseTitles = ["Youngest first", "Most recently active", "Reverse alphabetically", "Most lines added", "Most lines removed"]
-	static let normalTitles = ["Oldest first", "Inactive for longest", "Alphabetically", "Least lines added", "Least lines removed"]
+    static let normalTitles = ["Oldest first", "Inactive for longest", "Alphabetically", "Least lines added", "Least lines removed"]
 
-	init?(_ rawValue: Int) {
-		self.init(rawValue: rawValue)
-	}
+    init?(_ rawValue: Int) {
+        self.init(rawValue: rawValue)
+    }
 
-	var normalTitle: String {
-		return SortingMethod.normalTitles[rawValue]
-	}
+    var normalTitle: String {
+        SortingMethod.normalTitles[rawValue]
+    }
 
-	var reverseTitle: String {
-		return SortingMethod.reverseTitles[rawValue]
-	}
+    var reverseTitle: String {
+        SortingMethod.reverseTitles[rawValue]
+    }
 
     var field: String? {
         switch self {
@@ -190,39 +192,41 @@ enum SortingMethod: Int {
 }
 
 enum HandlingPolicy: Int {
-	case keepMine, keepMineAndParticipated, keepAll, keepNone
-	static let labels = ["Keep Mine", "Keep Mine & Participated", "Keep All", "Don't Keep"]
-	var name: String {
-		return HandlingPolicy.labels[rawValue]
-	}
-	init?(_ rawValue: Int) {
-		self.init(rawValue: rawValue)
-	}
+    case keepMine, keepMineAndParticipated, keepAll, keepNone
+    static let labels = ["Keep Mine", "Keep Mine & Participated", "Keep All", "Don't Keep"]
+    var name: String {
+        HandlingPolicy.labels[rawValue]
+    }
+
+    init?(_ rawValue: Int) {
+        self.init(rawValue: rawValue)
+    }
 }
 
 enum AssignmentPolicy: Int {
-	case moveToMine, moveToParticipated, doNothing
-	static let labels = ["Move To Mine", "Move To Participated", "Do Nothing"]
-	var name: String {
-		return AssignmentPolicy.labels[rawValue]
-	}
-	init?(_ rawValue: Int) {
-		self.init(rawValue: rawValue)
-	}
+    case moveToMine, moveToParticipated, doNothing
+    static let labels = ["Move To Mine", "Move To Participated", "Do Nothing"]
+    var name: String {
+        AssignmentPolicy.labels[rawValue]
+    }
+
+    init?(_ rawValue: Int) {
+        self.init(rawValue: rawValue)
+    }
 }
 
 enum RepoDisplayPolicy: Int64, CaseIterable {
-	case hide = 0
+    case hide = 0
     case mine = 1
     case mineAndPaticipated = 2
     case all = 3
     case authoredOnly = 4
-    
+
     static var labels: [String] {
-        return self.allCases.map { $0.name }
+        allCases.map(\.name)
     }
-    	                         
-	var name: String {
+
+    var name: String {
         switch self {
         case .hide:
             return "Hide"
@@ -235,15 +239,17 @@ enum RepoDisplayPolicy: Int64, CaseIterable {
         case .authoredOnly:
             return "Authored"
         }
-	}
+    }
+
     var bold: Bool {
         switch self {
-        case .hide, .authoredOnly:
+        case .authoredOnly, .hide:
             return false
         default:
             return true
         }
     }
+
     var selectable: Bool {
         switch self {
         case .authoredOnly:
@@ -252,6 +258,7 @@ enum RepoDisplayPolicy: Int64, CaseIterable {
             return true
         }
     }
+
     var color: COLOR_CLASS {
         switch self {
         case .hide:
@@ -265,15 +272,17 @@ enum RepoDisplayPolicy: Int64, CaseIterable {
         case .all:
             return COLOR_CLASS(red: 0.0, green: 0.5, blue: 0.0, alpha: 1.0)
         }
-	}
-	var intValue: Int { return Int(rawValue) }
+    }
 
-	init?(_ rawValue: Int64) {
-		self.init(rawValue: rawValue)
-	}
-	init?(_ rawValue: Int) {
-		self.init(rawValue: Int64(rawValue))
-	}
+    var intValue: Int { Int(rawValue) }
+
+    init?(_ rawValue: Int64) {
+        self.init(rawValue: rawValue)
+    }
+
+    init?(_ rawValue: Int) {
+        self.init(rawValue: Int64(rawValue))
+    }
 }
 
 enum DraftHandlingPolicy: Int {
@@ -282,19 +291,20 @@ enum DraftHandlingPolicy: Int {
 }
 
 enum RepoHidingPolicy: Int64 {
-	case noHiding, hideMyAuthoredPrs, hideMyAuthoredIssues, hideAllMyAuthoredItems, hideOthersPrs, hideOthersIssues, hideAllOthersItems
-	static let labels = ["No Filter", "Hide My PRs", "Hide My Issues", "Hide All Mine", "Hide Others PRs", "Hide Others Issues", "Hide All Others"]
-	static let policies = [noHiding, hideMyAuthoredPrs, hideMyAuthoredIssues, hideAllMyAuthoredItems, hideOthersPrs, hideOthersIssues, hideAllOthersItems]
-	static let colors = [    COLOR_CLASS.appTertiaryLabel,
-	                         COLOR_CLASS(red: 0.1, green: 0.1, blue: 0.5, alpha: 1.0),
-	                         COLOR_CLASS(red: 0.1, green: 0.1, blue: 0.5, alpha: 1.0),
-	                         COLOR_CLASS(red: 0.1, green: 0.1, blue: 0.5, alpha: 1.0),
-	                         COLOR_CLASS(red: 0.5, green: 0.1, blue: 0.1, alpha: 1.0),
-	                         COLOR_CLASS(red: 0.5, green: 0.1, blue: 0.1, alpha: 1.0),
-	                         COLOR_CLASS(red: 0.5, green: 0.1, blue: 0.1, alpha: 1.0)]
-	var name: String {
-		return RepoHidingPolicy.labels[Int(rawValue)]
-	}
+    case noHiding, hideMyAuthoredPrs, hideMyAuthoredIssues, hideAllMyAuthoredItems, hideOthersPrs, hideOthersIssues, hideAllOthersItems
+    static let labels = ["No Filter", "Hide My PRs", "Hide My Issues", "Hide All Mine", "Hide Others PRs", "Hide Others Issues", "Hide All Others"]
+    static let policies = [noHiding, hideMyAuthoredPrs, hideMyAuthoredIssues, hideAllMyAuthoredItems, hideOthersPrs, hideOthersIssues, hideAllOthersItems]
+    static let colors = [COLOR_CLASS.appTertiaryLabel,
+                         COLOR_CLASS(red: 0.1, green: 0.1, blue: 0.5, alpha: 1.0),
+                         COLOR_CLASS(red: 0.1, green: 0.1, blue: 0.5, alpha: 1.0),
+                         COLOR_CLASS(red: 0.1, green: 0.1, blue: 0.5, alpha: 1.0),
+                         COLOR_CLASS(red: 0.5, green: 0.1, blue: 0.1, alpha: 1.0),
+                         COLOR_CLASS(red: 0.5, green: 0.1, blue: 0.1, alpha: 1.0),
+                         COLOR_CLASS(red: 0.5, green: 0.1, blue: 0.1, alpha: 1.0)]
+    var name: String {
+        RepoHidingPolicy.labels[Int(rawValue)]
+    }
+
     var bold: Bool {
         switch self {
         case .noHiding:
@@ -303,97 +313,100 @@ enum RepoHidingPolicy: Int64 {
             return true
         }
     }
+
     var color: COLOR_CLASS {
-		return RepoHidingPolicy.colors[Int(rawValue)]
-	}
-	init?(_ rawValue: Int64) {
-		self.init(rawValue: rawValue)
-	}
-	init?(_ rawValue: Int) {
-		self.init(rawValue: Int64(rawValue))
-	}
+        RepoHidingPolicy.colors[Int(rawValue)]
+    }
+
+    init?(_ rawValue: Int64) {
+        self.init(rawValue: rawValue)
+    }
+
+    init?(_ rawValue: Int) {
+        self.init(rawValue: Int64(rawValue))
+    }
 }
 
 let apiDateFormatter: DateFormatter = {
     let d = DateFormatter()
     d.timeZone = TimeZone(abbreviation: "UTC")
     d.locale = Locale(identifier: "en_US")
-    d.dateFormat =  "yyyy-MM-dd'T'HH:mm:ss'Z'"
+    d.dateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'"
     return d
 }()
 
 struct ApiStats {
-	let nodeCount, cost, remaining, limit: Int64
-	let resetAt: Date?
+    let nodeCount, cost, remaining, limit: Int64
+    let resetAt: Date?
 
-	static func fromV3(headers: [AnyHashable: Any]) -> ApiStats {
-		let date: Date?
-		if let epochSeconds = headers["X-RateLimit-Reset"] as? String, let t = TimeInterval(epochSeconds) {
-			date = Date(timeIntervalSince1970: t)
-		} else {
-			date = nil
-		}
+    static func fromV3(headers: [AnyHashable: Any]) -> ApiStats {
+        let date: Date?
+        if let epochSeconds = headers["X-RateLimit-Reset"] as? String, let t = TimeInterval(epochSeconds) {
+            date = Date(timeIntervalSince1970: t)
+        } else {
+            date = nil
+        }
         return ApiStats(nodeCount: 0,
-                             cost: 1,
-                             remaining: Int64(S(headers["X-RateLimit-Remaining"] as? String)) ?? 10000,
-                             limit: Int64(S(headers["X-RateLimit-Limit"] as? String)) ?? 10000,
-                             resetAt: date)
-	}
-    
+                        cost: 1,
+                        remaining: Int64(S(headers["X-RateLimit-Remaining"] as? String)) ?? 10000,
+                        limit: Int64(S(headers["X-RateLimit-Limit"] as? String)) ?? 10000,
+                        resetAt: date)
+    }
+
     static func fromV4(json: [AnyHashable: Any]?) -> ApiStats? {
         guard let info = json?["rateLimit"] as? [AnyHashable: Any] else { return nil }
         let date = apiDateFormatter.date(from: info["resetAt"] as? String ?? "")
         return ApiStats(nodeCount: info["nodeCount"] as? Int64 ?? 0,
-                             cost: info["cost"] as? Int64 ?? 0,
-                             remaining: info["remaining"] as? Int64 ?? 10000,
-                             limit: info["limit"] as? Int64 ?? 10000,
-                             resetAt: date)
+                        cost: info["cost"] as? Int64 ?? 0,
+                        remaining: info["remaining"] as? Int64 ?? 10000,
+                        limit: info["limit"] as? Int64 ?? 10000,
+                        resetAt: date)
     }
-    
-	static var noLimits: ApiStats {
-        return ApiStats(nodeCount: 0, cost: 0, remaining: 10000, limit: 10000, resetAt: nil)
-	}
-    
-	var areValid: Bool {
-		return remaining >= 0
-	}
+
+    static var noLimits: ApiStats {
+        ApiStats(nodeCount: 0, cost: 0, remaining: 10000, limit: 10000, resetAt: nil)
+    }
+
+    var areValid: Bool {
+        remaining >= 0
+    }
 }
 
 var currentAppVersion: String {
-	return S(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String)
+    S(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String)
 }
 
 var versionString: String {
-	let buildNumber = S(Bundle.main.infoDictionary?["CFBundleVersion"] as? String)
-	return "Version \(currentAppVersion) (\(buildNumber))"
+    let buildNumber = S(Bundle.main.infoDictionary?["CFBundleVersion"] as? String)
+    return "Version \(currentAppVersion) (\(buildNumber))"
 }
 
 #if os(OSX)
 
-func openItem(_ url: URL) {
-	openURL(url, using: Settings.defaultAppForOpeningItems.trim)
-}
+    func openItem(_ url: URL) {
+        openURL(url, using: Settings.defaultAppForOpeningItems.trim)
+    }
 
-func openLink(_ url: URL) {
-	openURL(url, using: Settings.defaultAppForOpeningWeb.trim)
-}
+    func openLink(_ url: URL) {
+        openURL(url, using: Settings.defaultAppForOpeningWeb.trim)
+    }
 
-func openURL(_ url: URL, using path: String) {
-	if path.isEmpty {
-		NSWorkspace.shared.open(url)
-	} else {
-		let appURL = URL(fileURLWithPath: path)
-		do {
-			try NSWorkspace.shared.open([url], withApplicationAt: appURL, options: [], configuration: [:])
-		} catch {
-			let a = NSAlert()
-			a.alertStyle = .warning
-			a.messageText = "Could not open this URL using '\(path)'"
-			a.informativeText = error.localizedDescription
-			a.runModal()
-		}
-	}
-}
+    func openURL(_ url: URL, using path: String) {
+        if path.isEmpty {
+            NSWorkspace.shared.open(url)
+        } else {
+            let appURL = URL(fileURLWithPath: path)
+            do {
+                try NSWorkspace.shared.open([url], withApplicationAt: appURL, options: [], configuration: [:])
+            } catch {
+                let a = NSAlert()
+                a.alertStyle = .warning
+                a.messageText = "Could not open this URL using '\(path)'"
+                a.informativeText = error.localizedDescription
+                a.runModal()
+            }
+        }
+    }
 
 #endif
 

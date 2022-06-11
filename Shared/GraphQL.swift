@@ -1,17 +1,16 @@
-import Foundation
 import CoreData
+import Foundation
 
 @globalActor
 private final actor NodeActor {
     static let shared = NodeActor()
 }
 
-final class GraphQL {
-    
+enum GraphQL {
     private static let idField = GQLField(name: "id")
-    
+
     private static let nameWithOwnerField = GQLField(name: "nameWithOwner")
-        
+
     private static let userFragment = GQLFragment(on: "User", elements: [
         idField,
         GQLField(name: "login"),
@@ -27,12 +26,12 @@ final class GraphQL {
         GQLField(name: "login"),
         GQLField(name: "avatarUrl")
     ])
-    
+
     private static let teamFragment = GQLFragment(on: "Team", elements: [
         idField,
         GQLField(name: "slug")
     ])
-    
+
     private static let commentFields: [GQLElement] = [
         idField,
         GQLField(name: "body"),
@@ -41,7 +40,7 @@ final class GraphQL {
         GQLField(name: "updatedAt"),
         GQLGroup(name: "author", fields: [userFragment])
     ]
-    
+
     private static let statusFragment = GQLFragment(on: "StatusContext", elements: [
         idField,
         GQLField(name: "context"),
@@ -76,12 +75,12 @@ final class GraphQL {
     }
 
     @MainActor
-    static func update<T: ListableItem>(for items: [T], of type: T.Type, in moc: NSManagedObjectContext, steps: API.SyncSteps) async throws {
+    static func update<T: ListableItem>(for items: [T], of _: T.Type, in _: NSManagedObjectContext, steps: API.SyncSteps) async throws {
         let typeName = String(describing: T.self)
-        
+
         var elements: [GQLElement] = [idField]
         var elementTypes = [String]()
-        
+
         if let prs = items as? [PullRequest] {
             if steps.contains(.reviewRequests) {
                 elementTypes.append("ReviewRequest")
@@ -91,14 +90,14 @@ final class GraphQL {
                 ])
                 elements.append(GQLGroup(name: "reviewRequests", fields: [requestFragment], pageSize: 100))
             }
-            
+
             if steps.contains(.reviews) {
                 prs.forEach {
                     $0.reviews.forEach {
                         $0.postSyncAction = PostSyncAction.delete.rawValue
                     }
                 }
-                
+
                 elementTypes.append("PullRequestReview")
                 let reviewFragment = GQLFragment(on: "PullRequestReview", elements: [
                     idField,
@@ -110,7 +109,7 @@ final class GraphQL {
                 ])
                 elements.append(GQLGroup(name: "reviews", fields: [reviewFragment], pageSize: 100))
             }
-            
+
             if steps.contains(.statuses) {
                 let now = Date()
                 prs.forEach {
@@ -119,7 +118,7 @@ final class GraphQL {
                         $0.postSyncAction = PostSyncAction.delete.rawValue
                     }
                 }
-                
+
                 elementTypes.append("StatusContext")
                 elements.append(GQLGroup(name: "commits", fields: [
                     GQLGroup(name: "commit", fields: [
@@ -133,7 +132,7 @@ final class GraphQL {
                 ], pageSize: 1, onlyLast: true))
             }
         }
-        
+
         if steps.contains(.reactions) {
             let now = Date()
             items.forEach {
@@ -142,7 +141,7 @@ final class GraphQL {
                     $0.postSyncAction = PostSyncAction.delete.rawValue
                 }
             }
-            
+
             elementTypes.append("Reaction")
             let reactionFragment = GQLFragment(on: "Reaction", elements: [
                 idField,
@@ -152,7 +151,7 @@ final class GraphQL {
             ])
             elements.append(GQLGroup(name: "reactions", fields: [reactionFragment], pageSize: 100))
         }
-                
+
         if steps.contains(.comments) {
             items.forEach {
                 $0.comments.forEach {
@@ -168,8 +167,8 @@ final class GraphQL {
 
         try await process(name: steps.toString, elementTypes: elementTypes, items: items, parentType: T.self, fields: fields)
     }
-    
-    static func updateReactions(for comments: [PRComment], moc: NSManagedObjectContext) async throws {
+
+    static func updateReactions(for comments: [PRComment], moc _: NSManagedObjectContext) async throws {
         let reactionFragment = GQLFragment(on: "Reaction", elements: [
             idField,
             GQLField(name: "content"),
@@ -180,14 +179,14 @@ final class GraphQL {
         let itemFragment = GQLFragment(on: "IssueComment", elements: [
             idField,
             GQLGroup(name: "reactions", fields: [reactionFragment], pageSize: 100)
-            ])
-        
+        ])
+
         try await process(name: "Comment Reactions", elementTypes: ["Reaction"], items: comments, fields: [itemFragment])
     }
 
-    static func updateComments(for reviews: [Review], moc: NSManagedObjectContext) async throws {
+    static func updateComments(for reviews: [Review], moc _: NSManagedObjectContext) async throws {
         let commentFragment = GQLFragment(on: "PullRequestReviewComment", elements: commentFields)
-        
+
         let itemFragment = GQLFragment(on: "PullRequestReview", elements: [
             idField,
             GQLGroup(name: "comments", fields: [commentFragment], pageSize: 100)
@@ -196,15 +195,15 @@ final class GraphQL {
         try await process(name: "Review Comments", elementTypes: ["PullRequestReviewComment"], items: reviews, fields: [itemFragment])
     }
 
-    private static func process<T: ListableItem>(name: String, elementTypes: [String], items: [DataItem], parentType: T.Type? = nil, fields: [GQLElement]) async throws {
+    private static func process<T: ListableItem>(name: String, elementTypes _: [String], items: [DataItem], parentType: T.Type? = nil, fields: [GQLElement]) async throws {
         if items.isEmpty {
             return
         }
-        
+
         let itemsByServer = Dictionary(grouping: items) { $0.apiServer }
         var count = 0
         for (server, items) in itemsByServer {
-            let ids = ContiguousArray(items.compactMap { $0.nodeId })
+            let ids = ContiguousArray(items.compactMap(\.nodeId))
             var nodes = [String: ContiguousArray<GQLNode>]()
             let serverName = server.label ?? "<no label>"
             let queries = GQLQuery.batching("\(serverName): \(name)", fields: fields, idList: ids, batchSize: 100) { @NodeActor node in
@@ -217,7 +216,7 @@ final class GraphQL {
                     array.append(node)
                     nodes[type] = array
                 }
-                
+
                 count += 1
                 if count > 1999 {
                     count = 0
@@ -225,7 +224,7 @@ final class GraphQL {
                     nodes.removeAll()
                 }
             }
-            
+
             do {
                 try await server.run(queries: queries)
                 await processItems(nodes, server.objectID, parentMoc: server.managedObjectContext, parentType: parentType)
@@ -237,13 +236,13 @@ final class GraphQL {
     }
 
     private static var milestoneFragment: GQLFragment {
-        return GQLFragment(on: "Milestone", elements: [
+        GQLFragment(on: "Milestone", elements: [
             GQLField(name: "title")
         ])
     }
-    
+
     private static var labelFragment: GQLFragment {
-        return GQLFragment(on: "Label", elements: [
+        GQLFragment(on: "Label", elements: [
             idField,
             GQLField(name: "name"),
             GQLField(name: "color"),
@@ -251,9 +250,9 @@ final class GraphQL {
             GQLField(name: "updatedAt")
         ])
     }
-    
+
     private static var repositoryFragment: GQLFragment {
-        return GQLFragment(on: "Repository", elements: [
+        GQLFragment(on: "Repository", elements: [
             idField,
             GQLField(name: "createdAt"),
             GQLField(name: "updatedAt"),
@@ -265,7 +264,7 @@ final class GraphQL {
             GQLGroup(name: "owner", fields: [idField])
         ])
     }
-    
+
     private static func prFragment(assigneesAndLabelPageSize: Int, includeRepo: Bool) -> GQLFragment {
         var elements: [GQLElement] = [
             idField,
@@ -296,7 +295,7 @@ final class GraphQL {
         }
         return GQLFragment(on: "PullRequest", elements: elements)
     }
-    
+
     private static func issueFragment(assigneesAndLabelPageSize: Int, includeRepo: Bool) -> GQLFragment {
         var elements: [GQLElement] = [
             idField,
@@ -317,23 +316,24 @@ final class GraphQL {
         }
         return GQLFragment(on: "Issue", elements: elements)
     }
-    
+
     @MainActor
     static func fetchAllAuthoredItems(from servers: [ApiServer]) async {
-
         for server in servers {
             var authorFields = [GQLGroup]()
+
             if Settings.queryAuthoredPRs {
                 let group = GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 20, includeRepo: true)], extraParams: ["states": "OPEN"], pageSize: 100)
                 authorFields.append(group)
             } else {
-                server.repos.filter { $0.displayPolicyForPrs == RepoDisplayPolicy.authoredOnly.rawValue}.forEach { $0.displayPolicyForPrs = RepoDisplayPolicy.hide.rawValue }
+                server.repos.filter { $0.displayPolicyForPrs == RepoDisplayPolicy.authoredOnly.rawValue }.forEach { $0.displayPolicyForPrs = RepoDisplayPolicy.hide.rawValue }
             }
+
             if Settings.queryAuthoredIssues {
                 let group = GQLGroup(name: "issues", fields: [issueFragment(assigneesAndLabelPageSize: 20, includeRepo: true)], extraParams: ["states": "OPEN"], pageSize: 100)
                 authorFields.append(group)
             } else {
-                server.repos.filter { $0.displayPolicyForIssues == RepoDisplayPolicy.authoredOnly.rawValue}.forEach { $0.displayPolicyForIssues = RepoDisplayPolicy.hide.rawValue }
+                server.repos.filter { $0.displayPolicyForIssues == RepoDisplayPolicy.authoredOnly.rawValue }.forEach { $0.displayPolicyForIssues = RepoDisplayPolicy.hide.rawValue }
             }
 
             var count = 0
@@ -349,7 +349,7 @@ final class GraphQL {
                     array.append(node)
                     nodes[type] = array
                 }
-                
+
                 count += 1
                 if count > 1999 {
                     count = 0
@@ -359,40 +359,61 @@ final class GraphQL {
             }
             do {
                 try await server.run(queries: [authoredItemsQuery])
-                await self.processItems(nodes, server.objectID, parentMoc: server.managedObjectContext)
+                await processItems(nodes, server.objectID, parentMoc: server.managedObjectContext)
+
+                var prsToCheck = [PullRequest]()
+                let fetchedPrIds = Set(nodes["PullRequest"]?.map(\.id) ?? [])
+                for repo in server.repos.filter({ $0.displayPolicyForPrs == RepoDisplayPolicy.authoredOnly.rawValue }) {
+                    for pr in repo.pullRequests where !fetchedPrIds.contains(pr.nodeId ?? "") {
+                        prsToCheck.append(pr)
+                    }
+                }
+                try await updatePrStates(prs: prsToCheck)
+
+                let fetchedIssueIds = Set(nodes["Issue"]?.map(\.id) ?? [])
+                for repo in server.repos.filter({ $0.displayPolicyForIssues == RepoDisplayPolicy.authoredOnly.rawValue }) {
+                    for issue in repo.issues where !fetchedIssueIds.contains(issue.nodeId ?? "") {
+                        issue.stateChanged = ListableItem.StateChange.closed.rawValue
+                        issue.condition = ItemCondition.closed.rawValue
+                    }
+                }
+
             } catch {
                 server.lastSyncSucceeded = false
             }
         }
     }
-    
+
+    private static func updatePrStates(prs _: [PullRequest]) async throws {
+        // TODO: needs implementing
+    }
+
     private static let alreadyParsed = NSError(domain: "com.housetrip.Trailer.parsing", code: 1, userInfo: [NSLocalizedDescriptionKey: "Node already parsed in previous sync"])
-    
+
     @MainActor
     static func fetchAllSubscribedItems(from repos: [Repo]) async {
-        
         let latestPrsFragment = GQLFragment(on: "Repository", elements: [
             idField,
             GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["orderBy": "{direction: DESC, field: UPDATED_AT}"], pageSize: 10)
-            ])
+        ])
 
         let latestIssuesFragment = GQLFragment(on: "Repository", elements: [
             idField,
             GQLGroup(name: "issues", fields: [issueFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["orderBy": "{direction: DESC, field: UPDATED_AT}"], pageSize: 20)
-            ])
-        
+        ])
+
         let allOpenPrsFragment = GQLFragment(on: "Repository", elements: [
             idField,
             GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["states": "OPEN"], pageSize: 50)
-            ])
+        ])
 
         let allOpenIssuesFragment = GQLFragment(on: "Repository", elements: [
             idField,
             GQLGroup(name: "issues", fields: [issueFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["states": "OPEN"], pageSize: 50)
-            ])
+        ])
 
         let reposByServer = Dictionary(grouping: repos) { $0.apiServer }
-        
+
         var prRepoIdToLatestExistingUpdate = [String: Date]()
         var issueRepoIdToLatestExistingUpdate = [String: Date]()
 
@@ -409,11 +430,10 @@ final class GraphQL {
         }
 
         for (server, reposInThisServer) in reposByServer {
-
             var count = 0
             var nodes = [String: ContiguousArray<GQLNode>]()
 
-            let perNodeBlock = { (node: GQLNode) -> Void in
+            let perNodeBlock = { (node: GQLNode) in
 
                 let type = node.elementType
                 if var existingList = nodes[type] {
@@ -425,20 +445,20 @@ final class GraphQL {
                     array.append(node)
                     nodes[type] = array
                 }
-                
+
                 if type == "PullRequest",
-                    let repo = node.parent,
-                    let updatedAt = node.jsonPayload["updatedAt"] as? String,
-                    let d = DataItem.parseGH8601(updatedAt),
-                    d < prRepoIdToLatestExistingUpdate[repo.id]! {
+                   let repo = node.parent,
+                   let updatedAt = node.jsonPayload["updatedAt"] as? String,
+                   let d = DataItem.parseGH8601(updatedAt),
+                   d < prRepoIdToLatestExistingUpdate[repo.id]! {
                     throw GraphQL.alreadyParsed
                 }
 
                 if type == "Issue",
-                    let repo = node.parent,
-                    let updatedAt = node.jsonPayload["updatedAt"] as? String,
-                    let d = DataItem.parseGH8601(updatedAt),
-                    d < issueRepoIdToLatestExistingUpdate[repo.id]! {
+                   let repo = node.parent,
+                   let updatedAt = node.jsonPayload["updatedAt"] as? String,
+                   let d = DataItem.parseGH8601(updatedAt),
+                   d < issueRepoIdToLatestExistingUpdate[repo.id]! {
                     throw GraphQL.alreadyParsed
                 }
 
@@ -449,10 +469,10 @@ final class GraphQL {
                     nodes.removeAll()
                 }
             }
-            
+
             var queriesForServer = [GQLQuery]()
             let serverLabel = server.label ?? "<no label>"
-            
+
             var idsForReposInThisServerWantingAllOpenPrs = ContiguousArray<String>()
             var idsForReposInThisServerWantingLatestPrs = ContiguousArray<String>()
             var idsForReposInThisServerWantingAllOpenIssues = ContiguousArray<String>()
@@ -471,7 +491,7 @@ final class GraphQL {
                     }
                 }
             }
-            
+
             if !idsForReposInThisServerWantingLatestIssues.isEmpty {
                 let q = GQLQuery.batching("\(serverLabel): Updated Issues", fields: [latestIssuesFragment], idList: idsForReposInThisServerWantingLatestIssues, batchSize: 10, perNode: perNodeBlock)
                 queriesForServer.append(contentsOf: q)
@@ -491,30 +511,29 @@ final class GraphQL {
                 let q = GQLQuery.batching("\(serverLabel): Open PRs", fields: [allOpenPrsFragment], idList: idsForReposInThisServerWantingAllOpenPrs, batchSize: 100, perNode: perNodeBlock)
                 queriesForServer.append(contentsOf: q)
             }
-            
+
             do {
                 try await server.run(queries: queriesForServer)
-                await self.processItems(nodes, server.objectID, parentMoc: server.managedObjectContext)
+                await processItems(nodes, server.objectID, parentMoc: server.managedObjectContext)
             } catch {
                 server.lastSyncSucceeded = false
             }
         }
     }
-    
+
     private static func processItems<T: ListableItem>(_ nodes: [String: ContiguousArray<GQLNode>], _ serverId: NSManagedObjectID, parentMoc: NSManagedObjectContext?, parentType: T.Type? = nil) async {
         if nodes.isEmpty {
             return
         }
-    
+
         let processMoc = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         processMoc.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
         processMoc.parent = parentMoc ?? DataManager.main
         processMoc.undoManager = nil
-        
+
         await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
             processMoc.perform {
                 if let server = try? processMoc.existingObject(with: serverId) as? ApiServer {
-                    
                     // Order must be fixed, since labels may refer to PRs or Issues, ensure they are created first
 
                     if let nodeList = nodes["Repository"] {
@@ -553,7 +572,7 @@ final class GraphQL {
                     if let nodeList = nodes["CheckRun"] {
                         PRStatus.sync(from: nodeList, on: server)
                     }
-                    
+
                     try? processMoc.save()
                     continuation.resume()
                 }

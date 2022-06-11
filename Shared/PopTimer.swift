@@ -1,7 +1,6 @@
 import Foundation
 
 final class TrailerTimer {
-
     private let timer: DispatchSourceTimer
 
     init(interval: TimeInterval, block: @escaping () -> Void) {
@@ -17,7 +16,6 @@ final class TrailerTimer {
 }
 
 final class PopTimer {
-
     private var popTimer: TrailerTimer?
     private let timeInterval: TimeInterval
     private let callback: () -> Void
@@ -34,7 +32,7 @@ final class PopTimer {
     }
 
     var isRunning: Bool {
-        return popTimer != nil
+        popTimer != nil
     }
 
     init(timeInterval: TimeInterval, callback: @escaping () -> Void) {

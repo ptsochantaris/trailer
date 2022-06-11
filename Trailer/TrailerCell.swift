@@ -1,48 +1,45 @@
 import Cocoa
 
 final class TrailerCell: NSTableCellView {
-
-	private static let statusAttributes: [NSAttributedString.Key: Any] = {
-
-		let paragraphStyle = NSMutableParagraphStyle()
-		paragraphStyle.headIndent = 17
+    private static let statusAttributes: [NSAttributedString.Key: Any] = {
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.headIndent = 17
 
         return [
             .font: NSFont.monospacedSystemFont(ofSize: 9, weight: .regular),
             .paragraphStyle: paragraphStyle
         ]
-	}()
+    }()
 
     private let detailFont = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
     private let titleFont = NSFont.systemFont(ofSize: NSFont.systemFontSize)
 
-	private let dataItemId: NSManagedObjectID
+    private let dataItemId: NSManagedObjectID
 
     private let title = CenterTextField(frame: .zero)
     private let labels = CenterTextField(frame: .zero)
     private let reviews = CenterTextField(frame: .zero)
     private let subtitle = CenterTextField(frame: .zero)
-	private var trackingArea: NSTrackingArea?
+    private var trackingArea: NSTrackingArea?
 
-	init(item: ListableItem) {
+    init(item: ListableItem) {
+        dataItemId = item.objectID
 
-		dataItemId = item.objectID
+        super.init(frame: .zero)
 
-		super.init(frame: .zero)
+        let faded = item.shouldSkipNotifications
 
-		let faded = item.shouldSkipNotifications
+        var W = MENU_WIDTH - LEFTPADDING - app.scrollBarWidth
 
-		var W = MENU_WIDTH-LEFTPADDING-app.scrollBarWidth
+        let showUnpin = item.condition != ItemCondition.open.rawValue
+        if showUnpin { W -= REMOVE_BUTTON_WIDTH } else { W -= 4 }
 
-		let showUnpin = item.condition != ItemCondition.open.rawValue
-		if showUnpin { W -= REMOVE_BUTTON_WIDTH } else { W -= 4 }
+        let showAvatar = !Settings.hideAvatars
+        let shift: CGFloat = showAvatar ? AVATAR_SIZE + AVATAR_PADDING : -4
+        W -= shift
 
-		let showAvatar = !Settings.hideAvatars
-		let shift: CGFloat = showAvatar ? AVATAR_SIZE + AVATAR_PADDING : -4
-		W -= shift
-
-		var y: CGFloat = 8
-		let widthLimit = CGSize(width: W, height: .greatestFiniteMagnitude)
+        var y: CGFloat = 8
+        let widthLimit = CGSize(width: W, height: .greatestFiniteMagnitude)
 
         func append(_ field: CenterTextField) {
             let a = field.attributedStringValue
@@ -52,7 +49,7 @@ final class TrailerCell: NSTableCellView {
             addSubview(field)
             y += height
         }
-        
+
         if let pullRequest = item as? PullRequest, item.section.shouldListStatuses {
             let statuses = pullRequest.displayedStatuses.reversed()
             if !statuses.isEmpty {
@@ -67,7 +64,7 @@ final class TrailerCell: NSTableCellView {
                 }
                 y += 1
             }
-		}
+        }
 
         updateText(for: item)
         append(subtitle)
@@ -75,61 +72,62 @@ final class TrailerCell: NSTableCellView {
         y += 1
         append(labels)
         append(title)
-        
+
         let cellPadding: CGFloat = 5
         y += cellPadding
 
-		frame = CGRect(x: 0, y: 0, width: MENU_WIDTH, height: y)
+        frame = CGRect(x: 0, y: 0, width: MENU_WIDTH, height: y)
 
         let accesoryCenterY = y - AVATAR_SIZE * 0.5 - cellPadding - 7
-        
-		let hasNewCommits = (item as? PullRequest)?.hasNewCommits ?? false
-		addCounts(total: item.totalComments, unread: item.unreadComments, alert: hasNewCommits, faded: faded, centerY: accesoryCenterY)
 
-		if showAvatar {
+        let hasNewCommits = (item as? PullRequest)?.hasNewCommits ?? false
+        addCounts(total: item.totalComments, unread: item.unreadComments, alert: hasNewCommits, faded: faded, centerY: accesoryCenterY)
+
+        if showAvatar {
             let avatarRect = CGRect(x: LEFTPADDING, y: accesoryCenterY - AVATAR_SIZE * 0.5, width: AVATAR_SIZE, height: AVATAR_SIZE)
-			let userImage = AvatarView(frame: avatarRect, url: item.userAvatarUrl)
-			userImage.alphaValue = faded ? DISABLED_FADE : 1.0
-			addSubview(userImage)
-		}
+            let userImage = AvatarView(frame: avatarRect, url: item.userAvatarUrl)
+            userImage.alphaValue = faded ? DISABLED_FADE : 1.0
+            addSubview(userImage)
+        }
 
-		if showUnpin {
-			let pinRect = CGRect(x: LEFTPADDING + W + shift, y: floor((bounds.size.height-24)*0.5), width: REMOVE_BUTTON_WIDTH-10, height: 24)
-			let unpin = NSButton(frame: pinRect)
-			unpin.title = "Remove"
-			unpin.target = self
-			unpin.action = #selector(unPinSelected)
-			unpin.setButtonType(.momentaryLight)
-			unpin.bezelStyle = .roundRect
-			unpin.font = NSFont.systemFont(ofSize: 10.0)
-			addSubview(unpin)
-		}
+        if showUnpin {
+            let pinRect = CGRect(x: LEFTPADDING + W + shift, y: floor((bounds.size.height - 24) * 0.5), width: REMOVE_BUTTON_WIDTH - 10, height: 24)
+            let unpin = NSButton(frame: pinRect)
+            unpin.title = "Remove"
+            unpin.target = self
+            unpin.action = #selector(unPinSelected)
+            unpin.setButtonType(.momentaryLight)
+            unpin.bezelStyle = .roundRect
+            unpin.font = NSFont.systemFont(ofSize: 10.0)
+            addSubview(unpin)
+        }
 
-		if faded {
-			title.alphaValue = DISABLED_FADE
-			subtitle.alphaValue = DISABLED_FADE
+        if faded {
+            title.alphaValue = DISABLED_FADE
+            subtitle.alphaValue = DISABLED_FADE
             reviews.alphaValue = DISABLED_FADE
-		}
-	}
+        }
+    }
 
-	required init?(coder: NSCoder) {
-		fatalError("init(coder:) has not been implemented")
-	}
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
-	@objc private func unPinSelected() {
-		if let i = associatedDataItem {
-			app.unPinSelected(for: i)
-		}
-	}
+    @objc private func unPinSelected() {
+        if let i = associatedDataItem {
+            app.unPinSelected(for: i)
+        }
+    }
 
-	override func mouseEntered(with theEvent: NSEvent?) {
-		if !app.isManuallyScrolling { selected = true }
-	}
+    override func mouseEntered(with _: NSEvent?) {
+        if !app.isManuallyScrolling { selected = true }
+    }
 
-	override func mouseExited(with theEvent: NSEvent?) {
-		selected = false
-	}
-    
+    override func mouseExited(with _: NSEvent?) {
+        selected = false
+    }
+
     private func updateText(for item: ListableItem) {
         title.attributedStringValue = item.title(with: titleFont, labelFont: detailFont, titleColor: .controlTextColor, numberColor: .secondaryLabelColor)
         labels.attributedStringValue = item.labelsAttributedString(labelFont: detailFont) ?? emptyAttributedString
@@ -137,47 +135,47 @@ final class TrailerCell: NSTableCellView {
         subtitle.attributedStringValue = item.subtitle(with: detailFont, lightColor: .tertiaryLabelColor, darkColor: .secondaryLabelColor, separator: "   ")
     }
 
-	var selected = false {
-		didSet {
-			guard let table = app.visibleWindow?.table else { return }
+    var selected = false {
+        didSet {
+            guard let table = app.visibleWindow?.table else { return }
 
             if let item = associatedDataItem {
                 updateText(for: item)
             }
 
-			if selected {
-				table.selectRowIndexes(IndexSet(integer: table.row(for: self)), byExtendingSelection: false)
-			} else {
-				table.deselectRow(table.row(for: self))
-			}
+            if selected {
+                table.selectRowIndexes(IndexSet(integer: table.row(for: self)), byExtendingSelection: false)
+            } else {
+                table.deselectRow(table.row(for: self))
+            }
 
-			highlight(selected)
-		}
-	}
+            highlight(selected)
+        }
+    }
 
-	@objc private func openRepo() {
-		if let u = associatedDataItem?.repo.webUrl, let url = URL(string: u) {
-			openLink(url)
-		}
-	}
+    @objc private func openRepo() {
+        if let u = associatedDataItem?.repo.webUrl, let url = URL(string: u) {
+            openLink(url)
+        }
+    }
 
-	@objc private func copyToClipboard() {
-		if let s = associatedDataItem?.webUrl {
-			let p = NSPasteboard.general
-			p.clearContents()
-			p.declareTypes([NSPasteboard.PasteboardType.string], owner: self)
-			p.setString(s, forType: NSPasteboard.PasteboardType.string)
-		}
-	}
+    @objc private func copyToClipboard() {
+        if let s = associatedDataItem?.webUrl {
+            let p = NSPasteboard.general
+            p.clearContents()
+            p.declareTypes([NSPasteboard.PasteboardType.string], owner: self)
+            p.setString(s, forType: NSPasteboard.PasteboardType.string)
+        }
+    }
 
-	@objc private func copyNumberToClipboard() {
-		if let a = associatedDataItem, let name = a.repo.fullName {
-			let p = NSPasteboard.general
-			p.clearContents()
-			p.declareTypes([NSPasteboard.PasteboardType.string], owner: self)
-			p.setString("\(name)#\(a.number)", forType: NSPasteboard.PasteboardType.string)
-		}
-	}
+    @objc private func copyNumberToClipboard() {
+        if let a = associatedDataItem, let name = a.repo.fullName {
+            let p = NSPasteboard.general
+            p.clearContents()
+            p.declareTypes([NSPasteboard.PasteboardType.string], owner: self)
+            p.setString("\(name)#\(a.number)", forType: NSPasteboard.PasteboardType.string)
+        }
+    }
 
     @objc private func copyBranchToClipboard() {
         if let a = associatedDataItem as? PullRequest, let name = a.headRefName {
@@ -188,17 +186,16 @@ final class TrailerCell: NSTableCellView {
         }
     }
 
-	override func menu(for event: NSEvent) -> NSMenu? {
-
-		guard let item = associatedDataItem else {
-			return nil
-		}
+    override func menu(for _: NSEvent) -> NSMenu? {
+        guard let item = associatedDataItem else {
+            return nil
+        }
 
         let title = item.contextMenuTitle
-        
-		let m = NSMenu(title: title)
-		m.addItem(withTitle: title, action: #selector(copyNumberToClipboard), keyEquivalent: "")
-        
+
+        let m = NSMenu(title: title)
+        m.addItem(withTitle: title, action: #selector(copyNumberToClipboard), keyEquivalent: "")
+
         if let subtitle = item.contextMenuSubtitle {
             let c = m.addItem(withTitle: subtitle, action: #selector(copyBranchToClipboard), keyEquivalent: "c")
             c.keyEquivalentModifierMask = [.command, .option]
@@ -228,7 +225,7 @@ final class TrailerCell: NSTableCellView {
                 let c = m.addItem(withTitle: a.title, action: #selector(wakeUpSelected), keyEquivalent: "0")
                 c.keyEquivalentModifierMask = [.command, .option]
 
-            case .snooze(let presets):
+            case let .snooze(presets):
                 let s = NSMenu(title: "Snooze")
                 var count = 1
                 for i in presets {
@@ -257,10 +254,10 @@ final class TrailerCell: NSTableCellView {
                 m.addItem(withTitle: a.title, action: #selector(removeSelected), keyEquivalent: "")
             }
         }
-        
-		return m
-	}
-    
+
+        return m
+    }
+
     @objc private func removeSelected() {
         if let item = associatedDataItem {
             item.sectionIndex = Section.none.rawValue
@@ -270,146 +267,146 @@ final class TrailerCell: NSTableCellView {
         }
     }
 
-	@objc private func snoozeConfigSelected() {
-		app.showPreferencesWindow(andSelect: 6)
-	}
+    @objc private func snoozeConfigSelected() {
+        app.showPreferencesWindow(andSelect: 6)
+    }
 
-	@objc private func snoozeSelected(_ sender: NSMenuItem) {
-		if let item = associatedDataItem, let oid = sender.representedObject as? NSManagedObjectID, let snoozeItem = existingObject(with: oid) as? SnoozePreset {
-			item.snooze(using: snoozeItem)
-			saveAndRequestMenuUpdate(item)
-		}
-	}
+    @objc private func snoozeSelected(_ sender: NSMenuItem) {
+        if let item = associatedDataItem, let oid = sender.representedObject as? NSManagedObjectID, let snoozeItem = existingObject(with: oid) as? SnoozePreset {
+            item.snooze(using: snoozeItem)
+            saveAndRequestMenuUpdate(item)
+        }
+    }
 
-	@objc private func wakeUpSelected() {
-		if let item = associatedDataItem {
-			item.wakeUp()
-			saveAndRequestMenuUpdate(item)
-		}
-	}
+    @objc private func wakeUpSelected() {
+        if let item = associatedDataItem {
+            item.wakeUp()
+            saveAndRequestMenuUpdate(item)
+        }
+    }
 
-	@objc private func markReadSelected() {
-		if let item = associatedDataItem {
-			item.catchUpWithComments()
-			saveAndRequestMenuUpdate(item)
-		}
-	}
+    @objc private func markReadSelected() {
+        if let item = associatedDataItem {
+            item.catchUpWithComments()
+            saveAndRequestMenuUpdate(item)
+        }
+    }
 
-	@objc private func markUnreadSelected() {
-		if let item = associatedDataItem {
-			item.latestReadCommentDate = .distantPast
-			item.postProcess()
-			saveAndRequestMenuUpdate(item)
-		}
-	}
+    @objc private func markUnreadSelected() {
+        if let item = associatedDataItem {
+            item.latestReadCommentDate = .distantPast
+            item.postProcess()
+            saveAndRequestMenuUpdate(item)
+        }
+    }
 
-	@objc private func muteSelected() {
-		if let item = associatedDataItem {
-			item.setMute(to: true)
-			saveAndRequestMenuUpdate(item)
-		}
-	}
+    @objc private func muteSelected() {
+        if let item = associatedDataItem {
+            item.setMute(to: true)
+            saveAndRequestMenuUpdate(item)
+        }
+    }
 
-	@objc private func unMuteSelected() {
-		if let item = associatedDataItem {
-			item.setMute(to: false)
-			saveAndRequestMenuUpdate(item)
-		}
-	}
+    @objc private func unMuteSelected() {
+        if let item = associatedDataItem {
+            item.setMute(to: false)
+            saveAndRequestMenuUpdate(item)
+        }
+    }
 
-	private func saveAndRequestMenuUpdate(_ item: ListableItem) {
-		DataManager.saveDB()
-		app.updateRelatedMenus(for: item)
-	}
+    private func saveAndRequestMenuUpdate(_ item: ListableItem) {
+        DataManager.saveDB()
+        app.updateRelatedMenus(for: item)
+    }
 
-	var associatedDataItem: ListableItem? {
-		return existingObject(with: dataItemId) as? ListableItem
-	}
+    var associatedDataItem: ListableItem? {
+        existingObject(with: dataItemId) as? ListableItem
+    }
 
-	override func updateTrackingAreas() {
-		if let t = trackingArea {
-			removeTrackingArea(t)
-		}
+    override func updateTrackingAreas() {
+        if let t = trackingArea {
+            removeTrackingArea(t)
+        }
 
-		let t = NSTrackingArea(rect: bounds, options: [NSTrackingArea.Options.mouseEnteredAndExited, NSTrackingArea.Options.activeInKeyWindow], owner: self, userInfo: nil)
-		addTrackingArea(t)
-		trackingArea = t
+        let t = NSTrackingArea(rect: bounds, options: [NSTrackingArea.Options.mouseEnteredAndExited, NSTrackingArea.Options.activeInKeyWindow], owner: self, userInfo: nil)
+        addTrackingArea(t)
+        trackingArea = t
 
-		if let mouseLocation = window?.mouseLocationOutsideOfEventStream {
-			let localLocation = convert(mouseLocation, to: self)
-            if bounds.contains(localLocation) && !selected {
-				mouseEntered(with: nil)
-			} else if selected {
-				mouseExited(with: nil)
-			}
-		}
-	}
+        if let mouseLocation = window?.mouseLocationOutsideOfEventStream {
+            let localLocation = convert(mouseLocation, to: self)
+            if bounds.contains(localLocation), !selected {
+                mouseEntered(with: nil)
+            } else if selected {
+                mouseExited(with: nil)
+            }
+        }
+    }
 
-	//////////////////////////// Counts
+    //////////////////////////// Counts
 
-	private var countBackground: FilledView?
-	private var newBackground: FilledView?
-	private var countView: CenterTextField?
+    private var countBackground: FilledView?
+    private var newBackground: FilledView?
+    private var countView: CenterTextField?
 
     func addCounts(total: Int64, unread: Int64, alert: Bool, faded: Bool, centerY: CGFloat) {
+        if total == 0 && !alert {
+            return
+        }
 
-		if total == 0 && !alert {
-			return
-		}
+        let pCenter = NSMutableParagraphStyle()
+        pCenter.alignment = .center
 
-		let pCenter = NSMutableParagraphStyle()
-		pCenter.alignment = .center
+        let countString = NSAttributedString(string: numberFormatter.string(for: total)!, attributes: [
+            NSAttributedString.Key.font: NSFont.menuFont(ofSize: 11),
+            NSAttributedString.Key.foregroundColor: NSColor.controlTextColor,
+            NSAttributedString.Key.paragraphStyle: pCenter
+        ])
 
-		let countString = NSAttributedString(string: numberFormatter.string(for: total)!, attributes: [
-			NSAttributedString.Key.font: NSFont.menuFont(ofSize: 11),
-			NSAttributedString.Key.foregroundColor: NSColor.controlTextColor,
-			NSAttributedString.Key.paragraphStyle: pCenter])
-
-		var height: CGFloat = 20
-		var width = max(height, countString.size().width+10)
-		var left = (LEFTPADDING-width)*0.5
+        var height: CGFloat = 20
+        var width = max(height, countString.size().width + 10)
+        var left = (LEFTPADDING - width) * 0.5
 
         let c = FilledView(frame: CGRect(x: left, y: centerY - height * 0.5, width: width, height: height).integral)
-		c.cornerRadius = floor(height/2.0)
+        c.cornerRadius = floor(height / 2.0)
 
-		countView = CenterTextField(frame: c.bounds)
-		countView!.vibrant = false
-		countView!.attributedStringValue = countString
-		if faded { countView!.alphaValue = DISABLED_FADE }
-		c.addSubview(countView!)
-		addSubview(c)
+        countView = CenterTextField(frame: c.bounds)
+        countView!.vibrant = false
+        countView!.attributedStringValue = countString
+        if faded { countView!.alphaValue = DISABLED_FADE }
+        c.addSubview(countView!)
+        addSubview(c)
 
-		countBackground = c
+        countBackground = c
 
-		if unread > 0 || alert {
+        if unread > 0 || alert {
+            let alertText = unread == 0 ? "!" : numberFormatter.string(for: unread)!
+            let alertString = NSAttributedString(string: alertText, attributes: [
+                NSAttributedString.Key.font: NSFont.menuFont(ofSize: 8),
+                NSAttributedString.Key.foregroundColor: NSColor.white,
+                NSAttributedString.Key.paragraphStyle: pCenter
+            ])
 
-			let alertText = unread==0 ? "!" : numberFormatter.string(for: unread)!
-			let alertString = NSAttributedString(string: alertText, attributes: [
-				NSAttributedString.Key.font: NSFont.menuFont(ofSize: 8),
-				NSAttributedString.Key.foregroundColor: NSColor.white,
-				NSAttributedString.Key.paragraphStyle: pCenter])
+            height = 14
+            width = max(height, alertString.size().width + 8.0)
+            left -= width * 0.5
 
-			height = 14
-			width = max(height, alertString.size().width+8.0)
-			left -= width * 0.5
+            let cc = FilledView(frame: CGRect(x: left, y: centerY, width: width, height: height).integral)
+            cc.cornerRadius = floor(height * 0.5)
 
-			let cc = FilledView(frame: CGRect(x: left, y: centerY, width: width, height: height).integral)
-			cc.cornerRadius = floor(height*0.5)
+            let alertCount = CenterTextField(frame: cc.bounds)
+            alertCount.vibrant = false
+            alertCount.attributedStringValue = alertString
+            if faded { alertCount.alphaValue = DISABLED_FADE }
+            cc.addSubview(alertCount)
+            addSubview(cc)
 
-			let alertCount = CenterTextField(frame: cc.bounds)
-			alertCount.vibrant = false
-			alertCount.attributedStringValue = alertString
-			if faded { alertCount.alphaValue = DISABLED_FADE }
-			cc.addSubview(alertCount)
-			addSubview(cc)
+            newBackground = cc
+        }
 
-			newBackground = cc
-		}
+        highlight(false)
+    }
 
-		highlight(false)
-	}
-
-	private func highlight(_ on: Bool) {
+    private func highlight(_ on: Bool) {
         guard let c = countBackground else { return }
 
         let color: NSColor
@@ -429,5 +426,5 @@ final class TrailerCell: NSTableCellView {
             a.addAttribute(NSAttributedString.Key.foregroundColor, value: color, range: NSRange(location: 0, length: a.length))
             countView?.attributedStringValue = a
         }
-	}
+    }
 }

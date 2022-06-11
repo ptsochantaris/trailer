@@ -1,12 +1,11 @@
 import Cocoa
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
-
     @objc private func terminate() {
         NSApp.terminate(nil)
     }
 
-    func applicationDidFinishLaunching(_ aNotification: Notification) {
+    func applicationDidFinishLaunching(_: Notification) {
         if LauncherCommon.isMainAppRunning {
             terminate()
         } else {

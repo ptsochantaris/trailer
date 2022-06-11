@@ -5,8 +5,8 @@
 //  Created by Paul Tsochantaris on 24/05/2022.
 //
 
-import WidgetKit
 import SwiftUI
+import WidgetKit
 
 struct Summary: TimelineEntry {
     let date = Date()
@@ -14,22 +14,22 @@ struct Summary: TimelineEntry {
 }
 
 struct Provider: TimelineProvider {
-    func placeholder(in context: Context) -> Summary {
+    func placeholder(in _: Context) -> Summary {
         Summary(data: nil)
     }
-    
+
     private var currentEntry: Summary {
         let data = NSDictionary(contentsOf: FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.Trailer")!.appendingPathComponent("overview.plist"))
         return Summary(data: data as Dictionary?)
     }
 
-    func getSnapshot(in context: Context, completion: @escaping (Summary) -> Void) {
+    func getSnapshot(in _: Context, completion: @escaping (Summary) -> Void) {
         let data = NSDictionary(contentsOf: FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.Trailer")!.appendingPathComponent("overview.plist"))
         let entry = Summary(data: data as Dictionary?)
         completion(entry)
     }
 
-    func getTimeline(in context: Context, completion: @escaping (Timeline<Summary>) -> Void) {
+    func getTimeline(in _: Context, completion: @escaping (Timeline<Summary>) -> Void) {
         let timeline = Timeline(entries: [currentEntry], policy: .never)
         completion(timeline)
     }
@@ -37,8 +37,8 @@ struct Provider: TimelineProvider {
 
 @main
 struct PocketTrailer_Widget: Widget {
-    let kind: String = "PocketTrailer_Widget"
-    
+    let kind = "PocketTrailer_Widget"
+
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
             MainView(entry: entry)

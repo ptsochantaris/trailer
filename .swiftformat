@@ -1,0 +1,5 @@
+--commas inline
+--allman false
+--redundanttype inferred
+--disable wrapMultilineStatementBraces, wrapConditionalBodies, wrapAttributes
+--enable sortedSwitchCases
