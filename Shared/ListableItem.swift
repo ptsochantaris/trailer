@@ -65,7 +65,6 @@ class ListableItem: DataItem {
         issueUrl?.appending(pathComponent: "reactions")
     }
 
-    @MainActor
     static func reactionCheckBatch<T: ListableItem>(for type: T.Type, in moc: NSManagedObjectContext) -> [T] {
         let entityName = String(describing: type)
         let f = NSFetchRequest<T>(entityName: entityName)

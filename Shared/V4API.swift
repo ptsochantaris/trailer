@@ -39,7 +39,6 @@ extension API {
         }
     }
 
-    @MainActor
     static func v4Sync(to moc: NSManagedObjectContext, newOrUpdatedPrs: [PullRequest], newOrUpdatedIssues: [Issue]) async throws {
         if Settings.showStatusItems {
             let prs = PullRequest.statusCheckBatch(in: moc)

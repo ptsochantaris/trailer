@@ -171,7 +171,9 @@ final class ApiServer: NSManagedObject {
         requestsRemaining = stats.remaining
         requestsLimit = stats.limit
         resetDate = stats.resetAt
-        NotificationCenter.default.post(name: .ApiUsageUpdate, object: self, userInfo: nil)
+        Task { @MainActor in
+            NotificationCenter.default.post(name: .ApiUsageUpdate, object: self, userInfo: nil)
+        }
     }
 
     func resetToGithub() {
@@ -292,7 +294,6 @@ final class ApiServer: NSManagedObject {
 
     // MARK: GraphQL
 
-    @MainActor
     func run(queries: [GQLQuery]) async throws {
         let path = graphQLPath ?? ""
         let token = authToken ?? ""

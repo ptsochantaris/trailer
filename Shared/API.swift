@@ -58,7 +58,6 @@ final class API {
 
     static var currentOperationName = lastSuccessfulSyncAt {
         didSet {
-            assert(Thread.isMainThread)
             DLog("Status update: \(currentOperationName)")
             NotificationCenter.default.post(name: .SyncProgressUpdate, object: nil)
         }
@@ -150,7 +149,7 @@ final class API {
         }
     }
 
-    @discardableResult @MainActor
+    @discardableResult
     static func avatar(from path: String) async throws -> (IMAGE_CLASS, String) {
         let connector = path.contains("?") ? "&" : "?"
         let absolutePath = "\(path)\(connector)s=128"
@@ -187,35 +186,36 @@ final class API {
 
     ////////////////////////////////////// API interface
 
-    @MainActor
-    static func performSync() async {
-        let syncContext = DataManager.buildChildContext()
-
-        if Settings.useV4API && canUseV4API(for: syncContext) != nil {
-            return
-        }
-
-        isRefreshing = true
-        currentOperationCount += 1
-        currentOperationName = "Fetching…"
-
-        let shouldRefreshReposToo = lastRepoCheck == .distantPast
-            || (Date().timeIntervalSince(lastRepoCheck) > TimeInterval(Settings.newRepoCheckPeriod * 3600))
-            || !Repo.anyVisibleRepos(in: syncContext)
-
-        if shouldRefreshReposToo {
-            await fetchRepositories(to: syncContext)
-            await sync(to: syncContext)
-
-        } else {
-            ApiServer.resetSyncSuccess(in: syncContext)
-            await ensureApiServersHaveUserIds(in: syncContext)
-            await sync(to: syncContext)
+    static func performSync() {
+        Task.detached {
+            let moc = DataManager.buildDetachedContext()
+            await _performSync(moc: moc)
         }
     }
 
-    @MainActor
-    private static func sync(to moc: NSManagedObjectContext) async {
+    private static func _performSync(moc: NSManagedObjectContext) async {
+        if Settings.useV4API && canUseV4API(for: moc) != nil {
+            return
+        }
+
+        await MainActor.run {
+            isRefreshing = true
+            currentOperationCount += 1
+            currentOperationName = "Fetching…"
+        }
+
+        let lastCheck = await MainActor.run { lastRepoCheck }
+        let shouldRefreshReposToo = lastCheck == .distantPast
+            || (Date().timeIntervalSince(lastCheck) > TimeInterval(Settings.newRepoCheckPeriod * 3600))
+            || !Repo.anyVisibleRepos(in: moc)
+
+        if shouldRefreshReposToo {
+            await fetchRepositories(to: moc)
+        } else {
+            ApiServer.resetSyncSuccess(in: moc)
+            await ensureApiServersHaveUserIds(in: moc)
+        }
+
         let disabledRepos = Repo.unsyncableRepos(in: moc)
         disabledRepos.forEach {
             $0.pullRequests.forEach {
@@ -229,24 +229,16 @@ final class API {
         let repos = Repo.syncableRepos(in: moc)
         let v4Mode = Settings.useV4API
 
-        await withTaskGroup(of: Void.self) { group in
-            if v4Mode {
-                let servers = ApiServer.allApiServers(in: moc).filter(\.goodToGo)
-                if !servers.isEmpty {
-                    group.addTask {
-                        await GraphQL.fetchAllAuthoredItems(from: servers)
-                    }
-                }
-                if !repos.isEmpty {
-                    group.addTask {
-                        await GraphQL.fetchAllSubscribedItems(from: repos)
-                    }
-                }
-            } else {
-                group.addTask {
-                    await v3_fetchItems(for: repos, to: moc)
-                }
+        if v4Mode {
+            let servers = ApiServer.allApiServers(in: moc).filter(\.goodToGo)
+            if !servers.isEmpty {
+                await GraphQL.fetchAllAuthoredItems(from: servers)
             }
+            if !repos.isEmpty {
+                await GraphQL.fetchAllSubscribedItems(from: repos)
+            }
+        } else {
+            await v3_fetchItems(for: repos, to: moc)
         }
 
         let reposWithSomeItems = repos.filter { !$0.issues.isEmpty || !$0.pullRequests.isEmpty }
@@ -268,39 +260,23 @@ final class API {
         // Transfer done, process
 
         let total = moc.updatedObjects.count + moc.insertedObjects.count + moc.deletedObjects.count
-        if total > 1, let totalText = numberFormatter.string(for: total) {
-            currentOperationName = "Processing \(totalText) items…"
-        } else {
-            currentOperationName = "Processing update…"
-        }
-
-        processSync(in: moc)
-    }
-
-    private static func processSync(in moc: NSManagedObjectContext) {
-        let processMoc = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        processMoc.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
-        processMoc.undoManager = nil
-        processMoc.parent = moc
-        processMoc.perform {
-            // discard any changes related to any failed API server
-            for apiServer in ApiServer.allApiServers(in: processMoc) where !apiServer.lastSyncSucceeded {
-                apiServer.rollBackAllUpdates(in: processMoc)
-                apiServer.lastSyncSucceeded = false // we just wiped all changes, but want to keep this one
-            }
-            DataItem.nukeDeletedItems(in: processMoc)
-            DataItem.nukeOrphanedItems(in: processMoc)
-            DataManager.postProcessAllItems(in: processMoc)
-            if processMoc.hasChanges {
-                try? processMoc.save()
-            }
-            DispatchQueue.main.async {
-                completeSync(in: moc)
+        Task { @MainActor in
+            if total > 1, let totalText = numberFormatter.string(for: total) {
+                currentOperationName = "Processing \(totalText) items…"
+            } else {
+                currentOperationName = "Processing update…"
             }
         }
-    }
 
-    private static func completeSync(in moc: NSManagedObjectContext) {
+        // discard any changes related to any failed API server
+        for apiServer in ApiServer.allApiServers(in: moc) where !apiServer.lastSyncSucceeded {
+            apiServer.rollBackAllUpdates(in: moc)
+            apiServer.lastSyncSucceeded = false // we just wiped all changes, but want to keep this one
+        }
+        DataItem.nukeDeletedItems(in: moc)
+        DataItem.nukeOrphanedItems(in: moc)
+        DataManager.postProcessAllItems(in: moc)
+
         do {
             if moc.hasChanges {
                 DLog("Committing synced data")
@@ -313,10 +289,12 @@ final class API {
             DLog("Committing sync failed: %@", error.localizedDescription)
         }
 
-        isRefreshing = false
-        currentOperationCount -= 1
+        Task { @MainActor in
+            isRefreshing = false
+            currentOperationCount -= 1
 
-        DataManager.sendNotificationsIndexAndSave()
+            DataManager.sendNotificationsIndexAndSave()
+        }
 
         DLog("Caching \(numberFormatter.string(for: URLCache.shared.currentMemoryUsage) ?? "") bytes in memory")
         DLog("Caching \(numberFormatter.string(for: URLCache.shared.currentDiskUsage) ?? "") bytes on disk")
@@ -327,7 +305,6 @@ final class API {
         return agoFormat(prefix: "updated", since: last).capitalFirstLetter
     }
 
-    @MainActor
     private static func fetchUserTeams(from server: ApiServer) async {
         for t in server.teams {
             t.postSyncAction = PostSyncAction.delete.rawValue
@@ -342,46 +319,33 @@ final class API {
         }
     }
 
-    @MainActor
     static func fetchRepositories(to moc: NSManagedObjectContext) async {
-        assert(Thread.isMainThread)
         ApiServer.resetSyncSuccess(in: moc)
 
-        assert(Thread.isMainThread)
         await syncUserDetails(in: moc)
 
-        assert(Thread.isMainThread)
         for r in DataItem.items(of: Repo.self, surviving: true, in: moc) {
             r.postSyncAction = r.shouldBeWipedIfNotInWatchlist ? PostSyncAction.delete.rawValue : PostSyncAction.doNothing.rawValue
         }
 
         let goodToGoServers = ApiServer.allApiServers(in: moc).filter(\.goodToGo)
-        await withTaskGroup(of: Void.self) { group in
-            for apiServer in goodToGoServers {
-                group.addTask {
-                    await syncWatchedRepos(from: apiServer)
-                }
-
-                group.addTask {
-                    await syncManuallyAddedRepos(from: apiServer)
-                }
-
-                group.addTask {
-                    await fetchUserTeams(from: apiServer)
-                }
-            }
+        for apiServer in goodToGoServers {
+            await syncWatchedRepos(from: apiServer)
+            await syncManuallyAddedRepos(from: apiServer)
+            await fetchUserTeams(from: apiServer)
         }
 
-        assert(Thread.isMainThread)
         if Settings.hideArchivedRepos { Repo.hideArchivedRepos(in: moc) }
         for r in DataItem.newItems(of: Repo.self, in: moc) where r.shouldSync {
-            NotificationQueue.add(type: .newRepoAnnouncement, for: r)
+            Task { @MainActor in
+                NotificationQueue.add(type: .newRepoAnnouncement, for: r)
+            }
         }
-        lastRepoCheck = Date()
-        assert(Thread.isMainThread)
+        await MainActor.run {
+            lastRepoCheck = Date()
+        }
     }
 
-    @MainActor
     private static func ensureApiServersHaveUserIds(in moc: NSManagedObjectContext) async {
         var needToCheck = false
         for apiServer in ApiServer.allApiServers(in: moc) {
@@ -397,7 +361,6 @@ final class API {
         }
     }
 
-    @MainActor
     private static func getRateLimit(from server: ApiServer) async -> ApiStats? {
         do {
             let (_, headers, _) = try await RestAccess.start(call: "/rate_limit", on: server, triggeredByUser: true)
@@ -413,41 +376,30 @@ final class API {
         return nil
     }
 
-    @MainActor
     static func updateLimitsFromServer() async {
         let configuredServers = ApiServer.allApiServers(in: DataManager.main).filter(\.goodToGo)
-        await withTaskGroup(of: Void.self) { group in
-            group.addTask {
-                for apiServer in configuredServers {
-                    if let l = await getRateLimit(from: apiServer) {
-                        apiServer.updateApiStats(l)
-                    }
-                }
+        for apiServer in configuredServers {
+            if let l = await getRateLimit(from: apiServer) {
+                apiServer.updateApiStats(l)
             }
         }
     }
 
-    @MainActor
     private static func syncManuallyAddedRepos(from server: ApiServer) async {
         if !server.lastSyncSucceeded {
             return
         }
 
         let repos = server.repos.filter(\.manuallyAdded)
-        await withTaskGroup(of: Void.self) { group in
-            for repo in repos {
-                group.addTask {
-                    do {
-                        try await fetchRepo(fullName: repo.fullName ?? "", from: server)
-                    } catch {
-                        server.lastSyncSucceeded = false
-                    }
-                }
+        for repo in repos {
+            do {
+                try await fetchRepo(fullName: repo.fullName ?? "", from: server)
+            } catch {
+                server.lastSyncSucceeded = false
             }
         }
     }
 
-    @MainActor
     private static func syncWatchedRepos(from server: ApiServer) async {
         if !server.lastSyncSucceeded {
             return
@@ -468,7 +420,6 @@ final class API {
         }
     }
 
-    @MainActor
     static func fetchRepo(fullName: String, from server: ApiServer) async throws {
         let path = "\(server.apiPath ?? "")/repos/\(fullName)"
         do {
@@ -482,7 +433,6 @@ final class API {
         }
     }
 
-    @MainActor
     static func fetchAllRepos(owner: String, from server: ApiServer) async throws {
         let userPath = "\(server.apiPath ?? "")/users/\(owner)/repos"
         let userTask = Task { () -> [[AnyHashable: Any]] in
@@ -522,36 +472,27 @@ final class API {
         Repo.syncRepos(from: userList + orgList, server: server, addNewRepos: true, manuallyAdded: true)
     }
 
-    @MainActor
     static func fetchRepo(named: String, owner: String, from server: ApiServer) async throws {
         try await fetchRepo(fullName: "\(owner)/\(named)", from: server)
     }
 
-    @MainActor
     private static func syncUserDetails(in moc: NSManagedObjectContext) async {
         let configuredServers = ApiServer.allApiServers(in: moc).filter(\.goodToGo)
-        assert(Thread.isMainThread)
-        await withTaskGroup(of: Void.self) { group in
-            for apiServer in configuredServers {
-                group.addTask {
-                    do {
-                        let (data, _, _) = try await RestAccess.getData(in: "/user", from: apiServer)
-                        assert(Thread.isMainThread)
-                        if let d = data as? [AnyHashable: Any] {
-                            apiServer.userName = d["login"] as? String
-                            apiServer.userNodeId = d["node_id"] as? String
-                        } else {
-                            apiServer.lastSyncSucceeded = false
-                        }
-                    } catch {
-                        apiServer.lastSyncSucceeded = false
-                    }
+        for apiServer in configuredServers {
+            do {
+                let (data, _, _) = try await RestAccess.getData(in: "/user", from: apiServer)
+                if let d = data as? [AnyHashable: Any] {
+                    apiServer.userName = d["login"] as? String
+                    apiServer.userNodeId = d["node_id"] as? String
+                } else {
+                    apiServer.lastSyncSucceeded = false
                 }
+            } catch {
+                apiServer.lastSyncSucceeded = false
             }
         }
     }
 
-    @MainActor
     static func testApi(to apiServer: ApiServer) async throws {
         let (_, _, data) = try await RestAccess.start(call: "/user", on: apiServer, triggeredByUser: true)
         if let d = data as? [AnyHashable: Any], let userName = d["login"] as? String, let userId = d["id"] as? Int64 {

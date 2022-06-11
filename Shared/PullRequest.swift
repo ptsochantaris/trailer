@@ -31,7 +31,6 @@ final class PullRequest: ListableItem {
 
     static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext) {
         syncItems(of: PullRequest.self, from: nodes, on: server, moc: moc) { pr, node in
-
             guard node.created || node.updated,
                   let parentId = node.parent?.id ?? (node.jsonPayload["repository"] as? [AnyHashable: Any])?["id"] as? String,
                   let parent = DataItem.item(of: Repo.self, with: parentId, in: moc)

@@ -18,7 +18,6 @@ final class BackgroundTask {
     }
 
     static func appBackgrounded() {
-        assert(Thread.isMainThread)
         appInBackground = true
         if globalBackgroundCount != 0, bgTask == .invalid {
             DLog("BG Task starting")
@@ -29,7 +28,6 @@ final class BackgroundTask {
     }
 
     static func appForegrounded() {
-        assert(Thread.isMainThread)
         endTimer.abort()
         appInBackground = false
         endTask()

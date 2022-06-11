@@ -16,7 +16,7 @@ final class DataManager {
     }()
 
     static func checkMigration() {
-        guard let count = main.persistentStoreCoordinator?.persistentStores.count, count > 0 else { return }
+        guard let count = persistentStoreCoordinator?.persistentStores.count, count > 0 else { return }
 
         if Settings.lastRunVersion != versionString {
             DLog("VERSION UPDATE MAINTENANCE NEEDED")
@@ -248,6 +248,14 @@ final class DataManager {
         return c
     }
 
+    static func buildDetachedContext() -> NSManagedObjectContext {
+        let c = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        c.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
+        c.undoManager = nil
+        c.persistentStoreCoordinator = persistentStoreCoordinator
+        return c
+    }
+
     static func info(for item: DataItem) -> [String: Any] {
         if let item = item as? PRComment {
             let uri = item.objectID.uriRepresentation().absoluteString
@@ -309,7 +317,7 @@ final class DataManager {
     }
 
     static func id(for uriPath: String?) -> NSManagedObjectID? {
-        if let up = uriPath, let u = URL(string: up), let p = main.persistentStoreCoordinator {
+        if let up = uriPath, let u = URL(string: up), let p = persistentStoreCoordinator {
             return p.managedObjectID(forURIRepresentation: u)
         }
         return nil
@@ -345,7 +353,7 @@ final class DataManager {
 
     private static var _justMigrated = false
 
-    private static var persistentStoreCoordinator: NSPersistentStoreCoordinator? = {
+    static var persistentStoreCoordinator: NSPersistentStoreCoordinator? = {
         let storeOptions: [AnyHashable: Any] = [
             NSMigratePersistentStoresAutomaticallyOption: true,
             NSInferMappingModelAutomaticallyOption: true,

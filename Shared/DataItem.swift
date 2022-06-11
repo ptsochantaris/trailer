@@ -109,8 +109,6 @@ class DataItem: NSManagedObject {
 
         if !createNewItems { return }
 
-        assert(Thread.isMainThread)
-
         let serverMoc = server.managedObjectContext!
         for nodeId in nodeIdsOfItems {
             if let info = nodeIdsToInfo[nodeId] {
@@ -130,7 +128,7 @@ class DataItem: NSManagedObject {
 
     static func item<T: DataItem>(of type: T.Type, with nodeId: String, in moc: NSManagedObjectContext) -> T? {
         let f = NSFetchRequest<T>(entityName: String(describing: type))
-        f.returnsObjectsAsFaults = true
+        f.returnsObjectsAsFaults = false
         f.includesSubentities = false
         f.fetchLimit = 1
         f.predicate = NSPredicate(format: "nodeId == %@", nodeId)
@@ -310,7 +308,7 @@ class DataItem: NSManagedObject {
         } else if node.created {
             updatedAt = createdAt
         }
-        
+
         if node.forcedUpdate {
             node.updated = true
         }

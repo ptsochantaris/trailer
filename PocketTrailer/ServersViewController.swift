@@ -117,7 +117,7 @@ final class ServersViewController: UITableViewController {
         present(a, animated: true)
         a.popoverPresentationController?.barButtonItem = sender
     }
-    
+
     private func apiChanged() {
         updateApiLabel()
         ApiServer.allApiServers(in: DataManager.main).forEach {

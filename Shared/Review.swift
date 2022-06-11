@@ -14,7 +14,7 @@ final class Review: DataItem {
         case DISMISSED
     }
 
-    static func syncRequests(from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext) {
+    static func syncRequests(from nodes: ContiguousArray<GQLNode>, on _: ApiServer, moc: NSManagedObjectContext) {
         var prIdsToAssignedUsers = [String: Set<String>]()
         var prIdsToAssignedTeams = [String: Set<String>]()
 

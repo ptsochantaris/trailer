@@ -760,9 +760,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
             return
         }
 
-        Task {
-            await API.performSync()
-        }
+        API.performSync()
     }
 
     private func refreshTimerDone() {

@@ -1,5 +1,5 @@
-import Foundation
 import CoreData
+import Foundation
 
 final class PRStatus: DataItem {
     @NSManaged var descriptionText: String?

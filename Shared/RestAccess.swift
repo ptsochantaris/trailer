@@ -6,7 +6,6 @@ final class RestAccess {
         var nextIncrement: TimeInterval
     }
 
-    @MainActor
     static func getPagedData(at path: String, from server: ApiServer, startingFrom page: Int = 1, perPage: @escaping ([[AnyHashable: Any]]?, Bool) -> Bool) async -> (Bool, Int) {
         if path.isEmpty {
             // handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
@@ -26,12 +25,19 @@ final class RestAccess {
         }
     }
 
-    @MainActor
     static func getData(in path: String, from server: ApiServer, attemptCount: Int = 0) async throws -> (Any?, Bool, Int) {
         var attemptCount = attemptCount
-        API.currentOperationCount += 1
+        Task {
+            await MainActor.run {
+                API.currentOperationCount += 1
+            }
+        }
         defer {
-            API.currentOperationCount -= 1
+            Task {
+                await MainActor.run {
+                    API.currentOperationCount -= 1
+                }
+            }
         }
         while true {
             do {
@@ -47,7 +53,7 @@ final class RestAccess {
                 }
                 let shouldRetry = (code == 502 || code == 503 || code == -1001) // retry in case GH is deploying, or timeout
                 if !shouldRetry {
-                    if code >= 400 && (code != 404 && code != 410) {
+                    if code >= 400, code != 404, code != 410 {
                         throw API.apiError("Server returned error code \(code)")
                     }
                     return (data, lastPage, code)
@@ -67,7 +73,6 @@ final class RestAccess {
         }
     }
 
-    @MainActor
     static func getRawData(at path: String, from server: ApiServer) async throws -> (Any?, Int) {
         if path.isEmpty {
             // handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
@@ -78,7 +83,6 @@ final class RestAccess {
         return (data, resultCode)
     }
 
-    @MainActor
     static func start(call path: String, on server: ApiServer, triggeredByUser: Bool) async throws -> (Int, [AnyHashable: Any]?, Any?) {
         let apiServerLabel: String
         if server.lastSyncSucceeded || triggeredByUser {

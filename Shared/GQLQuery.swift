@@ -3,13 +3,13 @@ import Foundation
 
 final class GQLQuery {
     let name: String
-    let perNodeBlock: ((GQLNode) async throws -> Void)?
+    let perNodeBlock: PerNodeBlock?
 
     private let rootElement: GQLScanning
     private let parent: GQLNode?
     private let allowsEmptyResponse: Bool
 
-    init(name: String, rootElement: GQLScanning, parent: GQLNode? = nil, allowsEmptyResponse: Bool = false, perNode: ((GQLNode) async throws -> Void)? = nil) {
+    init(name: String, rootElement: GQLScanning, parent: GQLNode? = nil, allowsEmptyResponse: Bool = false, perNode: PerNodeBlock? = nil) {
         self.rootElement = rootElement
         self.parent = parent
         self.name = name
@@ -17,7 +17,7 @@ final class GQLQuery {
         perNodeBlock = perNode
     }
 
-    static func batching(_ name: String, fields: [GQLElement], idList: ContiguousArray<String>, batchSize: Int, perNode: ((GQLNode) async throws -> Void)? = nil) -> [GQLQuery] {
+    static func batching(_ name: String, fields: [GQLElement], idList: ContiguousArray<String>, batchSize: Int, perNode: PerNodeBlock? = nil) -> [GQLQuery] {
         var list = idList
         var queries = [GQLQuery]()
         while !list.isEmpty {

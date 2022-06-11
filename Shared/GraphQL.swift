@@ -2,18 +2,15 @@ import CoreData
 import Foundation
 
 @globalActor
-private final actor NodeActor {
+final actor NodeActor {
     static let shared = NodeActor()
 }
 
-@globalActor
-private final actor ProcessActor {
-    static let shared = ProcessActor()
-}
+typealias PerNodeBlock = @NodeActor(GQLNode) async throws -> Void
 
 enum GraphQL {
     private static let nodeBlockMax = 500
-    
+
     private static let idField = GQLField(name: "id")
 
     private static let nameWithOwnerField = GQLField(name: "nameWithOwner")
@@ -66,7 +63,6 @@ enum GraphQL {
         GQLField(name: "permalink")
     ])
 
-    @MainActor
     static func testApi(to apiServer: ApiServer) async throws {
         var gotUserNode = false
         let testQuery = GQLQuery(name: "Testing", rootElement: GQLGroup(name: "viewer", fields: [userFragment])) { node in
@@ -81,7 +77,6 @@ enum GraphQL {
         }
     }
 
-    @MainActor
     static func update<T: ListableItem>(for items: [T], of _: T.Type, in _: NSManagedObjectContext, steps: API.SyncSteps) async throws {
         let typeName = String(describing: T.self)
 
@@ -201,14 +196,6 @@ enum GraphQL {
 
         try await process(name: "Review Comments", elementTypes: ["PullRequestReviewComment"], items: reviews, fields: [itemFragment])
     }
-    
-    private static func createProcessMoc(from parent: NSManagedObjectContext?) -> NSManagedObjectContext {
-        let processMoc = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        processMoc.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
-        processMoc.parent = parent ?? DataManager.main
-        processMoc.undoManager = nil
-        return processMoc
-    }
 
     private static func process<T: ListableItem>(name: String, elementTypes _: [String], items: [DataItem], parentType: T.Type? = nil, fields: [GQLElement]) async throws {
         if items.isEmpty {
@@ -221,8 +208,7 @@ enum GraphQL {
             let ids = ContiguousArray(items.compactMap(\.nodeId))
             var nodes = [String: ContiguousArray<GQLNode>]()
             let serverName = server.label ?? "<no label>"
-            let processMoc = createProcessMoc(from: server.managedObjectContext)
-            let queries = GQLQuery.batching("\(serverName): \(name)", fields: fields, idList: ids, batchSize: 100) { @NodeActor node in
+            let queries = GQLQuery.batching("\(serverName): \(name)", fields: fields, idList: ids, batchSize: 100) { node in
                 let type = node.elementType
                 if var existingList = nodes[type] {
                     existingList.append(node)
@@ -236,14 +222,14 @@ enum GraphQL {
                 count += 1
                 if count > nodeBlockMax {
                     count = 0
-                    await processItems(nodes, server.objectID, processMoc: processMoc, parentType: parentType)
+                    await processItems(nodes, server, parentType: parentType, wait: false)
                     nodes.removeAll(keepingCapacity: true)
                 }
             }
 
             do {
                 try await server.run(queries: queries)
-                await processItems(nodes, server.objectID, processMoc: processMoc, parentType: parentType)
+                await processItems(nodes, server, parentType: parentType, wait: true)
             } catch {
                 server.lastSyncSucceeded = false
                 throw error
@@ -333,7 +319,6 @@ enum GraphQL {
         return GQLFragment(on: "Issue", elements: elements)
     }
 
-    @MainActor
     static func fetchAllAuthoredItems(from servers: [ApiServer]) async {
         for server in servers {
             var authorFields = [GQLGroup]()
@@ -354,8 +339,7 @@ enum GraphQL {
 
             var count = 0
             var nodes = [String: ContiguousArray<GQLNode>]()
-            let processMoc = createProcessMoc(from: server.managedObjectContext)
-            let authoredItemsQuery = GQLQuery(name: "Authored Items", rootElement: GQLGroup(name: "viewer", fields: authorFields)) { @NodeActor node in
+            let authoredItemsQuery = GQLQuery(name: "Authored Items", rootElement: GQLGroup(name: "viewer", fields: authorFields)) { node in
                 let type = node.elementType
                 if var existingList = nodes[type] {
                     existingList.append(node)
@@ -370,16 +354,13 @@ enum GraphQL {
                 count += 1
                 if count > nodeBlockMax {
                     count = 0
-                    let nodesCopy = nodes
-                    Task { @ProcessActor in
-                        await self.processItems(nodesCopy, server.objectID, processMoc: processMoc)
-                    }
+                    await self.processItems(nodes, server, wait: false)
                     nodes.removeAll(keepingCapacity: true)
                 }
             }
             do {
                 try await server.run(queries: [authoredItemsQuery])
-                await processItems(nodes, server.objectID, processMoc: processMoc)
+                await processItems(nodes, server, wait: true)
 
                 var prsToCheck = [PullRequest]()
                 let fetchedPrIds = Set(nodes["PullRequest"]?.map(\.id) ?? [])
@@ -397,7 +378,7 @@ enum GraphQL {
                         nodes.append(node)
                     }
                     try await server.run(queries: [query])
-                    await processItems(["PullRequest": nodes], server.objectID, processMoc: processMoc)
+                    await processItems(["PullRequest": nodes], server, wait: true)
                 }
 
                 let fetchedIssueIds = Set(nodes["Issue"]?.map(\.id) ?? []) // investigate missing issues
@@ -416,7 +397,6 @@ enum GraphQL {
 
     private static let alreadyParsed = NSError(domain: "com.housetrip.Trailer.parsing", code: 1, userInfo: [NSLocalizedDescriptionKey: "Node already parsed in previous sync"])
 
-    @MainActor
     static func fetchAllSubscribedItems(from repos: [Repo]) async {
         let latestPrsFragment = GQLFragment(on: "Repository", elements: [
             idField,
@@ -458,9 +438,8 @@ enum GraphQL {
         for (server, reposInThisServer) in reposByServer {
             var count = 0
             var nodes = [String: ContiguousArray<GQLNode>]()
-            let processMoc = createProcessMoc(from: server.managedObjectContext)
 
-            let perNodeBlock = { (node: GQLNode) in
+            let perNodeBlock: PerNodeBlock = { node in
 
                 let type = node.elementType
                 if var existingList = nodes[type] {
@@ -492,10 +471,7 @@ enum GraphQL {
                 count += 1
                 if count > nodeBlockMax {
                     count = 0
-                    let nodesCopy = nodes
-                    Task { @ProcessActor in
-                        await processItems(nodesCopy, server.objectID, processMoc: processMoc)
-                    }
+                    await processItems(nodes, server, wait: false)
                     nodes.removeAll(keepingCapacity: true)
                 }
             }
@@ -544,66 +520,74 @@ enum GraphQL {
 
             do {
                 try await server.run(queries: queriesForServer)
-                let nodesCopy = nodes
-                await Task { @ProcessActor in
-                    await processItems(nodesCopy, server.objectID, processMoc: processMoc)
-                }.value
+                await processItems(nodes, server, wait: true)
             } catch {
                 server.lastSyncSucceeded = false
             }
         }
     }
 
-    private static func processItems<T: ListableItem>(_ nodes: [String: ContiguousArray<GQLNode>], _ serverId: NSManagedObjectID, processMoc: NSManagedObjectContext, parentType: T.Type? = nil) async {
+    private static func processItems<T: ListableItem>(_ nodes: [String: ContiguousArray<GQLNode>], _ server: ApiServer, parentType: T.Type? = nil, wait: Bool) async {
         if nodes.isEmpty {
             return
         }
 
-        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+        guard let processMoc = server.managedObjectContext else {
+            return
+        }
+
+        let serverId = server.objectID
+
+        if wait {
+            processMoc.performAndWait {
+                processBlock(nodes, serverId, processMoc, parentType)
+            }
+        } else {
             processMoc.perform {
-                if let server = try? processMoc.existingObject(with: serverId) as? ApiServer {
-                    // Order must be fixed, since labels may refer to PRs or Issues, ensure they are created first
+                processBlock(nodes, serverId, processMoc, parentType)
+            }
+        }
+    }
 
-                    if let nodeList = nodes["Repository"] {
-                        Repo.sync(from: nodeList, on: server, moc: processMoc)
-                    }
-                    if let nodeList = nodes["Issue"] {
-                        Issue.sync(from: nodeList, on: server, moc: processMoc)
-                    }
-                    if let nodeList = nodes["PullRequest"] {
-                        PullRequest.sync(from: nodeList, on: server, moc: processMoc)
-                    }
-                    if let nodeList = nodes["Label"] {
-                        PRLabel.sync(from: nodeList, on: server, moc: processMoc)
-                    }
-                    if let nodeList = nodes["CommentReaction"] {
-                        Reaction.sync(from: nodeList, for: PRComment.self, on: server, moc: processMoc)
-                    }
-                    if let nodeList = nodes["IssueComment"] {
-                        PRComment.sync(from: nodeList, on: server, moc: processMoc)
-                    }
-                    if let nodeList = nodes["PullRequestReviewComment"] {
-                        PRComment.sync(from: nodeList, on: server, moc: processMoc)
-                    }
-                    if let nodeList = nodes["Reaction"], let parentType = parentType {
-                        Reaction.sync(from: nodeList, for: parentType, on: server, moc: processMoc)
-                    }
-                    if let nodeList = nodes["ReviewRequest"] {
-                        Review.syncRequests(from: nodeList, on: server, moc: processMoc)
-                    }
-                    if let nodeList = nodes["PullRequestReview"] {
-                        Review.sync(from: nodeList, on: server, moc: processMoc)
-                    }
-                    if let nodeList = nodes["StatusContext"] {
-                        PRStatus.sync(from: nodeList, on: server, moc: processMoc)
-                    }
-                    if let nodeList = nodes["CheckRun"] {
-                        PRStatus.sync(from: nodeList, on: server, moc: processMoc)
-                    }
+    private static func processBlock<T: ListableItem>(_ nodes: [String: ContiguousArray<GQLNode>], _ serverId: NSManagedObjectID, _ processMoc: NSManagedObjectContext, _ parentType: T.Type?) {
+        if let server = try? processMoc.existingObject(with: serverId) as? ApiServer {
+            // Order must be fixed, since labels may refer to PRs or Issues, ensure they are created first
 
-                    try? processMoc.save()
-                    continuation.resume()
-                }
+            if let nodeList = nodes["Repository"] {
+                Repo.sync(from: nodeList, on: server, moc: processMoc)
+            }
+            if let nodeList = nodes["Issue"] {
+                Issue.sync(from: nodeList, on: server, moc: processMoc)
+            }
+            if let nodeList = nodes["PullRequest"] {
+                PullRequest.sync(from: nodeList, on: server, moc: processMoc)
+            }
+            if let nodeList = nodes["Label"] {
+                PRLabel.sync(from: nodeList, on: server, moc: processMoc)
+            }
+            if let nodeList = nodes["CommentReaction"] {
+                Reaction.sync(from: nodeList, for: PRComment.self, on: server, moc: processMoc)
+            }
+            if let nodeList = nodes["IssueComment"] {
+                PRComment.sync(from: nodeList, on: server, moc: processMoc)
+            }
+            if let nodeList = nodes["PullRequestReviewComment"] {
+                PRComment.sync(from: nodeList, on: server, moc: processMoc)
+            }
+            if let nodeList = nodes["Reaction"], let parentType = parentType {
+                Reaction.sync(from: nodeList, for: parentType, on: server, moc: processMoc)
+            }
+            if let nodeList = nodes["ReviewRequest"] {
+                Review.syncRequests(from: nodeList, on: server, moc: processMoc)
+            }
+            if let nodeList = nodes["PullRequestReview"] {
+                Review.sync(from: nodeList, on: server, moc: processMoc)
+            }
+            if let nodeList = nodes["StatusContext"] {
+                PRStatus.sync(from: nodeList, on: server, moc: processMoc)
+            }
+            if let nodeList = nodes["CheckRun"] {
+                PRStatus.sync(from: nodeList, on: server, moc: processMoc)
             }
         }
     }

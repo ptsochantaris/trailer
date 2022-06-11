@@ -12,7 +12,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
             session?.delegate = self
             session?.activate()
         }
-        
+
         NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: .main) { [weak self] _ in
             Task { [weak self] in
                 _ = await self?.buildOverview()
@@ -181,9 +181,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
         f.fetchOffset = from
         f.fetchLimit = count
 
-        let tempMoc = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        tempMoc.undoManager = nil
-        tempMoc.persistentStoreCoordinator = DataManager.main.persistentStoreCoordinator
+        let tempMoc = DataManager.buildDetachedContext()
         return await tempMoc.perform { [weak self] in
             guard let self = self else { return [:] }
             let items = try! tempMoc.fetch(f).map { self.baseDataForItem(item: $0, showLabels: showLabels) }
