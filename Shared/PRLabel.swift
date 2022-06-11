@@ -10,10 +10,9 @@ final class PRLabel: DataItem {
     @NSManaged var pullRequests: Set<PullRequest>
     @NSManaged var issues: Set<Issue>
 
-    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer) {
-        syncItems(of: PRLabel.self, from: nodes, on: server) { label, node in
+    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext) {
+        syncItems(of: PRLabel.self, from: nodes, on: server, moc: moc) { label, node in
             guard
-                let moc = server.managedObjectContext,
                 let parent = node.parent else { return }
 
             if parent.updated || parent.created {

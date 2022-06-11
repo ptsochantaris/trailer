@@ -331,11 +331,7 @@ class DataItem: NSManagedObject {
         // }
     }
 
-    static func syncItems<T: DataItem>(of type: T.Type, from nodes: ContiguousArray<GQLNode>, on server: ApiServer, perItemCallback: (T, GQLNode) -> Void) {
-        guard let moc = server.managedObjectContext else {
-            return
-        }
-
+    static func syncItems<T: DataItem>(of type: T.Type, from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext, perItemCallback: (T, GQLNode) -> Void) {
         let validNodes = nodes.filter { !($0.parent?.creationSkipped ?? false) }
 
         let entityName = String(describing: type)

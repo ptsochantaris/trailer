@@ -29,12 +29,11 @@ final class PullRequest: ListableItem {
         repo.pullRequests.reduce(.distantPast) { max($0, $1.updatedAt ?? .distantPast) }
     }
 
-    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer) {
-        syncItems(of: PullRequest.self, from: nodes, on: server) { pr, node in
+    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext) {
+        syncItems(of: PullRequest.self, from: nodes, on: server, moc: moc) { pr, node in
 
             guard node.created || node.updated,
                   let parentId = node.parent?.id ?? (node.jsonPayload["repository"] as? [AnyHashable: Any])?["id"] as? String,
-                  let moc = server.managedObjectContext,
                   let parent = DataItem.item(of: Repo.self, with: parentId, in: moc)
             else { return }
 

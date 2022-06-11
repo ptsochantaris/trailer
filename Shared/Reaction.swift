@@ -1,3 +1,5 @@
+import CoreData
+
 final class Reaction: DataItem {
     @NSManaged var content: String?
     @NSManaged var userName: String?
@@ -8,11 +10,10 @@ final class Reaction: DataItem {
     @NSManaged var issue: Issue?
     @NSManaged var comment: PRComment?
 
-    static func sync<T: DataItem>(from nodes: ContiguousArray<GQLNode>, for parentType: T.Type, on server: ApiServer) {
-        syncItems(of: Reaction.self, from: nodes, on: server) { reaction, node in
+    static func sync<T: DataItem>(from nodes: ContiguousArray<GQLNode>, for parentType: T.Type, on server: ApiServer, moc: NSManagedObjectContext) {
+        syncItems(of: Reaction.self, from: nodes, on: server, moc: moc) { reaction, node in
             guard node.created || node.updated,
-                  let parentId = node.parent?.id,
-                  let moc = server.managedObjectContext
+                  let parentId = node.parent?.id
             else { return }
 
             if node.created {

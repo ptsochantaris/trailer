@@ -12,12 +12,11 @@ final class Issue: ListableItem {
         super.webUrl?.appending(pathComponent: "issues").appending(pathComponent: String(number))
     }
 
-    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer) {
-        syncItems(of: Issue.self, from: nodes, on: server) { issue, node in
+    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext) {
+        syncItems(of: Issue.self, from: nodes, on: server, moc: moc) { issue, node in
 
             guard node.created || node.updated,
                   let parentId = node.parent?.id ?? (node.jsonPayload["repository"] as? [AnyHashable: Any])?["id"] as? String,
-                  let moc = server.managedObjectContext,
                   let parent = DataItem.item(of: Repo.self, with: parentId, in: moc)
             else { return }
 

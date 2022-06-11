@@ -1,4 +1,5 @@
 import Foundation
+import CoreData
 
 final class PRStatus: DataItem {
     @NSManaged var descriptionText: String?
@@ -25,11 +26,10 @@ final class PRStatus: DataItem {
         }
     }
 
-    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer) {
-        syncItems(of: PRStatus.self, from: nodes, on: server) { status, node in
+    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext) {
+        syncItems(of: PRStatus.self, from: nodes, on: server, moc: moc) { status, node in
             guard node.created || node.updated,
-                  let parentId = node.parent?.id,
-                  let moc = server.managedObjectContext
+                  let parentId = node.parent?.id
             else { return }
 
             if node.created {

@@ -14,7 +14,7 @@ final class Review: DataItem {
         case DISMISSED
     }
 
-    static func syncRequests(from nodes: ContiguousArray<GQLNode>, on server: ApiServer) {
+    static func syncRequests(from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext) {
         var prIdsToAssignedUsers = [String: Set<String>]()
         var prIdsToAssignedTeams = [String: Set<String>]()
 
@@ -41,7 +41,6 @@ final class Review: DataItem {
         for node in nodes {
             guard node.elementType == "ReviewRequest",
                   let parentId = node.parent?.id,
-                  let moc = server.managedObjectContext,
                   let parent = DataItem.item(of: PullRequest.self, with: parentId, in: moc) else {
                 continue
             }
@@ -50,8 +49,8 @@ final class Review: DataItem {
         }
     }
 
-    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer) {
-        syncItems(of: Review.self, from: nodes, on: server) { review, node in
+    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext) {
+        syncItems(of: Review.self, from: nodes, on: server, moc: moc) { review, node in
 
             let info = node.jsonPayload
             if info.count == 3 { // this node is a blank container (id, comments, typename)
@@ -61,8 +60,7 @@ final class Review: DataItem {
             review.check(newState: newState)
 
             guard node.created || node.updated,
-                  let parentId = node.parent?.id,
-                  let moc = server.managedObjectContext
+                  let parentId = node.parent?.id
             else { return }
 
             if node.created {

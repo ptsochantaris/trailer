@@ -16,11 +16,10 @@ final class PRComment: DataItem {
 
     @NSManaged var reactions: Set<Reaction>
 
-    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer) {
-        syncItems(of: PRComment.self, from: nodes, on: server) { comment, node in
+    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext) {
+        syncItems(of: PRComment.self, from: nodes, on: server, moc: moc) { comment, node in
             guard node.created || node.updated,
-                  let parentId = node.parent?.id,
-                  let moc = server.managedObjectContext
+                  let parentId = node.parent?.id
             else { return }
 
             if node.created {

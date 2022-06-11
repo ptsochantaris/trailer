@@ -22,12 +22,12 @@ final class Repo: DataItem {
         updatedAt = updatedAt?.addingTimeInterval(-1)
     }
 
-    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer) {
-        syncItems(of: Repo.self, from: nodes, on: server) { repo, node in
+    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext) {
+        syncItems(of: Repo.self, from: nodes, on: server, moc: moc) { repo, node in
 
             var neededByAuthoredPr = false
             var neededByAuthoredIssue = false
-            if let parent = node.parent, let moc = server.managedObjectContext {
+            if let parent = node.parent {
                 if parent.elementType == "PullRequest" {
                     neededByAuthoredPr = true
                     DataItem.item(of: PullRequest.self, with: parent.id, in: moc)?.repo = repo
