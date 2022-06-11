@@ -347,36 +347,34 @@ extension API {
     }
 
     private static func V3_fetchReviewAssignmentsForCurrentPullRequests(to _: NSManagedObjectContext, for prs: [PullRequest]) async {
-        await withThrowingTaskGroup(of: Void.self) { group in
-            for p in prs {
-                group.addTask {
-                    let repoFullName = S(p.repo.fullName)
-                    let (data, _) = try await RestAccess.getRawData(at: "/repos/\(repoFullName)/pulls/\(p.number)/requested_reviewers", from: p.apiServer)
-                    var reviewUsers = Set<String>()
-                    var reviewTeams = Set<String>()
+        for p in prs {
+            do {
+                let repoFullName = S(p.repo.fullName)
+                let (data, _) = try await RestAccess.getRawData(at: "/repos/\(repoFullName)/pulls/\(p.number)/requested_reviewers", from: p.apiServer)
+                var reviewUsers = Set<String>()
+                var reviewTeams = Set<String>()
 
-                    if let userList = data as? [[AnyHashable: Any]] {
-                        // Legacy API results
-                        for userName in userList.compactMap({ $0["login"] as? String }) {
-                            reviewUsers.insert(userName)
-                        }
-                        p.checkAndStoreReviewAssignments(reviewUsers, reviewTeams)
-
-                    } else if let data = data as? [AnyHashable: Any], let userList = data["users"] as? [[AnyHashable: Any]], let teamList = data["teams"] as? [[AnyHashable: Any]] {
-                        // New API results
-                        for userName in userList.compactMap({ $0["login"] as? String }) {
-                            reviewUsers.insert(userName)
-                        }
-                        for teamName in teamList.compactMap({ $0["slug"] as? String }) {
-                            reviewTeams.insert(teamName)
-                        }
-                        p.checkAndStoreReviewAssignments(reviewUsers, reviewTeams)
-
-                    } else {
-                        p.apiServer.lastSyncSucceeded = false
+                if let userList = data as? [[AnyHashable: Any]] {
+                    // Legacy API results
+                    for userName in userList.compactMap({ $0["login"] as? String }) {
+                        reviewUsers.insert(userName)
                     }
+                    p.checkAndStoreReviewAssignments(reviewUsers, reviewTeams)
+
+                } else if let data = data as? [AnyHashable: Any], let userList = data["users"] as? [[AnyHashable: Any]], let teamList = data["teams"] as? [[AnyHashable: Any]] {
+                    // New API results
+                    for userName in userList.compactMap({ $0["login"] as? String }) {
+                        reviewUsers.insert(userName)
+                    }
+                    for teamName in teamList.compactMap({ $0["slug"] as? String }) {
+                        reviewTeams.insert(teamName)
+                    }
+                    p.checkAndStoreReviewAssignments(reviewUsers, reviewTeams)
+
+                } else {
+                    p.apiServer.lastSyncSucceeded = false
                 }
-            }
+            } catch {}
         }
     }
 

@@ -142,13 +142,12 @@ final class GQLQuery {
     }
 
     static func runQueries(queries: [GQLQuery], on path: String, token: String) async throws -> ApiStats? {
-        try await withThrowingTaskGroup(of: ApiStats?.self, returning: ApiStats?.self) { group in
-            for query in queries {
-                group.addTask {
-                    try await query.run(for: path, authToken: token, attempt: 10)
-                }
+        var mostRecentNonNilStats: ApiStats?
+        for query in queries {
+            if let stats = try await query.run(for: path, authToken: token, attempt: 10) {
+                mostRecentNonNilStats = stats
             }
-            return try await group.reduce(nil) { $1 ?? $0 }
         }
+        return mostRecentNonNilStats
     }
 }
