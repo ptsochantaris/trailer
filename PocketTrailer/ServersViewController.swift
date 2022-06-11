@@ -103,19 +103,28 @@ final class ServersViewController: UITableViewController {
         let a = UIAlertController(title: "Switch API", message: Settings.useV4APIHelp, preferredStyle: .actionSheet)
         a.addAction(UIAlertAction(title: "Use legacy v3 API", style: .default) { [weak self] _ in
             Settings.useV4API = false
-            self?.updateApiLabel()
+            self?.apiChanged()
         })
         a.addAction(UIAlertAction(title: "Use v4 API", style: .default) { [weak self] _ in
             if let error = API.canUseV4API(for: DataManager.main) {
                 showMessage(Settings.v4title, error)
             } else {
                 Settings.useV4API = true
-                self?.updateApiLabel()
+                self?.apiChanged()
             }
         })
         a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         present(a, animated: true)
         a.popoverPresentationController?.barButtonItem = sender
+    }
+    
+    private func apiChanged() {
+        updateApiLabel()
+        ApiServer.allApiServers(in: DataManager.main).forEach {
+            $0.deleteEverything()
+            $0.resetSyncState()
+        }
+        DataManager.saveDB()
     }
 
     @IBAction private func resyncEverythingSelected(_ sender: UIBarButtonItem) {

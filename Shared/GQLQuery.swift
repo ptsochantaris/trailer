@@ -7,11 +7,13 @@ final class GQLQuery {
 
     private let rootElement: GQLScanning
     private let parent: GQLNode?
+    private let allowsEmptyResponse: Bool
 
-    init(name: String, rootElement: GQLScanning, parent: GQLNode? = nil, perNode: ((GQLNode) async throws -> Void)? = nil) {
+    init(name: String, rootElement: GQLScanning, parent: GQLNode? = nil, allowsEmptyResponse: Bool = false, perNode: ((GQLNode) async throws -> Void)? = nil) {
         self.rootElement = rootElement
         self.parent = parent
         self.name = name
+        self.allowsEmptyResponse = allowsEmptyResponse
         perNodeBlock = perNode
     }
 
@@ -107,7 +109,11 @@ final class GQLQuery {
 
             let r = rootElement
             guard let topData = data[r.name] else {
-                throw API.apiError("\(logPrefix)No data in JSON")
+                if allowsEmptyResponse {
+                    return apiStats
+                } else {
+                    throw API.apiError("\(logPrefix)No data in JSON")
+                }
             }
 
             do {

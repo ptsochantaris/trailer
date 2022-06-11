@@ -368,7 +368,9 @@ enum GraphQL {
                         prsToCheck.append(pr)
                     }
                 }
-                try await updatePrStates(prIds: prsToCheck.compactMap(\.nodeId), on: server)
+                if !prsToCheck.isEmpty {
+                    try await updatePrStates(prIds: prsToCheck.compactMap(\.nodeId), on: server)
+                }
 
                 let fetchedIssueIds = Set(nodes["Issue"]?.map(\.id) ?? [])
                 for repo in server.repos.filter({ $0.displayPolicyForIssues == RepoDisplayPolicy.authoredOnly.rawValue }) {
@@ -385,18 +387,11 @@ enum GraphQL {
     }
 
     private static func updatePrStates(prIds: [String], on server: ApiServer) async throws {
-        let elements: [GQLElement] = [
-            idField,
-            GQLField(name: "state"),
-            GQLField(name: "createdAt"),
-            GQLField(name: "updatedAt"),
-            GQLField(name: "number")
-        ]
-        let prConditionFragment =  GQLFragment(on: "PullRequest", elements: elements)
-        let prGroup = GQLGroup(name: "pullRequests", fields: [prConditionFragment])
+        let prGroup = GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 1, includeRepo: true)])
         let group = GQLBatchGroup(templateGroup: prGroup, idList: prIds, batchSize: 100)
         var nodes = ContiguousArray<GQLNode>()
-        let query = GQLQuery(name: "Closed PRs", rootElement: group, parent: nil) { node in
+        let query = GQLQuery(name: "Closed Authored PRs", rootElement: group, allowsEmptyResponse: true) { node in
+            node.forcedUpdate = true
             nodes.append(node)
         }
         try await server.run(queries: [query])

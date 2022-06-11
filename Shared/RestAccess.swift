@@ -45,10 +45,13 @@ final class RestAccess {
                         lastPage = !linkHeader.contains("rel=\"next\"")
                     }
                 }
-                if code >= 400 {
-                    throw API.apiError("Server returned error code \(code)")
+                let shouldRetry = (code == 502 || code == 503 || code == -1001) // retry in case GH is deploying, or timeout
+                if !shouldRetry {
+                    if code >= 400 && (code != 404 && code != 410) {
+                        throw API.apiError("Server returned error code \(code)")
+                    }
+                    return (data, lastPage, code)
                 }
-                return (data, lastPage, code)
             } catch {
                 let error = error as NSError
                 let code = error.code

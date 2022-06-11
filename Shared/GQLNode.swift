@@ -8,6 +8,7 @@ final class GQLNode: Hashable {
     var creationSkipped = false
     var created = false
     var updated = false
+    var forcedUpdate = false
 
     init(id: String, elementType: String, jsonPayload: [AnyHashable: Any], parent: GQLNode?) {
         self.id = id

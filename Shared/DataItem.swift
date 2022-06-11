@@ -310,6 +310,10 @@ class DataItem: NSManagedObject {
         } else if node.created {
             updatedAt = createdAt
         }
+        
+        if node.forcedUpdate {
+            node.updated = true
+        }
 
         if node.created {
             DLog("Creating \(entityName) ID: %@", node.id)
