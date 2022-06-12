@@ -26,7 +26,6 @@ final class RestAccess {
         }
     }
 
-    @ApiActor
     static func getData(in path: String, from server: ApiServer) async throws -> (Any?, Bool, Int) {
         Task { @MainActor in
             API.currentOperationCount += 1
@@ -72,7 +71,6 @@ final class RestAccess {
         }
     }
 
-    @ApiActor
     static func getRawData(at path: String, from server: ApiServer) async throws -> (Any?, Int) {
         if path.isEmpty {
             // handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
@@ -83,7 +81,6 @@ final class RestAccess {
         return (data, resultCode)
     }
 
-    @ApiActor
     static func start(call path: String, on server: ApiServer, triggeredByUser: Bool) async throws -> (Int, [AnyHashable: Any]?, Any?) {
         let apiServerLabel: String
         if server.lastSyncSucceeded || triggeredByUser {

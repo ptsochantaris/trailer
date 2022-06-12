@@ -527,6 +527,7 @@ enum GraphQL {
         }
     }
 
+    @ApiActor
     private static func processItems<T: ListableItem>(_ nodes: [String: ContiguousArray<GQLNode>], _ server: ApiServer, parentType: T.Type? = nil, wait: Bool) async {
         if nodes.isEmpty {
             return
@@ -539,19 +540,11 @@ enum GraphQL {
         let serverId = server.objectID
 
         if wait {
-            processMoc.performAndWait {
+            processBlock(nodes, serverId, processMoc, parentType)
+        } else {
+            Task {
                 processBlock(nodes, serverId, processMoc, parentType)
             }
-        } else {
-            #if os(macOS)
-                processMoc.perform {
-                    processBlock(nodes, serverId, processMoc, parentType)
-                }
-            #else
-                await processMoc.perform(schedule: .enqueued) {
-                    processBlock(nodes, serverId, processMoc, parentType)
-                }
-            #endif
         }
     }
 
