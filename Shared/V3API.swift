@@ -3,7 +3,7 @@ import Foundation
 
 extension API {
     @ApiActor
-    private static func v3_handleRepoSyncFailure(repo: Repo, resultCode: Int) {
+    private static func handleRepoSyncFailure(repo: Repo, resultCode: Int) {
         if resultCode == 404 { // repo disabled
             repo.inaccessible = true
             repo.postSyncAction = PostSyncAction.doNothing.rawValue
@@ -21,7 +21,7 @@ extension API {
     }
 
     @ApiActor
-    private static func v3_fetchItems(for repos: [Repo], in moc: NSManagedObjectContext) async {
+    private static func fetchItems(for repos: [Repo], in moc: NSManagedObjectContext) async {
         for r in repos {
             for p in r.pullRequests where p.condition == ItemCondition.open.rawValue {
                 p.postSyncAction = PostSyncAction.delete.rawValue
@@ -43,7 +43,7 @@ extension API {
                             return false
                         }
                         if !success {
-                            v3_handleRepoSyncFailure(repo: r, resultCode: resultCode)
+                            handleRepoSyncFailure(repo: r, resultCode: resultCode)
                         }
                     }
                 }
@@ -56,7 +56,7 @@ extension API {
                             return false
                         }
                         if !success {
-                            v3_handleRepoSyncFailure(repo: r, resultCode: resultCode)
+                            handleRepoSyncFailure(repo: r, resultCode: resultCode)
                         }
                     }
                 }
@@ -65,7 +65,7 @@ extension API {
     }
 
     @ApiActor
-    static func V3_markExtraUpdatedItems(from repos: [Repo], to _: NSManagedObjectContext) async {
+    private static func markExtraUpdatedItems(from repos: [Repo], to _: NSManagedObjectContext) async {
         await withTaskGroup(of: Void.self) { group in
             for r in repos {
                 let repoFullName = S(r.fullName)
@@ -122,9 +122,9 @@ extension API {
 
     @ApiActor
     static func v3Sync(_ repos: [Repo], to moc: NSManagedObjectContext) async {
-        await v3_fetchItems(for: repos, in: moc)
+        await fetchItems(for: repos, in: moc)
         let reposWithSomeItems = repos.filter { !$0.issues.isEmpty || !$0.pullRequests.isEmpty }
-        await V3_markExtraUpdatedItems(from: reposWithSomeItems, to: moc)
+        await markExtraUpdatedItems(from: reposWithSomeItems, to: moc)
         let newOrUpdatedPrs = DataItem.newOrUpdatedItems(of: PullRequest.self, in: moc, fromSuccessfulSyncOnly: true)
         let newOrUpdatedIssues = DataItem.newOrUpdatedItems(of: Issue.self, in: moc, fromSuccessfulSyncOnly: true)
 
@@ -132,7 +132,7 @@ extension API {
 
             if Settings.showStatusItems {
                 group.addTask { @ApiActor in
-                    await V3_fetchStatusesForCurrentPullRequests(to: moc)
+                    await fetchStatusesForCurrentPullRequests(to: moc)
                 }
             } else {
                 for p in DataItem.allItems(of: PullRequest.self, in: moc) {
@@ -145,20 +145,20 @@ extension API {
 
             if Settings.notifyOnItemReactions {
                 group.addTask { @ApiActor in
-                    await V3_fetchItemReactionsIfNeeded(for: PullRequest.self, to: moc)
+                    await fetchItemReactionsIfNeeded(for: PullRequest.self, to: moc)
                 }
 
                 group.addTask { @ApiActor in
-                    await V3_fetchItemReactionsIfNeeded(for: Issue.self, to: moc)
+                    await fetchItemReactionsIfNeeded(for: Issue.self, to: moc)
                 }
             }
 
             if Settings.showLabels {
                 group.addTask { @ApiActor in
-                    await V3_fetchLabelsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
+                    await fetchLabelsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
                 }
                 group.addTask { @ApiActor in
-                    await V3_fetchLabelsForCurrentIssues(to: moc, for: newOrUpdatedIssues)
+                    await fetchLabelsForCurrentIssues(to: moc, for: newOrUpdatedIssues)
                 }
             } else {
                 for l in DataItem.allItems(of: PRLabel.self, in: moc) {
@@ -167,50 +167,50 @@ extension API {
             }
 
             group.addTask { @ApiActor in
-                await V3_checkPrClosures(in: moc)
+                await checkPrClosures(in: moc)
             }
 
             group.addTask { @ApiActor in
-                await V3_detectAssignedPullRequests(in: moc, for: newOrUpdatedPrs)
+                await detectAssignedPullRequests(in: moc, for: newOrUpdatedPrs)
             }
 
             if shouldSyncReviewAssignments {
                 group.addTask { @ApiActor in
-                    await V3_fetchReviewAssignmentsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
+                    await fetchReviewAssignmentsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
                 }
             }
 
             await withTaskGroup(of: Void.self) { commentGroup in
                 if shouldSyncReviews {
                     commentGroup.addTask { @ApiActor in
-                        await V3_fetchReviewsForForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
-                        await V3_fetchCommentsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
+                        await fetchReviewsForForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
+                        await fetchCommentsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
                     }
                 } else {
                     for r in DataItem.allItems(of: Review.self, in: moc) {
                         r.postSyncAction = PostSyncAction.delete.rawValue
                     }
                     commentGroup.addTask { @ApiActor in
-                        await V3_fetchCommentsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
+                        await fetchCommentsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
                     }
                 }
 
                 commentGroup.addTask { @ApiActor in
-                    await V3_fetchCommentsForCurrentIssues(to: moc, for: newOrUpdatedIssues)
-                    V3_checkIssueClosures(in: moc)
+                    await fetchCommentsForCurrentIssues(to: moc, for: newOrUpdatedIssues)
+                    checkIssueClosures(in: moc)
                 }
             }
 
             if Settings.notifyOnCommentReactions {
                 group.addTask { @ApiActor in
-                    await V3_fetchCommentReactionsIfNeeded(to: moc)
+                    await fetchCommentReactionsIfNeeded(to: moc)
                 }
             }
         }
     }
 
     @ApiActor
-    private static func V3_checkIssueClosures(in moc: NSManagedObjectContext) {
+    private static func checkIssueClosures(in moc: NSManagedObjectContext) {
         let f = NSFetchRequest<Issue>(entityName: "Issue")
         f.predicate =
             NSCompoundPredicate(type: .and, subpredicates: [
@@ -230,7 +230,7 @@ extension API {
     }
 
     @ApiActor
-    private static func V3_fetchCommentReactionsIfNeeded(to moc: NSManagedObjectContext) async {
+    private static func fetchCommentReactionsIfNeeded(to moc: NSManagedObjectContext) async {
         let comments = PRComment.commentsThatNeedReactionsToBeRefreshed(in: moc)
 
         if comments.isEmpty {
@@ -259,7 +259,7 @@ extension API {
     }
 
     @ApiActor
-    private static func V3_fetchItemReactionsIfNeeded<T: ListableItem>(for type: T.Type, to moc: NSManagedObjectContext) async {
+    private static func fetchItemReactionsIfNeeded<T: ListableItem>(for type: T.Type, to moc: NSManagedObjectContext) async {
         let items = T.reactionCheckBatch(for: type, in: moc)
         if items.isEmpty {
             return
@@ -289,7 +289,7 @@ extension API {
     }
 
     @ApiActor
-    private static func V3_fetchCommentsForCurrentPullRequests(to moc: NSManagedObjectContext, for prs: [PullRequest]) async {
+    private static func fetchCommentsForCurrentPullRequests(to moc: NSManagedObjectContext, for prs: [PullRequest]) async {
         if prs.isEmpty {
             return
         }
@@ -330,7 +330,7 @@ extension API {
     }
 
     @ApiActor
-    private static func V3_fetchCommentsForCurrentIssues(to moc: NSManagedObjectContext, for issues: [Issue]) async {
+    private static func fetchCommentsForCurrentIssues(to moc: NSManagedObjectContext, for issues: [Issue]) async {
         if issues.isEmpty {
             return
         }
@@ -359,7 +359,7 @@ extension API {
     }
 
     @ApiActor
-    private static func V3_fetchReviewsForForCurrentPullRequests(to moc: NSManagedObjectContext, for prs: [PullRequest]) async {
+    private static func fetchReviewsForForCurrentPullRequests(to moc: NSManagedObjectContext, for prs: [PullRequest]) async {
         if prs.isEmpty {
             return
         }
@@ -384,7 +384,7 @@ extension API {
     }
 
     @ApiActor
-    private static func V3_investigatePrClosure(for pullRequest: PullRequest) async {
+    private static func investigatePrClosure(for pullRequest: PullRequest) async {
         DLog("Checking closed PR to see if it was merged: %@", pullRequest.title)
 
         let repoFullName = S(pullRequest.repo.fullName)
@@ -417,7 +417,7 @@ extension API {
     }
 
     @ApiActor
-    private static func V3_checkPrClosures(in moc: NSManagedObjectContext) async {
+    private static func checkPrClosures(in moc: NSManagedObjectContext) async {
         let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
         f.predicate = NSCompoundPredicate(type: .and, subpredicates: [PostSyncAction.delete.matchingPredicate, ItemCondition.open.matchingPredicate])
         f.returnsObjectsAsFaults = false
@@ -428,14 +428,14 @@ extension API {
         await withTaskGroup(of: Void.self) { group in
             for r in prsToCheck {
                 group.addTask { @ApiActor in
-                    await V3_investigatePrClosure(for: r)
+                    await investigatePrClosure(for: r)
                 }
             }
         }
     }
 
     @ApiActor
-    private static func V3_fetchReviewAssignmentsForCurrentPullRequests(to _: NSManagedObjectContext, for prs: [PullRequest]) async {
+    private static func fetchReviewAssignmentsForCurrentPullRequests(to _: NSManagedObjectContext, for prs: [PullRequest]) async {
         await withThrowingTaskGroup(of: Void.self) { group in
             for p in prs {
                 group.addTask { @ApiActor in
@@ -470,7 +470,7 @@ extension API {
     }
 
     @ApiActor
-    private static func V3_fetchLabelsForCurrentPullRequests(to _: NSManagedObjectContext, for prs: [PullRequest]) async {
+    private static func fetchLabelsForCurrentPullRequests(to _: NSManagedObjectContext, for prs: [PullRequest]) async {
         if prs.isEmpty {
             return
         }
@@ -502,7 +502,7 @@ extension API {
     }
 
     @ApiActor
-    private static func V3_fetchLabelsForCurrentIssues(to _: NSManagedObjectContext, for issues: [Issue]) async {
+    private static func fetchLabelsForCurrentIssues(to _: NSManagedObjectContext, for issues: [Issue]) async {
         if issues.isEmpty {
             return
         }
@@ -534,7 +534,7 @@ extension API {
     }
 
     @ApiActor
-    private static func V3_fetchStatusesForCurrentPullRequests(to moc: NSManagedObjectContext) async {
+    private static func fetchStatusesForCurrentPullRequests(to moc: NSManagedObjectContext) async {
         let prs = PullRequest.statusCheckBatch(in: moc)
         if prs.isEmpty {
             return
@@ -577,7 +577,7 @@ extension API {
     }
 
     @ApiActor
-    private static func V3_detectAssignedPullRequests(in _: NSManagedObjectContext, for prs: [PullRequest]) async {
+    private static func detectAssignedPullRequests(in _: NSManagedObjectContext, for prs: [PullRequest]) async {
         await withTaskGroup(of: Void.self) { group in
             for p in prs {
                 let apiServer = p.apiServer
