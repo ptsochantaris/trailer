@@ -78,10 +78,10 @@ final class PullRequest: ListableItem {
         repo.apiUrl?.appending(pathComponent: "statuses").appending(pathComponent: mergeCommitSha ?? "")
     }
 
-    static func syncPullRequests(from data: [[AnyHashable: Any]]?, in repo: Repo) {
+    static func syncPullRequests(from data: [[AnyHashable: Any]]?, in repo: Repo, moc: NSManagedObjectContext) {
         let apiServer = repo.apiServer
         let apiServerUserId = apiServer.userNodeId
-        items(with: data, type: PullRequest.self, server: apiServer) { item, info, isNewOrUpdated in
+        items(with: data, type: PullRequest.self, server: apiServer, moc: moc) { item, info, isNewOrUpdated in
             if isNewOrUpdated {
                 item.baseSync(from: info, in: repo)
 

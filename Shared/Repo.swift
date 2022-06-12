@@ -61,7 +61,7 @@ final class Repo: DataItem {
         }
     }
 
-    static func syncRepos(from data: [[AnyHashable: Any]]?, server: ApiServer, addNewRepos: Bool, manuallyAdded: Bool) {
+    static func syncRepos(from data: [[AnyHashable: Any]]?, server: ApiServer, addNewRepos: Bool, manuallyAdded: Bool, moc: NSManagedObjectContext) {
         let filteredData = data?.filter { info -> Bool in
             if info["private"] as? Bool ?? false {
                 if let permissions = info["permissions"] as? [AnyHashable: Any] {
@@ -81,7 +81,7 @@ final class Repo: DataItem {
             }
         }
 
-        items(with: filteredData, type: Repo.self, server: server, createNewItems: addNewRepos) { item, info, newOrUpdated in
+        items(with: filteredData, type: Repo.self, server: server, createNewItems: addNewRepos, moc: moc) { item, info, newOrUpdated in
             if newOrUpdated {
                 item.fullName = info["full_name"] as? String
                 item.fork = info["fork"] as? Bool ?? false

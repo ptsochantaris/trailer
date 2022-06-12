@@ -53,8 +53,8 @@ final class PRComment: DataItem {
         }
     }
 
-    static func syncComments(from data: [[AnyHashable: Any]]?, parent: ListableItem) {
-        items(with: data, type: PRComment.self, server: parent.apiServer) { item, info, newOrUpdated in
+    static func syncComments(from data: [[AnyHashable: Any]]?, parent: ListableItem, moc: NSManagedObjectContext) {
+        items(with: data, type: PRComment.self, server: parent.apiServer, moc: moc) { item, info, newOrUpdated in
             if newOrUpdated {
                 item.pullRequest = parent as? PullRequest
                 item.issue = parent as? Issue

@@ -11,8 +11,8 @@ final class PRStatus: DataItem {
 
     override var alternateCreationDate: Bool { true }
 
-    static func syncStatuses(from data: [[AnyHashable: Any]]?, pullRequest: PullRequest) {
-        items(with: data, type: PRStatus.self, server: pullRequest.apiServer) { item, info, isNewOrUpdated in
+    static func syncStatuses(from data: [[AnyHashable: Any]]?, pullRequest: PullRequest, moc: NSManagedObjectContext) {
+        items(with: data, type: PRStatus.self, server: pullRequest.apiServer, moc: moc) { item, info, isNewOrUpdated in
             if isNewOrUpdated {
                 item.state = info["state"] as? String
                 item.context = info["context"] as? String

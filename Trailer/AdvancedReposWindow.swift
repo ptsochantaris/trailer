@@ -182,7 +182,7 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
             Task {
                 let alert = NSAlert()
                 do {
-                    try await API.fetchAllRepos(owner: owner, from: server)
+                    try await API.fetchAllRepos(owner: owner, from: server, moc: DataManager.main)
                     preferencesDirty = true
                     let addedCount = Repo.newItems(of: Repo.self, in: DataManager.main).count
                     alert.messageText = "\(addedCount) repositories added for '\(owner)'"
@@ -206,7 +206,7 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
             Task {
                 let alert = NSAlert()
                 do {
-                    try await API.fetchRepo(named: name, owner: owner, from: server)
+                    try await API.fetchRepo(named: name, owner: owner, from: server, moc: DataManager.main)
                     preferencesDirty = true
                     alert.messageText = "Repository added"
                     if Settings.displayPolicyForNewPrs == Int(RepoDisplayPolicy.hide.rawValue), Settings.displayPolicyForNewIssues == Int(RepoDisplayPolicy.hide.rawValue) {

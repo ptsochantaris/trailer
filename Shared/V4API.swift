@@ -39,7 +39,17 @@ extension API {
         }
     }
 
-    static func v4Sync(to moc: NSManagedObjectContext, newOrUpdatedPrs: [PullRequest], newOrUpdatedIssues: [Issue]) async throws {
+    static func v4Sync(_ repos: [Repo], to moc: NSManagedObjectContext) async throws {
+        let servers = ApiServer.allApiServers(in: moc).filter(\.goodToGo)
+        if !servers.isEmpty {
+            await GraphQL.fetchAllAuthoredItems(from: servers)
+        }
+        if !repos.isEmpty {
+            await GraphQL.fetchAllSubscribedItems(from: repos)
+        }
+        let newOrUpdatedPrs = DataItem.newOrUpdatedItems(of: PullRequest.self, in: moc, fromSuccessfulSyncOnly: true)
+        let newOrUpdatedIssues = DataItem.newOrUpdatedItems(of: Issue.self, in: moc, fromSuccessfulSyncOnly: true)
+
         if Settings.showStatusItems {
             let prs = PullRequest.statusCheckBatch(in: moc)
             try await GraphQL.update(for: prs, of: PullRequest.self, in: moc, steps: [.statuses])

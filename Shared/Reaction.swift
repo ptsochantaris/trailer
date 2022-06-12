@@ -37,8 +37,8 @@ final class Reaction: DataItem {
         }
     }
 
-    static func syncReactions(from data: [[AnyHashable: Any]]?, comment: PRComment) {
-        items(with: data, type: Reaction.self, server: comment.apiServer) { item, info, isNewOrUpdated in
+    static func syncReactions(from data: [[AnyHashable: Any]]?, comment: PRComment, moc: NSManagedObjectContext) {
+        items(with: data, type: Reaction.self, server: comment.apiServer, moc: moc) { item, info, isNewOrUpdated in
             if isNewOrUpdated {
                 item.pullRequest = nil
                 item.issue = nil
@@ -48,8 +48,8 @@ final class Reaction: DataItem {
         }
     }
 
-    static func syncReactions(from data: [[AnyHashable: Any]]?, parent: ListableItem) {
-        items(with: data, type: Reaction.self, server: parent.apiServer) { item, info, isNewOrUpdated in
+    static func syncReactions(from data: [[AnyHashable: Any]]?, parent: ListableItem, moc: NSManagedObjectContext) {
+        items(with: data, type: Reaction.self, server: parent.apiServer, moc: moc) { item, info, isNewOrUpdated in
             if isNewOrUpdated {
                 item.pullRequest = parent as? PullRequest
                 item.issue = parent as? Issue

@@ -76,8 +76,8 @@ final class Review: DataItem {
         }
     }
 
-    static func syncReviews(from data: [[AnyHashable: Any]]?, withParent: PullRequest) {
-        items(with: data, type: Review.self, server: withParent.apiServer) { item, info, isNewOrUpdated in
+    static func syncReviews(from data: [[AnyHashable: Any]]?, withParent: PullRequest, moc: NSManagedObjectContext) {
+        items(with: data, type: Review.self, server: withParent.apiServer, moc: moc) { item, info, isNewOrUpdated in
             if isNewOrUpdated {
                 item.pullRequest = withParent
                 item.body = info["body"] as? String

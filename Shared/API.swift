@@ -1,6 +1,11 @@
 import CommonCrypto
 import CoreData
 
+@globalActor
+final actor ApiActor {
+    static let shared = ApiActor()
+}
+
 final class API {
     static var currentNetworkStatus = NetworkStatus.NotReachable
 
@@ -21,7 +26,9 @@ final class API {
 
         let fileManager = FileManager.default
         if fileManager.fileExists(atPath: cacheDirectory) {
-            expireOldImageCacheEntries()
+            Task {
+                await expireOldImageCacheEntries()
+            }
         } else {
             try! fileManager.createDirectory(atPath: cacheDirectory, withIntermediateDirectories: true, attributes: nil)
         }
@@ -124,6 +131,7 @@ final class API {
 
     ///////////////////////////////////////////////////////// Images
 
+    @ApiActor
     private static func expireOldImageCacheEntries() {
         let now = Date()
         let fileManager = FileManager.default
@@ -140,6 +148,7 @@ final class API {
         }
     }
 
+    @ApiActor
     private static func sha1(_ input: String) -> Data {
         input.utf8CString.withUnsafeBytes { bytes -> Data in
             let len = Int(CC_SHA1_DIGEST_LENGTH)
@@ -150,6 +159,7 @@ final class API {
     }
 
     @discardableResult
+    @ApiActor
     static func avatar(from path: String) async throws -> (IMAGE_CLASS, String) {
         let connector = path.contains("?") ? "&" : "?"
         let absolutePath = "\(path)\(connector)s=128"
@@ -187,12 +197,15 @@ final class API {
     ////////////////////////////////////// API interface
 
     static func performSync() {
-        Task.detached {
-            let moc = DataManager.buildDetachedContext()
-            await _performSync(moc: moc)
+        let moc = DataManager.buildDetachedContext()
+        moc.perform {
+            Task { @ApiActor in
+                await _performSync(moc: moc)
+            }
         }
     }
 
+    @ApiActor
     private static func _performSync(moc: NSManagedObjectContext) async {
         if Settings.useV4API && canUseV4API(for: moc) != nil {
             return
@@ -227,34 +240,16 @@ final class API {
         }
 
         let repos = Repo.syncableRepos(in: moc)
-        let v4Mode = Settings.useV4API
 
-        if v4Mode {
-            let servers = ApiServer.allApiServers(in: moc).filter(\.goodToGo)
-            if !servers.isEmpty {
-                await GraphQL.fetchAllAuthoredItems(from: servers)
-            }
-            if !repos.isEmpty {
-                await GraphQL.fetchAllSubscribedItems(from: repos)
-            }
-        } else {
-            await v3_fetchItems(for: repos, to: moc)
-        }
-
-        let reposWithSomeItems = repos.filter { !$0.issues.isEmpty || !$0.pullRequests.isEmpty }
-        if v4Mode {
-            let newOrUpdatedPrs = DataItem.newOrUpdatedItems(of: PullRequest.self, in: moc, fromSuccessfulSyncOnly: true)
-            let newOrUpdatedIssues = DataItem.newOrUpdatedItems(of: Issue.self, in: moc, fromSuccessfulSyncOnly: true)
+        if Settings.useV4API {
             do {
-                try await v4Sync(to: moc, newOrUpdatedPrs: newOrUpdatedPrs, newOrUpdatedIssues: newOrUpdatedIssues)
+                try await v4Sync(repos, to: moc)
             } catch {
                 DLog("Sync aborted due to error")
             }
+
         } else {
-            await V3_markExtraUpdatedItems(from: reposWithSomeItems, to: moc)
-            let newOrUpdatedPrs = DataItem.newOrUpdatedItems(of: PullRequest.self, in: moc, fromSuccessfulSyncOnly: true)
-            let newOrUpdatedIssues = DataItem.newOrUpdatedItems(of: Issue.self, in: moc, fromSuccessfulSyncOnly: true)
-            await v3Sync(to: moc, newOrUpdatedPrs: newOrUpdatedPrs, newOrUpdatedIssues: newOrUpdatedIssues)
+            await v3Sync(repos, to: moc)
         }
 
         // Transfer done, process
@@ -288,7 +283,7 @@ final class API {
         } catch {
             DLog("Committing sync failed: %@", error.localizedDescription)
         }
-
+        
         Task { @MainActor in
             isRefreshing = false
             currentOperationCount -= 1
@@ -305,13 +300,14 @@ final class API {
         return agoFormat(prefix: "updated", since: last).capitalFirstLetter
     }
 
-    private static func fetchUserTeams(from server: ApiServer) async {
+    @ApiActor
+    private static func fetchUserTeams(from server: ApiServer, moc: NSManagedObjectContext) async {
         for t in server.teams {
             t.postSyncAction = PostSyncAction.delete.rawValue
         }
 
         let (success, _) = await RestAccess.getPagedData(at: "/user/teams", from: server) { data, _ in
-            Team.syncTeams(from: data, server: server)
+            Team.syncTeams(from: data, server: server, moc: moc)
             return false
         }
         if !success {
@@ -319,6 +315,7 @@ final class API {
         }
     }
 
+    @ApiActor
     static func fetchRepositories(to moc: NSManagedObjectContext) async {
         ApiServer.resetSyncSuccess(in: moc)
 
@@ -330,9 +327,9 @@ final class API {
 
         let goodToGoServers = ApiServer.allApiServers(in: moc).filter(\.goodToGo)
         for apiServer in goodToGoServers {
-            await syncWatchedRepos(from: apiServer)
-            await syncManuallyAddedRepos(from: apiServer)
-            await fetchUserTeams(from: apiServer)
+            await syncWatchedRepos(from: apiServer, moc: moc)
+            await syncManuallyAddedRepos(from: apiServer, moc: moc)
+            await fetchUserTeams(from: apiServer, moc: moc)
         }
 
         if Settings.hideArchivedRepos { Repo.hideArchivedRepos(in: moc) }
@@ -346,6 +343,7 @@ final class API {
         }
     }
 
+    @ApiActor
     private static func ensureApiServersHaveUserIds(in moc: NSManagedObjectContext) async {
         var needToCheck = false
         for apiServer in ApiServer.allApiServers(in: moc) {
@@ -361,6 +359,7 @@ final class API {
         }
     }
 
+    @ApiActor
     private static func getRateLimit(from server: ApiServer) async -> ApiStats? {
         do {
             let (_, headers, _) = try await RestAccess.start(call: "/rate_limit", on: server, triggeredByUser: true)
@@ -376,6 +375,7 @@ final class API {
         return nil
     }
 
+    @ApiActor
     static func updateLimitsFromServer() async {
         let configuredServers = ApiServer.allApiServers(in: DataManager.main).filter(\.goodToGo)
         for apiServer in configuredServers {
@@ -385,7 +385,8 @@ final class API {
         }
     }
 
-    private static func syncManuallyAddedRepos(from server: ApiServer) async {
+    @ApiActor
+    private static func syncManuallyAddedRepos(from server: ApiServer, moc: NSManagedObjectContext) async {
         if !server.lastSyncSucceeded {
             return
         }
@@ -393,21 +394,22 @@ final class API {
         let repos = server.repos.filter(\.manuallyAdded)
         for repo in repos {
             do {
-                try await fetchRepo(fullName: repo.fullName ?? "", from: server)
+                try await fetchRepo(fullName: repo.fullName ?? "", from: server, moc: moc)
             } catch {
                 server.lastSyncSucceeded = false
             }
         }
     }
 
-    private static func syncWatchedRepos(from server: ApiServer) async {
+    @ApiActor
+    private static func syncWatchedRepos(from server: ApiServer, moc: NSManagedObjectContext) async {
         if !server.lastSyncSucceeded {
             return
         }
 
         let createNewRepos = Settings.automaticallyRemoveDeletedReposFromWatchlist
         let (success, _) = await RestAccess.getPagedData(at: "/user/subscriptions", from: server) { data, _ in
-            Repo.syncRepos(from: data, server: server, addNewRepos: createNewRepos, manuallyAdded: false)
+            Repo.syncRepos(from: data, server: server, addNewRepos: createNewRepos, manuallyAdded: false, moc: moc)
             return false
         }
         if !success {
@@ -420,12 +422,13 @@ final class API {
         }
     }
 
-    static func fetchRepo(fullName: String, from server: ApiServer) async throws {
+    @ApiActor
+    static func fetchRepo(fullName: String, from server: ApiServer, moc: NSManagedObjectContext) async throws {
         let path = "\(server.apiPath ?? "")/repos/\(fullName)"
         do {
             let (data, _, _) = try await RestAccess.getData(in: path, from: server)
             if let repoData = data as? [AnyHashable: Any] {
-                Repo.syncRepos(from: [repoData], server: server, addNewRepos: true, manuallyAdded: true)
+                Repo.syncRepos(from: [repoData], server: server, addNewRepos: true, manuallyAdded: true, moc: moc)
             }
         } catch {
             let resultCode = (error as NSError).code
@@ -433,7 +436,8 @@ final class API {
         }
     }
 
-    static func fetchAllRepos(owner: String, from server: ApiServer) async throws {
+    @ApiActor
+    static func fetchAllRepos(owner: String, from server: ApiServer, moc: NSManagedObjectContext) async throws {
         let userPath = "\(server.apiPath ?? "")/users/\(owner)/repos"
         let userTask = Task { () -> [[AnyHashable: Any]] in
             var userList = [[AnyHashable: Any]]()
@@ -469,13 +473,15 @@ final class API {
         let userList = try await userTask.value
         let orgList = try await orgTask.value
 
-        Repo.syncRepos(from: userList + orgList, server: server, addNewRepos: true, manuallyAdded: true)
+        Repo.syncRepos(from: userList + orgList, server: server, addNewRepos: true, manuallyAdded: true, moc: moc)
     }
 
-    static func fetchRepo(named: String, owner: String, from server: ApiServer) async throws {
-        try await fetchRepo(fullName: "\(owner)/\(named)", from: server)
+    @ApiActor
+    static func fetchRepo(named: String, owner: String, from server: ApiServer, moc: NSManagedObjectContext) async throws {
+        try await fetchRepo(fullName: "\(owner)/\(named)", from: server, moc: moc)
     }
 
+    @ApiActor
     private static func syncUserDetails(in moc: NSManagedObjectContext) async {
         let configuredServers = ApiServer.allApiServers(in: moc).filter(\.goodToGo)
         for apiServer in configuredServers {
@@ -493,6 +499,7 @@ final class API {
         }
     }
 
+    @ApiActor
     static func testApi(to apiServer: ApiServer) async throws {
         let (_, _, data) = try await RestAccess.start(call: "/user", on: apiServer, triggeredByUser: true)
         if let d = data as? [AnyHashable: Any], let userName = d["login"] as? String, let userId = d["id"] as? Int64 {

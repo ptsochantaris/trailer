@@ -46,6 +46,7 @@ class DataItem: NSManagedObject {
                                    server: ApiServer,
                                    prefetchRelationships: [String]? = nil,
                                    createNewItems: Bool = true,
+                                   moc: NSManagedObjectContext,
                                    postProcessCallback: (T, [AnyHashable: Any], Bool) -> Void) {
         guard let infos = data, !infos.isEmpty else { return }
 
@@ -70,7 +71,7 @@ class DataItem: NSManagedObject {
 
         let legacyServerIds = legacyIdsToNodeIds.map { k, _ in k }
         f.predicate = NSPredicate(format: "serverId in %@ and apiServer == %@", legacyServerIds, server)
-        for item in try! server.managedObjectContext?.fetch(f) ?? [] {
+        for item in try! moc.fetch(f) {
             if let legacyId = item.value(forKey: "serverId") as? Int64 {
                 if let nodeId = legacyIdsToNodeIds[legacyId] {
                     item.nodeId = nodeId
@@ -86,7 +87,7 @@ class DataItem: NSManagedObject {
 
         var nodeIdsOfItems = Set(nodeIdsToInfo.map { k, _ in k })
         f.predicate = NSPredicate(format: "nodeId in %@ and apiServer == %@", nodeIdsOfItems, server)
-        let existingItems = try! server.managedObjectContext?.fetch(f) ?? []
+        let existingItems = try! moc.fetch(f)
 
         let now = Date()
 
@@ -109,11 +110,10 @@ class DataItem: NSManagedObject {
 
         if !createNewItems { return }
 
-        let serverMoc = server.managedObjectContext!
         for nodeId in nodeIdsOfItems {
             if let info = nodeIdsToInfo[nodeId] {
                 DLog("Creating %@: %@", entityName, nodeId)
-                let i = NSEntityDescription.insertNewObject(forEntityName: entityName, into: serverMoc) as! T
+                let i = NSEntityDescription.insertNewObject(forEntityName: entityName, into: moc) as! T
                 i.postSyncAction = PostSyncAction.isNew.rawValue
                 i.apiServer = server
                 i.nodeId = nodeId
