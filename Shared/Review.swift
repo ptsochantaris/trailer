@@ -76,6 +76,7 @@ final class Review: DataItem {
         }
     }
 
+    @ApiActor
     static func syncReviews(from data: [[AnyHashable: Any]]?, withParent: PullRequest, moc: NSManagedObjectContext) {
         items(with: data, type: Review.self, server: withParent.apiServer, moc: moc) { item, info, isNewOrUpdated in
             if isNewOrUpdated {

@@ -9,7 +9,7 @@ final actor NodeActor {
 typealias PerNodeBlock = @NodeActor(GQLNode) async throws -> Void
 
 enum GraphQL {
-    private static let nodeBlockMax = 500
+    private static let nodeBlockMax = 50
 
     private static let idField = GQLField(name: "id")
 
@@ -543,9 +543,15 @@ enum GraphQL {
                 processBlock(nodes, serverId, processMoc, parentType)
             }
         } else {
-            processMoc.perform {
-                processBlock(nodes, serverId, processMoc, parentType)
-            }
+            #if os(macOS)
+                processMoc.perform {
+                    processBlock(nodes, serverId, processMoc, parentType)
+                }
+            #else
+                await processMoc.perform(schedule: .enqueued) {
+                    processBlock(nodes, serverId, processMoc, parentType)
+                }
+            #endif
         }
     }
 

@@ -88,6 +88,7 @@ final class PRLabel: DataItem {
         }
     }
 
+    @ApiActor
     static func syncLabels(from info: [[AnyHashable: Any]]?, withParent: ListableItem) {
         labels(from: info, fromParent: withParent) { label, info in
             if let c = info["color"] as? String {

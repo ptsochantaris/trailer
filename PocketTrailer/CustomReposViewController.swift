@@ -109,7 +109,7 @@ final class CustomReposViewController: UIViewController, UITableViewDelegate, UI
         if repoName == "*" {
             Task {
                 do {
-                    try await API.fetchAllRepos(owner: ownerName, from: server)
+                    try await API.fetchAllRepos(owner: ownerName, from: server, moc: DataManager.main)
 
                     let addedCount = Repo.newItems(of: Repo.self, in: DataManager.main).count
                     if Settings.displayPolicyForNewPrs == Int(RepoDisplayPolicy.hide.rawValue), Settings.displayPolicyForNewIssues == Int(RepoDisplayPolicy.hide.rawValue) {
@@ -131,7 +131,7 @@ final class CustomReposViewController: UIViewController, UITableViewDelegate, UI
         } else {
             Task {
                 do {
-                    try await API.fetchRepo(named: repoName, owner: ownerName, from: server)
+                    try await API.fetchRepo(named: repoName, owner: ownerName, from: server, moc: DataManager.main)
 
                     if Settings.displayPolicyForNewPrs == Int(RepoDisplayPolicy.hide.rawValue), Settings.displayPolicyForNewIssues == Int(RepoDisplayPolicy.hide.rawValue) {
                         showMessage("Repository added", "WARNING: While the repository has been added successfully to your list, your default settings specify that it should be hidden. You probably want to change its visibility in the main repositories list.")

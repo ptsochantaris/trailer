@@ -53,6 +53,7 @@ final class PRComment: DataItem {
         }
     }
 
+    @ApiActor
     static func syncComments(from data: [[AnyHashable: Any]]?, parent: ListableItem, moc: NSManagedObjectContext) {
         items(with: data, type: PRComment.self, server: parent.apiServer, moc: moc) { item, info, newOrUpdated in
             if newOrUpdated {

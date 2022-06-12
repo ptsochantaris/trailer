@@ -41,6 +41,7 @@ class DataItem: NSManagedObject {
         return try! server.managedObjectContext!.fetch(f)
     }
 
+    @ApiActor
     static func items<T: DataItem>(with data: [[AnyHashable: Any]]?,
                                    type: T.Type,
                                    server: ApiServer,

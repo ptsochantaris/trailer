@@ -61,6 +61,7 @@ final class Repo: DataItem {
         }
     }
 
+    @ApiActor
     static func syncRepos(from data: [[AnyHashable: Any]]?, server: ApiServer, addNewRepos: Bool, manuallyAdded: Bool, moc: NSManagedObjectContext) {
         let filteredData = data?.filter { info -> Bool in
             if info["private"] as? Bool ?? false {

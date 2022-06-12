@@ -6,7 +6,7 @@ final actor ApiActor {
     static let shared = ApiActor()
 }
 
-final class API {
+enum API {
     static var currentNetworkStatus = NetworkStatus.NotReachable
 
     static let cacheDirectory: String = {
@@ -27,7 +27,7 @@ final class API {
         let fileManager = FileManager.default
         if fileManager.fileExists(atPath: cacheDirectory) {
             Task {
-                await expireOldImageCacheEntries()
+                expireOldImageCacheEntries()
             }
         } else {
             try! fileManager.createDirectory(atPath: cacheDirectory, withIntermediateDirectories: true, attributes: nil)
@@ -131,7 +131,6 @@ final class API {
 
     ///////////////////////////////////////////////////////// Images
 
-    @ApiActor
     private static func expireOldImageCacheEntries() {
         let now = Date()
         let fileManager = FileManager.default
@@ -148,7 +147,6 @@ final class API {
         }
     }
 
-    @ApiActor
     private static func sha1(_ input: String) -> Data {
         input.utf8CString.withUnsafeBytes { bytes -> Data in
             let len = Int(CC_SHA1_DIGEST_LENGTH)
@@ -159,7 +157,6 @@ final class API {
     }
 
     @discardableResult
-    @ApiActor
     static func avatar(from path: String) async throws -> (IMAGE_CLASS, String) {
         let connector = path.contains("?") ? "&" : "?"
         let absolutePath = "\(path)\(connector)s=128"
@@ -205,7 +202,6 @@ final class API {
         }
     }
 
-    @ApiActor
     private static func _performSync(moc: NSManagedObjectContext) async {
         if Settings.useV4API && canUseV4API(for: moc) != nil {
             return
@@ -283,7 +279,7 @@ final class API {
         } catch {
             DLog("Committing sync failed: %@", error.localizedDescription)
         }
-        
+
         Task { @MainActor in
             isRefreshing = false
             currentOperationCount -= 1
@@ -315,7 +311,6 @@ final class API {
         }
     }
 
-    @ApiActor
     static func fetchRepositories(to moc: NSManagedObjectContext) async {
         ApiServer.resetSyncSuccess(in: moc)
 
@@ -359,7 +354,6 @@ final class API {
         }
     }
 
-    @ApiActor
     private static func getRateLimit(from server: ApiServer) async -> ApiStats? {
         do {
             let (_, headers, _) = try await RestAccess.start(call: "/rate_limit", on: server, triggeredByUser: true)
@@ -499,7 +493,6 @@ final class API {
         }
     }
 
-    @ApiActor
     static func testApi(to apiServer: ApiServer) async throws {
         let (_, _, data) = try await RestAccess.start(call: "/user", on: apiServer, triggeredByUser: true)
         if let d = data as? [AnyHashable: Any], let userName = d["login"] as? String, let userId = d["id"] as? Int64 {

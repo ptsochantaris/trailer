@@ -165,7 +165,7 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
             return .noConfiguredServers
         }
 
-        await API.performSync()
+        API.performSync()
 
         return .started
     }

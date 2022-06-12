@@ -78,6 +78,7 @@ final class PullRequest: ListableItem {
         repo.apiUrl?.appending(pathComponent: "statuses").appending(pathComponent: mergeCommitSha ?? "")
     }
 
+    @ApiActor
     static func syncPullRequests(from data: [[AnyHashable: Any]]?, in repo: Repo, moc: NSManagedObjectContext) {
         let apiServer = repo.apiServer
         let apiServerUserId = apiServer.userNodeId

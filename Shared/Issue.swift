@@ -25,6 +25,7 @@ final class Issue: ListableItem {
         }
     }
 
+    @ApiActor
     static func syncIssues(from data: [[AnyHashable: Any]]?, in repo: Repo, moc: NSManagedObjectContext) {
         let filteredData = data?.filter { $0["pull_request"] == nil } // don't sync issues which are pull requests, they are already synced
         items(with: filteredData, type: Issue.self, server: repo.apiServer, prefetchRelationships: ["labels"], moc: moc) { item, info, isNewOrUpdated in

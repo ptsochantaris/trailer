@@ -37,26 +37,26 @@ extension API {
             await withTaskGroup(of: Void.self) { group in
                 if r.displayPolicyForPrs != RepoDisplayPolicy.hide.rawValue {
                     let repoFullName = S(r.fullName)
-                    group.addTask {
+                    group.addTask { @ApiActor in
                         let (success, resultCode) = await RestAccess.getPagedData(at: "/repos/\(repoFullName)/pulls", from: apiServer) { data, _ in
                             PullRequest.syncPullRequests(from: data, in: r, moc: moc)
                             return false
                         }
                         if !success {
-                            await v3_handleRepoSyncFailure(repo: r, resultCode: resultCode)
+                            v3_handleRepoSyncFailure(repo: r, resultCode: resultCode)
                         }
                     }
                 }
 
                 if r.displayPolicyForIssues != RepoDisplayPolicy.hide.rawValue {
                     let repoFullName = S(r.fullName)
-                    group.addTask {
+                    group.addTask { @ApiActor in
                         let (success, resultCode) = await RestAccess.getPagedData(at: "/repos/\(repoFullName)/issues", from: apiServer) { data, _ in
                             Issue.syncIssues(from: data, in: r, moc: moc)
                             return false
                         }
                         if !success {
-                            await v3_handleRepoSyncFailure(repo: r, resultCode: resultCode)
+                            v3_handleRepoSyncFailure(repo: r, resultCode: resultCode)
                         }
                     }
                 }
@@ -72,7 +72,7 @@ extension API {
                 let lastLocalEvent = r.lastScannedIssueEventId
                 let isFirstEventSync = lastLocalEvent == 0
                 r.lastScannedIssueEventId = 0
-                group.addTask {
+                group.addTask { @ApiActor in
                     let (success, _) = await RestAccess.getPagedData(at: "/repos/\(repoFullName)/issues/events", from: r.apiServer) { data, _ in
                         guard let data = data, !data.isEmpty else { return true }
 
@@ -119,7 +119,7 @@ extension API {
             }
         }
     }
-    
+
     @ApiActor
     static func v3Sync(_ repos: [Repo], to moc: NSManagedObjectContext) async {
         await v3_fetchItems(for: repos, in: moc)
@@ -127,11 +127,11 @@ extension API {
         await V3_markExtraUpdatedItems(from: reposWithSomeItems, to: moc)
         let newOrUpdatedPrs = DataItem.newOrUpdatedItems(of: PullRequest.self, in: moc, fromSuccessfulSyncOnly: true)
         let newOrUpdatedIssues = DataItem.newOrUpdatedItems(of: Issue.self, in: moc, fromSuccessfulSyncOnly: true)
-        
+
         await withTaskGroup(of: Void.self) { group in
-            
+
             if Settings.showStatusItems {
-                group.addTask {
+                group.addTask { @ApiActor in
                     await V3_fetchStatusesForCurrentPullRequests(to: moc)
                 }
             } else {
@@ -142,22 +142,22 @@ extension API {
                     }
                 }
             }
-            
+
             if Settings.notifyOnItemReactions {
-                group.addTask {
+                group.addTask { @ApiActor in
                     await V3_fetchItemReactionsIfNeeded(for: PullRequest.self, to: moc)
                 }
-                
-                group.addTask {
+
+                group.addTask { @ApiActor in
                     await V3_fetchItemReactionsIfNeeded(for: Issue.self, to: moc)
                 }
             }
-            
+
             if Settings.showLabels {
-                group.addTask {
+                group.addTask { @ApiActor in
                     await V3_fetchLabelsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
                 }
-                group.addTask {
+                group.addTask { @ApiActor in
                     await V3_fetchLabelsForCurrentIssues(to: moc, for: newOrUpdatedIssues)
                 }
             } else {
@@ -165,48 +165,44 @@ extension API {
                     l.postSyncAction = PostSyncAction.delete.rawValue
                 }
             }
-            
-            var commentTasks = [Task<Void, Never>]()
-            
-            if shouldSyncReviews {
-                commentTasks.append(Task {
-                    await V3_fetchReviewsForForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
-                    await V3_fetchCommentsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
-                })
-            } else {
-                for r in DataItem.allItems(of: Review.self, in: moc) {
-                    r.postSyncAction = PostSyncAction.delete.rawValue
-                }
-                commentTasks.append(Task {
-                    await V3_fetchCommentsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
-                })
-            }
-            
-            commentTasks.append(Task {
-                await V3_fetchCommentsForCurrentIssues(to: moc, for: newOrUpdatedIssues)
-                V3_checkIssueClosures(in: moc)
-            })
-            
-            group.addTask {
+
+            group.addTask { @ApiActor in
                 await V3_checkPrClosures(in: moc)
             }
-            
-            group.addTask {
+
+            group.addTask { @ApiActor in
                 await V3_detectAssignedPullRequests(in: moc, for: newOrUpdatedPrs)
             }
-            
+
             if shouldSyncReviewAssignments {
-                group.addTask {
+                group.addTask { @ApiActor in
                     await V3_fetchReviewAssignmentsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
                 }
             }
-            
-            for task in commentTasks {
-                _ = await task.value
+
+            await withTaskGroup(of: Void.self) { commentGroup in
+                if shouldSyncReviews {
+                    commentGroup.addTask { @ApiActor in
+                        await V3_fetchReviewsForForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
+                        await V3_fetchCommentsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
+                    }
+                } else {
+                    for r in DataItem.allItems(of: Review.self, in: moc) {
+                        r.postSyncAction = PostSyncAction.delete.rawValue
+                    }
+                    commentGroup.addTask { @ApiActor in
+                        await V3_fetchCommentsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
+                    }
+                }
+
+                commentGroup.addTask { @ApiActor in
+                    await V3_fetchCommentsForCurrentIssues(to: moc, for: newOrUpdatedIssues)
+                    V3_checkIssueClosures(in: moc)
+                }
             }
-            
+
             if Settings.notifyOnCommentReactions {
-                group.addTask {
+                group.addTask { @ApiActor in
                     await V3_fetchCommentReactionsIfNeeded(to: moc)
                 }
             }
@@ -247,7 +243,7 @@ extension API {
                     r.postSyncAction = PostSyncAction.delete.rawValue
                 }
                 guard let reactionUrl = c.reactionsUrl else { continue }
-                group.addTask {
+                group.addTask { @ApiActor in
                     let (success, _) = await RestAccess.getPagedData(at: reactionUrl, from: c.apiServer) { data, _ in
                         Reaction.syncReactions(from: data, comment: c, moc: moc)
                         return false
@@ -279,7 +275,7 @@ extension API {
                 guard let reactionsUrl = i.reactionsUrl else {
                     continue
                 }
-                group.addTask {
+                group.addTask { @ApiActor in
                     let (success, _) = await RestAccess.getPagedData(at: reactionsUrl, from: i.apiServer) { data, _ in
                         Reaction.syncReactions(from: data, parent: i, moc: moc)
                         return false
@@ -309,7 +305,7 @@ extension API {
                 for p in prs {
                     if let link = (issues ? p.commentsLink : p.reviewCommentLink) {
                         let apiServer = p.apiServer
-                        group.addTask {
+                        group.addTask { @ApiActor in
                             let (success, _) = await RestAccess.getPagedData(at: link, from: apiServer) { data, _ in
                                 PRComment.syncComments(from: data, parent: p, moc: moc)
                                 return false
@@ -324,10 +320,10 @@ extension API {
         }
 
         await withTaskGroup(of: Void.self) { group in
-            group.addTask {
+            group.addTask { @ApiActor in
                 await _fetchComments(issues: true)
             }
-            group.addTask {
+            group.addTask { @ApiActor in
                 await _fetchComments(issues: false)
             }
         }
@@ -348,7 +344,7 @@ extension API {
                 if let link = i.commentsLink {
                     let apiServer = i.apiServer
 
-                    group.addTask {
+                    group.addTask { @ApiActor in
                         let (success, _) = await RestAccess.getPagedData(at: link, from: apiServer) { data, _ in
                             PRComment.syncComments(from: data, parent: i, moc: moc)
                             return false
@@ -374,7 +370,7 @@ extension API {
                     l.postSyncAction = PostSyncAction.delete.rawValue
                 }
                 let repoFullName = S(p.repo.fullName)
-                group.addTask {
+                group.addTask { @ApiActor in
                     let (success, _) = await RestAccess.getPagedData(at: "/repos/\(repoFullName)/pulls/\(p.number)/reviews", from: p.apiServer) { data, _ in
                         Review.syncReviews(from: data, withParent: p, moc: moc)
                         return false
@@ -431,7 +427,7 @@ extension API {
 
         await withTaskGroup(of: Void.self) { group in
             for r in prsToCheck {
-                group.addTask {
+                group.addTask { @ApiActor in
                     await V3_investigatePrClosure(for: r)
                 }
             }
@@ -442,7 +438,7 @@ extension API {
     private static func V3_fetchReviewAssignmentsForCurrentPullRequests(to _: NSManagedObjectContext, for prs: [PullRequest]) async {
         await withThrowingTaskGroup(of: Void.self) { group in
             for p in prs {
-                group.addTask {
+                group.addTask { @ApiActor in
                     let repoFullName = S(p.repo.fullName)
                     let (data, _) = try await RestAccess.getRawData(at: "/repos/\(repoFullName)/pulls/\(p.number)/requested_reviewers", from: p.apiServer)
                     var reviewUsers = Set<String>()
@@ -474,7 +470,7 @@ extension API {
     }
 
     @ApiActor
-    private static func V3_fetchLabelsForCurrentPullRequests(to moc: NSManagedObjectContext, for prs: [PullRequest]) async {
+    private static func V3_fetchLabelsForCurrentPullRequests(to _: NSManagedObjectContext, for prs: [PullRequest]) async {
         if prs.isEmpty {
             return
         }
@@ -489,11 +485,9 @@ extension API {
                     continue
                 }
 
-                group.addTask {
+                group.addTask { @ApiActor in
                     let (success, resultCode) = await RestAccess.getPagedData(at: link, from: p.apiServer) { data, _ in
-                        p.apiServer.managedObjectContext?.perform {
-                            PRLabel.syncLabels(from: data, withParent: p)
-                        }
+                        PRLabel.syncLabels(from: data, withParent: p)
                         return false
                     }
                     if !success {
@@ -506,9 +500,9 @@ extension API {
             }
         }
     }
-    
+
     @ApiActor
-    private static func V3_fetchLabelsForCurrentIssues(to moc: NSManagedObjectContext, for issues: [Issue]) async {
+    private static func V3_fetchLabelsForCurrentIssues(to _: NSManagedObjectContext, for issues: [Issue]) async {
         if issues.isEmpty {
             return
         }
@@ -523,11 +517,9 @@ extension API {
                     continue
                 }
 
-                group.addTask {
+                group.addTask { @ApiActor in
                     let (success, resultCode) = await RestAccess.getPagedData(at: link, from: i.apiServer) { data, _ in
-                        i.apiServer.managedObjectContext?.perform {
-                            PRLabel.syncLabels(from: data, withParent: i)
-                        }
+                        PRLabel.syncLabels(from: data, withParent: i)
                         return false
                     }
                     if !success {
@@ -547,7 +539,7 @@ extension API {
         if prs.isEmpty {
             return
         }
-        
+
         let now = Date()
         await withTaskGroup(of: Void.self) { group in
 
@@ -559,7 +551,7 @@ extension API {
                 let apiServer = p.apiServer
 
                 if let statusLink = p.statusesLink {
-                    group.addTask {
+                    group.addTask { @ApiActor in
                         let (success, resultCode) = await RestAccess.getPagedData(at: statusLink, from: apiServer) { data, _ in
                             PRStatus.syncStatuses(from: data, pullRequest: p, moc: moc)
                             return false
@@ -585,12 +577,12 @@ extension API {
     }
 
     @ApiActor
-    private static func V3_detectAssignedPullRequests(in moc: NSManagedObjectContext, for prs: [PullRequest]) async {
+    private static func V3_detectAssignedPullRequests(in _: NSManagedObjectContext, for prs: [PullRequest]) async {
         await withTaskGroup(of: Void.self) { group in
             for p in prs {
                 let apiServer = p.apiServer
                 if let issueLink = p.issueUrl {
-                    group.addTask {
+                    group.addTask { @ApiActor in
                         do {
                             let (data, _, resultCode) = try await RestAccess.getData(in: issueLink, from: apiServer)
                             if resultCode == 200 || resultCode == 404 || resultCode == 410 {

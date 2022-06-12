@@ -37,6 +37,7 @@ final class Reaction: DataItem {
         }
     }
 
+    @ApiActor
     static func syncReactions(from data: [[AnyHashable: Any]]?, comment: PRComment, moc: NSManagedObjectContext) {
         items(with: data, type: Reaction.self, server: comment.apiServer, moc: moc) { item, info, isNewOrUpdated in
             if isNewOrUpdated {
@@ -48,6 +49,7 @@ final class Reaction: DataItem {
         }
     }
 
+    @ApiActor
     static func syncReactions(from data: [[AnyHashable: Any]]?, parent: ListableItem, moc: NSManagedObjectContext) {
         items(with: data, type: Reaction.self, server: parent.apiServer, moc: moc) { item, info, isNewOrUpdated in
             if isNewOrUpdated {
