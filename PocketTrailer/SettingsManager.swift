@@ -3,6 +3,7 @@ import UIKit
 let settingsManager = SettingsManager()
 
 final class SettingsManager {
+    @MainActor
     private func loadSettingsFrom(url: URL) {
         if Settings.readFromURL(url) {
             DataManager.saveDB()
@@ -24,6 +25,7 @@ final class SettingsManager {
         }
     }
 
+    @MainActor
     func loadSettingsFrom(url: URL, confirmFromView: UIViewController?, withCompletion: ((Bool) -> Void)?) {
         if let v = confirmFromView {
             let a = UIAlertController(title: "Import these settings?", message: "This will overwrite all your current settings, are you sure?", preferredStyle: .alert)

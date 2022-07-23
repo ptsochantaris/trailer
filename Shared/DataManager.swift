@@ -1,6 +1,7 @@
 import CoreData
 
-final class DataManager {
+@MainActor
+enum DataManager {
     static var postMigrationRepoPrPolicy: RepoDisplayPolicy?
     static var postMigrationRepoIssuePolicy: RepoDisplayPolicy?
     static var postMigrationSnoozeWakeOnComment: Bool?
@@ -306,8 +307,7 @@ final class DataManager {
         }
     }
 
-    static func postProcessAllItems(in moc: NSManagedObjectContext? = nil) {
-        let context = moc ?? main
+    nonisolated static func postProcessAllItems(in context: NSManagedObjectContext) {
         for p in DataItem.allItems(of: PullRequest.self, in: context, prefetchRelationships: ["comments", "reactions", "reviews"]) {
             p.postProcess()
         }

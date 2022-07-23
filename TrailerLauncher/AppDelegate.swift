@@ -5,6 +5,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.terminate(nil)
     }
 
+    @MainActor
     func applicationDidFinishLaunching(_: Notification) {
         if LauncherCommon.isMainAppRunning {
             terminate()

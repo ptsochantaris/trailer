@@ -31,6 +31,7 @@ extension MenuWindow {
             super.init()
         }
 
+        @MainActor
         var uniqueIdentifier: String {
             var segments = [String(describing: type)]
             if let viewCriterion = viewCriterion {
@@ -49,6 +50,7 @@ extension MenuWindow {
             return segments.joined(separator: "-")
         }
 
+        @MainActor
         func reloadData(filter: String?) {
             itemIds.removeAll(keepingCapacity: false)
 
@@ -75,6 +77,7 @@ extension MenuWindow {
             }
         }
 
+        @MainActor
         func tableView(_: NSTableView, viewFor _: NSTableColumn?, row: Int) -> NSView? {
             let object = itemIds[row]
             if let id = object as? NSManagedObjectID, let i = existingObject(with: id) as? ListableItem {
@@ -85,6 +88,7 @@ extension MenuWindow {
             return nil
         }
 
+        @MainActor
         func tableView(_ tv: NSTableView, heightOfRow row: Int) -> CGFloat {
             if let v = tableView(tv, viewFor: nil, row: row) {
                 return v.frame.size.height
@@ -97,6 +101,7 @@ extension MenuWindow {
             itemIds.count
         }
 
+        @MainActor
         func itemAtRow(_ row: Int) -> ListableItem? {
             if row >= 0, row < itemIds.count, let id = itemIds[row] as? NSManagedObjectID {
                 return existingObject(with: id) as? ListableItem

@@ -121,7 +121,7 @@ final class MenuBarSet {
                             hasUnread: Bool,
                             reasonForEmpty: @escaping @MainActor(String) async -> NSAttributedString) async {
         if forceVisible || shouldShow(type: type) {
-            let isRefreshing = await API.isRefreshing
+            let isRefreshing = API.isRefreshing
             let shouldGray = Settings.grayOutWhenRefreshing && isRefreshing
 
             let somethingFailed = ApiServer.shouldReportRefreshFailure(in: DataManager.main) && (viewCriterion?.relatedServerFailed ?? true)
@@ -172,7 +172,7 @@ final class MenuBarSet {
         if forceVisible || Repo.mayProvideIssuesForDisplay(fromServerWithId: viewCriterion?.apiServerId) {
             let hasUnread = Issue.badgeCount(in: DataManager.main, criterion: viewCriterion) > 0
             await updateMenu(of: Issue.self, menu: issuesMenu, forceVisible: forceVisible, hasUnread: hasUnread) {
-                await Issue.reasonForEmpty(with: $0, criterion: self.viewCriterion)
+                Issue.reasonForEmpty(with: $0, criterion: self.viewCriterion)
             }
 
         } else {
@@ -185,7 +185,7 @@ final class MenuBarSet {
         if forceVisible || Repo.mayProvidePrsForDisplay(fromServerWithId: sid) || !Repo.mayProvideIssuesForDisplay(fromServerWithId: sid) {
             let hasUnread = PullRequest.badgeCount(in: DataManager.main, criterion: viewCriterion) > 0
             await updateMenu(of: PullRequest.self, menu: prMenu, forceVisible: forceVisible, hasUnread: hasUnread) {
-                await PullRequest.reasonForEmpty(with: $0, criterion: self.viewCriterion)
+                PullRequest.reasonForEmpty(with: $0, criterion: self.viewCriterion)
             }
 
         } else {

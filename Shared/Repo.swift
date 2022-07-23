@@ -188,6 +188,7 @@ final class Repo: DataItem {
         return c > 0
     }
 
+    @MainActor
     static func mayProvideIssuesForDisplay(fromServerWithId id: NSManagedObjectID? = nil) -> Bool {
         let all: [Repo]
         if let aid = id, let apiServer = existingObject(with: aid) as? ApiServer {
@@ -198,6 +199,7 @@ final class Repo: DataItem {
         return all.contains { $0.displayPolicyForIssues != RepoDisplayPolicy.hide.rawValue }
     }
 
+    @MainActor
     static func mayProvidePrsForDisplay(fromServerWithId id: NSManagedObjectID? = nil) -> Bool {
         let all: [Repo]
         if let aid = id, let apiServer = existingObject(with: aid) as? ApiServer {
@@ -232,6 +234,7 @@ final class Repo: DataItem {
         return try! moc.fetch(f)
     }
 
+    @MainActor
     static func reposFiltered(by filter: String?) -> [Repo] {
         let f = NSFetchRequest<Repo>(entityName: "Repo")
         f.returnsObjectsAsFaults = false

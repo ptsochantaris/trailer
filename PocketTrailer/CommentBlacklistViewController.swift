@@ -95,7 +95,7 @@ final class CommentBlacklistViewController: UITableViewController {
         case .itemAuthors:
             Settings.itemAuthorBlacklist = newList
         }
-        DataManager.postProcessAllItems()
+        DataManager.postProcessAllItems(in: DataManager.main)
     }
 
     @IBAction private func addSelected() {

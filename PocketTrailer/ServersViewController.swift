@@ -143,7 +143,7 @@ final class ServersViewController: UITableViewController {
             a.resetSyncState()
         }
         DataManager.saveDB()
-        DataManager.postProcessAllItems()
+        DataManager.postProcessAllItems(in: DataManager.main)
         Task {
             await app.startRefresh()
         }

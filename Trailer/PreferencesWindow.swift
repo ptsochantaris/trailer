@@ -227,17 +227,15 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         n.addObserver(self, selector: #selector(updateImportExportSettings), name: .SettingsExported, object: nil)
 
         deferredUpdateTimer = PopTimer(timeInterval: 1) { [weak self] in
-            DataManager.postProcessAllItems()
-            if let s = self, s.serversDirty {
-                s.serversDirty = false
-                DataManager.saveDB()
-                Settings.possibleExport(nil)
-                Task { @MainActor in
+            Task { @MainActor [weak self] in
+                DataManager.postProcessAllItems(in: DataManager.main)
+                if let s = self, s.serversDirty {
+                    s.serversDirty = false
+                    DataManager.saveDB()
+                    Settings.possibleExport(nil)
                     app.setupWindows()
-                }
-            } else {
-                DataManager.saveDB()
-                Task { @MainActor in
+                } else {
+                    DataManager.saveDB()
                     await app.updateAllMenus()
                 }
             }
@@ -683,12 +681,10 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
 
         updateReviewOptions()
 
-        Task {
-            await updateActivity()
-        }
+        updateActivity()
     }
 
-    func updateActivity() async {
+    func updateActivity() {
         let refreshing = API.isRefreshing
         let isIdle = !refreshing
         projectsTable.isEnabled = isIdle
@@ -704,7 +700,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         } else {
             projectsTable.alphaValue = 0.3
         }
-        await advancedReposWindow?.updateActivity()
+        advancedReposWindow?.updateActivity()
     }
 
     @IBAction private func reloadAllDataSelected(_: NSButton) {

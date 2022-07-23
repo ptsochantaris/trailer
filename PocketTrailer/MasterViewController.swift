@@ -7,6 +7,7 @@ final class TabBarSet {
     var issuesItem: UITabBarItem?
     let viewCriterion: GroupingCriterion?
 
+    @MainActor
     var tabItems: [UITabBarItem] {
         let label = viewCriterion?.label
         var items = [UITabBarItem]()

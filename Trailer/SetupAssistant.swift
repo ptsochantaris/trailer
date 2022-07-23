@@ -66,7 +66,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate, NSControlTextEditingDele
                     await app.startRefreshIfItIsDue()
                     checkTimer = Timer(repeats: true, interval: 0.5) { [weak self] in
                         Task { [weak self] in
-                            await self?.checkRefreshDone()
+                            self?.checkRefreshDone()
                         }
                     }
                 } catch {
@@ -82,8 +82,8 @@ final class SetupAssistant: NSWindow, NSWindowDelegate, NSControlTextEditingDele
         }
     }
 
-    private func checkRefreshDone() async {
-        let isRefreshing = await API.isRefreshing
+    private func checkRefreshDone() {
+        let isRefreshing = API.isRefreshing
         if !isRefreshing {
             checkTimer = nil
 

@@ -20,8 +20,10 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .automatic
         settingsChangedTimer = PopTimer(timeInterval: 1.0) {
-            DataManager.postProcessAllItems()
-            DataManager.saveDB()
+            Task { @MainActor in
+                DataManager.postProcessAllItems(in: DataManager.main)
+                DataManager.saveDB()
+            }
         }
     }
 
@@ -127,7 +129,7 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
         for i in DataItem.allItems(of: Issue.self, in: DataManager.main) {
             i.wakeIfAutoSnoozed()
         }
-        DataManager.postProcessAllItems()
+        DataManager.postProcessAllItems(in: DataManager.main)
     }
 
     override func viewDidAppear(_ animated: Bool) {

@@ -204,9 +204,9 @@ final class NotificationManager {
             }
         }
 
-        notification.userInfo = DataManager.info(for: item)
-
         Task {
+            notification.userInfo = await DataManager.info(for: item)
+
             if !Settings.hideAvatarsInNotifications, let url = (item as? PRComment)?.avatarUrl ?? (item as? ListableItem)?.userAvatarUrl {
                 let res = try? await API.avatar(from: url)
                 if let res = res, let attachment = try? UNNotificationAttachment(identifier: res.1, url: URL(fileURLWithPath: res.1), options: nil) {

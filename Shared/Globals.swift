@@ -65,6 +65,7 @@ let NOTIFICATION_URL_KEY = "urlKey"
 
 let emptyAttributedString = NSAttributedString()
 
+@MainActor
 func existingObject(with id: NSManagedObjectID) -> NSManagedObject? {
     try? DataManager.main.existingObject(with: id)
 }
@@ -97,6 +98,7 @@ let numberFormatter: NumberFormatter = {
     return n
 }()
 
+@MainActor
 func bootUp() {
     Settings.checkMigration()
     DataManager.checkMigration()

@@ -61,6 +61,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         }
     }
 
+    @MainActor
     func applicationWillFinishLaunching(_: Notification) {
         app = self
         bootUp()
@@ -76,7 +77,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
             return
         }
 
-        DataManager.postProcessAllItems()
+        DataManager.postProcessAllItems(in: DataManager.main)
 
         mouseIgnoreTimer = PopTimer(timeInterval: 0.4) {
             app.isManuallyScrolling = false
@@ -200,6 +201,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         NSUserNotificationCenter.default.removeDeliveredNotification(notification)
     }
 
+    @MainActor
     func postNotification(type: NotificationType, for item: DataItem) {
         let notification = NSUserNotification()
 
@@ -590,7 +592,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
     @discardableResult
     @MainActor
     func tryLoadSettings(from url: URL, skipConfirm: Bool) async -> Bool {
-        if await API.isRefreshing {
+        if API.isRefreshing {
             let alert = NSAlert()
             alert.messageText = "Trailer is currently refreshing data, please wait until it's done and try importing your settings again"
             alert.addButton(withTitle: "OK")
@@ -620,7 +622,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
             alert.runModal()
             return false
         }
-        DataManager.postProcessAllItems()
+        DataManager.postProcessAllItems(in: DataManager.main)
         DataManager.saveDB()
         preferencesWindow?.reloadSettings()
         setupWindows()
@@ -630,6 +632,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         return true
     }
 
+    @MainActor
     func applicationShouldTerminate(_: NSApplication) -> NSApplication.TerminateReply {
         DataManager.saveDB()
         return .terminateNow
@@ -674,6 +677,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         await startRefresh()
     }
 
+    @MainActor
     private func checkApiUsage() {
         for apiServer in ApiServer.allApiServers(in: DataManager.main) {
             if apiServer.goodToGo, apiServer.hasApiLimit, let resetDate = apiServer.resetDate {
@@ -704,9 +708,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
     @objc private func refreshStarting() {
         refreshTimer = nil
 
-        Task {
-            await preferencesWindow?.updateActivity()
-        }
+        preferencesWindow?.updateActivity()
 
         for d in menuBarSets {
             d.prepareForRefresh()
@@ -723,9 +725,10 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
             d.allowRefresh = true
         }
 
+        preferencesWindow?.updateActivity()
+        preferencesWindow?.reloadRepositories()
+
         Task {
-            await preferencesWindow?.updateActivity()
-            preferencesWindow?.reloadRepositories()
             await updateAllMenus()
         }
 
@@ -760,6 +763,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         menuBarSets.compactMap { ($0.viewCriterion?.isRelated(to: i) ?? true) ? $0 : nil }
     }
 
+    @MainActor
     func application(_: NSApplication, continue userActivity: NSUserActivity, restorationHandler _: @escaping ([NSUserActivityRestoring]) -> Void) -> Bool {
         #if canImport(CoreSpotlight)
             if userActivity.activityType == CSSearchableItemActionType,
@@ -796,7 +800,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 
     @MainActor
     func startRefresh() async {
-        if await API.isRefreshing {
+        if API.isRefreshing {
             DLog("Won't start refresh because refresh is already ongoing")
             return
         }
@@ -817,9 +821,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
             return
         }
 
-        Task {
-            await API.performSync()
-        }
+        API.performSync()
     }
 
     @MainActor
@@ -914,14 +916,16 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                         return incomingEvent
                     }
                     if app.isManuallyScrolling, w.table.selectedRow == -1 { return nil }
-                    var i = w.table.selectedRow + 1
-                    if i < w.table.numberOfRows {
-                        while w.dataSource.itemAtRow(i) == nil { i += 1 }
-                    } else if w.table.numberOfRows > 0 {
-                        i = 0
-                        while w.dataSource.itemAtRow(i) == nil { i += 1 }
+                    Task { @MainActor in
+                        var i = w.table.selectedRow + 1
+                        if i < w.table.numberOfRows {
+                            while w.dataSource.itemAtRow(i) == nil { i += 1 }
+                        } else if w.table.numberOfRows > 0 {
+                            i = 0
+                            while w.dataSource.itemAtRow(i) == nil { i += 1 }
+                        }
+                        S.scrollTo(index: i, inMenu: w)
                     }
-                    S.scrollTo(index: i, inMenu: w)
                     return nil
 
                 case 126: // up
@@ -929,13 +933,15 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                         return incomingEvent
                     }
                     if app.isManuallyScrolling, w.table.selectedRow == -1 { return nil }
-                    var i = w.table.selectedRow - 1
-                    if i > 0, w.table.numberOfRows > 0 {
-                        while w.dataSource.itemAtRow(i) == nil { i -= 1 }
-                    } else {
-                        i = w.table.numberOfRows - 1
+                    Task { @MainActor in
+                        var i = w.table.selectedRow - 1
+                        if i > 0, w.table.numberOfRows > 0 {
+                            while w.dataSource.itemAtRow(i) == nil { i -= 1 }
+                        } else {
+                            i = w.table.numberOfRows - 1
+                        }
+                        S.scrollTo(index: i, inMenu: w)
                     }
-                    S.scrollTo(index: i, inMenu: w)
                     return nil
 
                 case 36: // enter
@@ -964,8 +970,8 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                     switch incomingEvent.charactersIgnoringModifiers ?? "" {
                     case "m":
                         selectedItem.setMute(to: !selectedItem.muted)
-                        DataManager.saveDB()
                         Task { @MainActor in
+                            DataManager.saveDB()
                             app.updateRelatedMenus(for: selectedItem)
                         }
                         return nil
@@ -980,13 +986,11 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                         }
                         if let snoozeIndex = Int(incomingEvent.charactersIgnoringModifiers ?? "") {
                             if snoozeIndex > 0, !selectedItem.isSnoozing {
-                                if S.snooze(item: selectedItem, snoozeIndex: snoozeIndex - 1, window: w) {
-                                    return nil
-                                }
+                                S.snooze(item: selectedItem, snoozeIndex: snoozeIndex - 1, window: w)
                             } else if snoozeIndex == 0, selectedItem.isSnoozing {
                                 S.wake(item: selectedItem, window: w)
-                                return nil
                             }
+                            return nil
                         }
                     }
                 }
@@ -998,28 +1002,27 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
     private func wake(item: ListableItem, window: MenuWindow) {
         let oldIndex = window.table.selectedRow
         item.wakeUp()
-        DataManager.saveDB()
         Task { @MainActor in
+            DataManager.saveDB()
             app.updateRelatedMenus(for: item)
             scrollToNearest(index: oldIndex, window: window, preferDown: false)
         }
     }
 
-    private func snooze(item: ListableItem, snoozeIndex: Int, window: MenuWindow) -> Bool {
-        let s = SnoozePreset.allSnoozePresets(in: DataManager.main)
-        if s.count > snoozeIndex {
-            let oldIndex = window.table.selectedRow
-            item.snooze(using: s[snoozeIndex])
-            DataManager.saveDB()
-            Task { @MainActor in
+    private func snooze(item: ListableItem, snoozeIndex: Int, window: MenuWindow) {
+        Task { @MainActor in
+            let s = SnoozePreset.allSnoozePresets(in: DataManager.main)
+            if s.count > snoozeIndex {
+                let oldIndex = window.table.selectedRow
+                item.snooze(using: s[snoozeIndex])
+                DataManager.saveDB()
                 updateRelatedMenus(for: item)
                 scrollToNearest(index: oldIndex, window: window, preferDown: true)
             }
-            return true
         }
-        return false
     }
 
+    @MainActor
     private func scrollToNearest(index: Int, window: MenuWindow, preferDown: Bool) {
         let table = window.table!
         let maxRowIndex = table.numberOfRows - 1
@@ -1192,6 +1195,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 
     //////////////////////// Database error on startup
 
+    @MainActor
     private func databaseErrorOnStartup() {
         let alert = NSAlert()
         alert.messageText = "Database error"

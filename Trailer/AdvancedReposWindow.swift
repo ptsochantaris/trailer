@@ -15,6 +15,7 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
 
     weak var prefs: PreferencesWindow?
 
+    @MainActor
     override func awakeFromNib() {
         super.awakeFromNib()
         delegate = self
@@ -34,9 +35,7 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
 
         newRepoCheckChanged(nil)
 
-        Task {
-            await updateActivity()
-        }
+        updateActivity()
 
         let allServers = ApiServer.allApiServers(in: DataManager.main)
         if allServers.count > 1 {
@@ -57,8 +56,8 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
     }
 
     // chain this to updateActivity from the main repferences window
-    func updateActivity() async {
-        let refreshing = await API.isRefreshing
+    func updateActivity() {
+        let refreshing = API.isRefreshing
         if refreshing {
             refreshButton.isEnabled = false
             activityDisplay.startAnimation(nil)

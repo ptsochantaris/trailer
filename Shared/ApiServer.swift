@@ -61,6 +61,7 @@ final class ApiServer: NSManagedObject {
         !S(authToken).isEmpty
     }
 
+    @MainActor
     static func resetSyncOfEverything() {
         DLog("RESETTING SYNC STATE OF ALL ITEMS")
         for r in DataItem.allItems(of: Repo.self, in: DataManager.main, prefetchRelationships: ["pullRequests", "issues"]) {
@@ -215,6 +216,7 @@ final class ApiServer: NSManagedObject {
         return nil
     }
 
+    @MainActor
     static var archivedApiServers: [AnyHashable: [AnyHashable: Any]] {
         var archivedData = [AnyHashable: [AnyHashable: Any]]()
         for a in ApiServer.allApiServers(in: DataManager.main) {
@@ -247,6 +249,7 @@ final class ApiServer: NSManagedObject {
         return archivedData
     }
 
+    @MainActor
     static func configure(from archive: [String: [String: NSObject]]) -> Bool {
         let tempMoc = DataManager.buildChildContext()
 

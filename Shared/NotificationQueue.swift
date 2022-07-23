@@ -13,8 +13,11 @@ final class NotificationQueue {
         queue.removeAll()
     }
 
+    @MainActor
     static func commit(moc: NSManagedObjectContext) {
-        queue.forEach { type, itemId in
+        let copy = queue
+        clear()
+        copy.forEach { type, itemId in
             if let storedItem = try? moc.existingObject(with: itemId) as? DataItem, storedItem.apiServer.lastSyncSucceeded {
                 #if os(iOS)
                     NotificationManager.postNotification(type: type, for: storedItem)
@@ -23,6 +26,5 @@ final class NotificationQueue {
                 #endif
             }
         }
-        clear()
     }
 }

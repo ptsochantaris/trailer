@@ -202,6 +202,7 @@ final actor ApiActor {
 
     ////////////////////////////////////// API interface
 
+    @MainActor
     static func performSync() {
         let moc = DataManager.buildDetachedContext()
         moc.perform {
@@ -376,6 +377,7 @@ final actor ApiActor {
         return nil
     }
 
+    @MainActor
     static func updateLimitsFromServer() async {
         let configuredServers = ApiServer.allApiServers(in: DataManager.main).filter(\.goodToGo)
         for apiServer in configuredServers {

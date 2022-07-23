@@ -111,6 +111,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
         }
     }
 
+    @MainActor
     private func processList(message: [String: Any]) async -> [String: Any] {
         var result = [String: Any]()
 
@@ -158,6 +159,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
 
     ////////////////////////////
 
+    @MainActor
     private func buildItemList(type: String, sectionIndex: Int64, from: Int, apiServerUri: String, group: String, count: Int, onlyUnread: Bool) async -> [String: Any] {
         let showLabels = Settings.showLabels
         let entity: ListableItem.Type
@@ -237,6 +239,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
 
     /////////////////////////////
 
+    @MainActor
     private func buildItemDetail(localId: String) -> Data? {
         if let oid = DataManager.id(for: localId), let item = existingObject(with: oid) as? ListableItem {
             var result = baseDataForItem(item: item, showLabels: Settings.showLabels)

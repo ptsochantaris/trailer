@@ -66,6 +66,7 @@ final class Issue: ListableItem {
         return badgeCount(from: f, in: moc)
     }
 
+    @MainActor
     static func badgeCount(in moc: NSManagedObjectContext, criterion: GroupingCriterion?) -> Int {
         let f = requestForItems(of: Issue.self, withFilter: nil, sectionIndex: -1, criterion: criterion)
         return badgeCount(from: f, in: moc)

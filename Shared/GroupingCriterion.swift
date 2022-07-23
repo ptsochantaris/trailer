@@ -14,6 +14,7 @@ final class GroupingCriterion {
         self.repoGroup = repoGroup
     }
 
+    @MainActor
     var label: String {
         if let r = repoGroup {
             return r
@@ -24,6 +25,7 @@ final class GroupingCriterion {
         }
     }
 
+    @MainActor
     var relatedServerFailed: Bool {
         if let aid = apiServerId, let a = existingObject(with: aid) as? ApiServer, !a.lastSyncSucceeded {
             return true

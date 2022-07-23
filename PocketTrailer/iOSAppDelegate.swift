@@ -31,7 +31,7 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
     }
 
     func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
-        DataManager.postProcessAllItems()
+        DataManager.postProcessAllItems(in: DataManager.main)
 
         if ApiServer.someServersHaveAuthTokens(in: DataManager.main) {
             Task {
@@ -172,9 +172,7 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
             return .noConfiguredServers
         }
 
-        Task {
-            await API.performSync()
-        }
+        API.performSync()
 
         return .started
     }

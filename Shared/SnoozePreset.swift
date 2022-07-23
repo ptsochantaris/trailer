@@ -119,6 +119,7 @@ final class SnoozePreset: NSManagedObject {
         }
     }
 
+    @MainActor
     static var archivedPresets: [[String: NSObject]] {
         var archivedData = [[String: NSObject]]()
         for a in SnoozePreset.allSnoozePresets(in: DataManager.main) {
@@ -133,6 +134,7 @@ final class SnoozePreset: NSManagedObject {
         return archivedData
     }
 
+    @MainActor
     static func configure(from archive: [[String: NSObject]]) -> Bool {
         let tempMoc = DataManager.buildChildContext()
 

@@ -96,21 +96,17 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
     }
 
     @objc private func menuWillOpen(_: NSMenu) {
-        Task {
-            if await API.isRefreshing {
-                refreshUpdate()
-            } else {
-                let lastSync = await API.lastSuccessfulSyncAt
-                refreshMenuItem.title = " Refresh (\(lastSync))"
-            }
+        if API.isRefreshing {
+            refreshUpdate()
+        } else {
+            let lastSync = API.lastSuccessfulSyncAt
+            refreshMenuItem.title = " Refresh (\(lastSync))"
         }
     }
 
     @objc private func refreshUpdate() {
-        Task {
-            let operation = await API.currentOperationName
-            refreshMenuItem.title = " Refresh: " + operation
-        }
+        let operation = API.currentOperationName
+        refreshMenuItem.title = " Refresh: " + operation
     }
 
     func scrollToTop() {

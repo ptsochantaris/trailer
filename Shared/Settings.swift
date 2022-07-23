@@ -27,6 +27,7 @@ enum Settings {
         ]
     }
 
+    @MainActor
     static func checkMigration() {
         if let snoozeWakeOnComment = sharedDefaults.object(forKey: "SNOOZE_WAKEUP_ON_COMMENT") as? Bool {
             DataManager.postMigrationSnoozeWakeOnComment = snoozeWakeOnComment
@@ -235,6 +236,7 @@ enum Settings {
         return true
     }
 
+    @MainActor
     static func readFromURL(_ url: URL) -> Bool {
         if let settings = NSDictionary(contentsOf: url) {
             DLog("Reading settings from %@", url.absoluteString)
