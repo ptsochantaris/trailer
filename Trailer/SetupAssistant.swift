@@ -63,9 +63,11 @@ final class SetupAssistant: NSWindow, NSWindowDelegate, NSControlTextEditingDele
                     try await API.testApi(to: newServer)
                     quickstart.stringValue = "\nFetching your watchlist. This will take a moment…"
                     Settings.lastSuccessfulRefresh = nil
-                    app.startRefreshIfItIsDue()
+                    await app.startRefreshIfItIsDue()
                     checkTimer = Timer(repeats: true, interval: 0.5) { [weak self] in
-                        self?.checkRefreshDone()
+                        Task { [weak self] in
+                            await self?.checkRefreshDone()
+                        }
                     }
                 } catch {
                     let alert = NSAlert()
@@ -80,8 +82,9 @@ final class SetupAssistant: NSWindow, NSWindowDelegate, NSControlTextEditingDele
         }
     }
 
-    private func checkRefreshDone() {
-        if !API.isRefreshing {
+    private func checkRefreshDone() async {
+        let isRefreshing = await API.isRefreshing
+        if !isRefreshing {
             checkTimer = nil
 
             if newServer.lastSyncSucceeded {
@@ -141,11 +144,12 @@ final class SetupAssistant: NSWindow, NSWindowDelegate, NSControlTextEditingDele
         o.message = "Import Settings From File…"
         o.isExtensionHidden = false
         o.allowedFileTypes = ["trailerSettings"]
-        o.beginSheetModal(for: self) { response in
+        o.beginSheetModal(for: self) { [weak self] response in
+            guard let self = self else { return }
             if response == .OK, let url = o.url {
-                DispatchQueue.main.async { [weak self] in
-                    if app.tryLoadSettings(from: url, skipConfirm: Settings.dontConfirmSettingsImport) {
-                        self?.close()
+                Task { @MainActor in
+                    if await app.tryLoadSettings(from: url, skipConfirm: Settings.dontConfirmSettingsImport) {
+                        self.close()
                     }
                 }
             }

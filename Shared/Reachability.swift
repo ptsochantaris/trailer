@@ -10,7 +10,9 @@ enum NetworkStatus: Int {
 let ReachabilityChangedNotification = Notification.Name("ReachabilityChangedNotification")
 
 func ReachabilityCallback(target _: SCNetworkReachability, flags _: SCNetworkReachabilityFlags, info _: UnsafeMutableRawPointer?) {
-    NotificationCenter.default.post(name: ReachabilityChangedNotification, object: nil)
+    Task { @MainActor in
+        NotificationCenter.default.post(name: ReachabilityChangedNotification, object: nil)
+    }
 }
 
 final class Reachability {

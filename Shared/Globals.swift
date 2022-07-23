@@ -77,6 +77,8 @@ let itemDateFormatter: DateFormatter = {
     return f
 }()
 
+import os.log
+
 func DLog(_ message: String, _ arg1: @autoclosure () -> Any? = nil, _ arg2: @autoclosure () -> Any? = nil, _ arg3: @autoclosure () -> Any? = nil, _ arg4: @autoclosure () -> Any? = nil, _ arg5: @autoclosure () -> Any? = nil) {
     if Settings.logActivityToConsole {
         let message = String(format: message,
@@ -85,11 +87,7 @@ func DLog(_ message: String, _ arg1: @autoclosure () -> Any? = nil, _ arg2: @aut
                              String(describing: arg3() ?? "(nil)"),
                              String(describing: arg4() ?? "(nil)"),
                              String(describing: arg5() ?? "(nil)"))
-        #if DEBUG
-            print(">>>", message)
-        #else
-            NSLog(message)
-        #endif
+        os_log("%{public}@", message)
     }
 }
 
@@ -102,7 +100,9 @@ let numberFormatter: NumberFormatter = {
 func bootUp() {
     Settings.checkMigration()
     DataManager.checkMigration()
-    API.setup()
+    Task {
+        await API.setup()
+    }
 }
 
 //////////////////////// Enums

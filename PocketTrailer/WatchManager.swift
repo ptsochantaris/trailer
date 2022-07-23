@@ -47,7 +47,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
     private func handle(message: [String: Any]) async -> [String: Any] {
         switch S(message["command"] as? String) {
         case "refresh":
-            let status = app.startRefresh()
+            let status = await app.startRefresh()
             switch status {
             case .started:
                 return reportSuccess(result: [:])

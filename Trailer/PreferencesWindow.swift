@@ -232,10 +232,14 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
                 s.serversDirty = false
                 DataManager.saveDB()
                 Settings.possibleExport(nil)
-                app.setupWindows()
+                Task { @MainActor in
+                    app.setupWindows()
+                }
             } else {
                 DataManager.saveDB()
-                app.updateAllMenus()
+                Task { @MainActor in
+                    await app.updateAllMenus()
+                }
             }
         }
     }
@@ -679,11 +683,14 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
 
         updateReviewOptions()
 
-        updateActivity()
+        Task {
+            await updateActivity()
+        }
     }
 
-    func updateActivity() {
-        let isIdle = !API.isRefreshing
+    func updateActivity() async {
+        let refreshing = API.isRefreshing
+        let isIdle = !refreshing
         projectsTable.isEnabled = isIdle
         allPrsSetting.isEnabled = isIdle
         allIssuesSetting.isEnabled = isIdle
@@ -697,7 +704,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         } else {
             projectsTable.alphaValue = 0.3
         }
-        advancedReposWindow?.updateActivity()
+        await advancedReposWindow?.updateActivity()
     }
 
     @IBAction private func reloadAllDataSelected(_: NSButton) {
@@ -718,8 +725,10 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
             a.resetSyncState()
         }
         DataManager.saveDB()
-        app.updateAllMenus()
-        app.startRefresh()
+        Task {
+            await app.updateAllMenus()
+            await app.startRefresh()
+        }
     }
 
     @IBAction private func displayNumbersForItemsSelected(_ sender: NSButton) {
@@ -1270,8 +1279,8 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         o.allowedFileTypes = ["trailerSettings"]
         o.beginSheetModal(for: self) { response in
             if response == .OK, let url = o.url {
-                DispatchQueue.main.async {
-                    app.tryLoadSettings(from: url, skipConfirm: Settings.dontConfirmSettingsImport)
+                Task {
+                    await app.tryLoadSettings(from: url, skipConfirm: Settings.dontConfirmSettingsImport)
                 }
             }
         }
@@ -1456,10 +1465,14 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     func windowWillClose(_: Notification) {
         advancedReposWindow?.close()
         if ApiServer.someServersHaveAuthTokens(in: DataManager.main), preferencesDirty {
-            app.startRefresh()
+            Task {
+                await app.startRefresh()
+            }
         } else {
             if app.refreshTimer == nil, Settings.refreshPeriod > 0.0 {
-                app.startRefreshIfItIsDue()
+                Task {
+                    await app.startRefreshIfItIsDue()
+                }
             }
         }
         app.setUpdateCheckParameters()

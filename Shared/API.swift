@@ -6,7 +6,7 @@ final actor ApiActor {
     static let shared = ApiActor()
 }
 
-enum API {
+@ApiActor enum API {
     static var currentNetworkStatus = NetworkStatus.NotReachable
 
     static let cacheDirectory: String = {
@@ -36,7 +36,9 @@ enum API {
         NotificationCenter.default.addObserver(forName: ReachabilityChangedNotification, object: nil, queue: .main) { _ in
             checkNetworkAvailability()
             if currentNetworkStatus != .NotReachable {
-                app.startRefreshIfItIsDue()
+                Task {
+                    await app.startRefreshIfItIsDue()
+                }
             }
         }
     }
@@ -63,6 +65,7 @@ enum API {
 
     /////////////////////////////////////////////////////// Utilities
 
+    @MainActor
     static var currentOperationName = lastSuccessfulSyncAt {
         didSet {
             DLog("Status update: \(currentOperationName)")
@@ -70,6 +73,7 @@ enum API {
         }
     }
 
+    @MainActor
     static var currentOperationCount = 0 {
         didSet {
             let newValue = currentOperationCount
@@ -93,6 +97,7 @@ enum API {
         }
     }
 
+    @MainActor
     static var isRefreshing = false {
         didSet {
             if oldValue == isRefreshing {
@@ -117,15 +122,15 @@ enum API {
         }
     }
 
-    static var shouldSyncReactions: Bool {
+    nonisolated static var shouldSyncReactions: Bool {
         Settings.notifyOnItemReactions || Settings.notifyOnCommentReactions
     }
 
-    static var shouldSyncReviews: Bool {
+    nonisolated static var shouldSyncReviews: Bool {
         Settings.displayReviewsOnItems || Settings.notifyOnReviewDismissals || Settings.notifyOnReviewAcceptances || Settings.notifyOnReviewChangeRequests
     }
 
-    static var shouldSyncReviewAssignments: Bool {
+    nonisolated static var shouldSyncReviewAssignments: Bool {
         Settings.displayReviewsOnItems || Settings.showRequestedTeamReviews || Settings.notifyOnReviewAssignments || (Int64(Settings.assignedReviewHandlingPolicy) != Section.none.rawValue)
     }
 
@@ -177,9 +182,13 @@ enum API {
         }
 
         #if os(iOS)
-            BackgroundTask.registerForBackground()
+            Task {
+                await BackgroundTask.registerForBackground()
+            }
             defer {
-                BackgroundTask.unregisterForBackground()
+                Task {
+                    await BackgroundTask.unregisterForBackground()
+                }
             }
         #endif
         let data = try await HTTP.getData(from: url).0
@@ -196,7 +205,7 @@ enum API {
     static func performSync() {
         let moc = DataManager.buildDetachedContext()
         moc.perform {
-            Task { @ApiActor in
+            Task {
                 await _performSync(moc: moc)
             }
         }
@@ -207,7 +216,7 @@ enum API {
             return
         }
 
-        await MainActor.run {
+        Task { @MainActor in
             isRefreshing = true
             currentOperationCount += 1
             currentOperationName = "Fetching…"
@@ -249,7 +258,6 @@ enum API {
         }
 
         // Transfer done, process
-
         let total = moc.updatedObjects.count + moc.insertedObjects.count + moc.deletedObjects.count
         Task { @MainActor in
             if total > 1, let totalText = numberFormatter.string(for: total) {
@@ -285,18 +293,18 @@ enum API {
             currentOperationCount -= 1
 
             DataManager.sendNotificationsIndexAndSave()
-        }
 
-        DLog("Caching \(numberFormatter.string(for: URLCache.shared.currentMemoryUsage) ?? "") bytes in memory")
-        DLog("Caching \(numberFormatter.string(for: URLCache.shared.currentDiskUsage) ?? "") bytes on disk")
+            DLog("Caching \(numberFormatter.string(for: URLCache.shared.currentMemoryUsage) ?? "") bytes in memory")
+            DLog("Caching \(numberFormatter.string(for: URLCache.shared.currentDiskUsage) ?? "") bytes on disk")
+        }
     }
 
+    @MainActor
     static var lastSuccessfulSyncAt: String {
         let last = Settings.lastSuccessfulRefresh ?? Date()
         return agoFormat(prefix: "updated", since: last).capitalFirstLetter
     }
 
-    @ApiActor
     private static func fetchUserTeams(from server: ApiServer, moc: NSManagedObjectContext) async {
         for t in server.teams {
             t.postSyncAction = PostSyncAction.delete.rawValue
@@ -338,7 +346,6 @@ enum API {
         }
     }
 
-    @ApiActor
     private static func ensureApiServersHaveUserIds(in moc: NSManagedObjectContext) async {
         var needToCheck = false
         for apiServer in ApiServer.allApiServers(in: moc) {
@@ -369,7 +376,6 @@ enum API {
         return nil
     }
 
-    @ApiActor
     static func updateLimitsFromServer() async {
         let configuredServers = ApiServer.allApiServers(in: DataManager.main).filter(\.goodToGo)
         for apiServer in configuredServers {
@@ -379,7 +385,6 @@ enum API {
         }
     }
 
-    @ApiActor
     private static func syncManuallyAddedRepos(from server: ApiServer, moc: NSManagedObjectContext) async {
         if !server.lastSyncSucceeded {
             return
@@ -395,7 +400,6 @@ enum API {
         }
     }
 
-    @ApiActor
     private static func syncWatchedRepos(from server: ApiServer, moc: NSManagedObjectContext) async {
         if !server.lastSyncSucceeded {
             return
@@ -416,7 +420,6 @@ enum API {
         }
     }
 
-    @ApiActor
     static func fetchRepo(fullName: String, from server: ApiServer, moc: NSManagedObjectContext) async throws {
         let path = "\(server.apiPath ?? "")/repos/\(fullName)"
         do {
@@ -430,7 +433,6 @@ enum API {
         }
     }
 
-    @ApiActor
     static func fetchAllRepos(owner: String, from server: ApiServer, moc: NSManagedObjectContext) async throws {
         let userPath = "\(server.apiPath ?? "")/users/\(owner)/repos"
         let userTask = Task { () -> [[AnyHashable: Any]] in
@@ -470,12 +472,10 @@ enum API {
         Repo.syncRepos(from: userList + orgList, server: server, addNewRepos: true, manuallyAdded: true, moc: moc)
     }
 
-    @ApiActor
     static func fetchRepo(named: String, owner: String, from server: ApiServer, moc: NSManagedObjectContext) async throws {
         try await fetchRepo(fullName: "\(owner)/\(named)", from: server, moc: moc)
     }
 
-    @ApiActor
     private static func syncUserDetails(in moc: NSManagedObjectContext) async {
         let configuredServers = ApiServer.allApiServers(in: moc).filter(\.goodToGo)
         for apiServer in configuredServers {
@@ -503,7 +503,7 @@ enum API {
         }
     }
 
-    static func apiError(_ message: String) -> Error {
+    nonisolated static func apiError(_ message: String) -> Error {
         NSError(domain: "API Error", code: -1, userInfo: [NSLocalizedDescriptionKey: message])
     }
 }

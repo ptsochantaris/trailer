@@ -16,6 +16,7 @@ extension NSImage {
     }
 }
 
+@MainActor
 final class MenuBarSet {
     private let prMenuController = NSWindowController(windowNibName: NSNib.Name("MenuWindow"))
     private let issuesMenuController = NSWindowController(windowNibName: NSNib.Name("MenuWindow"))
@@ -48,15 +49,19 @@ final class MenuBarSet {
 
     func setTimers() {
         prFilterTimer = PopTimer(timeInterval: 0.2) { [weak self] in
-            guard let s = self else { return }
-            s.updatePrMenu()
-            s.prMenu.scrollToTop()
+            Task { [weak self] in
+                guard let self = self else { return }
+                await self.updatePrMenu()
+                self.prMenu.scrollToTop()
+            }
         }
 
         issuesFilterTimer = PopTimer(timeInterval: 0.2) { [weak self] in
-            guard let s = self else { return }
-            s.updateIssuesMenu()
-            s.issuesMenu.scrollToTop()
+            Task { [weak self] in
+                guard let self = self else { return }
+                await self.updateIssuesMenu()
+                self.issuesMenu.scrollToTop()
+            }
         }
     }
 
@@ -66,13 +71,17 @@ final class MenuBarSet {
         let grayOut = Settings.grayOutWhenRefreshing
 
         if prMenu.messageView != nil {
-            updatePrMenu()
+            Task {
+                await updatePrMenu()
+            }
         }
         prMenu.refreshMenuItem.title = " Refreshing…"
         prMenu.statusItem?.statusView.grayOut = grayOut
 
         if issuesMenu.messageView != nil {
-            updateIssuesMenu()
+            Task {
+                await updateIssuesMenu()
+            }
         }
         issuesMenu.refreshMenuItem.title = " Refreshing…"
         issuesMenu.statusItem?.statusView.grayOut = grayOut
@@ -110,9 +119,10 @@ final class MenuBarSet {
                             menu: MenuWindow,
                             forceVisible: Bool,
                             hasUnread: Bool,
-                            reasonForEmpty: @escaping (String) -> NSAttributedString) {
+                            reasonForEmpty: @escaping @MainActor(String) async -> NSAttributedString) async {
         if forceVisible || shouldShow(type: type) {
-            let shouldGray = Settings.grayOutWhenRefreshing && API.isRefreshing
+            let isRefreshing = await API.isRefreshing
+            let shouldGray = Settings.grayOutWhenRefreshing && isRefreshing
 
             let somethingFailed = ApiServer.shouldReportRefreshFailure(in: DataManager.main) && (viewCriterion?.relatedServerFailed ?? true)
             let attributes = somethingFailed || hasUnread ? MenuBarSet.redText : MenuBarSet.normalText
@@ -147,22 +157,22 @@ final class MenuBarSet {
             menu.hideStatusItem()
         }
 
-        DispatchQueue.main.async {
-            menu.reload()
+        // TODO: may need a delay
+        menu.reload()
 
-            if menu.table.numberOfRows == 0 {
-                menu.messageView = MessageView(frame: CGRect(x: 0, y: 0, width: MENU_WIDTH, height: 100), message: reasonForEmpty(menu.filter.stringValue))
-            }
-
-            menu.size(andShow: false)
+        if menu.table.numberOfRows == 0 {
+            let reason = await reasonForEmpty(menu.filter.stringValue)
+            menu.messageView = MessageView(frame: CGRect(x: 0, y: 0, width: MENU_WIDTH, height: 100), message: reason)
         }
+
+        menu.size(andShow: false)
     }
 
-    func updateIssuesMenu(forceVisible: Bool = false) {
+    func updateIssuesMenu(forceVisible: Bool = false) async {
         if forceVisible || Repo.mayProvideIssuesForDisplay(fromServerWithId: viewCriterion?.apiServerId) {
             let hasUnread = Issue.badgeCount(in: DataManager.main, criterion: viewCriterion) > 0
-            updateMenu(of: Issue.self, menu: issuesMenu, forceVisible: forceVisible, hasUnread: hasUnread) {
-                Issue.reasonForEmpty(with: $0, criterion: self.viewCriterion)
+            await updateMenu(of: Issue.self, menu: issuesMenu, forceVisible: forceVisible, hasUnread: hasUnread) {
+                await Issue.reasonForEmpty(with: $0, criterion: self.viewCriterion)
             }
 
         } else {
@@ -170,12 +180,12 @@ final class MenuBarSet {
         }
     }
 
-    func updatePrMenu(forceVisible: Bool = false) {
+    func updatePrMenu(forceVisible: Bool = false) async {
         let sid = viewCriterion?.apiServerId
         if forceVisible || Repo.mayProvidePrsForDisplay(fromServerWithId: sid) || !Repo.mayProvideIssuesForDisplay(fromServerWithId: sid) {
             let hasUnread = PullRequest.badgeCount(in: DataManager.main, criterion: viewCriterion) > 0
-            updateMenu(of: PullRequest.self, menu: prMenu, forceVisible: forceVisible, hasUnread: hasUnread) {
-                PullRequest.reasonForEmpty(with: $0, criterion: self.viewCriterion)
+            await updateMenu(of: PullRequest.self, menu: prMenu, forceVisible: forceVisible, hasUnread: hasUnread) {
+                await PullRequest.reasonForEmpty(with: $0, criterion: self.viewCriterion)
             }
 
         } else {

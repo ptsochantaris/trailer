@@ -1,6 +1,7 @@
 import Cocoa
 
 extension NSColor {
+    @MainActor
     var highlighted: NSColor {
         if app.theme == .light {
             return .controlAccentColor

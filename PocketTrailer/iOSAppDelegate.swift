@@ -41,12 +41,14 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
 
         UIToolbar.appearance().tintColor = UIColor(named: "apptint")
 
-        BGTaskScheduler.shared.register(forTaskWithIdentifier: "com.housetrip.mobile.trailer.ios.PocketTrailer.refresh", using: .main) { task in
-            guard let task = task as? BGProcessingTask, DataManager.appIsConfigured else {
+        BGTaskScheduler.shared.register(forTaskWithIdentifier: "com.housetrip.mobile.trailer.ios.PocketTrailer.refresh", using: .main) { [weak self] task in
+            guard let task = task as? BGProcessingTask, DataManager.appIsConfigured, let self = self else {
                 return
             }
             self.backgroundProcessing = task
-            self.startRefresh()
+            Task {
+                await self.startRefresh()
+            }
         }
 
         NotificationManager.setup(delegate: self)
@@ -108,7 +110,9 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
                 return
             }
         }
-        startRefresh()
+        Task {
+            await startRefresh()
+        }
     }
 
     private func checkApiUsage() {
@@ -149,23 +153,28 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
     private var backgroundTask = UIBackgroundTaskIdentifier.invalid
 
     @discardableResult
-    func startRefresh() -> RefreshStartResult {
-        if API.isRefreshing {
+    func startRefresh() async -> RefreshStartResult {
+        let refreshing = API.isRefreshing
+        if refreshing {
             wrapBackgroundProcessing(success: false)
             return .alreadyRefreshing
         }
 
-        if !API.hasNetworkConnection {
+        let hasConnection = await API.hasNetworkConnection
+        if !hasConnection {
             wrapBackgroundProcessing(success: false)
             return .noNetwork
         }
 
-        if !ApiServer.someServersHaveAuthTokens(in: DataManager.main) {
+        let someHaveTokens = ApiServer.someServersHaveAuthTokens(in: DataManager.main)
+        if !someHaveTokens {
             wrapBackgroundProcessing(success: false)
             return .noConfiguredServers
         }
 
-        API.performSync()
+        Task {
+            await API.performSync()
+        }
 
         return .started
     }

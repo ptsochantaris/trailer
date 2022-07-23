@@ -4,6 +4,7 @@ extension Notification.Name {
     static let KillHelper = Notification.Name("KillTrailerLauncher")
 }
 
+@MainActor
 enum LauncherCommon {
     static let helperAppId = "com.housetrip.Trailer.Launcher"
     static var isHelperRunning: Bool {

@@ -4,7 +4,9 @@ final class PreferencesTabBarController: UITabBarController {
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         if preferencesDirty {
-            app.startRefresh()
+            Task {
+                await app.startRefresh()
+            }
         }
     }
 }

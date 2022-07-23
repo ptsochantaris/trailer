@@ -34,7 +34,9 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
 
         newRepoCheckChanged(nil)
 
-        updateActivity()
+        Task {
+            await updateActivity()
+        }
 
         let allServers = ApiServer.allApiServers(in: DataManager.main)
         if allServers.count > 1 {
@@ -55,8 +57,9 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
     }
 
     // chain this to updateActivity from the main repferences window
-    func updateActivity() {
-        if API.isRefreshing {
+    func updateActivity() async {
+        let refreshing = await API.isRefreshing
+        if refreshing {
             refreshButton.isEnabled = false
             activityDisplay.startAnimation(nil)
         } else {
@@ -64,8 +67,8 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
             activityDisplay.stopAnimation(nil)
             updateRemovableRepos()
         }
-        addButton.isEnabled = !API.isRefreshing
-        removeButton.isEnabled = !API.isRefreshing
+        addButton.isEnabled = !refreshing
+        removeButton.isEnabled = !refreshing
     }
 
     private func updateRemovableRepos() {
@@ -105,7 +108,9 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
         if Settings.hideArchivedRepos, Repo.hideArchivedRepos(in: DataManager.main) {
             prefs?.reloadRepositories()
             updateRemovableRepos()
-            app.updateAllMenus()
+            Task {
+                await app.updateAllMenus()
+            }
             DataManager.saveDB()
         }
     }
@@ -178,8 +183,8 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
             self.addButton.isEnabled = true
         }
 
-        if name == "*" {
-            Task {
+        Task {
+            if name == "*" {
                 let alert = NSAlert()
                 do {
                     try await API.fetchAllRepos(owner: owner, from: server, moc: DataManager.main)
@@ -192,18 +197,16 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
                         alert.informativeText = "The new repositories have been added to your local list. Trailer will refresh after you close preferences to fetch any items from them."
                     }
                     DataManager.saveDB()
-                    self.prefs?.reloadRepositories()
-                    self.updateRemovableRepos()
-                    app.updateAllMenus()
+                    prefs?.reloadRepositories()
+                    updateRemovableRepos()
+                    await app.updateAllMenus()
                 } catch {
                     alert.messageText = "Fetching Repository Information Failed"
                     alert.informativeText = error.localizedDescription
                 }
                 alert.addButton(withTitle: "OK")
                 await alert.beginSheetModal(for: self)
-            }
-        } else {
-            Task {
+            } else {
                 let alert = NSAlert()
                 do {
                     try await API.fetchRepo(named: name, owner: owner, from: server, moc: DataManager.main)
@@ -215,9 +218,9 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
                         alert.informativeText = "The new repository has been added to your local list. Trailer will refresh after you close preferences to fetch any items from it."
                     }
                     DataManager.saveDB()
-                    self.prefs?.reloadRepositories()
-                    self.updateRemovableRepos()
-                    app.updateAllMenus()
+                    prefs?.reloadRepositories()
+                    updateRemovableRepos()
+                    await app.updateAllMenus()
                 } catch {
                     alert.messageText = "Fetching Repository Information Failed"
                     alert.informativeText = error.localizedDescription
@@ -236,6 +239,8 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
         DataManager.saveDB()
         prefs?.reloadRepositories()
         updateRemovableRepos()
-        app.updateAllMenus()
+        Task {
+            await app.updateAllMenus()
+        }
     }
 }

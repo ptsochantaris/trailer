@@ -291,7 +291,8 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
     @objc private func refreshUpdated() {
         updateTitle()
-        refreshControl?.attributedTitle = NSAttributedString(string: API.currentOperationName, attributes: nil)
+        let name = API.currentOperationName
+        refreshControl?.attributedTitle = NSAttributedString(string: name, attributes: nil)
     }
 
     override var canBecomeFirstResponder: Bool {
@@ -373,15 +374,17 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
     }
 
     @objc private func keyForceRefresh() {
-        switch app.startRefresh() {
-        case .alreadyRefreshing, .started:
-            break
-        case .noConfiguredServers:
-            showMessage("No Configured Servers", "There are no configured servers to sync from, please check your settings")
-        case .noNetwork:
-            showMessage("No Network", "There is no network connectivity, please try again later")
+        Task {
+            switch await app.startRefresh() {
+            case .alreadyRefreshing, .started:
+                break
+            case .noConfiguredServers:
+                showMessage("No Configured Servers", "There are no configured servers to sync from, please check your settings")
+            case .noNetwork:
+                showMessage("No Network", "There is no network connectivity, please try again later")
+            }
+            updateStatus(becauseOfChanges: false)
         }
-        updateStatus(becauseOfChanges: false)
     }
 
     @objc private func keyShowSelectedItem() {
@@ -1115,8 +1118,12 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
     override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         becomeFirstResponder()
-        if scrollView.contentOffset.y <= 0, !API.isRefreshing {
-            refreshControl?.attributedTitle = NSAttributedString(string: API.lastSuccessfulSyncAt, attributes: nil)
+        if scrollView.contentOffset.y <= 0 {
+            let refreshing = API.isRefreshing
+            if !refreshing {
+                let last = API.lastSuccessfulSyncAt
+                refreshControl?.attributedTitle = NSAttributedString(string: last, attributes: nil)
+            }
         }
     }
 

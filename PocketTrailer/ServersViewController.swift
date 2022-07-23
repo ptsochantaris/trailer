@@ -144,6 +144,8 @@ final class ServersViewController: UITableViewController {
         }
         DataManager.saveDB()
         DataManager.postProcessAllItems()
-        app.startRefresh()
+        Task {
+            await app.startRefresh()
+        }
     }
 }

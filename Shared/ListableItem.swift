@@ -1188,6 +1188,7 @@ class ListableItem: DataItem {
         false
     }
 
+    @MainActor
     static func reasonForEmpty(with filterValue: String?, criterion: GroupingCriterion?) -> NSAttributedString {
         let color: COLOR_CLASS
         let message: String

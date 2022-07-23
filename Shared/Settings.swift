@@ -181,7 +181,9 @@ enum Settings {
 
     private static let saveTimer = PopTimer(timeInterval: 2) {
         if let e = Settings.lastExportUrl {
-            Settings.writeToURL(e)
+            Task { @MainActor in
+                Settings.writeToURL(e)
+            }
         }
     }
 
@@ -210,6 +212,7 @@ enum Settings {
     ///////////////////////////////// IMPORT / EXPORT
 
     @discardableResult
+    @MainActor
     static func writeToURL(_ url: URL) -> Bool {
         saveTimer.abort()
 

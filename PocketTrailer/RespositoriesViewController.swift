@@ -136,6 +136,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
         NotificationQueue.clear()
 
         API.isRefreshing = true
+
         let tempContext = DataManager.buildChildContext()
         Task {
             await API.fetchRepositories(to: tempContext)
