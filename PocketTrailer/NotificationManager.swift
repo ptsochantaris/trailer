@@ -2,6 +2,7 @@ import CoreSpotlight
 import UIKit
 import UserNotifications
 
+@MainActor
 final class NotificationManager {
     static func handleLocalNotification(notification: UNNotificationContent, action: String) {
         if !notification.userInfo.isEmpty {
@@ -204,9 +205,9 @@ final class NotificationManager {
             }
         }
 
-        Task {
-            notification.userInfo = await DataManager.info(for: item)
+        notification.userInfo = DataManager.info(for: item)
 
+        Task {
             if !Settings.hideAvatarsInNotifications, let url = (item as? PRComment)?.avatarUrl ?? (item as? ListableItem)?.userAvatarUrl {
                 let res = try? await API.avatar(from: url)
                 if let res = res, let attachment = try? UNNotificationAttachment(identifier: res.1, url: URL(fileURLWithPath: res.1), options: nil) {

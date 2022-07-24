@@ -157,7 +157,6 @@ final class MenuBarSet {
             menu.hideStatusItem()
         }
 
-        // TODO: may need a delay
         menu.reload()
 
         if menu.table.numberOfRows == 0 {

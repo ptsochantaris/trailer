@@ -2,7 +2,6 @@ import CoreData
 import Foundation
 
 extension API {
-    @ApiActor
     private static func handleRepoSyncFailure(repo: Repo, resultCode: Int) {
         if resultCode == 404 { // repo disabled
             repo.inaccessible = true
@@ -20,7 +19,6 @@ extension API {
         }
     }
 
-    @ApiActor
     private static func fetchItems(for repos: [Repo], in moc: NSManagedObjectContext) async {
         for r in repos {
             for p in r.pullRequests where p.condition == ItemCondition.open.rawValue {
@@ -64,7 +62,6 @@ extension API {
         }
     }
 
-    @ApiActor
     private static func markExtraUpdatedItems(from repos: [Repo], to _: NSManagedObjectContext) async {
         await withTaskGroup(of: Void.self) { group in
             for r in repos {
@@ -120,7 +117,6 @@ extension API {
         }
     }
 
-    @ApiActor
     static func v3Sync(_ repos: [Repo], to moc: NSManagedObjectContext) async {
         await fetchItems(for: repos, in: moc)
         let reposWithSomeItems = repos.filter { !$0.issues.isEmpty || !$0.pullRequests.isEmpty }
@@ -209,7 +205,6 @@ extension API {
         }
     }
 
-    @ApiActor
     private static func checkIssueClosures(in moc: NSManagedObjectContext) {
         let f = NSFetchRequest<Issue>(entityName: "Issue")
         f.predicate =
@@ -229,7 +224,6 @@ extension API {
         }
     }
 
-    @ApiActor
     private static func fetchCommentReactionsIfNeeded(to moc: NSManagedObjectContext) async {
         let comments = PRComment.commentsThatNeedReactionsToBeRefreshed(in: moc)
 
@@ -258,7 +252,6 @@ extension API {
         }
     }
 
-    @ApiActor
     private static func fetchItemReactionsIfNeeded<T: ListableItem>(for type: T.Type, to moc: NSManagedObjectContext) async {
         let items = T.reactionCheckBatch(for: type, in: moc)
         if items.isEmpty {
@@ -288,7 +281,6 @@ extension API {
         }
     }
 
-    @ApiActor
     private static func fetchCommentsForCurrentPullRequests(to moc: NSManagedObjectContext, for prs: [PullRequest]) async {
         if prs.isEmpty {
             return
@@ -329,7 +321,6 @@ extension API {
         }
     }
 
-    @ApiActor
     private static func fetchCommentsForCurrentIssues(to moc: NSManagedObjectContext, for issues: [Issue]) async {
         if issues.isEmpty {
             return
@@ -358,7 +349,6 @@ extension API {
         }
     }
 
-    @ApiActor
     private static func fetchReviewsForForCurrentPullRequests(to moc: NSManagedObjectContext, for prs: [PullRequest]) async {
         if prs.isEmpty {
             return
@@ -383,7 +373,6 @@ extension API {
         }
     }
 
-    @ApiActor
     private static func investigatePrClosure(for pullRequest: PullRequest) async {
         DLog("Checking closed PR to see if it was merged: %@", pullRequest.title)
 
@@ -416,7 +405,6 @@ extension API {
         }
     }
 
-    @ApiActor
     private static func checkPrClosures(in moc: NSManagedObjectContext) async {
         let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
         f.predicate = NSCompoundPredicate(type: .and, subpredicates: [PostSyncAction.delete.matchingPredicate, ItemCondition.open.matchingPredicate])
@@ -434,7 +422,6 @@ extension API {
         }
     }
 
-    @ApiActor
     private static func fetchReviewAssignmentsForCurrentPullRequests(to _: NSManagedObjectContext, for prs: [PullRequest]) async {
         await withThrowingTaskGroup(of: Void.self) { group in
             for p in prs {
@@ -469,7 +456,6 @@ extension API {
         }
     }
 
-    @ApiActor
     private static func fetchLabelsForCurrentPullRequests(to _: NSManagedObjectContext, for prs: [PullRequest]) async {
         if prs.isEmpty {
             return
@@ -501,7 +487,6 @@ extension API {
         }
     }
 
-    @ApiActor
     private static func fetchLabelsForCurrentIssues(to _: NSManagedObjectContext, for issues: [Issue]) async {
         if issues.isEmpty {
             return
@@ -533,7 +518,6 @@ extension API {
         }
     }
 
-    @ApiActor
     private static func fetchStatusesForCurrentPullRequests(to moc: NSManagedObjectContext) async {
         let prs = PullRequest.statusCheckBatch(in: moc)
         if prs.isEmpty {
@@ -576,7 +560,6 @@ extension API {
         }
     }
 
-    @ApiActor
     private static func detectAssignedPullRequests(in _: NSManagedObjectContext, for prs: [PullRequest]) async {
         await withTaskGroup(of: Void.self) { group in
             for p in prs {

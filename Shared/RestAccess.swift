@@ -1,12 +1,12 @@
 import Foundation
 
+@ApiActor
 final class RestAccess {
     private struct UrlBackOffEntry {
         var nextAttemptAt: Date
         var nextIncrement: TimeInterval
     }
 
-    @ApiActor
     static func getPagedData(at path: String, from server: ApiServer, startingFrom page: Int = 1, perPage: @ApiActor @escaping ([[AnyHashable: Any]]?, Bool) -> Bool) async -> (Bool, Int) {
         if path.isEmpty {
             // handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
@@ -26,7 +26,6 @@ final class RestAccess {
         }
     }
 
-    @ApiActor
     static func getData(in path: String, from server: ApiServer) async throws -> (Any?, Bool, Int) {
         Task { @MainActor in
             API.currentOperationCount += 1
@@ -82,7 +81,6 @@ final class RestAccess {
         return (data, resultCode)
     }
 
-    @ApiActor
     static func start(call path: String, on server: ApiServer, triggeredByUser: Bool) async throws -> (Int, [AnyHashable: Any]?, Any?) {
         let apiServerLabel: String
         if server.lastSyncSucceeded || triggeredByUser {

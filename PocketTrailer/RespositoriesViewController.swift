@@ -156,7 +156,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
                     try? tempContext.save()
                 }
                 DataManager.saveDB()
-                NotificationQueue.commit(moc: DataManager.main)
+                NotificationQueue.commit()
             }
             preferencesDirty = true
             navigationItem.title = originalName

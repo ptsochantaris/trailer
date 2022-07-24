@@ -22,6 +22,7 @@ extension MenuWindow {
             return [iodD, sectionIndexD]
         }()
 
+        @MainActor
         init(type: ListableItem.Type, sections: [String], removeButtonsInSections: [String], viewCriterion: GroupingCriterion?) {
             self.type = type
             self.sections = sections
@@ -97,6 +98,7 @@ extension MenuWindow {
             }
         }
 
+        @MainActor
         func numberOfRows(in _: NSTableView) -> Int {
             itemIds.count
         }

@@ -224,7 +224,7 @@ enum DataManager {
 
         saveDB()
 
-        NotificationQueue.commit(moc: main)
+        NotificationQueue.commit()
     }
 
     static func saveDB() {

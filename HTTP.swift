@@ -7,6 +7,7 @@
 
 import Foundation
 
+@ApiActor
 final class HTTP {
     private final actor GateKeeper {
         private var counter: Int
