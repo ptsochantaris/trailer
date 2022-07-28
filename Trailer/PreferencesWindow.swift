@@ -1180,6 +1180,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         Settings.isAppLoginItem = sender.integerValue == 1
     }
 
+    @MainActor
     func refreshRepos() {
         API.isRefreshing = true
         let tempContext = DataManager.buildChildContext()
