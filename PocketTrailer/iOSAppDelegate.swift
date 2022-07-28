@@ -31,7 +31,9 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
     }
 
     func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
-        DataManager.postProcessAllItems(in: DataManager.main)
+        Task {
+            await DataManager.postProcessAllItems(in: DataManager.main)
+        }
 
         if ApiServer.someServersHaveAuthTokens(in: DataManager.main) {
             Task {

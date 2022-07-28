@@ -77,7 +77,7 @@ extension MenuWindow {
                 }
             }
         }
-
+        
         @MainActor
         func tableView(_: NSTableView, viewFor _: NSTableColumn?, row: Int) -> NSView? {
             let object = itemIds[row]
@@ -87,15 +87,6 @@ extension MenuWindow {
                 return SectionHeader(title: title, showRemoveAllButton: removalSections.contains(title))
             }
             return nil
-        }
-
-        @MainActor
-        func tableView(_ tv: NSTableView, heightOfRow row: Int) -> CGFloat {
-            if let v = tableView(tv, viewFor: nil, row: row) {
-                return v.frame.size.height
-            } else {
-                return 0
-            }
         }
 
         @MainActor

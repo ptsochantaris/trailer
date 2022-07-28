@@ -3,7 +3,7 @@
     import CoreData
     import UIKit
 
-    weak var app: iOSAppDelegate!
+    @MainActor weak var app: iOSAppDelegate!
 
     let GLOBAL_SCREEN_SCALE = UIScreen.main.scale
     let DISABLED_FADE: CGFloat = 0.3
@@ -21,7 +21,7 @@
 
 #elseif os(OSX)
 
-    weak var app: MacAppDelegate!
+    @MainActor weak var app: MacAppDelegate!
 
     let AVATAR_SIZE: CGFloat = 26
     let AVATAR_PADDING: CGFloat = 8
@@ -39,8 +39,8 @@
 
 #endif
 
-var preferencesDirty = false
-var lastRepoCheck = Date.distantPast
+@MainActor var preferencesDirty = false
+@MainActor var lastRepoCheck = Date.distantPast
 let autoSnoozeSentinelDate = Date.distantFuture.addingTimeInterval(-1)
 let LISTABLE_URI_KEY = "listableUriKey"
 let COMMENT_ID_KEY = "commentIdKey"
@@ -50,6 +50,7 @@ let NOTIFICATION_URL_KEY = "urlKey"
 
 #if os(iOS)
 
+    @MainActor
     func showMessage(_ title: String, _ message: String?) {
         var viewController = app.window?.rootViewController
         while viewController?.presentedViewController != nil {

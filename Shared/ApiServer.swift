@@ -73,9 +73,7 @@ final class ApiServer: NSManagedObject {
                 i.resetSyncState()
             }
         }
-        if app != nil {
-            preferencesDirty = true
-        }
+        preferencesDirty = true
     }
 
     func deleteEverything() {
@@ -182,13 +180,14 @@ final class ApiServer: NSManagedObject {
         apiPath = "https://api.github.com"
         graphQLPath = "https://api.github.com/graphql"
         label = "GitHub"
-        resetSyncState()
+        Task { @MainActor in
+            resetSyncState()
+        }
     }
 
+    @MainActor
     func resetSyncState() {
-        if app != nil {
-            lastRepoCheck = .distantPast
-        }
+        lastRepoCheck = .distantPast
         lastSyncSucceeded = true
     }
 

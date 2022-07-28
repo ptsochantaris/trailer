@@ -34,9 +34,9 @@ final actor ApiActor {
         }
 
         NotificationCenter.default.addObserver(forName: ReachabilityChangedNotification, object: nil, queue: .main) { _ in
-            checkNetworkAvailability()
-            if currentNetworkStatus != .NotReachable {
-                Task {
+            Task { @ApiActor in
+                checkNetworkAvailability()
+                if currentNetworkStatus != .NotReachable {
                     await app.startRefreshIfItIsDue()
                 }
             }
@@ -182,12 +182,12 @@ final actor ApiActor {
         }
 
         #if os(iOS)
-            Task {
-                await BackgroundTask.registerForBackground()
+            Task { @MainActor in
+                BackgroundTask.registerForBackground()
             }
             defer {
-                Task {
-                    await BackgroundTask.unregisterForBackground()
+                Task { @MainActor in
+                    BackgroundTask.unregisterForBackground()
                 }
             }
         #endif
@@ -223,7 +223,7 @@ final actor ApiActor {
             currentOperationName = "Fetching…"
         }
 
-        let lastCheck = await MainActor.run { lastRepoCheck }
+        let lastCheck = await lastRepoCheck
         let shouldRefreshReposToo = lastCheck == .distantPast
             || (Date().timeIntervalSince(lastCheck) > TimeInterval(Settings.newRepoCheckPeriod * 3600))
             || !Repo.anyVisibleRepos(in: moc)
@@ -275,7 +275,7 @@ final actor ApiActor {
         }
         DataItem.nukeDeletedItems(in: moc)
         DataItem.nukeOrphanedItems(in: moc)
-        DataManager.postProcessAllItems(in: moc)
+        await DataManager.postProcessAllItems(in: moc)
 
         do {
             if moc.hasChanges {

@@ -76,7 +76,11 @@ final class TrailerCell: NSTableCellView {
         let cellPadding: CGFloat = 5
         y += cellPadding
 
-        frame = CGRect(x: 0, y: 0, width: MENU_WIDTH, height: y)
+        translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            widthAnchor.constraint(equalToConstant: MENU_WIDTH),
+            heightAnchor.constraint(equalToConstant: y),
+        ])
 
         let accesoryCenterY = y - AVATAR_SIZE * 0.5 - cellPadding - 7
 

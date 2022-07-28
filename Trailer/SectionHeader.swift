@@ -6,7 +6,12 @@ final class SectionHeader: NSTableRowView {
     init(title: String, showRemoveAllButton: Bool) {
         let titleHeight: CGFloat = 42
 
-        super.init(frame: CGRect(x: 0, y: 0, width: MENU_WIDTH, height: titleHeight))
+        super.init(frame: .zero)
+        translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            widthAnchor.constraint(equalToConstant: MENU_WIDTH),
+            heightAnchor.constraint(equalToConstant: titleHeight)
+        ])
 
         let W = MENU_WIDTH - app.scrollBarWidth
         if showRemoveAllButton {

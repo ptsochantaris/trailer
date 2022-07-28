@@ -307,12 +307,24 @@ enum DataManager {
         }
     }
 
-    nonisolated static func postProcessAllItems(in context: NSManagedObjectContext) {
-        for p in DataItem.allItems(of: PullRequest.self, in: context, prefetchRelationships: ["comments", "reactions", "reviews"]) {
-            p.postProcess()
-        }
-        for i in DataItem.allItems(of: Issue.self, in: context, prefetchRelationships: ["comments", "reactions"]) {
-            i.postProcess()
+    nonisolated static func postProcessAllItems(in context: NSManagedObjectContext) async {
+        
+        let c = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        c.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
+        c.undoManager = nil
+        c.parent = context
+
+        await withCheckedContinuation { continuation in
+            c.perform {
+                for p in DataItem.allItems(of: PullRequest.self, in: c, prefetchRelationships: ["comments", "reactions", "reviews"]) {
+                    p.postProcess()
+                }
+                for i in DataItem.allItems(of: Issue.self, in: c, prefetchRelationships: ["comments", "reactions"]) {
+                    i.postProcess()
+                }
+                try? c.save()
+                continuation.resume()
+            }
         }
     }
 

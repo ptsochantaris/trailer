@@ -77,8 +77,6 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
             return
         }
 
-        DataManager.postProcessAllItems(in: DataManager.main)
-
         mouseIgnoreTimer = PopTimer(timeInterval: 0.4) {
             app.isManuallyScrolling = false
         }
@@ -86,6 +84,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         theme = getTheme() // also sets up windows
 
         Task {
+            await DataManager.postProcessAllItems(in: DataManager.main)
             await API.updateLimitsFromServer()
         }
 
@@ -384,7 +383,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 
         let window = item is PullRequest ? menuBarSet.prMenu : menuBarSet.issuesMenu
         let reSelectIndex = alternativeSelect ? window.table.selectedRow : -1
-        window.filter.becomeFirstResponder()
+        _ = window.filter.becomeFirstResponder()
 
         if reSelectIndex > -1, reSelectIndex < window.table.numberOfRows {
             window.table.selectRowIndexes(IndexSet(integer: reSelectIndex), byExtendingSelection: false)
@@ -419,8 +418,8 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                     let alert = NSAlert()
                     alert.messageText = "Clear \(mergedRequests.count) merged PRs?"
                     alert.informativeText = "This will clear \(mergedRequests.count) merged PRs from this list.  This action cannot be undone, are you sure?"
-                    alert.addButton(withTitle: "No")
-                    alert.addButton(withTitle: "Yes")
+                    _ = alert.addButton(withTitle: "No")
+                    _ = alert.addButton(withTitle: "Yes")
                     alert.showsSuppressionButton = true
 
                     if alert.runModal() == .alertSecondButtonReturn {
@@ -439,8 +438,8 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                     let alert = NSAlert()
                     alert.messageText = "Clear \(closedRequests.count) closed PRs?"
                     alert.informativeText = "This will remove \(closedRequests.count) closed PRs from this list.  This action cannot be undone, are you sure?"
-                    alert.addButton(withTitle: "No")
-                    alert.addButton(withTitle: "Yes")
+                    _ = alert.addButton(withTitle: "No")
+                    _ = alert.addButton(withTitle: "Yes")
                     alert.showsSuppressionButton = true
 
                     if alert.runModal() == .alertSecondButtonReturn {
@@ -464,8 +463,8 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                     let alert = NSAlert()
                     alert.messageText = "Clear \(closedIssues.count) closed issues?"
                     alert.informativeText = "This will remove \(closedIssues.count) closed issues from this list.  This action cannot be undone, are you sure?"
-                    alert.addButton(withTitle: "No")
-                    alert.addButton(withTitle: "Yes")
+                    _ = alert.addButton(withTitle: "No")
+                    _ = alert.addButton(withTitle: "Yes")
                     alert.showsSuppressionButton = true
 
                     if alert.runModal() == .alertSecondButtonReturn {
@@ -595,16 +594,16 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         if API.isRefreshing {
             let alert = NSAlert()
             alert.messageText = "Trailer is currently refreshing data, please wait until it's done and try importing your settings again"
-            alert.addButton(withTitle: "OK")
-            alert.runModal()
+            _ = alert.addButton(withTitle: "OK")
+            _ = alert.runModal()
             return false
 
         } else if !skipConfirm {
             let alert = NSAlert()
             alert.messageText = "Import settings from this file?"
             alert.informativeText = "This will overwrite all your current Trailer settings, are you sure?"
-            alert.addButton(withTitle: "No")
-            alert.addButton(withTitle: "Yes")
+            _ = alert.addButton(withTitle: "No")
+            _ = alert.addButton(withTitle: "Yes")
             alert.showsSuppressionButton = true
             if alert.runModal() == .alertSecondButtonReturn {
                 if alert.suppressionButton!.state == .on {
@@ -618,11 +617,11 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         if !Settings.readFromURL(url) {
             let alert = NSAlert()
             alert.messageText = "The selected settings file could not be imported due to an error"
-            alert.addButton(withTitle: "OK")
-            alert.runModal()
+            _ = alert.addButton(withTitle: "OK")
+            _ = alert.runModal()
             return false
         }
-        DataManager.postProcessAllItems(in: DataManager.main)
+        await DataManager.postProcessAllItems(in: DataManager.main)
         DataManager.saveDB()
         preferencesWindow?.reloadSettings()
         setupWindows()
@@ -688,8 +687,8 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                     let alert = NSAlert()
                     alert.messageText = "Your API request usage for '\(apiLabel)' is over the limit!"
                     alert.informativeText = "Your request cannot be completed until your hourly API allowance is reset \(resetDateString).\n\nIf you get this error often, try to make fewer manual refreshes or reducing the number of repos you are monitoring.\n\nYou can check your API usage at any time from 'Servers' preferences pane at any time."
-                    alert.addButton(withTitle: "OK")
-                    alert.runModal()
+                    _ = alert.addButton(withTitle: "OK")
+                    _ = alert.runModal()
                 } else if apiServer.shouldReportCloseToApiLimit {
                     let apiLabel = S(apiServer.label)
                     let resetDateString = itemDateFormatter.string(from: resetDate)
@@ -697,8 +696,8 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                     let alert = NSAlert()
                     alert.messageText = "Your API request usage for '\(apiLabel)' is close to full"
                     alert.informativeText = "Try to make fewer manual refreshes, increasing the automatic refresh time, or reducing the number of repos you are monitoring.\n\nYour allowance will be reset by GitHub \(resetDateString).\n\nYou can check your API usage from the 'Servers' preferences pane at any time."
-                    alert.addButton(withTitle: "OK")
-                    alert.runModal()
+                    _ = alert.addButton(withTitle: "OK")
+                    _ = alert.runModal()
                 }
             }
         }
@@ -873,7 +872,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
             return
         }
 
-        keyDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] incomingEvent -> NSEvent? in
+        keyDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { @MainActor [weak self] incomingEvent -> NSEvent? in
 
             guard let S = self else { return incomingEvent }
 
@@ -916,16 +915,14 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                         return incomingEvent
                     }
                     if app.isManuallyScrolling, w.table.selectedRow == -1 { return nil }
-                    Task { @MainActor in
-                        var i = w.table.selectedRow + 1
-                        if i < w.table.numberOfRows {
-                            while w.dataSource.itemAtRow(i) == nil { i += 1 }
-                        } else if w.table.numberOfRows > 0 {
-                            i = 0
-                            while w.dataSource.itemAtRow(i) == nil { i += 1 }
-                        }
-                        S.scrollTo(index: i, inMenu: w)
+                    var i = w.table.selectedRow + 1
+                    if i < w.table.numberOfRows {
+                        while w.dataSource.itemAtRow(i) == nil { i += 1 }
+                    } else if w.table.numberOfRows > 0 {
+                        i = 0
+                        while w.dataSource.itemAtRow(i) == nil { i += 1 }
                     }
+                    S.scrollTo(index: i, inMenu: w)
                     return nil
 
                 case 126: // up
@@ -933,15 +930,13 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                         return incomingEvent
                     }
                     if app.isManuallyScrolling, w.table.selectedRow == -1 { return nil }
-                    Task { @MainActor in
-                        var i = w.table.selectedRow - 1
-                        if i > 0, w.table.numberOfRows > 0 {
-                            while w.dataSource.itemAtRow(i) == nil { i -= 1 }
-                        } else {
-                            i = w.table.numberOfRows - 1
-                        }
-                        S.scrollTo(index: i, inMenu: w)
+                    var i = w.table.selectedRow - 1
+                    if i > 0, w.table.numberOfRows > 0 {
+                        while w.dataSource.itemAtRow(i) == nil { i -= 1 }
+                    } else {
+                        i = w.table.numberOfRows - 1
                     }
+                    S.scrollTo(index: i, inMenu: w)
                     return nil
 
                 case 36: // enter
@@ -950,9 +945,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                     }
                     if let dataItem = S.focusedItem(blink: true) {
                         let isAlternative = incomingEvent.modifierFlags.contains(.option)
-                        Task { @MainActor in
-                            S.selected(dataItem, alternativeSelect: isAlternative, window: w)
-                        }
+                        S.selected(dataItem, alternativeSelect: isAlternative, window: w)
                     }
                     return nil
 
@@ -970,10 +963,8 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                     switch incomingEvent.charactersIgnoringModifiers ?? "" {
                     case "m":
                         selectedItem.setMute(to: !selectedItem.muted)
-                        Task { @MainActor in
-                            DataManager.saveDB()
-                            app.updateRelatedMenus(for: selectedItem)
-                        }
+                        DataManager.saveDB()
+                        app.updateRelatedMenus(for: selectedItem)
                         return nil
                     case "o":
                         if let w = selectedItem.repo.webUrl, let u = URL(string: w) {
@@ -986,11 +977,13 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                         }
                         if let snoozeIndex = Int(incomingEvent.charactersIgnoringModifiers ?? "") {
                             if snoozeIndex > 0, !selectedItem.isSnoozing {
-                                S.snooze(item: selectedItem, snoozeIndex: snoozeIndex - 1, window: w)
+                                if S.snooze(item: selectedItem, snoozeIndex: snoozeIndex - 1, window: w) {
+                                    return nil
+                                }
                             } else if snoozeIndex == 0, selectedItem.isSnoozing {
                                 S.wake(item: selectedItem, window: w)
+                                return nil
                             }
-                            return nil
                         }
                     }
                 }
@@ -999,27 +992,27 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         }
     }
 
+    @MainActor
     private func wake(item: ListableItem, window: MenuWindow) {
         let oldIndex = window.table.selectedRow
         item.wakeUp()
-        Task { @MainActor in
-            DataManager.saveDB()
-            app.updateRelatedMenus(for: item)
-            scrollToNearest(index: oldIndex, window: window, preferDown: false)
-        }
+        DataManager.saveDB()
+        app.updateRelatedMenus(for: item)
+        scrollToNearest(index: oldIndex, window: window, preferDown: false)
     }
 
-    private func snooze(item: ListableItem, snoozeIndex: Int, window: MenuWindow) {
-        Task { @MainActor in
-            let s = SnoozePreset.allSnoozePresets(in: DataManager.main)
-            if s.count > snoozeIndex {
-                let oldIndex = window.table.selectedRow
-                item.snooze(using: s[snoozeIndex])
-                DataManager.saveDB()
-                updateRelatedMenus(for: item)
-                scrollToNearest(index: oldIndex, window: window, preferDown: true)
-            }
+    @MainActor
+    private func snooze(item: ListableItem, snoozeIndex: Int, window: MenuWindow) -> Bool {
+        let s = SnoozePreset.allSnoozePresets(in: DataManager.main)
+        if s.count > snoozeIndex {
+            let oldIndex = window.table.selectedRow
+            item.snooze(using: s[snoozeIndex])
+            DataManager.saveDB()
+            updateRelatedMenus(for: item)
+            scrollToNearest(index: oldIndex, window: window, preferDown: true)
+            return true
         }
+        return false
     }
 
     @MainActor
@@ -1037,6 +1030,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         }
     }
 
+    @MainActor
     private func scrollTo(index i: Int, inMenu: MenuWindow) {
         app.isManuallyScrolling = true
         mouseIgnoreTimer.push()
@@ -1200,8 +1194,8 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         let alert = NSAlert()
         alert.messageText = "Database error"
         alert.informativeText = "Trailer encountered an error while trying to load the database.\n\nThis could be because of a failed upgrade or a software bug.\n\nPlease either quit and downgrade to the previous version, or reset Trailer's state and setup from a fresh state."
-        alert.addButton(withTitle: "Quit")
-        alert.addButton(withTitle: "Reset Trailer")
+        _ = alert.addButton(withTitle: "Quit")
+        _ = alert.addButton(withTitle: "Reset Trailer")
 
         if alert.runModal() == .alertSecondButtonReturn {
             DataManager.removeDatabaseFiles()

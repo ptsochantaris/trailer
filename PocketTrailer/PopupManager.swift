@@ -1,7 +1,9 @@
 import UIKit
 
+@MainActor
 let popupManager = PopupManager()
 
+@MainActor
 final class PopupManager: NSObject {
     /////////////// Popovers
 

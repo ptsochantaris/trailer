@@ -21,7 +21,7 @@ final class ImportExport: NSObject, UIDocumentPickerDelegate {
     @objc func exportSelected(sender: UIBarButtonItem) {
         let tempFilePath = NSTemporaryDirectory().appending(pathComponent: "Trailer Settings (iOS).trailerSettings")
         tempUrl = URL(fileURLWithPath: tempFilePath)
-        Settings.writeToURL(tempUrl!)
+        _ = Settings.writeToURL(tempUrl!)
 
         let menu = UIDocumentPickerViewController(forExporting: [tempUrl!])
         menu.delegate = self

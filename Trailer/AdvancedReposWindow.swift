@@ -203,8 +203,8 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
                     alert.messageText = "Fetching Repository Information Failed"
                     alert.informativeText = error.localizedDescription
                 }
-                alert.addButton(withTitle: "OK")
-                await alert.beginSheetModal(for: self)
+                _ = alert.addButton(withTitle: "OK")
+                _ = await alert.beginSheetModal(for: self)
             } else {
                 let alert = NSAlert()
                 do {
@@ -224,8 +224,8 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
                     alert.messageText = "Fetching Repository Information Failed"
                     alert.informativeText = error.localizedDescription
                 }
-                alert.addButton(withTitle: "OK")
-                await alert.beginSheetModal(for: self)
+                _ = alert.addButton(withTitle: "OK")
+                _ = await alert.beginSheetModal(for: self)
             }
         }
     }

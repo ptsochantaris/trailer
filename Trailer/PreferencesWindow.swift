@@ -228,7 +228,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
 
         deferredUpdateTimer = PopTimer(timeInterval: 1) { [weak self] in
             Task { @MainActor [weak self] in
-                DataManager.postProcessAllItems(in: DataManager.main)
+                await DataManager.postProcessAllItems(in: DataManager.main)
                 if let s = self, s.serversDirty {
                     s.serversDirty = false
                     DataManager.saveDB()
@@ -1198,8 +1198,8 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
                 let alert = NSAlert()
                 alert.messageText = "Error"
                 alert.informativeText = "Could not refresh repository list from \(serverNames), please ensure that the tokens you are using are valid"
-                alert.addButton(withTitle: "OK")
-                alert.runModal()
+                _ = alert.addButton(withTitle: "OK")
+                _ = alert.runModal()
             } else if tempContext.hasChanges {
                 try? tempContext.save()
             }
@@ -1259,7 +1259,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         s.allowedFileTypes = ["trailerSettings"]
         s.beginSheetModal(for: self) { response in
             if response == .OK, let url = s.url {
-                Settings.writeToURL(url)
+                _ = Settings.writeToURL(url)
                 DLog("Exported settings to %@", url.absoluteString)
             }
         }
@@ -1399,8 +1399,8 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
                 alert.informativeText = error.localizedDescription
             }
 
-            alert.addButton(withTitle: "OK")
-            alert.runModal()
+            _ = alert.addButton(withTitle: "OK")
+            _ = alert.runModal()
             sender.isEnabled = true
         }
     }

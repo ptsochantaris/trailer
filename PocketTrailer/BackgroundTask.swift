@@ -1,5 +1,6 @@
 import UIKit
 
+@MainActor
 final class BackgroundTask {
     private static var bgTask = UIBackgroundTaskIdentifier.invalid
 
@@ -17,7 +18,6 @@ final class BackgroundTask {
         endTask()
     }
 
-    @MainActor
     static func appBackgrounded() {
         appInBackground = true
         if globalBackgroundCount != 0, bgTask == .invalid {
@@ -28,14 +28,12 @@ final class BackgroundTask {
         }
     }
 
-    @MainActor
     static func appForegrounded() {
         endTimer.abort()
         appInBackground = false
         endTask()
     }
 
-    @MainActor
     static func registerForBackground() {
         endTimer.abort()
         let count = globalBackgroundCount
@@ -45,7 +43,6 @@ final class BackgroundTask {
         }
     }
 
-    @MainActor
     static func unregisterForBackground() {
         globalBackgroundCount -= 1
         if globalBackgroundCount == 0, bgTask != .invalid {

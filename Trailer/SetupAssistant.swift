@@ -73,7 +73,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate, NSControlTextEditingDele
                     let alert = NSAlert()
                     alert.messageText = "Testing the token failed - please check that you have pasted your token correctly"
                     alert.informativeText = error.localizedDescription
-                    alert.addButton(withTitle: "OK")
+                    _ = alert.addButton(withTitle: "OK")
                     alert.beginSheetModal(for: self) { [weak self] _ in
                         self?.normalState()
                     }
