@@ -77,7 +77,7 @@ extension MenuWindow {
                 }
             }
         }
-        
+
         @MainActor
         func tableView(_: NSTableView, viewFor _: NSTableColumn?, row: Int) -> NSView? {
             let object = itemIds[row]

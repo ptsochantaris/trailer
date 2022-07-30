@@ -1,7 +1,7 @@
 import Foundation
 
 @ApiActor
-final class RestAccess {
+enum RestAccess {
     private struct UrlBackOffEntry {
         var nextAttemptAt: Date
         var nextIncrement: TimeInterval

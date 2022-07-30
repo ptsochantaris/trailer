@@ -1183,8 +1183,8 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     @MainActor
     func refreshRepos() {
         API.isRefreshing = true
-        let tempContext = DataManager.buildChildContext()
-        Task {
+        Task { @ApiActor in
+            let tempContext = await DataManager.buildDetachedContext()
             await API.fetchRepositories(to: tempContext)
             if ApiServer.shouldReportRefreshFailure(in: tempContext) {
                 var errorServers = [String]()
@@ -1193,19 +1193,23 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
                         errorServers.append(S(apiServer.label))
                     }
                 }
-
+                
                 let serverNames = errorServers.joined(separator: ", ")
-
-                let alert = NSAlert()
-                alert.messageText = "Error"
-                alert.informativeText = "Could not refresh repository list from \(serverNames), please ensure that the tokens you are using are valid"
-                _ = alert.addButton(withTitle: "OK")
-                _ = alert.runModal()
+                
+                Task { @MainActor in
+                    let alert = NSAlert()
+                    alert.messageText = "Error"
+                    alert.informativeText = "Could not refresh repository list from \(serverNames), please ensure that the tokens you are using are valid"
+                    _ = alert.addButton(withTitle: "OK")
+                    _ = alert.runModal()
+                }
             } else if tempContext.hasChanges {
                 try? tempContext.save()
             }
-            DataItem.nukeDeletedItems(in: DataManager.main)
-            API.isRefreshing = false
+            Task { @MainActor in
+                DataItem.nukeDeletedItems(in: DataManager.main)
+                API.isRefreshing = false
+            }
         }
     }
 

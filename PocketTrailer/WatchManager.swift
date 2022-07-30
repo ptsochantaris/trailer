@@ -183,13 +183,13 @@ final class WatchManager: NSObject, WCSessionDelegate {
         f.fetchOffset = from
         f.fetchLimit = count
 
-        let tempMoc = DataManager.buildDetachedContext()
-        return await tempMoc.perform { [weak self] in
+        return await Task.detached { [weak self] in
             guard let self = self else { return [:] }
+            let tempMoc = await DataManager.buildDetachedContext()
             let items = try! tempMoc.fetch(f).map { self.baseDataForItem(item: $0, showLabels: showLabels) }
             let compressedData = (try? NSKeyedArchiver.archivedData(withRootObject: items, requiringSecureCoding: false).data(operation: .compress)) ?? Data()
             return ["result": compressedData]
-        }
+        }.value
     }
 
     private func baseDataForItem(item: ListableItem, showLabels: Bool) -> [String: Any] {

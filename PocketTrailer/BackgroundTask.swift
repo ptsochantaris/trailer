@@ -1,7 +1,7 @@
 import UIKit
 
 @MainActor
-final class BackgroundTask {
+enum BackgroundTask {
     private static var bgTask = UIBackgroundTaskIdentifier.invalid
 
     private static func endTask() {

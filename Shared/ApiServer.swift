@@ -185,9 +185,10 @@ final class ApiServer: NSManagedObject {
         }
     }
 
-    @MainActor
     func resetSyncState() {
-        lastRepoCheck = .distantPast
+        Task { @MainActor in
+            lastRepoCheck = .distantPast
+        }
         lastSyncSucceeded = true
     }
 

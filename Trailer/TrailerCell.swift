@@ -76,10 +76,12 @@ final class TrailerCell: NSTableCellView {
         let cellPadding: CGFloat = 5
         y += cellPadding
 
+        let cellHeight = y
+
         translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             widthAnchor.constraint(equalToConstant: MENU_WIDTH),
-            heightAnchor.constraint(equalToConstant: y),
+            heightAnchor.constraint(equalToConstant: cellHeight)
         ])
 
         let accesoryCenterY = y - AVATAR_SIZE * 0.5 - cellPadding - 7
@@ -90,19 +92,19 @@ final class TrailerCell: NSTableCellView {
         if showAvatar {
             let avatarRect = CGRect(x: LEFTPADDING, y: accesoryCenterY - AVATAR_SIZE * 0.5, width: AVATAR_SIZE, height: AVATAR_SIZE)
             let userImage = AvatarView(frame: avatarRect, url: item.userAvatarUrl)
-            userImage.alphaValue = faded ? DISABLED_FADE : 1.0
+            userImage.alphaValue = faded ? DISABLED_FADE : 1
             addSubview(userImage)
         }
 
         if showUnpin {
-            let pinRect = CGRect(x: LEFTPADDING + W + shift, y: floor((bounds.size.height - 24) * 0.5), width: REMOVE_BUTTON_WIDTH - 10, height: 24)
+            let pinRect = CGRect(x: LEFTPADDING + W + shift, y: floor((cellHeight - 24) * 0.5), width: REMOVE_BUTTON_WIDTH - 10, height: 24)
             let unpin = NSButton(frame: pinRect)
             unpin.title = "Remove"
             unpin.target = self
             unpin.action = #selector(unPinSelected)
             unpin.setButtonType(.momentaryLight)
             unpin.bezelStyle = .roundRect
-            unpin.font = NSFont.systemFont(ofSize: 10.0)
+            unpin.font = NSFont.systemFont(ofSize: 10)
             addSubview(unpin)
         }
 

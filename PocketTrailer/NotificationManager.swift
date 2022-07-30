@@ -3,7 +3,7 @@ import UIKit
 import UserNotifications
 
 @MainActor
-final class NotificationManager {
+enum NotificationManager {
     static func handleLocalNotification(notification: UNNotificationContent, action: String) {
         if !notification.userInfo.isEmpty {
             DLog("Received local notification: %@", notification.userInfo)

@@ -820,7 +820,9 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
             return
         }
 
-        API.performSync()
+        Task { @ApiActor in
+            await API.performSync()
+        }
     }
 
     @MainActor

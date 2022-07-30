@@ -137,8 +137,8 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 
         API.isRefreshing = true
 
-        let tempContext = DataManager.buildChildContext()
-        Task {
+        Task { @ApiActor in
+            let tempContext = await DataManager.buildDetachedContext()
             await API.fetchRepositories(to: tempContext)
             if ApiServer.shouldReportRefreshFailure(in: tempContext) {
                 var errorServers = [String]()
@@ -148,23 +148,29 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
                     }
                 }
                 let serverNames = errorServers.joined(separator: ", ")
-                showMessage("Error", "Could not refresh repository list from \(serverNames), please ensure that the tokens you are using are valid")
-                NotificationQueue.clear()
+                Task { @MainActor in
+                    showMessage("Error", "Could not refresh repository list from \(serverNames), please ensure that the tokens you are using are valid")
+                    NotificationQueue.clear()
+                }
             } else {
                 DataItem.nukeDeletedItems(in: tempContext)
                 if tempContext.hasChanges {
                     try? tempContext.save()
                 }
-                DataManager.saveDB()
-                NotificationQueue.commit()
+                Task { @MainActor in
+                    DataManager.saveDB()
+                    NotificationQueue.commit()
+                }
             }
-            preferencesDirty = true
-            navigationItem.title = originalName
-            actionsButton.isEnabled = ApiServer.someServersHaveAuthTokens(in: DataManager.main)
-            tableView.alpha = 1.0
-            tableView.isUserInteractionEnabled = true
-            navigationItem.rightBarButtonItem?.isEnabled = true
-            API.isRefreshing = false
+            Task { @MainActor in
+                preferencesDirty = true
+                navigationItem.title = originalName
+                actionsButton.isEnabled = ApiServer.someServersHaveAuthTokens(in: DataManager.main)
+                tableView.alpha = 1.0
+                tableView.isUserInteractionEnabled = true
+                navigationItem.rightBarButtonItem?.isEnabled = true
+                API.isRefreshing = false
+            }
         }
     }
 

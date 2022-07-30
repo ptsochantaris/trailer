@@ -8,8 +8,9 @@ final actor NodeActor {
 
 typealias PerNodeBlock = @NodeActor(GQLNode) async throws -> Void
 
+@ApiActor
 enum GraphQL {
-    private static let nodeBlockMax = 50
+    private static let nodeBlockMax = 200
 
     private static let idField = GQLField(name: "id")
 
@@ -527,7 +528,6 @@ enum GraphQL {
         }
     }
 
-    @ApiActor
     private static func processItems<T: ListableItem>(_ nodes: [String: ContiguousArray<GQLNode>], _ server: ApiServer, parentType: T.Type? = nil, wait: Bool) async {
         if nodes.isEmpty {
             return

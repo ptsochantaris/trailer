@@ -202,17 +202,9 @@ final actor ApiActor {
 
     ////////////////////////////////////// API interface
 
-    @MainActor
-    static func performSync() {
-        let moc = DataManager.buildDetachedContext()
-        moc.perform {
-            Task {
-                await _performSync(moc: moc)
-            }
-        }
-    }
+    static func performSync() async {
+        let moc = await DataManager.buildDetachedContext()
 
-    private static func _performSync(moc: NSManagedObjectContext) async {
         if Settings.useV4API && canUseV4API(for: moc) != nil {
             return
         }
@@ -275,7 +267,7 @@ final actor ApiActor {
         }
         DataItem.nukeDeletedItems(in: moc)
         DataItem.nukeOrphanedItems(in: moc)
-        await DataManager.postProcessAllItems(in: moc)
+        DataManager.postProcessAllItemsSynchronously(in: moc)
 
         do {
             if moc.hasChanges {
@@ -320,6 +312,7 @@ final actor ApiActor {
         }
     }
 
+    // moc must have been created in an @APIActor task
     static func fetchRepositories(to moc: NSManagedObjectContext) async {
         ApiServer.resetSyncSuccess(in: moc)
 
@@ -330,17 +323,23 @@ final actor ApiActor {
         }
 
         let goodToGoServers = ApiServer.allApiServers(in: moc).filter(\.goodToGo)
-        for apiServer in goodToGoServers {
-            await syncWatchedRepos(from: apiServer, moc: moc)
-            await syncManuallyAddedRepos(from: apiServer, moc: moc)
-            await fetchUserTeams(from: apiServer, moc: moc)
+        await withTaskGroup(of: Void.self) { group in
+            for apiServer in goodToGoServers {
+                group.addTask { @ApiActor in
+                    await syncWatchedRepos(from: apiServer, moc: moc)
+                }
+                group.addTask { @ApiActor in
+                    await syncManuallyAddedRepos(from: apiServer, moc: moc)
+                }
+                group.addTask { @ApiActor in
+                    await fetchUserTeams(from: apiServer, moc: moc)
+                }
+            }
         }
 
         if Settings.hideArchivedRepos { Repo.hideArchivedRepos(in: moc) }
         for r in DataItem.newItems(of: Repo.self, in: moc) where r.shouldSync {
-            Task { @MainActor in
-                NotificationQueue.add(type: .newRepoAnnouncement, for: r)
-            }
+            NotificationQueue.add(type: .newRepoAnnouncement, for: r)
         }
         await MainActor.run {
             lastRepoCheck = Date()

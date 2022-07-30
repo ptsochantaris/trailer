@@ -249,11 +249,11 @@ enum DataManager {
         return c
     }
 
-    static func buildDetachedContext() -> NSManagedObjectContext {
-        let c = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+    nonisolated static func buildDetachedContext() async -> NSManagedObjectContext {
+        let c = NSManagedObjectContext(concurrencyType: .confinementConcurrencyType)
         c.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
         c.undoManager = nil
-        c.persistentStoreCoordinator = persistentStoreCoordinator
+        c.persistentStoreCoordinator = await persistentStoreCoordinator
         return c
     }
 
@@ -306,6 +306,15 @@ enum DataManager {
             _justMigrated = false
         }
     }
+    
+    nonisolated static func postProcessAllItemsSynchronously(in context: NSManagedObjectContext) {
+        for p in DataItem.allItems(of: PullRequest.self, in: context, prefetchRelationships: ["comments", "reactions", "reviews"]) {
+            p.postProcess()
+        }
+        for i in DataItem.allItems(of: Issue.self, in: context, prefetchRelationships: ["comments", "reactions"]) {
+            i.postProcess()
+        }
+    }
 
     nonisolated static func postProcessAllItems(in context: NSManagedObjectContext) async {
         
@@ -314,14 +323,9 @@ enum DataManager {
         c.undoManager = nil
         c.parent = context
 
-        await withCheckedContinuation { continuation in
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
             c.perform {
-                for p in DataItem.allItems(of: PullRequest.self, in: c, prefetchRelationships: ["comments", "reactions", "reviews"]) {
-                    p.postProcess()
-                }
-                for i in DataItem.allItems(of: Issue.self, in: c, prefetchRelationships: ["comments", "reactions"]) {
-                    i.postProcess()
-                }
+                postProcessAllItemsSynchronously(in: c)
                 try? c.save()
                 continuation.resume()
             }
