@@ -1107,7 +1107,7 @@ class ListableItem: DataItem {
         #elseif os(iOS)
             let nc = UNUserNotificationCenter.current()
             nc.getDeliveredNotifications { notifications in
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     for n in notifications {
                         let r = n.request.identifier
                         let u = n.request.content.userInfo

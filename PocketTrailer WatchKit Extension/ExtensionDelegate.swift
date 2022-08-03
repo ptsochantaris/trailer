@@ -55,9 +55,8 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate 
     }
 
     private func potentialUpdate() {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            if let l = self.lastView, self.session.isReachable {
+        Task { @MainActor in
+            if let l = lastView, session.isReachable {
                 l.requestData(command: nil)
             }
         }

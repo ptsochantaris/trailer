@@ -237,14 +237,6 @@ enum DataManager {
         }
     }
 
-    static func buildChildContext() -> NSManagedObjectContext {
-        let c = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
-        c.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
-        c.undoManager = nil
-        c.parent = main
-        return c
-    }
-
     nonisolated static func buildDetachedContext() async -> NSManagedObjectContext {
         let c = NSManagedObjectContext(concurrencyType: .confinementConcurrencyType)
         c.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)

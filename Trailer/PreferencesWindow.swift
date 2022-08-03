@@ -1704,7 +1704,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
                     serversDirty = true
                     deferredUpdateTimer.push()
                 }
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     self.windowController?.window?.makeFirstResponder(tv)
                 }
 

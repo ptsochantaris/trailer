@@ -1,4 +1,3 @@
-import Dispatch
 import Foundation
 
 final class GQLQuery {

@@ -246,8 +246,8 @@ final class ApiServer: NSManagedObject {
     }
 
     @MainActor
-    static func configure(from archive: [String: [String: NSObject]]) -> Bool {
-        let tempMoc = DataManager.buildChildContext()
+    static func configure(from archive: [String: [String: NSObject]]) async -> Bool {
+        let tempMoc = await DataManager.buildDetachedContext()
 
         for apiServer in allApiServers(in: tempMoc) {
             tempMoc.delete(apiServer)

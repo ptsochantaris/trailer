@@ -54,9 +54,8 @@ final class PRListController: CommonController {
 
     override func didAppear() {
         super.didAppear()
-        DispatchQueue.main.async { [weak self] in
-            guard let S = self else { return }
-            S.sleeping = false
+        Task { @MainActor in
+            sleeping = false
         }
     }
 
@@ -114,8 +113,8 @@ final class PRListController: CommonController {
               let pageArray = try? NSKeyedUnarchiver.unarchivedObject(ofClass: NSArray.self, from: uncompressedData),
               let page = pageArray as? [[AnyHashable: Any]]
         else { return }
-        DispatchQueue.main.async { [weak self] in
-            self?.completeUpdate(from: page)
+        Task { @MainActor in
+            completeUpdate(from: page)
         }
     }
 
@@ -123,8 +122,8 @@ final class PRListController: CommonController {
         loadingBuffer.append(contentsOf: page)
 
         if page.count == PAGE_SIZE {
-            DispatchQueue.main.async { [weak self] in
-                self?._requestData(nil)
+            Task { @MainActor in
+                _requestData(nil)
             }
 
         } else {

@@ -54,25 +54,24 @@ class CommonController: WKInterfaceController {
         WCSession.default.sendMessage(request) { [weak self] response in
             guard let S = self else { return }
             if let errorIndicator = response["error"] as? Bool, errorIndicator == true {
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     S.loading = 0
                     S.showTemporaryError(response["status"] as! String)
                 }
             } else {
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     S.loading = 0
                 }
                 S.update(from: response)
             }
         } errorHandler: { error in
-            DispatchQueue.main.async { [weak self] in
+            Task { @MainActor [weak self] in
                 guard let S = self else { return }
                 if S.loading == 5 {
                     S.loadingFailed(with: error)
                 } else {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        S.attempt(request: request)
-                    }
+                    try? await Task.sleep(nanoseconds: 300 * NSEC_PER_MSEC)
+                    S.attempt(request: request)
                 }
             }
         }
@@ -81,9 +80,10 @@ class CommonController: WKInterfaceController {
     private func showTemporaryError(_ mesage: String) {
         _statusLabel.setTextColor(UIColor(red: 1, green: 0.2, blue: 0.2, alpha: 1))
         show(status: mesage, hideTable: true)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 4) { [weak self] in
-            self?._statusLabel.setTextColor(.white)
-            self?.show(status: "", hideTable: false)
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 400 * NSEC_PER_MSEC)
+            _statusLabel.setTextColor(.white)
+            show(status: "", hideTable: false)
         }
     }
 

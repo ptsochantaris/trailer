@@ -135,8 +135,8 @@ final class SnoozePreset: NSManagedObject {
     }
 
     @MainActor
-    static func configure(from archive: [[String: NSObject]]) -> Bool {
-        let tempMoc = DataManager.buildChildContext()
+    static func configure(from archive: [[String: NSObject]]) async -> Bool {
+        let tempMoc = await DataManager.buildDetachedContext()
 
         for apiServer in allSnoozePresets(in: tempMoc) {
             tempMoc.delete(apiServer)

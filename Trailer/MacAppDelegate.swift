@@ -91,8 +91,9 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         let nc = NSUserNotificationCenter.default
         nc.delegate = self
         if let launchNotification = notification.userInfo?[NSApplication.launchUserNotificationUserInfoKey] as? NSUserNotification {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-                self?.userNotificationCenter(nc, didActivate: launchNotification)
+            Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 500 * NSEC_PER_MSEC)
+                userNotificationCenter(nc, didActivate: launchNotification)
             }
         }
 
@@ -614,7 +615,8 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
             }
         }
 
-        if !Settings.readFromURL(url) {
+        let readSucceeded = await Settings.readFromURL(url)
+        if !readSucceeded {
             let alert = NSAlert()
             alert.messageText = "The selected settings file could not be imported due to an error"
             _ = alert.addButton(withTitle: "OK")
@@ -1037,7 +1039,8 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         app.isManuallyScrolling = true
         mouseIgnoreTimer.push()
         inMenu.table.scrollRowToVisible(i)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 100 * NSEC_PER_MSEC)
             if let cell = inMenu.table.view(atColumn: 0, row: i, makeIfNecessary: false) as? TrailerCell {
                 cell.selected = true
             }

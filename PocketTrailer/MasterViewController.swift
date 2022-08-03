@@ -81,33 +81,31 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
     }
 
     func removeAllMerged() {
-        DispatchQueue.main.async { [weak self] in
-            guard let S = self else { return }
+        Task { @MainActor in
             if Settings.dontAskBeforeWipingMerged {
-                S.removeAllMergedConfirmed()
+                removeAllMergedConfirmed()
             } else {
-                let a = UIAlertController(title: "Sure?", message: "Remove all \(S.pluralNameForItems) in the Merged section?", preferredStyle: .alert)
+                let a = UIAlertController(title: "Sure?", message: "Remove all \(pluralNameForItems) in the Merged section?", preferredStyle: .alert)
                 a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-                a.addAction(UIAlertAction(title: "Remove", style: .destructive) { [weak S] _ in
-                    S?.removeAllMergedConfirmed()
+                a.addAction(UIAlertAction(title: "Remove", style: .destructive) { [weak self] _ in
+                    self?.removeAllMergedConfirmed()
                 })
-                S.present(a, animated: true)
+                present(a, animated: true)
             }
         }
     }
 
     func removeAllClosed() {
-        DispatchQueue.main.async { [weak self] in
-            guard let S = self else { return }
+        Task { @MainActor in
             if Settings.dontAskBeforeWipingClosed {
-                S.removeAllClosedConfirmed()
+                removeAllClosedConfirmed()
             } else {
-                let a = UIAlertController(title: "Sure?", message: "Remove all \(S.pluralNameForItems) in the Closed section?", preferredStyle: .alert)
+                let a = UIAlertController(title: "Sure?", message: "Remove all \(pluralNameForItems) in the Closed section?", preferredStyle: .alert)
                 a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-                a.addAction(UIAlertAction(title: "Remove", style: .destructive) { [weak S] _ in
-                    S?.removeAllClosedConfirmed()
+                a.addAction(UIAlertAction(title: "Remove", style: .destructive) { [weak self] _ in
+                    self?.removeAllClosedConfirmed()
                 })
-                S.present(a, animated: true)
+                present(a, animated: true)
             }
         }
     }
@@ -228,7 +226,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
         if let items = notification.userInfo?[NSInsertedObjectsKey] as? Set<NSManagedObject>, items.contains(where: { $0 is ListableItem }) {
             // DLog(">>>>>>>>>>>>>>> detected inserted items")
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self.updateStatus(becauseOfChanges: true)
             }
             return
@@ -236,7 +234,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
         if let items = notification.userInfo?[NSDeletedObjectsKey] as? Set<NSManagedObject>, items.contains(where: { $0 is ListableItem }) {
             // DLog(">>>>>>>>>>>>>>> detected deleted items")
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self.updateStatus(becauseOfChanges: true)
             }
             return
@@ -244,7 +242,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
         if let items = notification.userInfo?[NSUpdatedObjectsKey] as? Set<NSManagedObject>, items.contains(where: { ($0 as? ListableItem)?.hasPersistentChangedValues ?? false }) {
             // DLog(">>>>>>>>>>>>>>> detected permanently changed items")
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self.updateStatus(becauseOfChanges: true)
             }
             return
@@ -458,7 +456,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
             if nextIndex >= items.count {
                 nextIndex = 0
             }
-            requestTabFocus(tabItem: items[nextIndex])
+            Task {
+                await requestTabFocus(tabItem: items[nextIndex])
+            }
         }
     }
 
@@ -468,22 +468,23 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
             if nextIndex < 0 {
                 nextIndex = items.count - 1
             }
-            requestTabFocus(tabItem: items[nextIndex])
+            Task {
+                await requestTabFocus(tabItem: items[nextIndex])
+            }
         }
     }
 
-    private func requestTabFocus(tabItem: UITabBarItem?, item: ListableItem? = nil, overrideUrl: String? = nil, andOpen: Bool = false) {
-        let group = DispatchGroup()
-        if let tabItem = tabItem {
-            group.enter()
-            tabbing(tabs, didSelect: tabItem) {
-                group.leave()
+    private func requestTabFocus(tabItem: UITabBarItem?, item: ListableItem? = nil, overrideUrl: String? = nil, andOpen: Bool = false) async {
+        await withTaskGroup(of: Void.self) { group in
+            if let tabItem = tabItem {
+                group.addTask { @MainActor [weak self] in
+                    guard let self = self else { return }
+                    await self.tabbing(self.tabs, didSelect: tabItem)
+                }
             }
         }
-        group.notify(queue: .main) { [weak self] in
-            if let item = item {
-                self?.selectInCurrentTab(item: item, overrideUrl: overrideUrl, andOpen: andOpen)
-            }
+        if let item = item {
+            selectInCurrentTab(item: item, overrideUrl: overrideUrl, andOpen: andOpen)
         }
     }
 
@@ -492,17 +493,17 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
         tableView.selectRow(at: ip, animated: false, scrollPosition: .middle)
         if andOpen {
-            DispatchQueue.main.async { [weak self] in
-                guard let S = self else { return }
+            Task { @MainActor in
                 if let u = overrideUrl, let url = URL(string: u) {
-                    S.showDetail(url: url, objectId: item.objectID)
+                    showDetail(url: url, objectId: item.objectID)
                 } else if let u = item.webUrl, let url = URL(string: u) {
-                    S.showDetail(url: url, objectId: item.objectID)
+                    showDetail(url: url, objectId: item.objectID)
                 }
             }
         } else {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                self.tableView.deselectRow(at: ip, animated: true)
+            Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 2 * NSEC_PER_SEC)
+                tableView.deselectRow(at: ip, animated: true)
             }
         }
     }
@@ -513,16 +514,15 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
     }
 
     func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
-        tabbing(tabBar, didSelect: item, completion: nil)
+        Task {
+            await tabbing(tabBar, didSelect: item)
+        }
     }
 
-    private func tabbing(_ tabBar: UITabBar, didSelect item: UITabBarItem, completion: (() -> Void)?) {
-        safeScrollToTop { [weak self] in
-            guard let S = self else { return }
-            S.lastTabIndex = tabBar.items?.firstIndex(of: item) ?? 0
-            S.updateStatus(becauseOfChanges: false, updateItems: true)
-            completion?()
-        }
+    private func tabbing(_ tabBar: UITabBar, didSelect item: UITabBarItem) async {
+        await safeScrollToTop()
+        lastTabIndex = tabBar.items?.firstIndex(of: item) ?? 0
+        updateStatus(becauseOfChanges: false, updateItems: true)
     }
 
     private func updateSearch() {
@@ -758,8 +758,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
                     sc.searchBar.text = nil
                     sc.isActive = false
                 }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    self.selectTab(for: item, overrideUrl: urlToOpen, andOpen: true)
+                Task { @MainActor in
+                    try? await Task.sleep(nanoseconds: 100 * NSEC_PER_MSEC)
+                    selectTab(for: item, overrideUrl: urlToOpen, andOpen: true)
                 }
             }
         } else {
@@ -775,7 +776,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
                 break
             }
         }
-        requestTabFocus(tabItem: tabItem, item: item, overrideUrl: overrideUrl, andOpen: andOpen)
+        Task {
+            await requestTabFocus(tabItem: tabItem, item: item, overrideUrl: overrideUrl, andOpen: andOpen)
+        }
     }
 
     func highightItemWithUriPath(uriPath: String) {
@@ -1132,17 +1135,12 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         searchTimer.push()
     }
 
-    private func safeScrollToTop(completion: (() -> Void)?) {
+    private func safeScrollToTop() async {
         tableView.contentOffset = tableView.contentOffset // halt any inertial scrolling
-        DispatchQueue.main.async { [weak self] in
-            guard let S = self else { return }
-            if S.tableView.numberOfSections > 0 {
-                S.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
-            }
-            DispatchQueue.main.async {
-                completion?()
-            }
+        if tableView.numberOfSections > 0 {
+            tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
         }
+        try? await Task.sleep(nanoseconds: 100 * NSEC_PER_MSEC)
     }
 
     @objc func focusFilter(terms: String?) {
@@ -1153,13 +1151,11 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         searchTimer.push()
     }
 
-    func resetView(becauseOfChanges: Bool) {
-        safeScrollToTop { [weak self] in
-            guard let S = self else { return }
-            S.updateQuery(newFetchRequest: S.itemFetchRequest)
-            S.updateStatus(becauseOfChanges: becauseOfChanges)
-            S.tableView.reloadData()
-        }
+    func resetView(becauseOfChanges: Bool) async {
+        await safeScrollToTop()
+        updateQuery(newFetchRequest: itemFetchRequest)
+        updateStatus(becauseOfChanges: becauseOfChanges)
+        tableView.reloadData()
     }
 
     ////////////////// opening prefs

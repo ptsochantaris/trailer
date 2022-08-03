@@ -31,11 +31,11 @@ final class ImportExport: NSObject, UIDocumentPickerDelegate {
     func documentPicker(_: UIDocumentPickerViewController, didPickDocumentAt url: URL) {
         if tempUrl == nil {
             DLog("Will import settings from %@", url.absoluteString)
-            settingsManager.loadSettingsFrom(url: url, confirmFromView: parentVC) { confirmed in
-                if confirmed {
-                    self.parentVC.dismiss(animated: false)
+            Task {
+                if await settingsManager.loadSettingsFrom(url: url, confirmFromView: parentVC) {
+                    await parentVC.dismiss(animated: false)
                 }
-                self.documentInteractionCleanup()
+                documentInteractionCleanup()
             }
         } else {
             DLog("Saved settings to %@", url.absoluteString)

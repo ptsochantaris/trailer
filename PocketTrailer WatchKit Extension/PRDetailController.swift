@@ -52,8 +52,8 @@ final class PRDetailController: CommonController {
               let itemInfo = try? NSKeyedUnarchiver.unarchivedObject(ofClass: NSDictionary.self, from: uncompressedData),
               let item = itemInfo as? [AnyHashable: Any]
         else { return }
-        DispatchQueue.main.async { [weak self] in
-            self?.completeUpdate(from: item)
+        Task { @MainActor in
+            completeUpdate(from: item)
         }
     }
 

@@ -4,44 +4,49 @@ let settingsManager = SettingsManager()
 
 final class SettingsManager {
     @MainActor
-    private func loadSettingsFrom(url: URL) {
-        if Settings.readFromURL(url) {
+    private func loadSettingsFrom(url: URL) async {
+        if await Settings.readFromURL(url) {
             DataManager.saveDB()
 
-            DispatchQueue.main.async {
-                popupManager.masterController.resetView(becauseOfChanges: true)
+            Task {
+                await popupManager.masterController.resetView(becauseOfChanges: true)
 
                 preferencesDirty = true
                 Settings.lastSuccessfulRefresh = nil
 
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     app.startRefreshIfItIsDue()
                 }
             }
         } else {
-            DispatchQueue.main.async {
+            Task { 
                 showMessage("Error", "These settings could not be imported due to an error")
             }
         }
     }
 
     @MainActor
-    func loadSettingsFrom(url: URL, confirmFromView: UIViewController?, withCompletion: ((Bool) -> Void)?) {
+    func loadSettingsFrom(url: URL, confirmFromView: UIViewController?) async -> Bool {
         if let v = confirmFromView {
+            var continuation: CheckedContinuation<Bool, Never>?
             let a = UIAlertController(title: "Import these settings?", message: "This will overwrite all your current settings, are you sure?", preferredStyle: .alert)
             a.addAction(UIAlertAction(title: "Yes", style: .destructive) { _ in
-                self.loadSettingsFrom(url: url)
-                withCompletion?(true)
+                continuation?.resume(returning: true)
             })
             a.addAction(UIAlertAction(title: "No", style: .cancel) { _ in
-                withCompletion?(false)
+                continuation?.resume(returning: false)
             })
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 v.present(a, animated: true)
             }
-        } else {
-            loadSettingsFrom(url: url)
-            withCompletion?(true)
+            let decision = await withCheckedContinuation { c in
+                continuation = c
+            }
+            if !decision {
+                return false
+            }
         }
+        await loadSettingsFrom(url: url)
+        return true
     }
 }

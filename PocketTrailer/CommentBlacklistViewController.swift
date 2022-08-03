@@ -114,7 +114,7 @@ final class CommentBlacklistViewController: UITableViewController {
 
             let name = n.hasPrefix("@") ? String(n.dropFirst()) : n
 
-            DispatchQueue.main.async { [weak self] in
+            Task { @MainActor [weak self] in
                 guard let S = self else { return }
                 var blackList = S.getBlacklist()
                 if !name.isEmpty, !blackList.contains(name) {

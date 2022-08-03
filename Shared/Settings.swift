@@ -237,7 +237,7 @@ enum Settings {
     }
 
     @MainActor
-    static func readFromURL(_ url: URL) -> Bool {
+    static func readFromURL(_ url: URL) async -> Bool {
         if let settings = NSDictionary(contentsOf: url) {
             DLog("Reading settings from %@", url.absoluteString)
             resetAllSettings()
@@ -246,8 +246,9 @@ enum Settings {
                     sharedDefaults.set(v, forKey: k)
                 }
             }
-            return ApiServer.configure(from: settings["DB_CONFIG_OBJECTS"] as! [String: [String: NSObject]])
-                && SnoozePreset.configure(from: settings["DB_SNOOZE_OBJECTS"] as! [[String: NSObject]])
+            let result1 = await ApiServer.configure(from: settings["DB_CONFIG_OBJECTS"] as! [String: [String: NSObject]])
+            let result2 = await SnoozePreset.configure(from: settings["DB_SNOOZE_OBJECTS"] as! [[String: NSObject]])
+            return result1 && result2
         }
         return false
     }

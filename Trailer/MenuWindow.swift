@@ -229,10 +229,10 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
             i = dataSource.itemAtRow(row)
             if blink {
                 table.deselectAll(nil)
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-                    guard let S = self else { return }
+                Task { @MainActor in
+                    try? await Task.sleep(nanoseconds: 100 * NSEC_PER_MSEC)
                     let i = IndexSet(integer: row)
-                    S.table.selectRowIndexes(i, byExtendingSelection: false)
+                    table.selectRowIndexes(i, byExtendingSelection: false)
                 }
             }
         }

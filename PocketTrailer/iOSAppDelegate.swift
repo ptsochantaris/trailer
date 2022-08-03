@@ -89,7 +89,9 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
             }
             popupManager.masterController.focusFilter(terms: terms)
         } else {
-            settingsManager.loadSettingsFrom(url: url, confirmFromView: nil, withCompletion: nil)
+            Task {
+                await settingsManager.loadSettingsFrom(url: url, confirmFromView: nil)
+            }
         }
 
         return true

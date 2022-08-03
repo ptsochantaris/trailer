@@ -47,14 +47,13 @@ final class SectionController: CommonController {
     }
 
     override func update(from response: [AnyHashable: Any]) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
+        Task { @MainActor in
             if let overview = response["result"] as? [AnyHashable: Any] {
                 ExtensionDelegate.storedOverview = overview
             }
-            self.updateUI()
-            self.startRefreshButton.setHidden(false)
-            self.updatedLabel.setHidden(false)
+            updateUI()
+            startRefreshButton.setHidden(false)
+            updatedLabel.setHidden(false)
         }
     }
 

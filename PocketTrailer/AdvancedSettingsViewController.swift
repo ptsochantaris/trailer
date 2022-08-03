@@ -364,9 +364,8 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
         }
         tableView.reloadData()
         if previousSearchText != searchText {
-            DispatchQueue.main.async { [weak self] in
-                guard let S = self else { return }
-                S.tableView.scrollRectToVisible(CGRect(origin: .zero, size: CGSize(width: 1, height: 1)), animated: false)
+            Task { @MainActor in
+                tableView.scrollRectToVisible(CGRect(origin: .zero, size: CGSize(width: 1, height: 1)), animated: false)
             }
         }
     }
@@ -596,7 +595,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
                 settingsChangedTimer.push()
             case 6:
                 Settings.showSeparateApiServersInMenu = !Settings.showSeparateApiServersInMenu
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     popupManager.masterController.updateStatus(becauseOfChanges: true)
                 }
                 settingsChangedTimer.push()
