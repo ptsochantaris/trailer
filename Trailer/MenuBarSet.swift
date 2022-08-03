@@ -119,7 +119,7 @@ final class MenuBarSet {
                             menu: MenuWindow,
                             forceVisible: Bool,
                             hasUnread: Bool,
-                            reasonForEmpty: @escaping @MainActor(String) async -> NSAttributedString) async {
+                            reasonForEmpty: @escaping @MainActor (String) async -> NSAttributedString) async {
         if forceVisible || shouldShow(type: type) {
             let isRefreshing = API.isRefreshing
             let shouldGray = Settings.grayOutWhenRefreshing && isRefreshing

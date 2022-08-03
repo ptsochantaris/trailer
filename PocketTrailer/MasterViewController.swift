@@ -1166,11 +1166,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         var allServersHaveTokens = true
-        for a in ApiServer.allApiServers(in: DataManager.main) {
-            if !a.goodToGo {
-                allServersHaveTokens = false
-                break
-            }
+        for a in ApiServer.allApiServers(in: DataManager.main) where !a.goodToGo {
+            allServersHaveTokens = false
+            break
         }
 
         if let destination = segue.destination as? UITabBarController {

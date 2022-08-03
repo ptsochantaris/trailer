@@ -145,10 +145,8 @@ final class SnoozePreset: NSManagedObject {
         for presetData in archive {
             let a = newSnoozePreset(in: tempMoc)
             let attributes = Array(a.entity.attributesByName.keys)
-            for (k, v) in presetData {
-                if attributes.contains(k) {
-                    a.setValue(v, forKey: k)
-                }
+            for (k, v) in presetData where attributes.contains(k) {
+                a.setValue(v, forKey: k)
             }
         }
 

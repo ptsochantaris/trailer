@@ -149,10 +149,8 @@ final class PRComment: DataItem {
 
     final func contains(terms: [String]) -> Bool {
         if let b = body {
-            for t in terms {
-                if !t.isEmpty, b.localizedCaseInsensitiveContains(t) {
-                    return true
-                }
+            for t in terms where !t.isEmpty && b.localizedCaseInsensitiveContains(t) {
+                return true
             }
         }
         return false

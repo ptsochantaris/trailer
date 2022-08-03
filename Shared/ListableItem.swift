@@ -174,10 +174,8 @@ class ListableItem: DataItem {
         var foundAssignmentToMe = false
 
         if let assignees = info?["assignees"] as? [[AnyHashable: Any]], !assignees.isEmpty {
-            for assignee in assignees {
-                if checkAndStoreAssigneeName(from: assignee) {
-                    foundAssignmentToMe = true
-                }
+            for assignee in assignees where checkAndStoreAssigneeName(from: assignee) {
+                foundAssignmentToMe = true
             }
         } else if let assignee = info?["assignee"] as? [AnyHashable: Any] {
             foundAssignmentToMe = checkAndStoreAssigneeName(from: assignee)
@@ -321,16 +319,12 @@ class ListableItem: DataItem {
 
     private final func contains(terms: [String]) -> Bool {
         if let b = body {
-            for t in terms {
-                if !t.isEmpty, b.localizedCaseInsensitiveContains(t) {
-                    return true
-                }
-            }
-        }
-        for c in comments {
-            if c.contains(terms: terms) {
+            for t in terms where !t.isEmpty && b.localizedCaseInsensitiveContains(t) {
                 return true
             }
+        }
+        for c in comments where c.contains(terms: terms) {
+            return true
         }
         return false
     }
@@ -602,18 +596,14 @@ class ListableItem: DataItem {
                 count += 1
             }
             if Settings.notifyOnCommentReactions {
-                for r in c.reactions {
-                    if !r.isMine, (r.createdAt ?? .distantPast) > since {
-                        count += 1
-                    }
+                for r in c.reactions where !r.isMine && (r.createdAt ?? .distantPast) > since {
+                    count += 1
                 }
             }
         }
         if Settings.notifyOnItemReactions {
-            for r in reactions {
-                if !r.isMine, (r.createdAt ?? .distantPast) > since {
-                    count += 1
-                }
+            for r in reactions where !r.isMine && (r.createdAt ?? .distantPast) > since {
+                count += 1
             }
         }
         return count

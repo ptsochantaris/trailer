@@ -100,10 +100,8 @@ final class ApiServer: NSManagedObject {
     }
 
     static func shouldReportRefreshFailure(in moc: NSManagedObjectContext) -> Bool {
-        for apiServer in allApiServers(in: moc) {
-            if apiServer.goodToGo, !apiServer.lastSyncSucceeded, apiServer.reportRefreshFailures {
-                return true
-            }
+        for apiServer in allApiServers(in: moc) where apiServer.goodToGo && !apiServer.lastSyncSucceeded && apiServer.reportRefreshFailures {
+            return true
         }
         return false
     }
@@ -133,10 +131,8 @@ final class ApiServer: NSManagedObject {
     }
 
     static func someServersHaveAuthTokens(in moc: NSManagedObjectContext) -> Bool {
-        for apiServer in allApiServers(in: moc) {
-            if !S(apiServer.authToken).isEmpty {
-                return true
-            }
+        for apiServer in allApiServers(in: moc) where !S(apiServer.authToken).isEmpty {
+            return true
         }
         return false
     }
@@ -284,10 +280,8 @@ final class ApiServer: NSManagedObject {
         guard let moc = managedObjectContext else { return }
         for (_, repoData) in archive {
             let r = NSEntityDescription.insertNewObject(forEntityName: "Repo", into: moc) as! Repo
-            for (k, v) in repoData {
-                if r.entity.attributesByName.keys.contains(k) {
-                    r.setValue(v, forKey: k)
-                }
+            for (k, v) in repoData where r.entity.attributesByName.keys.contains(k) {
+                r.setValue(v, forKey: k)
             }
             r.apiServer = self
             r.resetSyncState()

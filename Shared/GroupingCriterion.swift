@@ -30,12 +30,8 @@ final class GroupingCriterion {
         if let aid = apiServerId, let a = existingObject(with: aid) as? ApiServer, !a.lastSyncSucceeded {
             return true
         }
-        if let group = repoGroup {
-            for repo in Repo.repos(for: group, in: DataManager.main) {
-                if !repo.apiServer.lastSyncSucceeded {
-                    return true
-                }
-            }
+        if let group = repoGroup, Repo.repos(for: group, in: DataManager.main).contains(where: { !$0.apiServer.lastSyncSucceeded }) {
+            return true
         }
         return false
     }

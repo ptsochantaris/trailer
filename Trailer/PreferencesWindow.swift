@@ -1188,14 +1188,12 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
             await API.fetchRepositories(to: tempContext)
             if ApiServer.shouldReportRefreshFailure(in: tempContext) {
                 var errorServers = [String]()
-                for apiServer in ApiServer.allApiServers(in: tempContext) {
-                    if apiServer.goodToGo, !apiServer.lastSyncSucceeded {
-                        errorServers.append(S(apiServer.label))
-                    }
+                for apiServer in ApiServer.allApiServers(in: tempContext) where apiServer.goodToGo && !apiServer.lastSyncSucceeded {
+                    errorServers.append(S(apiServer.label))
                 }
-                
+
                 let serverNames = errorServers.joined(separator: ", ")
-                
+
                 Task { @MainActor in
                     let alert = NSAlert()
                     alert.messageText = "Error"

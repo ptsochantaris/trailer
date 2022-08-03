@@ -79,15 +79,11 @@ enum DataManager {
         ApiServer.resetSyncOfEverything()
 
         DLog("Marking all unspecified (nil) announced flags as announced")
-        for i in DataItem.allItems(of: PullRequest.self, in: main) {
-            if i.value(forKey: "announced") == nil {
-                i.announced = true
-            }
+        for i in DataItem.allItems(of: PullRequest.self, in: main) where i.value(forKey: "announced") == nil {
+            i.announced = true
         }
-        for i in DataItem.allItems(of: Issue.self, in: main) {
-            if i.value(forKey: "announced") == nil {
-                i.announced = true
-            }
+        for i in DataItem.allItems(of: Issue.self, in: main) where i.value(forKey: "announced") == nil {
+            i.announced = true
         }
 
         DLog("Migrating display policies")
@@ -306,7 +302,7 @@ enum DataManager {
             _justMigrated = false
         }
     }
-    
+
     nonisolated static func postProcessAllItemsSynchronously(in context: NSManagedObjectContext) {
         for p in DataItem.allItems(of: PullRequest.self, in: context, prefetchRelationships: ["comments", "reactions", "reviews"]) {
             p.postProcess()
@@ -317,7 +313,6 @@ enum DataManager {
     }
 
     nonisolated static func postProcessAllItems(in context: NSManagedObjectContext) async {
-        
         let c = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         c.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
         c.undoManager = nil
@@ -354,11 +349,9 @@ enum DataManager {
         let fm = FileManager.default
         let documentsDirectory = dataFilesDirectory.path
         do {
-            for file in try fm.contentsOfDirectory(atPath: documentsDirectory) {
-                if file.contains("Trailer.sqlite") {
-                    DLog("Removing old database file: %@", file)
-                    try! fm.removeItem(atPath: documentsDirectory.appending(pathComponent: file))
-                }
+            for file in try fm.contentsOfDirectory(atPath: documentsDirectory) where file.contains("Trailer.sqlite") {
+                DLog("Removing old database file: %@", file)
+                try! fm.removeItem(atPath: documentsDirectory.appending(pathComponent: file))
             }
         } catch { /* no directory */ }
     }

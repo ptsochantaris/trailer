@@ -6,7 +6,7 @@ final actor NodeActor {
     static let shared = NodeActor()
 }
 
-typealias PerNodeBlock = @NodeActor(GQLNode) async throws -> Void
+typealias PerNodeBlock = @NodeActor (GQLNode) async throws -> Void
 
 @ApiActor
 enum GraphQL {
