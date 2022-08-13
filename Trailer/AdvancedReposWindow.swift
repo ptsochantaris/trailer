@@ -15,6 +15,7 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
 
     weak var prefs: PreferencesWindow?
 
+    @MainActor
     override func awakeFromNib() {
         super.awakeFromNib()
         delegate = self

@@ -2,9 +2,9 @@ import CoreData
 import Foundation
 
 @globalActor
-struct NodeActor {
-  actor ActorType { }
-  static let shared: ActorType = ActorType()
+enum NodeActor {
+    actor ActorType {}
+    static let shared = ActorType()
 }
 
 typealias PerNodeBlock = @NodeActor (GQLNode) async throws -> Void

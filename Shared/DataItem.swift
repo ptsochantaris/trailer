@@ -11,7 +11,7 @@ class DataItem: NSManagedObject {
     @NSManaged var apiServer: ApiServer
 
     var alternateCreationDate: Bool { false }
-    
+
     class var isParentType: Bool { false }
 
     func resetSyncState() {
@@ -130,7 +130,7 @@ class DataItem: NSManagedObject {
             }
         }
     }
-    
+
     static var parentCache: FetchCache?
     static func parent<T: DataItem>(of type: T.Type, with nodeId: String, in moc: NSManagedObjectContext) -> T? {
         if let parentCache = parentCache, let existingObject = parentCache.object(forKey: nodeId as NSString) as? T {
@@ -341,7 +341,7 @@ class DataItem: NSManagedObject {
             postSyncAction = PostSyncAction.doNothing.rawValue
         }
     }
-    
+
     static func syncItems<T: DataItem>(of type: T.Type, from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext, perItemCallback: (T, GQLNode) -> Void) async {
         let validNodes = nodes.filter { !($0.parent?.creationSkipped ?? false) }
 
@@ -351,7 +351,7 @@ class DataItem: NSManagedObject {
         f.includesSubentities = false
         f.predicate = NSPredicate(format: "nodeId in %@", validNodes.map(\.id))
         var existingItems = try! moc.fetch(f)
-        
+
         for node in validNodes {
             if let existingItem = existingItems.first(where: { $0.nodeId == node.id }) {
                 // there can be multiple updates for an item, because of multiple parents

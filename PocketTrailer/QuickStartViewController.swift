@@ -56,7 +56,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
                 try await API.testApi(to: newServer)
                 feedback.text = "\nFetching your watchlist. This will take a moment…"
                 Settings.lastSuccessfulRefresh = nil
-                app.startRefreshIfItIsDue()
+                await app.startRefreshIfItIsDue()
                 await checkRefreshDone()
 
             } catch {
@@ -73,7 +73,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
         }
 
         checkTimer = nil
-        
+
         if newServer.lastSyncSucceeded {
             await dismiss(animated: true)
             await popupManager.masterController.resetView(becauseOfChanges: true)

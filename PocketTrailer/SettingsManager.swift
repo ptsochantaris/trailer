@@ -1,10 +1,10 @@
 import UIKit
 
+@MainActor
 let settingsManager = SettingsManager()
 
 @MainActor
 final class SettingsManager {
-
     private func loadSettingsFrom(url: URL) async {
         if await Settings.readFromURL(url) {
             DataManager.saveDB()
@@ -15,12 +15,12 @@ final class SettingsManager {
                 preferencesDirty = true
                 Settings.lastSuccessfulRefresh = nil
 
-                Task { @MainActor in
-                    app.startRefreshIfItIsDue()
+                Task {
+                    await app.startRefreshIfItIsDue()
                 }
             }
         } else {
-            Task { 
+            Task {
                 showMessage("Error", "These settings could not be imported due to an error")
             }
         }

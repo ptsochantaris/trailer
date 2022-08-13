@@ -218,7 +218,9 @@ class ListableItem: DataItem {
 
     override final func prepareForDeletion() {
         let uri = objectID.uriRepresentation().absoluteString
-        hideFromSpotlightAndNotifications(uri: uri)
+        Task { @MainActor in
+            hideFromSpotlightAndNotifications(uri: uri)
+        }
         super.prepareForDeletion()
     }
 

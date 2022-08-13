@@ -2,7 +2,7 @@ import CoreData
 import Foundation
 
 @MainActor
-final class NotificationQueue {
+enum NotificationQueue {
     private static var queue = [(NotificationType, NSManagedObjectID)]()
 
     static func add(type: NotificationType, for item: DataItem) {

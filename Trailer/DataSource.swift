@@ -1,7 +1,6 @@
 import Cocoa
 
 extension MenuWindow {
-    
     final class DataSource: NSObject, NSTableViewDelegate, NSTableViewDataSource {
         private var itemIds = ContiguousArray<Any>()
         private let type: ListableItem.Type

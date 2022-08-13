@@ -30,10 +30,10 @@ enum API {
         }
 
         NotificationCenter.default.addObserver(forName: ReachabilityChangedNotification, object: nil, queue: .main) { _ in
-            Task { @MainActor in
+            Task {
                 checkNetworkAvailability()
                 if currentNetworkStatus != .NotReachable {
-                    app.startRefreshIfItIsDue()
+                    await app.startRefreshIfItIsDue()
                 }
             }
         }

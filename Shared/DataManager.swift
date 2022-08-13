@@ -305,7 +305,7 @@ enum DataManager {
             i.postProcess()
         }
     }
-    
+
     static func postProcessAllItems(in context: NSManagedObjectContext) async {
         await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
             let c = context.buildChildPrivateQueue()

@@ -1,6 +1,5 @@
 import Foundation
 
-@MainActor
 enum Section: Int64 {
     case none, mine, participated, mentioned, merged, closed, all, snoozed
     static let prMenuTitles = ["", "Mine", "Participated", "Mentioned", "Recently Merged", "Recently Closed", "All Pull Requests", "Snoozed"]

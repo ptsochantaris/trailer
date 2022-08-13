@@ -14,6 +14,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate, NSControlTextEditingDele
     private let newServer = ApiServer.allApiServers(in: DataManager.main).first!
     private var checkTimer: Timer?
 
+    @MainActor
     override func awakeFromNib() {
         Settings.isAppLoginItem = true
         startAtLogin.integerValue = 1

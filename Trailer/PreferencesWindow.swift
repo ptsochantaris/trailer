@@ -200,6 +200,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     // Tabs
     @IBOutlet var tabs: NSTabView!
 
+    @MainActor
     override func awakeFromNib() {
         super.awakeFromNib()
         delegate = self

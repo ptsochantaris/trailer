@@ -1,6 +1,7 @@
 import Foundation
 
 extension Section {
+    @MainActor
     var shouldBadgeComments: Bool {
         switch self {
         case .all:
@@ -14,6 +15,7 @@ extension Section {
         }
     }
 
+    @MainActor
     var shouldListReactions: Bool {
         if API.shouldSyncReactions {
             return shouldBadgeComments
@@ -21,6 +23,7 @@ extension Section {
         return false
     }
 
+    @MainActor
     var shouldListStatuses: Bool {
         if !Settings.showStatusItems {
             return false
@@ -35,6 +38,7 @@ extension Section {
         }
     }
 
+    @MainActor
     var shouldCheckStatuses: Bool {
         if !Settings.showStatusItems {
             return false

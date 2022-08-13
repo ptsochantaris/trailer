@@ -60,7 +60,7 @@ final class GQLQuery {
 
     func run(for url: String, authToken: String, attempt: Int) async throws -> ApiStats? {
         let Q = queryText
-        if await Settings.dumpAPIResponsesInConsole {
+        if Settings.dumpAPIResponsesInConsole {
             DLog("\(logPrefix)Fetching: \(Q)")
         }
 
@@ -83,7 +83,7 @@ final class GQLQuery {
                 throw API.apiError("\(logPrefix)Invalid JSON")
             }
 
-            if await Settings.dumpAPIResponsesInConsole {
+            if Settings.dumpAPIResponsesInConsole {
                 DLog("\(logPrefix)API data from %@: %@", url, String(bytes: info, encoding: .utf8))
             }
 

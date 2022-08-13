@@ -5,9 +5,8 @@
     import ServiceManagement
 #endif
 
-@MainActor
 enum Settings {
-    private nonisolated static let sharedDefaults = UserDefaults(suiteName: "group.Trailer")!
+    private static let sharedDefaults = UserDefaults(suiteName: "group.Trailer")!
 
     private static var allFields: [String] {
         [
@@ -28,6 +27,7 @@ enum Settings {
         ]
     }
 
+    @MainActor
     static func checkMigration() {
         if let snoozeWakeOnComment = sharedDefaults.object(forKey: "SNOOZE_WAKEUP_ON_COMMENT") as? Bool {
             DataManager.postMigrationSnoozeWakeOnComment = snoozeWakeOnComment
@@ -151,7 +151,7 @@ enum Settings {
         }
     #endif
 
-    private nonisolated static func set(_ key: String, _ value: Any?) {
+    private static func set(_ key: String, _ value: Any?) {
         let previousValue = sharedDefaults.object(forKey: key)
 
         if let v = value {
@@ -215,6 +215,7 @@ enum Settings {
     ///////////////////////////////// IMPORT / EXPORT
 
     @discardableResult
+    @MainActor
     static func writeToURL(_ url: URL) -> Bool {
         saveTimer.abort()
 
@@ -237,6 +238,7 @@ enum Settings {
         return true
     }
 
+    @MainActor
     static func readFromURL(_ url: URL) async -> Bool {
         if let settings = NSDictionary(contentsOf: url) {
             DLog("Reading settings from %@", url.absoluteString)
@@ -552,7 +554,7 @@ enum Settings {
     }
 
     static let logActivityToConsoleHelp = "This is meant for troubleshooting and should be turned off usually, as it is a performance and security concern when activated. It will output detailed messages about the app's behaviour in the device console."
-    nonisolated static var logActivityToConsole: Bool {
+    static var logActivityToConsole: Bool {
         get {
             #if DEBUG
                 return true

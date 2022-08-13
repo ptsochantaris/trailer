@@ -105,7 +105,7 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
         NotificationCenter.default.removeObserver(self)
     }
 
-    func startRefreshIfItIsDue() {
+    func startRefreshIfItIsDue() async {
         if let l = Settings.lastSuccessfulRefresh {
             let howLongAgo = Date().timeIntervalSince(l).rounded()
             let howLongUntilNextSync = Settings.backgroundRefreshPeriod - howLongAgo
@@ -114,9 +114,7 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
                 return
             }
         }
-        Task {
-            await startRefresh()
-        }
+        await startRefresh()
     }
 
     private func checkApiUsage() {
@@ -164,7 +162,7 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
             return .alreadyRefreshing
         }
 
-        let hasConnection = await API.hasNetworkConnection
+        let hasConnection = API.hasNetworkConnection
         if !hasConnection {
             wrapBackgroundProcessing(success: false)
             return .noNetwork
@@ -200,7 +198,9 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
 
     func applicationDidBecomeActive(_: UIApplication) {
         BGTaskScheduler.shared.cancelAllTaskRequests()
-        startRefreshIfItIsDue()
+        Task {
+            await startRefreshIfItIsDue()
+        }
     }
 
     func applicationWillResignActive(_: UIApplication) {
