@@ -29,6 +29,7 @@ struct CommentCount: View {
     }
 }
 
+@MainActor
 struct TypeSection: View {
     let type: String
 

@@ -137,37 +137,40 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 
         API.isRefreshing = true
 
-        Task { @ApiActor in
-            let tempContext = await DataManager.buildDetachedContext()
-            await API.fetchRepositories(to: tempContext)
-            if ApiServer.shouldReportRefreshFailure(in: tempContext) {
-                var errorServers = [String]()
-                for apiServer in ApiServer.allApiServers(in: tempContext) where apiServer.goodToGo && !apiServer.lastSyncSucceeded {
-                    errorServers.append(S(apiServer.label))
+        let tempContext = DataManager.main.buildChildPrivateQueue()
+        tempContext.perform { [weak self] in
+            Task {
+                await API.fetchRepositories(to: tempContext)
+                if ApiServer.shouldReportRefreshFailure(in: tempContext) {
+                    var errorServers = [String]()
+                    for apiServer in ApiServer.allApiServers(in: tempContext) where apiServer.goodToGo && !apiServer.lastSyncSucceeded {
+                        errorServers.append(S(apiServer.label))
+                    }
+                    let serverNames = errorServers.joined(separator: ", ")
+                    Task { @MainActor in
+                        showMessage("Error", "Could not refresh repository list from \(serverNames), please ensure that the tokens you are using are valid")
+                        NotificationQueue.clear()
+                    }
+                } else {
+                    DataItem.nukeDeletedItems(in: tempContext)
+                    if tempContext.hasChanges {
+                        try? tempContext.save()
+                    }
+                    Task { @MainActor in
+                        DataManager.saveDB()
+                        NotificationQueue.commit()
+                    }
                 }
-                let serverNames = errorServers.joined(separator: ", ")
-                Task { @MainActor in
-                    showMessage("Error", "Could not refresh repository list from \(serverNames), please ensure that the tokens you are using are valid")
-                    NotificationQueue.clear()
+                Task { @MainActor [weak self] in
+                    guard let self = self else { return }
+                    preferencesDirty = true
+                    self.navigationItem.title = originalName
+                    self.actionsButton.isEnabled = ApiServer.someServersHaveAuthTokens(in: DataManager.main)
+                    self.tableView.alpha = 1.0
+                    self.tableView.isUserInteractionEnabled = true
+                    self.navigationItem.rightBarButtonItem?.isEnabled = true
+                    API.isRefreshing = false
                 }
-            } else {
-                DataItem.nukeDeletedItems(in: tempContext)
-                if tempContext.hasChanges {
-                    try? tempContext.save()
-                }
-                Task { @MainActor in
-                    DataManager.saveDB()
-                    NotificationQueue.commit()
-                }
-            }
-            Task { @MainActor in
-                preferencesDirty = true
-                navigationItem.title = originalName
-                actionsButton.isEnabled = ApiServer.someServersHaveAuthTokens(in: DataManager.main)
-                tableView.alpha = 1.0
-                tableView.isUserInteractionEnabled = true
-                navigationItem.rightBarButtonItem?.isEnabled = true
-                API.isRefreshing = false
             }
         }
     }

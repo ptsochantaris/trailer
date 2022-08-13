@@ -1,5 +1,15 @@
 import CoreData
 
+extension NSManagedObjectContext {
+    func buildChildPrivateQueue() -> NSManagedObjectContext {
+        let c = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        c.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
+        c.undoManager = nil
+        c.parent = self
+        return c
+    }
+}
+
 @MainActor
 enum DataManager {
     static var postMigrationRepoPrPolicy: RepoDisplayPolicy?
@@ -237,14 +247,6 @@ enum DataManager {
         }
     }
 
-    nonisolated static func buildDetachedContext() async -> NSManagedObjectContext {
-        let c = NSManagedObjectContext(concurrencyType: .confinementConcurrencyType)
-        c.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
-        c.undoManager = nil
-        c.persistentStoreCoordinator = await persistentStoreCoordinator
-        return c
-    }
-
     static func info(for item: DataItem) -> [String: Any] {
         if let item = item as? PRComment {
             let uri = item.objectID.uriRepresentation().absoluteString
@@ -295,7 +297,7 @@ enum DataManager {
         }
     }
 
-    nonisolated static func postProcessAllItemsSynchronously(in context: NSManagedObjectContext) {
+    static func postProcessAllItemsSynchronously(in context: NSManagedObjectContext) {
         for p in DataItem.allItems(of: PullRequest.self, in: context, prefetchRelationships: ["comments", "reactions", "reviews"]) {
             p.postProcess()
         }
@@ -303,14 +305,10 @@ enum DataManager {
             i.postProcess()
         }
     }
-
-    nonisolated static func postProcessAllItems(in context: NSManagedObjectContext) async {
-        let c = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        c.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
-        c.undoManager = nil
-        c.parent = context
-
+    
+    static func postProcessAllItems(in context: NSManagedObjectContext) async {
         await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            let c = context.buildChildPrivateQueue()
             c.perform {
                 postProcessAllItemsSynchronously(in: c)
                 try? c.save()

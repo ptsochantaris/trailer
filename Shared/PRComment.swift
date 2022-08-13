@@ -16,24 +16,24 @@ final class PRComment: DataItem {
 
     @NSManaged var reactions: Set<Reaction>
 
-    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext) {
-        syncItems(of: PRComment.self, from: nodes, on: server, moc: moc) { comment, node in
+    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext) async {
+        await syncItems(of: PRComment.self, from: nodes, on: server, moc: moc) { comment, node in
             guard node.created || node.updated,
                   let parentId = node.parent?.id
             else { return }
 
             if node.created {
-                let review = DataItem.item(of: Review.self, with: parentId, in: moc)
+                let review = DataItem.parent(of: Review.self, with: parentId, in: moc)
                 comment.review = review
 
-                let pr = DataItem.item(of: PullRequest.self, with: parentId, in: moc)
+                let pr = DataItem.parent(of: PullRequest.self, with: parentId, in: moc)
                 if pr == nil, review != nil {
                     comment.pullRequest = review?.pullRequest
                 } else {
                     comment.pullRequest = pr
                 }
 
-                let issue = DataItem.item(of: Issue.self, with: parentId, in: moc)
+                let issue = DataItem.parent(of: Issue.self, with: parentId, in: moc)
                 comment.issue = issue
 
                 if issue == nil, pr == nil, review == nil {
@@ -53,7 +53,6 @@ final class PRComment: DataItem {
         }
     }
 
-    @ApiActor
     static func syncComments(from data: [[AnyHashable: Any]]?, parent: ListableItem, moc: NSManagedObjectContext) {
         items(with: data, type: PRComment.self, server: parent.apiServer, moc: moc) { item, info, newOrUpdated in
             if newOrUpdated {

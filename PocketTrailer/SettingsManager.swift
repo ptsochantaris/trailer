@@ -2,8 +2,9 @@ import UIKit
 
 let settingsManager = SettingsManager()
 
+@MainActor
 final class SettingsManager {
-    @MainActor
+
     private func loadSettingsFrom(url: URL) async {
         if await Settings.readFromURL(url) {
             DataManager.saveDB()
@@ -25,7 +26,6 @@ final class SettingsManager {
         }
     }
 
-    @MainActor
     func loadSettingsFrom(url: URL, confirmFromView: UIViewController?) async -> Bool {
         if let v = confirmFromView {
             var continuation: CheckedContinuation<Bool, Never>?

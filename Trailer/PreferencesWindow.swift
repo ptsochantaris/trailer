@@ -1180,15 +1180,13 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         Settings.isAppLoginItem = sender.integerValue == 1
     }
 
-    @MainActor
     func refreshRepos() {
         API.isRefreshing = true
-        Task { @ApiActor in
-            let tempContext = await DataManager.buildDetachedContext()
-            await API.fetchRepositories(to: tempContext)
-            if ApiServer.shouldReportRefreshFailure(in: tempContext) {
+        Task { @MainActor in
+            await API.fetchRepositories(to: DataManager.main)
+            if ApiServer.shouldReportRefreshFailure(in: DataManager.main) {
                 var errorServers = [String]()
-                for apiServer in ApiServer.allApiServers(in: tempContext) where apiServer.goodToGo && !apiServer.lastSyncSucceeded {
+                for apiServer in ApiServer.allApiServers(in: DataManager.main) where apiServer.goodToGo && !apiServer.lastSyncSucceeded {
                     errorServers.append(S(apiServer.label))
                 }
 
@@ -1201,13 +1199,11 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
                     _ = alert.addButton(withTitle: "OK")
                     _ = alert.runModal()
                 }
-            } else if tempContext.hasChanges {
-                try? tempContext.save()
+            } else {
+                DataManager.saveDB()
             }
-            Task { @MainActor in
-                DataItem.nukeDeletedItems(in: DataManager.main)
-                API.isRefreshing = false
-            }
+            DataItem.nukeDeletedItems(in: DataManager.main)
+            API.isRefreshing = false
         }
     }
 

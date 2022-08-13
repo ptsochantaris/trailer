@@ -49,6 +49,8 @@ class ListableItem: DataItem {
     @NSManaged var labels: Set<PRLabel>
     @NSManaged var reactions: Set<Reaction>
 
+    override class var isParentType: Bool { true }
+
     var webUrl: String? {
         repo.webUrl
     }
@@ -953,7 +955,6 @@ class ListableItem: DataItem {
     private static let filterLabelPredicate = "SUBQUERY(labels, $label, $label.name contains[cd] %@).@count > 0"
     private static let filterStatusPredicate = "SUBQUERY(statuses, $status, $status.descriptionText contains[cd] %@).@count > 0"
 
-    @MainActor
     static func requestForItems<T: ListableItem>(of itemType: T.Type, withFilter: String?, sectionIndex: Int64, criterion: GroupingCriterion? = nil, onlyUnread: Bool = false, excludeSnoozed: Bool = false) -> NSFetchRequest<T> {
         var andPredicates = [NSPredicate]()
 
@@ -1071,7 +1072,6 @@ class ListableItem: DataItem {
 
     private static let isUnmergeablePredicate = NSPredicate(format: "isMergeable == false")
 
-    @MainActor
     static func relatedItems(from notificationUserInfo: [AnyHashable: Any]) -> (PRComment?, ListableItem)? {
         var item: ListableItem?
         var comment: PRComment?
@@ -1180,7 +1180,6 @@ class ListableItem: DataItem {
         false
     }
 
-    @MainActor
     static func reasonForEmpty(with filterValue: String?, criterion: GroupingCriterion?) -> NSAttributedString {
         let color: COLOR_CLASS
         let message: String
@@ -1282,7 +1281,6 @@ class ListableItem: DataItem {
         (self as? PullRequest)?.headRefName
     }
 
-    @MainActor
     var contextActions: [MenuAction] {
         var actions: [MenuAction] = [.copy, .openRepo]
 

@@ -1,5 +1,6 @@
 import CoreData
 
+@MainActor
 final class SnoozePreset: NSManagedObject {
     @NSManaged var day: Int64
     @NSManaged var hour: Int64
@@ -119,7 +120,6 @@ final class SnoozePreset: NSManagedObject {
         }
     }
 
-    @MainActor
     static var archivedPresets: [[String: NSObject]] {
         var archivedData = [[String: NSObject]]()
         for a in SnoozePreset.allSnoozePresets(in: DataManager.main) {
@@ -134,27 +134,20 @@ final class SnoozePreset: NSManagedObject {
         return archivedData
     }
 
-    @MainActor
-    static func configure(from archive: [[String: NSObject]]) async -> Bool {
-        let tempMoc = await DataManager.buildDetachedContext()
-
-        for apiServer in allSnoozePresets(in: tempMoc) {
-            tempMoc.delete(apiServer)
+    static func configure(from archive: [[String: NSObject]]) -> Bool {
+        for apiServer in allSnoozePresets(in: DataManager.main) {
+            DataManager.main.delete(apiServer)
         }
 
         for presetData in archive {
-            let a = newSnoozePreset(in: tempMoc)
+            let a = newSnoozePreset(in: DataManager.main)
             let attributes = Array(a.entity.attributesByName.keys)
             for (k, v) in presetData where attributes.contains(k) {
                 a.setValue(v, forKey: k)
             }
         }
 
-        do {
-            try tempMoc.save()
-            return true
-        } catch {
-            return false
-        }
+        DataManager.saveDB()
+        return true
     }
 }

@@ -41,7 +41,7 @@ final class Review: DataItem {
         for node in nodes {
             guard node.elementType == "ReviewRequest",
                   let parentId = node.parent?.id,
-                  let parent = DataItem.item(of: PullRequest.self, with: parentId, in: moc) else {
+                  let parent = DataItem.parent(of: PullRequest.self, with: parentId, in: moc) else {
                 continue
             }
             parent.checkAndStoreReviewAssignments(prIdsToAssignedUsers[parentId] ?? [],
@@ -49,8 +49,8 @@ final class Review: DataItem {
         }
     }
 
-    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext) {
-        syncItems(of: Review.self, from: nodes, on: server, moc: moc) { review, node in
+    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext) async {
+        await syncItems(of: Review.self, from: nodes, on: server, moc: moc) { review, node in
 
             let info = node.jsonPayload
             if info.count == 3 { // this node is a blank container (id, comments, typename)
@@ -64,7 +64,7 @@ final class Review: DataItem {
             else { return }
 
             if node.created {
-                if let parent = DataItem.item(of: PullRequest.self, with: parentId, in: moc) {
+                if let parent = DataItem.parent(of: PullRequest.self, with: parentId, in: moc) {
                     review.pullRequest = parent
                 } else {
                     DLog("Warning Review without parent")
@@ -76,7 +76,6 @@ final class Review: DataItem {
         }
     }
 
-    @ApiActor
     static func syncReviews(from data: [[AnyHashable: Any]]?, withParent: PullRequest, moc: NSManagedObjectContext) {
         items(with: data, type: Review.self, server: withParent.apiServer, moc: moc) { item, info, isNewOrUpdated in
             if isNewOrUpdated {

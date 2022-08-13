@@ -1,5 +1,6 @@
 import CoreData
 
+@MainActor
 final class ApiServer: NSManagedObject {
     @NSManaged var apiPath: String?
     @NSManaged var graphQLPath: String?
@@ -61,7 +62,6 @@ final class ApiServer: NSManagedObject {
         !S(authToken).isEmpty
     }
 
-    @MainActor
     static func resetSyncOfEverything() {
         DLog("RESETTING SYNC STATE OF ALL ITEMS")
         for r in DataItem.allItems(of: Repo.self, in: DataManager.main, prefetchRelationships: ["pullRequests", "issues"]) {
@@ -212,7 +212,6 @@ final class ApiServer: NSManagedObject {
         return nil
     }
 
-    @MainActor
     static var archivedApiServers: [AnyHashable: [AnyHashable: Any]] {
         var archivedData = [AnyHashable: [AnyHashable: Any]]()
         for a in ApiServer.allApiServers(in: DataManager.main) {
@@ -245,16 +244,13 @@ final class ApiServer: NSManagedObject {
         return archivedData
     }
 
-    @MainActor
-    static func configure(from archive: [String: [String: NSObject]]) async -> Bool {
-        let tempMoc = await DataManager.buildDetachedContext()
-
-        for apiServer in allApiServers(in: tempMoc) {
-            tempMoc.delete(apiServer)
+    static func configure(from archive: [String: [String: NSObject]]) -> Bool {
+        for apiServer in allApiServers(in: DataManager.main) {
+            DataManager.main.delete(apiServer)
         }
 
         for (_, apiServerData) in archive {
-            let a = insertNewServer(in: tempMoc)
+            let a = insertNewServer(in: DataManager.main)
             for (k, v) in apiServerData {
                 if k == "repos" {
                     let archive = v as! [String: [String: NSObject]]
@@ -268,12 +264,8 @@ final class ApiServer: NSManagedObject {
             a.resetSyncState()
         }
 
-        do {
-            try tempMoc.save()
-            return true
-        } catch {
-            return false
-        }
+        DataManager.saveDB()
+        return true
     }
 
     func configureRepos(from archive: [String: [String: NSObject]]) {

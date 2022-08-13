@@ -12,12 +12,12 @@ final class Issue: ListableItem {
         super.webUrl?.appending(pathComponent: "issues").appending(pathComponent: String(number))
     }
 
-    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext) {
-        syncItems(of: Issue.self, from: nodes, on: server, moc: moc) { issue, node in
+    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext) async {
+        await syncItems(of: Issue.self, from: nodes, on: server, moc: moc) { issue, node in
 
             guard node.created || node.updated,
                   let parentId = node.parent?.id ?? (node.jsonPayload["repository"] as? [AnyHashable: Any])?["id"] as? String,
-                  let parent = DataItem.item(of: Repo.self, with: parentId, in: moc)
+                  let parent = DataItem.parent(of: Repo.self, with: parentId, in: moc)
             else { return }
 
             let json = node.jsonPayload
@@ -25,7 +25,6 @@ final class Issue: ListableItem {
         }
     }
 
-    @ApiActor
     static func syncIssues(from data: [[AnyHashable: Any]]?, in repo: Repo, moc: NSManagedObjectContext) {
         let filteredData = data?.filter { $0["pull_request"] == nil } // don't sync issues which are pull requests, they are already synced
         items(with: filteredData, type: Issue.self, server: repo.apiServer, prefetchRelationships: ["labels"], moc: moc) { item, info, isNewOrUpdated in
@@ -66,7 +65,6 @@ final class Issue: ListableItem {
         return badgeCount(from: f, in: moc)
     }
 
-    @MainActor
     static func badgeCount(in moc: NSManagedObjectContext, criterion: GroupingCriterion?) -> Int {
         let f = requestForItems(of: Issue.self, withFilter: nil, sectionIndex: -1, criterion: criterion)
         return badgeCount(from: f, in: moc)

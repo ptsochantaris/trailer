@@ -146,14 +146,17 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         }
     }
 
+    @MainActor
     func performUpdateCheck() {
         updater.updater.checkForUpdates()
     }
 
+    @MainActor
     func setUpdateCheckParameters() {
         updater.updater.updateCheckInterval = TimeInterval(Settings.checkForUpdatesInterval)
     }
 
+    @MainActor
     private lazy var updater = SPUStandardUpdaterController(startingUpdater: Settings.checkForUpdatesAutomatically, updaterDelegate: self, userDriverDelegate: nil)
 
     func userNotificationCenter(_: NSUserNotificationCenter, shouldPresent _: NSUserNotification) -> Bool {
@@ -660,6 +663,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         }
     }
 
+    @MainActor
     func startRefreshIfItIsDue() async {
         if let l = Settings.lastSuccessfulRefresh {
             let howLongAgo = Date().timeIntervalSince(l).rounded()
@@ -760,6 +764,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         }
     }
 
+    @MainActor
     private func relatedMenus(for i: ListableItem) -> [MenuBarSet] {
         menuBarSets.compactMap { ($0.viewCriterion?.isRelated(to: i) ?? true) ? $0 : nil }
     }
@@ -780,7 +785,6 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         return false
     }
 
-    @MainActor
     func updateAllMenus() async {
         for d in menuBarSets {
             await d.updatePrMenu()
@@ -811,7 +815,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
             return
         }
 
-        let hasConnection = await API.hasNetworkConnection
+        let hasConnection = API.hasNetworkConnection
         if !hasConnection {
             DLog("Won't start refresh because internet connectivity is down")
             return
@@ -822,7 +826,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
             return
         }
 
-        Task { @ApiActor in
+        Task { @MainActor in
             await API.performSync()
         }
     }
@@ -854,6 +858,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         return list
     }
 
+    @MainActor
     func addHotKeySupport() {
         if Settings.hotkeyEnable {
             if globalKeyMonitor == nil {
@@ -876,7 +881,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
             return
         }
 
-        keyDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { @MainActor [weak self] incomingEvent -> NSEvent? in
+        keyDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] incomingEvent -> NSEvent? in
 
             guard let S = self else { return incomingEvent }
 
@@ -1055,6 +1060,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
     }
 
     @discardableResult
+    @MainActor
     private func checkForHotkey(in incomingEvent: NSEvent) -> Bool {
         var check = 0
 
@@ -1226,7 +1232,6 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         }
     }
 
-    @MainActor
     private func getTheme() -> Theme {
         // with many thanks from https://medium.com/@ruiaureliano/check-light-dark-appearance-for-macos-mojave-catalina-fb2343af875f
         let d = UserDefaults.standard

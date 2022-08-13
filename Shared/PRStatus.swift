@@ -11,7 +11,6 @@ final class PRStatus: DataItem {
 
     override var alternateCreationDate: Bool { true }
 
-    @ApiActor
     static func syncStatuses(from data: [[AnyHashable: Any]]?, pullRequest: PullRequest, moc: NSManagedObjectContext) {
         items(with: data, type: PRStatus.self, server: pullRequest.apiServer, moc: moc) { item, info, isNewOrUpdated in
             if isNewOrUpdated {
@@ -27,14 +26,14 @@ final class PRStatus: DataItem {
         }
     }
 
-    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext) {
-        syncItems(of: PRStatus.self, from: nodes, on: server, moc: moc) { status, node in
+    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext) async {
+        await syncItems(of: PRStatus.self, from: nodes, on: server, moc: moc) { status, node in
             guard node.created || node.updated,
                   let parentId = node.parent?.id
             else { return }
 
             if node.created {
-                if let parent = DataItem.item(of: PullRequest.self, with: parentId, in: moc) {
+                if let parent = DataItem.parent(of: PullRequest.self, with: parentId, in: moc) {
                     status.pullRequest = parent
                 } else {
                     DLog("Warning: PRStatus without parent")

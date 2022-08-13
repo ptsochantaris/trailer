@@ -1,5 +1,8 @@
 import CoreData
 
+typealias FetchCache = NSCache<NSString, NSManagedObject>
+
+@MainActor
 class DataItem: NSManagedObject {
     @NSManaged var nodeId: String?
     @NSManaged var postSyncAction: Int64
@@ -8,6 +11,8 @@ class DataItem: NSManagedObject {
     @NSManaged var apiServer: ApiServer
 
     var alternateCreationDate: Bool { false }
+    
+    class var isParentType: Bool { false }
 
     func resetSyncState() {
         updatedAt = updatedAt?.addingTimeInterval(-1) ?? .distantPast
@@ -41,7 +46,6 @@ class DataItem: NSManagedObject {
         return try! server.managedObjectContext!.fetch(f)
     }
 
-    @ApiActor
     static func items<T: DataItem>(with data: [[AnyHashable: Any]]?,
                                    type: T.Type,
                                    server: ApiServer,
@@ -96,7 +100,7 @@ class DataItem: NSManagedObject {
             if let nodeId = i.nodeId, let info = nodeIdsToInfo[nodeId] {
                 let updatedDate = DataItem.parseGH8601(info["updated_at"] as? String) ?? i.createdAt ?? now
                 if updatedDate != i.updatedAt {
-                    DLog("Updating %@: %@", entityName, nodeId)
+                    DLog("Updating %@: %@ (v3)", entityName, nodeId)
                     i.postSyncAction = PostSyncAction.isUpdated.rawValue
                     i.updatedAt = updatedDate
                     postProcessCallback(i, info, true)
@@ -113,7 +117,7 @@ class DataItem: NSManagedObject {
 
         for nodeId in nodeIdsOfItems {
             if let info = nodeIdsToInfo[nodeId] {
-                DLog("Creating %@: %@", entityName, nodeId)
+                DLog("Creating %@: %@ (v3)", entityName, nodeId)
                 let i = NSEntityDescription.insertNewObject(forEntityName: entityName, into: moc) as! T
                 i.postSyncAction = PostSyncAction.isNew.rawValue
                 i.apiServer = server
@@ -126,14 +130,23 @@ class DataItem: NSManagedObject {
             }
         }
     }
+    
+    static var parentCache: FetchCache?
+    static func parent<T: DataItem>(of type: T.Type, with nodeId: String, in moc: NSManagedObjectContext) -> T? {
+        if let parentCache = parentCache, let existingObject = parentCache.object(forKey: nodeId as NSString) as? T {
+            return existingObject
+        }
 
-    static func item<T: DataItem>(of type: T.Type, with nodeId: String, in moc: NSManagedObjectContext) -> T? {
         let f = NSFetchRequest<T>(entityName: String(describing: type))
-        f.returnsObjectsAsFaults = false
+        f.returnsObjectsAsFaults = true
         f.includesSubentities = false
         f.fetchLimit = 1
         f.predicate = NSPredicate(format: "nodeId == %@", nodeId)
-        return try! moc.fetch(f).first
+        let object = try! moc.fetch(f).first
+        if let object = object, let parentCache = parentCache {
+            parentCache.setObject(object, forKey: nodeId as NSString)
+        }
+        return object
     }
 
     static func items<T: DataItem>(of type: T.Type, surviving: Bool, in moc: NSManagedObjectContext, prefetchRelationships: [String]? = nil) -> [T] {
@@ -315,22 +328,21 @@ class DataItem: NSManagedObject {
         }
 
         if node.created {
-            DLog("Creating \(entityName) ID: %@", node.id)
+            DLog("Creating \(entityName) ID: %@ (v4)", node.id)
             postSyncAction = PostSyncAction.isNew.rawValue
+            DataItem.parentCache?.setObject(self, forKey: node.id as NSString)
 
         } else if node.updated {
-            DLog("Updating \(entityName) ID: %@", node.id)
+            DLog("Updating \(entityName) ID: %@ (v4)", node.id)
             postSyncAction = PostSyncAction.isUpdated.rawValue
 
         } else if postSyncAction == PostSyncAction.delete.rawValue {
             // DLog("Keeping \(entityName) ID: %@", node.id)
             postSyncAction = PostSyncAction.doNothing.rawValue
-        } // else {
-        // DLog("Ignoring \(entityName) ID: %@", node.id)
-        // }
+        }
     }
-
-    static func syncItems<T: DataItem>(of type: T.Type, from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext, perItemCallback: (T, GQLNode) -> Void) {
+    
+    static func syncItems<T: DataItem>(of type: T.Type, from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext, perItemCallback: (T, GQLNode) -> Void) async {
         let validNodes = nodes.filter { !($0.parent?.creationSkipped ?? false) }
 
         let entityName = String(describing: type)
@@ -339,7 +351,7 @@ class DataItem: NSManagedObject {
         f.includesSubentities = false
         f.predicate = NSPredicate(format: "nodeId in %@", validNodes.map(\.id))
         var existingItems = try! moc.fetch(f)
-
+        
         for node in validNodes {
             if let existingItem = existingItems.first(where: { $0.nodeId == node.id }) {
                 // there can be multiple updates for an item, because of multiple parents
@@ -354,6 +366,7 @@ class DataItem: NSManagedObject {
                 perItemCallback(item, node)
                 existingItems.append(item)
             }
+            await Task.yield()
         }
     }
 

@@ -10,14 +10,14 @@ final class Reaction: DataItem {
     @NSManaged var issue: Issue?
     @NSManaged var comment: PRComment?
 
-    static func sync<T: DataItem>(from nodes: ContiguousArray<GQLNode>, for parentType: T.Type, on server: ApiServer, moc: NSManagedObjectContext) {
-        syncItems(of: Reaction.self, from: nodes, on: server, moc: moc) { reaction, node in
+    static func sync<T: DataItem>(from nodes: ContiguousArray<GQLNode>, for parentType: T.Type, on server: ApiServer, moc: NSManagedObjectContext) async {
+        await syncItems(of: Reaction.self, from: nodes, on: server, moc: moc) { reaction, node in
             guard node.created || node.updated,
                   let parentId = node.parent?.id
             else { return }
 
             if node.created {
-                let parent = DataItem.item(of: parentType, with: parentId, in: moc)
+                let parent = DataItem.parent(of: parentType, with: parentId, in: moc)
                 reaction.pullRequest = parent as? PullRequest
                 reaction.issue = parent as? Issue
                 reaction.comment = parent as? PRComment
@@ -37,7 +37,6 @@ final class Reaction: DataItem {
         }
     }
 
-    @ApiActor
     static func syncReactions(from data: [[AnyHashable: Any]]?, comment: PRComment, moc: NSManagedObjectContext) {
         items(with: data, type: Reaction.self, server: comment.apiServer, moc: moc) { item, info, isNewOrUpdated in
             if isNewOrUpdated {
@@ -49,7 +48,6 @@ final class Reaction: DataItem {
         }
     }
 
-    @ApiActor
     static func syncReactions(from data: [[AnyHashable: Any]]?, parent: ListableItem, moc: NSManagedObjectContext) {
         items(with: data, type: Reaction.self, server: parent.apiServer, moc: moc) { item, info, isNewOrUpdated in
             if isNewOrUpdated {

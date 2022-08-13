@@ -1,6 +1,7 @@
 import Cocoa
 
 extension MenuWindow {
+    
     final class DataSource: NSObject, NSTableViewDelegate, NSTableViewDataSource {
         private var itemIds = ContiguousArray<Any>()
         private let type: ListableItem.Type
@@ -22,7 +23,6 @@ extension MenuWindow {
             return [iodD, sectionIndexD]
         }()
 
-        @MainActor
         init(type: ListableItem.Type, sections: [String], removeButtonsInSections: [String], viewCriterion: GroupingCriterion?) {
             self.type = type
             self.sections = sections
@@ -89,7 +89,6 @@ extension MenuWindow {
             return nil
         }
 
-        @MainActor
         func numberOfRows(in _: NSTableView) -> Int {
             itemIds.count
         }

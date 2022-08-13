@@ -5,8 +5,9 @@
     import ServiceManagement
 #endif
 
+@MainActor
 enum Settings {
-    private static let sharedDefaults = UserDefaults(suiteName: "group.Trailer")!
+    private nonisolated static let sharedDefaults = UserDefaults(suiteName: "group.Trailer")!
 
     private static var allFields: [String] {
         [
@@ -27,7 +28,6 @@ enum Settings {
         ]
     }
 
-    @MainActor
     static func checkMigration() {
         if let snoozeWakeOnComment = sharedDefaults.object(forKey: "SNOOZE_WAKEUP_ON_COMMENT") as? Bool {
             DataManager.postMigrationSnoozeWakeOnComment = snoozeWakeOnComment
@@ -151,7 +151,7 @@ enum Settings {
         }
     #endif
 
-    private static func set(_ key: String, _ value: Any?) {
+    private nonisolated static func set(_ key: String, _ value: Any?) {
         let previousValue = sharedDefaults.object(forKey: key)
 
         if let v = value {
@@ -177,7 +177,9 @@ enum Settings {
             DLog("Clearing option %@", key)
         }
 
-        possibleExport(key)
+        Task { @MainActor in
+            possibleExport(key)
+        }
     }
 
     private static let saveTimer = PopTimer(timeInterval: 2) {
@@ -213,7 +215,6 @@ enum Settings {
     ///////////////////////////////// IMPORT / EXPORT
 
     @discardableResult
-    @MainActor
     static func writeToURL(_ url: URL) -> Bool {
         saveTimer.abort()
 
@@ -236,7 +237,6 @@ enum Settings {
         return true
     }
 
-    @MainActor
     static func readFromURL(_ url: URL) async -> Bool {
         if let settings = NSDictionary(contentsOf: url) {
             DLog("Reading settings from %@", url.absoluteString)
@@ -246,8 +246,8 @@ enum Settings {
                     sharedDefaults.set(v, forKey: k)
                 }
             }
-            let result1 = await ApiServer.configure(from: settings["DB_CONFIG_OBJECTS"] as! [String: [String: NSObject]])
-            let result2 = await SnoozePreset.configure(from: settings["DB_SNOOZE_OBJECTS"] as! [[String: NSObject]])
+            let result1 = ApiServer.configure(from: settings["DB_CONFIG_OBJECTS"] as! [String: [String: NSObject]])
+            let result2 = SnoozePreset.configure(from: settings["DB_SNOOZE_OBJECTS"] as! [[String: NSObject]])
             return result1 && result2
         }
         return false
@@ -552,7 +552,7 @@ enum Settings {
     }
 
     static let logActivityToConsoleHelp = "This is meant for troubleshooting and should be turned off usually, as it is a performance and security concern when activated. It will output detailed messages about the app's behaviour in the device console."
-    static var logActivityToConsole: Bool {
+    nonisolated static var logActivityToConsole: Bool {
         get {
             #if DEBUG
                 return true

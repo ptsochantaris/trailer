@@ -183,15 +183,12 @@ final class WatchManager: NSObject, WCSessionDelegate {
         f.fetchOffset = from
         f.fetchLimit = count
 
-        return await Task.detached { [weak self] in
-            guard let self = self else { return [:] }
-            let tempMoc = await DataManager.buildDetachedContext()
-            let items = try! tempMoc.fetch(f).map { self.baseDataForItem(item: $0, showLabels: showLabels) }
-            let compressedData = (try? NSKeyedArchiver.archivedData(withRootObject: items, requiringSecureCoding: false).data(operation: .compress)) ?? Data()
-            return ["result": compressedData]
-        }.value
+        let items = try! DataManager.main.fetch(f).map { self.baseDataForItem(item: $0, showLabels: showLabels) }
+        let compressedData = (try? NSKeyedArchiver.archivedData(withRootObject: items, requiringSecureCoding: false).data(operation: .compress)) ?? Data()
+        return ["result": compressedData]
     }
 
+    @MainActor
     private func baseDataForItem(item: ListableItem, showLabels: Bool) -> [String: Any] {
         let font = UIFont.systemFont(ofSize: UIFont.systemFontSize)
         let smallFont = UIFont.systemFont(ofSize: UIFont.systemFontSize - 4)
@@ -215,6 +212,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
         return itemData
     }
 
+    @MainActor
     private func labelsForItem(item: ListableItem) -> [[String: Any]] {
         var labels = [[String: Any]]()
         for l in item.labels {
@@ -226,6 +224,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
         return labels
     }
 
+    @MainActor
     private func statusLinesForPr(pr: PullRequest) -> [[String: Any]] {
         var statusLines = [[String: Any]]()
         for status in pr.displayedStatuses {
@@ -251,6 +250,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
         return nil
     }
 
+    @MainActor
     private func commentsForItem(item: ListableItem) -> [[String: Any]] {
         var comments = [[String: Any]]()
         for comment in item.sortedComments(using: .orderedDescending) {
@@ -334,11 +334,13 @@ final class WatchManager: NSObject, WCSessionDelegate {
         }
     }
 
+    @MainActor
     private static func counts<T: ListableItem>(for type: T.Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> [String: Int] {
         ["total": countItems(of: type, in: section, criterion: criterion, moc: moc),
          "unread": badgeCount(for: type, in: section, criterion: criterion, moc: moc)]
     }
 
+    @MainActor
     private static func countallItems<T: ListableItem>(of type: T.Type, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> Int {
         let f = NSFetchRequest<T>(entityName: String(describing: type))
         f.includesSubentities = false
@@ -349,6 +351,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
         return try! moc.count(for: f)
     }
 
+    @MainActor
     private static func countItems<T: ListableItem>(of type: T.Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> Int {
         let f = NSFetchRequest<T>(entityName: String(describing: type))
         f.includesSubentities = false
@@ -359,6 +362,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
         return try! moc.count(for: f)
     }
 
+    @MainActor
     private static func badgeCount<T: ListableItem>(for type: T.Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> Int {
         let f = NSFetchRequest<T>(entityName: String(describing: type))
         f.includesSubentities = false
@@ -367,6 +371,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
         return ListableItem.badgeCount(from: f, in: moc)
     }
 
+    @MainActor
     private static func countOpenAndVisible<T: ListableItem>(of type: T.Type, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> Int {
         let f = NSFetchRequest<T>(entityName: String(describing: type))
         f.includesSubentities = false

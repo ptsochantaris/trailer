@@ -103,9 +103,7 @@ let numberFormatter: NumberFormatter = {
 func bootUp() {
     Settings.checkMigration()
     DataManager.checkMigration()
-    Task {
-        await API.setup()
-    }
+    API.setup()
 }
 
 //////////////////////// Enums
@@ -386,10 +384,12 @@ var versionString: String {
 
 #if os(OSX)
 
+    @MainActor
     func openItem(_ url: URL) {
         openURL(url, using: Settings.defaultAppForOpeningItems.trim)
     }
 
+    @MainActor
     func openLink(_ url: URL) {
         openURL(url, using: Settings.defaultAppForOpeningWeb.trim)
     }

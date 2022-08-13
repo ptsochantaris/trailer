@@ -10,15 +10,15 @@ final class PRLabel: DataItem {
     @NSManaged var pullRequests: Set<PullRequest>
     @NSManaged var issues: Set<Issue>
 
-    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext) {
-        syncItems(of: PRLabel.self, from: nodes, on: server, moc: moc) { label, node in
+    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext) async {
+        await syncItems(of: PRLabel.self, from: nodes, on: server, moc: moc) { label, node in
             guard
                 let parent = node.parent else { return }
 
             if parent.updated || parent.created {
-                if let parentPr = DataItem.item(of: PullRequest.self, with: parent.id, in: moc) {
+                if let parentPr = DataItem.parent(of: PullRequest.self, with: parent.id, in: moc) {
                     parentPr.mutableSetValue(forKey: "labels").add(label)
-                } else if let parentIssue = DataItem.item(of: Issue.self, with: parent.id, in: moc) {
+                } else if let parentIssue = DataItem.parent(of: Issue.self, with: parent.id, in: moc) {
                     parentIssue.mutableSetValue(forKey: "labels").add(label)
                 } else {
                     DLog("Warning: PRLabel without parent")
@@ -88,7 +88,6 @@ final class PRLabel: DataItem {
         }
     }
 
-    @ApiActor
     static func syncLabels(from info: [[AnyHashable: Any]]?, withParent: ListableItem) {
         labels(from: info, fromParent: withParent) { label, info in
             if let c = info["color"] as? String {

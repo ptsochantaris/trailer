@@ -1,12 +1,8 @@
 import CommonCrypto
 import CoreData
 
-@globalActor
-final actor ApiActor {
-    static let shared = ApiActor()
-}
-
-@ApiActor enum API {
+@MainActor
+enum API {
     static var currentNetworkStatus = NetworkStatus.NotReachable
 
     static let cacheDirectory: String = {
@@ -34,10 +30,10 @@ final actor ApiActor {
         }
 
         NotificationCenter.default.addObserver(forName: ReachabilityChangedNotification, object: nil, queue: .main) { _ in
-            Task { @ApiActor in
+            Task { @MainActor in
                 checkNetworkAvailability()
                 if currentNetworkStatus != .NotReachable {
-                    await app.startRefreshIfItIsDue()
+                    app.startRefreshIfItIsDue()
                 }
             }
         }
@@ -65,7 +61,6 @@ final actor ApiActor {
 
     /////////////////////////////////////////////////////// Utilities
 
-    @MainActor
     static var currentOperationName = lastSuccessfulSyncAt {
         didSet {
             DLog("Status update: \(currentOperationName)")
@@ -73,7 +68,6 @@ final actor ApiActor {
         }
     }
 
-    @MainActor
     static var currentOperationCount = 0 {
         didSet {
             let newValue = currentOperationCount
@@ -97,7 +91,6 @@ final actor ApiActor {
         }
     }
 
-    @MainActor
     static var isRefreshing = false {
         didSet {
             if oldValue == isRefreshing {
@@ -122,15 +115,18 @@ final actor ApiActor {
         }
     }
 
-    nonisolated static var shouldSyncReactions: Bool {
+    @MainActor
+    static var shouldSyncReactions: Bool {
         Settings.notifyOnItemReactions || Settings.notifyOnCommentReactions
     }
 
-    nonisolated static var shouldSyncReviews: Bool {
+    @MainActor
+    static var shouldSyncReviews: Bool {
         Settings.displayReviewsOnItems || Settings.notifyOnReviewDismissals || Settings.notifyOnReviewAcceptances || Settings.notifyOnReviewChangeRequests
     }
 
-    nonisolated static var shouldSyncReviewAssignments: Bool {
+    @MainActor
+    static var shouldSyncReviewAssignments: Bool {
         Settings.displayReviewsOnItems || Settings.showRequestedTeamReviews || Settings.notifyOnReviewAssignments || (Int64(Settings.assignedReviewHandlingPolicy) != Section.none.rawValue)
     }
 
@@ -203,7 +199,7 @@ final actor ApiActor {
     ////////////////////////////////////// API interface
 
     static func performSync() async {
-        let moc = await DataManager.buildDetachedContext()
+        let moc = DataManager.main
 
         if Settings.useV4API && canUseV4API(for: moc) != nil {
             return
@@ -215,7 +211,7 @@ final actor ApiActor {
             currentOperationName = "Fetching…"
         }
 
-        let lastCheck = await lastRepoCheck
+        let lastCheck = lastRepoCheck
         let shouldRefreshReposToo = lastCheck == .distantPast
             || (Date().timeIntervalSince(lastCheck) > TimeInterval(Settings.newRepoCheckPeriod * 3600))
             || !Repo.anyVisibleRepos(in: moc)
@@ -292,7 +288,6 @@ final actor ApiActor {
         }
     }
 
-    @MainActor
     static var lastSuccessfulSyncAt: String {
         let last = Settings.lastSuccessfulRefresh ?? Date()
         return agoFormat(prefix: "updated", since: last).capitalFirstLetter
@@ -325,13 +320,13 @@ final actor ApiActor {
         let goodToGoServers = ApiServer.allApiServers(in: moc).filter(\.goodToGo)
         await withTaskGroup(of: Void.self) { group in
             for apiServer in goodToGoServers {
-                group.addTask { @ApiActor in
+                group.addTask { @MainActor in
                     await syncWatchedRepos(from: apiServer, moc: moc)
                 }
-                group.addTask { @ApiActor in
+                group.addTask { @MainActor in
                     await syncManuallyAddedRepos(from: apiServer, moc: moc)
                 }
-                group.addTask { @ApiActor in
+                group.addTask { @MainActor in
                     await fetchUserTeams(from: apiServer, moc: moc)
                 }
             }
@@ -376,7 +371,6 @@ final actor ApiActor {
         return nil
     }
 
-    @MainActor
     static func updateLimitsFromServer() async {
         let configuredServers = ApiServer.allApiServers(in: DataManager.main).filter(\.goodToGo)
         for apiServer in configuredServers {

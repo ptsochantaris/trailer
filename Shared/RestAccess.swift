@@ -1,13 +1,13 @@
 import Foundation
 
-@ApiActor
+@MainActor
 enum RestAccess {
     private struct UrlBackOffEntry {
         var nextAttemptAt: Date
         var nextIncrement: TimeInterval
     }
 
-    static func getPagedData(at path: String, from server: ApiServer, startingFrom page: Int = 1, perPage: @ApiActor @escaping ([[AnyHashable: Any]]?, Bool) -> Bool) async -> (Bool, Int) {
+    static func getPagedData(at path: String, from server: ApiServer, startingFrom page: Int = 1, perPage: @MainActor @escaping ([[AnyHashable: Any]]?, Bool) -> Bool) async -> (Bool, Int) {
         if path.isEmpty {
             // handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
             return (true, -1)
@@ -114,7 +114,7 @@ enum RestAccess {
             let code = response.statusCode
 
             DLog("(%@) GET %@ - RESULT: %@", apiServerLabel, expandedPath, code)
-            let parsedData = try? JSONSerialization.jsonObject(with: data, options: [])
+            let parsedData = await Task.detached { try? JSONSerialization.jsonObject(with: data, options: []) }.value
 
             if Settings.dumpAPIResponsesInConsole {
                 DLog("API data from %@: %@", expandedPath, String(bytes: data, encoding: .utf8))

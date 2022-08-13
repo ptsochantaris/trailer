@@ -1,9 +1,11 @@
 import WatchKit
 
+@MainActor
 protocol PopulatableRow {
     func populate(from other: Any)
 }
 
+@MainActor
 final class SectionRow: NSObject, PopulatableRow {
     var section: Section?
     var totalCount: Int?

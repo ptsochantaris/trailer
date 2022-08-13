@@ -2,12 +2,12 @@ import CoreData
 import UIKit
 import UserNotifications
 
+@MainActor
 final class TabBarSet {
     var prItem: UITabBarItem?
     var issuesItem: UITabBarItem?
     let viewCriterion: GroupingCriterion?
 
-    @MainActor
     var tabItems: [UITabBarItem] {
         let label = viewCriterion?.label
         var items = [UITabBarItem]()

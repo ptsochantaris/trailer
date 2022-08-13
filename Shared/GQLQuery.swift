@@ -60,7 +60,7 @@ final class GQLQuery {
 
     func run(for url: String, authToken: String, attempt: Int) async throws -> ApiStats? {
         let Q = queryText
-        if Settings.dumpAPIResponsesInConsole {
+        if await Settings.dumpAPIResponsesInConsole {
             DLog("\(logPrefix)Fetching: \(Q)")
         }
 
@@ -78,11 +78,12 @@ final class GQLQuery {
         var shouldRetry = false
         do {
             let (info, response) = try await HTTP.getData(for: r)
-            guard let json = try JSONSerialization.jsonObject(with: info, options: []) as? [AnyHashable: Any] else {
+            let json = try await Task.detached { try JSONSerialization.jsonObject(with: info, options: []) as? [AnyHashable: Any] }.value
+            guard let json = json else {
                 throw API.apiError("\(logPrefix)Invalid JSON")
             }
 
-            if Settings.dumpAPIResponsesInConsole {
+            if await Settings.dumpAPIResponsesInConsole {
                 DLog("\(logPrefix)API data from %@: %@", url, String(bytes: info, encoding: .utf8))
             }
 

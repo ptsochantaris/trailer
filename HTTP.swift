@@ -7,7 +7,7 @@
 
 import Foundation
 
-@ApiActor
+@MainActor
 enum HTTP {
     private final actor GateKeeper {
         private var counter: Int

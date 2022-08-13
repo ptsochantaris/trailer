@@ -16,25 +16,27 @@ final class Repo: DataItem {
     @NSManaged var archived: Bool
     @NSManaged var lastScannedIssueEventId: Int64
 
+    override class var isParentType: Bool { true }
+
     override func resetSyncState() {
         super.resetSyncState()
         lastScannedIssueEventId = 0
         updatedAt = updatedAt?.addingTimeInterval(-1)
     }
 
-    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext) {
-        syncItems(of: Repo.self, from: nodes, on: server, moc: moc) { repo, node in
+    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext) async {
+        await syncItems(of: Repo.self, from: nodes, on: server, moc: moc) { repo, node in
 
             var neededByAuthoredPr = false
             var neededByAuthoredIssue = false
             if let parent = node.parent {
                 if parent.elementType == "PullRequest" {
                     neededByAuthoredPr = true
-                    DataItem.item(of: PullRequest.self, with: parent.id, in: moc)?.repo = repo
+                    DataItem.parent(of: PullRequest.self, with: parent.id, in: moc)?.repo = repo
 
                 } else if parent.elementType == "Issue" {
                     neededByAuthoredIssue = true
-                    DataItem.item(of: Issue.self, with: parent.id, in: moc)?.repo = repo
+                    DataItem.parent(of: Issue.self, with: parent.id, in: moc)?.repo = repo
                 }
             }
 
@@ -61,7 +63,6 @@ final class Repo: DataItem {
         }
     }
 
-    @ApiActor
     static func syncRepos(from data: [[AnyHashable: Any]]?, server: ApiServer, addNewRepos: Bool, manuallyAdded: Bool, moc: NSManagedObjectContext) {
         let filteredData = data?.filter { info -> Bool in
             if info["private"] as? Bool ?? false {
@@ -188,7 +189,6 @@ final class Repo: DataItem {
         return c > 0
     }
 
-    @MainActor
     static func mayProvideIssuesForDisplay(fromServerWithId id: NSManagedObjectID? = nil) -> Bool {
         let all: [Repo]
         if let aid = id, let apiServer = existingObject(with: aid) as? ApiServer {
@@ -199,7 +199,6 @@ final class Repo: DataItem {
         return all.contains { $0.displayPolicyForIssues != RepoDisplayPolicy.hide.rawValue }
     }
 
-    @MainActor
     static func mayProvidePrsForDisplay(fromServerWithId id: NSManagedObjectID? = nil) -> Bool {
         let all: [Repo]
         if let aid = id, let apiServer = existingObject(with: aid) as? ApiServer {
@@ -234,7 +233,6 @@ final class Repo: DataItem {
         return try! moc.fetch(f)
     }
 
-    @MainActor
     static func reposFiltered(by filter: String?) -> [Repo] {
         let f = NSFetchRequest<Repo>(entityName: "Repo")
         f.returnsObjectsAsFaults = false
