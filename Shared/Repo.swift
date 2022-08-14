@@ -243,7 +243,7 @@ final class Repo: DataItem {
         return try! DataManager.main.fetch(f)
     }
 
-    func markItemsAsUpdated(with numbers: Set<Int64>, reasons _: Set<String>) {
+    func markItemsAsUpdated(with numbers: Set<Int64>) {
         let predicate = NSPredicate(format: "(number IN %@) AND (repo == %@)", numbers, self)
 
         func mark<T>(type: T.Type) where T: ListableItem {

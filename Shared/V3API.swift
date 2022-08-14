@@ -62,7 +62,7 @@ extension API {
         }
     }
 
-    private static func markExtraUpdatedItems(from repos: [Repo], to _: NSManagedObjectContext) async {
+    private static func markExtraUpdatedItems(from repos: [Repo]) async {
         await withTaskGroup(of: Void.self) { group in
             for r in repos {
                 let repoFullName = S(r.fullName)
@@ -82,7 +82,6 @@ extension API {
 
                         } else {
                             var numbers = Set<Int64>()
-                            var reasons = Set<String>()
                             var foundLastEvent = false
                             for event in data {
                                 if let eventId = event["id"] as? Int64, let issue = event["issue"] as? [AnyHashable: Any], let issueNumber = issue["number"] as? Int64 {
@@ -94,9 +93,8 @@ extension API {
                                         DLog("Parsed all repo issue events up to the one we already have")
                                         break // we're done
                                     }
-                                    if let reason = event["event"] as? String {
+                                    if event["event"] as? String != nil {
                                         numbers.insert(issueNumber)
-                                        reasons.insert(reason)
                                     }
                                 }
                             }
@@ -104,7 +102,7 @@ extension API {
                                 r.lastScannedIssueEventId = lastLocalEvent
                             }
                             if !numbers.isEmpty {
-                                r.markItemsAsUpdated(with: numbers, reasons: reasons)
+                                r.markItemsAsUpdated(with: numbers)
                             }
                             return foundLastEvent
                         }
@@ -120,7 +118,7 @@ extension API {
     static func v3Sync(_ repos: [Repo], to moc: NSManagedObjectContext) async {
         await fetchItems(for: repos, in: moc)
         let reposWithSomeItems = repos.filter { !$0.issues.isEmpty || !$0.pullRequests.isEmpty }
-        await markExtraUpdatedItems(from: reposWithSomeItems, to: moc)
+        await markExtraUpdatedItems(from: reposWithSomeItems)
         let newOrUpdatedPrs = DataItem.newOrUpdatedItems(of: PullRequest.self, in: moc, fromSuccessfulSyncOnly: true)
         let newOrUpdatedIssues = DataItem.newOrUpdatedItems(of: Issue.self, in: moc, fromSuccessfulSyncOnly: true)
 
@@ -151,10 +149,10 @@ extension API {
 
             if Settings.showLabels {
                 group.addTask { @MainActor in
-                    await fetchLabelsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
+                    await fetchLabelsForCurrentPullRequests(for: newOrUpdatedPrs)
                 }
                 group.addTask { @MainActor in
-                    await fetchLabelsForCurrentIssues(to: moc, for: newOrUpdatedIssues)
+                    await fetchLabelsForCurrentIssues(for: newOrUpdatedIssues)
                 }
             } else {
                 for l in DataItem.allItems(of: PRLabel.self, in: moc) {
@@ -167,12 +165,12 @@ extension API {
             }
 
             group.addTask { @MainActor in
-                await detectAssignedPullRequests(in: moc, for: newOrUpdatedPrs)
+                await detectAssignedPullRequests(for: newOrUpdatedPrs)
             }
 
             if shouldSyncReviewAssignments {
                 group.addTask { @MainActor in
-                    await fetchReviewAssignmentsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
+                    await fetchReviewAssignmentsForCurrentPullRequests(for: newOrUpdatedPrs)
                 }
             }
 
@@ -423,7 +421,7 @@ extension API {
         }
     }
 
-    private static func fetchReviewAssignmentsForCurrentPullRequests(to _: NSManagedObjectContext, for prs: [PullRequest]) async {
+    private static func fetchReviewAssignmentsForCurrentPullRequests(for prs: [PullRequest]) async {
         await withThrowingTaskGroup(of: Void.self) { group in
             for p in prs {
                 group.addTask { @MainActor in
@@ -457,7 +455,7 @@ extension API {
         }
     }
 
-    private static func fetchLabelsForCurrentPullRequests(to _: NSManagedObjectContext, for prs: [PullRequest]) async {
+    private static func fetchLabelsForCurrentPullRequests(for prs: [PullRequest]) async {
         if prs.isEmpty {
             return
         }
@@ -488,7 +486,7 @@ extension API {
         }
     }
 
-    private static func fetchLabelsForCurrentIssues(to _: NSManagedObjectContext, for issues: [Issue]) async {
+    private static func fetchLabelsForCurrentIssues(for issues: [Issue]) async {
         if issues.isEmpty {
             return
         }
@@ -561,7 +559,7 @@ extension API {
         }
     }
 
-    private static func detectAssignedPullRequests(in _: NSManagedObjectContext, for prs: [PullRequest]) async {
+    private static func detectAssignedPullRequests(for prs: [PullRequest]) async {
         await withTaskGroup(of: Void.self) { group in
             for p in prs {
                 let apiServer = p.apiServer

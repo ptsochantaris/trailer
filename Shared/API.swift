@@ -236,11 +236,13 @@ enum API {
         let repos = Repo.syncableRepos(in: moc)
 
         if Settings.useV4API {
+            DataItem.parentCache = FetchCache()
             do {
                 try await v4Sync(repos, to: moc)
             } catch {
                 DLog("Sync aborted due to error")
             }
+            DataItem.parentCache = nil
 
         } else {
             await v3Sync(repos, to: moc)

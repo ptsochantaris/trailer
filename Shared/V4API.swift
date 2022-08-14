@@ -52,7 +52,7 @@ extension API {
 
         if Settings.showStatusItems {
             let prs = PullRequest.statusCheckBatch(in: moc)
-            try await GraphQL.update(for: prs, of: PullRequest.self, in: moc, steps: [.statuses])
+            try await GraphQL.update(for: prs, steps: [.statuses])
         } else {
             for p in DataItem.allItems(of: PullRequest.self, in: moc) {
                 p.lastStatusScan = nil
@@ -64,10 +64,10 @@ extension API {
 
         if Settings.notifyOnItemReactions {
             let rp = PullRequest.reactionCheckBatch(for: PullRequest.self, in: moc)
-            try await GraphQL.update(for: rp, of: PullRequest.self, in: moc, steps: [.reactions])
+            try await GraphQL.update(for: rp, steps: [.reactions])
 
             let ri = Issue.reactionCheckBatch(for: Issue.self, in: moc)
-            try await GraphQL.update(for: ri, of: Issue.self, in: moc, steps: [.reactions])
+            try await GraphQL.update(for: ri, steps: [.reactions])
         }
 
         var steps: SyncSteps = [.comments]
@@ -84,12 +84,12 @@ extension API {
             }
         }
 
-        try await GraphQL.update(for: newOrUpdatedPrs, of: PullRequest.self, in: moc, steps: steps)
+        try await GraphQL.update(for: newOrUpdatedPrs, steps: steps)
 
         let reviews = DataItem.newOrUpdatedItems(of: Review.self, in: moc, fromSuccessfulSyncOnly: true)
-        try await GraphQL.updateComments(for: reviews, moc: moc) // must run after fetching reviews
+        try await GraphQL.updateComments(for: reviews) // must run after fetching reviews
 
-        try await GraphQL.update(for: newOrUpdatedIssues, of: Issue.self, in: moc, steps: steps)
+        try await GraphQL.update(for: newOrUpdatedIssues, steps: steps)
 
         if Settings.notifyOnCommentReactions {
             let comments = PRComment.commentsThatNeedReactionsToBeRefreshed(in: moc)
@@ -99,7 +99,7 @@ extension API {
                     r.postSyncAction = PostSyncAction.delete.rawValue
                 }
             }
-            try await GraphQL.updateReactions(for: comments, moc: moc)
+            try await GraphQL.updateReactions(for: comments)
         }
     }
 }

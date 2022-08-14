@@ -79,15 +79,13 @@ enum GraphQL {
         }
     }
 
-    static func update<T: ListableItem>(for items: [T], of _: T.Type, in _: NSManagedObjectContext, steps: API.SyncSteps) async throws {
+    static func update<T: ListableItem>(for items: [T], steps: API.SyncSteps) async throws {
         let typeName = String(describing: T.self)
 
         var elements: [GQLElement] = [idField]
-        var elementTypes = [String]()
 
         if let prs = items as? [PullRequest] {
             if steps.contains(.reviewRequests) {
-                elementTypes.append("ReviewRequest")
                 let requestFragment = GQLFragment(on: "ReviewRequest", elements: [
                     idField,
                     GQLGroup(name: "requestedReviewer", fields: [userFragment, teamFragment, mannequinFragment])
@@ -102,7 +100,6 @@ enum GraphQL {
                     }
                 }
 
-                elementTypes.append("PullRequestReview")
                 let reviewFragment = GQLFragment(on: "PullRequestReview", elements: [
                     idField,
                     GQLField(name: "body"),
@@ -123,7 +120,6 @@ enum GraphQL {
                     }
                 }
 
-                elementTypes.append("StatusContext")
                 elements.append(GQLGroup(name: "commits", fields: [
                     GQLGroup(name: "commit", fields: [
                         GQLGroup(name: "checkSuites", fields: [
@@ -146,7 +142,6 @@ enum GraphQL {
                 }
             }
 
-            elementTypes.append("Reaction")
             let reactionFragment = GQLFragment(on: "Reaction", elements: [
                 idField,
                 GQLField(name: "content"),
@@ -162,17 +157,15 @@ enum GraphQL {
                     $0.postSyncAction = PostSyncAction.delete.rawValue
                 }
             }
-            elementTypes.append("IssueComment")
             let commentFragment = GQLFragment(on: "IssueComment", elements: commentFields)
             elements.append(GQLGroup(name: "comments", fields: [commentFragment], pageSize: 100))
         }
 
         let fields = [GQLFragment(on: typeName, elements: elements)]
-
-        try await process(name: steps.toString, elementTypes: elementTypes, items: items, parentType: T.self, fields: fields)
+        try await process(name: steps.toString, items: items, parentType: T.self, fields: fields)
     }
 
-    static func updateReactions(for comments: [PRComment], moc _: NSManagedObjectContext) async throws {
+    static func updateReactions(for comments: [PRComment]) async throws {
         let reactionFragment = GQLFragment(on: "Reaction", elements: [
             idField,
             GQLField(name: "content"),
@@ -185,10 +178,10 @@ enum GraphQL {
             GQLGroup(name: "reactions", fields: [reactionFragment], pageSize: 100)
         ])
 
-        try await process(name: "Comment Reactions", elementTypes: ["Reaction"], items: comments, fields: [itemFragment])
+        try await process(name: "Comment Reactions", items: comments, fields: [itemFragment])
     }
 
-    static func updateComments(for reviews: [Review], moc _: NSManagedObjectContext) async throws {
+    static func updateComments(for reviews: [Review]) async throws {
         let commentFragment = GQLFragment(on: "PullRequestReviewComment", elements: commentFields)
 
         let itemFragment = GQLFragment(on: "PullRequestReview", elements: [
@@ -196,10 +189,10 @@ enum GraphQL {
             GQLGroup(name: "comments", fields: [commentFragment], pageSize: 100)
         ])
 
-        try await process(name: "Review Comments", elementTypes: ["PullRequestReviewComment"], items: reviews, fields: [itemFragment])
+        try await process(name: "Review Comments", items: reviews, fields: [itemFragment])
     }
 
-    private static func process<T: ListableItem>(name: String, elementTypes _: [String], items: [DataItem], parentType: T.Type? = nil, fields: [GQLElement]) async throws {
+    private static func process<T: ListableItem>(name: String, items: [DataItem], parentType: T.Type? = nil, fields: [GQLElement]) async throws {
         if items.isEmpty {
             return
         }
@@ -578,7 +571,7 @@ enum GraphQL {
                 await Reaction.sync(from: nodeList, for: parentType, on: server, moc: processMoc)
             }
             if let nodeList = nodes["ReviewRequest"] {
-                Review.syncRequests(from: nodeList, on: server, moc: processMoc)
+                Review.syncRequests(from: nodeList, moc: processMoc)
             }
             if let nodeList = nodes["PullRequestReview"] {
                 await Review.sync(from: nodeList, on: server, moc: processMoc)

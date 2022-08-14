@@ -132,6 +132,7 @@ class DataItem: NSManagedObject {
     }
 
     static var parentCache: FetchCache?
+    // must only be called from inside `sync(from nodes`
     static func parent<T: DataItem>(of type: T.Type, with nodeId: String, in moc: NSManagedObjectContext) -> T? {
         if let parentCache = parentCache, let existingObject = parentCache.object(forKey: nodeId as NSString) as? T {
             return existingObject

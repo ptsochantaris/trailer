@@ -76,7 +76,7 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
         }
     }
 
-    func statusItemViewSelected(_: StatusItemView) {
+    func statusItemViewSelected() {
         if isVisible {
             closeMenu()
         } else {
