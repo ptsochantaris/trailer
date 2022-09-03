@@ -7,7 +7,7 @@ enum RestAccess {
         var nextIncrement: TimeInterval
     }
 
-    static func getPagedData(at path: String, from server: ApiServer, startingFrom page: Int = 1, perPage: @MainActor @escaping ([[AnyHashable: Any]]?, Bool) -> Bool) async -> (Bool, Int) {
+    static func getPagedData(at path: String, from server: ApiServer, startingFrom page: Int = 1, perPage: @MainActor @escaping ([[AnyHashable: Any]]?, Bool) async -> Bool) async -> (Bool, Int) {
         if path.isEmpty {
             // handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
             return (true, -1)
@@ -16,7 +16,7 @@ enum RestAccess {
         do {
             let p = page > 1 ? "\(path)?page=\(page)&per_page=100" : "\(path)?per_page=100"
             let (data, lastPage, resultCode) = try await getData(in: p, from: server)
-            if perPage(data as? [[AnyHashable: Any]], lastPage) || lastPage {
+            if await perPage(data as? [[AnyHashable: Any]], lastPage) || lastPage {
                 return (true, resultCode)
             } else {
                 return await getPagedData(at: path, from: server, startingFrom: page + 1, perPage: perPage)

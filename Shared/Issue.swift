@@ -12,8 +12,8 @@ final class Issue: ListableItem {
         super.webUrl?.appending(pathComponent: "issues").appending(pathComponent: String(number))
     }
 
-    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext) async {
-        await syncItems(of: Issue.self, from: nodes, on: server, moc: moc) { issue, node in
+    static func sync(from nodes: ContiguousArray<GQLNode>, on serverId: NSManagedObjectID, moc: NSManagedObjectContext) async {
+        await syncItems(of: Issue.self, from: nodes, on: serverId, moc: moc) { issue, node, moc in
 
             guard node.created || node.updated,
                   let parentId = node.parent?.id ?? (node.jsonPayload["repository"] as? [AnyHashable: Any])?["id"] as? String,
@@ -25,9 +25,9 @@ final class Issue: ListableItem {
         }
     }
 
-    static func syncIssues(from data: [[AnyHashable: Any]]?, in repo: Repo, moc: NSManagedObjectContext) {
+    static func syncIssues(from data: [[AnyHashable: Any]]?, in repo: Repo, moc: NSManagedObjectContext) async {
         let filteredData = data?.filter { $0["pull_request"] == nil } // don't sync issues which are pull requests, they are already synced
-        items(with: filteredData, type: Issue.self, server: repo.apiServer, prefetchRelationships: ["labels"], moc: moc) { item, info, isNewOrUpdated in
+        await items(with: filteredData, type: Issue.self, server: repo.apiServer, prefetchRelationships: ["labels"], moc: moc) { item, info, isNewOrUpdated in
             if isNewOrUpdated {
                 item.baseSync(from: info, in: repo)
 

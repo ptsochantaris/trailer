@@ -14,8 +14,8 @@ final class Team: DataItem {
         return try? moc.fetch(f).first
     }
 
-    static func syncTeams(from data: [[AnyHashable: Any]]?, server: ApiServer, moc: NSManagedObjectContext) {
-        items(with: data, type: Team.self, server: server, moc: moc) { item, info, _ in
+    static func syncTeams(from data: [[AnyHashable: Any]]?, server: ApiServer, moc: NSManagedObjectContext) async {
+        await items(with: data, type: Team.self, server: server, moc: moc) { item, info, _ in
             let slug = S(info["slug"] as? String)
             let org = S((info["organization"] as? [AnyHashable: Any])?["login"] as? String)
             item.slug = slug

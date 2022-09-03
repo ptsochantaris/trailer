@@ -236,13 +236,11 @@ enum API {
         let repos = Repo.syncableRepos(in: moc)
 
         if Settings.useV4API {
-            DataItem.parentCache = FetchCache()
             do {
                 try await v4Sync(repos, to: moc)
             } catch {
                 DLog("Sync aborted due to error")
             }
-            DataItem.parentCache = nil
 
         } else {
             await v3Sync(repos, to: moc)
@@ -301,7 +299,7 @@ enum API {
         }
 
         let (success, _) = await RestAccess.getPagedData(at: "/user/teams", from: server) { data, _ in
-            Team.syncTeams(from: data, server: server, moc: moc)
+            await Team.syncTeams(from: data, server: server, moc: moc)
             return false
         }
         if !success {
@@ -404,7 +402,7 @@ enum API {
 
         let createNewRepos = Settings.automaticallyRemoveDeletedReposFromWatchlist
         let (success, _) = await RestAccess.getPagedData(at: "/user/subscriptions", from: server) { data, _ in
-            Repo.syncRepos(from: data, server: server, addNewRepos: createNewRepos, manuallyAdded: false, moc: moc)
+            await Repo.syncRepos(from: data, server: server, addNewRepos: createNewRepos, manuallyAdded: false, moc: moc)
             return false
         }
         if !success {
@@ -422,7 +420,7 @@ enum API {
         do {
             let (data, _, _) = try await RestAccess.getData(in: path, from: server)
             if let repoData = data as? [AnyHashable: Any] {
-                Repo.syncRepos(from: [repoData], server: server, addNewRepos: true, manuallyAdded: true, moc: moc)
+                await Repo.syncRepos(from: [repoData], server: server, addNewRepos: true, manuallyAdded: true, moc: moc)
             }
         } catch {
             let resultCode = (error as NSError).code
@@ -466,7 +464,7 @@ enum API {
         let userList = try await userTask.value
         let orgList = try await orgTask.value
 
-        Repo.syncRepos(from: userList + orgList, server: server, addNewRepos: true, manuallyAdded: true, moc: moc)
+        await Repo.syncRepos(from: userList + orgList, server: server, addNewRepos: true, manuallyAdded: true, moc: moc)
     }
 
     static func fetchRepo(named: String, owner: String, from server: ApiServer, moc: NSManagedObjectContext) async throws {

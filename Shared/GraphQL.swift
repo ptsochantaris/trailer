@@ -543,45 +543,45 @@ enum GraphQL {
     }
 
     private static func processBlock<T: ListableItem>(_ nodes: [String: ContiguousArray<GQLNode>], _ serverId: NSManagedObjectID, _ processMoc: NSManagedObjectContext, _ parentType: T.Type?) async {
-        if let server = try? processMoc.existingObject(with: serverId) as? ApiServer {
-            // Order must be fixed, since labels may refer to PRs or Issues, ensure they are created first
+        // Order must be fixed, since labels may refer to PRs or Issues, ensure they are created first
 
-            if let nodeList = nodes["Repository"] {
-                await Repo.sync(from: nodeList, on: server, moc: processMoc)
-            }
-            if let nodeList = nodes["Issue"] {
-                await Issue.sync(from: nodeList, on: server, moc: processMoc)
-            }
-            if let nodeList = nodes["PullRequest"] {
-                await PullRequest.sync(from: nodeList, on: server, moc: processMoc)
-            }
-            if let nodeList = nodes["Label"] {
-                await PRLabel.sync(from: nodeList, on: server, moc: processMoc)
-            }
-            if let nodeList = nodes["CommentReaction"] {
-                await Reaction.sync(from: nodeList, for: PRComment.self, on: server, moc: processMoc)
-            }
-            if let nodeList = nodes["IssueComment"] {
-                await PRComment.sync(from: nodeList, on: server, moc: processMoc)
-            }
-            if let nodeList = nodes["PullRequestReviewComment"] {
-                await PRComment.sync(from: nodeList, on: server, moc: processMoc)
-            }
-            if let nodeList = nodes["Reaction"], let parentType = parentType {
-                await Reaction.sync(from: nodeList, for: parentType, on: server, moc: processMoc)
-            }
-            if let nodeList = nodes["ReviewRequest"] {
-                Review.syncRequests(from: nodeList, moc: processMoc)
-            }
-            if let nodeList = nodes["PullRequestReview"] {
-                await Review.sync(from: nodeList, on: server, moc: processMoc)
-            }
-            if let nodeList = nodes["StatusContext"] {
-                await PRStatus.sync(from: nodeList, on: server, moc: processMoc)
-            }
-            if let nodeList = nodes["CheckRun"] {
-                await PRStatus.sync(from: nodeList, on: server, moc: processMoc)
-            }
+        // TODO place child context here?
+        
+        if let nodeList = nodes["Repository"] {
+            await Repo.sync(from: nodeList, on: serverId, moc: processMoc)
+        }
+        if let nodeList = nodes["Issue"] {
+            await Issue.sync(from: nodeList, on: serverId, moc: processMoc)
+        }
+        if let nodeList = nodes["PullRequest"] {
+            await PullRequest.sync(from: nodeList, on: serverId, moc: processMoc)
+        }
+        if let nodeList = nodes["Label"] {
+            await PRLabel.sync(from: nodeList, on: serverId, moc: processMoc)
+        }
+        if let nodeList = nodes["CommentReaction"] {
+            await Reaction.sync(from: nodeList, for: PRComment.self, on: serverId, moc: processMoc)
+        }
+        if let nodeList = nodes["IssueComment"] {
+            await PRComment.sync(from: nodeList, on: serverId, moc: processMoc)
+        }
+        if let nodeList = nodes["PullRequestReviewComment"] {
+            await PRComment.sync(from: nodeList, on: serverId, moc: processMoc)
+        }
+        if let nodeList = nodes["Reaction"], let parentType = parentType {
+            await Reaction.sync(from: nodeList, for: parentType, on: serverId, moc: processMoc)
+        }
+        if let nodeList = nodes["ReviewRequest"] {
+            Review.syncRequests(from: nodeList, moc: processMoc)
+        }
+        if let nodeList = nodes["PullRequestReview"] {
+            await Review.sync(from: nodeList, on: serverId, moc: processMoc)
+        }
+        if let nodeList = nodes["StatusContext"] {
+            await PRStatus.sync(from: nodeList, on: serverId, moc: processMoc)
+        }
+        if let nodeList = nodes["CheckRun"] {
+            await PRStatus.sync(from: nodeList, on: serverId, moc: processMoc)
         }
     }
 }

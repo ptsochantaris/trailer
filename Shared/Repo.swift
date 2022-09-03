@@ -24,8 +24,8 @@ final class Repo: DataItem {
         updatedAt = updatedAt?.addingTimeInterval(-1)
     }
 
-    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext) async {
-        await syncItems(of: Repo.self, from: nodes, on: server, moc: moc) { repo, node in
+    static func sync(from nodes: ContiguousArray<GQLNode>, on serverId: NSManagedObjectID, moc: NSManagedObjectContext) async {
+        await syncItems(of: Repo.self, from: nodes, on: serverId, moc: moc) { repo, node, moc in
 
             var neededByAuthoredPr = false
             var neededByAuthoredIssue = false
@@ -63,7 +63,7 @@ final class Repo: DataItem {
         }
     }
 
-    static func syncRepos(from data: [[AnyHashable: Any]]?, server: ApiServer, addNewRepos: Bool, manuallyAdded: Bool, moc: NSManagedObjectContext) {
+    static func syncRepos(from data: [[AnyHashable: Any]]?, server: ApiServer, addNewRepos: Bool, manuallyAdded: Bool, moc: NSManagedObjectContext) async {
         let filteredData = data?.filter { info -> Bool in
             if info["private"] as? Bool ?? false {
                 if let permissions = info["permissions"] as? [AnyHashable: Any] {
@@ -83,7 +83,7 @@ final class Repo: DataItem {
             }
         }
 
-        items(with: filteredData, type: Repo.self, server: server, createNewItems: addNewRepos, moc: moc) { item, info, newOrUpdated in
+        await items(with: filteredData, type: Repo.self, server: server, createNewItems: addNewRepos, moc: moc) { item, info, newOrUpdated in
             if newOrUpdated {
                 item.fullName = info["full_name"] as? String
                 item.fork = info["fork"] as? Bool ?? false

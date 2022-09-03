@@ -49,8 +49,8 @@ final class Review: DataItem {
         }
     }
 
-    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext) async {
-        await syncItems(of: Review.self, from: nodes, on: server, moc: moc) { review, node in
+    static func sync(from nodes: ContiguousArray<GQLNode>, on serverId: NSManagedObjectID, moc: NSManagedObjectContext) async {
+        await syncItems(of: Review.self, from: nodes, on: serverId, moc: moc) { review, node, moc in
 
             let info = node.jsonPayload
             if info.count == 3 { // this node is a blank container (id, comments, typename)
@@ -76,8 +76,8 @@ final class Review: DataItem {
         }
     }
 
-    static func syncReviews(from data: [[AnyHashable: Any]]?, withParent: PullRequest, moc: NSManagedObjectContext) {
-        items(with: data, type: Review.self, server: withParent.apiServer, moc: moc) { item, info, isNewOrUpdated in
+    static func syncReviews(from data: [[AnyHashable: Any]]?, withParent: PullRequest, moc: NSManagedObjectContext) async {
+        await items(with: data, type: Review.self, server: withParent.apiServer, moc: moc) { item, info, isNewOrUpdated in
             if isNewOrUpdated {
                 item.pullRequest = withParent
                 item.body = info["body"] as? String

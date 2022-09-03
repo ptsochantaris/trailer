@@ -37,7 +37,7 @@ extension API {
                     let repoFullName = S(r.fullName)
                     group.addTask { @MainActor in
                         let (success, resultCode) = await RestAccess.getPagedData(at: "/repos/\(repoFullName)/pulls", from: apiServer) { data, _ in
-                            PullRequest.syncPullRequests(from: data, in: r, moc: moc)
+                            await PullRequest.syncPullRequests(from: data, in: r, moc: moc)
                             return false
                         }
                         if !success {
@@ -50,7 +50,7 @@ extension API {
                     let repoFullName = S(r.fullName)
                     group.addTask { @MainActor in
                         let (success, resultCode) = await RestAccess.getPagedData(at: "/repos/\(repoFullName)/issues", from: apiServer) { data, _ in
-                            Issue.syncIssues(from: data, in: r, moc: moc)
+                            await Issue.syncIssues(from: data, in: r, moc: moc)
                             return false
                         }
                         if !success {
@@ -237,7 +237,7 @@ extension API {
                 guard let reactionUrl = c.reactionsUrl else { continue }
                 group.addTask { @MainActor in
                     let (success, _) = await RestAccess.getPagedData(at: reactionUrl, from: c.apiServer) { data, _ in
-                        Reaction.syncReactions(from: data, comment: c, moc: moc)
+                        await Reaction.syncReactions(from: data, comment: c, moc: moc)
                         return false
                     }
                     if success {
@@ -268,7 +268,7 @@ extension API {
                 }
                 group.addTask { @MainActor in
                     let (success, _) = await RestAccess.getPagedData(at: reactionsUrl, from: i.apiServer) { data, _ in
-                        Reaction.syncReactions(from: data, parent: i, moc: moc)
+                        await Reaction.syncReactions(from: data, parent: i, moc: moc)
                         return false
                     }
                     if !success {
@@ -298,7 +298,7 @@ extension API {
                         let apiServer = p.apiServer
                         group.addTask { @MainActor in
                             let (success, _) = await RestAccess.getPagedData(at: link, from: apiServer) { data, _ in
-                                PRComment.syncComments(from: data, parent: p, moc: moc)
+                                await PRComment.syncComments(from: data, parent: p, moc: moc)
                                 return false
                             }
                             if !success {
@@ -336,7 +336,7 @@ extension API {
 
                     group.addTask { @MainActor in
                         let (success, _) = await RestAccess.getPagedData(at: link, from: apiServer) { data, _ in
-                            PRComment.syncComments(from: data, parent: i, moc: moc)
+                            await PRComment.syncComments(from: data, parent: i, moc: moc)
                             return false
                         }
                         if !success {
@@ -361,7 +361,7 @@ extension API {
                 let repoFullName = S(p.repo.fullName)
                 group.addTask { @MainActor in
                     let (success, _) = await RestAccess.getPagedData(at: "/repos/\(repoFullName)/pulls/\(p.number)/reviews", from: p.apiServer) { data, _ in
-                        Review.syncReviews(from: data, withParent: p, moc: moc)
+                        await Review.syncReviews(from: data, withParent: p, moc: moc)
                         return false
                     }
                     if !success {
@@ -536,7 +536,7 @@ extension API {
                 if let statusLink = p.statusesLink {
                     group.addTask { @MainActor in
                         let (success, resultCode) = await RestAccess.getPagedData(at: statusLink, from: apiServer) { data, _ in
-                            PRStatus.syncStatuses(from: data, pullRequest: p, moc: moc)
+                            await PRStatus.syncStatuses(from: data, pullRequest: p, moc: moc)
                             return false
                         }
                         var allGood = success

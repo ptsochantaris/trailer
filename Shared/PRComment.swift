@@ -16,8 +16,8 @@ final class PRComment: DataItem {
 
     @NSManaged var reactions: Set<Reaction>
 
-    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext) async {
-        await syncItems(of: PRComment.self, from: nodes, on: server, moc: moc) { comment, node in
+    static func sync(from nodes: ContiguousArray<GQLNode>, on serverId: NSManagedObjectID, moc: NSManagedObjectContext) async {
+        await syncItems(of: PRComment.self, from: nodes, on: serverId, moc: moc) { comment, node, moc in
             guard node.created || node.updated,
                   let parentId = node.parent?.id
             else { return }
@@ -53,8 +53,8 @@ final class PRComment: DataItem {
         }
     }
 
-    static func syncComments(from data: [[AnyHashable: Any]]?, parent: ListableItem, moc: NSManagedObjectContext) {
-        items(with: data, type: PRComment.self, server: parent.apiServer, moc: moc) { item, info, newOrUpdated in
+    static func syncComments(from data: [[AnyHashable: Any]]?, parent: ListableItem, moc: NSManagedObjectContext) async {
+        await items(with: data, type: PRComment.self, server: parent.apiServer, moc: moc) { item, info, newOrUpdated in
             if newOrUpdated {
                 item.pullRequest = parent as? PullRequest
                 item.issue = parent as? Issue

@@ -29,8 +29,8 @@ final class PullRequest: ListableItem {
         repo.pullRequests.reduce(.distantPast) { max($0, $1.updatedAt ?? .distantPast) }
     }
 
-    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext) async {
-        await syncItems(of: PullRequest.self, from: nodes, on: server, moc: moc) { pr, node in
+    static func sync(from nodes: ContiguousArray<GQLNode>, on serverId: NSManagedObjectID, moc: NSManagedObjectContext) async {
+        await syncItems(of: PullRequest.self, from: nodes, on: serverId, moc: moc) { pr, node, moc in
             guard node.created || node.updated,
                   let parentId = node.parent?.id ?? (node.jsonPayload["repository"] as? [AnyHashable: Any])?["id"] as? String,
                   let parent = DataItem.parent(of: Repo.self, with: parentId, in: moc)
@@ -78,10 +78,10 @@ final class PullRequest: ListableItem {
         repo.apiUrl?.appending(pathComponent: "statuses").appending(pathComponent: mergeCommitSha ?? "")
     }
 
-    static func syncPullRequests(from data: [[AnyHashable: Any]]?, in repo: Repo, moc: NSManagedObjectContext) {
+    static func syncPullRequests(from data: [[AnyHashable: Any]]?, in repo: Repo, moc: NSManagedObjectContext) async {
         let apiServer = repo.apiServer
         let apiServerUserId = apiServer.userNodeId
-        items(with: data, type: PullRequest.self, server: apiServer, moc: moc) { item, info, isNewOrUpdated in
+        await items(with: data, type: PullRequest.self, server: apiServer, moc: moc) { item, info, isNewOrUpdated in
             if isNewOrUpdated {
                 item.baseSync(from: info, in: repo)
 

@@ -1,6 +1,6 @@
 import CoreData
 
-typealias FetchCache = NSCache<NSString, NSManagedObject>
+typealias FetchCache = NSCache<NSString, NSManagedObjectID>
 
 @MainActor
 class DataItem: NSManagedObject {
@@ -52,7 +52,7 @@ class DataItem: NSManagedObject {
                                    prefetchRelationships: [String]? = nil,
                                    createNewItems: Bool = true,
                                    moc: NSManagedObjectContext,
-                                   postProcessCallback: (T, [AnyHashable: Any], Bool) -> Void) {
+                                   postProcessCallback: @escaping (T, [AnyHashable: Any], Bool) -> Void) async {
         guard let infos = data, !infos.isEmpty else { return }
 
         var legacyIdsToNodeIds = [Int64: String]()
@@ -68,86 +68,86 @@ class DataItem: NSManagedObject {
 
         if nodeIdsToInfo.isEmpty { return }
 
-        let entityName = String(describing: type)
-        let f = NSFetchRequest<T>(entityName: entityName)
-        f.relationshipKeyPathsForPrefetching = prefetchRelationships
-        f.returnsObjectsAsFaults = false
-        f.includesSubentities = false
-
-        let legacyServerIds = legacyIdsToNodeIds.map { k, _ in k }
-        f.predicate = NSPredicate(format: "serverId in %@ and apiServer == %@", legacyServerIds, server)
-        for item in try! moc.fetch(f) {
-            if let legacyId = item.value(forKey: "serverId") as? Int64 {
-                if let nodeId = legacyIdsToNodeIds[legacyId] {
-                    item.nodeId = nodeId
-                    item.setValue(nil, forKey: "serverId")
-                    DLog("Migrated \(entityName) from legacy ID \(legacyId) to node ID \(nodeId)")
-                } else {
-                    DLog("Warning: Migration failed for \(entityName) with legacy ID \(legacyId), could not find node ID")
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            let syncMoc = moc.buildChildPrivateQueue()
+            syncMoc.perform {
+                defer {
+                    try? syncMoc.save()
+                    continuation.resume()
                 }
-            } else {
-                DLog("Warning: Migration failed for \(entityName) - could not read legacy ID!")
-            }
-        }
+                
+                let entityName = String(describing: type)
+                let f = NSFetchRequest<T>(entityName: entityName)
+                f.relationshipKeyPathsForPrefetching = prefetchRelationships
+                f.returnsObjectsAsFaults = false
+                f.includesSubentities = false
 
-        var nodeIdsOfItems = Set(nodeIdsToInfo.map { k, _ in k })
-        f.predicate = NSPredicate(format: "nodeId in %@ and apiServer == %@", nodeIdsOfItems, server)
-        let existingItems = try! moc.fetch(f)
-
-        let now = Date()
-
-        for i in existingItems {
-            if let nodeId = i.nodeId, let info = nodeIdsToInfo[nodeId] {
-                let updatedDate = DataItem.parseGH8601(info["updated_at"] as? String) ?? i.createdAt ?? now
-                if updatedDate != i.updatedAt {
-                    DLog("Updating %@: %@ (v3)", entityName, nodeId)
-                    i.postSyncAction = PostSyncAction.isUpdated.rawValue
-                    i.updatedAt = updatedDate
-                    postProcessCallback(i, info, true)
-                } else {
-                    // DLog("Skipping %@: %@",type,serverId)
-                    i.postSyncAction = PostSyncAction.doNothing.rawValue
-                    postProcessCallback(i, info, false)
+                let legacyServerIds = legacyIdsToNodeIds.map { k, _ in k }
+                f.predicate = NSPredicate(format: "serverId in %@ and apiServer == %@", legacyServerIds, server)
+                for item in try! syncMoc.fetch(f) {
+                    if let legacyId = item.value(forKey: "serverId") as? Int64 {
+                        if let nodeId = legacyIdsToNodeIds[legacyId] {
+                            item.nodeId = nodeId
+                            item.setValue(nil, forKey: "serverId")
+                            DLog("Migrated \(entityName) from legacy ID \(legacyId) to node ID \(nodeId)")
+                        } else {
+                            DLog("Warning: Migration failed for \(entityName) with legacy ID \(legacyId), could not find node ID")
+                        }
+                    } else {
+                        DLog("Warning: Migration failed for \(entityName) - could not read legacy ID!")
+                    }
                 }
-                nodeIdsOfItems.remove(nodeId)
-            }
-        }
 
-        if !createNewItems { return }
+                var nodeIdsOfItems = Set(nodeIdsToInfo.map { k, _ in k })
+                f.predicate = NSPredicate(format: "nodeId in %@ and apiServer == %@", nodeIdsOfItems, server)
+                let existingItems = try! syncMoc.fetch(f)
 
-        for nodeId in nodeIdsOfItems {
-            if let info = nodeIdsToInfo[nodeId] {
-                DLog("Creating %@: %@ (v3)", entityName, nodeId)
-                let i = NSEntityDescription.insertNewObject(forEntityName: entityName, into: moc) as! T
-                i.postSyncAction = PostSyncAction.isNew.rawValue
-                i.apiServer = server
-                i.nodeId = nodeId
+                let now = Date()
 
-                i.createdAt = DataItem.parseGH8601(info["created_at"] as? String) ?? now
-                i.updatedAt = DataItem.parseGH8601(info["updated_at"] as? String) ?? i.createdAt
+                for i in existingItems {
+                    if let nodeId = i.nodeId, let info = nodeIdsToInfo[nodeId] {
+                        let updatedDate = DataItem.parseGH8601(info["updated_at"] as? String) ?? i.createdAt ?? now
+                        if updatedDate != i.updatedAt {
+                            DLog("Updating %@: %@ (v3)", entityName, nodeId)
+                            i.postSyncAction = PostSyncAction.isUpdated.rawValue
+                            i.updatedAt = updatedDate
+                            postProcessCallback(i, info, true)
+                        } else {
+                            // DLog("Skipping %@: %@",type,serverId)
+                            i.postSyncAction = PostSyncAction.doNothing.rawValue
+                            postProcessCallback(i, info, false)
+                        }
+                        nodeIdsOfItems.remove(nodeId)
+                    }
+                }
 
-                postProcessCallback(i, info, true)
+                if !createNewItems { return }
+
+                for nodeId in nodeIdsOfItems {
+                    if let info = nodeIdsToInfo[nodeId] {
+                        DLog("Creating %@: %@ (v3)", entityName, nodeId)
+                        let i = NSEntityDescription.insertNewObject(forEntityName: entityName, into: moc) as! T
+                        i.postSyncAction = PostSyncAction.isNew.rawValue
+                        i.apiServer = server
+                        i.nodeId = nodeId
+
+                        i.createdAt = DataItem.parseGH8601(info["created_at"] as? String) ?? now
+                        i.updatedAt = DataItem.parseGH8601(info["updated_at"] as? String) ?? i.createdAt
+
+                        postProcessCallback(i, info, true)
+                    }
+                }
             }
         }
     }
 
-    static var parentCache: FetchCache?
-    // must only be called from inside `sync(from nodes`
     static func parent<T: DataItem>(of type: T.Type, with nodeId: String, in moc: NSManagedObjectContext) -> T? {
-        if let parentCache = parentCache, let existingObject = parentCache.object(forKey: nodeId as NSString) as? T {
-            return existingObject
-        }
-
         let f = NSFetchRequest<T>(entityName: String(describing: type))
         f.returnsObjectsAsFaults = true
         f.includesSubentities = false
         f.fetchLimit = 1
         f.predicate = NSPredicate(format: "nodeId == %@", nodeId)
-        let object = try! moc.fetch(f).first
-        if let object = object, let parentCache = parentCache {
-            parentCache.setObject(object, forKey: nodeId as NSString)
-        }
-        return object
+        return try! moc.fetch(f).first
     }
 
     static func items<T: DataItem>(of type: T.Type, surviving: Bool, in moc: NSManagedObjectContext, prefetchRelationships: [String]? = nil) -> [T] {
@@ -331,7 +331,6 @@ class DataItem: NSManagedObject {
         if node.created {
             DLog("Creating \(entityName) ID: %@ (v4)", node.id)
             postSyncAction = PostSyncAction.isNew.rawValue
-            DataItem.parentCache?.setObject(self, forKey: node.id as NSString)
 
         } else if node.updated {
             DLog("Updating \(entityName) ID: %@ (v4)", node.id)
@@ -343,31 +342,42 @@ class DataItem: NSManagedObject {
         }
     }
 
-    static func syncItems<T: DataItem>(of type: T.Type, from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext, perItemCallback: (T, GQLNode) -> Void) async {
+    static func syncItems<T: DataItem>(of type: T.Type, from nodes: ContiguousArray<GQLNode>, on serverId: NSManagedObjectID, moc: NSManagedObjectContext, perItemCallback: @escaping (T, GQLNode, NSManagedObjectContext) -> Void) async {
         let validNodes = nodes.filter { !($0.parent?.creationSkipped ?? false) }
+        if nodes.isEmpty {
+            return
+        }
 
-        let entityName = String(describing: type)
-        let f = NSFetchRequest<T>(entityName: entityName)
-        f.returnsObjectsAsFaults = false
-        f.includesSubentities = false
-        f.predicate = NSPredicate(format: "nodeId in %@", validNodes.map(\.id))
-        var existingItems = try! moc.fetch(f)
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            let syncMoc = moc.buildChildPrivateQueue()
+            syncMoc.perform {
+                let entityName = String(describing: type)
+                let f = NSFetchRequest<T>(entityName: entityName)
+                f.returnsObjectsAsFaults = false
+                f.includesSubentities = false
+                f.predicate = NSPredicate(format: "nodeId in %@", validNodes.map(\.id))
+                let existingItems = try! syncMoc.fetch(f)
+                let existingItemIds = Set(existingItems.map { $0.nodeId })
+                let itemLookup = Dictionary(uniqueKeysWithValues: zip(existingItemIds, existingItems))
 
-        for node in validNodes {
-            if let existingItem = existingItems.first(where: { $0.nodeId == node.id }) {
-                // there can be multiple updates for an item, because of multiple parents
-                existingItem.populate(type: T.self, node: node)
-                perItemCallback(existingItem, node)
-            } else if shouldCreate(from: node) {
-                // but only one creation
-                node.created = true
-                let item = NSEntityDescription.insertNewObject(forEntityName: entityName, into: moc) as! T
-                item.apiServer = server
-                item.populate(type: T.self, node: node)
-                perItemCallback(item, node)
-                existingItems.append(item)
+                for node in validNodes {
+                    if let existingItem = itemLookup[node.id] {
+                        // there can be multiple updates for an item, because of multiple parents
+                        existingItem.populate(type: T.self, node: node)
+                        perItemCallback(existingItem, node, syncMoc)
+                    } else if shouldCreate(from: node) {
+                        // but only one creation
+                        node.created = true
+                        let item = NSEntityDescription.insertNewObject(forEntityName: entityName, into: syncMoc) as! T
+                        item.apiServer = try! syncMoc.existingObject(with: serverId) as! ApiServer
+                        item.populate(type: T.self, node: node)
+                        perItemCallback(item, node, syncMoc)
+                    }
+                }
+                
+                try? syncMoc.save()
+                continuation.resume()
             }
-            await Task.yield()
         }
     }
 
