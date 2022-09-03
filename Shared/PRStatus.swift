@@ -26,14 +26,14 @@ final class PRStatus: DataItem {
         }
     }
 
-    static func sync(from nodes: ContiguousArray<GQLNode>, on serverId: NSManagedObjectID, moc: NSManagedObjectContext) async {
-        await syncItems(of: PRStatus.self, from: nodes, on: serverId, moc: moc) { status, node, moc in
+    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
+        syncItems(of: PRStatus.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { status, node in
             guard node.created || node.updated,
                   let parentId = node.parent?.id
             else { return }
 
             if node.created {
-                if let parent = DataItem.parent(of: PullRequest.self, with: parentId, in: moc) {
+                if let parent = DataItem.parent(of: PullRequest.self, with: parentId, in: moc, parentCache: parentCache) {
                     status.pullRequest = parent
                 } else {
                     DLog("Warning: PRStatus without parent")

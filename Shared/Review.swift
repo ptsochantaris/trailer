@@ -14,7 +14,7 @@ final class Review: DataItem {
         case DISMISSED
     }
 
-    static func syncRequests(from nodes: ContiguousArray<GQLNode>, moc: NSManagedObjectContext) {
+    static func syncRequests(from nodes: ContiguousArray<GQLNode>, moc: NSManagedObjectContext, parentCache: FetchCache) {
         var prIdsToAssignedUsers = [String: Set<String>]()
         var prIdsToAssignedTeams = [String: Set<String>]()
 
@@ -41,7 +41,7 @@ final class Review: DataItem {
         for node in nodes {
             guard node.elementType == "ReviewRequest",
                   let parentId = node.parent?.id,
-                  let parent = DataItem.parent(of: PullRequest.self, with: parentId, in: moc) else {
+                  let parent = DataItem.parent(of: PullRequest.self, with: parentId, in: moc, parentCache: parentCache) else {
                 continue
             }
             parent.checkAndStoreReviewAssignments(prIdsToAssignedUsers[parentId] ?? [],
@@ -49,8 +49,8 @@ final class Review: DataItem {
         }
     }
 
-    static func sync(from nodes: ContiguousArray<GQLNode>, on serverId: NSManagedObjectID, moc: NSManagedObjectContext) async {
-        await syncItems(of: Review.self, from: nodes, on: serverId, moc: moc) { review, node, moc in
+    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
+        syncItems(of: Review.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { review, node in
 
             let info = node.jsonPayload
             if info.count == 3 { // this node is a blank container (id, comments, typename)
@@ -64,7 +64,7 @@ final class Review: DataItem {
             else { return }
 
             if node.created {
-                if let parent = DataItem.parent(of: PullRequest.self, with: parentId, in: moc) {
+                if let parent = DataItem.parent(of: PullRequest.self, with: parentId, in: moc, parentCache: parentCache) {
                     review.pullRequest = parent
                 } else {
                     DLog("Warning Review without parent")

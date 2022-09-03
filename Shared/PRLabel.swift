@@ -10,15 +10,15 @@ final class PRLabel: DataItem {
     @NSManaged var pullRequests: Set<PullRequest>
     @NSManaged var issues: Set<Issue>
 
-    static func sync(from nodes: ContiguousArray<GQLNode>, on serverId: NSManagedObjectID, moc: NSManagedObjectContext) async {
-        await syncItems(of: PRLabel.self, from: nodes, on: serverId, moc: moc) { label, node, moc in
+    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
+        syncItems(of: PRLabel.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { label, node in
             guard
                 let parent = node.parent else { return }
 
             if parent.updated || parent.created {
-                if let parentPr = DataItem.parent(of: PullRequest.self, with: parent.id, in: moc) {
+                if let parentPr = DataItem.parent(of: PullRequest.self, with: parent.id, in: moc, parentCache: parentCache) {
                     parentPr.mutableSetValue(forKey: "labels").add(label)
-                } else if let parentIssue = DataItem.parent(of: Issue.self, with: parent.id, in: moc) {
+                } else if let parentIssue = DataItem.parent(of: Issue.self, with: parent.id, in: moc, parentCache: parentCache) {
                     parentIssue.mutableSetValue(forKey: "labels").add(label)
                 } else {
                     DLog("Warning: PRLabel without parent")

@@ -29,11 +29,11 @@ final class PullRequest: ListableItem {
         repo.pullRequests.reduce(.distantPast) { max($0, $1.updatedAt ?? .distantPast) }
     }
 
-    static func sync(from nodes: ContiguousArray<GQLNode>, on serverId: NSManagedObjectID, moc: NSManagedObjectContext) async {
-        await syncItems(of: PullRequest.self, from: nodes, on: serverId, moc: moc) { pr, node, moc in
+    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
+        syncItems(of: PullRequest.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { pr, node in
             guard node.created || node.updated,
                   let parentId = node.parent?.id ?? (node.jsonPayload["repository"] as? [AnyHashable: Any])?["id"] as? String,
-                  let parent = DataItem.parent(of: Repo.self, with: parentId, in: moc)
+                  let parent = DataItem.parent(of: Repo.self, with: parentId, in: moc, parentCache: parentCache)
             else { return }
 
             let json = node.jsonPayload
@@ -143,6 +143,7 @@ final class PullRequest: ListableItem {
         }
     }
 
+    @MainActor
     static func allMerged(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, includeAllGroups: Bool = false) -> [PullRequest] {
         let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
         f.returnsObjectsAsFaults = false
@@ -152,6 +153,7 @@ final class PullRequest: ListableItem {
         return try! moc.fetch(f)
     }
 
+    @MainActor
     static func allClosed(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, includeAllGroups: Bool = false) -> [PullRequest] {
         let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
         f.returnsObjectsAsFaults = false
@@ -212,6 +214,7 @@ final class PullRequest: ListableItem {
         return badgeCount(from: f, in: moc)
     }
 
+    @MainActor
     static func badgeCount(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
         let f = requestForItems(of: PullRequest.self, withFilter: nil, sectionIndex: -1, criterion: criterion)
         return badgeCount(from: f, in: moc)
@@ -440,6 +443,7 @@ final class PullRequest: ListableItem {
         return res
     }
 
+    @MainActor
     final func handleMerging() {
         let byUserId = mergedByNodeId
         let myUserId = apiServer.userNodeId

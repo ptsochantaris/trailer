@@ -115,18 +115,15 @@ enum API {
         }
     }
 
-    @MainActor
-    static var shouldSyncReactions: Bool {
+    static nonisolated var shouldSyncReactions: Bool {
         Settings.notifyOnItemReactions || Settings.notifyOnCommentReactions
     }
 
-    @MainActor
-    static var shouldSyncReviews: Bool {
+    static nonisolated var shouldSyncReviews: Bool {
         Settings.displayReviewsOnItems || Settings.notifyOnReviewDismissals || Settings.notifyOnReviewAcceptances || Settings.notifyOnReviewChangeRequests
     }
 
-    @MainActor
-    static var shouldSyncReviewAssignments: Bool {
+    static nonisolated var shouldSyncReviewAssignments: Bool {
         Settings.displayReviewsOnItems || Settings.showRequestedTeamReviews || Settings.notifyOnReviewAssignments || (Int64(Settings.assignedReviewHandlingPolicy) != Section.none.rawValue)
     }
 
@@ -263,7 +260,7 @@ enum API {
         }
         DataItem.nukeDeletedItems(in: moc)
         DataItem.nukeOrphanedItems(in: moc)
-        DataManager.postProcessAllItemsSynchronously(in: moc)
+        await DataManager.postProcessAllItems(in: moc)
 
         do {
             if moc.hasChanges {

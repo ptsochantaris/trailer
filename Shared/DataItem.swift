@@ -1,8 +1,7 @@
 import CoreData
 
-typealias FetchCache = NSCache<NSString, NSManagedObjectID>
+typealias FetchCache = NSCache<NSString, NSManagedObject>
 
-@MainActor
 class DataItem: NSManagedObject {
     @NSManaged var nodeId: String?
     @NSManaged var postSyncAction: Int64
@@ -141,13 +140,20 @@ class DataItem: NSManagedObject {
         }
     }
 
-    static func parent<T: DataItem>(of type: T.Type, with nodeId: String, in moc: NSManagedObjectContext) -> T? {
+    static func parent<T: DataItem>(of type: T.Type, with nodeId: String, in moc: NSManagedObjectContext, parentCache: FetchCache) -> T? {
+        if let existingObject = parentCache.object(forKey: nodeId as NSString) as? T {
+            return existingObject
+        }
         let f = NSFetchRequest<T>(entityName: String(describing: type))
         f.returnsObjectsAsFaults = true
         f.includesSubentities = false
         f.fetchLimit = 1
         f.predicate = NSPredicate(format: "nodeId == %@", nodeId)
-        return try! moc.fetch(f).first
+        let object = try! moc.fetch(f).first
+        if let object = object {
+            parentCache.setObject(object, forKey: nodeId as NSString)
+        }
+        return object
     }
 
     static func items<T: DataItem>(of type: T.Type, surviving: Bool, in moc: NSManagedObjectContext, prefetchRelationships: [String]? = nil) -> [T] {
@@ -258,6 +264,7 @@ class DataItem: NSManagedObject {
         return try! moc.count(for: f)
     }
 
+    @MainActor
     static func add<T: ListableItem>(criterion: GroupingCriterion?, toFetchRequest: NSFetchRequest<T>, originalPredicate: NSPredicate, in moc: NSManagedObjectContext, includeAllGroups: Bool = false) {
         var andPredicates = [NSPredicate]()
         if let c = criterion {
@@ -342,41 +349,34 @@ class DataItem: NSManagedObject {
         }
     }
 
-    static func syncItems<T: DataItem>(of type: T.Type, from nodes: ContiguousArray<GQLNode>, on serverId: NSManagedObjectID, moc: NSManagedObjectContext, perItemCallback: @escaping (T, GQLNode, NSManagedObjectContext) -> Void) async {
+    static func syncItems<T: DataItem>(of type: T.Type, from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache, perItemCallback: (T, GQLNode) -> Void) {
         let validNodes = nodes.filter { !($0.parent?.creationSkipped ?? false) }
         if nodes.isEmpty {
             return
         }
 
-        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
-            let syncMoc = moc.buildChildPrivateQueue()
-            syncMoc.perform {
-                let entityName = String(describing: type)
-                let f = NSFetchRequest<T>(entityName: entityName)
-                f.returnsObjectsAsFaults = false
-                f.includesSubentities = false
-                f.predicate = NSPredicate(format: "nodeId in %@", validNodes.map(\.id))
-                let existingItems = try! syncMoc.fetch(f)
-                let existingItemIds = Set(existingItems.map { $0.nodeId })
-                let itemLookup = Dictionary(uniqueKeysWithValues: zip(existingItemIds, existingItems))
+        let entityName = String(describing: type)
+        let f = NSFetchRequest<T>(entityName: entityName)
+        f.returnsObjectsAsFaults = false
+        f.includesSubentities = false
+        f.predicate = NSPredicate(format: "nodeId in %@", validNodes.map(\.id))
+        let existingItems = try! moc.fetch(f)
+        let existingItemIds = Set(existingItems.map { $0.nodeId })
+        let itemLookup = Dictionary(uniqueKeysWithValues: zip(existingItemIds, existingItems))
 
-                for node in validNodes {
-                    if let existingItem = itemLookup[node.id] {
-                        // there can be multiple updates for an item, because of multiple parents
-                        existingItem.populate(type: T.self, node: node)
-                        perItemCallback(existingItem, node, syncMoc)
-                    } else if shouldCreate(from: node) {
-                        // but only one creation
-                        node.created = true
-                        let item = NSEntityDescription.insertNewObject(forEntityName: entityName, into: syncMoc) as! T
-                        item.apiServer = try! syncMoc.existingObject(with: serverId) as! ApiServer
-                        item.populate(type: T.self, node: node)
-                        perItemCallback(item, node, syncMoc)
-                    }
-                }
-                
-                try? syncMoc.save()
-                continuation.resume()
+        for node in validNodes {
+            if let existingItem = itemLookup[node.id] {
+                // there can be multiple updates for an item, because of multiple parents
+                existingItem.populate(type: T.self, node: node)
+                perItemCallback(existingItem, node)
+            } else if shouldCreate(from: node) {
+                // but only one creation
+                node.created = true
+                let item = NSEntityDescription.insertNewObject(forEntityName: entityName, into: moc) as! T
+                item.apiServer = server
+                item.populate(type: T.self, node: node)
+                parentCache.setObject(item, forKey: node.id as NSString)
+                perItemCallback(item, node)
             }
         }
     }

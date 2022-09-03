@@ -12,12 +12,12 @@ final class Issue: ListableItem {
         super.webUrl?.appending(pathComponent: "issues").appending(pathComponent: String(number))
     }
 
-    static func sync(from nodes: ContiguousArray<GQLNode>, on serverId: NSManagedObjectID, moc: NSManagedObjectContext) async {
-        await syncItems(of: Issue.self, from: nodes, on: serverId, moc: moc) { issue, node, moc in
+    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
+        syncItems(of: Issue.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { issue, node in
 
             guard node.created || node.updated,
                   let parentId = node.parent?.id ?? (node.jsonPayload["repository"] as? [AnyHashable: Any])?["id"] as? String,
-                  let parent = DataItem.parent(of: Repo.self, with: parentId, in: moc)
+                  let parent = DataItem.parent(of: Repo.self, with: parentId, in: moc, parentCache: parentCache)
             else { return }
 
             let json = node.jsonPayload
@@ -65,11 +65,13 @@ final class Issue: ListableItem {
         return badgeCount(from: f, in: moc)
     }
 
+    @MainActor
     static func badgeCount(in moc: NSManagedObjectContext, criterion: GroupingCriterion?) -> Int {
         let f = requestForItems(of: Issue.self, withFilter: nil, sectionIndex: -1, criterion: criterion)
         return badgeCount(from: f, in: moc)
     }
 
+    @MainActor
     override class func hasOpen(in moc: NSManagedObjectContext, criterion: GroupingCriterion?) -> Bool {
         let f = NSFetchRequest<Issue>(entityName: "Issue")
         f.includesSubentities = false
@@ -86,6 +88,7 @@ final class Issue: ListableItem {
         Section.issueMenuTitles[Int(sectionIndex)]
     }
 
+    @MainActor
     static func allClosed(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, includeAllGroups: Bool = false) -> [Issue] {
         let f = NSFetchRequest<Issue>(entityName: "Issue")
         f.returnsObjectsAsFaults = false

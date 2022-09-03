@@ -1,6 +1,5 @@
 import CoreData
 
-@MainActor
 final class ApiServer: NSManagedObject {
     @NSManaged var apiPath: String?
     @NSManaged var graphQLPath: String?
@@ -62,6 +61,7 @@ final class ApiServer: NSManagedObject {
         !S(authToken).isEmpty
     }
 
+    @MainActor
     static func resetSyncOfEverything() {
         DLog("RESETTING SYNC STATE OF ALL ITEMS")
         for r in DataItem.allItems(of: Repo.self, in: DataManager.main, prefetchRelationships: ["pullRequests", "issues"]) {
@@ -87,18 +87,21 @@ final class ApiServer: NSManagedObject {
         }
     }
 
+    @MainActor
     static func insertNewServer(in moc: NSManagedObjectContext) -> ApiServer {
         let githubServer: ApiServer = NSEntityDescription.insertNewObject(forEntityName: "ApiServer", into: moc) as! ApiServer
         githubServer.createdAt = Date()
         return githubServer
     }
 
+    @MainActor
     static func resetSyncSuccess(in moc: NSManagedObjectContext) {
         for apiServer in allApiServers(in: moc) where apiServer.goodToGo {
             apiServer.lastSyncSucceeded = true
         }
     }
 
+    @MainActor
     static func shouldReportRefreshFailure(in moc: NSManagedObjectContext) -> Bool {
         for apiServer in allApiServers(in: moc) where apiServer.goodToGo && !apiServer.lastSyncSucceeded && apiServer.reportRefreshFailures {
             return true
@@ -106,6 +109,7 @@ final class ApiServer: NSManagedObject {
         return false
     }
 
+    @MainActor
     static func ensureAtLeastGithub(in moc: NSManagedObjectContext) {
         let f = NSFetchRequest<ApiServer>(entityName: "ApiServer")
         f.fetchLimit = 1
@@ -116,12 +120,14 @@ final class ApiServer: NSManagedObject {
     }
 
     @discardableResult
+    @MainActor
     static func addDefaultGithub(in moc: NSManagedObjectContext) -> ApiServer {
         let githubServer = insertNewServer(in: moc)
         githubServer.resetToGithub()
         return githubServer
     }
 
+    @MainActor
     static func allApiServers(in moc: NSManagedObjectContext) -> [ApiServer] {
         let f = NSFetchRequest<ApiServer>(entityName: "ApiServer")
         f.returnsObjectsAsFaults = false
@@ -130,6 +136,7 @@ final class ApiServer: NSManagedObject {
         return try! moc.fetch(f)
     }
 
+    @MainActor
     static func someServersHaveAuthTokens(in moc: NSManagedObjectContext) -> Bool {
         for apiServer in allApiServers(in: moc) where !S(apiServer.authToken).isEmpty {
             return true
@@ -192,6 +199,7 @@ final class ApiServer: NSManagedObject {
         apiPath?.hasPrefix("https://api.github.com") ?? true
     }
 
+    @MainActor
     static func server(host: String, moc: NSManagedObjectContext) -> ApiServer? {
         for s in ApiServer.allApiServers(in: moc) {
             if let apiBase = s.apiPath,
@@ -212,6 +220,7 @@ final class ApiServer: NSManagedObject {
         return nil
     }
 
+    @MainActor
     static var archivedApiServers: [AnyHashable: [AnyHashable: Any]] {
         var archivedData = [AnyHashable: [AnyHashable: Any]]()
         for a in ApiServer.allApiServers(in: DataManager.main) {
@@ -244,6 +253,7 @@ final class ApiServer: NSManagedObject {
         return archivedData
     }
 
+    @MainActor
     static func configure(from archive: [String: [String: NSObject]]) -> Bool {
         for apiServer in allApiServers(in: DataManager.main) {
             DataManager.main.delete(apiServer)

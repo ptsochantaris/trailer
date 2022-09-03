@@ -24,19 +24,19 @@ final class Repo: DataItem {
         updatedAt = updatedAt?.addingTimeInterval(-1)
     }
 
-    static func sync(from nodes: ContiguousArray<GQLNode>, on serverId: NSManagedObjectID, moc: NSManagedObjectContext) async {
-        await syncItems(of: Repo.self, from: nodes, on: serverId, moc: moc) { repo, node, moc in
+    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
+        syncItems(of: Repo.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { repo, node in
 
             var neededByAuthoredPr = false
             var neededByAuthoredIssue = false
             if let parent = node.parent {
                 if parent.elementType == "PullRequest" {
                     neededByAuthoredPr = true
-                    DataItem.parent(of: PullRequest.self, with: parent.id, in: moc)?.repo = repo
+                    DataItem.parent(of: PullRequest.self, with: parent.id, in: moc, parentCache: parentCache)?.repo = repo
 
                 } else if parent.elementType == "Issue" {
                     neededByAuthoredIssue = true
-                    DataItem.parent(of: Issue.self, with: parent.id, in: moc)?.repo = repo
+                    DataItem.parent(of: Issue.self, with: parent.id, in: moc, parentCache: parentCache)?.repo = repo
                 }
             }
 
@@ -158,6 +158,7 @@ final class Repo: DataItem {
         return try! moc.fetch(f)
     }
 
+    @MainActor
     static func anyVisibleRepos(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, excludeGrouped: Bool = false) -> Bool {
         func excludeGroupedRepos(_ p: NSPredicate) -> NSPredicate {
             let nilCheck = NSPredicate(format: "groupLabel == nil")
@@ -189,6 +190,7 @@ final class Repo: DataItem {
         return c > 0
     }
 
+    @MainActor
     static func mayProvideIssuesForDisplay(fromServerWithId id: NSManagedObjectID? = nil) -> Bool {
         let all: [Repo]
         if let aid = id, let apiServer = existingObject(with: aid) as? ApiServer {
@@ -199,6 +201,7 @@ final class Repo: DataItem {
         return all.contains { $0.displayPolicyForIssues != RepoDisplayPolicy.hide.rawValue }
     }
 
+    @MainActor
     static func mayProvidePrsForDisplay(fromServerWithId id: NSManagedObjectID? = nil) -> Bool {
         let all: [Repo]
         if let aid = id, let apiServer = existingObject(with: aid) as? ApiServer {
@@ -209,6 +212,7 @@ final class Repo: DataItem {
         return all.contains { $0.displayPolicyForPrs != RepoDisplayPolicy.hide.rawValue }
     }
 
+    @MainActor
     static func allGroupLabels(in moc: NSManagedObjectContext) -> [String] {
         let allRepos = allItems(of: Repo.self, in: moc)
         let labels = allRepos.compactMap { $0.displayPolicyForPrs > 0 || $0.displayPolicyForIssues > 0 ? $0.groupLabel : nil }
@@ -233,6 +237,7 @@ final class Repo: DataItem {
         return try! moc.fetch(f)
     }
 
+    @MainActor
     static func reposFiltered(by filter: String?) -> [Repo] {
         let f = NSFetchRequest<Repo>(entityName: "Repo")
         f.returnsObjectsAsFaults = false

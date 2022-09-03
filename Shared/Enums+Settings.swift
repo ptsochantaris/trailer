@@ -1,7 +1,6 @@
 import Foundation
 
 extension Section {
-    @MainActor
     var shouldBadgeComments: Bool {
         switch self {
         case .all:

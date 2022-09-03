@@ -16,24 +16,24 @@ final class PRComment: DataItem {
 
     @NSManaged var reactions: Set<Reaction>
 
-    static func sync(from nodes: ContiguousArray<GQLNode>, on serverId: NSManagedObjectID, moc: NSManagedObjectContext) async {
-        await syncItems(of: PRComment.self, from: nodes, on: serverId, moc: moc) { comment, node, moc in
+    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
+        syncItems(of: PRComment.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { comment, node in
             guard node.created || node.updated,
                   let parentId = node.parent?.id
             else { return }
 
             if node.created {
-                let review = DataItem.parent(of: Review.self, with: parentId, in: moc)
+                let review = DataItem.parent(of: Review.self, with: parentId, in: moc, parentCache: parentCache)
                 comment.review = review
 
-                let pr = DataItem.parent(of: PullRequest.self, with: parentId, in: moc)
+                let pr = DataItem.parent(of: PullRequest.self, with: parentId, in: moc, parentCache: parentCache)
                 if pr == nil, review != nil {
                     comment.pullRequest = review?.pullRequest
                 } else {
                     comment.pullRequest = pr
                 }
 
-                let issue = DataItem.parent(of: Issue.self, with: parentId, in: moc)
+                let issue = DataItem.parent(of: Issue.self, with: parentId, in: moc, parentCache: parentCache)
                 comment.issue = issue
 
                 if issue == nil, pr == nil, review == nil {
