@@ -1,4 +1,5 @@
 import CoreData
+import CoreSpotlight
 
 extension NSManagedObjectContext {
     func buildChildPrivateQueue() -> NSManagedObjectContext {
@@ -160,7 +161,7 @@ enum DataManager {
         }
     }
 
-    static func sendNotificationsIndexAndSave() {
+    static func sendNotificationsIndexAndSave() async {
         preferencesDirty = false
 
         processNotificationsForItems(of: PullRequest.self, newNotification: .newPr, reopenedNotification: .prReopened, assignmentNotification: .newPrAssigned)
@@ -218,19 +219,59 @@ enum DataManager {
             r.postSyncAction = PostSyncAction.doNothing.rawValue
         }
 
+        saveDB()
+
+        await updateIndexing()
+
+        NotificationQueue.commit()
+    }
+    
+    private static func updateIndexing() async {
+#if canImport(CoreSpotlight)
+        guard CSSearchableIndex.isIndexingAvailable() else {
+            return
+        }
+        
+        DLog("Updating spotlight indexes")
+        
+        var itemsToIndex = [CSSearchableItem]()
+        var itemsToRemove = [String]()
+        
         for pr in DataItem.allItems(of: PullRequest.self, in: main) {
-            pr.postSyncAction = PostSyncAction.doNothing.rawValue
-            pr.handleSpotlight()
+            switch await pr.handleSpotlight() {
+            case let .needsIndexing(item):
+                itemsToIndex.append(item)
+            case let .needsRemoval(uri):
+                itemsToRemove.append(uri)
+            }
+            await Task.yield()
         }
 
         for issue in DataItem.allItems(of: Issue.self, in: main) {
-            issue.postSyncAction = PostSyncAction.doNothing.rawValue
-            issue.handleSpotlight()
+            switch await issue.handleSpotlight() {
+            case let .needsIndexing(item):
+                itemsToIndex.append(item)
+            case let .needsRemoval(uri):
+                itemsToRemove.append(uri)
+            }
+            await Task.yield()
         }
-
-        saveDB()
-
-        NotificationQueue.commit()
+        
+        let finalRemovals = itemsToRemove
+        let finalIndexes = itemsToIndex
+        Task.detached {
+            let index = CSSearchableIndex.default()
+            if !finalRemovals.isEmpty {
+                DLog("De-indexing \(finalRemovals.count) items...")
+                try? await index.deleteSearchableItems(withIdentifiers: finalRemovals)
+            }
+            if !finalIndexes.isEmpty {
+                DLog("Indexing \(finalIndexes.count) items...")
+                try? await index.indexSearchableItems(finalIndexes)
+            }
+            DLog("Committed spotlight changes")
+        }
+#endif
     }
 
     static func saveDB() {

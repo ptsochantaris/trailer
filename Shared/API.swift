@@ -30,7 +30,7 @@ enum API {
         }
 
         NotificationCenter.default.addObserver(forName: ReachabilityChangedNotification, object: nil, queue: .main) { _ in
-            Task {
+            Task { @MainActor in
                 checkNetworkAvailability()
                 if currentNetworkStatus != .NotReachable {
                     await app.startRefreshIfItIsDue()
@@ -196,31 +196,31 @@ enum API {
     ////////////////////////////////////// API interface
 
     static func performSync() async {
-        let moc = DataManager.main
+        let syncMoc = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
+        syncMoc.undoManager = nil
+        syncMoc.parent = DataManager.main
 
-        if Settings.useV4API && canUseV4API(for: moc) != nil {
+        if Settings.useV4API && canUseV4API(for: syncMoc) != nil {
             return
         }
 
-        Task { @MainActor in
-            isRefreshing = true
-            currentOperationCount += 1
-            currentOperationName = "Fetching…"
-        }
+        isRefreshing = true
+        currentOperationCount += 1
+        currentOperationName = "Fetching…"
 
         let lastCheck = lastRepoCheck
         let shouldRefreshReposToo = lastCheck == .distantPast
             || (Date().timeIntervalSince(lastCheck) > TimeInterval(Settings.newRepoCheckPeriod * 3600))
-            || !Repo.anyVisibleRepos(in: moc)
+            || !Repo.anyVisibleRepos(in: syncMoc)
 
         if shouldRefreshReposToo {
-            await fetchRepositories(to: moc)
+            await fetchRepositories(to: syncMoc)
         } else {
-            ApiServer.resetSyncSuccess(in: moc)
-            await ensureApiServersHaveUserIds(in: moc)
+            ApiServer.resetSyncSuccess(in: syncMoc)
+            await ensureApiServersHaveUserIds(in: syncMoc)
         }
 
-        let disabledRepos = Repo.unsyncableRepos(in: moc)
+        let disabledRepos = Repo.unsyncableRepos(in: syncMoc)
         disabledRepos.forEach {
             $0.pullRequests.forEach {
                 $0.postSyncAction = PostSyncAction.delete.rawValue
@@ -230,43 +230,42 @@ enum API {
             }
         }
 
-        let repos = Repo.syncableRepos(in: moc)
+        let repos = Repo.syncableRepos(in: syncMoc)
 
         if Settings.useV4API {
             do {
-                try await v4Sync(repos, to: moc)
+                try await v4Sync(repos, to: syncMoc)
             } catch {
                 DLog("Sync aborted due to error")
             }
 
         } else {
-            await v3Sync(repos, to: moc)
+            await v3Sync(repos, to: syncMoc)
         }
 
         // Transfer done, process
-        let total = moc.updatedObjects.count + moc.insertedObjects.count + moc.deletedObjects.count
-        Task { @MainActor in
-            if total > 1, let totalText = numberFormatter.string(for: total) {
-                currentOperationName = "Processing \(totalText) items…"
-            } else {
-                currentOperationName = "Processing update…"
-            }
+        let total = syncMoc.updatedObjects.count + syncMoc.insertedObjects.count + syncMoc.deletedObjects.count
+        if total > 1, let totalText = numberFormatter.string(for: total) {
+            currentOperationName = "Processing \(totalText) items…"
+        } else {
+            currentOperationName = "Processing update…"
         }
 
         // discard any changes related to any failed API server
-        for apiServer in ApiServer.allApiServers(in: moc) where !apiServer.lastSyncSucceeded {
-            apiServer.rollBackAllUpdates(in: moc)
+        for apiServer in ApiServer.allApiServers(in: syncMoc) where !apiServer.lastSyncSucceeded {
+            apiServer.rollBackAllUpdates(in: syncMoc)
             apiServer.lastSyncSucceeded = false // we just wiped all changes, but want to keep this one
         }
-        DataItem.nukeDeletedItems(in: moc)
-        DataItem.nukeOrphanedItems(in: moc)
-        await DataManager.postProcessAllItems(in: moc)
+        DataItem.nukeDeletedItems(in: syncMoc)
+        DataItem.nukeOrphanedItems(in: syncMoc)
+        await DataManager.postProcessAllItems(in: syncMoc)
 
         do {
-            if moc.hasChanges {
+            if syncMoc.hasChanges {
                 DLog("Committing synced data")
-                try moc.save()
+                try syncMoc.save()
                 DLog("Synced data committed")
+                DataManager.saveDB()
             } else {
                 DLog("No changes, skipping commit")
             }
@@ -274,15 +273,13 @@ enum API {
             DLog("Committing sync failed: %@", error.localizedDescription)
         }
 
-        Task { @MainActor in
-            isRefreshing = false
-            currentOperationCount -= 1
+        isRefreshing = false
+        currentOperationCount -= 1
 
-            DataManager.sendNotificationsIndexAndSave()
+        await DataManager.sendNotificationsIndexAndSave()
 
-            DLog("Caching \(numberFormatter.string(for: URLCache.shared.currentMemoryUsage) ?? "") bytes in memory")
-            DLog("Caching \(numberFormatter.string(for: URLCache.shared.currentDiskUsage) ?? "") bytes on disk")
-        }
+        DLog("Caching \(numberFormatter.string(for: URLCache.shared.currentMemoryUsage) ?? "") bytes in memory")
+        DLog("Caching \(numberFormatter.string(for: URLCache.shared.currentDiskUsage) ?? "") bytes on disk")
     }
 
     static var lastSuccessfulSyncAt: String {

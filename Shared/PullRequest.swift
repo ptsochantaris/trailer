@@ -127,20 +127,25 @@ final class PullRequest: ListableItem {
     }
 
     func checkAndStoreReviewAssignments(_ reviewerNames: Set<String>, _ reviewerTeams: Set<String>) {
-        reviewers = reviewerNames.joined(separator: ",")
-        teamReviewers = reviewerTeams.joined(separator: ",")
         var assigned = reviewerNames.contains(S(apiServer.userName))
-        if !assigned {
-            for myTeamName in apiServer.teams.compactMap(\.slug) where reviewerTeams.contains(myTeamName) {
-                assigned = true // TODO: have a separate notification for this
-                break
+        let assignedToTeam: Bool
+        if assigned {
+            assignedToTeam = false
+        } else {
+            let myTeamNames = apiServer.teams.compactMap(\.slug)
+            assigned = myTeamNames.contains { reviewerTeams.contains($0) }
+            assignedToTeam = assigned
+        }
+        if assigned && !assignedForReview, Settings.notifyOnReviewAssignments {
+            if assignedToTeam {
+                NotificationQueue.add(type: .assignedToTeamForReview, for: self)
+            } else {
+                NotificationQueue.add(type: .assignedForReview, for: self)
             }
         }
-        let shouldNotify = assigned && !assignedForReview
         assignedForReview = assigned
-        if shouldNotify, Settings.notifyOnReviewAssignments {
-            NotificationQueue.add(type: .assignedForReview, for: self)
-        }
+        reviewers = reviewerNames.joined(separator: ",")
+        teamReviewers = reviewerTeams.joined(separator: ",")
     }
 
     @MainActor

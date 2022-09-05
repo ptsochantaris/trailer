@@ -182,11 +182,18 @@ enum NotificationManager {
 
         case .assignedForReview:
             guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
-            notification.title = "PR Assigned For Review"
+            notification.title = "PR Review Requested"
             if let n = p.repo.fullName { notification.subtitle = n }
             if let t = p.title { notification.body = t }
             notification.categoryIdentifier = "mutable"
 
+        case .assignedToTeamForReview:
+            guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
+            notification.title = "PR Review Request to Team"
+            if let n = p.repo.fullName { notification.subtitle = n }
+            if let t = p.title { notification.body = t }
+            notification.categoryIdentifier = "mutable"
+            
         case .newReaction:
             guard let r = item as? Reaction else { return }
             notification.title = r.displaySymbol
@@ -206,9 +213,10 @@ enum NotificationManager {
         }
 
         notification.userInfo = DataManager.info(for: item)
+        let url = (item as? PRComment)?.avatarUrl ?? (item as? ListableItem)?.userAvatarUrl
 
         Task {
-            if !Settings.hideAvatarsInNotifications, let url = (item as? PRComment)?.avatarUrl ?? (item as? ListableItem)?.userAvatarUrl {
+            if !Settings.hideAvatarsInNotifications, let url = url {
                 let res = try? await API.avatar(from: url)
                 if let res = res, let attachment = try? UNNotificationAttachment(identifier: res.1, url: URL(fileURLWithPath: res.1), options: nil) {
                     notification.attachments = [attachment]
@@ -216,7 +224,7 @@ enum NotificationManager {
             }
             let identifier = [notification.title, notification.subtitle, notification.body].map { $0 }.joined(separator: " - ")
             let request = UNNotificationRequest(identifier: identifier, content: notification, trigger: nil)
-            UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
+            try? await UNUserNotificationCenter.current().add(request)
         }
     }
 }

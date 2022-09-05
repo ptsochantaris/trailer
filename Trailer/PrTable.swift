@@ -8,7 +8,11 @@ final class PrTable: NSTableView, NSPasteboardItemDataProvider {
     func cell(at theEvent: NSEvent) -> NSView? {
         let globalLocation = theEvent.locationInWindow
         let localLocation = convert(globalLocation, from: nil)
-        return view(atColumn: column(at: localLocation), row: row(at: localLocation), makeIfNecessary: false)
+        let row = row(at: localLocation)
+        if row < 0 {
+            return nil
+        }
+        return view(atColumn: column(at: localLocation), row: row, makeIfNecessary: false)
     }
 
     override func mouseDown(with _: NSEvent) {

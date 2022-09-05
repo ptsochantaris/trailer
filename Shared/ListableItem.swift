@@ -1,5 +1,4 @@
 import CoreData
-
 import CoreSpotlight
 
 #if os(iOS)
@@ -225,11 +224,6 @@ class ListableItem: DataItem {
     }
 
     private final func hideFromSpotlightAndNotifications(uri: String) {
-        #if canImport(CoreSpotlight)
-            if CSSearchableIndex.isIndexingAvailable() {
-                CSSearchableIndex.default().deleteSearchableItems(withIdentifiers: [uri], completionHandler: nil)
-            }
-        #endif
         if Settings.removeNotificationsWhenItemIsRemoved {
             ListableItem.removeRelatedNotifications(uri: uri)
         }
@@ -1136,20 +1130,22 @@ class ListableItem: DataItem {
         #endif
     }
 
-    final func handleSpotlight() {
+    enum SpotLightResult {
+        case needsIndexing(CSSearchableItem), needsRemoval(String)
+    }
+    
+    final func handleSpotlight() async -> SpotLightResult {
         let uri = objectID.uriRepresentation().absoluteString
         if isVisibleOnMenu {
-            Task {
-                await indexForSpotlight(uri: uri)
-            }
+            let item = await indexForSpotlight(uri: uri)
+            return .needsIndexing(item)
         } else {
             hideFromSpotlightAndNotifications(uri: uri)
+            return .needsRemoval(uri)
         }
     }
 
-    private final func indexForSpotlight(uri: String) async {
-        guard CSSearchableIndex.isIndexingAvailable() else { return }
-
+    private final func indexForSpotlight(uri: String) async -> CSSearchableItem {
         let s = CSSearchableItemAttributeSet(itemContentType: "public.text")
 
         if let i = userAvatarUrl, !Settings.hideAvatars, let cachePath = try? await API.avatar(from: i).1 {
@@ -1165,8 +1161,7 @@ class ListableItem: DataItem {
         s.creator = userLogin
         s.contentDescription = "\(S(repo.fullName)) @\(S(userLogin)) - \(S(body?.trim))"
 
-        let i = CSSearchableItem(uniqueIdentifier: uri, domainIdentifier: nil, attributeSet: s)
-        try? await CSSearchableIndex.default().indexSearchableItems([i])
+        return CSSearchableItem(uniqueIdentifier: uri, domainIdentifier: nil, attributeSet: s)
     }
 
     override final class func shouldCreate(from node: GQLNode) -> Bool {

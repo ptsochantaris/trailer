@@ -339,11 +339,18 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 
         case .assignedForReview:
             guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
-            notification.title = "PR Assigned For Review"
+            notification.title = "PR Review Requested"
             notification.subtitle = p.repo.fullName
             notification.informativeText = p.title
             addPotentialExtraActions()
 
+        case .assignedToTeamForReview:
+            guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
+            notification.title = "PR Review Request to Team"
+            notification.subtitle = p.repo.fullName
+            notification.informativeText = p.title
+            addPotentialExtraActions()
+            
         case .newReaction:
             guard let r = item as? Reaction else { return }
             notification.title = r.displaySymbol
