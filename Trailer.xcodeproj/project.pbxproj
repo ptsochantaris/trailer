@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 55;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -161,7 +161,6 @@
 		16CBE1C21A2DBB2700485053 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C01A2DBB2700485053 /* DataManager.swift */; };
 		16CBE1C51A2DFBA500485053 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C41A2DFBA500485053 /* Settings.swift */; };
 		16CBE1C61A2DFBA500485053 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C41A2DFBA500485053 /* Settings.swift */; };
-		16CE47851B7755E00086F4DC /* PocketTrailer WatchKit Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 16522D701AB03AE500B1C3FB /* PocketTrailer WatchKit Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		16CE47881B7755E00086F4DC /* PocketTrailer WatchKit App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 16522D7C1AB03AE500B1C3FB /* PocketTrailer WatchKit App.app */; };
 		16D2B875251FA54E00D86C89 /* Enums+Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D2B874251FA54E00D86C89 /* Enums+Settings.swift */; };
 		16D2B876251FA54E00D86C89 /* Enums+Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D2B874251FA54E00D86C89 /* Enums+Settings.swift */; };
@@ -194,17 +193,10 @@
 		16FEB784283C4E320029FB0F /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16FEB783283C4E320029FB0F /* SwiftUI.framework */; };
 		16FEB787283C4E320029FB0F /* PocketTrailer_Widget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FEB786283C4E320029FB0F /* PocketTrailer_Widget.swift */; };
 		16FEB789283C4E330029FB0F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 16FEB788283C4E330029FB0F /* Assets.xcassets */; };
-		16FEB78D283C4E330029FB0F /* PocketTrailer WidgetExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 16FEB780283C4E320029FB0F /* PocketTrailer WidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		16FEB78D283C4E330029FB0F /* PocketTrailer WidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 16FEB780283C4E320029FB0F /* PocketTrailer WidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		16CE47831B7755E00086F4DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 168BC6A217EC2DF000BC4584 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 16522D6F1AB03AE500B1C3FB;
-			remoteInfo = "PocketTrailer WatchKit Extension";
-		};
 		16D780461B77E00D00A4D0BE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 168BC6A217EC2DF000BC4584 /* Project object */;
@@ -229,15 +221,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		16522D911AB03AE500B1C3FB /* Embed App Extensions */ = {
+		16522D911AB03AE500B1C3FB /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				16FEB78D283C4E330029FB0F /* PocketTrailer WidgetExtension.appex in Embed App Extensions */,
+				16FEB78D283C4E330029FB0F /* PocketTrailer WidgetExtension.appex in Embed Foundation Extensions */,
 			);
-			name = "Embed App Extensions";
+			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		16BF673F283B1B9D0028EC13 /* Embed Frameworks */ = {
@@ -249,17 +241,6 @@
 				16BF673E283B1B9D0028EC13 /* Sparkle.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		16CE47891B7755E00086F4DC /* Embed App Extensions */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 13;
-			files = (
-				16CE47851B7755E00086F4DC /* PocketTrailer WatchKit Extension.appex in Embed App Extensions */,
-			);
-			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		16CE478A1B7755E00086F4DC /* Embed Watch Content */ = {
@@ -345,7 +326,6 @@
 		164841011AD19933009E6383 /* NotificationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		164997471B127ED500D135A2 /* Trailer 21.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 21.xcdatamodel"; sourceTree = "<group>"; };
 		16519EB31ACF0E91002171D0 /* Trailer.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Trailer.icns; sourceTree = "<group>"; };
-		16522D701AB03AE500B1C3FB /* PocketTrailer WatchKit Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "PocketTrailer WatchKit Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		16522D731AB03AE500B1C3FB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		16522D781AB03AE500B1C3FB /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		16522D7C1AB03AE500B1C3FB /* PocketTrailer WatchKit App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "PocketTrailer WatchKit App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -761,7 +741,6 @@
 			children = (
 				168BC6AA17EC2DF000BC4584 /* Trailer.app */,
 				1628A6B118789E73005EDA69 /* PocketTrailer.app */,
-				16522D701AB03AE500B1C3FB /* PocketTrailer WatchKit Extension.appex */,
 				16522D7C1AB03AE500B1C3FB /* PocketTrailer WatchKit App.app */,
 				16DEA922235C6D7C004589B3 /* TrailerLauncher.app */,
 				16FEB780283C4E320029FB0F /* PocketTrailer WidgetExtension.appex */,
@@ -970,7 +949,7 @@
 				1628A6AD18789E73005EDA69 /* Sources */,
 				1628A6AE18789E73005EDA69 /* Frameworks */,
 				1628A6AF18789E73005EDA69 /* Resources */,
-				16522D911AB03AE500B1C3FB /* Embed App Extensions */,
+				16522D911AB03AE500B1C3FB /* Embed Foundation Extensions */,
 				16CE478A1B7755E00086F4DC /* Embed Watch Content */,
 			);
 			buildRules = (
@@ -984,39 +963,22 @@
 			productReference = 1628A6B118789E73005EDA69 /* PocketTrailer.app */;
 			productType = "com.apple.product-type.application";
 		};
-		16522D6F1AB03AE500B1C3FB /* PocketTrailer WatchKit Extension */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 16522D901AB03AE500B1C3FB /* Build configuration list for PBXNativeTarget "PocketTrailer WatchKit Extension" */;
-			buildPhases = (
-				16522D6C1AB03AE500B1C3FB /* Sources */,
-				16522D6D1AB03AE500B1C3FB /* Frameworks */,
-				16522D6E1AB03AE500B1C3FB /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "PocketTrailer WatchKit Extension";
-			productName = "PocketTrailer WatchKit Extension";
-			productReference = 16522D701AB03AE500B1C3FB /* PocketTrailer WatchKit Extension.appex */;
-			productType = "com.apple.product-type.watchkit2-extension";
-		};
 		16522D7B1AB03AE500B1C3FB /* PocketTrailer WatchKit App */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 16522D8F1AB03AE500B1C3FB /* Build configuration list for PBXNativeTarget "PocketTrailer WatchKit App" */;
 			buildPhases = (
 				16522D7A1AB03AE500B1C3FB /* Resources */,
-				16CE47891B7755E00086F4DC /* Embed App Extensions */,
+				16522D6C1AB03AE500B1C3FB /* Sources */,
+				16522D6D1AB03AE500B1C3FB /* Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				16CE47841B7755E00086F4DC /* PBXTargetDependency */,
 			);
 			name = "PocketTrailer WatchKit App";
 			productName = "PocketTrailer WatchKit App";
 			productReference = 16522D7C1AB03AE500B1C3FB /* PocketTrailer WatchKit App.app */;
-			productType = "com.apple.product-type.application.watchapp2";
+			productType = "com.apple.product-type.application";
 		};
 		168BC6A917EC2DF000BC4584 /* Trailer */ = {
 			isa = PBXNativeTarget;
@@ -1082,7 +1044,7 @@
 			attributes = {
 				LastSwiftMigration = 0700;
 				LastSwiftUpdateCheck = 1340;
-				LastUpgradeCheck = 1200;
+				LastUpgradeCheck = 1400;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
 					1628A6B018789E73005EDA69 = {
@@ -1097,16 +1059,6 @@
 							};
 							com.apple.iCloud = {
 								enabled = 1;
-							};
-						};
-					};
-					16522D6F1AB03AE500B1C3FB = {
-						CreatedOnToolsVersion = 6.2;
-						LastSwiftMigration = 1020;
-						ProvisioningStyle = Automatic;
-						SystemCapabilities = {
-							com.apple.ApplicationGroups.iOS = {
-								enabled = 0;
 							};
 						};
 					};
@@ -1135,7 +1087,7 @@
 				};
 			};
 			buildConfigurationList = 168BC6A517EC2DF000BC4584 /* Build configuration list for PBXProject "Trailer" */;
-			compatibilityVersion = "Xcode 13.0";
+			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -1151,7 +1103,6 @@
 				16DEA921235C6D7C004589B3 /* TrailerLauncher */,
 				1628A6B018789E73005EDA69 /* PocketTrailer */,
 				16522D7B1AB03AE500B1C3FB /* PocketTrailer WatchKit App */,
-				16522D6F1AB03AE500B1C3FB /* PocketTrailer WatchKit Extension */,
 				16FEB77F283C4E320029FB0F /* PocketTrailer WidgetExtension */,
 			);
 		};
@@ -1177,18 +1128,11 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		16522D6E1AB03AE500B1C3FB /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				16522D791AB03AE500B1C3FB /* Images.xcassets in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		16522D7A1AB03AE500B1C3FB /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				16522D791AB03AE500B1C3FB /* Images.xcassets in Resources */,
 				16522D851AB03AE500B1C3FB /* Interface.storyboard in Resources */,
 				16522D871AB03AE500B1C3FB /* Images.xcassets in Resources */,
 			);
@@ -1498,11 +1442,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		16CE47841B7755E00086F4DC /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 16522D6F1AB03AE500B1C3FB /* PocketTrailer WatchKit Extension */;
-			targetProxy = 16CE47831B7755E00086F4DC /* PBXContainerItemProxy */;
-		};
 		16D780471B77E00D00A4D0BE /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 16522D7B1AB03AE500B1C3FB /* PocketTrailer WatchKit App */;
@@ -1595,61 +1534,6 @@
 			};
 			name = Release;
 		};
-		16522D8B1AB03AE500B1C3FB /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = X727JSJUGJ;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				INFOPLIST_FILE = "PocketTrailer WatchKit Extension/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MTL_ENABLE_DEBUG_INFO = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.housetrip.mobile.trailer.ios.PocketTrailer.watchkitapp.watchkitextension;
-				PRODUCT_NAME = "${TARGET_NAME}";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				TARGETED_DEVICE_FAMILY = 4;
-			};
-			name = Debug;
-		};
-		16522D8C1AB03AE500B1C3FB /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = X727JSJUGJ;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				INFOPLIST_FILE = "PocketTrailer WatchKit Extension/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = com.housetrip.mobile.trailer.ios.PocketTrailer.watchkitapp.watchkitextension;
-				PRODUCT_NAME = "${TARGET_NAME}";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				TARGETED_DEVICE_FAMILY = 4;
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
 		16522D8D1AB03AE500B1C3FB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1661,8 +1545,13 @@
 				DEVELOPMENT_TEAM = X727JSJUGJ;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				IBSC_MODULE = PocketTrailer_WatchKit_Extension;
 				INFOPLIST_FILE = "PocketTrailer WatchKit App/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/Frameworks",
+					"@executable_path/../Frameworks",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.housetrip.mobile.trailer.ios.PocketTrailer.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1684,8 +1573,13 @@
 				DEVELOPMENT_TEAM = X727JSJUGJ;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				IBSC_MODULE = PocketTrailer_WatchKit_Extension;
 				INFOPLIST_FILE = "PocketTrailer WatchKit App/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/Frameworks",
+					"@executable_path/../Frameworks",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.housetrip.mobile.trailer.ios.PocketTrailer.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1724,7 +1618,8 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1602;
+				CURRENT_PROJECT_VERSION = 1603;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -1788,7 +1683,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1602;
+				CURRENT_PROJECT_VERSION = 1603;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEPLOYMENT_POSTPROCESSING = YES;
@@ -1833,6 +1728,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = X727JSJUGJ;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1862,6 +1758,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = X727JSJUGJ;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1898,6 +1795,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = X727JSJUGJ;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -1935,6 +1833,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = X727JSJUGJ;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -2054,15 +1953,6 @@
 			buildConfigurations = (
 				16522D8D1AB03AE500B1C3FB /* Debug */,
 				16522D8E1AB03AE500B1C3FB /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		16522D901AB03AE500B1C3FB /* Build configuration list for PBXNativeTarget "PocketTrailer WatchKit Extension" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				16522D8B1AB03AE500B1C3FB /* Debug */,
-				16522D8C1AB03AE500B1C3FB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

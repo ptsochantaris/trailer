@@ -9,7 +9,7 @@ import ClockKit
 import WatchConnectivity
 import WatchKit
 
-final class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
+@main final class ExtensionDelegate: NSObject, WKApplicationDelegate, WCSessionDelegate {
     private let session = WCSession.default
     private var appIsLaunched = false
 

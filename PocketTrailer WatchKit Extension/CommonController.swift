@@ -7,7 +7,7 @@ class CommonController: WKInterfaceController {
 
     override func willActivate() {
         super.willActivate()
-        if let app = WKExtension.shared().delegate as? ExtensionDelegate, app.lastView != self {
+        if let app = WKApplication.shared().delegate as? ExtensionDelegate, app.lastView != self {
             if showLoadingFeedback {
                 if loading == 0 {
                     show(status: "Connecting…", hideTable: false)
