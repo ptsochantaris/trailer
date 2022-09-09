@@ -334,7 +334,7 @@ class DataItem: NSManagedObject {
         if node.forcedUpdate {
             node.updated = true
         }
-        
+
         if node.created {
             DLog("Creating %@ ID: %@ (v4)", entityName, node.id)
             postSyncAction = PostSyncAction.isNew.rawValue

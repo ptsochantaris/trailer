@@ -59,7 +59,7 @@ final class PRLabel: DataItem {
         } else {
             f.predicate = NSPredicate(format: "name in %@ and issues contains %@", namesOfItems, fromParent)
         }
-        
+
         let existingItems = try! fromParent.managedObjectContext?.fetch(f) ?? []
         for i in existingItems {
             if let name = i.name, let idx = namesOfItems.firstIndex(of: name), let info = namesToInfo[name] {

@@ -91,7 +91,7 @@ class ListableItem: DataItem {
 
     final func baseNodeSync(node: GQLNode, parent: Repo) {
         repo = parent
-        
+
         let info = node.jsonPayload
         url = info["url"] as? String
         number = info["number"] as? Int64 ?? 0
