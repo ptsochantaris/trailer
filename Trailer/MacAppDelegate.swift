@@ -350,7 +350,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
             notification.subtitle = p.repo.fullName
             notification.informativeText = p.title
             addPotentialExtraActions()
-            
+
         case .newReaction:
             guard let r = item as? Reaction else { return }
             notification.title = r.displaySymbol
@@ -678,7 +678,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
             if howLongUntilNextSync > 0 {
                 DLog("No need to refresh yet, will refresh in %@ sec", howLongUntilNextSync)
                 refreshTimer = Timer(repeats: false, interval: howLongUntilNextSync) { [weak self] in
-                    guard let self = self else { return }
+                    guard let self else { return }
                     Task { @MainActor in
                         await self.refreshTimerDone()
                     }
@@ -745,7 +745,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         }
 
         refreshTimer = Timer(repeats: false, interval: TimeInterval(Settings.refreshPeriod)) { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             Task { @MainActor in
                 await self.refreshTimerDone()
             }
@@ -873,7 +873,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                 let options = [key: NSNumber(value: AXIsProcessTrusted() == false)] as CFDictionary
                 if AXIsProcessTrustedWithOptions(options) {
                     globalKeyMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { [weak self] incomingEvent in
-                        self?.checkForHotkey(in: incomingEvent)
+                        _ = self?.checkForHotkey(in: incomingEvent)
                     }
                 }
             }

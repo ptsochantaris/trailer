@@ -24,7 +24,7 @@ final class ServersViewController: UITableViewController {
     }
 
     deinit {
-        if let tableView = tableView {
+        if let tableView {
             NotificationCenter.default.removeObserver(tableView)
         }
     }

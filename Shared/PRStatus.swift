@@ -12,12 +12,14 @@ final class PRStatus: DataItem {
     override var alternateCreationDate: Bool { true }
 
     static func syncStatuses(from data: [[AnyHashable: Any]]?, pullRequest: PullRequest, moc: NSManagedObjectContext) async {
-        await items(with: data, type: PRStatus.self, server: pullRequest.apiServer, moc: moc) { item, info, isNewOrUpdated in
-            if isNewOrUpdated {
+        let pullRequestId = pullRequest.objectID
+        let serverId = pullRequest.apiServer.objectID
+        await v3items(with: data, type: PRStatus.self, serverId: serverId, moc: moc) { item, info, isNewOrUpdated, syncMoc in
+            if isNewOrUpdated, let pr = try? syncMoc.existingObject(with: pullRequestId) as? PullRequest {
                 item.state = info["state"] as? String
                 item.context = info["context"] as? String
                 item.targetUrl = info["target_url"] as? String
-                item.pullRequest = pullRequest
+                item.pullRequest = pr
 
                 if let ds = info["description"] as? String {
                     item.descriptionText = ds.trim
@@ -91,7 +93,7 @@ final class PRStatus: DataItem {
         }
 
         if let c = context, !c.isEmpty {
-            if c == nodeId, let createdAt = createdAt {
+            if c == nodeId, let createdAt {
                 text += shortDateFormatter.string(from: createdAt)
             } else {
                 text += c

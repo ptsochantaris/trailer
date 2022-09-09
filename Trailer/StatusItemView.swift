@@ -64,7 +64,7 @@ final class StatusItemView: NSView {
     func sizeToFit() {
         let H = NSStatusBar.system.thickness
         var itemWidth: CGFloat = 0
-        if let title = title {
+        if let title {
             itemWidth = icon.size.width - 6
             let titleWidth = title.size(withAttributes: titleAttributes(foregorund: .appLabel)).width
             itemWidth = max(itemWidth, titleWidth)

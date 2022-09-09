@@ -71,7 +71,7 @@ enum HTTP {
         #endif
         let (data, response) = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<(Data, URLResponse), Error>) in
             let task = urlSession.dataTask(with: request) { data, response, error in
-                if let data = data, let response = response {
+                if let data = data, let response {
                     continuation.resume(returning: (data, response))
                 } else {
                     continuation.resume(throwing: error ?? API.apiError("No data and no error from http call"))

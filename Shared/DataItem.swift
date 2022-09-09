@@ -38,20 +38,20 @@ class DataItem: NSManagedObject {
         return try! moc.fetch(f)
     }
 
-    static func allItems<T: DataItem>(of type: T.Type, in server: ApiServer) -> [T] {
+    static func allItems<T: DataItem>(of type: T.Type, in serverId: NSManagedObjectID, moc: NSManagedObjectContext) -> [T] {
         let f = NSFetchRequest<T>(entityName: String(describing: type))
         f.returnsObjectsAsFaults = false
-        f.predicate = NSPredicate(format: "apiServer == %@", server)
-        return try! server.managedObjectContext!.fetch(f)
+        f.predicate = NSPredicate(format: "apiServer == %@", serverId)
+        return try! moc.fetch(f)
     }
 
-    static func items<T: DataItem>(with data: [[AnyHashable: Any]]?,
-                                   type: T.Type,
-                                   server: ApiServer,
-                                   prefetchRelationships: [String]? = nil,
-                                   createNewItems: Bool = true,
-                                   moc: NSManagedObjectContext,
-                                   postProcessCallback: @escaping (T, [AnyHashable: Any], Bool) -> Void) async {
+    static func v3items<T: DataItem>(with data: [[AnyHashable: Any]]?,
+                                     type: T.Type,
+                                     serverId: NSManagedObjectID,
+                                     prefetchRelationships: [String]? = nil,
+                                     createNewItems: Bool = true,
+                                     moc: NSManagedObjectContext,
+                                     postProcessCallback: @escaping (T, [AnyHashable: Any], Bool, NSManagedObjectContext) -> Void) async {
         guard let infos = data, !infos.isEmpty else { return }
 
         var legacyIdsToNodeIds = [Int64: String]()
@@ -74,7 +74,7 @@ class DataItem: NSManagedObject {
                     try? syncMoc.save()
                     continuation.resume()
                 }
-                
+
                 let entityName = String(describing: type)
                 let f = NSFetchRequest<T>(entityName: entityName)
                 f.relationshipKeyPathsForPrefetching = prefetchRelationships
@@ -82,7 +82,7 @@ class DataItem: NSManagedObject {
                 f.includesSubentities = false
 
                 let legacyServerIds = legacyIdsToNodeIds.map { k, _ in k }
-                f.predicate = NSPredicate(format: "serverId in %@ and apiServer == %@", legacyServerIds, server)
+                f.predicate = NSPredicate(format: "serverId in %@ and apiServer == %@", legacyServerIds, serverId)
                 for item in try! syncMoc.fetch(f) {
                     if let legacyId = item.value(forKey: "serverId") as? Int64 {
                         if let nodeId = legacyIdsToNodeIds[legacyId] {
@@ -98,7 +98,7 @@ class DataItem: NSManagedObject {
                 }
 
                 var nodeIdsOfItems = Set(nodeIdsToInfo.map { k, _ in k })
-                f.predicate = NSPredicate(format: "nodeId in %@ and apiServer == %@", nodeIdsOfItems, server)
+                f.predicate = NSPredicate(format: "nodeId in %@ and apiServer == %@", nodeIdsOfItems, serverId)
                 let existingItems = try! syncMoc.fetch(f)
 
                 let now = Date()
@@ -110,11 +110,11 @@ class DataItem: NSManagedObject {
                             DLog("Updating %@: %@ (v3)", entityName, nodeId)
                             i.postSyncAction = PostSyncAction.isUpdated.rawValue
                             i.updatedAt = updatedDate
-                            postProcessCallback(i, info, true)
+                            postProcessCallback(i, info, true, syncMoc)
                         } else {
                             // DLog("Skipping %@: %@",type,serverId)
                             i.postSyncAction = PostSyncAction.doNothing.rawValue
-                            postProcessCallback(i, info, false)
+                            postProcessCallback(i, info, false, syncMoc)
                         }
                         nodeIdsOfItems.remove(nodeId)
                     }
@@ -123,17 +123,17 @@ class DataItem: NSManagedObject {
                 if !createNewItems { return }
 
                 for nodeId in nodeIdsOfItems {
-                    if let info = nodeIdsToInfo[nodeId] {
+                    if let info = nodeIdsToInfo[nodeId], let apiServer = try? syncMoc.existingObject(with: serverId) as? ApiServer {
                         DLog("Creating %@: %@ (v3)", entityName, nodeId)
-                        let i = NSEntityDescription.insertNewObject(forEntityName: entityName, into: moc) as! T
+                        let i = NSEntityDescription.insertNewObject(forEntityName: entityName, into: syncMoc) as! T
                         i.postSyncAction = PostSyncAction.isNew.rawValue
-                        i.apiServer = server
+                        i.apiServer = apiServer
                         i.nodeId = nodeId
 
                         i.createdAt = DataItem.parseGH8601(info["created_at"] as? String) ?? now
                         i.updatedAt = DataItem.parseGH8601(info["updated_at"] as? String) ?? i.createdAt
 
-                        postProcessCallback(i, info, true)
+                        postProcessCallback(i, info, true, syncMoc)
                     }
                 }
             }
@@ -150,7 +150,7 @@ class DataItem: NSManagedObject {
         f.fetchLimit = 1
         f.predicate = NSPredicate(format: "nodeId == %@", nodeId)
         let object = try! moc.fetch(f).first
-        if let object = object {
+        if let object {
             parentCache.setObject(object, forKey: nodeId as NSString)
         }
         return object
@@ -268,7 +268,7 @@ class DataItem: NSManagedObject {
     static func add<T: ListableItem>(criterion: GroupingCriterion?, toFetchRequest: NSFetchRequest<T>, originalPredicate: NSPredicate, in moc: NSManagedObjectContext, includeAllGroups: Bool = false) {
         var andPredicates = [NSPredicate]()
         if let c = criterion {
-            andPredicates.append(c.addCriterion(to: originalPredicate, in: moc))
+            andPredicates.append(c.addCriterion(to: originalPredicate))
         } else {
             andPredicates.append(originalPredicate)
         }
@@ -361,7 +361,7 @@ class DataItem: NSManagedObject {
         f.includesSubentities = false
         f.predicate = NSPredicate(format: "nodeId in %@", validNodes.map(\.id))
         let existingItems = try! moc.fetch(f)
-        let existingItemIds = Set(existingItems.map { $0.nodeId })
+        let existingItemIds = Set(existingItems.map(\.nodeId))
         let itemLookup = Dictionary(uniqueKeysWithValues: zip(existingItemIds, existingItems))
 
         for node in validNodes {

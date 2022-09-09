@@ -237,7 +237,7 @@ extension API {
                 guard let reactionUrl = c.reactionsUrl else { continue }
                 group.addTask { @MainActor in
                     let (success, _) = await RestAccess.getPagedData(at: reactionUrl, from: c.apiServer) { data, _ in
-                        await Reaction.syncReactions(from: data, comment: c, moc: moc)
+                        await Reaction.syncReactions(from: data, commentId: c.objectID, serverId: c.apiServer.objectID, moc: moc)
                         return false
                     }
                     if success {
@@ -266,9 +266,11 @@ extension API {
                 guard let reactionsUrl = i.reactionsUrl else {
                     continue
                 }
+                let oid = i.objectID
+                let serverId = i.apiServer.objectID
                 group.addTask { @MainActor in
                     let (success, _) = await RestAccess.getPagedData(at: reactionsUrl, from: i.apiServer) { data, _ in
-                        await Reaction.syncReactions(from: data, parent: i, moc: moc)
+                        await Reaction.syncReactions(from: data, parentId: oid, serverId: serverId, moc: moc)
                         return false
                     }
                     if !success {

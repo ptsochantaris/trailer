@@ -27,8 +27,8 @@ final class PRComment: DataItem {
                 comment.review = review
 
                 let pr = DataItem.parent(of: PullRequest.self, with: parentId, in: moc, parentCache: parentCache)
-                if pr == nil, review != nil {
-                    comment.pullRequest = review?.pullRequest
+                if pr == nil, let review {
+                    comment.pullRequest = review.pullRequest
                 } else {
                     comment.pullRequest = pr
                 }
@@ -54,8 +54,9 @@ final class PRComment: DataItem {
     }
 
     static func syncComments(from data: [[AnyHashable: Any]]?, parent: ListableItem, moc: NSManagedObjectContext) async {
-        await items(with: data, type: PRComment.self, server: parent.apiServer, moc: moc) { item, info, newOrUpdated in
-            if newOrUpdated {
+        let parentId = parent.objectID
+        await v3items(with: data, type: PRComment.self, serverId: parent.apiServer.objectID, moc: moc) { item, info, newOrUpdated, syncMoc in
+            if newOrUpdated, let parent = try? syncMoc.existingObject(with: parentId) as? ListableItem {
                 item.pullRequest = parent as? PullRequest
                 item.issue = parent as? Issue
                 item.fill(from: info)

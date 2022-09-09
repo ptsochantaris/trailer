@@ -193,7 +193,7 @@ enum NotificationManager {
             if let n = p.repo.fullName { notification.subtitle = n }
             if let t = p.title { notification.body = t }
             notification.categoryIdentifier = "mutable"
-            
+
         case .newReaction:
             guard let r = item as? Reaction else { return }
             notification.title = r.displaySymbol
@@ -216,7 +216,7 @@ enum NotificationManager {
         let url = (item as? PRComment)?.avatarUrl ?? (item as? ListableItem)?.userAvatarUrl
 
         Task {
-            if !Settings.hideAvatarsInNotifications, let url = url {
+            if !Settings.hideAvatarsInNotifications, let url {
                 let res = try? await API.avatar(from: url)
                 if let res = res, let attachment = try? UNNotificationAttachment(identifier: res.1, url: URL(fileURLWithPath: res.1), options: nil) {
                     notification.attachments = [attachment]

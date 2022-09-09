@@ -43,7 +43,17 @@ enum RestAccess {
                 var lastPage = true
                 if let allHeaders = headers {
                     let latestLimits = ApiStats.fromV3(headers: allHeaders)
-                    server.updateApiStats(latestLimits)
+                    if let serverMoc = server.managedObjectContext {
+                        #if os(iOS)
+                            await serverMoc.perform {
+                                server.updateApiStats(latestLimits)
+                            }
+                        #else
+                            serverMoc.perform {
+                                server.updateApiStats(latestLimits)
+                            }
+                        #endif
+                    }
 
                     if let linkHeader = allHeaders["Link"] as? String {
                         lastPage = !linkHeader.contains("rel=\"next\"")

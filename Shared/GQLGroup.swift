@@ -38,7 +38,7 @@ final class GQLGroup: GQLScanning {
                 brackets.append("last: 1")
             } else {
                 brackets.append("first: \(pageSize)")
-                if let lastCursor = lastCursor {
+                if let lastCursor {
                     brackets.append("after: \"\(lastCursor)\"")
                 }
             }

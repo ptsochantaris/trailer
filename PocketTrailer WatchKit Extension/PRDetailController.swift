@@ -26,7 +26,7 @@ final class PRDetailController: CommonController {
         if !loading {
             loading = true
             var params = ["list": "item_detail", "localId": itemId!]
-            if let command = command {
+            if let command {
                 params["command"] = command
             }
             send(request: params)

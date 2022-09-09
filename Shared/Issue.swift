@@ -26,9 +26,12 @@ final class Issue: ListableItem {
     }
 
     static func syncIssues(from data: [[AnyHashable: Any]]?, in repo: Repo, moc: NSManagedObjectContext) async {
+        let apiServer = repo.apiServer
+        let repoId = repo.objectID
+
         let filteredData = data?.filter { $0["pull_request"] == nil } // don't sync issues which are pull requests, they are already synced
-        await items(with: filteredData, type: Issue.self, server: repo.apiServer, prefetchRelationships: ["labels"], moc: moc) { item, info, isNewOrUpdated in
-            if isNewOrUpdated {
+        await v3items(with: filteredData, type: Issue.self, serverId: apiServer.objectID, prefetchRelationships: ["labels"], moc: moc) { item, info, isNewOrUpdated, syncMoc in
+            if isNewOrUpdated, let repo = try? syncMoc.existingObject(with: repoId) as? Repo {
                 item.baseSync(from: info, in: repo)
 
                 for l in item.labels {

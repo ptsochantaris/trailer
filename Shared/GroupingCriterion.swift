@@ -50,9 +50,9 @@ final class GroupingCriterion {
         return true
     }
 
-    func addCriterion(to predicate: NSPredicate, in moc: NSManagedObjectContext) -> NSPredicate {
-        if let a = apiServerId, let server = try! moc.existingObject(with: a) as? ApiServer {
-            let np = NSPredicate(format: "apiServer == %@", server)
+    func addCriterion(to predicate: NSPredicate) -> NSPredicate {
+        if let apiServerId {
+            let np = NSPredicate(format: "apiServer == %@", apiServerId)
             return NSCompoundPredicate(andPredicateWithSubpredicates: [np, predicate])
         } else if let r = repoGroup {
             let np = NSPredicate(format: "repo.groupLabel == %@", r)

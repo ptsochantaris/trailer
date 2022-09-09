@@ -83,7 +83,7 @@ final class Repo: DataItem {
             }
         }
 
-        await items(with: filteredData, type: Repo.self, server: server, createNewItems: addNewRepos, moc: moc) { item, info, newOrUpdated in
+        await v3items(with: filteredData, type: Repo.self, serverId: server.objectID, createNewItems: addNewRepos, moc: moc) { item, info, newOrUpdated, _ in
             if newOrUpdated {
                 item.fullName = info["full_name"] as? String
                 item.fork = info["fork"] as? Bool ?? false
@@ -174,7 +174,7 @@ final class Repo: DataItem {
                 let rp = NSPredicate(format: "groupLabel == %@", g)
                 f.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [rp, p])
             } else {
-                let ep = c.addCriterion(to: p, in: moc)
+                let ep = c.addCriterion(to: p)
                 if excludeGrouped {
                     f.predicate = excludeGroupedRepos(ep)
                 } else {
@@ -193,8 +193,8 @@ final class Repo: DataItem {
     @MainActor
     static func mayProvideIssuesForDisplay(fromServerWithId id: NSManagedObjectID? = nil) -> Bool {
         let all: [Repo]
-        if let aid = id, let apiServer = existingObject(with: aid) as? ApiServer {
-            all = Repo.allItems(of: Repo.self, in: apiServer)
+        if let serverId = id {
+            all = Repo.allItems(of: Repo.self, in: serverId, moc: DataManager.main)
         } else {
             all = Repo.allItems(of: Repo.self, in: DataManager.main)
         }
@@ -204,8 +204,8 @@ final class Repo: DataItem {
     @MainActor
     static func mayProvidePrsForDisplay(fromServerWithId id: NSManagedObjectID? = nil) -> Bool {
         let all: [Repo]
-        if let aid = id, let apiServer = existingObject(with: aid) as? ApiServer {
-            all = Repo.allItems(of: Repo.self, in: apiServer)
+        if let serverId = id {
+            all = Repo.allItems(of: Repo.self, in: serverId, moc: DataManager.main)
         } else {
             all = Repo.allItems(of: Repo.self, in: DataManager.main)
         }

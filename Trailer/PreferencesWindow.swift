@@ -16,7 +16,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     private var repoCache: [Repo]?
 
     private var repos: [Repo] {
-        if let repoCache = repoCache {
+        if let repoCache {
             return repoCache
         }
         repoCache = ((Repo.reposFiltered(by: repoFilter.stringValue) as NSArray)

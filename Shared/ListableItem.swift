@@ -749,13 +749,13 @@ class ListableItem: DataItem {
             branchB = splitB.last
             branchH = splitH.last
 
-            if let repoB = repoB {
+            if let repoB {
                 _subtitle.append(NSAttributedString(string: repoB, attributes: darkSubtitle))
                 if branchB != nil {
                     _subtitle.append(NSAttributedString(string: ":", attributes: lightSubtitle))
                 }
             }
-            if let branchB = branchB {
+            if let branchB {
                 _subtitle.append(NSAttributedString(string: branchB, attributes: lightSubtitle))
             }
 
@@ -763,13 +763,13 @@ class ListableItem: DataItem {
                 _subtitle.append(NSAttributedString(string: " ← ", attributes: lightSubtitle))
             }
 
-            if let repoH = repoH {
+            if let repoH {
                 _subtitle.append(NSAttributedString(string: repoH, attributes: lightSubtitle))
                 if branchH != nil {
                     _subtitle.append(NSAttributedString(string: ":", attributes: lightSubtitle))
                 }
             }
-            if let branchH = branchH {
+            if let branchH {
                 _subtitle.append(NSAttributedString(string: branchH, attributes: lightSubtitle))
             }
             _subtitle.append(separatorString)
@@ -1133,7 +1133,7 @@ class ListableItem: DataItem {
     enum SpotLightResult {
         case needsIndexing(CSSearchableItem), needsRemoval(String)
     }
-    
+
     final func handleSpotlight() async -> SpotLightResult {
         let uri = objectID.uriRepresentation().absoluteString
         if isVisibleOnMenu {

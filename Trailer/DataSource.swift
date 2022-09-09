@@ -34,7 +34,7 @@ extension MenuWindow {
         @MainActor
         var uniqueIdentifier: String {
             var segments = [String(describing: type)]
-            if let viewCriterion = viewCriterion {
+            if let viewCriterion {
                 segments.append(viewCriterion.label)
                 if let serverId = viewCriterion.apiServerId {
                     let uri = serverId.uriRepresentation()

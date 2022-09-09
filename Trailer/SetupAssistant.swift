@@ -146,7 +146,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate, NSControlTextEditingDele
         o.isExtensionHidden = false
         o.allowedFileTypes = ["trailerSettings"]
         o.beginSheetModal(for: self) { [weak self] response in
-            guard let self = self else { return }
+            guard let self else { return }
             if response == .OK, let url = o.url {
                 Task { @MainActor in
                     if await app.tryLoadSettings(from: url, skipConfirm: Settings.dontConfirmSettingsImport) {

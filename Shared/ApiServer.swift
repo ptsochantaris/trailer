@@ -115,12 +115,12 @@ final class ApiServer: NSManagedObject {
         f.fetchLimit = 1
         let numberOfExistingApiServers = try! moc.count(for: f)
         if numberOfExistingApiServers == 0 {
-            addDefaultGithub(in: moc)
+            _ = addDefaultGithub(in: moc)
         }
     }
 
-    @discardableResult
     @MainActor
+    @discardableResult
     static func addDefaultGithub(in moc: NSManagedObjectContext) -> ApiServer {
         let githubServer = insertNewServer(in: moc)
         githubServer.resetToGithub()
@@ -293,12 +293,13 @@ final class ApiServer: NSManagedObject {
 
     // MARK: GraphQL
 
+    @MainActor
     func run(queries: [GQLQuery]) async throws {
         let path = graphQLPath ?? ""
         let token = authToken ?? ""
 
         let newStats = try await GQLQuery.runQueries(queries: queries, on: path, token: token)
-        if let newStats = newStats {
+        if let newStats {
             updateApiStats(newStats)
         }
     }

@@ -50,7 +50,7 @@ final class MenuBarSet {
     func setTimers() {
         prFilterTimer = PopTimer(timeInterval: 0.2) { [weak self] in
             Task { [weak self] in
-                guard let self = self else { return }
+                guard let self else { return }
                 await self.updatePrMenu()
                 self.prMenu.scrollToTop()
             }
@@ -58,7 +58,7 @@ final class MenuBarSet {
 
         issuesFilterTimer = PopTimer(timeInterval: 0.2) { [weak self] in
             Task { [weak self] in
-                guard let self = self else { return }
+                guard let self else { return }
                 await self.updateIssuesMenu()
                 self.issuesMenu.scrollToTop()
             }

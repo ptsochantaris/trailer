@@ -476,14 +476,14 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
     private func requestTabFocus(tabItem: UITabBarItem?, item: ListableItem? = nil, overrideUrl: String? = nil, andOpen: Bool = false) async {
         await withTaskGroup(of: Void.self) { group in
-            if let tabItem = tabItem {
+            if let tabItem {
                 group.addTask { @MainActor [weak self] in
-                    guard let self = self else { return }
+                    guard let self else { return }
                     await self.tabbing(self.tabs, didSelect: tabItem)
                 }
             }
         }
-        if let item = item {
+        if let item {
             selectInCurrentTab(item: item, overrideUrl: overrideUrl, andOpen: andOpen)
         }
     }
@@ -509,7 +509,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
     }
 
     private func tabBarSetForTabItem(i: UITabBarItem?) -> TabBarSet? {
-        guard let i = i else { return tabBarSets.first }
+        guard let i else { return tabBarSets.first }
         return tabBarSets.first { $0.prItem === i || $0.issuesItem === i }
     }
 

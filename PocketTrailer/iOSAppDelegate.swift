@@ -44,7 +44,7 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
         UIToolbar.appearance().tintColor = UIColor(named: "apptint")
 
         BGTaskScheduler.shared.register(forTaskWithIdentifier: "com.housetrip.mobile.trailer.ios.PocketTrailer.refresh", using: .main) { [weak self] task in
-            guard let task = task as? BGProcessingTask, DataManager.appIsConfigured, let self = self else {
+            guard let task = task as? BGProcessingTask, DataManager.appIsConfigured, let self else {
                 return
             }
             self.backgroundProcessing = task
@@ -114,7 +114,7 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
                 return
             }
         }
-        await startRefresh()
+        _ = await startRefresh()
     }
 
     private func checkApiUsage() {

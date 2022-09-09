@@ -73,7 +73,7 @@ final class CustomReposViewController: UIViewController, UITableViewDelegate, UI
     }
 
     private func addRepo(url: String?) {
-        guard let url = url else { return }
+        guard let url else { return }
         guard let components = URLComponents(string: url) else {
             showMessage("This does not seem to be a valid URL", nil)
             return

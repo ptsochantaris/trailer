@@ -81,8 +81,10 @@ final class PullRequest: ListableItem {
     static func syncPullRequests(from data: [[AnyHashable: Any]]?, in repo: Repo, moc: NSManagedObjectContext) async {
         let apiServer = repo.apiServer
         let apiServerUserId = apiServer.userNodeId
-        await items(with: data, type: PullRequest.self, server: apiServer, moc: moc) { item, info, isNewOrUpdated in
+        let repoId = repo.objectID
+        await v3items(with: data, type: PullRequest.self, serverId: apiServer.objectID, moc: moc) { item, info, isNewOrUpdated, syncMoc in
             if isNewOrUpdated {
+                let repo = try! syncMoc.existingObject(with: repoId) as! Repo
                 item.baseSync(from: info, in: repo)
 
                 let baseInfo = info["base"] as? [AnyHashable: Any]
@@ -136,7 +138,7 @@ final class PullRequest: ListableItem {
             assigned = myTeamNames.contains { reviewerTeams.contains($0) }
             assignedToTeam = assigned
         }
-        if assigned && !assignedForReview, Settings.notifyOnReviewAssignments {
+        if assigned, !assignedForReview, Settings.notifyOnReviewAssignments {
             if assignedToTeam {
                 NotificationQueue.add(type: .assignedToTeamForReview, for: self)
             } else {

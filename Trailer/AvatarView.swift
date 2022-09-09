@@ -4,7 +4,7 @@ final class AvatarView: NSImageView {
     init(frame frameRect: NSRect, url: String?) {
         super.init(frame: frameRect)
 
-        guard let url = url else {
+        guard let url else {
             let size = NSSize(width: AVATAR_SIZE, height: AVATAR_SIZE)
             let img = NSImage(size: size)
             img.lockFocus()

@@ -77,9 +77,11 @@ final class Review: DataItem {
     }
 
     static func syncReviews(from data: [[AnyHashable: Any]]?, withParent: PullRequest, moc: NSManagedObjectContext) async {
-        await items(with: data, type: Review.self, server: withParent.apiServer, moc: moc) { item, info, isNewOrUpdated in
-            if isNewOrUpdated {
-                item.pullRequest = withParent
+        let parentId = withParent.objectID
+        let apiServerId = withParent.apiServer.objectID
+        await v3items(with: data, type: Review.self, serverId: apiServerId, moc: moc) { item, info, isNewOrUpdated, syncMoc in
+            if isNewOrUpdated, let parent = try? syncMoc.existingObject(with: parentId) as? PullRequest {
+                item.pullRequest = parent
                 item.body = info["body"] as? String
                 item.username = (info["user"] as? [AnyHashable: Any])?["login"] as? String
             }

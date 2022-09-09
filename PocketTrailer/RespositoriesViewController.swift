@@ -162,7 +162,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
                     }
                 }
                 Task { @MainActor [weak self] in
-                    guard let self = self else { return }
+                    guard let self else { return }
                     preferencesDirty = true
                     self.navigationItem.title = originalName
                     self.actionsButton.isEnabled = ApiServer.someServersHaveAuthTokens(in: DataManager.main)

@@ -79,7 +79,7 @@ final class GQLQuery {
         do {
             let (info, response) = try await HTTP.getData(for: r)
             let json = try await Task.detached { try JSONSerialization.jsonObject(with: info, options: []) as? [AnyHashable: Any] }.value
-            guard let json = json else {
+            guard let json else {
                 throw API.apiError("\(logPrefix)Invalid JSON")
             }
 

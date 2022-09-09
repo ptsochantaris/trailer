@@ -115,15 +115,15 @@ enum API {
         }
     }
 
-    static nonisolated var shouldSyncReactions: Bool {
+    nonisolated static var shouldSyncReactions: Bool {
         Settings.notifyOnItemReactions || Settings.notifyOnCommentReactions
     }
 
-    static nonisolated var shouldSyncReviews: Bool {
+    nonisolated static var shouldSyncReviews: Bool {
         Settings.displayReviewsOnItems || Settings.notifyOnReviewDismissals || Settings.notifyOnReviewAcceptances || Settings.notifyOnReviewChangeRequests
     }
 
-    static nonisolated var shouldSyncReviewAssignments: Bool {
+    nonisolated static var shouldSyncReviewAssignments: Bool {
         Settings.displayReviewsOnItems || Settings.showRequestedTeamReviews || Settings.notifyOnReviewAssignments || (Int64(Settings.assignedReviewHandlingPolicy) != Section.none.rawValue)
     }
 
@@ -292,8 +292,9 @@ enum API {
             t.postSyncAction = PostSyncAction.delete.rawValue
         }
 
+        let serverId = server.objectID
         let (success, _) = await RestAccess.getPagedData(at: "/user/teams", from: server) { data, _ in
-            await Team.syncTeams(from: data, server: server, moc: moc)
+            await Team.syncTeams(from: data, serverId: serverId, moc: moc)
             return false
         }
         if !success {
@@ -427,7 +428,7 @@ enum API {
         let userTask = Task { () -> [[AnyHashable: Any]] in
             var userList = [[AnyHashable: Any]]()
             let (success, resultCode) = await RestAccess.getPagedData(at: userPath, from: server) { data, _ -> Bool in
-                if let data = data {
+                if let data {
                     userList.append(contentsOf: data)
                 }
                 return false
@@ -443,7 +444,7 @@ enum API {
         let orgTask = Task { () -> [[AnyHashable: Any]] in
             var orgList = [[AnyHashable: Any]]()
             let (success, resultCode) = await RestAccess.getPagedData(at: orgPath, from: server) { data, _ -> Bool in
-                if let data = data {
+                if let data {
                     orgList.append(contentsOf: data)
                 }
                 return false

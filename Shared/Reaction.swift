@@ -37,20 +37,21 @@ final class Reaction: DataItem {
         }
     }
 
-    static func syncReactions(from data: [[AnyHashable: Any]]?, comment: PRComment, moc: NSManagedObjectContext) async {
-        await items(with: data, type: Reaction.self, server: comment.apiServer, moc: moc) { item, info, isNewOrUpdated in
-            if isNewOrUpdated {
+    static func syncReactions(from data: [[AnyHashable: Any]]?, commentId: NSManagedObjectID, serverId: NSManagedObjectID, moc: NSManagedObjectContext) async {
+        await v3items(with: data, type: Reaction.self, serverId: serverId, moc: moc) { item, info, isNewOrUpdated, syncMoc in
+            if isNewOrUpdated, let parent = try? syncMoc.existingObject(with: commentId) as? PRComment {
                 item.pullRequest = nil
                 item.issue = nil
-                item.comment = comment
+                item.comment = parent
                 item.fill(from: info)
             }
         }
     }
 
-    static func syncReactions(from data: [[AnyHashable: Any]]?, parent: ListableItem, moc: NSManagedObjectContext) async {
-        await items(with: data, type: Reaction.self, server: parent.apiServer, moc: moc) { item, info, isNewOrUpdated in
+    static func syncReactions(from data: [[AnyHashable: Any]]?, parentId: NSManagedObjectID, serverId: NSManagedObjectID, moc: NSManagedObjectContext) async {
+        await v3items(with: data, type: Reaction.self, serverId: serverId, moc: moc) { item, info, isNewOrUpdated, syncMoc in
             if isNewOrUpdated {
+                let parent = try! syncMoc.existingObject(with: parentId)
                 item.pullRequest = parent as? PullRequest
                 item.issue = parent as? Issue
                 item.comment = nil

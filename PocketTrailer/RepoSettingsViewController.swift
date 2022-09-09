@@ -17,11 +17,11 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        if let repo = repo {
+        if let repo {
             repoNameTitle.text = repo.fullName
             groupField.text = repo.groupLabel
         } else {
-            if let filter = filter {
+            if let filter {
                 repoNameTitle.text = "Settings for repos matching '\(filter)' (You don't need to pick values for each setting, you can set only one setting if you prefer)"
             } else {
                 repoNameTitle.text = "All repo settings (You don't need to pick values for each setting, you can set only one setting if you prefer)"
@@ -58,7 +58,7 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell")!
-        if let repo = repo {
+        if let repo {
             switch indexPath.section {
             case 0:
                 let special = (indexPath.row == 0 && repo.displayPolicyForPrs == RepoDisplayPolicy.authoredOnly.rawValue)
@@ -111,7 +111,7 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if repo == nil {
             let repos: [Repo]
-            if let filter = filter {
+            if let filter {
                 repos = Repo.allItems(of: Repo.self, in: DataManager.main).filter { $0.fullName?.localizedStandardContains(filter) ?? false }
             } else {
                 repos = Repo.allItems(of: Repo.self, in: DataManager.main)

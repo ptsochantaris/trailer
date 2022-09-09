@@ -527,7 +527,7 @@ enum GraphQL {
             }
         }
     }
-    
+
     @ProcessActor
     private static var processTask: Task<Void, Never>?
 
@@ -536,12 +536,12 @@ enum GraphQL {
         if nodes.isEmpty {
             return
         }
-        
+
         guard let child = server.managedObjectContext?.buildChildPrivateQueue() else {
             return
         }
-        
-        if let processTask = processTask {
+
+        if let processTask {
             await processTask.value
         }
 
@@ -563,7 +563,7 @@ enum GraphQL {
                     continuation.resume()
                     return
                 }
-                
+
                 let parentCache = FetchCache()
                 // Order must be fixed, since labels may refer to PRs or Issues, ensure they are created first
 
@@ -588,7 +588,7 @@ enum GraphQL {
                 if let nodeList = nodes["PullRequestReviewComment"] {
                     PRComment.sync(from: nodeList, on: server, moc: child, parentCache: parentCache)
                 }
-                if let nodeList = nodes["Reaction"], let parentType = parentType {
+                if let nodeList = nodes["Reaction"], let parentType {
                     Reaction.sync(from: nodeList, for: parentType, on: server, moc: child, parentCache: parentCache)
                 }
                 if let nodeList = nodes["ReviewRequest"] {
@@ -603,7 +603,7 @@ enum GraphQL {
                 if let nodeList = nodes["CheckRun"] {
                     PRStatus.sync(from: nodeList, on: server, moc: child, parentCache: parentCache)
                 }
-                
+
                 try? child.save()
                 continuation.resume()
             }
