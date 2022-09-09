@@ -16,10 +16,10 @@ final class PRLabel: DataItem {
                 let parent = node.parent else { return }
 
             if parent.updated || parent.created {
-                if let parentPr = DataItem.parent(of: PullRequest.self, with: parent.id, in: moc, parentCache: parentCache) {
-                    parentPr.mutableSetValue(forKey: "labels").add(label)
-                } else if let parentIssue = DataItem.parent(of: Issue.self, with: parent.id, in: moc, parentCache: parentCache) {
-                    parentIssue.mutableSetValue(forKey: "labels").add(label)
+                if parent.elementType == "PullRequest", let parentPr = DataItem.parent(of: PullRequest.self, with: parent.id, in: moc, parentCache: parentCache) {
+                    parentPr.labels.insert(label)
+                } else if parent.elementType == "Issue", let parentIssue = DataItem.parent(of: Issue.self, with: parent.id, in: moc, parentCache: parentCache) {
+                    parentIssue.labels.insert(label)
                 } else {
                     DLog("Warning: PRLabel without parent")
                 }
@@ -59,8 +59,8 @@ final class PRLabel: DataItem {
         } else {
             f.predicate = NSPredicate(format: "name in %@ and issues contains %@", namesOfItems, fromParent)
         }
+        
         let existingItems = try! fromParent.managedObjectContext?.fetch(f) ?? []
-
         for i in existingItems {
             if let name = i.name, let idx = namesOfItems.firstIndex(of: name), let info = namesToInfo[name] {
                 namesOfItems.remove(at: idx)
@@ -82,7 +82,7 @@ final class PRLabel: DataItem {
                 i.updatedAt = .distantPast
                 i.createdAt = .distantPast
                 i.apiServer = fromParent.apiServer
-                fromParent.mutableSetValue(forKey: "labels").add(i)
+                fromParent.labels.insert(i)
                 postProcessCallback(i, info)
             }
         }

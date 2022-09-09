@@ -47,7 +47,7 @@ final class PullRequest: ListableItem {
             pr.linesRemoved = json["deletions"] as? Int64 ?? 0
             pr.mergeCommitSha = json["headRefOid"] as? String
             pr.mergedByNodeId = (json["mergedBy"] as? [AnyHashable: Any])?["id"] as? String
-            pr.baseNodeSync(nodeJson: json, parent: parent)
+            pr.baseNodeSync(node: node, parent: parent)
             pr.reviewers = "" // will be populated by the review request API calls
             pr.teamReviewers = "" // will be populated by the review request API calls
 

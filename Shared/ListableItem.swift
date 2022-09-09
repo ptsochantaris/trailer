@@ -89,8 +89,10 @@ class ListableItem: DataItem {
         return Array(items)
     }
 
-    final func baseNodeSync(nodeJson info: [AnyHashable: Any], parent: Repo) {
+    final func baseNodeSync(node: GQLNode, parent: Repo) {
         repo = parent
+        
+        let info = node.jsonPayload
         url = info["url"] as? String
         number = info["number"] as? Int64 ?? 0
         title = info["title"] as? String ?? "(No title)"
@@ -99,7 +101,7 @@ class ListableItem: DataItem {
         draft = info["isDraft"] as? Bool ?? false
 
         let newCondition: Int64
-        switch (info["state"] as? String) ?? "" {
+        switch info["state"] as? String {
         case "MERGED": newCondition = ItemCondition.merged.rawValue
         case "CLOSED": newCondition = ItemCondition.closed.rawValue
         default: newCondition = ItemCondition.open.rawValue
@@ -133,7 +135,11 @@ class ListableItem: DataItem {
 
         processAssignmentStatus(from: ["assignees": i], idField: "id")
 
-        mutableSetValue(forKey: "labels").removeAllObjects()
+        if node.updated {
+            for label in labels {
+                label.postSyncAction = PostSyncAction.delete.rawValue
+            }
+        }
     }
 
     final func baseSync(from info: [AnyHashable: Any], in parentRepo: Repo) {

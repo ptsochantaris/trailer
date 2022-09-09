@@ -20,8 +20,7 @@ final class Issue: ListableItem {
                   let parent = DataItem.parent(of: Repo.self, with: parentId, in: moc, parentCache: parentCache)
             else { return }
 
-            let json = node.jsonPayload
-            issue.baseNodeSync(nodeJson: json, parent: parent)
+            issue.baseNodeSync(node: node, parent: parent)
         }
     }
 

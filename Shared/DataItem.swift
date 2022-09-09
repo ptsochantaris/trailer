@@ -334,17 +334,17 @@ class DataItem: NSManagedObject {
         if node.forcedUpdate {
             node.updated = true
         }
-
+        
         if node.created {
-            DLog("Creating \(entityName) ID: %@ (v4)", node.id)
+            DLog("Creating %@ ID: %@ (v4)", entityName, node.id)
             postSyncAction = PostSyncAction.isNew.rawValue
 
         } else if node.updated {
-            DLog("Updating \(entityName) ID: %@ (v4)", node.id)
+            DLog("Updating %@ ID: %@ (v4)", entityName, node.id)
             postSyncAction = PostSyncAction.isUpdated.rawValue
 
         } else if postSyncAction == PostSyncAction.delete.rawValue {
-            // DLog("Keeping \(entityName) ID: %@", node.id)
+            DLog("Keeping %@ ID: %@", entityName, node.id)
             postSyncAction = PostSyncAction.doNothing.rawValue
         }
     }

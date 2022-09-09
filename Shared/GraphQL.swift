@@ -563,7 +563,7 @@ enum GraphQL {
                     continuation.resume()
                     return
                 }
-
+                
                 let parentCache = FetchCache()
                 // Order must be fixed, since labels may refer to PRs or Issues, ensure they are created first
 
@@ -605,6 +605,7 @@ enum GraphQL {
                 }
 
                 try? child.save()
+                
                 continuation.resume()
             }
         }
