@@ -218,6 +218,14 @@ enum DataManager {
         for r in DataItem.newOrUpdatedItems(of: PRComment.self, in: main) {
             r.postSyncAction = PostSyncAction.doNothing.rawValue
         }
+        
+        for p in DataItem.newOrUpdatedItems(of: PullRequest.self, in: main) {
+            p.postSyncAction = PostSyncAction.doNothing.rawValue
+        }
+
+        for i in DataItem.newOrUpdatedItems(of: Issue.self, in: main) {
+            i.postSyncAction = PostSyncAction.doNothing.rawValue
+        }
 
         saveDB()
 

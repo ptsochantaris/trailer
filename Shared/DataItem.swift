@@ -13,6 +13,18 @@ class DataItem: NSManagedObject {
 
     class var isParentType: Bool { false }
 
+    /*
+    override func validateValue(_ value: AutoreleasingUnsafeMutablePointer<AnyObject?>, forKey key: String) throws {
+        try super.validateValue(value, forKey: key)
+        if key == "postSyncAction",
+            let valueInt = value.pointee as? NSInteger,
+            let nodeId,
+            let action = PostSyncAction(rawValue: Int64(valueInt)) {
+            DLog("postsyncaction for \(nodeId): \(action)")
+        }
+    }
+    */
+    
     func resetSyncState() {
         updatedAt = updatedAt?.addingTimeInterval(-1) ?? .distantPast
         apiServer.resetSyncState()
@@ -343,9 +355,24 @@ class DataItem: NSManagedObject {
             DLog("Updating %@ ID: %@ (v4)", entityName, node.id)
             postSyncAction = PostSyncAction.isUpdated.rawValue
 
-        } else if postSyncAction == PostSyncAction.delete.rawValue {
-            DLog("Keeping %@ ID: %@", entityName, node.id)
-            postSyncAction = PostSyncAction.doNothing.rawValue
+        } else {
+            /*
+            switch PostSyncAction(rawValue: postSyncAction) {
+            case .delete:
+                DLog("Keeping %@ ID: %@", entityName, node.id)
+            case .doNothing:
+                DLog("Ignoring %@ ID: %@", entityName, node.id)
+            case .isNew:
+                DLog("Is New %@ ID: %@", entityName, node.id)
+            case .isUpdated:
+                DLog("Is Updated %@ ID: %@", entityName, node.id)
+            case .none:
+                DLog("Other %@ ID: %@", entityName, node.id)
+            }
+             */
+            if postSyncAction == PostSyncAction.delete.rawValue {
+                postSyncAction = PostSyncAction.doNothing.rawValue
+            }
         }
     }
 

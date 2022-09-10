@@ -136,9 +136,7 @@ class ListableItem: DataItem {
         processAssignmentStatus(from: ["assignees": i], idField: "id")
 
         if node.updated {
-            for label in labels {
-                label.postSyncAction = PostSyncAction.delete.rawValue
-            }
+            labels.removeAll() // so not set delete post sync action, as label may not just be a child to this item. Orphaned labels are nuked afterwards
         }
     }
 

@@ -533,31 +533,31 @@ enum GraphQL {
 
     @ProcessActor
     private static func processItems<T: ListableItem>(_ nodes: [String: ContiguousArray<GQLNode>], _ server: ApiServer, parentType: T.Type? = nil, wait: Bool) async {
+        if let p = processTask { // wait for any previous task
+            await p.value
+            processTask = nil
+        }
+        
         if nodes.isEmpty {
             return
         }
 
-        guard let child = server.managedObjectContext?.buildChildPrivateQueue() else {
-            return
-        }
-
-        if let processTask {
-            await processTask.value
-        }
-
-        processTask = Task {
-            await processBlock(nodes, server, parentType, child)
-        }
-
         if wait {
-            await processTask?.value
-            processTask = nil
+            await processBlock(nodes, server, parentType)
+        } else {
+            processTask = Task {
+                await processBlock(nodes, server, parentType)
+            }
         }
     }
 
     @ProcessActor
-    private static func processBlock<T: ListableItem>(_ nodes: [String: ContiguousArray<GQLNode>], _ server: ApiServer, _ parentType: T.Type?, _ child: NSManagedObjectContext) async {
+    private static func processBlock<T: ListableItem>(_ nodes: [String: ContiguousArray<GQLNode>], _ server: ApiServer, _ parentType: T.Type?) async {
         await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            guard let child = server.managedObjectContext?.buildChildPrivateQueue() else {
+                continuation.resume()
+                return
+            }
             child.perform {
                 guard let server = try? child.existingObject(with: server.objectID) as? ApiServer else {
                     continuation.resume()
