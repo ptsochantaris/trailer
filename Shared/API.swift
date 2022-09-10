@@ -232,6 +232,8 @@ enum API {
 
         let repos = Repo.syncableRepos(in: syncMoc)
 
+        DLog("Will sync items from: %@", repos.compactMap(\.fullName).joined(separator: ", "))
+
         if Settings.useV4API {
             do {
                 try await v4Sync(repos, to: syncMoc)
@@ -331,9 +333,7 @@ enum API {
         for r in DataItem.newItems(of: Repo.self, in: moc) where r.shouldSync {
             NotificationQueue.add(type: .newRepoAnnouncement, for: r)
         }
-        await MainActor.run {
-            lastRepoCheck = Date()
-        }
+        lastRepoCheck = Date()
     }
 
     private static func ensureApiServersHaveUserIds(in moc: NSManagedObjectContext) async {

@@ -142,12 +142,25 @@ final class GQLQuery {
     }
 
     static func runQueries(queries: [GQLQuery], on path: String, token: String) async throws -> ApiStats? {
-        var mostRecentNonNilStats: ApiStats?
-        for query in queries {
-            if let stats = try await query.run(for: path, authToken: token, attempt: 10) {
+        try await withThrowingTaskGroup(of: ApiStats?.self, returning: ApiStats?.self) { group in
+            let gateKeeper = HTTP.GateKeeper(entries: 1) // two concurrent GQL queries can run at a time
+
+            for query in queries {
+                group.addTask { @MainActor in
+                    await gateKeeper.waitForGate()
+                    if let stats = try await query.run(for: path, authToken: token, attempt: 10) {
+                        await gateKeeper.signalGate()
+                        return stats
+                    }
+                    await gateKeeper.signalGate()
+                    return nil
+                }
+            }
+            var mostRecentNonNilStats: ApiStats?
+            for try await stats in group where stats != nil {
                 mostRecentNonNilStats = stats
             }
+            return mostRecentNonNilStats
         }
-        return mostRecentNonNilStats
     }
 }

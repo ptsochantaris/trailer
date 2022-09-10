@@ -14,17 +14,17 @@ class DataItem: NSManagedObject {
     class var isParentType: Bool { false }
 
     /*
-    override func validateValue(_ value: AutoreleasingUnsafeMutablePointer<AnyObject?>, forKey key: String) throws {
-        try super.validateValue(value, forKey: key)
-        if key == "postSyncAction",
-            let valueInt = value.pointee as? NSInteger,
-            let nodeId,
-            let action = PostSyncAction(rawValue: Int64(valueInt)) {
-            DLog("postsyncaction for \(nodeId): \(action)")
-        }
-    }
-    */
-    
+     override func validateValue(_ value: AutoreleasingUnsafeMutablePointer<AnyObject?>, forKey key: String) throws {
+         try super.validateValue(value, forKey: key)
+         if key == "postSyncAction",
+             let valueInt = value.pointee as? NSInteger,
+             let nodeId,
+             let action = PostSyncAction(rawValue: Int64(valueInt)) {
+             DLog("postsyncaction for \(nodeId): \(action)")
+         }
+     }
+     */
+
     func resetSyncState() {
         updatedAt = updatedAt?.addingTimeInterval(-1) ?? .distantPast
         apiServer.resetSyncState()
@@ -79,74 +79,66 @@ class DataItem: NSManagedObject {
 
         if nodeIdsToInfo.isEmpty { return }
 
-        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
-            let syncMoc = moc.buildChildPrivateQueue()
-            syncMoc.perform {
-                defer {
-                    try? syncMoc.save()
-                    continuation.resume()
-                }
+        await DataManager.runInChild(of: moc) { child in
+            let entityName = String(describing: type)
+            let f = NSFetchRequest<T>(entityName: entityName)
+            f.relationshipKeyPathsForPrefetching = prefetchRelationships
+            f.returnsObjectsAsFaults = false
+            f.includesSubentities = false
 
-                let entityName = String(describing: type)
-                let f = NSFetchRequest<T>(entityName: entityName)
-                f.relationshipKeyPathsForPrefetching = prefetchRelationships
-                f.returnsObjectsAsFaults = false
-                f.includesSubentities = false
-
-                let legacyServerIds = legacyIdsToNodeIds.map { k, _ in k }
-                f.predicate = NSPredicate(format: "serverId in %@ and apiServer == %@", legacyServerIds, serverId)
-                for item in try! syncMoc.fetch(f) {
-                    if let legacyId = item.value(forKey: "serverId") as? Int64 {
-                        if let nodeId = legacyIdsToNodeIds[legacyId] {
-                            item.nodeId = nodeId
-                            item.setValue(nil, forKey: "serverId")
-                            DLog("Migrated \(entityName) from legacy ID \(legacyId) to node ID \(nodeId)")
-                        } else {
-                            DLog("Warning: Migration failed for \(entityName) with legacy ID \(legacyId), could not find node ID")
-                        }
+            let legacyServerIds = legacyIdsToNodeIds.map { k, _ in k }
+            f.predicate = NSPredicate(format: "serverId in %@ and apiServer == %@", legacyServerIds, serverId)
+            for item in try! child.fetch(f) {
+                if let legacyId = item.value(forKey: "serverId") as? Int64 {
+                    if let nodeId = legacyIdsToNodeIds[legacyId] {
+                        item.nodeId = nodeId
+                        item.setValue(nil, forKey: "serverId")
+                        DLog("Migrated \(entityName) from legacy ID \(legacyId) to node ID \(nodeId)")
                     } else {
-                        DLog("Warning: Migration failed for \(entityName) - could not read legacy ID!")
+                        DLog("Warning: Migration failed for \(entityName) with legacy ID \(legacyId), could not find node ID")
                     }
+                } else {
+                    DLog("Warning: Migration failed for \(entityName) - could not read legacy ID!")
                 }
+            }
 
-                var nodeIdsOfItems = Set(nodeIdsToInfo.map { k, _ in k })
-                f.predicate = NSPredicate(format: "nodeId in %@ and apiServer == %@", nodeIdsOfItems, serverId)
-                let existingItems = try! syncMoc.fetch(f)
+            var nodeIdsOfItems = Set(nodeIdsToInfo.map { k, _ in k })
+            f.predicate = NSPredicate(format: "nodeId in %@ and apiServer == %@", nodeIdsOfItems, serverId)
+            let existingItems = try! child.fetch(f)
 
-                let now = Date()
+            let now = Date()
 
-                for i in existingItems {
-                    if let nodeId = i.nodeId, let info = nodeIdsToInfo[nodeId] {
-                        let updatedDate = DataItem.parseGH8601(info["updated_at"] as? String) ?? i.createdAt ?? now
-                        if updatedDate != i.updatedAt {
-                            DLog("Updating %@: %@ (v3)", entityName, nodeId)
-                            i.postSyncAction = PostSyncAction.isUpdated.rawValue
-                            i.updatedAt = updatedDate
-                            postProcessCallback(i, info, true, syncMoc)
-                        } else {
-                            // DLog("Skipping %@: %@",type,serverId)
-                            i.postSyncAction = PostSyncAction.doNothing.rawValue
-                            postProcessCallback(i, info, false, syncMoc)
-                        }
-                        nodeIdsOfItems.remove(nodeId)
+            for i in existingItems {
+                if let nodeId = i.nodeId, let info = nodeIdsToInfo[nodeId] {
+                    let updatedDate = DataItem.parseGH8601(info["updated_at"] as? String) ?? i.createdAt ?? now
+                    if updatedDate != i.updatedAt {
+                        DLog("Updating %@: %@ (v3)", entityName, nodeId)
+                        i.postSyncAction = PostSyncAction.isUpdated.rawValue
+                        i.updatedAt = updatedDate
+                        postProcessCallback(i, info, true, child)
+                    } else {
+                        // DLog("Skipping %@: %@",type,serverId)
+                        i.postSyncAction = PostSyncAction.doNothing.rawValue
+                        postProcessCallback(i, info, false, child)
                     }
+                    nodeIdsOfItems.remove(nodeId)
                 }
+            }
 
-                if !createNewItems { return }
+            if !createNewItems { return }
 
-                for nodeId in nodeIdsOfItems {
-                    if let info = nodeIdsToInfo[nodeId], let apiServer = try? syncMoc.existingObject(with: serverId) as? ApiServer {
-                        DLog("Creating %@: %@ (v3)", entityName, nodeId)
-                        let i = NSEntityDescription.insertNewObject(forEntityName: entityName, into: syncMoc) as! T
-                        i.postSyncAction = PostSyncAction.isNew.rawValue
-                        i.apiServer = apiServer
-                        i.nodeId = nodeId
+            for nodeId in nodeIdsOfItems {
+                if let info = nodeIdsToInfo[nodeId], let apiServer = try? child.existingObject(with: serverId) as? ApiServer {
+                    DLog("Creating %@: %@ (v3)", entityName, nodeId)
+                    let i = NSEntityDescription.insertNewObject(forEntityName: entityName, into: child) as! T
+                    i.postSyncAction = PostSyncAction.isNew.rawValue
+                    i.apiServer = apiServer
+                    i.nodeId = nodeId
 
-                        i.createdAt = DataItem.parseGH8601(info["created_at"] as? String) ?? now
-                        i.updatedAt = DataItem.parseGH8601(info["updated_at"] as? String) ?? i.createdAt
+                    i.createdAt = DataItem.parseGH8601(info["created_at"] as? String) ?? now
+                    i.updatedAt = DataItem.parseGH8601(info["updated_at"] as? String) ?? i.createdAt
 
-                        postProcessCallback(i, info, true, syncMoc)
-                    }
+                    postProcessCallback(i, info, true, child)
                 }
             }
         }
@@ -357,19 +349,19 @@ class DataItem: NSManagedObject {
 
         } else {
             /*
-            switch PostSyncAction(rawValue: postSyncAction) {
-            case .delete:
-                DLog("Keeping %@ ID: %@", entityName, node.id)
-            case .doNothing:
-                DLog("Ignoring %@ ID: %@", entityName, node.id)
-            case .isNew:
-                DLog("Is New %@ ID: %@", entityName, node.id)
-            case .isUpdated:
-                DLog("Is Updated %@ ID: %@", entityName, node.id)
-            case .none:
-                DLog("Other %@ ID: %@", entityName, node.id)
-            }
-             */
+             switch PostSyncAction(rawValue: postSyncAction) {
+             case .delete:
+                 DLog("Keeping %@ ID: %@", entityName, node.id)
+             case .doNothing:
+                 DLog("Ignoring %@ ID: %@", entityName, node.id)
+             case .isNew:
+                 DLog("Is New %@ ID: %@", entityName, node.id)
+             case .isUpdated:
+                 DLog("Is Updated %@ ID: %@", entityName, node.id)
+             case .none:
+                 DLog("Other %@ ID: %@", entityName, node.id)
+             }
+              */
             if postSyncAction == PostSyncAction.delete.rawValue {
                 postSyncAction = PostSyncAction.doNothing.rawValue
             }

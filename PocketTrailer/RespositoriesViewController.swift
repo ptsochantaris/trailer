@@ -137,7 +137,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 
         API.isRefreshing = true
 
-        let tempContext = DataManager.main.buildChildPrivateQueue()
+        let tempContext = DataManager.main.buildChildContext()
         tempContext.perform { [weak self] in
             Task {
                 await API.fetchRepositories(to: tempContext)

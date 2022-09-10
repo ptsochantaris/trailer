@@ -9,7 +9,7 @@ import Foundation
 
 @MainActor
 enum HTTP {
-    private final actor GateKeeper {
+    final actor GateKeeper {
         private var counter: Int
         init(entries: Int) {
             counter = entries

@@ -7,17 +7,11 @@ enum NodeActor {
     static let shared = ActorType()
 }
 
-@globalActor
-enum ProcessActor {
-    actor ActorType {}
-    static let shared = ActorType()
-}
-
 typealias PerNodeBlock = @NodeActor (GQLNode) async throws -> Void
 
 @MainActor
 enum GraphQL {
-    private static let nodeBlockMax = 200
+    private static let nodeBlockMax = 400
 
     private static let idField = GQLField(name: "id")
 
@@ -528,85 +522,78 @@ enum GraphQL {
         }
     }
 
-    @ProcessActor
     private static var processTask: Task<Void, Never>?
+    private static let gateKeeper = HTTP.GateKeeper(entries: 0)
 
-    @ProcessActor
     private static func processItems<T: ListableItem>(_ nodes: [String: ContiguousArray<GQLNode>], _ server: ApiServer, parentType: T.Type? = nil, wait: Bool) async {
+        await gateKeeper.waitForGate() // ensure this is a critical path
+
         if let p = processTask { // wait for any previous task
             await p.value
-            processTask = nil
         }
-        
+
         if nodes.isEmpty {
+            await gateKeeper.signalGate()
             return
         }
 
-        if wait {
+        processTask = Task {
             await processBlock(nodes, server, parentType)
-        } else {
-            processTask = Task {
-                await processBlock(nodes, server, parentType)
-            }
         }
+
+        if wait, let t = processTask {
+            await t.value
+            processTask = nil
+        }
+
+        await gateKeeper.signalGate()
     }
 
-    @ProcessActor
     private static func processBlock<T: ListableItem>(_ nodes: [String: ContiguousArray<GQLNode>], _ server: ApiServer, _ parentType: T.Type?) async {
-        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
-            guard let child = server.managedObjectContext?.buildChildPrivateQueue() else {
-                continuation.resume()
+        guard let moc = server.managedObjectContext else { return }
+        await DataManager.runInChild(of: moc) { child in
+            guard let server = try? child.existingObject(with: server.objectID) as? ApiServer else {
                 return
             }
-            child.perform {
-                guard let server = try? child.existingObject(with: server.objectID) as? ApiServer else {
-                    continuation.resume()
-                    return
-                }
 
-                let parentCache = FetchCache()
-                // Order must be fixed, since labels may refer to PRs or Issues, ensure they are created first
+            let parentCache = FetchCache()
+            // Order must be fixed, since labels may refer to PRs or Issues, ensure they are created first
 
-                if let nodeList = nodes["Repository"] {
-                    Repo.sync(from: nodeList, on: server, moc: child, parentCache: parentCache)
-                }
-                if let nodeList = nodes["Issue"] {
-                    Issue.sync(from: nodeList, on: server, moc: child, parentCache: parentCache)
-                }
-                if let nodeList = nodes["PullRequest"] {
-                    PullRequest.sync(from: nodeList, on: server, moc: child, parentCache: parentCache)
-                }
-                if let nodeList = nodes["Label"] {
-                    PRLabel.sync(from: nodeList, on: server, moc: child, parentCache: parentCache)
-                }
-                if let nodeList = nodes["CommentReaction"] {
-                    Reaction.sync(from: nodeList, for: PRComment.self, on: server, moc: child, parentCache: parentCache)
-                }
-                if let nodeList = nodes["IssueComment"] {
-                    PRComment.sync(from: nodeList, on: server, moc: child, parentCache: parentCache)
-                }
-                if let nodeList = nodes["PullRequestReviewComment"] {
-                    PRComment.sync(from: nodeList, on: server, moc: child, parentCache: parentCache)
-                }
-                if let nodeList = nodes["Reaction"], let parentType {
-                    Reaction.sync(from: nodeList, for: parentType, on: server, moc: child, parentCache: parentCache)
-                }
-                if let nodeList = nodes["ReviewRequest"] {
-                    Review.syncRequests(from: nodeList, moc: child, parentCache: parentCache)
-                }
-                if let nodeList = nodes["PullRequestReview"] {
-                    Review.sync(from: nodeList, on: server, moc: child, parentCache: parentCache)
-                }
-                if let nodeList = nodes["StatusContext"] {
-                    PRStatus.sync(from: nodeList, on: server, moc: child, parentCache: parentCache)
-                }
-                if let nodeList = nodes["CheckRun"] {
-                    PRStatus.sync(from: nodeList, on: server, moc: child, parentCache: parentCache)
-                }
-
-                try? child.save()
-
-                continuation.resume()
+            if let nodeList = nodes["Repository"] {
+                Repo.sync(from: nodeList, on: server, moc: child, parentCache: parentCache)
+            }
+            if let nodeList = nodes["Issue"] {
+                Issue.sync(from: nodeList, on: server, moc: child, parentCache: parentCache)
+            }
+            if let nodeList = nodes["PullRequest"] {
+                PullRequest.sync(from: nodeList, on: server, moc: child, parentCache: parentCache)
+            }
+            if let nodeList = nodes["Label"] {
+                PRLabel.sync(from: nodeList, on: server, moc: child, parentCache: parentCache)
+            }
+            if let nodeList = nodes["CommentReaction"] {
+                Reaction.sync(from: nodeList, for: PRComment.self, on: server, moc: child, parentCache: parentCache)
+            }
+            if let nodeList = nodes["IssueComment"] {
+                PRComment.sync(from: nodeList, on: server, moc: child, parentCache: parentCache)
+            }
+            if let nodeList = nodes["PullRequestReviewComment"] {
+                PRComment.sync(from: nodeList, on: server, moc: child, parentCache: parentCache)
+            }
+            if let nodeList = nodes["Reaction"], let parentType {
+                Reaction.sync(from: nodeList, for: parentType, on: server, moc: child, parentCache: parentCache)
+            }
+            if let nodeList = nodes["ReviewRequest"] {
+                Review.syncRequests(from: nodeList, moc: child, parentCache: parentCache)
+            }
+            if let nodeList = nodes["PullRequestReview"] {
+                Review.sync(from: nodeList, on: server, moc: child, parentCache: parentCache)
+            }
+            if let nodeList = nodes["StatusContext"] {
+                PRStatus.sync(from: nodeList, on: server, moc: child, parentCache: parentCache)
+            }
+            if let nodeList = nodes["CheckRun"] {
+                PRStatus.sync(from: nodeList, on: server, moc: child, parentCache: parentCache)
             }
         }
     }

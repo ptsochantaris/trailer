@@ -41,33 +41,50 @@ extension API {
 
     static func v4Sync(_ repos: [Repo], to moc: NSManagedObjectContext) async throws {
         let servers = ApiServer.allApiServers(in: moc).filter(\.goodToGo)
-        if !servers.isEmpty {
-            await GraphQL.fetchAllAuthoredItems(from: servers)
-        }
-        if !repos.isEmpty {
-            await GraphQL.fetchAllSubscribedItems(from: repos)
-        }
-        let newOrUpdatedPrs = DataItem.newOrUpdatedItems(of: PullRequest.self, in: moc, fromSuccessfulSyncOnly: true)
-        let newOrUpdatedIssues = DataItem.newOrUpdatedItems(of: Issue.self, in: moc, fromSuccessfulSyncOnly: true)
-
-        if Settings.showStatusItems {
-            let prs = PullRequest.statusCheckBatch(in: moc)
-            try await GraphQL.update(for: prs, steps: [.statuses])
-        } else {
-            for p in DataItem.allItems(of: PullRequest.self, in: moc) {
-                p.lastStatusScan = nil
-                p.statuses.forEach {
-                    $0.postSyncAction = PostSyncAction.delete.rawValue
+        await withTaskGroup(of: Void.self) { group in
+            if !servers.isEmpty {
+                group.addTask { @MainActor in
+                    await GraphQL.fetchAllAuthoredItems(from: servers)
+                }
+            }
+            if !repos.isEmpty {
+                group.addTask { @MainActor in
+                    await GraphQL.fetchAllSubscribedItems(from: repos)
                 }
             }
         }
 
-        if Settings.notifyOnItemReactions {
-            let rp = PullRequest.reactionCheckBatch(for: PullRequest.self, in: moc)
-            try await GraphQL.update(for: rp, steps: [.reactions])
+        let newOrUpdatedPrs = DataItem.newOrUpdatedItems(of: PullRequest.self, in: moc, fromSuccessfulSyncOnly: true)
+        let newOrUpdatedIssues = DataItem.newOrUpdatedItems(of: Issue.self, in: moc, fromSuccessfulSyncOnly: true)
 
-            let ri = Issue.reactionCheckBatch(for: Issue.self, in: moc)
-            try await GraphQL.update(for: ri, steps: [.reactions])
+        try await withThrowingTaskGroup(of: Void.self) { group in
+            if Settings.showStatusItems {
+                group.addTask { @MainActor in
+                    let prs = PullRequest.statusCheckBatch(in: moc)
+                    try await GraphQL.update(for: prs, steps: [.statuses])
+                }
+            } else {
+                for p in DataItem.allItems(of: PullRequest.self, in: moc) {
+                    p.lastStatusScan = nil
+                    p.statuses.forEach {
+                        $0.postSyncAction = PostSyncAction.delete.rawValue
+                    }
+                }
+            }
+
+            if Settings.notifyOnItemReactions {
+                group.addTask { @MainActor in
+                    let rp = PullRequest.reactionCheckBatch(for: PullRequest.self, in: moc)
+                    try await GraphQL.update(for: rp, steps: [.reactions])
+                }
+
+                group.addTask { @MainActor in
+                    let ri = Issue.reactionCheckBatch(for: Issue.self, in: moc)
+                    try await GraphQL.update(for: ri, steps: [.reactions])
+                }
+            }
+
+            try await group.waitForAll()
         }
 
         var steps: SyncSteps = [.comments]
@@ -84,12 +101,20 @@ extension API {
             }
         }
 
-        try await GraphQL.update(for: newOrUpdatedPrs, steps: steps)
+        try await withThrowingTaskGroup(of: Void.self) { group in
+            group.addTask { @MainActor in
+                try await GraphQL.update(for: newOrUpdatedPrs, steps: steps)
 
-        let reviews = DataItem.newOrUpdatedItems(of: Review.self, in: moc, fromSuccessfulSyncOnly: true)
-        try await GraphQL.updateComments(for: reviews) // must run after fetching reviews
+                let reviews = DataItem.newOrUpdatedItems(of: Review.self, in: moc, fromSuccessfulSyncOnly: true)
+                try await GraphQL.updateComments(for: reviews) // must run after fetching reviews
+            }
 
-        try await GraphQL.update(for: newOrUpdatedIssues, steps: steps)
+            group.addTask { @MainActor in
+                try await GraphQL.update(for: newOrUpdatedIssues, steps: steps)
+            }
+
+            try await group.waitForAll()
+        }
 
         if Settings.notifyOnCommentReactions {
             let comments = PRComment.commentsThatNeedReactionsToBeRefreshed(in: moc)

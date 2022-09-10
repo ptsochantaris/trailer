@@ -2,12 +2,12 @@ import CoreData
 import CoreSpotlight
 
 extension NSManagedObjectContext {
-    func buildChildPrivateQueue() -> NSManagedObjectContext {
-        let c = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        c.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
-        c.undoManager = nil
-        c.parent = self
-        return c
+    func buildChildContext() -> NSManagedObjectContext {
+        let child = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        child.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
+        child.undoManager = nil
+        child.parent = self
+        return child
     }
 }
 
@@ -130,33 +130,95 @@ enum DataManager {
         }
     }
 
-    private static func processNotificationsForItems<T: ListableItem>(of type: T.Type, newNotification: NotificationType, reopenedNotification: NotificationType, assignmentNotification: NotificationType) {
-        DataItem.allItems(of: type, in: main).forEach { i in
-            if i.stateChanged != 0 {
-                switch i.stateChanged {
-                case ListableItem.StateChange.reopened.rawValue:
-                    NotificationQueue.add(type: reopenedNotification, for: i)
-                    i.announced = true
+    private static func processNotificationsForItems<T: ListableItem>(of type: T.Type, newNotification: NotificationType, reopenedNotification: NotificationType, assignmentNotification: NotificationType) async {
+        await runInChild(of: main) { child in
+            let items = DataItem.allItems(of: type, in: child)
+            for i in items {
+                if i.stateChanged != 0 {
+                    switch i.stateChanged {
+                    case ListableItem.StateChange.reopened.rawValue:
+                        NotificationQueue.add(type: reopenedNotification, for: i)
+                        i.announced = true
 
-                case ListableItem.StateChange.merged.rawValue:
-                    (i as? PullRequest)?.handleMerging()
+                    case ListableItem.StateChange.merged.rawValue:
+                        (i as? PullRequest)?.handleMerging()
 
-                case ListableItem.StateChange.closed.rawValue:
-                    i.handleClosing()
+                    case ListableItem.StateChange.closed.rawValue:
+                        i.handleClosing()
 
-                default: break
+                    default: break
+                    }
+                    i.stateChanged = 0
+
+                } else if !i.createdByMe, i.isVisibleOnMenu {
+                    if i.isNewAssignment {
+                        NotificationQueue.add(type: assignmentNotification, for: i)
+                        i.announced = true
+                        i.isNewAssignment = false
+                    } else if !i.announced {
+                        NotificationQueue.add(type: newNotification, for: i)
+                        i.announced = true
+                    }
                 }
-                i.stateChanged = 0
+            }
+        }
+    }
 
-            } else if !i.createdByMe, i.isVisibleOnMenu {
-                if i.isNewAssignment {
-                    NotificationQueue.add(type: assignmentNotification, for: i)
-                    i.announced = true
-                    i.isNewAssignment = false
-                } else if !i.announced {
-                    NotificationQueue.add(type: newNotification, for: i)
-                    i.announced = true
+    private static func processCommentAndReviewNotifications() async {
+        await runInChild(of: main) { child in
+            for c in PRComment.newItems(of: PRComment.self, in: child) {
+                c.processNotifications()
+                c.postSyncAction = PostSyncAction.doNothing.rawValue
+            }
+
+            for r in Review.newOrUpdatedItems(of: Review.self, in: child) {
+                r.processNotifications()
+                r.postSyncAction = PostSyncAction.doNothing.rawValue
+            }
+        }
+    }
+
+    private static func processStatusNotifications() async {
+        await runInChild(of: main) { child in
+            let latestStatuses = PRStatus.newItems(of: PRStatus.self, in: child)
+            var coveredPrs = Set<NSManagedObjectID>()
+            if Settings.notifyOnStatusUpdates {
+                for pr in latestStatuses.map(\.pullRequest) where pr.shouldAnnounceStatus && !coveredPrs.contains(pr.objectID) {
+                    coveredPrs.insert(pr.objectID)
+                    if let s = pr.displayedStatuses.first {
+                        let displayText = s.descriptionText
+                        if pr.lastStatusNotified != displayText, pr.postSyncAction != PostSyncAction.isNew.rawValue {
+                            NotificationQueue.add(type: .newStatus, for: s)
+                            pr.lastStatusNotified = displayText
+                        }
+                    } else {
+                        pr.lastStatusNotified = nil
+                    }
                 }
+                coveredPrs.removeAll()
+            }
+
+            for pr in latestStatuses.map(\.pullRequest) where pr.isSnoozing && pr.shouldWakeOnStatusChange && !coveredPrs.contains(pr.objectID) {
+                coveredPrs.insert(pr.objectID)
+                DLog("Waking up snoozed PR ID %@ because of a status update", pr.nodeId ?? "<no ID>")
+                pr.wakeUp()
+            }
+
+            for s in latestStatuses {
+                s.postSyncAction = PostSyncAction.doNothing.rawValue
+            }
+        }
+    }
+
+    static func runInChild<T>(of moc: NSManagedObjectContext, block: @escaping (NSManagedObjectContext) -> T) async -> T {
+        await withCheckedContinuation { continuation in
+            let child = moc.buildChildContext()
+            child.perform {
+                let res = block(child)
+                if child.hasChanges {
+                    try? child.save()
+                }
+                continuation.resume(returning: res)
             }
         }
     }
@@ -164,67 +226,35 @@ enum DataManager {
     static func sendNotificationsIndexAndSave() async {
         preferencesDirty = false
 
-        processNotificationsForItems(of: PullRequest.self, newNotification: .newPr, reopenedNotification: .prReopened, assignmentNotification: .newPrAssigned)
+        await processNotificationsForItems(of: PullRequest.self, newNotification: .newPr, reopenedNotification: .prReopened, assignmentNotification: .newPrAssigned)
 
-        processNotificationsForItems(of: Issue.self, newNotification: .newIssue, reopenedNotification: .issueReopened, assignmentNotification: .newIssueAssigned)
+        await processNotificationsForItems(of: Issue.self, newNotification: .newIssue, reopenedNotification: .issueReopened, assignmentNotification: .newIssueAssigned)
 
-        for c in PRComment.newItems(of: PRComment.self, in: main) {
-            c.processNotifications()
-            c.postSyncAction = PostSyncAction.doNothing.rawValue
-        }
+        await processCommentAndReviewNotifications()
 
-        for r in Review.newOrUpdatedItems(of: Review.self, in: main) {
-            r.processNotifications()
-            r.postSyncAction = PostSyncAction.doNothing.rawValue
-        }
+        await processStatusNotifications()
 
-        let latestStatuses = PRStatus.newItems(of: PRStatus.self, in: main)
-        var coveredPrs = Set<NSManagedObjectID>()
-        if Settings.notifyOnStatusUpdates {
-            for pr in latestStatuses.map(\.pullRequest) where pr.shouldAnnounceStatus && !coveredPrs.contains(pr.objectID) {
-                coveredPrs.insert(pr.objectID)
-                if let s = pr.displayedStatuses.first {
-                    let displayText = s.descriptionText
-                    if pr.lastStatusNotified != displayText, pr.postSyncAction != PostSyncAction.isNew.rawValue {
-                        NotificationQueue.add(type: .newStatus, for: s)
-                        pr.lastStatusNotified = displayText
-                    }
-                } else {
-                    pr.lastStatusNotified = nil
-                }
+        await runInChild(of: main) { child in
+            for r in DataItem.newOrUpdatedItems(of: Reaction.self, in: child) {
+                r.checkNotifications()
+                r.postSyncAction = PostSyncAction.doNothing.rawValue
             }
-            coveredPrs.removeAll()
-        }
 
-        for pr in latestStatuses.map(\.pullRequest) where pr.isSnoozing && pr.shouldWakeOnStatusChange && !coveredPrs.contains(pr.objectID) {
-            coveredPrs.insert(pr.objectID)
-            DLog("Waking up snoozed PR ID %@ because of a status update", pr.nodeId ?? "<no ID>")
-            pr.wakeUp()
-        }
+            for r in DataItem.newOrUpdatedItems(of: Review.self, in: child) {
+                r.postSyncAction = PostSyncAction.doNothing.rawValue
+            }
 
-        for s in latestStatuses {
-            s.postSyncAction = PostSyncAction.doNothing.rawValue
-        }
+            for r in DataItem.newOrUpdatedItems(of: PRComment.self, in: child) {
+                r.postSyncAction = PostSyncAction.doNothing.rawValue
+            }
 
-        for r in DataItem.newOrUpdatedItems(of: Reaction.self, in: main) {
-            r.checkNotifications()
-            r.postSyncAction = PostSyncAction.doNothing.rawValue
-        }
+            for p in DataItem.newOrUpdatedItems(of: PullRequest.self, in: child) {
+                p.postSyncAction = PostSyncAction.doNothing.rawValue
+            }
 
-        for r in DataItem.newOrUpdatedItems(of: Review.self, in: main) {
-            r.postSyncAction = PostSyncAction.doNothing.rawValue
-        }
-
-        for r in DataItem.newOrUpdatedItems(of: PRComment.self, in: main) {
-            r.postSyncAction = PostSyncAction.doNothing.rawValue
-        }
-        
-        for p in DataItem.newOrUpdatedItems(of: PullRequest.self, in: main) {
-            p.postSyncAction = PostSyncAction.doNothing.rawValue
-        }
-
-        for i in DataItem.newOrUpdatedItems(of: Issue.self, in: main) {
-            i.postSyncAction = PostSyncAction.doNothing.rawValue
+            for i in DataItem.newOrUpdatedItems(of: Issue.self, in: child) {
+                i.postSyncAction = PostSyncAction.doNothing.rawValue
+            }
         }
 
         saveDB()
@@ -347,17 +377,12 @@ enum DataManager {
     }
 
     static func postProcessAllItems(in context: NSManagedObjectContext) async {
-        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
-            let c = context.buildChildPrivateQueue()
-            c.perform {
-                for p in DataItem.allItems(of: PullRequest.self, in: c, prefetchRelationships: ["comments", "reactions", "reviews"]) {
-                    p.postProcess()
-                }
-                for i in DataItem.allItems(of: Issue.self, in: c, prefetchRelationships: ["comments", "reactions"]) {
-                    i.postProcess()
-                }
-                try? c.save()
-                continuation.resume()
+        await runInChild(of: context) { child in
+            for p in DataItem.allItems(of: PullRequest.self, in: child, prefetchRelationships: ["comments", "reactions", "reviews"]) {
+                p.postProcess()
+            }
+            for i in DataItem.allItems(of: Issue.self, in: child, prefetchRelationships: ["comments", "reactions"]) {
+                i.postProcess()
             }
         }
     }

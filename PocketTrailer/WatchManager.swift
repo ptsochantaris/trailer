@@ -270,11 +270,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
     private func buildOverview() async -> [String: Any] {
         let allViewCriteria = popupManager.masterController.allTabSets.map(\.viewCriterion)
 
-        let tempMoc = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        tempMoc.undoManager = nil
-        tempMoc.parent = DataManager.main
-
-        return await tempMoc.perform {
+        return await DataManager.runInChild(of: DataManager.main) { tempMoc in
             var views = [[String: Any]]()
             var totalUnreadPrCount = 0
             var totalUnreadIssueCount = 0
