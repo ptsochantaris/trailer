@@ -44,7 +44,7 @@ enum GroupingCriterion {
             return NSCompoundPredicate(andPredicateWithSubpredicates: [np, predicate])
         }
     }
-    
+
     var repoGroup: String? {
         switch self {
         case let .group(name):
@@ -53,7 +53,7 @@ enum GroupingCriterion {
             return nil
         }
     }
-        
+
     var apiServerId: NSManagedObjectID? {
         switch self {
         case .group:

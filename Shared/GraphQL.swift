@@ -314,118 +314,136 @@ enum GraphQL {
         return GQLFragment(on: "Issue", elements: elements)
     }
 
-    static func fetchAllAuthoredItems(from servers: [ApiServer]) async {
-        for server in servers {
-            var authorFields = [GQLGroup]()
+    static func fetchAllAuthoredPrs(from servers: [ApiServer]) async {
+        await withTaskGroup(of: Void.self) { group in
+            for server in servers {
+                var authorFields = [GQLGroup]()
 
-            if Settings.queryAuthoredPRs {
-                let group = GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 20, includeRepo: true)], extraParams: ["states": "OPEN"], pageSize: 100)
-                authorFields.append(group)
-            } else {
-                server.repos.filter { $0.displayPolicyForPrs == RepoDisplayPolicy.authoredOnly.rawValue }.forEach { $0.displayPolicyForPrs = RepoDisplayPolicy.hide.rawValue }
-            }
-
-            if Settings.queryAuthoredIssues {
-                let group = GQLGroup(name: "issues", fields: [issueFragment(assigneesAndLabelPageSize: 20, includeRepo: true)], extraParams: ["states": "OPEN"], pageSize: 100)
-                authorFields.append(group)
-            } else {
-                server.repos.filter { $0.displayPolicyForIssues == RepoDisplayPolicy.authoredOnly.rawValue }.forEach { $0.displayPolicyForIssues = RepoDisplayPolicy.hide.rawValue }
-            }
-
-            var count = 0
-            var nodes = [String: ContiguousArray<GQLNode>]()
-            let authoredItemsQuery = GQLQuery(name: "Authored Items", rootElement: GQLGroup(name: "viewer", fields: authorFields)) { node in
-                let type = node.elementType
-                if var existingList = nodes[type] {
-                    existingList.append(node)
-                    nodes[type] = existingList
+                if Settings.queryAuthoredPRs {
+                    let g = GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 20, includeRepo: true)], extraParams: ["states": "OPEN"], pageSize: 100)
+                    authorFields.append(g)
                 } else {
-                    var array = ContiguousArray<GQLNode>()
-                    array.reserveCapacity(nodeBlockMax)
-                    array.append(node)
-                    nodes[type] = array
+                    server.repos.filter { $0.displayPolicyForPrs == RepoDisplayPolicy.authoredOnly.rawValue }.forEach { $0.displayPolicyForPrs = RepoDisplayPolicy.hide.rawValue }
                 }
 
-                count += 1
-                if count > nodeBlockMax {
-                    count = 0
-                    await self.processItems(nodes, server, wait: false)
-                    nodes.removeAll(keepingCapacity: true)
+                let fields = authorFields
+                group.addTask { @MainActor in
+                    await fetchAllAuthoredItems(from: server, fields: fields)
                 }
             }
-            do {
-                try await server.run(queries: [authoredItemsQuery])
-                await processItems(nodes, server, wait: true)
+        }
+    }
 
-                var prsToCheck = [PullRequest]()
-                let fetchedPrIds = Set(nodes["PullRequest"]?.map(\.id) ?? [])
-                for repo in server.repos.filter({ $0.displayPolicyForPrs == RepoDisplayPolicy.authoredOnly.rawValue }) {
-                    for pr in repo.pullRequests where !fetchedPrIds.contains(pr.nodeId ?? "") {
-                        prsToCheck.append(pr)
-                    }
-                }
-                if !prsToCheck.isEmpty { // investigate missing PRs
-                    let prGroup = GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 1, includeRepo: true)])
-                    let group = GQLBatchGroup(templateGroup: prGroup, idList: prsToCheck.compactMap(\.nodeId), batchSize: 100)
-                    var nodes = ContiguousArray<GQLNode>()
-                    let query = GQLQuery(name: "Closed Authored PRs", rootElement: group, allowsEmptyResponse: true) { node in
-                        node.forcedUpdate = true
-                        nodes.append(node)
-                    }
-                    try await server.run(queries: [query])
-                    await processItems(["PullRequest": nodes], server, wait: true)
+    static func fetchAllAuthoredIssues(from servers: [ApiServer]) async {
+        await withTaskGroup(of: Void.self) { group in
+            for server in servers {
+                var authorFields = [GQLGroup]()
+
+                if Settings.queryAuthoredIssues {
+                    let g = GQLGroup(name: "issues", fields: [issueFragment(assigneesAndLabelPageSize: 20, includeRepo: true)], extraParams: ["states": "OPEN"], pageSize: 100)
+                    authorFields.append(g)
+                } else {
+                    server.repos.filter { $0.displayPolicyForIssues == RepoDisplayPolicy.authoredOnly.rawValue }.forEach { $0.displayPolicyForIssues = RepoDisplayPolicy.hide.rawValue }
                 }
 
-                let fetchedIssueIds = Set(nodes["Issue"]?.map(\.id) ?? []) // investigate missing issues
-                for repo in server.repos.filter({ $0.displayPolicyForIssues == RepoDisplayPolicy.authoredOnly.rawValue }) {
-                    for issue in repo.issues where !fetchedIssueIds.contains(issue.nodeId ?? "") {
-                        issue.stateChanged = ListableItem.StateChange.closed.rawValue
-                        issue.condition = ItemCondition.closed.rawValue
-                    }
+                let fields = authorFields
+                group.addTask { @MainActor in
+                    await fetchAllAuthoredItems(from: server, fields: fields)
                 }
-
-            } catch {
-                server.lastSyncSucceeded = false
             }
+        }
+    }
+
+    static func fetchAllAuthoredItems(from server: ApiServer, fields: [GQLGroup]) async {
+        var count = 0
+        var nodes = [String: ContiguousArray<GQLNode>]()
+        let authoredItemsQuery = GQLQuery(name: "Authored Items", rootElement: GQLGroup(name: "viewer", fields: fields)) { node in
+            let type = node.elementType
+            if var existingList = nodes[type] {
+                existingList.append(node)
+                nodes[type] = existingList
+            } else {
+                var array = ContiguousArray<GQLNode>()
+                array.reserveCapacity(nodeBlockMax)
+                array.append(node)
+                nodes[type] = array
+            }
+
+            count += 1
+            if count > nodeBlockMax {
+                count = 0
+                await self.processItems(nodes, server, wait: false)
+                nodes.removeAll(keepingCapacity: true)
+            }
+        }
+        do {
+            try await server.run(queries: [authoredItemsQuery])
+            await processItems(nodes, server, wait: true)
+
+            var prsToCheck = [PullRequest]()
+            let fetchedPrIds = Set(nodes["PullRequest"]?.map(\.id) ?? [])
+            for repo in server.repos.filter({ $0.displayPolicyForPrs == RepoDisplayPolicy.authoredOnly.rawValue }) {
+                for pr in repo.pullRequests where !fetchedPrIds.contains(pr.nodeId ?? "") {
+                    prsToCheck.append(pr)
+                }
+            }
+            if !prsToCheck.isEmpty { // investigate missing PRs
+                let prGroup = GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 1, includeRepo: true)])
+                let group = GQLBatchGroup(templateGroup: prGroup, idList: prsToCheck.compactMap(\.nodeId), batchSize: 100)
+                var nodes = ContiguousArray<GQLNode>()
+                let query = GQLQuery(name: "Closed Authored PRs", rootElement: group, allowsEmptyResponse: true) { node in
+                    node.forcedUpdate = true
+                    nodes.append(node)
+                }
+                try await server.run(queries: [query])
+                await processItems(["PullRequest": nodes], server, wait: true)
+            }
+
+            let fetchedIssueIds = Set(nodes["Issue"]?.map(\.id) ?? []) // investigate missing issues
+            for repo in server.repos.filter({ $0.displayPolicyForIssues == RepoDisplayPolicy.authoredOnly.rawValue }) {
+                for issue in repo.issues where !fetchedIssueIds.contains(issue.nodeId ?? "") {
+                    issue.stateChanged = ListableItem.StateChange.closed.rawValue
+                    issue.condition = ItemCondition.closed.rawValue
+                }
+            }
+
+        } catch {
+            server.lastSyncSucceeded = false
         }
     }
 
     private static let alreadyParsed = NSError(domain: "com.housetrip.Trailer.parsing", code: 1, userInfo: [NSLocalizedDescriptionKey: "Node already parsed in previous sync"])
 
-    static func fetchAllSubscribedItems(from repos: [Repo]) async {
-        let latestPrsFragment = GQLFragment(on: "Repository", elements: [
-            idField,
-            GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["orderBy": "{direction: DESC, field: UPDATED_AT}"], pageSize: 10)
-        ])
+    private static let latestPrsFragment = GQLFragment(on: "Repository", elements: [
+        idField,
+        GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["orderBy": "{direction: DESC, field: UPDATED_AT}"], pageSize: 10)
+    ])
 
-        let latestIssuesFragment = GQLFragment(on: "Repository", elements: [
-            idField,
-            GQLGroup(name: "issues", fields: [issueFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["orderBy": "{direction: DESC, field: UPDATED_AT}"], pageSize: 20)
-        ])
+    private static let latestIssuesFragment = GQLFragment(on: "Repository", elements: [
+        idField,
+        GQLGroup(name: "issues", fields: [issueFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["orderBy": "{direction: DESC, field: UPDATED_AT}"], pageSize: 20)
+    ])
 
-        let allOpenPrsFragment = GQLFragment(on: "Repository", elements: [
-            idField,
-            GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["states": "OPEN"], pageSize: 50)
-        ])
+    private static let allOpenPrsFragment = GQLFragment(on: "Repository", elements: [
+        idField,
+        GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["states": "OPEN"], pageSize: 50)
+    ])
 
-        let allOpenIssuesFragment = GQLFragment(on: "Repository", elements: [
-            idField,
-            GQLGroup(name: "issues", fields: [issueFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["states": "OPEN"], pageSize: 50)
-        ])
+    private static let allOpenIssuesFragment = GQLFragment(on: "Repository", elements: [
+        idField,
+        GQLGroup(name: "issues", fields: [issueFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["states": "OPEN"], pageSize: 50)
+    ])
 
+    static func fetchAllSubscribedPrs(from repos: [Repo]) async {
         let reposByServer = Dictionary(grouping: repos) { $0.apiServer }
 
         var prRepoIdToLatestExistingUpdate = [String: Date]()
-        var issueRepoIdToLatestExistingUpdate = [String: Date]()
 
         let hideValue = RepoDisplayPolicy.hide.rawValue
         repos.forEach {
             if let n = $0.nodeId {
                 if $0.displayPolicyForPrs != hideValue {
                     prRepoIdToLatestExistingUpdate[n] = PullRequest.mostRecentItemUpdate(in: $0)
-                }
-                if $0.displayPolicyForIssues != hideValue {
-                    issueRepoIdToLatestExistingUpdate[n] = Issue.mostRecentItemUpdate(in: $0)
                 }
             }
         }
@@ -455,6 +473,79 @@ enum GraphQL {
                     throw GraphQL.alreadyParsed
                 }
 
+                count += 1
+                if count > nodeBlockMax {
+                    count = 0
+                    await processItems(nodes, server, wait: false)
+                    nodes.removeAll(keepingCapacity: true)
+                }
+            }
+
+            var queriesForServer = [GQLQuery]()
+            let serverLabel = server.label ?? "<no label>"
+
+            var idsForReposInThisServerWantingAllOpenPrs = ContiguousArray<String>()
+            var idsForReposInThisServerWantingLatestPrs = ContiguousArray<String>()
+            for repo in reposInThisServer {
+                if let n = repo.nodeId {
+                    if let last = prRepoIdToLatestExistingUpdate[n], last != .distantPast {
+                        idsForReposInThisServerWantingLatestPrs.append(n)
+                    } else if repo.displayPolicyForPrs != hideValue {
+                        idsForReposInThisServerWantingAllOpenPrs.append(n)
+                    }
+                }
+            }
+
+            if !idsForReposInThisServerWantingLatestPrs.isEmpty {
+                let q = GQLQuery.batching("\(serverLabel): Updated PRs", fields: [latestPrsFragment], idList: idsForReposInThisServerWantingLatestPrs, batchSize: 10, perNode: perNodeBlock)
+                queriesForServer.append(contentsOf: q)
+            }
+
+            if !idsForReposInThisServerWantingAllOpenPrs.isEmpty {
+                let q = GQLQuery.batching("\(serverLabel): Open PRs", fields: [allOpenPrsFragment], idList: idsForReposInThisServerWantingAllOpenPrs, batchSize: 100, perNode: perNodeBlock)
+                queriesForServer.append(contentsOf: q)
+            }
+
+            do {
+                try await server.run(queries: queriesForServer)
+                await processItems(nodes, server, wait: true)
+            } catch {
+                server.lastSyncSucceeded = false
+            }
+        }
+    }
+
+    static func fetchAllSubscribedIssues(from repos: [Repo]) async {
+        let reposByServer = Dictionary(grouping: repos) { $0.apiServer }
+
+        var issueRepoIdToLatestExistingUpdate = [String: Date]()
+
+        let hideValue = RepoDisplayPolicy.hide.rawValue
+        repos.forEach {
+            if let n = $0.nodeId {
+                if $0.displayPolicyForIssues != hideValue {
+                    issueRepoIdToLatestExistingUpdate[n] = Issue.mostRecentItemUpdate(in: $0)
+                }
+            }
+        }
+
+        for (server, reposInThisServer) in reposByServer {
+            var count = 0
+            var nodes = [String: ContiguousArray<GQLNode>]()
+
+            let perNodeBlock: PerNodeBlock = { node in
+
+                let type = node.elementType
+                if var existingList = nodes[type] {
+                    existingList.append(node)
+                    nodes[type] = existingList
+                } else {
+                    var array = ContiguousArray<GQLNode>()
+                    array.reserveCapacity(nodeBlockMax)
+                    array.append(node)
+                    nodes[type] = array
+                }
+
                 if type == "Issue",
                    let repo = node.parent,
                    let updatedAt = node.jsonPayload["updatedAt"] as? String,
@@ -474,17 +565,10 @@ enum GraphQL {
             var queriesForServer = [GQLQuery]()
             let serverLabel = server.label ?? "<no label>"
 
-            var idsForReposInThisServerWantingAllOpenPrs = ContiguousArray<String>()
-            var idsForReposInThisServerWantingLatestPrs = ContiguousArray<String>()
             var idsForReposInThisServerWantingAllOpenIssues = ContiguousArray<String>()
             var idsForReposInThisServerWantingLatestIssues = ContiguousArray<String>()
             for repo in reposInThisServer {
                 if let n = repo.nodeId {
-                    if let last = prRepoIdToLatestExistingUpdate[n], last != .distantPast {
-                        idsForReposInThisServerWantingLatestPrs.append(n)
-                    } else if repo.displayPolicyForPrs != hideValue {
-                        idsForReposInThisServerWantingAllOpenPrs.append(n)
-                    }
                     if let last = issueRepoIdToLatestExistingUpdate[n], last != .distantPast {
                         idsForReposInThisServerWantingLatestIssues.append(n)
                     } else if repo.displayPolicyForIssues != hideValue {
@@ -500,16 +584,6 @@ enum GraphQL {
 
             if !idsForReposInThisServerWantingAllOpenIssues.isEmpty {
                 let q = GQLQuery.batching("\(serverLabel): Open Issues", fields: [allOpenIssuesFragment], idList: idsForReposInThisServerWantingAllOpenIssues, batchSize: 100, perNode: perNodeBlock)
-                queriesForServer.append(contentsOf: q)
-            }
-
-            if !idsForReposInThisServerWantingLatestPrs.isEmpty {
-                let q = GQLQuery.batching("\(serverLabel): Updated PRs", fields: [latestPrsFragment], idList: idsForReposInThisServerWantingLatestPrs, batchSize: 10, perNode: perNodeBlock)
-                queriesForServer.append(contentsOf: q)
-            }
-
-            if !idsForReposInThisServerWantingAllOpenPrs.isEmpty {
-                let q = GQLQuery.batching("\(serverLabel): Open PRs", fields: [allOpenPrsFragment], idList: idsForReposInThisServerWantingAllOpenPrs, batchSize: 100, perNode: perNodeBlock)
                 queriesForServer.append(contentsOf: q)
             }
 

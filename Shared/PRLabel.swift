@@ -17,9 +17,9 @@ final class PRLabel: DataItem {
 
             if parent.updated || parent.created {
                 if parent.elementType == "PullRequest", let parentPr = DataItem.parent(of: PullRequest.self, with: parent.id, in: moc, parentCache: parentCache) {
-                    parentPr.labels.insert(label)
+                    label.pullRequests.insert(parentPr)
                 } else if parent.elementType == "Issue", let parentIssue = DataItem.parent(of: Issue.self, with: parent.id, in: moc, parentCache: parentCache) {
-                    parentIssue.labels.insert(label)
+                    label.issues.insert(parentIssue)
                 } else {
                     DLog("Warning: PRLabel without parent")
                 }

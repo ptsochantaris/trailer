@@ -13,18 +13,6 @@ class DataItem: NSManagedObject {
 
     class var isParentType: Bool { false }
 
-    /*
-     override func validateValue(_ value: AutoreleasingUnsafeMutablePointer<AnyObject?>, forKey key: String) throws {
-         try super.validateValue(value, forKey: key)
-         if key == "postSyncAction",
-             let valueInt = value.pointee as? NSInteger,
-             let nodeId,
-             let action = PostSyncAction(rawValue: Int64(valueInt)) {
-             DLog("postsyncaction for \(nodeId): \(action)")
-         }
-     }
-     */
-
     func resetSyncState() {
         updatedAt = updatedAt?.addingTimeInterval(-1) ?? .distantPast
         apiServer.resetSyncState()
@@ -380,8 +368,12 @@ class DataItem: NSManagedObject {
         f.includesSubentities = false
         f.predicate = NSPredicate(format: "nodeId in %@", validNodes.map(\.id))
         let existingItems = try! moc.fetch(f)
-        let existingItemIds = Set(existingItems.map(\.nodeId))
-        let itemLookup = Dictionary(uniqueKeysWithValues: zip(existingItemIds, existingItems))
+        let existingItemIds = existingItems.map(\.nodeId)
+        var itemLookup = Dictionary(zip(existingItemIds, existingItems)) { one, two in
+            DLog("Warning: Duplicate item of type \(String(describing: type)) claiming to be node ID \(one.nodeId ?? "<no node id>") - will delete")
+            two.postSyncAction = PostSyncAction.delete.rawValue
+            return one
+        }
 
         for node in validNodes {
             if let existingItem = itemLookup[node.id] {
@@ -395,6 +387,7 @@ class DataItem: NSManagedObject {
                 item.apiServer = server
                 item.populate(type: T.self, node: node)
                 parentCache.setObject(item, forKey: node.id as NSString)
+                itemLookup[node.id] = item
                 perItemCallback(item, node)
             }
         }
