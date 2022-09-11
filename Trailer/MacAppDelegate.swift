@@ -27,7 +27,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 
         var newSets = [MenuBarSet]()
         for groupLabel in Repo.allGroupLabels(in: DataManager.main) {
-            let c = GroupingCriterion(repoGroup: groupLabel)
+            let c = GroupingCriterion.group(groupLabel)
             let s = MenuBarSet(viewCriterion: c, delegate: self)
             s.setTimers()
             newSets.append(s)
@@ -35,7 +35,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 
         if Settings.showSeparateApiServersInMenu {
             for a in ApiServer.allApiServers(in: DataManager.main) where a.goodToGo {
-                let c = GroupingCriterion(apiServerId: a.objectID)
+                let c = GroupingCriterion.server(a.objectID)
                 let s = MenuBarSet(viewCriterion: c, delegate: self)
                 s.setTimers()
                 newSets.append(s)

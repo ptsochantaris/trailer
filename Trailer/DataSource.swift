@@ -36,15 +36,15 @@ extension MenuWindow {
             var segments = [String(describing: type)]
             if let viewCriterion {
                 segments.append(viewCriterion.label)
-                if let serverId = viewCriterion.apiServerId {
-                    let uri = serverId.uriRepresentation()
+                switch viewCriterion {
+                case let .server(aid):
+                    let uri = aid.uriRepresentation()
                     if let host = uri.host {
                         segments.append(host)
                     }
                     segments.append(uri.path)
-                }
-                if let groupName = viewCriterion.repoGroup {
-                    segments.append(groupName)
+                case let .group(name):
+                    segments.append(name)
                 }
             }
             return segments.joined(separator: "-")

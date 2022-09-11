@@ -1,64 +1,65 @@
 import CoreData
 
-@MainActor
-final class GroupingCriterion {
-    let apiServerId: NSManagedObjectID?
-    let repoGroup: String?
+enum GroupingCriterion {
+    case server(NSManagedObjectID), group(String)
 
-    init(apiServerId: NSManagedObjectID?) {
-        self.apiServerId = apiServerId
-        repoGroup = nil
-    }
-
-    init(repoGroup: String) {
-        apiServerId = nil
-        self.repoGroup = repoGroup
-    }
-
+    @MainActor
     var label: String {
-        if let r = repoGroup {
-            return r
-        } else if let aid = apiServerId, let a = existingObject(with: aid) as? ApiServer {
-            return a.label ?? "<none>"
-        } else {
-            return "<none>"
+        switch self {
+        case let .group(name):
+            return name
+        case let .server(aid):
+            let a = existingObject(with: aid) as? ApiServer
+            return a?.label ?? "<none>"
         }
     }
 
+    @MainActor
     var relatedServerFailed: Bool {
-        if let aid = apiServerId, let a = existingObject(with: aid) as? ApiServer, !a.lastSyncSucceeded {
-            return true
+        switch self {
+        case let .group(name):
+            return Repo.repos(for: name, in: DataManager.main).contains { !$0.apiServer.lastSyncSucceeded }
+        case let .server(aid):
+            let a = existingObject(with: aid) as? ApiServer
+            return !(a?.lastSyncSucceeded ?? true)
         }
-        if let group = repoGroup, Repo.repos(for: group, in: DataManager.main).contains(where: { !$0.apiServer.lastSyncSucceeded }) {
-            return true
-        }
-        return false
     }
 
     func isRelated(to i: ListableItem) -> Bool {
-        if let aid = apiServerId {
-            if i.apiServer.objectID != aid {
-                return false
-            }
-        } else if let r = repoGroup {
-            if let l = i.repo.groupLabel {
-                return r == l
-            } else {
-                return false
-            }
+        switch self {
+        case let .group(name):
+            return i.repo.groupLabel == name
+        case let .server(aid):
+            return i.apiServer.objectID == aid
         }
-        return true
     }
 
     func addCriterion(to predicate: NSPredicate) -> NSPredicate {
-        if let apiServerId {
-            let np = NSPredicate(format: "apiServer == %@", apiServerId)
+        switch self {
+        case let .group(name):
+            let np = NSPredicate(format: "repo.groupLabel == %@", name)
             return NSCompoundPredicate(andPredicateWithSubpredicates: [np, predicate])
-        } else if let r = repoGroup {
-            let np = NSPredicate(format: "repo.groupLabel == %@", r)
+        case let .server(aid):
+            let np = NSPredicate(format: "apiServer == %@", aid)
             return NSCompoundPredicate(andPredicateWithSubpredicates: [np, predicate])
-        } else {
-            return predicate
+        }
+    }
+    
+    var repoGroup: String? {
+        switch self {
+        case let .group(name):
+            return name
+        case .server:
+            return nil
+        }
+    }
+        
+    var apiServerId: NSManagedObjectID? {
+        switch self {
+        case .group:
+            return nil
+        case let .server(aid):
+            return aid
         }
     }
 }

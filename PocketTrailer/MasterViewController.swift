@@ -573,14 +573,14 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         tabBarSets.removeAll()
 
         for groupLabel in Repo.allGroupLabels(in: DataManager.main) {
-            let c = GroupingCriterion(repoGroup: groupLabel)
+            let c = GroupingCriterion.group(groupLabel)
             let s = TabBarSet(viewCriterion: c)
             tabBarSets.append(s)
         }
 
         if Settings.showSeparateApiServersInMenu {
             for a in ApiServer.allApiServers(in: DataManager.main) where a.goodToGo {
-                let c = GroupingCriterion(apiServerId: a.objectID)
+                let c = GroupingCriterion.server(a.objectID)
                 let s = TabBarSet(viewCriterion: c)
                 tabBarSets.append(s)
             }

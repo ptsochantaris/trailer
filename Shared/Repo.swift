@@ -170,10 +170,11 @@ final class Repo: DataItem {
         f.fetchLimit = 1
         let p = NSPredicate(format: "displayPolicyForPrs > 0 or displayPolicyForIssues > 0")
         if let c = criterion {
-            if let g = c.repoGroup { // special case will never need exclusion
+            switch c {
+            case let .group(g): // special case will never need exclusion
                 let rp = NSPredicate(format: "groupLabel == %@", g)
                 f.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [rp, p])
-            } else {
+            case .server:
                 let ep = c.addCriterion(to: p)
                 if excludeGrouped {
                     f.predicate = excludeGroupedRepos(ep)

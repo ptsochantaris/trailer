@@ -171,10 +171,10 @@ final class WatchManager: NSObject, WCSessionDelegate {
 
         let f: NSFetchRequest<ListableItem>
         if !apiServerUri.isEmpty, let aid = DataManager.id(for: apiServerUri) {
-            let criterion = GroupingCriterion(apiServerId: aid)
+            let criterion = GroupingCriterion.server(aid)
             f = ListableItem.requestForItems(of: entity, withFilter: nil, sectionIndex: sectionIndex, criterion: criterion, onlyUnread: onlyUnread)
         } else if !group.isEmpty {
-            let criterion = GroupingCriterion(repoGroup: group)
+            let criterion = GroupingCriterion.group(group)
             f = ListableItem.requestForItems(of: entity, withFilter: nil, sectionIndex: sectionIndex, criterion: criterion, onlyUnread: onlyUnread)
         } else {
             f = ListableItem.requestForItems(of: entity, withFilter: nil, sectionIndex: sectionIndex, onlyUnread: onlyUnread)
