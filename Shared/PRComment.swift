@@ -76,7 +76,7 @@ final class PRComment: DataItem {
     }
 
     func processNotifications() {
-        guard let parent = parent, parent.canBadge else {
+        guard let parent, parent.canBadge else {
             return
         }
         if contains(terms: ["@\(apiServer.userName!)"]) {

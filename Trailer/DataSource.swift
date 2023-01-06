@@ -1,6 +1,7 @@
 import Cocoa
 
 extension MenuWindow {
+    @MainActor
     final class DataSource: NSObject, NSTableViewDelegate, NSTableViewDataSource {
         private var itemIds = ContiguousArray<Any>()
         private let type: ListableItem.Type
@@ -31,7 +32,6 @@ extension MenuWindow {
             super.init()
         }
 
-        @MainActor
         var uniqueIdentifier: String {
             var segments = [String(describing: type)]
             if let viewCriterion {
@@ -50,7 +50,6 @@ extension MenuWindow {
             return segments.joined(separator: "-")
         }
 
-        @MainActor
         func reloadData(filter: String?) {
             itemIds.removeAll(keepingCapacity: false)
 
@@ -62,22 +61,17 @@ extension MenuWindow {
 
             itemIds.reserveCapacity(allItems.count + sections.count)
 
-            if let firstItem = allItems.first {
-                var lastSection = firstItem["si"] as! Int
-                itemIds.append(sections[lastSection])
-
-                for item in allItems {
-                    let i = item["si"] as! Int
-                    if lastSection < i {
-                        itemIds.append(sections[i])
-                        lastSection = i
-                    }
-                    itemIds.append(item["objectID"] as! NSManagedObjectID)
+            var lastSection = -999
+            for item in allItems {
+                let i = item["si"] as! Int
+                if lastSection < i {
+                    lastSection = i
+                    itemIds.append(sections[i])
                 }
+                itemIds.append(item["objectID"] as! NSManagedObjectID)
             }
         }
 
-        @MainActor
         func tableView(_: NSTableView, viewFor _: NSTableColumn?, row: Int) -> NSView? {
             let object = itemIds[row]
             if let id = object as? NSManagedObjectID, let i = existingObject(with: id) as? ListableItem {
@@ -92,7 +86,6 @@ extension MenuWindow {
             itemIds.count
         }
 
-        @MainActor
         func itemAtRow(_ row: Int) -> ListableItem? {
             if row >= 0, row < itemIds.count, let id = itemIds[row] as? NSManagedObjectID {
                 return existingObject(with: id) as? ListableItem

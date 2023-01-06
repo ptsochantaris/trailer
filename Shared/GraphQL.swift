@@ -192,7 +192,7 @@ enum GraphQL {
         try await process(name: "Review Comments", items: reviews, fields: [itemFragment])
     }
 
-    private static func process<T: ListableItem>(name: String, items: [DataItem], parentType: T.Type? = nil, fields: [GQLElement]) async throws {
+    private static func process(name: String, items: [DataItem], parentType: (some ListableItem).Type? = nil, fields: [GQLElement]) async throws {
         if items.isEmpty {
             return
         }
@@ -599,7 +599,7 @@ enum GraphQL {
     private static var processTask: Task<Void, Never>?
     private static let gateKeeper = HTTP.GateKeeper(entries: 0)
 
-    private static func processItems<T: ListableItem>(_ nodes: [String: ContiguousArray<GQLNode>], _ server: ApiServer, parentType: T.Type? = nil, wait: Bool) async {
+    private static func processItems(_ nodes: [String: ContiguousArray<GQLNode>], _ server: ApiServer, parentType: (some ListableItem).Type? = nil, wait: Bool) async {
         await gateKeeper.waitForGate() // ensure this is a critical path
 
         if let p = processTask { // wait for any previous task
@@ -623,7 +623,7 @@ enum GraphQL {
         await gateKeeper.signalGate()
     }
 
-    private static func processBlock<T: ListableItem>(_ nodes: [String: ContiguousArray<GQLNode>], _ server: ApiServer, _ parentType: T.Type?) async {
+    private static func processBlock(_ nodes: [String: ContiguousArray<GQLNode>], _ server: ApiServer, _ parentType: (some ListableItem).Type?) async {
         guard let moc = server.managedObjectContext else { return }
         await DataManager.runInChild(of: moc) { child in
             guard let server = try? child.existingObject(with: server.objectID) as? ApiServer else {

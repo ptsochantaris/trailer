@@ -357,7 +357,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 
     override func scrollViewWillBeginDragging(_: UIScrollView) {
         let searchBar = navigationItem.searchController?.searchBar
-        if let searchBar = searchBar, searchBar.isFirstResponder {
+        if let searchBar, searchBar.isFirstResponder {
             searchBar.resignFirstResponder()
         }
     }

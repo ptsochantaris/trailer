@@ -74,7 +74,7 @@ private let agoFormatter: DateComponentsFormatter = {
 }()
 
 func agoFormat(prefix: String, since: Date?) -> String {
-    guard let since = since, since != .distantPast else {
+    guard let since, since != .distantPast else {
         return "Not \(prefix.lowercased()) yet"
     }
 

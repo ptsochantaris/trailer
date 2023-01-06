@@ -217,7 +217,7 @@ class DataItem: NSManagedObject {
     }
 
     static func nukeDeletedItems(in moc: NSManagedObjectContext) {
-        func nukeDeletedItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext) -> Int {
+        func nukeDeletedItems(of type: (some DataItem).Type, in moc: NSManagedObjectContext) -> Int {
             let discarded = items(of: type, surviving: false, in: moc)
             if !discarded.isEmpty {
                 DLog("Nuking %@ %@ items marked for deletion", discarded.count, String(describing: type))
@@ -257,7 +257,7 @@ class DataItem: NSManagedObject {
     }
 
     @MainActor
-    static func add<T: ListableItem>(criterion: GroupingCriterion?, toFetchRequest: NSFetchRequest<T>, originalPredicate: NSPredicate, in moc: NSManagedObjectContext, includeAllGroups: Bool = false) {
+    static func add(criterion: GroupingCriterion?, toFetchRequest: NSFetchRequest<some ListableItem>, originalPredicate: NSPredicate, in moc: NSManagedObjectContext, includeAllGroups: Bool = false) {
         var andPredicates = [NSPredicate]()
         if let c = criterion {
             andPredicates.append(c.addCriterion(to: originalPredicate))
@@ -281,7 +281,7 @@ class DataItem: NSManagedObject {
     // https://github.com/soffes/SAMCategories/blob/master/SAMCategories/NSDate%2BSAMAdditions.m
     private static let dateParserTemplate = "                   +0000".cString(using: .ascii)!
     static func parseGH8601(_ i: String?) -> Date? {
-        guard let i = i, i.count > 18 else { return nil }
+        guard let i, i.count > 18 else { return nil }
 
         var buffer = [CChar](repeating: 0, count: 25)
         memcpy(&buffer, dateParserTemplate, 24)
@@ -294,7 +294,7 @@ class DataItem: NSManagedObject {
         return Date(timeIntervalSince1970: TimeInterval(t))
     }
 
-    private func populate<T: DataItem>(type: T.Type, node: GQLNode) {
+    private func populate(type: (some DataItem).Type, node: GQLNode) {
         let info = node.jsonPayload
         let entityName = String(describing: type)
 

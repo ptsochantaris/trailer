@@ -184,7 +184,8 @@ enum API {
                 }
             }
         #endif
-        let data = try await HTTP.getData(from: url).0
+        let req = URLRequest(url: url)
+        let data = try await HTTP.getData(for: req).data
         guard let i = IMAGE_CLASS(data: data) else {
             throw apiError("Invalid image data")
         }

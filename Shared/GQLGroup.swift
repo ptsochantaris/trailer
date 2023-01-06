@@ -113,7 +113,7 @@ final class GQLGroup: GQLScanning {
         }
         if !stop,
            let latestCursor = edges.last?["cursor"] as? String,
-           let pageInfo = pageInfo, pageInfo["hasNextPage"] as? Bool == true {
+           let pageInfo, pageInfo["hasNextPage"] as? Bool == true {
             let newGroup = GQLGroup(group: self, lastCursor: latestCursor)
             let nextPage = GQLQuery(name: query.name, rootElement: newGroup, parent: parent, perNode: query.perNodeBlock)
             extraQueries.append(nextPage)

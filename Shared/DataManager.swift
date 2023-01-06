@@ -130,7 +130,7 @@ enum DataManager {
         }
     }
 
-    private static func processNotificationsForItems<T: ListableItem>(of type: T.Type, newNotification: NotificationType, reopenedNotification: NotificationType, assignmentNotification: NotificationType) async {
+    private static func processNotificationsForItems(of type: (some ListableItem).Type, newNotification: NotificationType, reopenedNotification: NotificationType, assignmentNotification: NotificationType) async {
         await runInChild(of: main) { child in
             let items = DataItem.allItems(of: type, in: child)
             for i in items {

@@ -38,7 +38,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
     }
 
     func updateContext() {
-        if let session = session, session.isReachable {
+        if let session, session.isReachable {
             session.sendMessage(["newInfoAvailable": true], replyHandler: nil)
         }
     }
@@ -331,7 +331,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
     }
 
     @MainActor
-    private static func counts<T: ListableItem>(for type: T.Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> [String: Int] {
+    private static func counts(for type: (some ListableItem).Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> [String: Int] {
         ["total": countItems(of: type, in: section, criterion: criterion, moc: moc),
          "unread": badgeCount(for: type, in: section, criterion: criterion, moc: moc)]
     }

@@ -142,12 +142,11 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
     func size(andShow makeVisible: Bool) {
         guard let siv = statusItem?.statusView,
               let windowFrame = siv.window?.frame,
-              let screen = NSScreen.screens.first(where: { $0.frame.contains(windowFrame) })
+              let screenFrame = NSScreen.screens.first(where: { $0.frame.contains(windowFrame) })?.visibleFrame
         else { return }
 
-        var menuHeight: CGFloat = 28
+        var menuHeight: CGFloat = 54
         let rowCount = table.numberOfRows
-        let screenFrame = screen.visibleFrame
         var screenHeight = screenFrame.size.height
 
         if NSApp.presentationOptions.contains(.autoHideMenuBar) {
@@ -159,7 +158,8 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
         } else {
             for f in 0 ..< rowCount {
                 let rowView = table.view(atColumn: 0, row: f, makeIfNecessary: true)!
-                menuHeight += rowView.frame.size.height + 2
+                rowView.layoutSubtreeIfNeeded()
+                menuHeight += rowView.frame.size.height
                 if menuHeight >= screenHeight {
                     break
                 }
@@ -170,7 +170,6 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
         if #available(macOS 11.0, *) {
             if rowCount > 0 {
                 menuWidth += table.layoutMarginsGuide.frame.origin.x * 2
-                menuHeight += 24
             }
         }
 

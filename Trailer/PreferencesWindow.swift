@@ -1217,7 +1217,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     }
 
     @IBAction private func deleteSelectedServerSelected(_: NSButton) {
-        if let selectedServer = selectedServer, let index = ApiServer.allApiServers(in: DataManager.main).firstIndex(of: selectedServer) {
+        if let selectedServer, let index = ApiServer.allApiServers(in: DataManager.main).firstIndex(of: selectedServer) {
             DataManager.main.delete(selectedServer)
             serverList.reloadData()
             serverList.selectRowIndexes(IndexSet(integer: min(index, serverList.numberOfRows - 1)), byExtendingSelection: false)

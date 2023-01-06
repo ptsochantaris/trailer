@@ -80,7 +80,7 @@ final class PrTable: NSTableView, NSPasteboardItemDataProvider {
 
     private var draggingUrl: String?
     func pasteboard(_ pasteboard: NSPasteboard?, item _: NSPasteboardItem, provideDataForType type: NSPasteboard.PasteboardType) {
-        if let pasteboard = pasteboard, type == .string, draggingUrl != nil {
+        if let pasteboard, type == .string, draggingUrl != nil {
             pasteboard.setData(draggingUrl!.data(using: String.Encoding.utf8)!, forType: .string)
             draggingUrl = nil
         }

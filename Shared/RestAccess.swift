@@ -45,8 +45,10 @@ enum RestAccess {
                     let latestLimits = ApiStats.fromV3(headers: allHeaders)
                     if let serverMoc = server.managedObjectContext {
                         #if os(iOS)
-                            await serverMoc.perform {
-                                server.updateApiStats(latestLimits)
+                            Task {
+                                await serverMoc.perform {
+                                    server.updateApiStats(latestLimits)
+                                }
                             }
                         #else
                             serverMoc.perform {
@@ -117,18 +119,11 @@ enum RestAccess {
             request.setValue("token \(a)", forHTTPHeaderField: "Authorization")
         }
 
-        let capturedRequest = request
         do {
-            let (data, response) = try await HTTP.getData(for: capturedRequest)
+            let (parsedData, response) = try await HTTP.getJsonData(for: request)
             let headers = response.allHeaderFields
             let code = response.statusCode
-
             DLog("(%@) GET %@ - RESULT: %@", apiServerLabel, expandedPath, code)
-            let parsedData = await Task.detached { try? JSONSerialization.jsonObject(with: data, options: []) }.value
-
-            if Settings.dumpAPIResponsesInConsole {
-                DLog("API data from %@: %@", expandedPath, String(bytes: data, encoding: .utf8))
-            }
             return (code, headers, parsedData)
 
         } catch {

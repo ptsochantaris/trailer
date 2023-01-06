@@ -71,7 +71,7 @@ extension API {
                 r.lastScannedIssueEventId = 0
                 group.addTask { @MainActor in
                     let (success, _) = await RestAccess.getPagedData(at: "/repos/\(repoFullName)/issues/events", from: r.apiServer) { data, _ in
-                        guard let data = data, !data.isEmpty else { return true }
+                        guard let data, !data.isEmpty else { return true }
 
                         if isFirstEventSync {
                             DLog("First event check for this repo. Let's ensure all items are marked as updated")

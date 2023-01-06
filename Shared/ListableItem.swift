@@ -848,7 +848,7 @@ class ListableItem: DataItem {
         #endif
     }
 
-    class func badgeCount<T: ListableItem>(from fetch: NSFetchRequest<T>, in moc: NSManagedObjectContext) -> Int {
+    class func badgeCount(from fetch: NSFetchRequest<some ListableItem>, in moc: NSManagedObjectContext) -> Int {
         var badgeCount: Int64 = 0
         fetch.returnsObjectsAsFaults = false
         for i in try! moc.fetch(fetch) {

@@ -52,7 +52,7 @@ final class PullRequest: ListableItem {
             pr.teamReviewers = "" // will be populated by the review request API calls
 
             let headRefName = json["headRefName"] as? String
-            if let headRefName = headRefName,
+            if let headRefName,
                let headRepoName = (json["headRepository"] as? [AnyHashable: Any])?["nameWithOwner"] as? String {
                 pr.headLabel = headRepoName + ":" + headRefName
             } else {
@@ -61,7 +61,7 @@ final class PullRequest: ListableItem {
             pr.headRefName = headRefName
 
             let baseRefName = json["baseRefName"] as? String
-            if let baseRefName = baseRefName,
+            if let baseRefName,
                let baseRepoName = (json["baseRepository"] as? [AnyHashable: Any])?["nameWithOwner"] as? String {
                 pr.baseLabel = baseRepoName + ":" + baseRefName
             } else {
@@ -195,7 +195,7 @@ final class PullRequest: ListableItem {
         super.catchUpWithComments()
     }
 
-    override class func badgeCount<T: ListableItem>(from fetch: NSFetchRequest<T>, in moc: NSManagedObjectContext) -> Int {
+    override class func badgeCount(from fetch: NSFetchRequest<some ListableItem>, in moc: NSManagedObjectContext) -> Int {
         var badgeCount = super.badgeCount(from: fetch, in: moc)
         if Settings.markPrsAsUnreadOnNewCommits {
             for i in try! moc.fetch(fetch) {

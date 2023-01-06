@@ -100,7 +100,7 @@ final class PRCell: UITableViewCell {
 
         let sub = pullRequest.subtitle(with: detailFont, lightColor: UIColor.secondaryLabel, darkColor: UIColor.label, separator: separator)
         let r = pullRequest.reviewsAttributedString(labelFont: detailFont)
-        if let r = r, r.length > 0 {
+        if let r, r.length > 0 {
             let s = NSMutableAttributedString(attributedString: r)
             s.append(NSAttributedString(string: "\n"))
             s.append(sub)

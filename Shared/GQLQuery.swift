@@ -77,14 +77,9 @@ final class GQLQuery {
         var apiStats: ApiStats?
         var shouldRetry = false
         do {
-            let (info, response) = try await HTTP.getData(for: r)
-            let json = try await Task.detached { try JSONSerialization.jsonObject(with: info, options: []) as? [AnyHashable: Any] }.value
-            guard let json else {
+            let (data, response) = try await HTTP.getJsonData(for: r)
+            guard let json = data as? [AnyHashable: Any] else {
                 throw API.apiError("\(logPrefix)Invalid JSON")
-            }
-
-            if Settings.dumpAPIResponsesInConsole {
-                DLog("\(logPrefix)API data from %@: %@", url, String(bytes: info, encoding: .utf8))
             }
 
             apiStats = ApiStats.fromV4(json: json["data"] as? [AnyHashable: Any])
