@@ -7,6 +7,7 @@ enum BackgroundTask {
     private static func endTask() {
         if bgTask == .invalid { return }
         DLog("BG Task done")
+        endTimer.abort()
         UIApplication.shared.endBackgroundTask(bgTask)
         bgTask = .invalid
     }
@@ -35,8 +36,8 @@ enum BackgroundTask {
     }
 
     static func registerForBackground() {
-        endTimer.abort()
         let count = globalBackgroundCount
+        endTimer.abort()
         globalBackgroundCount = count + 1
         if appInBackground, bgTask == .invalid, count == 0 {
             appBackgrounded()

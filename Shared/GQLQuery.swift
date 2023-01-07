@@ -1,4 +1,6 @@
+import AsyncHTTPClient
 import Foundation
+import NIOCore
 
 final class GQLQuery {
     let name: String
@@ -64,11 +66,11 @@ final class GQLQuery {
             DLog("\(logPrefix)Fetching: \(Q)")
         }
 
-        let server = URL(string: url)!
-        var r = URLRequest(url: server)
-        r.httpMethod = "POST"
-        r.httpBody = try! JSONEncoder().encode(["query": Q])
-        r.setValue("bearer \(authToken)", forHTTPHeaderField: "Authorization")
+        var r = HTTPClientRequest(url: url)
+        r.method = .POST
+        let data = try! JSONEncoder().encode(["query": Q])
+        r.body = .bytes(ByteBuffer(bytes: data))
+        r.headers.add(name: "Authorization", value: "bearer \(authToken)")
 
         Task { @MainActor in
             API.currentOperationName = name
@@ -76,7 +78,7 @@ final class GQLQuery {
 
         var apiStats: ApiStats?
         do {
-            let json = try await HTTP.getJsonData(for: r, attempts: attempts).json
+            let json = try await HTTP.getJsonData(for: r, attempts: attempts, checkCache: false).json
             guard let json = json as? [AnyHashable: Any] else {
                 throw API.apiError("\(logPrefix)Invalid JSON")
             }

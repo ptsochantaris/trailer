@@ -217,8 +217,8 @@ enum NotificationManager {
 
         Task {
             if !Settings.hideAvatarsInNotifications, let url {
-                let res = try? await API.avatar(from: url)
-                if let res, let attachment = try? UNNotificationAttachment(identifier: res.1, url: URL(fileURLWithPath: res.1), options: nil) {
+                let entry = try? await HTTP.avatar(from: url)
+                if let entry, let res = entry.1, let attachment = try? UNNotificationAttachment(identifier: res, url: URL(fileURLWithPath: res), options: nil) {
                     notification.attachments = [attachment]
                 }
             }

@@ -5,10 +5,13 @@
 //  Created by Paul Tsochantaris on 22/05/2022.
 //
 
+import AsyncHTTPClient
 import Foundation
+import NIOCore
+import NIOHTTP1
 
 enum DataResult {
-    case success(headers: [AnyHashable: Any]), notFound, deleted, failed(code: Int)
+    case success(headers: HTTPHeaders, cachedIn: String?), notFound, deleted, failed(code: UInt)
 
     var logValue: String {
         switch self {
@@ -20,13 +23,12 @@ enum DataResult {
     }
 }
 
-@globalActor
-enum HttpActor {
-    actor ActorType {}
-    static let shared = ActorType()
+extension ByteBuffer {
+    var asData: Data {
+        Data(buffer: self)
+    }
 }
 
-@HttpActor
 enum HTTP {
     final actor GateKeeper {
         private var counter: Int
@@ -48,96 +50,139 @@ enum HTTP {
 
     private static let gateKeeper = GateKeeper(entries: 8)
 
-    private static var urlSessionConfig: URLSessionConfiguration {
-        #if DEBUG
-            #if os(iOS)
-                let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-iOS-Development"
-            #else
-                let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-macOS-Development"
-            #endif
+    #if DEBUG
+        #if os(iOS)
+            private static let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-iOS-Development"
         #else
-            #if os(iOS)
-                let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-iOS-Release"
-            #else
-                let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-macOS-Release"
-            #endif
+            private static let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-macOS-Development"
         #endif
+    #else
+        #if os(iOS)
+            private static let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-iOS-Release"
+        #else
+            private static let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-macOS-Release"
+        #endif
+    #endif
 
-        let config = URLSessionConfiguration.default
-        config.httpShouldUsePipelining = true
-        config.httpAdditionalHeaders = ["User-Agent": userAgent]
-        config.urlCache = URLCache(memoryCapacity: 32 * 1024 * 1024, diskCapacity: 1024 * 1024 * 1024, diskPath: API.cacheDirectory)
-        return config
-    }
+    private static let httpClient = HTTPClient(eventLoopGroupProvider: .createNew,
+                                               configuration: HTTPClient.Configuration(certificateVerification: .fullVerification,
+                                                                                       redirectConfiguration: .disallow,
+                                                                                       decompression: .enabled(limit: .none)))
 
-    private static let urlSession = URLSession(configuration: urlSessionConfig, delegate: nil, delegateQueue: nil)
-
-    static func getJsonData(for request: URLRequest, attempts: Int) async throws -> (json: Any, result: DataResult) {
+    static func getJsonData(for request: HTTPClientRequest, attempts: Int, checkCache: Bool) async throws -> (json: Any, result: DataResult) {
         await gateKeeper.waitForGate()
         defer {
             Task {
                 await gateKeeper.signalGate()
             }
         }
-        let (data, result) = try await getData(for: request, attempts: attempts)
-        if Settings.dumpAPIResponsesInConsole {
-            DLog("API data from %@: %@", S(request.url?.path), String(bytes: data, encoding: .utf8))
+        let (result, data) = try await getData(for: request, attempts: attempts, checkCache: checkCache)
+        if case .success = result, Settings.dumpAPIResponsesInConsole {
+            DLog("API data from %@: %@", S(request.url), data.description)
         }
         let json = try await Task.detached { try JSONSerialization.jsonObject(with: data, options: []) }.value
         return (json, result)
     }
 
-    nonisolated static func getData(for request: URLRequest, attempts: Int) async throws -> (data: Data, response: DataResult) {
+    private static let getCache = HTTPCache()
+
+    static func getData(for request: HTTPClientRequest, attempts: Int, checkCache: Bool) async throws -> (result: DataResult, data: ByteBuffer) {
+        #if os(iOS)
+            Task { @MainActor in
+                BackgroundTask.registerForBackground()
+            }
+            defer {
+                Task { @MainActor in
+                    BackgroundTask.unregisterForBackground()
+                }
+            }
+        #endif
+
+        let cachedEntry: HTTPCache.CachedResponse?
+        var request = request
+        request.headers.add(name: "User-Agent", value: userAgent)
+        if checkCache {
+            cachedEntry = await getCache[request.url]
+            if let etag = cachedEntry?.etag {
+                request.headers.add(name: "If-None-Match", value: etag)
+            }
+        } else {
+            cachedEntry = nil
+        }
+
         var attempt = attempts
         while attempt > 0 {
             do {
-                let data: Data
-                let response: URLResponse
-                if #available(macOS 12.0, iOS 15.0, *) {
-                    (data, response) = try await urlSession.data(for: request)
-                } else {
-                    (data, response) = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<(Data, URLResponse), Error>) in
-                        let task = urlSession.dataTask(with: request) { data, response, error in
-                            if let data, let response {
-                                continuation.resume(returning: (data, response))
-                            } else {
-                                continuation.resume(throwing: error ?? API.apiError("No data and no error from http call"))
+                let response = try await httpClient.execute(request, timeout: .seconds(60))
+                let code = response.status.code
+
+                switch code {
+                case 304:
+                    if let cachedEntry {
+                        // DLog("304 - \(cachedEntry.etag) - \(request.url)")
+                        if let location = cachedEntry.cachedIn {
+                            Task {
+                                await getCache.touch(at: location)
                             }
                         }
-                        task.resume()
+                        return (.success(headers: response.headers, cachedIn: cachedEntry.cachedIn), cachedEntry.bytes)
+                    } else {
+                        throw API.apiError("Unexpected 304 received")
                     }
-                }
-                guard let response = response as? HTTPURLResponse else {
-                    throw API.apiError("Invalid HTTP response")
-                }
-                let code = response.statusCode
-                switch code {
                 case 404:
-                    return (data, .notFound)
+                    return (result: .notFound, data: ByteBuffer())
                 case 410:
-                    return (data, .deleted)
-                case 502, 503, -1001: // in case of throttle or ongoing GH deployment or timeout
+                    return (result: .deleted, data: ByteBuffer())
+                case 502, 503: // in case of throttle or ongoing GH deployment
                     throw API.apiError("HTTP Code \(code) received")
                 case 400...:
-                    return (data, .failed(code: code))
-                default: return (data, .success(headers: response.allHeaderFields))
+                    return (result: .failed(code: code), data: ByteBuffer())
+                default:
+                    let data = try await response.body.collect(upTo: 10240 * 1024 * 1024) // 1Gb
+                    if let etag = response.headers["ETag"].first {
+                        let cached = HTTPCache.CachedResponse(bytes: data, etag: etag)
+                        let key = request.url
+                        Task {
+                            await getCache.set(response: cached, for: key) // sets the cache location as well
+                        }
+                        return (.success(headers: response.headers, cachedIn: cached.cachedIn), data)
+                    } else {
+                        return (.success(headers: response.headers, cachedIn: nil), data)
+                    }
                 }
-
             } catch {
                 attempt -= 1
                 if attempt > 0 {
-                    if let url = request.url {
-                        DLog("Will pause and retry call to %@", url)
-                    }
+                    DLog("Will pause and retry call to %@", request.url)
                     try? await Task.sleep(nanoseconds: 5 * NSEC_PER_SEC)
                 } else {
-                    if let url = request.url {
-                        DLog("Failed API call to %@", url)
-                    }
+                    DLog("Failed API call to %@", request.url)
                     throw error
                 }
             }
         }
         throw API.apiError("HTTP Error")
+    }
+
+    @discardableResult
+    static func avatar(from path: String) async throws -> (IMAGE_CLASS, String?) {
+        let connector = path.contains("?") ? "&" : "?"
+        let absolutePath = "\(path)\(connector)s=128"
+
+        // if image exists, return without checking in with the server
+        if let existingEntry = await getCache[absolutePath], let i = IMAGE_CLASS(data: existingEntry.bytes.asData) {
+            return (i, existingEntry.cachedIn)
+        }
+
+        let req = HTTPClientRequest(url: absolutePath)
+        let response = try await HTTP.getData(for: req, attempts: 1, checkCache: false)
+        guard let i = IMAGE_CLASS(data: response.data.asData) else {
+            throw API.apiError("Invalid image data")
+        }
+        if case let .success(_, cachePath) = response.result {
+            return (i, cachePath)
+        } else {
+            return (i, nil)
+        }
     }
 }

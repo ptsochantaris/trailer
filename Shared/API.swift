@@ -1,15 +1,25 @@
+import AsyncHTTPClient
 import CommonCrypto
 import CoreData
+
+extension String {
+    private func sha1() -> Data {
+        utf8CString.withUnsafeBytes { bytes -> Data in
+            let len = Int(CC_SHA1_DIGEST_LENGTH)
+            var digest = [UInt8](repeating: 0, count: len)
+            CC_SHA1(bytes.baseAddress, CC_LONG(bytes.count), &digest)
+            return Data(bytes: digest, count: len)
+        }
+    }
+
+    var fileHash: String {
+        sha1().base64EncodedString().replacingOccurrences(of: "/", with: "-")
+    }
+}
 
 @MainActor
 enum API {
     static var currentNetworkStatus = NetworkStatus.NotReachable
-
-    static let cacheDirectory: String = {
-        let fileManager = FileManager.default
-        let appSupportURL = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!
-        return appSupportURL.appendingPathComponent("com.housetrip.Trailer").path
-    }()
 
     private static let reachability = Reachability()
 
@@ -19,15 +29,6 @@ enum API {
         let n = reachability.status
         DLog("Network is %@", n.name)
         currentNetworkStatus = n
-
-        let fileManager = FileManager.default
-        if fileManager.fileExists(atPath: cacheDirectory) {
-            Task {
-                expireOldImageCacheEntries()
-            }
-        } else {
-            try! fileManager.createDirectory(atPath: cacheDirectory, withIntermediateDirectories: true, attributes: nil)
-        }
 
         NotificationCenter.default.addObserver(forName: ReachabilityChangedNotification, object: nil, queue: .main) { _ in
             Task { @MainActor in
@@ -70,18 +71,8 @@ enum API {
 
     static var currentOperationCount = 0 {
         didSet {
-            let newValue = currentOperationCount
-            if oldValue == 0, newValue > 0 {
-                #if os(iOS)
-                    BackgroundTask.registerForBackground()
-                #endif
-            } else if oldValue > 0, newValue == 0 {
-                #if os(iOS)
-                    BackgroundTask.unregisterForBackground()
-                #endif
-            }
-
             if isRefreshing, currentOperationName.hasPrefix("Fetching…") {
+                let newValue = currentOperationCount
                 if newValue > 1 {
                     currentOperationName = "Fetching… (\(newValue) calls queued)"
                 } else {
@@ -125,73 +116,6 @@ enum API {
 
     nonisolated static var shouldSyncReviewAssignments: Bool {
         Settings.displayReviewsOnItems || Settings.showRequestedTeamReviews || Settings.notifyOnReviewAssignments || (Int64(Settings.assignedReviewHandlingPolicy) != Section.none.rawValue)
-    }
-
-    ///////////////////////////////////////////////////////// Images
-
-    private static func expireOldImageCacheEntries() {
-        let now = Date()
-        let fileManager = FileManager.default
-        for f in try! fileManager.contentsOfDirectory(atPath: cacheDirectory) where f.hasPrefix("imgc-") {
-            do {
-                let path = cacheDirectory.appending(pathComponent: f)
-                let attributes = try fileManager.attributesOfItem(atPath: path)
-                if let date = attributes[.creationDate] as? Date, now.timeIntervalSince(date) > 3600 * 24 {
-                    try? fileManager.removeItem(atPath: path)
-                }
-            } catch {
-                DLog("File error when removing old cached image: %@", error.localizedDescription)
-            }
-        }
-    }
-
-    private static func sha1(_ input: String) -> Data {
-        input.utf8CString.withUnsafeBytes { bytes -> Data in
-            let len = Int(CC_SHA1_DIGEST_LENGTH)
-            var digest = [UInt8](repeating: 0, count: len)
-            CC_SHA1(bytes.baseAddress, CC_LONG(bytes.count), &digest)
-            return Data(bytes: digest, count: len)
-        }
-    }
-
-    @discardableResult
-    static func avatar(from path: String) async throws -> (IMAGE_CLASS, String) {
-        let connector = path.contains("?") ? "&" : "?"
-        let absolutePath = "\(path)\(connector)s=128"
-        let hash = sha1("\(absolutePath) \(currentAppVersion)").base64EncodedString().replacingOccurrences(of: "/", with: "-")
-        let cachePath = cacheDirectory.appending(pathComponent: "imgc-\(hash)")
-
-        let fileManager = FileManager.default
-        if fileManager.fileExists(atPath: cachePath) {
-            if let imgData = try? Data(contentsOf: URL(fileURLWithPath: cachePath)), let r = IMAGE_CLASS(data: imgData) {
-                return (r, cachePath)
-            } else {
-                try fileManager.removeItem(atPath: cachePath)
-            }
-        }
-
-        guard let url = URL(string: absolutePath) else {
-            throw apiError("Invalid URL")
-        }
-
-        #if os(iOS)
-            Task { @MainActor in
-                BackgroundTask.registerForBackground()
-            }
-            defer {
-                Task { @MainActor in
-                    BackgroundTask.unregisterForBackground()
-                }
-            }
-        #endif
-        let req = URLRequest(url: url)
-        let data = try await HTTP.getData(for: req, attempts: 1).data
-        guard let i = IMAGE_CLASS(data: data) else {
-            throw apiError("Invalid image data")
-        }
-
-        try data.write(to: URL(fileURLWithPath: cachePath))
-        return (i, cachePath)
     }
 
     ////////////////////////////////////// API interface
@@ -280,9 +204,6 @@ enum API {
         currentOperationCount -= 1
 
         await DataManager.sendNotificationsIndexAndSave()
-
-        DLog("Caching \(numberFormatter.string(for: URLCache.shared.currentMemoryUsage) ?? "") bytes in memory")
-        DLog("Caching \(numberFormatter.string(for: URLCache.shared.currentDiskUsage) ?? "") bytes on disk")
     }
 
     static var lastSuccessfulSyncAt: String {
@@ -363,7 +284,7 @@ enum API {
                 return ApiStats.noLimits
             case .deleted, .failed:
                 break
-            case let .success(headers):
+            case let .success(headers, _):
                 return ApiStats.fromV3(headers: headers)
             }
         } catch {}

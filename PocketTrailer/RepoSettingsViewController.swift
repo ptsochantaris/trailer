@@ -171,7 +171,7 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
                 popupManager.masterController.updateStatus(becauseOfChanges: true)
             }
         }
-        if settingsChangedTimer.isRunning {
+        if settingsChangedTimer.isPushed {
             settingsChangedTimer.abort()
             Task {
                 await DataManager.postProcessAllItems(in: DataManager.main)

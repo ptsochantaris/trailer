@@ -1,3 +1,4 @@
+import AsyncHTTPClient
 import Foundation
 
 @MainActor
@@ -10,7 +11,7 @@ enum RestAccess {
     static func getPagedData(at path: String, from server: ApiServer, startingFrom page: Int = 1, perPage: @MainActor @escaping ([[AnyHashable: Any]]?, Bool) async -> Bool) async -> DataResult {
         if path.isEmpty {
             // handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
-            return .success(headers: [:])
+            return .success(headers: [:], cachedIn: nil)
         }
 
         do {
@@ -22,7 +23,7 @@ enum RestAccess {
                 return await getPagedData(at: path, from: server, startingFrom: page + 1, perPage: perPage)
             }
         } catch {
-            return .failed(code: (error as NSError).code)
+            return .failed(code: 0)
         }
     }
 
@@ -48,7 +49,7 @@ enum RestAccess {
 
         let (result, data) = try await start(call: path, on: server, triggeredByUser: false)
         var lastPage = true
-        if case let .success(allHeaders) = result {
+        if case let .success(allHeaders, _) = result {
             if let serverMoc = server.managedObjectContext {
                 #if os(iOS)
                     Task {
@@ -65,7 +66,7 @@ enum RestAccess {
                 #endif
             }
 
-            if let linkHeader = allHeaders["Link"] as? String {
+            if let linkHeader = allHeaders["Link"].first {
                 lastPage = !linkHeader.contains("rel=\"next\"")
             }
         }
@@ -75,7 +76,7 @@ enum RestAccess {
     static func getRawData(at path: String, from server: ApiServer) async throws -> (Any?, DataResult) {
         if path.isEmpty {
             // handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
-            return (nil, .success(headers: [:]))
+            return (nil, .success(headers: [:], cachedIn: nil))
         }
 
         let (data, _, result) = try await getData(in: "\(path)?per_page=100", from: server)
@@ -91,9 +92,8 @@ enum RestAccess {
         }
 
         let expandedPath = path.hasPrefix("/") ? S(server.apiPath).appending(pathComponent: path) : path
-        let url = URL(string: expandedPath)!
 
-        var request = URLRequest(url: url)
+        var request = HTTPClientRequest(url: expandedPath)
         var acceptTypes = [String]()
         if API.shouldSyncReactions {
             acceptTypes.append("application/vnd.github.squirrel-girl-preview")
@@ -103,13 +103,13 @@ enum RestAccess {
         }
         acceptTypes.append("application/vnd.github.shadow-cat-preview+json") // draft indicators
         acceptTypes.append("application/vnd.github.v3+json")
-        request.setValue(acceptTypes.joined(separator: ", "), forHTTPHeaderField: "Accept")
+        request.headers.add(name: "Accept", value: acceptTypes.joined(separator: ", "))
         if let a = server.authToken {
-            request.setValue("token \(a)", forHTTPHeaderField: "Authorization")
+            request.headers.add(name: "Authorization", value: "token \(a)")
         }
 
         do {
-            let (parsedData, result) = try await HTTP.getJsonData(for: request, attempts: attempts)
+            let (parsedData, result) = try await HTTP.getJsonData(for: request, attempts: attempts, checkCache: true)
             DLog("(%@) GET %@ - RESULT: %@", apiServerLabel, expandedPath, result.logValue)
             return (result, parsedData)
 

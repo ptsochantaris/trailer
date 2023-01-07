@@ -1,42 +1,36 @@
+import Combine
 import Foundation
 
-final class TrailerTimer {
-    private let timer: DispatchSourceTimer
-
-    init(interval: TimeInterval, block: @escaping () -> Void) {
-        timer = DispatchSource.makeTimerSource(flags: [], queue: .main)
-        timer.schedule(deadline: .now() + interval)
-        timer.setEventHandler(handler: block)
-        timer.resume()
-    }
-
-    deinit {
-        timer.cancel()
-    }
-}
-
 final class PopTimer {
-    private var popTimer: TrailerTimer?
-    private let timeInterval: TimeInterval
+    private let publisher = PassthroughSubject<Void, Never>()
+    private let stride: RunLoop.SchedulerTimeType.Stride
     private let callback: () -> Void
+    private var cancel: Cancellable?
 
     func push() {
-        popTimer = TrailerTimer(interval: timeInterval) { [weak self] in
-            self?.abort()
-            self?.callback()
+        if cancel == nil {
+            cancel = publisher.debounce(for: stride, scheduler: RunLoop.main).sink { [weak self] _ in
+                guard let self else { return }
+                self.cancel = nil
+                self.callback()
+            }
         }
+        publisher.send()
     }
 
     func abort() {
-        popTimer = nil
+        if let c = cancel {
+            c.cancel()
+            cancel = nil
+        }
     }
-
-    var isRunning: Bool {
-        popTimer != nil
+    
+    var isPushed: Bool {
+        cancel != nil
     }
 
     init(timeInterval: TimeInterval, callback: @escaping () -> Void) {
-        self.timeInterval = timeInterval
+        self.stride = RunLoop.SchedulerTimeType.Stride(timeInterval)
         self.callback = callback
     }
 }

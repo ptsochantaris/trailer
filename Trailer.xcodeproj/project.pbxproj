@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		16039A7F296973E300CC73F4 /* AsyncHTTPClient in Frameworks */ = {isa = PBXBuildFile; productRef = 16039A7E296973E300CC73F4 /* AsyncHTTPClient */; };
+		16039A812969817B00CC73F4 /* AsyncHTTPClient in Frameworks */ = {isa = PBXBuildFile; productRef = 16039A802969817B00CC73F4 /* AsyncHTTPClient */; };
+		16039A832969827C00CC73F4 /* HTTPCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16039A822969827C00CC73F4 /* HTTPCache.swift */; };
+		16039A842969827C00CC73F4 /* HTTPCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16039A822969827C00CC73F4 /* HTTPCache.swift */; };
 		1606F1BB1A4703E60088368E /* iOSAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1606F1BA1A4703E60088368E /* iOSAppDelegate.swift */; };
 		1606F1BD1A471CDC0088368E /* RespositoriesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1606F1BC1A471CDC0088368E /* RespositoriesViewController.swift */; };
 		160823F51A44997F006F91AD /* UINavigationControllerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160823F31A44982F006F91AD /* UINavigationControllerExtensions.swift */; };
@@ -268,6 +272,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		16039A822969827C00CC73F4 /* HTTPCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPCache.swift; sourceTree = "<group>"; };
 		1605EDCB1D58B71900D91F50 /* Trailer 31.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 31.xcdatamodel"; sourceTree = "<group>"; };
 		1606F1BA1A4703E60088368E /* iOSAppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = iOSAppDelegate.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		1606F1BC1A471CDC0088368E /* RespositoriesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = RespositoriesViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -474,6 +479,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				16039A812969817B00CC73F4 /* AsyncHTTPClient in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -490,6 +496,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				167E80F42517EC1700ED9A67 /* CoreSpotlight.framework in Frameworks */,
+				16039A7F296973E300CC73F4 /* AsyncHTTPClient in Frameworks */,
 				16BF673D283B1B9D0028EC13 /* Sparkle.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -603,6 +610,7 @@
 				16901A441D659E9500141595 /* NotificationQueue.swift */,
 				160E19E11D672BD1006C1A59 /* PopTimer.swift */,
 				1639E2C01E4007B900C561E1 /* Timer.swift */,
+				16039A822969827C00CC73F4 /* HTTPCache.swift */,
 			);
 			name = Logic;
 			sourceTree = "<group>";
@@ -959,6 +967,9 @@
 				16FEB78C283C4E330029FB0F /* PBXTargetDependency */,
 			);
 			name = PocketTrailer;
+			packageProductDependencies = (
+				16039A802969817B00CC73F4 /* AsyncHTTPClient */,
+			);
 			productName = PocketTrailer;
 			productReference = 1628A6B118789E73005EDA69 /* PocketTrailer.app */;
 			productType = "com.apple.product-type.application";
@@ -998,6 +1009,9 @@
 				16DEA93B235C6F17004589B3 /* PBXTargetDependency */,
 			);
 			name = Trailer;
+			packageProductDependencies = (
+				16039A7E296973E300CC73F4 /* AsyncHTTPClient */,
+			);
 			productName = Trailer;
 			productReference = 168BC6AA17EC2DF000BC4584 /* Trailer.app */;
 			productType = "com.apple.product-type.application";
@@ -1090,6 +1104,9 @@
 				Base,
 			);
 			mainGroup = 168BC6A117EC2DF000BC4584;
+			packageReferences = (
+				16039A7D296973E300CC73F4 /* XCRemoteSwiftPackageReference "async-http-client" */,
+			);
 			productRefGroup = 168BC6AB17EC2DF000BC4584 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -1277,6 +1294,7 @@
 				1657230523AAA2AC00F597EF /* V3API.swift in Sources */,
 				16878B8323C50D8A00F2213B /* GQLScanning.swift in Sources */,
 				169205641E34DA9F00FB9547 /* CustomReposViewController.swift in Sources */,
+				16039A842969827C00CC73F4 /* HTTPCache.swift in Sources */,
 				164840FC1AD196D6009E6383 /* SettingsManager.swift in Sources */,
 				1657230923AAA3B000F597EF /* RestAccess.swift in Sources */,
 				1633C1931ABCEC4A0086C692 /* Issue.swift in Sources */,
@@ -1396,6 +1414,7 @@
 				16B3B3171A34E8E2000BE6CC /* ApiServer.swift in Sources */,
 				161C959E1A3A36020019A577 /* MenuWindow.swift in Sources */,
 				16A69EDA1AC83020008231F9 /* ListableItem.swift in Sources */,
+				16039A832969827C00CC73F4 /* HTTPCache.swift in Sources */,
 				16CBE1C51A2DFBA500485053 /* Settings.swift in Sources */,
 				16D2B875251FA54E00D86C89 /* Enums+Settings.swift in Sources */,
 				16DC40FC1A3F591200BB361A /* TrailerCell.swift in Sources */,
@@ -1613,7 +1632,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1609;
+				CURRENT_PROJECT_VERSION = 1611;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -1632,7 +1651,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1678,7 +1697,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1609;
+				CURRENT_PROJECT_VERSION = 1611;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEPLOYMENT_POSTPROCESSING = YES;
@@ -1694,7 +1713,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1995,6 +2014,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		16039A7D296973E300CC73F4 /* XCRemoteSwiftPackageReference "async-http-client" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/swift-server/async-http-client.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		16039A7E296973E300CC73F4 /* AsyncHTTPClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 16039A7D296973E300CC73F4 /* XCRemoteSwiftPackageReference "async-http-client" */;
+			productName = AsyncHTTPClient;
+		};
+		16039A802969817B00CC73F4 /* AsyncHTTPClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 16039A7D296973E300CC73F4 /* XCRemoteSwiftPackageReference "async-http-client" */;
+			productName = AsyncHTTPClient;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
 		16B3B33B1A34E990000BE6CC /* Trailer.xcdatamodeld */ = {

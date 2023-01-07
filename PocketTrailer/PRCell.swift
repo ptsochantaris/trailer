@@ -203,7 +203,7 @@ final class PRCell: UITableViewCell {
         failedToLoadImage = nil
         if let path = imagePath {
             Task {
-                let image = try? await API.avatar(from: path).0
+                let image = try? await HTTP.avatar(from: path).0
                 if waitingForImageInPath == path {
                     _image.image = image
                     failedToLoadImage = image == nil ? imagePath : nil

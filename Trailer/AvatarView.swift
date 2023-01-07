@@ -24,7 +24,7 @@ final class AvatarView: NSImageView {
         spinner.startAnimation(self)
 
         Task {
-            image = try? await API.avatar(from: url).0
+            image = try? await HTTP.avatar(from: url).0
             spinner.stopAnimation(nil)
             spinner.removeFromSuperview()
         }

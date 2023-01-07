@@ -29,6 +29,14 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
         NotificationManager.handleLocalNotification(notification: response.notification.request.content, action: response.actionIdentifier)
         completionHandler()
     }
+    
+    func applicationDidEnterBackground(_ application: UIApplication) {
+        BackgroundTask.appBackgrounded()
+    }
+    
+    func applicationWillEnterForeground(_ application: UIApplication) {
+        BackgroundTask.appForegrounded()
+    }
 
     func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         Task {
