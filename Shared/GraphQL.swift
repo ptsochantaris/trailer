@@ -73,7 +73,7 @@ enum GraphQL {
                 gotUserNode = true
             }
         }
-        _ = try await testQuery.run(for: apiServer.graphQLPath ?? "", authToken: apiServer.authToken ?? "", attempt: 0)
+        _ = try await testQuery.run(for: apiServer.graphQLPath ?? "", authToken: apiServer.authToken ?? "", attempts: 1)
         if !gotUserNode {
             throw API.apiError("Could not read a valid user record from this endpoint")
         }

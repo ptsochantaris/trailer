@@ -61,7 +61,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate, NSControlTextEditingDele
             testingState()
             Task {
                 do {
-                    try await API.testApi(to: newServer)
+                    try await newServer.test()
                     quickstart.stringValue = "\nFetching your watchlist. This will take a moment…"
                     Settings.lastSuccessfulRefresh = nil
                     await app.startRefreshIfItIsDue()

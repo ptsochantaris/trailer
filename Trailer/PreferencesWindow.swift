@@ -224,7 +224,6 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         }
 
         let n = NotificationCenter.default
-        n.addObserver(self, selector: #selector(updateApiTable), name: .ApiUsageUpdate, object: nil)
         n.addObserver(self, selector: #selector(updateImportExportSettings), name: .SettingsExported, object: nil)
 
         deferredUpdateTimer = PopTimer(timeInterval: 1) { [weak self] in
@@ -422,10 +421,6 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         } else {
             sender.integerValue = 1 - sender.integerValue
         }
-    }
-
-    @objc private func updateApiTable() {
-        serverList.reloadData()
     }
 
     deinit {
@@ -1379,23 +1374,12 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
 
         Task {
             let alert = NSAlert()
-            alert.messageText = "This API server seems OK!"
-
-            if apiServer.graphQLPath != nil {
-                DLog("Checking GraphQL interface on \(S(apiServer.graphQLPath))")
-
-                do {
-                    try await GraphQL.testApi(to: apiServer)
-                } catch {
-                    alert.messageText = "The test failed for \(S(apiServer.graphQLPath))"
-                    alert.informativeText = error.localizedDescription
-                }
-            }
 
             do {
-                try await API.testApi(to: apiServer)
+                try await apiServer.test()
+                alert.messageText = "This API server seems OK!"
             } catch {
-                alert.messageText = "The test failed for \(S(apiServer.apiPath))"
+                alert.messageText = "The test failed: \(error.localizedDescription)"
                 alert.informativeText = error.localizedDescription
             }
 

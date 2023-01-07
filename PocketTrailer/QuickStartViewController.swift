@@ -49,11 +49,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 
         Task {
             do {
-                if newServer.graphQLPath != nil {
-                    DLog("Checking GraphQL interface on \(S(newServer.graphQLPath))")
-                    try await GraphQL.testApi(to: newServer)
-                }
-                try await API.testApi(to: newServer)
+                try await newServer.test()
                 feedback.text = "\nFetching your watchlist. This will take a moment…"
                 Settings.lastSuccessfulRefresh = nil
                 await app.startRefreshIfItIsDue()

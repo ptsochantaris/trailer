@@ -173,8 +173,25 @@ final class ApiServer: NSManagedObject {
         requestsRemaining = stats.remaining
         requestsLimit = stats.limit
         resetDate = stats.resetAt
-        Task { @MainActor in
-            NotificationCenter.default.post(name: .ApiUsageUpdate, object: self, userInfo: nil)
+    }
+
+    func test() async throws {
+        try await withThrowingTaskGroup(of: Void.self) { group in
+            if let graphQLPath {
+                group.addTask { @MainActor in
+                    DLog("Checking GraphQL interface on \(S(graphQLPath))")
+                    try await GraphQL.testApi(to: self)
+                }
+            }
+
+            if let apiPath {
+                group.addTask { @MainActor in
+                    DLog("Checking REST interface on \(S(apiPath))")
+                    try await RestAccess.testApi(to: self)
+                }
+            }
+
+            try await group.waitForAll()
         }
     }
 

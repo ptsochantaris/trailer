@@ -342,16 +342,14 @@ struct ApiStats {
 
     static func fromV3(headers: [AnyHashable: Any]) -> ApiStats {
         let date: Date?
-        if let epochSeconds = headers["X-RateLimit-Reset"] as? String, let t = TimeInterval(epochSeconds) {
+        if let epochSeconds = headers["x-ratelimit-reset"] as? String, let t = TimeInterval(epochSeconds) {
             date = Date(timeIntervalSince1970: t)
         } else {
             date = nil
         }
-        return ApiStats(nodeCount: 0,
-                        cost: 1,
-                        remaining: Int64(S(headers["X-RateLimit-Remaining"] as? String)) ?? 10000,
-                        limit: Int64(S(headers["X-RateLimit-Limit"] as? String)) ?? 10000,
-                        resetAt: date)
+        let remaining = Int64(headers["x-ratelimit-remaining"] as? String ?? "") ?? 10000
+        let limit = Int64(headers["x-ratelimit-limit"] as? String ?? "") ?? 10000
+        return ApiStats(nodeCount: 0, cost: 1, remaining: remaining, limit: limit, resetAt: date)
     }
 
     static func fromV4(json: [AnyHashable: Any]?) -> ApiStats? {
@@ -419,6 +417,5 @@ extension Notification.Name {
     static let RefreshStarting = Notification.Name("RefreshStartingNotification")
     static let RefreshEnded = Notification.Name("RefreshEndedNotification")
     static let SyncProgressUpdate = Notification.Name("SyncProgressUpdateNotification")
-    static let ApiUsageUpdate = Notification.Name("ApiUsageUpdateNotification")
     static let SettingsExported = Notification.Name("SettingsExportedNotification")
 }

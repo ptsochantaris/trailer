@@ -58,7 +58,7 @@ final class GQLQuery {
         "(GQL '\(name)') "
     }
 
-    func run(for url: String, authToken: String, attempt: Int) async throws -> ApiStats? {
+    func run(for url: String, authToken: String, attempts: Int = 5) async throws -> ApiStats? {
         let Q = queryText
         if Settings.dumpAPIResponsesInConsole {
             DLog("\(logPrefix)Fetching: \(Q)")
@@ -75,10 +75,9 @@ final class GQLQuery {
         }
 
         var apiStats: ApiStats?
-        var shouldRetry = false
         do {
-            let (data, response) = try await HTTP.getJsonData(for: r)
-            guard let json = data as? [AnyHashable: Any] else {
+            let json = try await HTTP.getJsonData(for: r, attempts: attempts).json
+            guard let json = json as? [AnyHashable: Any] else {
                 throw API.apiError("\(logPrefix)Invalid JSON")
             }
 
@@ -91,8 +90,6 @@ final class GQLQuery {
 
             let allData = json["data"] as? [AnyHashable: Any]
             guard let data = (parent == nil) ? allData : allData?["node"] as? [AnyHashable: Any] else {
-                let code = response.statusCode
-                shouldRetry = code == 403 || code == 502 || code == 503 || code == -1001 // pause to retry in case of throttle or ongoing GH deployment or timeout
                 if let errors = json["errors"] as? [[AnyHashable: Any]] {
                     let msg = errors.first?["message"] as? String ?? "Unspecified server error: \(json)"
                     throw API.apiError(msg)
@@ -126,13 +123,7 @@ final class GQLQuery {
 
         } catch {
             DLog("\(logPrefix) Error: \(error.localizedDescription)")
-            if shouldRetry, attempt > 0 {
-                DLog("\(logPrefix) Pausing for retry, attempt \(attempt)")
-                try? await Task.sleep(nanoseconds: 2 * NSEC_PER_SEC)
-                return try await run(for: url, authToken: authToken, attempt: attempt - 1)
-            } else {
-                throw error
-            }
+            throw error
         }
     }
 
@@ -143,7 +134,7 @@ final class GQLQuery {
             for query in queries {
                 group.addTask { @MainActor in
                     await gateKeeper.waitForGate()
-                    if let stats = try await query.run(for: path, authToken: token, attempt: 10) {
+                    if let stats = try await query.run(for: path, authToken: token) {
                         await gateKeeper.signalGate()
                         return stats
                     }

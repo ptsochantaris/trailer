@@ -185,7 +185,7 @@ enum API {
             }
         #endif
         let req = URLRequest(url: url)
-        let data = try await HTTP.getData(for: req).data
+        let data = try await HTTP.getData(for: req, attempts: 1).data
         guard let i = IMAGE_CLASS(data: data) else {
             throw apiError("Invalid image data")
         }
@@ -296,11 +296,14 @@ enum API {
         }
 
         let serverId = server.objectID
-        let (success, _) = await RestAccess.getPagedData(at: "/user/teams", from: server) { data, _ in
+        let result = await RestAccess.getPagedData(at: "/user/teams", from: server) { data, _ in
             await Team.syncTeams(from: data, serverId: serverId, moc: moc)
             return false
         }
-        if !success {
+        switch result {
+        case .success:
+            break
+        case .deleted, .failed, .notFound:
             server.lastSyncSucceeded = false
         }
     }
@@ -354,16 +357,16 @@ enum API {
 
     private static func getRateLimit(from server: ApiServer) async -> ApiStats? {
         do {
-            let (_, headers, _) = try await RestAccess.start(call: "/rate_limit", on: server, triggeredByUser: true)
-            if let h = headers {
-                return ApiStats.fromV3(headers: h)
-            }
-        } catch {
-            let code = (error as NSError).code
-            if code == 404 { // is GE account
+            let (code, _) = try await RestAccess.start(call: "/rate_limit", on: server, triggeredByUser: true)
+            switch code {
+            case .notFound: // is GE account
                 return ApiStats.noLimits
+            case .deleted, .failed:
+                break
+            case let .success(headers):
+                return ApiStats.fromV3(headers: headers)
             }
-        }
+        } catch {}
         return nil
     }
 
@@ -397,17 +400,20 @@ enum API {
         }
 
         let createNewRepos = Settings.automaticallyRemoveDeletedReposFromWatchlist
-        let (success, _) = await RestAccess.getPagedData(at: "/user/subscriptions", from: server) { data, _ in
+        let result = await RestAccess.getPagedData(at: "/user/subscriptions", from: server) { data, _ in
             await Repo.syncRepos(from: data, server: server, addNewRepos: createNewRepos, manuallyAdded: false, moc: moc)
             return false
         }
-        if !success {
-            server.lastSyncSucceeded = false
-        } else if !Settings.automaticallyRemoveDeletedReposFromWatchlist { // Ignore any missing repos in all cases if deleteGoneRepos is false
-            let reposThatWouldBeDeleted = Repo.items(of: Repo.self, surviving: false, in: server.managedObjectContext!)
-            for r in reposThatWouldBeDeleted {
-                r.postSyncAction = PostSyncAction.doNothing.rawValue
+        switch result {
+        case .success:
+            if !Settings.automaticallyRemoveDeletedReposFromWatchlist { // Ignore any missing repos in all cases if deleteGoneRepos is false
+                let reposThatWouldBeDeleted = Repo.items(of: Repo.self, surviving: false, in: server.managedObjectContext!)
+                for r in reposThatWouldBeDeleted {
+                    r.postSyncAction = PostSyncAction.doNothing.rawValue
+                }
             }
+        case .deleted, .failed, .notFound:
+            server.lastSyncSucceeded = false
         }
     }
 
@@ -428,32 +434,42 @@ enum API {
         let userPath = "\(server.apiPath ?? "")/users/\(owner)/repos"
         let userTask = Task { () -> [[AnyHashable: Any]] in
             var userList = [[AnyHashable: Any]]()
-            let (success, resultCode) = await RestAccess.getPagedData(at: userPath, from: server) { data, _ -> Bool in
+            let result = await RestAccess.getPagedData(at: userPath, from: server) { data, _ -> Bool in
                 if let data {
                     userList.append(contentsOf: data)
                 }
                 return false
             }
-            if success {
+            switch result {
+            case .success:
                 return userList
-            } else {
-                throw apiError("Operation failed with code \(resultCode)")
+            case .notFound:
+                throw apiError("Operation failed with code 404")
+            case .deleted:
+                throw apiError("Operation failed with code 410")
+            case let .failed(code):
+                throw apiError("Operation failed with code \(code)")
             }
         }
 
         let orgPath = "\(server.apiPath ?? "")/orgs/\(owner)/repos"
         let orgTask = Task { () -> [[AnyHashable: Any]] in
             var orgList = [[AnyHashable: Any]]()
-            let (success, resultCode) = await RestAccess.getPagedData(at: orgPath, from: server) { data, _ -> Bool in
+            let result = await RestAccess.getPagedData(at: orgPath, from: server) { data, _ -> Bool in
                 if let data {
                     orgList.append(contentsOf: data)
                 }
                 return false
             }
-            if success {
+            switch result {
+            case .success:
                 return orgList
-            } else {
-                throw apiError("Operation failed with code \(resultCode)")
+            case .notFound:
+                throw apiError("Operation failed with code 404")
+            case .deleted:
+                throw apiError("Operation failed with code 410")
+            case let .failed(code):
+                throw apiError("Operation failed with code \(code)")
             }
         }
 
@@ -480,16 +496,6 @@ enum API {
                 }
             } catch {
                 apiServer.lastSyncSucceeded = false
-            }
-        }
-    }
-
-    static func testApi(to apiServer: ApiServer) async throws {
-        let (_, _, data) = try await RestAccess.start(call: "/user", on: apiServer, triggeredByUser: true)
-        if let d = data as? [AnyHashable: Any], let userName = d["login"] as? String, let userId = d["id"] as? Int64 {
-            if userName.isEmpty || userId <= 0 {
-                let localError = apiError("Could not read a valid user record from this endpoint")
-                throw localError
             }
         }
     }

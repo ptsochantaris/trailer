@@ -54,21 +54,12 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
         sender.isEnabled = false
 
         Task {
-            if apiServer.graphQLPath != nil {
-                DLog("Checking GraphQL interface on \(S(apiServer.graphQLPath))")
-                do {
-                    try await GraphQL.testApi(to: apiServer)
-                } catch {
-                    showMessage("The test failed for \(S(apiServer.graphQLPath))", error.localizedDescription)
-                }
-            }
-
             do {
-                try await API.testApi(to: apiServer)
+                try await apiServer.test()
+                showMessage("API seems OK for \(S(apiServer.label))", nil)
             } catch {
-                showMessage("The test failed for \(S(apiServer.apiPath))", error.localizedDescription)
+                showMessage("The test failed", error.localizedDescription)
             }
-
             sender.isEnabled = true
         }
     }

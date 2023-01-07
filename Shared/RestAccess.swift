@@ -7,26 +7,36 @@ enum RestAccess {
         var nextIncrement: TimeInterval
     }
 
-    static func getPagedData(at path: String, from server: ApiServer, startingFrom page: Int = 1, perPage: @MainActor @escaping ([[AnyHashable: Any]]?, Bool) async -> Bool) async -> (Bool, Int) {
+    static func getPagedData(at path: String, from server: ApiServer, startingFrom page: Int = 1, perPage: @MainActor @escaping ([[AnyHashable: Any]]?, Bool) async -> Bool) async -> DataResult {
         if path.isEmpty {
             // handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
-            return (true, -1)
+            return .success(headers: [:])
         }
 
         do {
             let p = page > 1 ? "\(path)?page=\(page)&per_page=100" : "\(path)?per_page=100"
-            let (data, lastPage, resultCode) = try await getData(in: p, from: server)
+            let (data, lastPage, result) = try await getData(in: p, from: server)
             if await perPage(data as? [[AnyHashable: Any]], lastPage) || lastPage {
-                return (true, resultCode)
+                return result
             } else {
                 return await getPagedData(at: path, from: server, startingFrom: page + 1, perPage: perPage)
             }
         } catch {
-            return (false, (error as NSError).code)
+            return .failed(code: (error as NSError).code)
         }
     }
 
-    static func getData(in path: String, from server: ApiServer) async throws -> (Any?, Bool, Int) {
+    static func testApi(to apiServer: ApiServer) async throws {
+        let (_, data) = try await start(call: "/user", on: apiServer, triggeredByUser: true, attempts: 1)
+        if let d = data as? [AnyHashable: Any], let userName = d["login"] as? String, let userId = d["id"] as? Int64 {
+            if userName.isEmpty || userId <= 0 {
+                let localError = API.apiError("Could not read a valid user record from this endpoint")
+                throw localError
+            }
+        }
+    }
+
+    static func getData(in path: String, from server: ApiServer) async throws -> (Any?, Bool, DataResult) {
         Task { @MainActor in
             API.currentOperationCount += 1
         }
@@ -36,64 +46,43 @@ enum RestAccess {
             }
         }
 
-        var attemptCount = 0
-        while true {
-            do {
-                let (code, headers, data) = try await start(call: path, on: server, triggeredByUser: false)
-                var lastPage = true
-                if let allHeaders = headers {
-                    let latestLimits = ApiStats.fromV3(headers: allHeaders)
-                    if let serverMoc = server.managedObjectContext {
-                        #if os(iOS)
-                            Task {
-                                await serverMoc.perform {
-                                    server.updateApiStats(latestLimits)
-                                }
-                            }
-                        #else
-                            serverMoc.perform {
-                                server.updateApiStats(latestLimits)
-                            }
-                        #endif
+        let (result, data) = try await start(call: path, on: server, triggeredByUser: false)
+        var lastPage = true
+        if case let .success(allHeaders) = result {
+            if let serverMoc = server.managedObjectContext {
+                #if os(iOS)
+                    Task {
+                        await serverMoc.perform {
+                            let latestLimits = ApiStats.fromV3(headers: allHeaders)
+                            server.updateApiStats(latestLimits)
+                        }
                     }
-
-                    if let linkHeader = allHeaders["Link"] as? String {
-                        lastPage = !linkHeader.contains("rel=\"next\"")
+                #else
+                    serverMoc.perform {
+                        let latestLimits = ApiStats.fromV3(headers: allHeaders)
+                        server.updateApiStats(latestLimits)
                     }
-                }
-                let shouldRetry = (code == 502 || code == 503 || code == -1001) // retry in case GH is deploying, or timeout
-                if !shouldRetry {
-                    if code >= 400, code != 404, code != 410 {
-                        throw API.apiError("Server returned error code \(code)")
-                    }
-                    return (data, lastPage, code)
-                }
-            } catch {
-                let error = error as NSError
-                let code = error.code
-                let shouldRetry = (code == 502 || code == 503 || code == -1001) // retry in case GH is deploying, or timeout
-                if !shouldRetry || attemptCount > 2 {
-                    DLog("(%@) Giving up on failed API call to %@", S(server.label), path)
-                    throw error
-                }
+                #endif
             }
-            attemptCount += 1
-            DLog("(%@) Will retry failed API call to %@ (attempt #%@)", S(server.label), path, attemptCount)
-            try? await Task.sleep(nanoseconds: 3 * NSEC_PER_SEC)
+
+            if let linkHeader = allHeaders["Link"] as? String {
+                lastPage = !linkHeader.contains("rel=\"next\"")
+            }
         }
+        return (data, lastPage, result)
     }
 
-    static func getRawData(at path: String, from server: ApiServer) async throws -> (Any?, Int) {
+    static func getRawData(at path: String, from server: ApiServer) async throws -> (Any?, DataResult) {
         if path.isEmpty {
             // handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
-            return (nil, -1)
+            return (nil, .success(headers: [:]))
         }
 
-        let (data, _, resultCode) = try await getData(in: "\(path)?per_page=100", from: server)
-        return (data, resultCode)
+        let (data, _, result) = try await getData(in: "\(path)?per_page=100", from: server)
+        return (data, result)
     }
 
-    static func start(call path: String, on server: ApiServer, triggeredByUser: Bool) async throws -> (Int, [AnyHashable: Any]?, Any?) {
+    static func start(call path: String, on server: ApiServer, triggeredByUser: Bool, attempts: Int = 5) async throws -> (DataResult, Any?) {
         let apiServerLabel: String
         if server.lastSyncSucceeded || triggeredByUser {
             apiServerLabel = S(server.label)
@@ -120,11 +109,9 @@ enum RestAccess {
         }
 
         do {
-            let (parsedData, response) = try await HTTP.getJsonData(for: request)
-            let headers = response.allHeaderFields
-            let code = response.statusCode
-            DLog("(%@) GET %@ - RESULT: %@", apiServerLabel, expandedPath, code)
-            return (code, headers, parsedData)
+            let (parsedData, result) = try await HTTP.getJsonData(for: request, attempts: attempts)
+            DLog("(%@) GET %@ - RESULT: %@", apiServerLabel, expandedPath, result.logValue)
+            return (result, parsedData)
 
         } catch {
             let error = error as NSError

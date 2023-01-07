@@ -2,8 +2,11 @@ import CoreData
 import Foundation
 
 extension API {
-    private static func handleRepoSyncFailure(repo: Repo, resultCode: Int) {
-        if resultCode == 404 { // repo disabled
+    private static func handleRepoSync(for repo: Repo, result: DataResult) {
+        switch result {
+        case .success:
+            break // all good
+        case .notFound:
             repo.inaccessible = true
             repo.postSyncAction = PostSyncAction.doNothing.rawValue
             for p in repo.pullRequests {
@@ -12,9 +15,9 @@ extension API {
             for i in repo.issues {
                 i.postSyncAction = PostSyncAction.delete.rawValue
             }
-        } else if resultCode == 410 { // repo gone for good
+        case .deleted:
             repo.postSyncAction = PostSyncAction.delete.rawValue
-        } else { // fetch problem
+        case .failed:
             repo.apiServer.lastSyncSucceeded = false
         }
     }
@@ -36,26 +39,22 @@ extension API {
                 if r.displayPolicyForPrs != RepoDisplayPolicy.hide.rawValue {
                     let repoFullName = S(r.fullName)
                     group.addTask { @MainActor in
-                        let (success, resultCode) = await RestAccess.getPagedData(at: "/repos/\(repoFullName)/pulls", from: apiServer) { data, _ in
+                        let result = await RestAccess.getPagedData(at: "/repos/\(repoFullName)/pulls", from: apiServer) { data, _ in
                             await PullRequest.syncPullRequests(from: data, in: r, moc: moc)
                             return false
                         }
-                        if !success {
-                            handleRepoSyncFailure(repo: r, resultCode: resultCode)
-                        }
+                        handleRepoSync(for: r, result: result)
                     }
                 }
 
                 if r.displayPolicyForIssues != RepoDisplayPolicy.hide.rawValue {
                     let repoFullName = S(r.fullName)
                     group.addTask { @MainActor in
-                        let (success, resultCode) = await RestAccess.getPagedData(at: "/repos/\(repoFullName)/issues", from: apiServer) { data, _ in
+                        let result = await RestAccess.getPagedData(at: "/repos/\(repoFullName)/issues", from: apiServer) { data, _ in
                             await Issue.syncIssues(from: data, in: r, moc: moc)
                             return false
                         }
-                        if !success {
-                            handleRepoSyncFailure(repo: r, resultCode: resultCode)
-                        }
+                        handleRepoSync(for: r, result: result)
                     }
                 }
             }
@@ -70,7 +69,8 @@ extension API {
                 let isFirstEventSync = lastLocalEvent == 0
                 r.lastScannedIssueEventId = 0
                 group.addTask { @MainActor in
-                    let (success, _) = await RestAccess.getPagedData(at: "/repos/\(repoFullName)/issues/events", from: r.apiServer) { data, _ in
+                    let apiServer = r.apiServer
+                    let result = await RestAccess.getPagedData(at: "/repos/\(repoFullName)/issues/events", from: apiServer) { data, _ in
                         guard let data, !data.isEmpty else { return true }
 
                         if isFirstEventSync {
@@ -107,8 +107,10 @@ extension API {
                             return foundLastEvent
                         }
                     }
-                    if !success {
-                        r.apiServer.lastSyncSucceeded = false
+                    switch result {
+                    case .success: break
+                    case .deleted, .failed, .notFound:
+                        apiServer.lastSyncSucceeded = false
                     }
                 }
             }
@@ -236,13 +238,14 @@ extension API {
                 }
                 guard let reactionUrl = c.reactionsUrl else { continue }
                 group.addTask { @MainActor in
-                    let (success, _) = await RestAccess.getPagedData(at: reactionUrl, from: c.apiServer) { data, _ in
+                    let result = await RestAccess.getPagedData(at: reactionUrl, from: c.apiServer) { data, _ in
                         await Reaction.syncReactions(from: data, commentId: c.objectID, serverId: c.apiServer.objectID, moc: moc)
                         return false
                     }
-                    if success {
+                    switch result {
+                    case .success:
                         c.pendingReactionScan = false
-                    } else {
+                    case .deleted, .failed, .notFound:
                         c.apiServer.lastSyncSucceeded = false
                     }
                 }
@@ -269,12 +272,15 @@ extension API {
                 let oid = i.objectID
                 let serverId = i.apiServer.objectID
                 group.addTask { @MainActor in
-                    let (success, _) = await RestAccess.getPagedData(at: reactionsUrl, from: i.apiServer) { data, _ in
+                    let apiServer = i.apiServer
+                    let result = await RestAccess.getPagedData(at: reactionsUrl, from: apiServer) { data, _ in
                         await Reaction.syncReactions(from: data, parentId: oid, serverId: serverId, moc: moc)
                         return false
                     }
-                    if !success {
-                        i.apiServer.lastSyncSucceeded = false
+                    switch result {
+                    case .success: break
+                    case .deleted, .failed, .notFound:
+                        apiServer.lastSyncSucceeded = false
                     }
                 }
             }
@@ -299,11 +305,13 @@ extension API {
                     if let link = (issues ? p.commentsLink : p.reviewCommentLink) {
                         let apiServer = p.apiServer
                         group.addTask { @MainActor in
-                            let (success, _) = await RestAccess.getPagedData(at: link, from: apiServer) { data, _ in
+                            let result = await RestAccess.getPagedData(at: link, from: apiServer) { data, _ in
                                 await PRComment.syncComments(from: data, parent: p, moc: moc)
                                 return false
                             }
-                            if !success {
+                            switch result {
+                            case .success: break
+                            case .deleted, .failed, .notFound:
                                 apiServer.lastSyncSucceeded = false
                             }
                         }
@@ -337,11 +345,13 @@ extension API {
                     let apiServer = i.apiServer
 
                     group.addTask { @MainActor in
-                        let (success, _) = await RestAccess.getPagedData(at: link, from: apiServer) { data, _ in
+                        let result = await RestAccess.getPagedData(at: link, from: apiServer) { data, _ in
                             await PRComment.syncComments(from: data, parent: i, moc: moc)
                             return false
                         }
-                        if !success {
+                        switch result {
+                        case .success: break
+                        case .deleted, .failed, .notFound:
                             apiServer.lastSyncSucceeded = false
                         }
                     }
@@ -362,12 +372,15 @@ extension API {
                 }
                 let repoFullName = S(p.repo.fullName)
                 group.addTask { @MainActor in
-                    let (success, _) = await RestAccess.getPagedData(at: "/repos/\(repoFullName)/pulls/\(p.number)/reviews", from: p.apiServer) { data, _ in
+                    let apiServer = p.apiServer
+                    let result = await RestAccess.getPagedData(at: "/repos/\(repoFullName)/pulls/\(p.number)/reviews", from: apiServer) { data, _ in
                         await Review.syncReviews(from: data, withParent: p, moc: moc)
                         return false
                     }
-                    if !success {
-                        p.apiServer.lastSyncSucceeded = false
+                    switch result {
+                    case .success: break
+                    case .deleted, .failed, .notFound:
+                        apiServer.lastSyncSucceeded = false
                     }
                 }
             }
@@ -381,28 +394,30 @@ extension API {
         let path = "/repos/\(repoFullName)/pulls/\(pullRequest.number)"
 
         do {
-            let (data, _, _) = try await RestAccess.getData(in: path, from: pullRequest.apiServer)
-            if let d = data as? [AnyHashable: Any] {
-                if let mergeInfo = d["merged_by"] as? [AnyHashable: Any], let mergeUserId = mergeInfo["node_id"] as? String {
-                    pullRequest.mergedByNodeId = mergeUserId
-                    pullRequest.stateChanged = ListableItem.StateChange.merged.rawValue
-                    pullRequest.postSyncAction = PostSyncAction.isUpdated.rawValue // let handleMerging() decide
+            let (data, _, result) = try await RestAccess.getData(in: path, from: pullRequest.apiServer)
+            switch result {
+            case .success:
+                if let d = data as? [AnyHashable: Any] {
+                    if let mergeInfo = d["merged_by"] as? [AnyHashable: Any], let mergeUserId = mergeInfo["node_id"] as? String {
+                        pullRequest.mergedByNodeId = mergeUserId
+                        pullRequest.stateChanged = ListableItem.StateChange.merged.rawValue
+                        pullRequest.postSyncAction = PostSyncAction.isUpdated.rawValue // let handleMerging() decide
 
-                } else {
-                    pullRequest.stateChanged = ListableItem.StateChange.closed.rawValue
-                    pullRequest.postSyncAction = PostSyncAction.isUpdated.rawValue // let handleClosing() decide
+                    } else {
+                        pullRequest.stateChanged = ListableItem.StateChange.closed.rawValue
+                        pullRequest.postSyncAction = PostSyncAction.isUpdated.rawValue // let handleClosing() decide
+                    }
                 }
-            }
-        } catch {
-            let resultCode = (error as NSError).code
-            if resultCode == 404 || resultCode == 410 { // PR gone for good
+            case .deleted, .notFound:
                 pullRequest.stateChanged = ListableItem.StateChange.closed.rawValue
                 pullRequest.postSyncAction = PostSyncAction.isUpdated.rawValue // let handleClosing() decide
-
-            } else { // fetch/server problem
+            case .failed:
                 pullRequest.postSyncAction = PostSyncAction.doNothing.rawValue // keep since we don't know what's going on here
                 pullRequest.apiServer.lastSyncSucceeded = false
             }
+        } catch {
+            pullRequest.postSyncAction = PostSyncAction.doNothing.rawValue // keep since we don't know what's going on here
+            pullRequest.apiServer.lastSyncSucceeded = false
         }
     }
 
@@ -473,15 +488,16 @@ extension API {
                 }
 
                 group.addTask { @MainActor in
-                    let (success, resultCode) = await RestAccess.getPagedData(at: link, from: p.apiServer) { data, _ in
+                    let apiServer = p.apiServer
+                    let result = await RestAccess.getPagedData(at: link, from: apiServer) { data, _ in
                         PRLabel.syncLabels(from: data, withParent: p)
                         return false
                     }
-                    if !success {
-                        // 404/410 means the label has been deleted
-                        if !(resultCode == 404 || resultCode == 410) {
-                            p.apiServer.lastSyncSucceeded = false
-                        }
+                    switch result {
+                    case .deleted, .notFound, .success:
+                        break
+                    case .failed:
+                        apiServer.lastSyncSucceeded = false
                     }
                 }
             }
@@ -504,15 +520,16 @@ extension API {
                 }
 
                 group.addTask { @MainActor in
-                    let (success, resultCode) = await RestAccess.getPagedData(at: link, from: i.apiServer) { data, _ in
+                    let apiServer = i.apiServer
+                    let result = await RestAccess.getPagedData(at: link, from: apiServer) { data, _ in
                         PRLabel.syncLabels(from: data, withParent: i)
                         return false
                     }
-                    if !success {
-                        // 404/410 means the label has been deleted
-                        if !(resultCode == 404 || resultCode == 410) {
-                            i.apiServer.lastSyncSucceeded = false
-                        }
+                    switch result {
+                    case .deleted, .notFound, .success:
+                        break
+                    case .failed:
+                        apiServer.lastSyncSucceeded = false
                     }
                 }
             }
@@ -537,21 +554,15 @@ extension API {
 
                 if let statusLink = p.statusesLink {
                     group.addTask { @MainActor in
-                        let (success, resultCode) = await RestAccess.getPagedData(at: statusLink, from: apiServer) { data, _ in
+                        let result = await RestAccess.getPagedData(at: statusLink, from: apiServer) { data, _ in
                             await PRStatus.syncStatuses(from: data, pullRequest: p, moc: moc)
                             return false
                         }
-                        var allGood = success
-                        if !success {
-                            // 404/410 means the status has been deleted
-                            if !(resultCode == 404 || resultCode == 410) {
-                                apiServer.lastSyncSucceeded = false
-                            } else {
-                                allGood = true
-                            }
-                        }
-                        if allGood {
+                        switch result {
+                        case .deleted, .notFound, .success:
                             p.lastStatusScan = now
+                        case .failed:
+                            apiServer.lastSyncSucceeded = false
                         }
                     }
                 } else {
@@ -568,13 +579,9 @@ extension API {
                 if let issueLink = p.issueUrl {
                     group.addTask { @MainActor in
                         do {
-                            let (data, _, resultCode) = try await RestAccess.getData(in: issueLink, from: apiServer)
-                            if resultCode == 200 || resultCode == 404 || resultCode == 410 {
-                                if let d = data as? [AnyHashable: Any] {
-                                    p.processAssignmentStatus(from: d, idField: "node_id")
-                                }
-                            } else {
-                                apiServer.lastSyncSucceeded = false
+                            let (data, _, _) = try await RestAccess.getData(in: issueLink, from: apiServer)
+                            if let d = data as? [AnyHashable: Any] {
+                                p.processAssignmentStatus(from: d, idField: "node_id")
                             }
                         } catch {
                             apiServer.lastSyncSucceeded = false

@@ -7,6 +7,19 @@
 
 import Foundation
 
+enum DataResult {
+    case success(headers: [AnyHashable: Any]), notFound, deleted, failed(code: Int)
+
+    var logValue: String {
+        switch self {
+        case .success: return "Success"
+        case .deleted: return "Deleted"
+        case .notFound: return "Not Found"
+        case let .failed(code): return "Error Code \(code)"
+        }
+    }
+}
+
 @globalActor
 enum HttpActor {
     actor ActorType {}
@@ -58,42 +71,73 @@ enum HTTP {
     }
 
     private static let urlSession = URLSession(configuration: urlSessionConfig, delegate: nil, delegateQueue: nil)
-    
-    static func getJsonData(for request: URLRequest) async throws -> (json: Any, response: HTTPURLResponse) {
+
+    static func getJsonData(for request: URLRequest, attempts: Int) async throws -> (json: Any, result: DataResult) {
         await gateKeeper.waitForGate()
         defer {
             Task {
                 await gateKeeper.signalGate()
             }
         }
-        let (data, response) = try await getData(for: request)
+        let (data, result) = try await getData(for: request, attempts: attempts)
         if Settings.dumpAPIResponsesInConsole {
             DLog("API data from %@: %@", S(request.url?.path), String(bytes: data, encoding: .utf8))
         }
         let json = try await Task.detached { try JSONSerialization.jsonObject(with: data, options: []) }.value
-        return (json, response)
+        return (json, result)
     }
 
-    nonisolated static func getData(for request: URLRequest) async throws -> (data: Data, response: HTTPURLResponse) {
-        let data: Data
-        let response: URLResponse
-        if #available(macOS 12.0, iOS 15.0, *) {
-            (data, response) = try await urlSession.data(for: request)
-        } else {
-            (data, response) = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<(Data, URLResponse), Error>) in
-                let task = urlSession.dataTask(with: request) { data, response, error in
-                    if let data, let response {
-                        continuation.resume(returning: (data, response))
-                    } else {
-                        continuation.resume(throwing: error ?? API.apiError("No data and no error from http call"))
+    nonisolated static func getData(for request: URLRequest, attempts: Int) async throws -> (data: Data, response: DataResult) {
+        var attempt = attempts
+        while attempt > 0 {
+            do {
+                let data: Data
+                let response: URLResponse
+                if #available(macOS 12.0, iOS 15.0, *) {
+                    (data, response) = try await urlSession.data(for: request)
+                } else {
+                    (data, response) = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<(Data, URLResponse), Error>) in
+                        let task = urlSession.dataTask(with: request) { data, response, error in
+                            if let data, let response {
+                                continuation.resume(returning: (data, response))
+                            } else {
+                                continuation.resume(throwing: error ?? API.apiError("No data and no error from http call"))
+                            }
+                        }
+                        task.resume()
                     }
                 }
-                task.resume()
+                guard let response = response as? HTTPURLResponse else {
+                    throw API.apiError("Invalid HTTP response")
+                }
+                let code = response.statusCode
+                switch code {
+                case 404:
+                    return (data, .notFound)
+                case 410:
+                    return (data, .deleted)
+                case 502, 503, -1001: // in case of throttle or ongoing GH deployment or timeout
+                    throw API.apiError("HTTP Code \(code) received")
+                case 400...:
+                    return (data, .failed(code: code))
+                default: return (data, .success(headers: response.allHeaderFields))
+                }
+
+            } catch {
+                attempt -= 1
+                if attempt > 0 {
+                    if let url = request.url {
+                        DLog("Will pause and retry call to %@", url)
+                    }
+                    try? await Task.sleep(nanoseconds: 5 * NSEC_PER_SEC)
+                } else {
+                    if let url = request.url {
+                        DLog("Failed API call to %@", url)
+                    }
+                    throw error
+                }
             }
         }
-        guard let response = response as? HTTPURLResponse else {
-            throw API.apiError("Invalid HTTP response")
-        }
-        return (data, response)
+        throw API.apiError("HTTP Error")
     }
 }
