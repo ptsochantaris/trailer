@@ -31,7 +31,7 @@ final class GQLGroup: GQLScanning {
 
     var queryText: String {
         var query = name
-        var brackets = [String]()
+        let brackets = LinkedList<String>()
 
         if pageSize > 0 {
             if onlyLast {
@@ -50,7 +50,7 @@ final class GQLGroup: GQLScanning {
             }
         }
 
-        if !brackets.isEmpty {
+        if brackets.count > 0 {
             query += "(" + brackets.joined(separator: ", ") + ")"
         }
 
@@ -69,10 +69,16 @@ final class GQLGroup: GQLScanning {
         return query
     }
 
-    var fragments: [GQLFragment] { fields.reduce([]) { $0 + $1.fragments } }
+    var fragments: LinkedList<GQLFragment> {
+        let res = LinkedList<GQLFragment>()
+        for field in fields {
+            res.append(contentsOf: field.fragments)
+        }
+        return res
+    }
 
     @discardableResult
-    private func scanNode(_ node: [AnyHashable: Any], query: GQLQuery, parent: GQLNode?) async throws -> [GQLQuery] {
+    private func scanNode(_ node: [AnyHashable: Any], query: GQLQuery, parent: GQLNode?) async throws -> LinkedList<GQLQuery> {
         let thisObject: GQLNode?
 
         if let typeName = node["__typename"] as? String, let id = node["id"] as? String {
@@ -84,27 +90,27 @@ final class GQLGroup: GQLScanning {
             thisObject = parent
         }
 
-        var extraQueries = [GQLQuery]()
+        let extraQueries = LinkedList<GQLQuery>()
 
         for field in fields {
             if let fragment = field as? GQLFragment {
-                extraQueries += await fragment.scan(query: query, pageData: node, parent: thisObject)
+                extraQueries.append(contentsOf: await fragment.scan(query: query, pageData: node, parent: thisObject))
 
             } else if let ingestable = field as? GQLScanning, let fieldData = node[field.name] {
-                extraQueries += await ingestable.scan(query: query, pageData: fieldData, parent: thisObject)
+                extraQueries.append(contentsOf: await ingestable.scan(query: query, pageData: fieldData, parent: thisObject))
             }
         }
 
         return extraQueries
     }
 
-    private func scanPage(_ edges: [[AnyHashable: Any]], pageInfo: [AnyHashable: Any]?, query: GQLQuery, parent: GQLNode?) async -> [GQLQuery] {
-        var extraQueries = [GQLQuery]()
+    private func scanPage(_ edges: [[AnyHashable: Any]], pageInfo: [AnyHashable: Any]?, query: GQLQuery, parent: GQLNode?) async -> LinkedList<GQLQuery> {
+        let extraQueries = LinkedList<GQLQuery>()
         var stop = false
         for e in edges {
             if let node = e["node"] as? [AnyHashable: Any] {
                 do {
-                    extraQueries += try await scanNode(node, query: query, parent: parent)
+                    extraQueries.append(contentsOf: try await scanNode(node, query: query, parent: parent))
                 } catch {
                     stop = true
                     break
@@ -121,31 +127,29 @@ final class GQLGroup: GQLScanning {
         return extraQueries
     }
 
-    func scan(query: GQLQuery, pageData: Any, parent: GQLNode?) async -> [GQLQuery] {
-        var extraQueries = [GQLQuery]()
+    func scan(query: GQLQuery, pageData: Any, parent: GQLNode?) async -> LinkedList<GQLQuery> {
+        var extraQueries = LinkedList<GQLQuery>()
 
         if let hash = pageData as? [AnyHashable: Any] {
             if let edges = hash["edges"] as? [[AnyHashable: Any]] {
                 extraQueries = await scanPage(edges, pageInfo: hash["pageInfo"] as? [AnyHashable: Any], query: query, parent: parent)
             } else {
-                extraQueries = (try? await scanNode(hash, query: query, parent: parent)) ?? []
+                extraQueries = (try? await scanNode(hash, query: query, parent: parent)) ?? LinkedList<GQLQuery>()
             }
 
         } else if let nodes = pageData as? [[AnyHashable: Any]] {
             for node in nodes {
                 do {
-                    extraQueries += try await scanNode(node, query: query, parent: parent)
+                    extraQueries.append(contentsOf: try await scanNode(node, query: query, parent: parent))
                 } catch {
                     break
                 }
             }
         }
 
-        guard extraQueries.isEmpty else {
+        if extraQueries.count > 0 {
             DLog("\(query.logPrefix)(Group: \(name)) will need further paging")
-            return extraQueries
         }
-
-        return []
+        return extraQueries
     }
 }

@@ -18,9 +18,9 @@ final class GQLQuery {
         perNodeBlock = perNode
     }
 
-    static func batching(_ name: String, fields: [GQLElement], idList: ContiguousArray<String>, batchSize: Int, perNode: PerNodeBlock? = nil) -> [GQLQuery] {
+    static func batching(_ name: String, fields: [GQLElement], idList: [String], batchSize: Int, perNode: PerNodeBlock? = nil) -> LinkedList<GQLQuery> {
         var list = idList
-        var queries = [GQLQuery]()
+        let queries = LinkedList<GQLQuery>()
         while !list.isEmpty {
             let segment = list.prefix(batchSize)
             list.removeFirst(segment.count)
@@ -112,7 +112,7 @@ final class GQLQuery {
 
             do {
                 let extraQueries = await r.scan(query: self, pageData: topData, parent: parent)
-                if extraQueries.isEmpty {
+                if extraQueries.count == 0 {
                     DLog("\(logPrefix)Parsed all pages")
                 } else {
                     DLog("\(logPrefix)Needs more page data (\(extraQueries.count) queries)")
@@ -129,7 +129,7 @@ final class GQLQuery {
         }
     }
 
-    static func runQueries(queries: [GQLQuery], on path: String, token: String) async throws -> ApiStats? {
+    static func runQueries(queries: LinkedList<GQLQuery>, on path: String, token: String) async throws -> ApiStats? {
         try await withThrowingTaskGroup(of: ApiStats?.self, returning: ApiStats?.self) { group in
             let gateKeeper = HTTP.GateKeeper(entries: 1) // two concurrent GQL queries can run at a time
 

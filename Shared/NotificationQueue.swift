@@ -2,7 +2,7 @@ import CoreData
 import Foundation
 
 enum NotificationQueue {
-    private static var queue = [(NotificationType, NSManagedObjectID)]()
+    private static var queue = LinkedList<(NotificationType, NSManagedObjectID)>()
 
     static func add(type: NotificationType, for item: DataItem) {
         try? item.managedObjectContext?.obtainPermanentIDs(for: [item])
@@ -20,7 +20,7 @@ enum NotificationQueue {
     @MainActor
     static func commit() {
         let moc = DataManager.main
-        queue.forEach { type, itemId in
+        while let (type, itemId) = queue.pop() {
             if let storedItem = try? moc.existingObject(with: itemId) as? DataItem, storedItem.apiServer.lastSyncSucceeded {
                 #if os(iOS)
                     NotificationManager.postNotification(type: type, for: storedItem)
@@ -29,6 +29,5 @@ enum NotificationQueue {
                 #endif
             }
         }
-        clear()
     }
 }

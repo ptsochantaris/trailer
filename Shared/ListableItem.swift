@@ -633,7 +633,7 @@ class ListableItem: DataItem {
     }
 
     final var accessibleTitle: String {
-        var components = [String]()
+        let components = LinkedList<String>()
         if let t = title {
             components.append(t)
         }
@@ -958,7 +958,7 @@ class ListableItem: DataItem {
 
     @MainActor
     static func requestForItems<T: ListableItem>(of itemType: T.Type, withFilter: String?, sectionIndex: Int64, criterion: GroupingCriterion? = nil, onlyUnread: Bool = false, excludeSnoozed: Bool = false) -> NSFetchRequest<T> {
-        var andPredicates = [NSPredicate]()
+        let andPredicates = LinkedList<NSPredicate>()
 
         if onlyUnread {
             andPredicates.append(itemType.includeInUnreadPredicate)
@@ -1008,7 +1008,7 @@ class ListableItem: DataItem {
             check(forTag: "state") { statePredicate(from: $0, termAt: $1) }
 
             if !fi.isEmpty {
-                var predicates = [NSPredicate]()
+                let predicates = LinkedList<NSPredicate>()
                 let negative = fi.hasPrefix("!")
 
                 func appendPredicate(format: String, numeric: Bool) {
@@ -1029,14 +1029,14 @@ class ListableItem: DataItem {
                    Settings.includeStatusesInFilter { appendPredicate(format: filterStatusPredicate, numeric: false) }
 
                 if negative {
-                    andPredicates.append(NSCompoundPredicate(andPredicateWithSubpredicates: predicates))
+                    andPredicates.append(NSCompoundPredicate(andPredicateWithSubpredicates: Array(predicates)))
                 } else {
-                    andPredicates.append(NSCompoundPredicate(orPredicateWithSubpredicates: predicates))
+                    andPredicates.append(NSCompoundPredicate(orPredicateWithSubpredicates: Array(predicates)))
                 }
             }
         }
 
-        var sortDescriptors = [NSSortDescriptor]()
+        let sortDescriptors = LinkedList<NSSortDescriptor>()
         sortDescriptors.append(NSSortDescriptor(key: "sectionIndex", ascending: true))
         if Settings.groupByRepo {
             sortDescriptors.append(NSSortDescriptor(key: "repo.fullName", ascending: true, selector: #selector(NSString.localizedCaseInsensitiveCompare)))
@@ -1057,9 +1057,9 @@ class ListableItem: DataItem {
         f.relationshipKeyPathsForPrefetching = (itemType == PullRequest.self) ? ["labels", "statuses", "reviews"] : ["labels"]
         f.returnsObjectsAsFaults = false
         f.includesSubentities = false
-        let p = NSCompoundPredicate(andPredicateWithSubpredicates: andPredicates)
+        let p = NSCompoundPredicate(andPredicateWithSubpredicates: Array(andPredicates))
         add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: DataManager.main)
-        f.sortDescriptors = sortDescriptors
+        f.sortDescriptors = Array(sortDescriptors)
         return f
     }
 

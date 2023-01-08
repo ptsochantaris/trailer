@@ -270,10 +270,10 @@ enum DataManager {
                 return
             }
 
-            DLog("Updating spotlight indexes")
+            DLog("Gathering spotlight indexes")
 
-            var itemsToIndex = [CSSearchableItem]()
-            var itemsToRemove = [String]()
+            let itemsToIndex = LinkedList<CSSearchableItem>()
+            let itemsToRemove = LinkedList<String>()
 
             for pr in DataItem.allItems(of: PullRequest.self, in: main) {
                 switch await pr.handleSpotlight() {
@@ -282,7 +282,6 @@ enum DataManager {
                 case let .needsRemoval(uri):
                     itemsToRemove.append(uri)
                 }
-                await Task.yield()
             }
 
             for issue in DataItem.allItems(of: Issue.self, in: main) {
@@ -292,20 +291,17 @@ enum DataManager {
                 case let .needsRemoval(uri):
                     itemsToRemove.append(uri)
                 }
-                await Task.yield()
             }
 
-            let finalRemovals = itemsToRemove
-            let finalIndexes = itemsToIndex
             Task.detached {
                 let index = CSSearchableIndex.default()
-                if !finalRemovals.isEmpty {
-                    DLog("De-indexing \(finalRemovals.count) items...")
-                    try? await index.deleteSearchableItems(withIdentifiers: finalRemovals)
+                if itemsToRemove.count > 0 {
+                    DLog("De-indexing \(itemsToRemove.count) items...")
+                    try? await index.deleteSearchableItems(withIdentifiers: Array(itemsToRemove))
                 }
-                if !finalIndexes.isEmpty {
-                    DLog("Indexing \(finalIndexes.count) items...")
-                    try? await index.indexSearchableItems(finalIndexes)
+                if itemsToIndex.count > 0 {
+                    DLog("Indexing \(itemsToIndex.count) items...")
+                    try? await index.indexSearchableItems(Array(itemsToIndex))
                 }
                 DLog("Committed spotlight changes")
             }

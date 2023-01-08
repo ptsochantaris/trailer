@@ -28,7 +28,13 @@ final class GQLBatchGroup: GQLScanning {
         }
     }
 
-    var fragments: [GQLFragment] { idsToGroups.values.reduce([]) { $0 + $1.fragments } }
+    var fragments: LinkedList<GQLFragment> {
+        let res = LinkedList<GQLFragment>()
+        for list in idsToGroups.values {
+            res.append(contentsOf: list.fragments)
+        }
+        return res
+    }
 
     private var pageOfIds: [String] {
         let k = idsToGroups.keys.sorted()
@@ -36,11 +42,11 @@ final class GQLBatchGroup: GQLScanning {
         return Array(k[0 ..< max])
     }
 
-    func scan(query: GQLQuery, pageData: Any, parent: GQLNode?) async -> [GQLQuery] {
+    func scan(query: GQLQuery, pageData: Any, parent: GQLNode?) async -> LinkedList<GQLQuery> {
         // DLog("\(query.logPrefix)Scanning batch group \(name)")
-        guard let nodes = pageData as? [Any] else { return [] }
+        guard let nodes = pageData as? [Any] else { return LinkedList<GQLQuery>() }
 
-        var extraQueries = [GQLQuery]()
+        let extraQueries = LinkedList<GQLQuery>()
 
         let page = pageOfIds
         let newIds = idsToGroups.keys.filter { !page.contains($0) }
@@ -56,7 +62,7 @@ final class GQLBatchGroup: GQLScanning {
             }
         }
 
-        if !extraQueries.isEmpty {
+        if extraQueries.count > 0 {
             DLog("\(query.logPrefix)(Group: \(name)) - Will need further paging")
         }
         return extraQueries

@@ -222,7 +222,7 @@ enum NotificationManager {
                     notification.attachments = [attachment]
                 }
             }
-            let identifier = [notification.title, notification.subtitle, notification.body].map { $0 }.joined(separator: " - ")
+            let identifier = [notification.title, notification.subtitle, notification.body].joined(separator: " - ")
             let request = UNNotificationRequest(identifier: identifier, content: notification, trigger: nil)
             try? await UNUserNotificationCenter.current().add(request)
         }

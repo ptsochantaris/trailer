@@ -29,12 +29,12 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
         NotificationManager.handleLocalNotification(notification: response.notification.request.content, action: response.actionIdentifier)
         completionHandler()
     }
-    
-    func applicationDidEnterBackground(_ application: UIApplication) {
+
+    func applicationDidEnterBackground(_: UIApplication) {
         BackgroundTask.appBackgrounded()
     }
-    
-    func applicationWillEnterForeground(_ application: UIApplication) {
+
+    func applicationWillEnterForeground(_: UIApplication) {
         BackgroundTask.appForegrounded()
     }
 

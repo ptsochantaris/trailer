@@ -121,6 +121,8 @@
 		1694008D1E7AAE32002C5DAD /* Reaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1694008B1E7AAE32002C5DAD /* Reaction.swift */; };
 		16954D3724333B0B0008AD4F /* Settings.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 16954D3524333B0B0008AD4F /* Settings.storyboard */; };
 		16954D3924333B8E0008AD4F /* Quickstart.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 16954D3824333B8E0008AD4F /* Quickstart.storyboard */; };
+		1696855A296A3E6800D7BD9B /* LinkedList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16968559296A3E6800D7BD9B /* LinkedList.swift */; };
+		1696855B296A3E6800D7BD9B /* LinkedList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16968559296A3E6800D7BD9B /* LinkedList.swift */; };
 		169B92961CC52C05002774A8 /* SnoozePreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169B92951CC52C05002774A8 /* SnoozePreset.swift */; };
 		169B92971CC52C05002774A8 /* SnoozePreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169B92951CC52C05002774A8 /* SnoozePreset.swift */; };
 		169FB2361A3DBD7D00E00771 /* SectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169FB2351A3DBD7D00E00771 /* SectionHeader.swift */; };
@@ -384,6 +386,7 @@
 		1694008B1E7AAE32002C5DAD /* Reaction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Reaction.swift; path = Shared/Reaction.swift; sourceTree = SOURCE_ROOT; };
 		16954D3624333B0B0008AD4F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = PocketTrailer/Base.lproj/Settings.storyboard; sourceTree = "<group>"; };
 		16954D3824333B8E0008AD4F /* Quickstart.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Quickstart.storyboard; sourceTree = "<group>"; };
+		16968559296A3E6800D7BD9B /* LinkedList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkedList.swift; sourceTree = "<group>"; };
 		169B92941CC3E5AD002774A8 /* Trailer 25.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 25.xcdatamodel"; sourceTree = "<group>"; };
 		169B92951CC52C05002774A8 /* SnoozePreset.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = SnoozePreset.swift; path = ../Shared/SnoozePreset.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		169FB2351A3DBD7D00E00771 /* SectionHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SectionHeader.swift; sourceTree = "<group>"; };
@@ -611,6 +614,7 @@
 				160E19E11D672BD1006C1A59 /* PopTimer.swift */,
 				1639E2C01E4007B900C561E1 /* Timer.swift */,
 				16039A822969827C00CC73F4 /* HTTPCache.swift */,
+				16968559296A3E6800D7BD9B /* LinkedList.swift */,
 			);
 			name = Logic;
 			sourceTree = "<group>";
@@ -1322,6 +1326,7 @@
 				164840C51AD04C3C009E6383 /* QuickStartViewController.swift in Sources */,
 				16A0FA7423AECFAE0023B565 /* BackgroundTask.swift in Sources */,
 				166A84BE1A457CA700A3B292 /* ServersViewController.swift in Sources */,
+				1696855B296A3E6800D7BD9B /* LinkedList.swift in Sources */,
 				161504601A4651CB001CF50C /* MasterViewController.swift in Sources */,
 				16D2B876251FA54E00D86C89 /* Enums+Settings.swift in Sources */,
 				164840FE1AD19837009E6383 /* PopupManager.swift in Sources */,
@@ -1395,6 +1400,7 @@
 				169FB2361A3DBD7D00E00771 /* SectionHeader.swift in Sources */,
 				16358F3B1CF138190055F849 /* DataSource.swift in Sources */,
 				16275DF51CF8944100EEBF48 /* API.swift in Sources */,
+				1696855A296A3E6800D7BD9B /* LinkedList.swift in Sources */,
 				162002DD1A2A58B900FF95F3 /* CenterTextField.swift in Sources */,
 				16358F3D1CF206CE0055F849 /* MenuBarSet.swift in Sources */,
 				162002E71A2A75BD00FF95F3 /* AvatarView.swift in Sources */,
@@ -1632,7 +1638,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1611;
+				CURRENT_PROJECT_VERSION = 1614;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -1697,7 +1703,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1611;
+				CURRENT_PROJECT_VERSION = 1614;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEPLOYMENT_POSTPROCESSING = YES;

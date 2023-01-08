@@ -82,7 +82,7 @@ enum GraphQL {
     static func update<T: ListableItem>(for items: [T], steps: API.SyncSteps) async throws {
         let typeName = String(describing: T.self)
 
-        var elements: [GQLElement] = [idField]
+        let elements = LinkedList<GQLElement>(value: idField)
 
         if let prs = items as? [PullRequest] {
             if steps.contains(.reviewRequests) {
@@ -161,7 +161,7 @@ enum GraphQL {
             elements.append(GQLGroup(name: "comments", fields: [commentFragment], pageSize: 100))
         }
 
-        let fields = [GQLFragment(on: typeName, elements: elements)]
+        let fields = [GQLFragment(on: typeName, elements: Array(elements))]
         try await process(name: steps.toString, items: items, parentType: T.self, fields: fields)
     }
 
@@ -200,18 +200,15 @@ enum GraphQL {
         let itemsByServer = Dictionary(grouping: items) { $0.apiServer }
         var count = 0
         for (server, items) in itemsByServer {
-            let ids = ContiguousArray(items.compactMap(\.nodeId))
-            var nodes = [String: ContiguousArray<GQLNode>]()
+            let ids = items.compactMap(\.nodeId)
+            var nodes = [String: LinkedList<GQLNode>]()
             let serverName = server.label ?? "<no label>"
             let queries = GQLQuery.batching("\(serverName): \(name)", fields: fields, idList: ids, batchSize: 100) { node in
                 let type = node.elementType
-                if var existingList = nodes[type] {
+                if let existingList = nodes[type] {
                     existingList.append(node)
-                    nodes[type] = existingList
                 } else {
-                    var array = ContiguousArray<GQLNode>()
-                    array.append(node)
-                    nodes[type] = array
+                    nodes[type] = LinkedList<GQLNode>(value: node)
                 }
 
                 count += 1
@@ -356,17 +353,13 @@ enum GraphQL {
 
     static func fetchAllAuthoredItems(from server: ApiServer, fields: [GQLGroup]) async {
         var count = 0
-        var nodes = [String: ContiguousArray<GQLNode>]()
+        var nodes = [String: LinkedList<GQLNode>]()
         let authoredItemsQuery = GQLQuery(name: "Authored Items", rootElement: GQLGroup(name: "viewer", fields: fields)) { node in
             let type = node.elementType
-            if var existingList = nodes[type] {
+            if let existingList = nodes[type] {
                 existingList.append(node)
-                nodes[type] = existingList
             } else {
-                var array = ContiguousArray<GQLNode>()
-                array.reserveCapacity(nodeBlockMax)
-                array.append(node)
-                nodes[type] = array
+                nodes[type] = LinkedList<GQLNode>(value: node)
             }
 
             count += 1
@@ -377,25 +370,25 @@ enum GraphQL {
             }
         }
         do {
-            try await server.run(queries: [authoredItemsQuery])
+            try await server.run(queries: LinkedList(value: authoredItemsQuery))
             await processItems(nodes, server, wait: true)
 
-            var prsToCheck = [PullRequest]()
+            let prsToCheck = LinkedList<PullRequest>()
             let fetchedPrIds = Set(nodes["PullRequest"]?.map(\.id) ?? [])
             for repo in server.repos.filter({ $0.displayPolicyForPrs == RepoDisplayPolicy.authoredOnly.rawValue }) {
                 for pr in repo.pullRequests where !fetchedPrIds.contains(pr.nodeId ?? "") {
                     prsToCheck.append(pr)
                 }
             }
-            if !prsToCheck.isEmpty { // investigate missing PRs
+            if prsToCheck.count > 0 { // investigate missing PRs
                 let prGroup = GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 1, includeRepo: true)])
                 let group = GQLBatchGroup(templateGroup: prGroup, idList: prsToCheck.compactMap(\.nodeId), batchSize: 100)
-                var nodes = ContiguousArray<GQLNode>()
+                let nodes = LinkedList<GQLNode>()
                 let query = GQLQuery(name: "Closed Authored PRs", rootElement: group, allowsEmptyResponse: true) { node in
                     node.forcedUpdate = true
                     nodes.append(node)
                 }
-                try await server.run(queries: [query])
+                try await server.run(queries: LinkedList(value: query))
                 await processItems(["PullRequest": nodes], server, wait: true)
             }
 
@@ -450,19 +443,15 @@ enum GraphQL {
 
         for (server, reposInThisServer) in reposByServer {
             var count = 0
-            var nodes = [String: ContiguousArray<GQLNode>]()
+            var nodes = [String: LinkedList<GQLNode>]()
 
             let perNodeBlock: PerNodeBlock = { node in
 
                 let type = node.elementType
-                if var existingList = nodes[type] {
+                if let existingList = nodes[type] {
                     existingList.append(node)
-                    nodes[type] = existingList
                 } else {
-                    var array = ContiguousArray<GQLNode>()
-                    array.reserveCapacity(nodeBlockMax)
-                    array.append(node)
-                    nodes[type] = array
+                    nodes[type] = LinkedList<GQLNode>(value: node)
                 }
 
                 if type == "PullRequest",
@@ -481,11 +470,11 @@ enum GraphQL {
                 }
             }
 
-            var queriesForServer = [GQLQuery]()
+            let queriesForServer = LinkedList<GQLQuery>()
             let serverLabel = server.label ?? "<no label>"
 
-            var idsForReposInThisServerWantingAllOpenPrs = ContiguousArray<String>()
-            var idsForReposInThisServerWantingLatestPrs = ContiguousArray<String>()
+            let idsForReposInThisServerWantingAllOpenPrs = LinkedList<String>()
+            let idsForReposInThisServerWantingLatestPrs = LinkedList<String>()
             for repo in reposInThisServer {
                 if let n = repo.nodeId {
                     if let last = prRepoIdToLatestExistingUpdate[n], last != .distantPast {
@@ -496,13 +485,13 @@ enum GraphQL {
                 }
             }
 
-            if !idsForReposInThisServerWantingLatestPrs.isEmpty {
-                let q = GQLQuery.batching("\(serverLabel): Updated PRs", fields: [latestPrsFragment], idList: idsForReposInThisServerWantingLatestPrs, batchSize: 10, perNode: perNodeBlock)
+            if idsForReposInThisServerWantingLatestPrs.count > 0 {
+                let q = GQLQuery.batching("\(serverLabel): Updated PRs", fields: [latestPrsFragment], idList: Array(idsForReposInThisServerWantingLatestPrs), batchSize: 10, perNode: perNodeBlock)
                 queriesForServer.append(contentsOf: q)
             }
 
-            if !idsForReposInThisServerWantingAllOpenPrs.isEmpty {
-                let q = GQLQuery.batching("\(serverLabel): Open PRs", fields: [allOpenPrsFragment], idList: idsForReposInThisServerWantingAllOpenPrs, batchSize: 100, perNode: perNodeBlock)
+            if idsForReposInThisServerWantingAllOpenPrs.count > 0 {
+                let q = GQLQuery.batching("\(serverLabel): Open PRs", fields: [allOpenPrsFragment], idList: Array(idsForReposInThisServerWantingAllOpenPrs), batchSize: 100, perNode: perNodeBlock)
                 queriesForServer.append(contentsOf: q)
             }
 
@@ -531,19 +520,15 @@ enum GraphQL {
 
         for (server, reposInThisServer) in reposByServer {
             var count = 0
-            var nodes = [String: ContiguousArray<GQLNode>]()
+            var nodes = [String: LinkedList<GQLNode>]()
 
             let perNodeBlock: PerNodeBlock = { node in
 
                 let type = node.elementType
-                if var existingList = nodes[type] {
+                if let existingList = nodes[type] {
                     existingList.append(node)
-                    nodes[type] = existingList
                 } else {
-                    var array = ContiguousArray<GQLNode>()
-                    array.reserveCapacity(nodeBlockMax)
-                    array.append(node)
-                    nodes[type] = array
+                    nodes[type] = LinkedList<GQLNode>(value: node)
                 }
 
                 if type == "Issue",
@@ -562,11 +547,11 @@ enum GraphQL {
                 }
             }
 
-            var queriesForServer = [GQLQuery]()
+            let queriesForServer = LinkedList<GQLQuery>()
             let serverLabel = server.label ?? "<no label>"
 
-            var idsForReposInThisServerWantingAllOpenIssues = ContiguousArray<String>()
-            var idsForReposInThisServerWantingLatestIssues = ContiguousArray<String>()
+            let idsForReposInThisServerWantingAllOpenIssues = LinkedList<String>()
+            let idsForReposInThisServerWantingLatestIssues = LinkedList<String>()
             for repo in reposInThisServer {
                 if let n = repo.nodeId {
                     if let last = issueRepoIdToLatestExistingUpdate[n], last != .distantPast {
@@ -577,13 +562,13 @@ enum GraphQL {
                 }
             }
 
-            if !idsForReposInThisServerWantingLatestIssues.isEmpty {
-                let q = GQLQuery.batching("\(serverLabel): Updated Issues", fields: [latestIssuesFragment], idList: idsForReposInThisServerWantingLatestIssues, batchSize: 10, perNode: perNodeBlock)
+            if idsForReposInThisServerWantingLatestIssues.count > 0 {
+                let q = GQLQuery.batching("\(serverLabel): Updated Issues", fields: [latestIssuesFragment], idList: Array(idsForReposInThisServerWantingLatestIssues), batchSize: 10, perNode: perNodeBlock)
                 queriesForServer.append(contentsOf: q)
             }
 
-            if !idsForReposInThisServerWantingAllOpenIssues.isEmpty {
-                let q = GQLQuery.batching("\(serverLabel): Open Issues", fields: [allOpenIssuesFragment], idList: idsForReposInThisServerWantingAllOpenIssues, batchSize: 100, perNode: perNodeBlock)
+            if idsForReposInThisServerWantingAllOpenIssues.count > 0 {
+                let q = GQLQuery.batching("\(serverLabel): Open Issues", fields: [allOpenIssuesFragment], idList: Array(idsForReposInThisServerWantingAllOpenIssues), batchSize: 100, perNode: perNodeBlock)
                 queriesForServer.append(contentsOf: q)
             }
 
@@ -599,14 +584,14 @@ enum GraphQL {
     private static var processTask: Task<Void, Never>?
     private static let gateKeeper = HTTP.GateKeeper(entries: 0)
 
-    private static func processItems(_ nodes: [String: ContiguousArray<GQLNode>], _ server: ApiServer, parentType: (some ListableItem).Type? = nil, wait: Bool) async {
+    private static func processItems(_ nodes: [String: LinkedList<GQLNode>], _ server: ApiServer, parentType: (some ListableItem).Type? = nil, wait: Bool) async {
         await gateKeeper.waitForGate() // ensure this is a critical path
 
         if let p = processTask { // wait for any previous task
             await p.value
         }
 
-        if nodes.isEmpty {
+        if nodes.count == 0 {
             await gateKeeper.signalGate()
             return
         }
@@ -623,7 +608,7 @@ enum GraphQL {
         await gateKeeper.signalGate()
     }
 
-    private static func processBlock(_ nodes: [String: ContiguousArray<GQLNode>], _ server: ApiServer, _ parentType: (some ListableItem).Type?) async {
+    private static func processBlock(_ nodes: [String: LinkedList<GQLNode>], _ server: ApiServer, _ parentType: (some ListableItem).Type?) async {
         guard let moc = server.managedObjectContext else { return }
         await DataManager.runInChild(of: moc) { child in
             guard let server = try? child.existingObject(with: server.objectID) as? ApiServer else {

@@ -356,9 +356,9 @@ class DataItem: NSManagedObject {
         }
     }
 
-    static func syncItems<T: DataItem>(of type: T.Type, from nodes: ContiguousArray<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache, perItemCallback: (T, GQLNode) -> Void) {
+    static func syncItems<T: DataItem>(of type: T.Type, from nodes: LinkedList<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache, perItemCallback: (T, GQLNode) -> Void) {
         let validNodes = nodes.filter { !($0.parent?.creationSkipped ?? false) }
-        if nodes.isEmpty {
+        if validNodes.isEmpty {
             return
         }
 

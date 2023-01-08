@@ -311,7 +311,7 @@ final class ApiServer: NSManagedObject {
     // MARK: GraphQL
 
     @MainActor
-    func run(queries: [GQLQuery]) async throws {
+    func run(queries: LinkedList<GQLQuery>) async throws {
         let path = graphQLPath ?? ""
         let token = authToken ?? ""
 
