@@ -12,18 +12,9 @@ final class LinkedList<Value>: Sequence {
         fileprivate let value: Value
         fileprivate var next: Node<Value>?
 
-        init(_ value: Value) {
-            self.value = value
-        }
-
-        init(_ value: Value, next: Node<Value>?) {
+        init(_ value: Value, _ next: Node<Value>?) {
             self.value = value
             self.next = next
-        }
-        
-        init(_ value: Value, previous: Node<Value>?) {
-            self.value = value
-            previous?.next = self
         }
     }
 
@@ -34,9 +25,9 @@ final class LinkedList<Value>: Sequence {
 
     init(value: Value? = nil) {
         if let value {
-            let node = Node(value)
-            head = node
-            tail = node
+            let newNode = Node(value, nil)
+            head = newNode
+            tail = newNode
             count = 1
         } else {
             head = nil
@@ -48,28 +39,30 @@ final class LinkedList<Value>: Sequence {
     func push(_ value: Value) {
         count += 1
 
-        let newNode = Node(value, next: head)
+        let newNode = Node(value, head)
         if tail == nil {
             tail = newNode
         }
         head = newNode
     }
-
+    
     func append(_ value: Value) {
         count += 1
 
-        let newNode = Node(value, previous: tail)
-        if head == nil {
+        let newNode = Node(value, nil)
+        if let t = tail {
+            t.next = newNode
+        } else {
             head = newNode
         }
         tail = newNode
     }
-
+    
     func append(contentsOf collection: LinkedList<Value>) {
         if collection.count == 0 {
             return
         }
-
+        
         count += collection.count
 
         if let t = tail {
@@ -80,6 +73,7 @@ final class LinkedList<Value>: Sequence {
         tail = collection.tail
     }
 
+
     func pop() -> Value? {
         if let top = head {
             head = top.next
@@ -89,7 +83,7 @@ final class LinkedList<Value>: Sequence {
             return nil
         }
     }
-
+    
     var first: Value? {
         head?.value
     }
@@ -99,20 +93,26 @@ final class LinkedList<Value>: Sequence {
         guard var prev = head else {
             return false
         }
-
+        
         var current = head
-
+        
         while let c = current {
             if removeCheck(c.value) {
                 prev.next = c.next
                 count -= 1
+                if count == 0 {
+                    head = nil
+                    tail = nil
+                } else if tail === c {
+                    tail = prev
+                }
                 return true
             }
-
+                        
             prev = c
             current = c.next
         }
-
+        
         return false
     }
 
@@ -159,10 +159,9 @@ extension LinkedList: Codable where Value: Codable {
             }
         }
     }
-
+    
     func encode(to encoder: Encoder) throws {
-        let array = map { $0 }
         var container = encoder.unkeyedContainer()
-        try container.encode(array)
+        try container.encode(Array(self))
     }
 }
