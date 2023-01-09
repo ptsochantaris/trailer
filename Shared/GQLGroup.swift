@@ -1,6 +1,6 @@
 import Foundation
 
-final class GQLGroup: GQLScanning {
+struct GQLGroup: GQLScanning {
     let name: String
     let fields: [GQLElement]
     private let pageSize: Int

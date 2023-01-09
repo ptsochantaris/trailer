@@ -1,11 +1,9 @@
 import Foundation
 
-final class GQLField: GQLElement {
+let emptyList = LinkedList<GQLFragment>()
+
+struct GQLField: GQLElement {
     let name: String
     var queryText: String { name }
-    var fragments: LinkedList<GQLFragment> { LinkedList() }
-
-    init(name: String) {
-        self.name = name
-    }
+    var fragments: LinkedList<GQLFragment> { emptyList }
 }

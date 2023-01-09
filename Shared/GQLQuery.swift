@@ -2,7 +2,7 @@ import AsyncHTTPClient
 import Foundation
 import NIOCore
 
-final class GQLQuery {
+struct GQLQuery {
     let name: String
     let perNodeBlock: PerNodeBlock?
 

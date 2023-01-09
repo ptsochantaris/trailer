@@ -1,21 +1,23 @@
 import Foundation
 
-final class GQLBatchGroup: GQLScanning {
+struct GQLBatchGroup: GQLScanning {
     let name = "nodes"
 
-    private var idsToGroups = [String: GQLGroup]()
+    private let idsToGroups: [String: GQLGroup]
     private let originalTemplate: GQLGroup
     private let nextCount: Int
     private let batchSize: Int
 
     init(templateGroup: GQLGroup, idList: [String], startingCount: Int = 0, batchSize: Int) {
-        originalTemplate = templateGroup
         var index = startingCount
+        var id2g = [String: GQLGroup]()
+        id2g.reserveCapacity(idList.count)
         for id in idList {
-            let t = GQLGroup(group: templateGroup, name: templateGroup.name + "\(index)")
-            idsToGroups[id] = t
+            id2g[id] = GQLGroup(group: templateGroup, name: "\(templateGroup.name)\(index)")
             index += 1
         }
+        originalTemplate = templateGroup
+        idsToGroups = id2g
         nextCount = index
         self.batchSize = batchSize
     }

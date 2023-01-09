@@ -1,6 +1,6 @@
 import Foundation
 
-final class GQLFragment: GQLScanning, Hashable {
+struct GQLFragment: GQLScanning, Hashable {
     let name: String
 
     private let elements: [GQLElement]
