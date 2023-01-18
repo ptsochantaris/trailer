@@ -3,9 +3,12 @@ import Cocoa
 extension MenuWindow {
     @MainActor
     final class DataSource: NSObject, NSTableViewDelegate, NSTableViewDataSource {
-        private var itemIds = ContiguousArray<Any>()
+        enum Entry {
+            case section(String), id(NSManagedObjectID)
+        }
+        private var itemIds = ContiguousArray<Entry>()
         private let type: ListableItem.Type
-        private let sections: [String]
+        private let sections: ContiguousArray<String>
         private let removalSections: Set<String>
         private let viewCriterion: GroupingCriterion?
 
@@ -25,7 +28,7 @@ extension MenuWindow {
 
         init(type: ListableItem.Type, sections: [String], removeButtonsInSections: [String], viewCriterion: GroupingCriterion?) {
             self.type = type
-            self.sections = sections
+            self.sections = ContiguousArray(sections)
             removalSections = Set(removeButtonsInSections)
             self.viewCriterion = viewCriterion
 
@@ -66,20 +69,23 @@ extension MenuWindow {
                 let i = item["si"] as! Int
                 if lastSection < i {
                     lastSection = i
-                    itemIds.append(sections[i])
+                    itemIds.append(.section(sections[i]))
                 }
-                itemIds.append(item["objectID"] as! NSManagedObjectID)
+                itemIds.append(.id(item["objectID"] as! NSManagedObjectID))
             }
         }
 
         func tableView(_: NSTableView, viewFor _: NSTableColumn?, row: Int) -> NSView? {
-            let object = itemIds[row]
-            if let id = object as? NSManagedObjectID, let i = existingObject(with: id) as? ListableItem {
-                return TrailerCell(item: i)
-            } else if let title = object as? String {
+            switch itemIds[row] {
+            case let .id(id):
+                if let i = existingObject(with: id) as? ListableItem {
+                    return TrailerCell(item: i)
+                } else {
+                    return  nil
+                }
+            case let .section(title):
                 return SectionHeader(title: title, showRemoveAllButton: removalSections.contains(title))
             }
-            return nil
         }
 
         func numberOfRows(in _: NSTableView) -> Int {
@@ -87,10 +93,14 @@ extension MenuWindow {
         }
 
         func itemAtRow(_ row: Int) -> ListableItem? {
-            if row >= 0, row < itemIds.count, let id = itemIds[row] as? NSManagedObjectID {
-                return existingObject(with: id) as? ListableItem
-            } else {
+            guard row >= 0, row < itemIds.count else {
                 return nil
+            }
+            switch itemIds[row] {
+            case .section:
+                return nil
+            case let .id(id):
+                return existingObject(with: id) as? ListableItem
             }
         }
     }

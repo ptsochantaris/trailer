@@ -36,8 +36,8 @@ enum BackgroundTask {
     }
 
     static func registerForBackground() {
-        let count = globalBackgroundCount
         endTimer.abort()
+        let count = globalBackgroundCount
         globalBackgroundCount = count + 1
         if appInBackground, bgTask == .invalid, count == 0 {
             appBackgrounded()
