@@ -38,7 +38,7 @@ enum HTTP {
 
         func waitForGate() async {
             while counter < 0 {
-                await Task.yield()
+                try? await Task.sleep(nanoseconds: 10 * NSEC_PER_MSEC)
             }
             counter -= 1
         }
