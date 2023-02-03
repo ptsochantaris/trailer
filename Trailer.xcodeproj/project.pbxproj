@@ -76,6 +76,7 @@
 		165238F8298D58290043BB26 /* GateKeeper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165238F7298D58290043BB26 /* GateKeeper.swift */; };
 		165238F9298D58290043BB26 /* GateKeeper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165238F7298D58290043BB26 /* GateKeeper.swift */; };
 		165238FC298D58A40043BB26 /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 165238FB298D58A40043BB26 /* AsyncAlgorithms */; };
+		165238FE298D603E0043BB26 /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 165238FD298D603E0043BB26 /* AsyncAlgorithms */; };
 		1657230123AAA23500F597EF /* V4API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1657230023AAA23500F597EF /* V4API.swift */; };
 		1657230223AAA23500F597EF /* V4API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1657230023AAA23500F597EF /* V4API.swift */; };
 		1657230423AAA2AC00F597EF /* V3API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1657230323AAA2AC00F597EF /* V3API.swift */; };
@@ -487,6 +488,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				16039A812969817B00CC73F4 /* AsyncHTTPClient in Frameworks */,
+				165238FE298D603E0043BB26 /* AsyncAlgorithms in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -979,6 +981,7 @@
 			name = PocketTrailer;
 			packageProductDependencies = (
 				16039A802969817B00CC73F4 /* AsyncHTTPClient */,
+				165238FD298D603E0043BB26 /* AsyncAlgorithms */,
 			);
 			productName = PocketTrailer;
 			productReference = 1628A6B118789E73005EDA69 /* PocketTrailer.app */;
@@ -1648,7 +1651,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1619;
+				CURRENT_PROJECT_VERSION = 1620;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -1713,7 +1716,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1619;
+				CURRENT_PROJECT_VERSION = 1620;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEPLOYMENT_POSTPROCESSING = YES;
@@ -2062,6 +2065,11 @@
 			productName = AsyncHTTPClient;
 		};
 		165238FB298D58A40043BB26 /* AsyncAlgorithms */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 165238FA298D58A40043BB26 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
+			productName = AsyncAlgorithms;
+		};
+		165238FD298D603E0043BB26 /* AsyncAlgorithms */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 165238FA298D58A40043BB26 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
 			productName = AsyncAlgorithms;
