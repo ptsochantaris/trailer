@@ -30,24 +30,6 @@ extension ByteBuffer {
 }
 
 enum HTTP {
-    final actor GateKeeper {
-        private var counter: Int
-        init(entries: Int) {
-            counter = entries
-        }
-
-        func waitForGate() async {
-            while counter < 0 {
-                try? await Task.sleep(nanoseconds: 10 * NSEC_PER_MSEC)
-            }
-            counter -= 1
-        }
-
-        func signalGate() {
-            counter += 1
-        }
-    }
-
     private static let gateKeeper = GateKeeper(entries: 8)
 
     #if DEBUG

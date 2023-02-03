@@ -582,7 +582,7 @@ enum GraphQL {
     }
 
     private static var processTask: Task<Void, Never>?
-    private static let gateKeeper = HTTP.GateKeeper(entries: 0)
+    private static let gateKeeper = GateKeeper(entries: 1)
 
     private static func processItems(_ nodes: [String: LinkedList<GQLNode>], _ server: ApiServer, parentType: (some ListableItem).Type? = nil, wait: Bool) async {
         await gateKeeper.waitForGate() // ensure this is a critical path

@@ -73,6 +73,9 @@
 		16522D791AB03AE500B1C3FB /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 16522D781AB03AE500B1C3FB /* Images.xcassets */; };
 		16522D851AB03AE500B1C3FB /* Interface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 16522D831AB03AE500B1C3FB /* Interface.storyboard */; };
 		16522D871AB03AE500B1C3FB /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 16522D861AB03AE500B1C3FB /* Images.xcassets */; };
+		165238F8298D58290043BB26 /* GateKeeper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165238F7298D58290043BB26 /* GateKeeper.swift */; };
+		165238F9298D58290043BB26 /* GateKeeper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165238F7298D58290043BB26 /* GateKeeper.swift */; };
+		165238FC298D58A40043BB26 /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 165238FB298D58A40043BB26 /* AsyncAlgorithms */; };
 		1657230123AAA23500F597EF /* V4API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1657230023AAA23500F597EF /* V4API.swift */; };
 		1657230223AAA23500F597EF /* V4API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1657230023AAA23500F597EF /* V4API.swift */; };
 		1657230423AAA2AC00F597EF /* V3API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1657230323AAA2AC00F597EF /* V3API.swift */; };
@@ -339,6 +342,7 @@
 		16522D821AB03AE500B1C3FB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		16522D841AB03AE500B1C3FB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Interface.storyboard; sourceTree = "<group>"; };
 		16522D861AB03AE500B1C3FB /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		165238F7298D58290043BB26 /* GateKeeper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GateKeeper.swift; sourceTree = "<group>"; };
 		16561EC81BDA8E90008DBAF3 /* Trailer 22.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 22.xcdatamodel"; sourceTree = "<group>"; };
 		1657230023AAA23500F597EF /* V4API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = V4API.swift; path = Shared/V4API.swift; sourceTree = "<group>"; };
 		1657230323AAA2AC00F597EF /* V3API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = V3API.swift; path = Shared/V3API.swift; sourceTree = "<group>"; };
@@ -501,6 +505,7 @@
 				167E80F42517EC1700ED9A67 /* CoreSpotlight.framework in Frameworks */,
 				16039A7F296973E300CC73F4 /* AsyncHTTPClient in Frameworks */,
 				16BF673D283B1B9D0028EC13 /* Sparkle.framework in Frameworks */,
+				165238FC298D58A40043BB26 /* AsyncAlgorithms in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -615,6 +620,7 @@
 				1639E2C01E4007B900C561E1 /* Timer.swift */,
 				16039A822969827C00CC73F4 /* HTTPCache.swift */,
 				16968559296A3E6800D7BD9B /* LinkedList.swift */,
+				165238F7298D58290043BB26 /* GateKeeper.swift */,
 			);
 			name = Logic;
 			sourceTree = "<group>";
@@ -1015,6 +1021,7 @@
 			name = Trailer;
 			packageProductDependencies = (
 				16039A7E296973E300CC73F4 /* AsyncHTTPClient */,
+				165238FB298D58A40043BB26 /* AsyncAlgorithms */,
 			);
 			productName = Trailer;
 			productReference = 168BC6AA17EC2DF000BC4584 /* Trailer.app */;
@@ -1110,6 +1117,7 @@
 			mainGroup = 168BC6A117EC2DF000BC4584;
 			packageReferences = (
 				16039A7D296973E300CC73F4 /* XCRemoteSwiftPackageReference "async-http-client" */,
+				165238FA298D58A40043BB26 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
 			);
 			productRefGroup = 168BC6AB17EC2DF000BC4584 /* Products */;
 			projectDirPath = "";
@@ -1315,6 +1323,7 @@
 				164841021AD19933009E6383 /* NotificationManager.swift in Sources */,
 				16B3B3221A34E8E2000BE6CC /* PullRequest.swift in Sources */,
 				1664CBCB1B7796840006BDE7 /* Enums.swift in Sources */,
+				165238F9298D58290043BB26 /* GateKeeper.swift in Sources */,
 				16B3B3241A34E8E2000BE6CC /* Repo.swift in Sources */,
 				16878B7D23C50D7500F2213B /* GQLNode.swift in Sources */,
 				16C90F021B13BC180095E8D5 /* RepoSettingsViewController.swift in Sources */,
@@ -1381,6 +1390,7 @@
 				162002D61A2A49A300FF95F3 /* ViewAllowsVibrancy.swift in Sources */,
 				1657230123AAA23500F597EF /* V4API.swift in Sources */,
 				160CA03223A65152003FA0D8 /* GraphQL.swift in Sources */,
+				165238F8298D58290043BB26 /* GateKeeper.swift in Sources */,
 				16A41E9E22A71C7A00D1D352 /* TextFieldCell.swift in Sources */,
 				162002DF1A2A5C9200FF95F3 /* LinkField.swift in Sources */,
 				160CA03A23A65152003FA0D8 /* GQLGroup.swift in Sources */,
@@ -1638,7 +1648,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1618;
+				CURRENT_PROJECT_VERSION = 1619;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -1703,7 +1713,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1618;
+				CURRENT_PROJECT_VERSION = 1619;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEPLOYMENT_POSTPROCESSING = YES;
@@ -2030,6 +2040,14 @@
 				minimumVersion = 1.0.0;
 			};
 		};
+		165238FA298D58A40043BB26 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-async-algorithms";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -2042,6 +2060,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 16039A7D296973E300CC73F4 /* XCRemoteSwiftPackageReference "async-http-client" */;
 			productName = AsyncHTTPClient;
+		};
+		165238FB298D58A40043BB26 /* AsyncAlgorithms */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 165238FA298D58A40043BB26 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
+			productName = AsyncAlgorithms;
 		};
 /* End XCSwiftPackageProductDependency section */
 
