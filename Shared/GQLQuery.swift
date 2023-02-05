@@ -136,11 +136,12 @@ struct GQLQuery {
             for query in queries {
                 group.addTask { @MainActor in
                     await gateKeeper.waitForGate()
+                    defer {
+                        gateKeeper.signalGate()
+                    }
                     if let stats = try await query.run(for: path, authToken: token) {
-                        await gateKeeper.signalGate()
                         return stats
                     }
-                    await gateKeeper.signalGate()
                     return nil
                 }
             }

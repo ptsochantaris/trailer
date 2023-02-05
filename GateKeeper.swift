@@ -1,26 +1,27 @@
 import Foundation
 import AsyncAlgorithms
 
-public final actor GateKeeper {
-    private var stream = AsyncChannel<Void>()
+public final class GateKeeper {
+    private var channel: AsyncChannel<Void>
+    private var iterator: AsyncChannel<Void>.Iterator
     
     public init(entries: Int) {
+        channel = AsyncChannel<Void>()
+        iterator = channel.makeAsyncIterator()
         Task {
             for _ in 0 ..< entries {
-                await stream.send(())
+                await channel.send(())
             }
         }
     }
 
     public func waitForGate() async {
-        for await _ in stream {
-            return
-        }
+        _ = await iterator.next()
     }
 
     public func signalGate() {
         Task {
-            await stream.send(())
+            await channel.send(())
         }
     }
 }

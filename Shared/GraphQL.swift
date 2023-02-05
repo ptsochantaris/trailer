@@ -586,13 +586,15 @@ enum GraphQL {
 
     private static func processItems(_ nodes: [String: LinkedList<GQLNode>], _ server: ApiServer, parentType: (some ListableItem).Type? = nil, wait: Bool) async {
         await gateKeeper.waitForGate() // ensure this is a critical path
+        defer {
+            gateKeeper.signalGate()
+        }
 
         if let p = processTask { // wait for any previous task
             await p.value
         }
 
         if nodes.count == 0 {
-            await gateKeeper.signalGate()
             return
         }
 
@@ -604,8 +606,6 @@ enum GraphQL {
             await t.value
             processTask = nil
         }
-
-        await gateKeeper.signalGate()
     }
 
     private static func processBlock(_ nodes: [String: LinkedList<GQLNode>], _ server: ApiServer, _ parentType: (some ListableItem).Type?) async {

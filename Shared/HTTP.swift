@@ -54,9 +54,7 @@ enum HTTP {
     static func getJsonData(for request: HTTPClientRequest, attempts: Int, checkCache: Bool) async throws -> (json: Any, result: DataResult) {
         await gateKeeper.waitForGate()
         defer {
-            Task {
-                await gateKeeper.signalGate()
-            }
+            gateKeeper.signalGate()
         }
         let (result, data) = try await getData(for: request, attempts: attempts, checkCache: checkCache)
         if case .success = result, Settings.dumpAPIResponsesInConsole {
