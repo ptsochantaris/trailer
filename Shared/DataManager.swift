@@ -315,17 +315,14 @@ enum DataManager {
     }
 
     static func saveDB() async {
+        #if os(iOS)
+            BackgroundTask.registerForBackground()
+        #endif
+
         guard main.hasChanges else {
             DLog("No DB changes")
             if migrated {
-                #if os(iOS)
-                    BackgroundTask.registerForBackground()
-                #endif
-                await updateIndexingFromScratch()
-                migrated = false
-                #if os(iOS)
-                    BackgroundTask.unregisterForBackground()
-                #endif
+                await processSpotlight(newItems: [])
             }
             return
         }
@@ -342,10 +339,6 @@ enum DataManager {
             }
         }
 
-        #if os(iOS)
-            BackgroundTask.registerForBackground()
-        #endif
-
         let newObjects = main.insertedObjects
 
         DLog("Saving DB")
@@ -355,22 +348,21 @@ enum DataManager {
             DLog("Error while saving DB: %@", error.localizedDescription)
         }
 
+        Task {
+            await processSpotlight(newItems: newObjects)
+        }
+    }
+    
+    private static func processSpotlight(newItems: Set<NSManagedObject>) async {
         if migrated {
             migrated = false
-            Task {
-                await updateIndexingFromScratch()
-                #if os(iOS)
-                    BackgroundTask.unregisterForBackground()
-                #endif
-            }
+            await updateIndexingFromScratch()
         } else {
-            Task {
-                await processSpotlight(updates: newObjects, deletions: [])
-                #if os(iOS)
-                    BackgroundTask.unregisterForBackground()
-                #endif
-            }
+            await processSpotlight(updates: newItems, deletions: [])
         }
+        #if os(iOS)
+            BackgroundTask.unregisterForBackground()
+        #endif
     }
 
     private static func processSpotlight(updates: Set<NSManagedObject>, deletions: Set<NSManagedObject>) async {
