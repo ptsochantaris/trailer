@@ -167,8 +167,10 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
     func userNotificationCenter(_: NSUserNotificationCenter, didActivate notification: NSUserNotification) {
         if let userInfo = notification.userInfo {
             func saveAndRefresh(_ i: ListableItem) {
-                DataManager.saveDB()
-                updateRelatedMenus(for: i)
+                Task {
+                    await DataManager.saveDB()
+                    updateRelatedMenus(for: i)
+                }
             }
 
             switch notification.activationType {
@@ -497,8 +499,8 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         for r in PullRequest.allMerged(in: DataManager.main, criterion: menuBarSet.viewCriterion) {
             DataManager.main.delete(r)
         }
-        DataManager.saveDB()
         Task {
+            await DataManager.saveDB()
             await menuBarSet.updatePrMenu()
             await ensureAtLeastOneMenuVisible()
         }
@@ -509,8 +511,8 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         for r in PullRequest.allClosed(in: DataManager.main, criterion: menuBarSet.viewCriterion) {
             DataManager.main.delete(r)
         }
-        DataManager.saveDB()
         Task {
+            await DataManager.saveDB()
             await menuBarSet.updatePrMenu()
             await ensureAtLeastOneMenuVisible()
         }
@@ -521,8 +523,8 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         for i in Issue.allClosed(in: DataManager.main, criterion: menuBarSet.viewCriterion) {
             DataManager.main.delete(i)
         }
-        DataManager.saveDB()
         Task {
+            await DataManager.saveDB()
             await menuBarSet.updateIssuesMenu()
             await ensureAtLeastOneMenuVisible()
         }
@@ -532,8 +534,8 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
     func unPinSelected(for item: ListableItem) {
         let menus = relatedMenus(for: item)
         DataManager.main.delete(item)
-        DataManager.saveDB()
         Task {
+            await DataManager.saveDB()
             if item is PullRequest {
                 for menu in menus {
                     await menu.updatePrMenu()
@@ -569,9 +571,9 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         for r in try! DataManager.main.fetch(f) {
             r.catchUpWithComments()
         }
-        DataManager.saveDB()
 
         Task {
+            await DataManager.saveDB()
             if prMenu {
                 await menuBarSet.updatePrMenu()
             } else {
@@ -634,7 +636,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
             return false
         }
         await DataManager.postProcessAllItems(in: DataManager.main)
-        DataManager.saveDB()
+        await DataManager.saveDB()
         preferencesWindow?.reloadSettings()
         setupWindows()
         preferencesDirty = true
@@ -644,11 +646,14 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
     }
 
     @MainActor
-    func applicationShouldTerminate(_: NSApplication) -> NSApplication.TerminateReply {
-        DataManager.saveDB()
-        return .terminateNow
+    func applicationShouldTerminate(_ app: NSApplication) -> NSApplication.TerminateReply {
+        Task {
+            await DataManager.saveDB()
+            app.reply(toApplicationShouldTerminate: true)
+        }
+        return .terminateLater
     }
-
+    
     func windowDidBecomeKey(_ notification: Notification) {
         if let window = notification.object as? MenuWindow {
             if ignoreNextFocusLoss {
@@ -778,17 +783,15 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 
     @MainActor
     func application(_: NSApplication, continue userActivity: NSUserActivity, restorationHandler _: @escaping ([NSUserActivityRestoring]) -> Void) -> Bool {
-        #if canImport(CoreSpotlight)
-            if userActivity.activityType == CSSearchableItemActionType,
-               let uriPath = userActivity.userInfo?[CSSearchableItemActivityIdentifier] as? String,
-               let itemId = DataManager.id(for: uriPath),
-               let item = existingObject(with: itemId) as? ListableItem,
-               let urlString = item.webUrl,
-               let url = URL(string: urlString) {
-                NSWorkspace.shared.open(url)
-                return true
-            }
-        #endif
+        if userActivity.activityType == CSSearchableItemActionType,
+           let uriPath = userActivity.userInfo?[CSSearchableItemActivityIdentifier] as? String,
+           let itemId = DataManager.id(for: uriPath),
+           let item = existingObject(with: itemId) as? ListableItem,
+           let urlString = item.webUrl,
+           let url = URL(string: urlString) {
+            NSWorkspace.shared.open(url)
+            return true
+        }
         return false
     }
 
@@ -979,8 +982,10 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                     switch incomingEvent.charactersIgnoringModifiers ?? "" {
                     case "m":
                         selectedItem.setMute(to: !selectedItem.muted)
-                        DataManager.saveDB()
-                        app.updateRelatedMenus(for: selectedItem)
+                        Task {
+                            await DataManager.saveDB()
+                            app.updateRelatedMenus(for: selectedItem)
+                        }
                         return nil
                     case "o":
                         if let w = selectedItem.repo.webUrl, let u = URL(string: w) {
@@ -1012,9 +1017,11 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
     private func wake(item: ListableItem, window: MenuWindow) {
         let oldIndex = window.table.selectedRow
         item.wakeUp()
-        DataManager.saveDB()
-        app.updateRelatedMenus(for: item)
-        scrollToNearest(index: oldIndex, window: window, preferDown: false)
+        Task {
+            await DataManager.saveDB()
+            app.updateRelatedMenus(for: item)
+            scrollToNearest(index: oldIndex, window: window, preferDown: false)
+        }
     }
 
     @MainActor
@@ -1023,9 +1030,11 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         if s.count > snoozeIndex {
             let oldIndex = window.table.selectedRow
             item.snooze(using: s[snoozeIndex])
-            DataManager.saveDB()
-            updateRelatedMenus(for: item)
-            scrollToNearest(index: oldIndex, window: window, preferDown: true)
+            Task {
+                await DataManager.saveDB()
+                updateRelatedMenus(for: item)
+                scrollToNearest(index: oldIndex, window: window, preferDown: true)
+            }
             return true
         }
         return false

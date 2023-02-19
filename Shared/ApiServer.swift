@@ -271,7 +271,7 @@ final class ApiServer: NSManagedObject {
     }
 
     @MainActor
-    static func configure(from archive: [String: [String: NSObject]]) -> Bool {
+    static func configure(from archive: [String: [String: NSObject]]) async -> Bool {
         for apiServer in allApiServers(in: DataManager.main) {
             DataManager.main.delete(apiServer)
         }
@@ -291,7 +291,7 @@ final class ApiServer: NSManagedObject {
             a.resetSyncState()
         }
 
-        DataManager.saveDB()
+        await DataManager.saveDB()
         return true
     }
 

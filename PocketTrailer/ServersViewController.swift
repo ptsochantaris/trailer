@@ -77,8 +77,10 @@ final class ServersViewController: UITableViewController {
             let a = allServers[indexPath.row]
             allServers.remove(at: indexPath.row)
             DataManager.main.delete(a)
-            DataManager.saveDB()
-            tableView.deleteRows(at: [indexPath], with: .fade)
+            Task {
+                await DataManager.saveDB()
+                tableView.deleteRows(at: [indexPath], with: .fade)
+            }
         }
     }
 
@@ -124,7 +126,9 @@ final class ServersViewController: UITableViewController {
             $0.deleteEverything()
             $0.resetSyncState()
         }
-        DataManager.saveDB()
+        Task {
+            await DataManager.saveDB()
+        }
     }
 
     @IBAction private func resyncEverythingSelected(_ sender: UIBarButtonItem) {
@@ -142,8 +146,8 @@ final class ServersViewController: UITableViewController {
             a.deleteEverything()
             a.resetSyncState()
         }
-        DataManager.saveDB()
         Task {
+            await DataManager.saveDB()
             await DataManager.postProcessAllItems(in: DataManager.main)
             _ = await app.startRefresh()
         }

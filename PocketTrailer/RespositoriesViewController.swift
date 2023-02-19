@@ -157,7 +157,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
                         try? tempContext.save()
                     }
                     Task { @MainActor in
-                        DataManager.saveDB()
+                        await DataManager.saveDB()
                         NotificationQueue.commit()
                     }
                 }

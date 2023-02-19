@@ -222,12 +222,12 @@ class ListableItem: DataItem {
     override final func prepareForDeletion() {
         let uri = objectID.uriRepresentation().absoluteString
         Task { @MainActor in
-            hideFromSpotlightAndNotifications(uri: uri)
+            hideFromNotifications(uri: uri)
         }
         super.prepareForDeletion()
     }
-
-    private final func hideFromSpotlightAndNotifications(uri: String) {
+    
+    private final func hideFromNotifications(uri: String) {
         if Settings.removeNotificationsWhenItemIsRemoved {
             ListableItem.removeRelatedNotifications(uri: uri)
         }
@@ -1144,7 +1144,7 @@ class ListableItem: DataItem {
             let item = await indexForSpotlight(uri: uri)
             return .needsIndexing(item)
         } else {
-            hideFromSpotlightAndNotifications(uri: uri)
+            hideFromNotifications(uri: uri)
             return .needsRemoval(uri)
         }
     }

@@ -6,6 +6,7 @@ extension MenuWindow {
         enum Entry {
             case section(String), id(NSManagedObjectID)
         }
+
         private var itemIds = ContiguousArray<Entry>()
         private let type: ListableItem.Type
         private let sections: ContiguousArray<String>
@@ -81,7 +82,7 @@ extension MenuWindow {
                 if let i = existingObject(with: id) as? ListableItem {
                     return TrailerCell(item: i)
                 } else {
-                    return  nil
+                    return nil
                 }
             case let .section(title):
                 return SectionHeader(title: title, showRemoveAllButton: removalSections.contains(title))

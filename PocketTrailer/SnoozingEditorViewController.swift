@@ -64,7 +64,9 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        DataManager.saveDB()
+        Task {
+            await DataManager.saveDB()
+        }
     }
 
     @IBAction private func downSelected(_: UIBarButtonItem) {

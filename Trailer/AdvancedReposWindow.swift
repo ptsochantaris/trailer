@@ -109,8 +109,8 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
             updateRemovableRepos()
             Task {
                 await app.updateAllMenus()
+                await DataManager.saveDB()
             }
-            DataManager.saveDB()
         }
     }
 
@@ -129,28 +129,32 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
     @IBAction private func automaticallyAddNewReposSelected(_ sender: NSButton) {
         let set = sender.integerValue == 1
         Settings.automaticallyAddNewReposFromWatchlist = set
-        if set {
-            prepareReposForSync()
+        Task {
+            if set {
+                await prepareReposForSync()
+            }
         }
     }
 
-    private func prepareReposForSync() {
+    private func prepareReposForSync() async {
         lastRepoCheck = .distantPast
         for a in ApiServer.allApiServers(in: DataManager.main) {
             for r in a.repos {
                 r.resetSyncState()
             }
         }
-        DataManager.saveDB()
+        await DataManager.saveDB()
     }
 
     @IBAction private func automaticallyRemoveReposSelected(_ sender: NSButton) {
         let set = sender.integerValue == 1
         Settings.automaticallyRemoveDeletedReposFromWatchlist = set
-        if set {
-            prepareReposForSync()
+        Task {
+            if set {
+                await prepareReposForSync()
+            }
+            await DataManager.saveDB()
         }
-        DataManager.saveDB()
     }
 
     @IBOutlet private var serverPicker: NSPopUpButton!
@@ -195,7 +199,7 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
                     } else {
                         alert.informativeText = "The new repositories have been added to your local list. Trailer will refresh after you close preferences to fetch any items from them."
                     }
-                    DataManager.saveDB()
+                    await DataManager.saveDB()
                     prefs?.reloadRepositories()
                     updateRemovableRepos()
                     await app.updateAllMenus()
@@ -216,7 +220,7 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
                     } else {
                         alert.informativeText = "The new repository has been added to your local list. Trailer will refresh after you close preferences to fetch any items from it."
                     }
-                    DataManager.saveDB()
+                    await DataManager.saveDB()
                     prefs?.reloadRepositories()
                     updateRemovableRepos()
                     await app.updateAllMenus()
@@ -235,10 +239,10 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
     @IBAction private func removeSelected(_: NSButton) {
         guard let repo = removeRepoList.selectedItem?.representedObject as? Repo else { return }
         DataManager.main.delete(repo)
-        DataManager.saveDB()
-        prefs?.reloadRepositories()
-        updateRemovableRepos()
         Task {
+            await DataManager.saveDB()
+            prefs?.reloadRepositories()
+            updateRemovableRepos()
             await app.updateAllMenus()
         }
     }

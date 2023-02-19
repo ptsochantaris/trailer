@@ -269,7 +269,9 @@ final class TrailerCell: NSTableCellView {
             item.sectionIndex = Section.none.rawValue
             app.updateRelatedMenus(for: item) // saveAndRequestMenuUpdate won't work in this case
             DataManager.main.delete(item)
-            DataManager.saveDB()
+            Task {
+                await DataManager.saveDB()
+            }
         }
     }
 
@@ -321,8 +323,10 @@ final class TrailerCell: NSTableCellView {
     }
 
     private func saveAndRequestMenuUpdate(_ item: ListableItem) {
-        DataManager.saveDB()
-        app.updateRelatedMenus(for: item)
+        Task {
+            await DataManager.saveDB()
+            app.updateRelatedMenus(for: item)
+        }
     }
 
     var associatedDataItem: ListableItem? {

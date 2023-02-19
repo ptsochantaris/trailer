@@ -42,11 +42,11 @@ final class CustomReposViewController: UIViewController, UITableViewDelegate, UI
     func tableView(_: UITableView, commit _: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         let r = repos[indexPath.row]
         DataManager.main.delete(r)
-        DataManager.saveDB()
         Task { @MainActor in
+            await DataManager.saveDB()
             popupManager.masterController.updateStatus(becauseOfChanges: true)
+            updateRepos()
         }
-        updateRepos()
     }
 
     private var sizer: CustomRepoCell!
@@ -117,11 +117,11 @@ final class CustomReposViewController: UIViewController, UITableViewDelegate, UI
                     } else {
                         showMessage("Repositories added", "\(addedCount) new repositories have been added to your local list. Trailer will refresh after you close preferences to fetch any items from them.")
                     }
-                    DataManager.saveDB()
                     Task { @MainActor in
+                        await DataManager.saveDB()
                         popupManager.masterController.updateStatus(becauseOfChanges: true)
+                        self.updateRepos()
                     }
-                    self.updateRepos()
                 } catch {
                     showMessage("Fetching Repository Information Failed", error.localizedDescription)
                 }
@@ -138,8 +138,8 @@ final class CustomReposViewController: UIViewController, UITableViewDelegate, UI
                     } else {
                         showMessage("Repository added", "The new repository has been added to your local list. Trailer will refresh after you close preferences to fetch any items from it.")
                     }
-                    DataManager.saveDB()
                     Task { @MainActor in
+                        await DataManager.saveDB()
                         popupManager.masterController.updateStatus(becauseOfChanges: true)
                     }
                     self.updateRepos()

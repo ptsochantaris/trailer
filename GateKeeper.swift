@@ -1,10 +1,10 @@
-import Foundation
 import AsyncAlgorithms
+import Foundation
 
 public final class GateKeeper {
     private var channel: AsyncChannel<Void>
     private var iterator: AsyncChannel<Void>.Iterator
-    
+
     public init(entries: Int) {
         channel = AsyncChannel<Void>()
         iterator = channel.makeAsyncIterator()

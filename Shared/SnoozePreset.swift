@@ -135,7 +135,7 @@ final class SnoozePreset: NSManagedObject {
     }
 
     @MainActor
-    static func configure(from archive: [[String: NSObject]]) -> Bool {
+    static func configure(from archive: [[String: NSObject]]) async -> Bool {
         for apiServer in allSnoozePresets(in: DataManager.main) {
             DataManager.main.delete(apiServer)
         }
@@ -148,7 +148,7 @@ final class SnoozePreset: NSManagedObject {
             }
         }
 
-        DataManager.saveDB()
+        await DataManager.saveDB()
         return true
     }
 }

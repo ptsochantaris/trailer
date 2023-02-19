@@ -248,8 +248,8 @@ enum Settings {
                     sharedDefaults.set(v, forKey: k)
                 }
             }
-            let result1 = ApiServer.configure(from: settings["DB_CONFIG_OBJECTS"] as! [String: [String: NSObject]])
-            let result2 = SnoozePreset.configure(from: settings["DB_SNOOZE_OBJECTS"] as! [[String: NSObject]])
+            let result1 = await ApiServer.configure(from: settings["DB_CONFIG_OBJECTS"] as! [String: [String: NSObject]])
+            let result2 = await SnoozePreset.configure(from: settings["DB_SNOOZE_OBJECTS"] as! [[String: NSObject]])
             return result1 && result2
         }
         return false

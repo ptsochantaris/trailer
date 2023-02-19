@@ -7,17 +7,12 @@ let settingsManager = SettingsManager()
 final class SettingsManager {
     private func loadSettingsFrom(url: URL) async {
         if await Settings.readFromURL(url) {
-            DataManager.saveDB()
-
             Task {
+                await DataManager.saveDB()
                 await popupManager.masterController.resetView(becauseOfChanges: true)
-
                 preferencesDirty = true
                 Settings.lastSuccessfulRefresh = nil
-
-                Task {
-                    await app.startRefreshIfItIsDue()
-                }
+                await app.startRefreshIfItIsDue()
             }
         } else {
             Task {

@@ -22,7 +22,7 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
         settingsChangedTimer = PopTimer(timeInterval: 1.0) {
             Task { @MainActor in
                 await DataManager.postProcessAllItems(in: DataManager.main)
-                DataManager.saveDB()
+                await DataManager.saveDB()
             }
         }
     }

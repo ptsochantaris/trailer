@@ -156,9 +156,11 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
     }
 
     private func commit() {
-        DataManager.saveDB()
         preferencesDirty = true
-        settingsChangedTimer.push()
+        Task {
+            await DataManager.saveDB()
+            settingsChangedTimer.push()
+        }
     }
 
     override func viewWillDisappear(_ animated: Bool) {

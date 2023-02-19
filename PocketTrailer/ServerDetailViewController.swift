@@ -24,8 +24,12 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
             a = existingObject(with: sid) as! ApiServer
         } else {
             a = ApiServer.addDefaultGithub(in: DataManager.main)
-            DataManager.saveDB()
-            serverLocalId = a.objectID
+            view.isUserInteractionEnabled = false
+            Task {
+                await DataManager.saveDB()
+                serverLocalId = a.objectID
+                view.isUserInteractionEnabled = true
+            }
         }
         name.text = a.label
         apiPath.text = a.apiPath
@@ -161,16 +165,18 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 
         a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         a.addAction(UIAlertAction(title: "Delete", style: .destructive) { _ in
-            self.deleteServer()
+            Task {
+                await self.deleteServer()
+            }
         })
 
         present(a, animated: true)
     }
 
-    private func deleteServer() {
+    private func deleteServer() async {
         if let a = existingObject(with: serverLocalId!) {
             DataManager.main.delete(a)
-            DataManager.saveDB()
+            await DataManager.saveDB()
         }
         serverLocalId = nil
         _ = navigationController?.popViewController(animated: true)

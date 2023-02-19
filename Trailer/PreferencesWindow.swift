@@ -231,11 +231,11 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
                 await DataManager.postProcessAllItems(in: DataManager.main)
                 if let s = self, s.serversDirty {
                     s.serversDirty = false
-                    DataManager.saveDB()
+                    await DataManager.saveDB()
                     Settings.possibleExport(nil)
                     app.setupWindows()
                 } else {
-                    DataManager.saveDB()
+                    await DataManager.saveDB()
                     await app.updateAllMenus()
                 }
             }
@@ -716,8 +716,8 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
             a.deleteEverything()
             a.resetSyncState()
         }
-        DataManager.saveDB()
         Task {
+            await DataManager.saveDB()
             await app.updateAllMenus()
             await app.startRefresh()
         }
@@ -1196,7 +1196,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
                     _ = alert.runModal()
                 }
             } else {
-                DataManager.saveDB()
+                await DataManager.saveDB()
             }
             DataItem.nukeDeletedItems(in: DataManager.main)
             API.isRefreshing = false

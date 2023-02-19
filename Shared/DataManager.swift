@@ -27,6 +27,8 @@ enum DataManager {
         return m
     }()
 
+    private static var migrated = false
+    
     static func checkMigration() {
         guard let count = persistentStoreCoordinator?.persistentStores.count, count > 0 else { return }
 
@@ -34,6 +36,7 @@ enum DataManager {
             DLog("VERSION UPDATE MAINTENANCE NEEDED")
             performVersionChangedTasks()
             Settings.lastRunVersion = versionString
+            migrated = true
         }
         ApiServer.ensureAtLeastGithub(in: main)
     }
@@ -257,68 +260,139 @@ enum DataManager {
             }
         }
 
-        saveDB()
-
-        await updateIndexing()
+        await saveDB()
 
         NotificationQueue.commit()
     }
 
-    private static func updateIndexing() async {
-        #if canImport(CoreSpotlight)
-            guard CSSearchableIndex.isIndexingAvailable() else {
-                return
-            }
-
-            DLog("Gathering spotlight indexes")
-
-            let itemsToIndex = LinkedList<CSSearchableItem>()
-            let itemsToRemove = LinkedList<String>()
-
-            for pr in DataItem.allItems(of: PullRequest.self, in: main) {
-                switch await pr.handleSpotlight() {
-                case let .needsIndexing(item):
-                    itemsToIndex.append(item)
-                case let .needsRemoval(uri):
-                    itemsToRemove.append(uri)
-                }
-            }
-
-            for issue in DataItem.allItems(of: Issue.self, in: main) {
-                switch await issue.handleSpotlight() {
-                case let .needsIndexing(item):
-                    itemsToIndex.append(item)
-                case let .needsRemoval(uri):
-                    itemsToRemove.append(uri)
-                }
-            }
-
-            Task.detached {
-                let index = CSSearchableIndex.default()
-                if itemsToRemove.count > 0 {
-                    DLog("De-indexing \(itemsToRemove.count) items...")
-                    try? await index.deleteSearchableItems(withIdentifiers: Array(itemsToRemove))
-                }
-                if itemsToIndex.count > 0 {
-                    DLog("Indexing \(itemsToIndex.count) items...")
-                    try? await index.indexSearchableItems(Array(itemsToIndex))
-                }
-                DLog("Committed spotlight changes")
-            }
-        #endif
-    }
-
-    static func saveDB() {
-        guard main.hasChanges else {
-            DLog("No DB changes")
+    private static func updateIndexingFromScratch() async {
+        guard CSSearchableIndex.isIndexingAvailable() else {
             return
         }
+        
+        DLog("Re-indexing spotlight")
+        
+        let itemsToIndex = LinkedList<CSSearchableItem>()
+        let itemsToRemove = LinkedList<String>()
+        
+        for pr in DataItem.allItems(of: PullRequest.self, in: main) {
+            switch await pr.handleSpotlight() {
+            case let .needsIndexing(item):
+                itemsToIndex.append(item)
+            case let .needsRemoval(uri):
+                itemsToRemove.append(uri)
+            }
+        }
+        
+        for issue in DataItem.allItems(of: Issue.self, in: main) {
+            switch await issue.handleSpotlight() {
+            case let .needsIndexing(item):
+                itemsToIndex.append(item)
+            case let .needsRemoval(uri):
+                itemsToRemove.append(uri)
+            }
+        }
+        
+        let index = CSSearchableIndex.default()
+        
+        do {
+            DLog("Clearing spotlight indexes")
+            try await index.deleteAllSearchableItems()
+        } catch {
+            DLog("Error clearing existing spotlight index: \(error.localizedDescription)")
+        }
+        
+        DLog("Comitting spotlight indexes")
+        if itemsToRemove.count > 0 {
+            DLog("De-indexing \(itemsToRemove.count) items...")
+            try? await index.deleteSearchableItems(withIdentifiers: Array(itemsToRemove))
+        }
+        if itemsToIndex.count > 0 {
+            DLog("Indexing \(itemsToIndex.count) items...")
+            try? await index.indexSearchableItems(Array(itemsToIndex))
+        }
+        DLog("Committed spotlight changes")
+    }
 
+    static func saveDB() async {
+        guard main.hasChanges else {
+            DLog("No DB changes")
+            if migrated {
+                BackgroundTask.registerForBackground()
+                await updateIndexingFromScratch()
+                migrated = false
+                BackgroundTask.unregisterForBackground()
+            }
+            return
+        }
+        
+        if !migrated {
+            BackgroundTask.registerForBackground()
+            Task {
+                await processSpotlight(updates: main.updatedObjects, deletions: main.deletedObjects)
+                BackgroundTask.unregisterForBackground()
+            }
+        }
+
+        BackgroundTask.registerForBackground()
+
+        let newObjects = main.insertedObjects
+        
         DLog("Saving DB")
         do {
             try main.save()
         } catch {
             DLog("Error while saving DB: %@", error.localizedDescription)
+        }
+
+        if migrated {
+            migrated = false
+            Task {
+                await updateIndexingFromScratch()
+                BackgroundTask.unregisterForBackground()
+            }
+        } else {
+            Task {
+                await processSpotlight(updates: newObjects, deletions: [])
+                BackgroundTask.unregisterForBackground()
+            }
+        }
+        
+    }
+    
+    private static func processSpotlight(updates: Set<NSManagedObject>, deletions: Set<NSManagedObject>) async {
+        guard CSSearchableIndex.isIndexingAvailable() else {
+            return
+        }
+        let urisToDelete = LinkedList<String>()
+        let itemsToReIndex = LinkedList<CSSearchableItem>()
+        for updatedItem in updates {
+            guard let updatedItem = updatedItem as? ListableItem else {
+                continue
+            }
+            let result = await updatedItem.handleSpotlight()
+            switch result {
+            case let .needsIndexing(item):
+                itemsToReIndex.append(item)
+            case let .needsRemoval(uri):
+                urisToDelete.append(uri)
+            }
+        }
+        for deletedItem in deletions {
+            guard let deletedItem = deletedItem as? ListableItem else {
+                continue
+            }
+            let uri = deletedItem.objectID.uriRepresentation().absoluteString
+            urisToDelete.append(uri)
+        }
+        let index = CSSearchableIndex.default()
+        if urisToDelete.count > 0 {
+            DLog("Deleting spotlight indexes for \(urisToDelete.count) items")
+            try? await index.deleteSearchableItems(withIdentifiers: Array(urisToDelete))
+        }
+        if itemsToReIndex.count > 0 {
+            DLog("Updating spotlight indexes for \(itemsToReIndex.count) items")
+            try? await index.indexSearchableItems(Array(itemsToReIndex))
         }
     }
 
@@ -373,14 +447,33 @@ enum DataManager {
     }
 
     static func postProcessAllItems(in context: NSManagedObjectContext) async {
-        await runInChild(of: context) { child in
-            for p in DataItem.allItems(of: PullRequest.self, in: child, prefetchRelationships: ["comments", "reactions", "reviews"]) {
-                p.postProcess()
+        let start = Date()
+        let increment = 500
+
+        await withTaskGroup(of: Void.self) { group in
+            let prCount = DataItem.countItems(of: PullRequest.self, in: context)
+            for i in stride(from: 0, to: prCount, by: increment) {
+                group.addTask {
+                    await runInChild(of: context) { child in
+                        for p in DataItem.allItems(of: PullRequest.self, offset: i, count: increment, in: child, prefetchRelationships: ["comments", "reactions", "reviews"]) {
+                            p.postProcess()
+                        }
+                    }
+                }
             }
-            for i in DataItem.allItems(of: Issue.self, in: child, prefetchRelationships: ["comments", "reactions"]) {
-                i.postProcess()
+
+            let issueCount = DataItem.countItems(of: Issue.self, in: context)
+            for i in stride(from: 0, to: issueCount, by: increment) {
+                group.addTask {
+                    await runInChild(of: context) { child in
+                        for i in DataItem.allItems(of: Issue.self, offset: i, count: increment, in: child, prefetchRelationships: ["comments", "reactions"]) {
+                            i.postProcess()
+                        }
+                    }
+                }
             }
         }
+        DLog("Postprocess done - \(-start.timeIntervalSinceNow) sec")
     }
 
     static func id(for uriPath: String?) -> NSManagedObjectID? {

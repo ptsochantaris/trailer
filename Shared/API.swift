@@ -192,7 +192,7 @@ enum API {
                 DLog("Committing synced data")
                 try syncMoc.save()
                 DLog("Synced data committed")
-                DataManager.saveDB()
+                await DataManager.saveDB()
             } else {
                 DLog("No changes, skipping commit")
             }

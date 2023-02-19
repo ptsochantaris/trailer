@@ -50,8 +50,10 @@ final class Application: NSApplication {
                                 i.latestReadCommentDate = .distantPast
                                 i.postProcess()
                             }
-                            DataManager.saveDB()
-                            app.updateRelatedMenus(for: i)
+                            Task { @MainActor in
+                                await DataManager.saveDB()
+                                app.updateRelatedMenus(for: i)
+                            }
                             return
                         } else if sendAction(#selector(NSResponder.selectAll), to: nil, from: self) {
                             return

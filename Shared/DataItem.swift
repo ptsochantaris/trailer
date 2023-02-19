@@ -38,6 +38,16 @@ class DataItem: NSManagedObject {
         return try! moc.fetch(f)
     }
 
+    static func allItems<T: DataItem>(of type: T.Type, offset: Int, count: Int, in moc: NSManagedObjectContext, prefetchRelationships: [String]? = nil) -> [T] {
+        let f = NSFetchRequest<T>(entityName: String(describing: type))
+        f.relationshipKeyPathsForPrefetching = prefetchRelationships
+        f.fetchOffset = offset
+        f.fetchLimit = count
+        f.returnsObjectsAsFaults = false
+        f.includesSubentities = false
+        return try! moc.fetch(f)
+    }
+
     static func allItems<T: DataItem>(of type: T.Type, in serverId: NSManagedObjectID, moc: NSManagedObjectContext) -> [T] {
         let f = NSFetchRequest<T>(entityName: String(describing: type))
         f.returnsObjectsAsFaults = false

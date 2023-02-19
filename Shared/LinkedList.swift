@@ -45,7 +45,7 @@ final class LinkedList<Value>: Sequence {
         }
         head = newNode
     }
-    
+
     func append(_ value: Value) {
         count += 1
 
@@ -57,12 +57,12 @@ final class LinkedList<Value>: Sequence {
         }
         tail = newNode
     }
-    
+
     func append(contentsOf collection: LinkedList<Value>) {
         if collection.count == 0 {
             return
         }
-        
+
         count += collection.count
 
         if let t = tail {
@@ -85,11 +85,11 @@ final class LinkedList<Value>: Sequence {
             return nil
         }
     }
-    
+
     var first: Value? {
         head?.value
     }
-    
+
     var last: Value? {
         tail?.value
     }
@@ -99,9 +99,9 @@ final class LinkedList<Value>: Sequence {
         guard var prev = head else {
             return false
         }
-        
+
         var current = head
-        
+
         while let c = current {
             if removeCheck(c.value) {
                 prev.next = c.next
@@ -114,11 +114,11 @@ final class LinkedList<Value>: Sequence {
                 }
                 return true
             }
-                        
+
             prev = c
             current = c.next
         }
-        
+
         return false
     }
 
@@ -159,7 +159,7 @@ extension LinkedList: Codable where Value: Codable {
             append(element)
         }
     }
-    
+
     func encode(to encoder: Encoder) throws {
         var container = encoder.unkeyedContainer()
         try container.encode(contentsOf: self)
@@ -172,9 +172,9 @@ extension LinkedList where Value: AnyObject {
         guard var prev = head else {
             return false
         }
-        
+
         var current = head
-        
+
         while let c = current {
             if c.value === item {
                 prev.next = c.next
@@ -187,11 +187,11 @@ extension LinkedList where Value: AnyObject {
                 }
                 return true
             }
-                        
+
             prev = c
             current = c.next
         }
-        
+
         return false
     }
 }
