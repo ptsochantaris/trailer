@@ -28,7 +28,7 @@ enum DataManager {
     }()
 
     private static var migrated = false
-    
+
     static func checkMigration() {
         guard let count = persistentStoreCoordinator?.persistentStores.count, count > 0 else { return }
 
@@ -269,12 +269,12 @@ enum DataManager {
         guard CSSearchableIndex.isIndexingAvailable() else {
             return
         }
-        
+
         DLog("Re-indexing spotlight")
-        
+
         let itemsToIndex = LinkedList<CSSearchableItem>()
         let itemsToRemove = LinkedList<String>()
-        
+
         for pr in DataItem.allItems(of: PullRequest.self, in: main) {
             switch await pr.handleSpotlight() {
             case let .needsIndexing(item):
@@ -283,7 +283,7 @@ enum DataManager {
                 itemsToRemove.append(uri)
             }
         }
-        
+
         for issue in DataItem.allItems(of: Issue.self, in: main) {
             switch await issue.handleSpotlight() {
             case let .needsIndexing(item):
@@ -292,16 +292,16 @@ enum DataManager {
                 itemsToRemove.append(uri)
             }
         }
-        
+
         let index = CSSearchableIndex.default()
-        
+
         do {
             DLog("Clearing spotlight indexes")
             try await index.deleteAllSearchableItems()
         } catch {
             DLog("Error clearing existing spotlight index: \(error.localizedDescription)")
         }
-        
+
         DLog("Comitting spotlight indexes")
         if itemsToRemove.count > 0 {
             DLog("De-indexing \(itemsToRemove.count) items...")
@@ -318,26 +318,36 @@ enum DataManager {
         guard main.hasChanges else {
             DLog("No DB changes")
             if migrated {
-                BackgroundTask.registerForBackground()
+                #if os(iOS)
+                    BackgroundTask.registerForBackground()
+                #endif
                 await updateIndexingFromScratch()
                 migrated = false
-                BackgroundTask.unregisterForBackground()
+                #if os(iOS)
+                    BackgroundTask.unregisterForBackground()
+                #endif
             }
             return
         }
-        
+
         if !migrated {
-            BackgroundTask.registerForBackground()
+            #if os(iOS)
+                BackgroundTask.registerForBackground()
+            #endif
             Task {
                 await processSpotlight(updates: main.updatedObjects, deletions: main.deletedObjects)
-                BackgroundTask.unregisterForBackground()
+                #if os(iOS)
+                    BackgroundTask.unregisterForBackground()
+                #endif
             }
         }
 
-        BackgroundTask.registerForBackground()
+        #if os(iOS)
+            BackgroundTask.registerForBackground()
+        #endif
 
         let newObjects = main.insertedObjects
-        
+
         DLog("Saving DB")
         do {
             try main.save()
@@ -349,17 +359,20 @@ enum DataManager {
             migrated = false
             Task {
                 await updateIndexingFromScratch()
-                BackgroundTask.unregisterForBackground()
+                #if os(iOS)
+                    BackgroundTask.unregisterForBackground()
+                #endif
             }
         } else {
             Task {
                 await processSpotlight(updates: newObjects, deletions: [])
-                BackgroundTask.unregisterForBackground()
+                #if os(iOS)
+                    BackgroundTask.unregisterForBackground()
+                #endif
             }
         }
-        
     }
-    
+
     private static func processSpotlight(updates: Set<NSManagedObject>, deletions: Set<NSManagedObject>) async {
         guard CSSearchableIndex.isIndexingAvailable() else {
             return

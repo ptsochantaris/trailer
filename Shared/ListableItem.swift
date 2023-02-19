@@ -226,7 +226,7 @@ class ListableItem: DataItem {
         }
         super.prepareForDeletion()
     }
-    
+
     private final func hideFromNotifications(uri: String) {
         if Settings.removeNotificationsWhenItemIsRemoved {
             ListableItem.removeRelatedNotifications(uri: uri)
