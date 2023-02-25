@@ -314,18 +314,15 @@ enum GraphQL {
     static func fetchAllAuthoredPrs(from servers: [ApiServer]) async {
         await withTaskGroup(of: Void.self) { group in
             for server in servers {
-                var authorFields = [GQLGroup]()
-
                 if Settings.queryAuthoredPRs {
                     let g = GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 20, includeRepo: true)], extraParams: ["states": "OPEN"], pageSize: 100)
-                    authorFields.append(g)
+                    group.addTask { @MainActor in
+                        if let nodes = await fetchAllAuthoredItems(from: server, fields: [g]) {
+                            await checkAuthoredPrClosures(nodes: nodes, in: server)
+                        }
+                    }
                 } else {
                     server.repos.filter { $0.displayPolicyForPrs == RepoDisplayPolicy.authoredOnly.rawValue }.forEach { $0.displayPolicyForPrs = RepoDisplayPolicy.hide.rawValue }
-                }
-
-                let fields = authorFields
-                group.addTask { @MainActor in
-                    await fetchAllAuthoredItems(from: server, fields: fields)
                 }
             }
         }
@@ -334,27 +331,25 @@ enum GraphQL {
     static func fetchAllAuthoredIssues(from servers: [ApiServer]) async {
         await withTaskGroup(of: Void.self) { group in
             for server in servers {
-                var authorFields = [GQLGroup]()
-
                 if Settings.queryAuthoredIssues {
                     let g = GQLGroup(name: "issues", fields: [issueFragment(assigneesAndLabelPageSize: 20, includeRepo: true)], extraParams: ["states": "OPEN"], pageSize: 100)
-                    authorFields.append(g)
+                    group.addTask { @MainActor in
+                        if let nodes = await fetchAllAuthoredItems(from: server, fields: [g]) {
+                            checkAuthoredIssueClosures(nodes: nodes, in: server)
+                        }
+                    }
                 } else {
                     server.repos.filter { $0.displayPolicyForIssues == RepoDisplayPolicy.authoredOnly.rawValue }.forEach { $0.displayPolicyForIssues = RepoDisplayPolicy.hide.rawValue }
-                }
-
-                let fields = authorFields
-                group.addTask { @MainActor in
-                    await fetchAllAuthoredItems(from: server, fields: fields)
                 }
             }
         }
     }
 
-    static func fetchAllAuthoredItems(from server: ApiServer, fields: [GQLGroup]) async {
+    static func fetchAllAuthoredItems(from server: ApiServer, fields: [GQLGroup]) async -> [String: LinkedList<GQLNode>]? {
         var count = 0
         var nodes = [String: LinkedList<GQLNode>]()
-        let authoredItemsQuery = GQLQuery(name: "Authored Items", rootElement: GQLGroup(name: "viewer", fields: fields)) { node in
+        let group = GQLGroup(name: "viewer", fields: fields)
+        let authoredItemsQuery = GQLQuery(name: "Authored Items", rootElement: group) { node in
             let type = node.elementType
             if let existingList = nodes[type] {
                 existingList.append(node)
@@ -372,36 +367,49 @@ enum GraphQL {
         do {
             try await server.run(queries: LinkedList(value: authoredItemsQuery))
             await processItems(nodes, server, wait: true)
-
-            let prsToCheck = LinkedList<PullRequest>()
-            let fetchedPrIds = Set(nodes["PullRequest"]?.map(\.id) ?? [])
-            for repo in server.repos.filter({ $0.displayPolicyForPrs == RepoDisplayPolicy.authoredOnly.rawValue }) {
-                for pr in repo.pullRequests where !fetchedPrIds.contains(pr.nodeId ?? "") {
-                    prsToCheck.append(pr)
-                }
-            }
-            if prsToCheck.count > 0 { // investigate missing PRs
-                let prGroup = GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 1, includeRepo: true)])
-                let group = GQLBatchGroup(templateGroup: prGroup, idList: prsToCheck.compactMap(\.nodeId), batchSize: 100)
-                let nodes = LinkedList<GQLNode>()
-                let query = GQLQuery(name: "Closed Authored PRs", rootElement: group, allowsEmptyResponse: true) { node in
-                    node.forcedUpdate = true
-                    nodes.append(node)
-                }
-                try await server.run(queries: LinkedList(value: query))
-                await processItems(["PullRequest": nodes], server, wait: true)
-            }
-
-            let fetchedIssueIds = Set(nodes["Issue"]?.map(\.id) ?? []) // investigate missing issues
-            for repo in server.repos.filter({ $0.displayPolicyForIssues == RepoDisplayPolicy.authoredOnly.rawValue }) {
-                for issue in repo.issues where !fetchedIssueIds.contains(issue.nodeId ?? "") {
-                    issue.stateChanged = ListableItem.StateChange.closed.rawValue
-                    issue.condition = ItemCondition.closed.rawValue
-                }
-            }
+            return nodes
 
         } catch {
             server.lastSyncSucceeded = false
+            return nil
+        }
+    }
+    
+    private static func checkAuthoredPrClosures(nodes: [String: LinkedList<GQLNode>], in server: ApiServer) async {
+        let prsToCheck = LinkedList<PullRequest>()
+        let fetchedPrIds = Set(nodes["PullRequest"]?.map(\.id) ?? [])
+        for repo in server.repos.filter({ $0.displayPolicyForPrs == RepoDisplayPolicy.authoredOnly.rawValue }) {
+            for pr in repo.pullRequests where !fetchedPrIds.contains(pr.nodeId ?? "") {
+                prsToCheck.append(pr)
+            }
+        }
+        
+        if prsToCheck.count == 0 {
+            return
+        }
+        
+        let prGroup = GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 1, includeRepo: true)])
+        let group = GQLBatchGroup(templateGroup: prGroup, idList: prsToCheck.compactMap(\.nodeId), batchSize: 100)
+        let nodes = LinkedList<GQLNode>()
+        let query = GQLQuery(name: "Closed Authored PRs", rootElement: group, allowsEmptyResponse: true) { node in
+            node.forcedUpdate = true
+            nodes.append(node)
+        }
+        do {
+            try await server.run(queries: LinkedList(value: query))
+            await processItems(["PullRequest": nodes], server, wait: true)
+        } catch {
+            server.lastSyncSucceeded = false
+        }
+    }
+    
+    private static func checkAuthoredIssueClosures(nodes: [String: LinkedList<GQLNode>], in server: ApiServer) {
+        let fetchedIssueIds = Set(nodes["Issue"]?.map(\.id) ?? []) // investigate missing issues
+        for repo in server.repos.filter({ $0.displayPolicyForIssues == RepoDisplayPolicy.authoredOnly.rawValue }) {
+            for issue in repo.issues where !fetchedIssueIds.contains(issue.nodeId ?? "") {
+                issue.stateChanged = ListableItem.StateChange.closed.rawValue
+                issue.condition = ItemCondition.closed.rawValue
+            }
         }
     }
 
