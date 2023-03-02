@@ -94,10 +94,10 @@ struct GQLGroup: GQLScanning {
 
         for field in fields {
             if let fragment = field as? GQLFragment {
-                extraQueries.append(contentsOf: await fragment.scan(query: query, pageData: node, parent: thisObject))
+                await extraQueries.append(contentsOf: fragment.scan(query: query, pageData: node, parent: thisObject))
 
             } else if let ingestable = field as? GQLScanning, let fieldData = node[field.name] {
-                extraQueries.append(contentsOf: await ingestable.scan(query: query, pageData: fieldData, parent: thisObject))
+                await extraQueries.append(contentsOf: ingestable.scan(query: query, pageData: fieldData, parent: thisObject))
             }
         }
 
@@ -110,7 +110,7 @@ struct GQLGroup: GQLScanning {
         for e in edges {
             if let node = e["node"] as? [AnyHashable: Any] {
                 do {
-                    extraQueries.append(contentsOf: try await scanNode(node, query: query, parent: parent))
+                    try await extraQueries.append(contentsOf: scanNode(node, query: query, parent: parent))
                 } catch {
                     stop = true
                     break
@@ -134,13 +134,13 @@ struct GQLGroup: GQLScanning {
             if let edges = hash["edges"] as? [[AnyHashable: Any]] {
                 extraQueries = await scanPage(edges, pageInfo: hash["pageInfo"] as? [AnyHashable: Any], query: query, parent: parent)
             } else {
-                extraQueries = (try? await scanNode(hash, query: query, parent: parent)) ?? LinkedList<GQLQuery>()
+                extraQueries = await (try? scanNode(hash, query: query, parent: parent)) ?? LinkedList<GQLQuery>()
             }
 
         } else if let nodes = pageData as? [[AnyHashable: Any]] {
             for node in nodes {
                 do {
-                    extraQueries.append(contentsOf: try await scanNode(node, query: query, parent: parent))
+                    try await extraQueries.append(contentsOf: scanNode(node, query: query, parent: parent))
                 } catch {
                     break
                 }

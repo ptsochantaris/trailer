@@ -360,7 +360,7 @@ enum GraphQL {
             count += 1
             if count > nodeBlockMax {
                 count = 0
-                await self.processItems(nodes, server, wait: false)
+                await processItems(nodes, server, wait: false)
                 nodes.removeAll(keepingCapacity: true)
             }
         }
@@ -374,7 +374,7 @@ enum GraphQL {
             return nil
         }
     }
-    
+
     private static func checkAuthoredPrClosures(nodes: [String: LinkedList<GQLNode>], in server: ApiServer) async {
         let prsToCheck = LinkedList<PullRequest>()
         let fetchedPrIds = Set(nodes["PullRequest"]?.map(\.id) ?? [])
@@ -383,11 +383,11 @@ enum GraphQL {
                 prsToCheck.append(pr)
             }
         }
-        
+
         if prsToCheck.count == 0 {
             return
         }
-        
+
         let prGroup = GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 1, includeRepo: true)])
         let group = GQLBatchGroup(templateGroup: prGroup, idList: prsToCheck.compactMap(\.nodeId), batchSize: 100)
         let nodes = LinkedList<GQLNode>()
@@ -402,7 +402,7 @@ enum GraphQL {
             server.lastSyncSucceeded = false
         }
     }
-    
+
     private static func checkAuthoredIssueClosures(nodes: [String: LinkedList<GQLNode>], in server: ApiServer) {
         let fetchedIssueIds = Set(nodes["Issue"]?.map(\.id) ?? []) // investigate missing issues
         for repo in server.repos.filter({ $0.displayPolicyForIssues == RepoDisplayPolicy.authoredOnly.rawValue }) {

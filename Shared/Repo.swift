@@ -16,8 +16,6 @@ final class Repo: DataItem {
     @NSManaged var archived: Bool
     @NSManaged var lastScannedIssueEventId: Int64
 
-    override class var isParentType: Bool { true }
-
     override func resetSyncState() {
         super.resetSyncState()
         lastScannedIssueEventId = 0

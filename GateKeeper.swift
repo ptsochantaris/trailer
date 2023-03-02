@@ -1,11 +1,11 @@
 import AsyncAlgorithms
 import Foundation
 
-public final class GateKeeper {
+final class GateKeeper {
     private var channel: AsyncChannel<Void>
     private var iterator: AsyncChannel<Void>.Iterator
 
-    public init(entries: Int) {
+    init(entries: Int) {
         channel = AsyncChannel<Void>()
         iterator = channel.makeAsyncIterator()
         Task {
@@ -15,11 +15,11 @@ public final class GateKeeper {
         }
     }
 
-    public func waitForGate() async {
+    func waitForGate() async {
         _ = await iterator.next()
     }
 
-    public func signalGate() {
+    func signalGate() {
         Task {
             await channel.send(())
         }

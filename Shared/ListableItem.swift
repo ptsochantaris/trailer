@@ -48,8 +48,6 @@ class ListableItem: DataItem {
     @NSManaged var labels: Set<PRLabel>
     @NSManaged var reactions: Set<Reaction>
 
-    override class var isParentType: Bool { true }
-
     var webUrl: String? {
         repo.webUrl
     }

@@ -62,12 +62,12 @@ final actor HTTPCache {
 
         fileprivate init(contentsOf path: String) throws {
             let etagPath = URL(fileURLWithPath: "\(path).etag")
-            guard let etag = String(data: try Data(contentsOf: etagPath), encoding: .utf8) else {
+            guard let etag = try String(data: Data(contentsOf: etagPath), encoding: .utf8) else {
                 throw API.apiError("Invalid Etag data in http cache")
             }
             self.etag = etag
             let binPath = URL(fileURLWithPath: "\(path).bin")
-            bytes = ByteBuffer(data: try Data(contentsOf: binPath))
+            bytes = try ByteBuffer(data: Data(contentsOf: binPath))
         }
     }
 

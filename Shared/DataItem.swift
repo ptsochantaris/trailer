@@ -11,8 +11,6 @@ class DataItem: NSManagedObject {
 
     var alternateCreationDate: Bool { false }
 
-    class var isParentType: Bool { false }
-
     func resetSyncState() {
         updatedAt = updatedAt?.addingTimeInterval(-1) ?? .distantPast
         apiServer.resetSyncState()

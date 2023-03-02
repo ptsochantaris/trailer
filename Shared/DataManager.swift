@@ -352,7 +352,7 @@ enum DataManager {
             await processSpotlight(newItems: newObjects)
         }
     }
-    
+
     private static func processSpotlight(newItems: Set<NSManagedObject>) async {
         if migrated {
             migrated = false
