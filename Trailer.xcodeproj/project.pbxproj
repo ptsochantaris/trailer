@@ -73,10 +73,6 @@
 		16522D791AB03AE500B1C3FB /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 16522D781AB03AE500B1C3FB /* Images.xcassets */; };
 		16522D851AB03AE500B1C3FB /* Interface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 16522D831AB03AE500B1C3FB /* Interface.storyboard */; };
 		16522D871AB03AE500B1C3FB /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 16522D861AB03AE500B1C3FB /* Images.xcassets */; };
-		165238F8298D58290043BB26 /* GateKeeper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165238F7298D58290043BB26 /* GateKeeper.swift */; };
-		165238F9298D58290043BB26 /* GateKeeper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165238F7298D58290043BB26 /* GateKeeper.swift */; };
-		165238FC298D58A40043BB26 /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 165238FB298D58A40043BB26 /* AsyncAlgorithms */; };
-		165238FE298D603E0043BB26 /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 165238FD298D603E0043BB26 /* AsyncAlgorithms */; };
 		1657230123AAA23500F597EF /* V4API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1657230023AAA23500F597EF /* V4API.swift */; };
 		1657230223AAA23500F597EF /* V4API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1657230023AAA23500F597EF /* V4API.swift */; };
 		1657230423AAA2AC00F597EF /* V3API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1657230323AAA2AC00F597EF /* V3API.swift */; };
@@ -155,6 +151,10 @@
 		16B3B3501A34E990000BE6CC /* Trailer.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B33B1A34E990000BE6CC /* Trailer.xcdatamodeld */; };
 		16B6B7C11BA3B94C006A509F /* ComplicationDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B6B7C01BA3B94C006A509F /* ComplicationDataSource.swift */; };
 		16B74E481A3B4AC800410EF6 /* PrTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B74E471A3B4AC800410EF6 /* PrTable.swift */; };
+		16B8179C29B29F1B009A49EB /* Gate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B8179A29B29F1B009A49EB /* Gate.swift */; };
+		16B8179D29B29F1B009A49EB /* Gate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B8179A29B29F1B009A49EB /* Gate.swift */; };
+		16B8179E29B29F1B009A49EB /* Barrier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B8179B29B29F1B009A49EB /* Barrier.swift */; };
+		16B8179F29B29F1B009A49EB /* Barrier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B8179B29B29F1B009A49EB /* Barrier.swift */; };
 		16B94072182D136700F32061 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 16B94070182D136700F32061 /* dsa_pub.pem */; };
 		16BF6736283A2AE20028EC13 /* HTTP.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16BF6735283A2AE20028EC13 /* HTTP.swift */; };
 		16BF6737283A2AE20028EC13 /* HTTP.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16BF6735283A2AE20028EC13 /* HTTP.swift */; };
@@ -343,7 +343,6 @@
 		16522D821AB03AE500B1C3FB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		16522D841AB03AE500B1C3FB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Interface.storyboard; sourceTree = "<group>"; };
 		16522D861AB03AE500B1C3FB /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		165238F7298D58290043BB26 /* GateKeeper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GateKeeper.swift; sourceTree = "<group>"; };
 		16561EC81BDA8E90008DBAF3 /* Trailer 22.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 22.xcdatamodel"; sourceTree = "<group>"; };
 		1657230023AAA23500F597EF /* V4API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = V4API.swift; path = Shared/V4API.swift; sourceTree = "<group>"; };
 		1657230323AAA2AC00F597EF /* V3API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = V3API.swift; path = Shared/V3API.swift; sourceTree = "<group>"; };
@@ -430,6 +429,8 @@
 		16B415611E3D054500741E6F /* Trailer 33.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 33.xcdatamodel"; sourceTree = "<group>"; };
 		16B6B7C01BA3B94C006A509F /* ComplicationDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ComplicationDataSource.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16B74E471A3B4AC800410EF6 /* PrTable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PrTable.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		16B8179A29B29F1B009A49EB /* Gate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Gate.swift; path = Shared/Gate.swift; sourceTree = "<group>"; };
+		16B8179B29B29F1B009A49EB /* Barrier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Barrier.swift; path = Shared/Barrier.swift; sourceTree = "<group>"; };
 		16B94070182D136700F32061 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
 		16BF6735283A2AE20028EC13 /* HTTP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HTTP.swift; path = Shared/HTTP.swift; sourceTree = "<group>"; };
 		16BF6738283B1A1A0028EC13 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
@@ -488,7 +489,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				16039A812969817B00CC73F4 /* AsyncHTTPClient in Frameworks */,
-				165238FE298D603E0043BB26 /* AsyncAlgorithms in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -507,7 +507,6 @@
 				167E80F42517EC1700ED9A67 /* CoreSpotlight.framework in Frameworks */,
 				16039A7F296973E300CC73F4 /* AsyncHTTPClient in Frameworks */,
 				16BF673D283B1B9D0028EC13 /* Sparkle.framework in Frameworks */,
-				165238FC298D58A40043BB26 /* AsyncAlgorithms in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -621,8 +620,9 @@
 				160E19E11D672BD1006C1A59 /* PopTimer.swift */,
 				1639E2C01E4007B900C561E1 /* Timer.swift */,
 				16039A822969827C00CC73F4 /* HTTPCache.swift */,
+				16B8179B29B29F1B009A49EB /* Barrier.swift */,
+				16B8179A29B29F1B009A49EB /* Gate.swift */,
 				16968559296A3E6800D7BD9B /* LinkedList.swift */,
-				165238F7298D58290043BB26 /* GateKeeper.swift */,
 			);
 			name = Logic;
 			sourceTree = "<group>";
@@ -980,7 +980,6 @@
 			name = PocketTrailer;
 			packageProductDependencies = (
 				16039A802969817B00CC73F4 /* AsyncHTTPClient */,
-				165238FD298D603E0043BB26 /* AsyncAlgorithms */,
 			);
 			productName = PocketTrailer;
 			productReference = 1628A6B118789E73005EDA69 /* PocketTrailer.app */;
@@ -1022,7 +1021,6 @@
 			name = Trailer;
 			packageProductDependencies = (
 				16039A7E296973E300CC73F4 /* AsyncHTTPClient */,
-				165238FB298D58A40043BB26 /* AsyncAlgorithms */,
 			);
 			productName = Trailer;
 			productReference = 168BC6AA17EC2DF000BC4584 /* Trailer.app */;
@@ -1118,7 +1116,6 @@
 			mainGroup = 168BC6A117EC2DF000BC4584;
 			packageReferences = (
 				16039A7D296973E300CC73F4 /* XCRemoteSwiftPackageReference "async-http-client" */,
-				165238FA298D58A40043BB26 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
 			);
 			productRefGroup = 168BC6AB17EC2DF000BC4584 /* Products */;
 			projectDirPath = "";
@@ -1250,9 +1247,11 @@
 				16A69EDB1AC83020008231F9 /* ListableItem.swift in Sources */,
 				164785AB1A2CE7BD00297764 /* Globals.swift in Sources */,
 				16C9A2761A44D12600EE54EC /* AboutTrailerViewController.swift in Sources */,
+				16B8179F29B29F1B009A49EB /* Barrier.swift in Sources */,
 				16CBE1C61A2DFBA500485053 /* Settings.swift in Sources */,
 				161B851D1AB8E12C00AD4C5D /* Team.swift in Sources */,
 				16C3048E1CF4ECEF0017D79F /* SectionHeaderView.swift in Sources */,
+				16B8179D29B29F1B009A49EB /* Gate.swift in Sources */,
 				160E19E31D672BD1006C1A59 /* PopTimer.swift in Sources */,
 				16EE6AD01A9A711C000A8483 /* CountLabel.swift in Sources */,
 				166ADEC61CCAFF77001BA61F /* SnoozingViewController.swift in Sources */,
@@ -1286,7 +1285,6 @@
 				164841021AD19933009E6383 /* NotificationManager.swift in Sources */,
 				16B3B3221A34E8E2000BE6CC /* PullRequest.swift in Sources */,
 				1664CBCB1B7796840006BDE7 /* Enums.swift in Sources */,
-				165238F9298D58290043BB26 /* GateKeeper.swift in Sources */,
 				16B3B3241A34E8E2000BE6CC /* Repo.swift in Sources */,
 				16878B7D23C50D7500F2213B /* GQLNode.swift in Sources */,
 				16C90F021B13BC180095E8D5 /* RepoSettingsViewController.swift in Sources */,
@@ -1353,7 +1351,6 @@
 				162002D61A2A49A300FF95F3 /* ViewAllowsVibrancy.swift in Sources */,
 				1657230123AAA23500F597EF /* V4API.swift in Sources */,
 				160CA03223A65152003FA0D8 /* GraphQL.swift in Sources */,
-				165238F8298D58290043BB26 /* GateKeeper.swift in Sources */,
 				16A41E9E22A71C7A00D1D352 /* TextFieldCell.swift in Sources */,
 				162002DF1A2A5C9200FF95F3 /* LinkField.swift in Sources */,
 				160CA03A23A65152003FA0D8 /* GQLGroup.swift in Sources */,
@@ -1384,8 +1381,10 @@
 				16B74E481A3B4AC800410EF6 /* PrTable.swift in Sources */,
 				16878B7C23C50D7500F2213B /* GQLNode.swift in Sources */,
 				16878B7923C50D6A00F2213B /* GQLElement.swift in Sources */,
+				16B8179C29B29F1B009A49EB /* Gate.swift in Sources */,
 				16F0BAD623A53EB4002EC348 /* Colors.swift in Sources */,
 				1657230423AAA2AC00F597EF /* V3API.swift in Sources */,
+				16B8179E29B29F1B009A49EB /* Barrier.swift in Sources */,
 				16B3B3191A34E8E2000BE6CC /* DataItem.swift in Sources */,
 				16CBE1C11A2DBB2700485053 /* DataManager.swift in Sources */,
 				16901A451D659E9500141595 /* NotificationQueue.swift in Sources */,
@@ -2005,14 +2004,6 @@
 				minimumVersion = 1.0.0;
 			};
 		};
-		165238FA298D58A40043BB26 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/apple/swift-async-algorithms";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -2025,16 +2016,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 16039A7D296973E300CC73F4 /* XCRemoteSwiftPackageReference "async-http-client" */;
 			productName = AsyncHTTPClient;
-		};
-		165238FB298D58A40043BB26 /* AsyncAlgorithms */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 165238FA298D58A40043BB26 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
-			productName = AsyncAlgorithms;
-		};
-		165238FD298D603E0043BB26 /* AsyncAlgorithms */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 165238FA298D58A40043BB26 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
-			productName = AsyncAlgorithms;
 		};
 /* End XCSwiftPackageProductDependency section */
 

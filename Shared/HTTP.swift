@@ -30,7 +30,7 @@ extension ByteBuffer {
 }
 
 enum HTTP {
-    private static let gateKeeper = GateKeeper(entries: 8)
+    private static let gateKeeper = Gate(tickets: 8)
 
     #if DEBUG
         #if os(iOS)
@@ -52,9 +52,9 @@ enum HTTP {
                                                                                        decompression: .enabled(limit: .none)))
 
     static func getJsonData(for request: HTTPClientRequest, attempts: Int, checkCache: Bool) async throws -> (json: Any, result: DataResult) {
-        await gateKeeper.waitForGate()
+        await gateKeeper.takeTicket()
         defer {
-            gateKeeper.signalGate()
+            gateKeeper.relaxedReturnTicket()
         }
         let (result, data) = try await getData(for: request, attempts: attempts, checkCache: checkCache)
         if case .success = result, Settings.dumpAPIResponsesInConsole {

@@ -590,12 +590,12 @@ enum GraphQL {
     }
 
     private static var processTask: Task<Void, Never>?
-    private static let gateKeeper = GateKeeper(entries: 1)
+    private static let gateKeeper = Gate(tickets: 1)
 
     private static func processItems(_ nodes: [String: LinkedList<GQLNode>], _ server: ApiServer, parentType: (some ListableItem).Type? = nil, wait: Bool) async {
-        await gateKeeper.waitForGate() // ensure this is a critical path
+        await gateKeeper.takeTicket() // ensure this is a critical path
         defer {
-            gateKeeper.signalGate()
+            gateKeeper.relaxedReturnTicket()
         }
 
         if let p = processTask { // wait for any previous task
