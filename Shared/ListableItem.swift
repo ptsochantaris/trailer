@@ -9,6 +9,17 @@ import CoreSpotlight
     import Cocoa
 #endif
 
+struct PostProcessContext {
+    let excludedLabels = Set(Settings.labelBlacklist.map(\.comparableForm))
+    let excludedAuthors = Set(Settings.itemAuthorBlacklist.map(\.comparableForm))
+    let assumeReadItemIfUserHasNewerComments = Settings.assumeReadItemIfUserHasNewerComments
+    let hideUncommentedItems = Settings.hideUncommentedItems
+    let shouldSyncReviews = API.shouldSyncReviews
+    let shouldSyncReviewAssignments = API.shouldSyncReviewAssignments
+    let notifyOnItemReactions = Settings.notifyOnItemReactions
+    let notifyOnCommentReactions = Settings.notifyOnCommentReactions
+}
+
 class ListableItem: DataItem {
     enum StateChange: Int64 {
         case none, reopened, merged, closed
@@ -458,7 +469,7 @@ class ListableItem: DataItem {
     }
 
     private func canBadge(in targetSection: Section) -> Bool {
-        if muted || !targetSection.shouldBadgeComments || postSyncAction == PostSyncAction.isNew.rawValue {
+        if !targetSection.shouldBadgeComments || muted || postSyncAction == PostSyncAction.isNew.rawValue {
             return false
         }
 
@@ -469,7 +480,7 @@ class ListableItem: DataItem {
         return true
     }
 
-    final func postProcess() {
+    final func postProcess(context: PostProcessContext = PostProcessContext()) {
         if let s = snoozeUntil, s < Date() { // our snooze-by date is past
             disableSnoozing(explicityAwoke: true)
         }
@@ -509,9 +520,8 @@ class ListableItem: DataItem {
         }
 
         if targetSection != .none {
-            let excludeLabels = Settings.labelBlacklist
-            if !excludeLabels.isEmpty {
-                let excluded = Set(excludeLabels.map(\.comparableForm))
+            let excluded = context.excludedLabels
+            if !excluded.isEmpty {
                 let mine = Set(labels.compactMap { $0.name?.comparableForm })
                 if !excluded.isDisjoint(with: mine) {
                     targetSection = .none
@@ -520,7 +530,7 @@ class ListableItem: DataItem {
         }
 
         if targetSection != .none {
-            let excludeAuthors = Settings.itemAuthorBlacklist.map(\.comparableForm)
+            let excludeAuthors = context.excludedAuthors
             if !excludeAuthors.isEmpty, let login = userLogin?.comparableForm {
                 if excludeAuthors.contains(login) {
                     targetSection = .none
@@ -535,7 +545,7 @@ class ListableItem: DataItem {
         if canBadge(in: targetSection) {
             var latestDate = latestReadCommentDate ?? .distantPast
 
-            if Settings.assumeReadItemIfUserHasNewerComments {
+            if context.assumeReadItemIfUserHasNewerComments {
                 for c in myComments(since: latestDate) {
                     if let createdDate = c.createdAt, latestDate < createdDate {
                         latestDate = createdDate
@@ -543,14 +553,14 @@ class ListableItem: DataItem {
                 }
                 latestReadCommentDate = latestDate
             }
-            unreadComments = countOthersComments(since: latestDate)
+            unreadComments = countOthersComments(since: latestDate, context: context)
 
         } else {
             catchUpCommentDate()
             unreadComments = 0
         }
 
-        if Settings.hideUncommentedItems, unreadComments == 0 {
+        if targetSection != .none, context.hideUncommentedItems, unreadComments == 0 {
             targetSection = .none
         }
 
@@ -559,18 +569,20 @@ class ListableItem: DataItem {
             return
         }
 
-        let reviewCount: Int64
-        if let p = self as? PullRequest, API.shouldSyncReviews || API.shouldSyncReviewAssignments {
-            reviewCount = Int64(p.reviews.count)
-        } else {
-            reviewCount = 0
-        }
-
-        totalComments = Int64(comments.count)
-            + (Settings.notifyOnItemReactions ? Int64(reactions.count) : 0)
-            + (Settings.notifyOnCommentReactions ? countCommentReactions : 0)
+        if targetSection != .none {
+            let reviewCount: Int64
+            if let p = self as? PullRequest, context.shouldSyncReviews || context.shouldSyncReviewAssignments {
+                reviewCount = Int64(p.reviews.count)
+            } else {
+                reviewCount = 0
+            }
+            
+            totalComments = Int64(comments.count)
+            + (context.notifyOnItemReactions ? Int64(reactions.count) : 0)
+            + (context.notifyOnCommentReactions ? countCommentReactions : 0)
             + reviewCount
-
+        }
+        
         sectionIndex = targetSection.rawValue
     }
 
@@ -590,19 +602,19 @@ class ListableItem: DataItem {
         comments.filter { !$0.isMine && ($0.createdAt ?? .distantPast) > since }
     }
 
-    private final func countOthersComments(since: Date) -> Int64 {
+    private final func countOthersComments(since: Date, context: PostProcessContext) -> Int64 {
         var count: Int64 = 0
         for c in comments {
             if !c.isMine, (c.createdAt ?? .distantPast) > since {
                 count += 1
             }
-            if Settings.notifyOnCommentReactions {
+            if context.notifyOnCommentReactions {
                 for r in c.reactions where !r.isMine && (r.createdAt ?? .distantPast) > since {
                     count += 1
                 }
             }
         }
-        if Settings.notifyOnItemReactions {
+        if context.notifyOnItemReactions {
             for r in reactions where !r.isMine && (r.createdAt ?? .distantPast) > since {
                 count += 1
             }
