@@ -9,7 +9,7 @@ enum Theme {
 @NSApplicationMain
 final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUserNotificationCenterDelegate, NSOpenSavePanelDelegate, NSControlTextEditingDelegate {
     // Globals
-    var refreshTimer: Timer?
+    var refreshTask: Task<Void, Never>?
     var openingWindow = false
     var isManuallyScrolling = false
     var ignoreNextFocusLoss = false
@@ -584,7 +584,8 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
     }
 
     func preferencesSelected() {
-        refreshTimer = nil
+        refreshTask?.cancel()
+        refreshTask = nil
         showPreferencesWindow(andSelect: nil)
     }
 
@@ -682,12 +683,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
             let howLongUntilNextSync = Settings.refreshPeriod - howLongAgo
             if howLongUntilNextSync > 0 {
                 DLog("No need to refresh yet, will refresh in %@ sec", howLongUntilNextSync)
-                refreshTimer = Timer(repeats: false, interval: howLongUntilNextSync) { [weak self] in
-                    guard let self else { return }
-                    Task { @MainActor in
-                        await self.refreshTimerDone()
-                    }
-                }
+                setupRefreshTask(in: howLongUntilNextSync)
                 return
             }
         }
@@ -723,7 +719,8 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 
     @MainActor
     @objc private func refreshStarting() {
-        refreshTimer = nil
+        refreshTask?.cancel()
+        refreshTask = nil
 
         preferencesWindow?.updateActivity()
 
@@ -749,12 +746,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
             await updateAllMenus()
         }
 
-        refreshTimer = Timer(repeats: false, interval: TimeInterval(Settings.refreshPeriod)) { [weak self] in
-            guard let self else { return }
-            Task { @MainActor in
-                await self.refreshTimerDone()
-            }
-        }
+        setupRefreshTask(in: Settings.refreshPeriod)
 
         checkApiUsage()
     }
@@ -842,12 +834,13 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
     }
 
     @MainActor
-    private func refreshTimerDone() async {
-        refreshTimer = nil
-        if DataManager.appIsConfigured {
-            if preferencesWindow != nil {
-                preferencesDirty = true
-            } else {
+    private func setupRefreshTask(in timeToWait: TimeInterval) {
+        if let refreshTask, !refreshTask.isCancelled {
+            refreshTask.cancel()
+        }
+        refreshTask = Task {
+            try? await Task.sleep(nanoseconds: UInt64(timeToWait * 1000) * NSEC_PER_MSEC)
+            if !Task.isCancelled, DataManager.appIsConfigured {
                 await startRefresh()
             }
         }

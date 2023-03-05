@@ -1448,11 +1448,9 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
             Task {
                 await app.startRefresh()
             }
-        } else {
-            if app.refreshTimer == nil, Settings.refreshPeriod > 0.0 {
-                Task {
-                    await app.startRefreshIfItIsDue()
-                }
+        } else if Settings.refreshPeriod > 0 {
+            Task {
+                await app.startRefreshIfItIsDue()
             }
         }
         app.setUpdateCheckParameters()

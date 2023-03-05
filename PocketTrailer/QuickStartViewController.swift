@@ -21,7 +21,6 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 
     private let newServer = ApiServer.allApiServers(in: DataManager.main).first!
     private var token = ""
-    private var checkTimer: Timer?
     private var importExport: ImportExport!
 
     override func viewDidLoad() {
@@ -67,8 +66,6 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
         while API.isRefreshing {
             try? await Task.sleep(nanoseconds: 1 * NSEC_PER_SEC)
         }
-
-        checkTimer = nil
 
         if newServer.lastSyncSucceeded {
             await dismiss(animated: true)

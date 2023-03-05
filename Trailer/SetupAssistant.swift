@@ -12,7 +12,6 @@ final class SetupAssistant: NSWindow, NSWindowDelegate, NSControlTextEditingDele
     @IBOutlet private var importButton: NSButton!
 
     private let newServer = ApiServer.allApiServers(in: DataManager.main).first!
-    private var checkTimer: Timer?
 
     @MainActor
     override func awakeFromNib() {
@@ -65,11 +64,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate, NSControlTextEditingDele
                     quickstart.stringValue = "\nFetching your watchlist. This will take a moment…"
                     Settings.lastSuccessfulRefresh = nil
                     await app.startRefreshIfItIsDue()
-                    checkTimer = Timer(repeats: true, interval: 0.5) { [weak self] in
-                        Task { [weak self] in
-                            self?.checkRefreshDone()
-                        }
-                    }
+                    await checkRefreshDone()
                 } catch {
                     let alert = NSAlert()
                     alert.messageText = "Testing the token failed - please check that you have pasted your token correctly"
@@ -83,28 +78,28 @@ final class SetupAssistant: NSWindow, NSWindowDelegate, NSControlTextEditingDele
         }
     }
 
-    private func checkRefreshDone() {
-        let isRefreshing = API.isRefreshing
-        if !isRefreshing {
-            checkTimer = nil
+    private func checkRefreshDone() async {
+        while API.isRefreshing {
+            try? await Task.sleep(nanoseconds: 1 * NSEC_PER_SEC)
+        }
 
-            if newServer.lastSyncSucceeded {
-                close()
+        if newServer.lastSyncSucceeded {
+            close()
 
-                app.showPreferencesWindow(andSelect: 1)
+            app.showPreferencesWindow(andSelect: 1)
 
-                let alert = NSAlert()
-                alert.messageText = "Setup complete!"
-                alert.informativeText = "This tab contains your watchlist, with view settings for each repository. Be sure to enable only the repos you need, in order to keep API usage low. Trailer will load data from the active repositories once you close the preferences window.\n\nYou can tweak options & behaviour from the other tabs.\n\nTrailer has read-only access to your GitHub data, so feel free to experiment, you can't damage your data or settings on GitHub."
-                alert.addButton(withTitle: "OK")
-                alert.runModal()
-            } else {
-                let alert = NSAlert()
-                alert.messageText = "Syncing with this server failed - please check that your network connection is working and that you have pasted your token correctly"
-                alert.addButton(withTitle: "OK")
-                alert.beginSheetModal(for: self) { _ in
-                    self.normalState()
-                }
+            let alert = NSAlert()
+            alert.messageText = "Setup complete!"
+            alert.informativeText = "This tab contains your watchlist, with view settings for each repository. Be sure to enable only the repos you need, in order to keep API usage low. Trailer will load data from the active repositories once you close the preferences window.\n\nYou can tweak options & behaviour from the other tabs.\n\nTrailer has read-only access to your GitHub data, so feel free to experiment, you can't damage your data or settings on GitHub."
+            alert.addButton(withTitle: "OK")
+            alert.runModal()
+            
+        } else {
+            let alert = NSAlert()
+            alert.messageText = "Syncing with this server failed - please check that your network connection is working and that you have pasted your token correctly"
+            alert.addButton(withTitle: "OK")
+            alert.beginSheetModal(for: self) { _ in
+                self.normalState()
             }
         }
     }
