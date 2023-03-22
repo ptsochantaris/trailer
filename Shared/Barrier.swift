@@ -54,24 +54,4 @@ public final actor Barrier {
                 }
         }
     }
-
-    @discardableResult
-    func wait(seconds: Int) async -> Bool {
-        if let result = publisher.value.immediateResult {
-            return result
-        }
-
-        return await withTaskGroup(of: Bool.self) { group in
-            group.addTask {
-                await self.wait()
-            }
-            group.addTask {
-                try? await Task.sleep(nanoseconds: NSEC_PER_SEC * UInt64(seconds))
-                return false
-            }
-            let result = await group.next() ?? false
-            group.cancelAll()
-            return result
-        }
-    }
 }
