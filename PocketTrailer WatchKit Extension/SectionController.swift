@@ -37,13 +37,14 @@ final class SectionController: CommonController {
     override func table(_: WKInterfaceTable, didSelectRowAt rowIndex: Int) {
         let r = rowControllers[rowIndex] as! SectionRow
         let section = r.section?.rawValue ?? -1
-        pushController(withName: "ListController", context: [
+        let list = [
             SECTION_KEY: section,
             TYPE_KEY: r.type!,
             UNREAD_KEY: section == -1,
             GROUP_KEY: r.groupLabel!,
             API_URI_KEY: r.apiServerUri!
-        ])
+        ] as [String: Any]
+        pushController(withName: "ListController", context: list)
     }
 
     override func update(from response: [AnyHashable: Any]) {

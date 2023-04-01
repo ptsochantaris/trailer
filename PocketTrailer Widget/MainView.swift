@@ -95,7 +95,7 @@ struct MainView: View {
     var entry: Summary
 
     var body: some View {
-        let imageSize = 18
+        let imageSize: CGFloat = 18
         if let result = entry.data {
             VStack(spacing: 16) {
                 HStack(alignment: .top) {

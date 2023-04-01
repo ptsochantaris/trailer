@@ -301,21 +301,25 @@ final class WatchManager: NSObject, WCSessionDelegate {
                 let unreadIssueCount = Issue.badgeCount(in: tempMoc, criterion: c)
                 totalUnreadIssueCount += unreadIssueCount
 
+                let prList = [
+                    "mine": myPrs, "participated": participatedPrs, "mentioned": mentionedPrs,
+                    "merged": mergedPrs, "closed": closedPrs, "other": otherPrs, "snoozed": snoozedPrs,
+                    "total": totalPrs, "total_open": totalOpenPrs, "unread": unreadPrCount,
+                    "error": totalPrs == 0 ? PullRequest.reasonForEmpty(with: nil, criterion: c).string : ""
+                ] as [String: Any]
+                
+                let issueList = [
+                    "mine": myIssues, "participated": participatedIssues, "mentioned": mentionedIssues,
+                    "closed": closedIssues, "other": otherIssues, "snoozed": snoozedIssues,
+                    "total": totalIssues, "total_open": totalOpenIssues, "unread": unreadIssueCount,
+                    "error": totalIssues == 0 ? Issue.reasonForEmpty(with: nil, criterion: c).string : ""
+                ] as [String: Any]
+                
                 views.append([
                     "title": S(c?.label),
                     "apiUri": S(c?.apiServerId?.uriRepresentation().absoluteString),
-                    "prs": [
-                        "mine": myPrs, "participated": participatedPrs, "mentioned": mentionedPrs,
-                        "merged": mergedPrs, "closed": closedPrs, "other": otherPrs, "snoozed": snoozedPrs,
-                        "total": totalPrs, "total_open": totalOpenPrs, "unread": unreadPrCount,
-                        "error": totalPrs == 0 ? PullRequest.reasonForEmpty(with: nil, criterion: c).string : ""
-                    ],
-                    "issues": [
-                        "mine": myIssues, "participated": participatedIssues, "mentioned": mentionedIssues,
-                        "closed": closedIssues, "other": otherIssues, "snoozed": snoozedIssues,
-                        "total": totalIssues, "total_open": totalOpenIssues, "unread": unreadIssueCount,
-                        "error": totalIssues == 0 ? Issue.reasonForEmpty(with: nil, criterion: c).string : ""
-                    ]
+                    "prs": prList,
+                    "issues": issueList
                 ])
             }
             let badgeCount = totalUnreadPrCount + totalUnreadIssueCount
