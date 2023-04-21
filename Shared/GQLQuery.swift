@@ -131,7 +131,7 @@ struct GQLQuery {
 
     static func runQueries(queries: LinkedList<GQLQuery>, on path: String, token: String) async throws -> ApiStats? {
         try await withThrowingTaskGroup(of: ApiStats?.self, returning: ApiStats?.self) { group in
-            let gateKeeper = Gate(tickets: 1) // two concurrent GQL queries can run at a time
+            let gateKeeper = Gate(tickets: 3)
 
             for query in queries {
                 group.addTask { @MainActor in
