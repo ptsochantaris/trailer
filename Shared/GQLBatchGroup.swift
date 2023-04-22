@@ -6,9 +6,9 @@ struct GQLBatchGroup: GQLScanning {
     private let idsToGroups: [String: GQLGroup]
     private let originalTemplate: GQLGroup
     private let nextCount: Int
-    private let batchSize: Int
+    private let batchLimit: Int
 
-    init(templateGroup: GQLGroup, idList: [String], startingCount: Int = 0, batchSize: Int) {
+    init(templateGroup: GQLGroup, idList: [String], startingCount: Int = 0, batchLimit: Int) {
         var index = startingCount
         var id2g = [String: GQLGroup]()
         id2g.reserveCapacity(idList.count)
@@ -19,7 +19,13 @@ struct GQLBatchGroup: GQLScanning {
         originalTemplate = templateGroup
         idsToGroups = id2g
         nextCount = index
-        self.batchSize = batchSize
+        self.batchLimit = batchLimit
+    }
+    
+    static func recommendedLimit(for template: GQLGroup) -> Int {
+        let templateCost = Float(template.nodeCost)
+        let estimatedBatchSize = (500000 / templateCost).rounded(.down)
+        return min(100, max(1, Int(estimatedBatchSize)))
     }
     
     var nodeCost: Int {
@@ -49,7 +55,7 @@ struct GQLBatchGroup: GQLScanning {
 
     private var pageOfIds: ArraySlice<String> {
         let k = idsToGroups.keys.sorted()
-        let chunkLimit = min(batchSize, k.count)
+        let chunkLimit = min(batchLimit, k.count)
         return k[0 ..< chunkLimit]
     }
 
@@ -62,7 +68,7 @@ struct GQLBatchGroup: GQLScanning {
         let page = pageOfIds
         let newIds = idsToGroups.keys.filter { !page.contains($0) }
         if !newIds.isEmpty {
-            let nextPage = GQLQuery(name: query.name, rootElement: GQLBatchGroup(templateGroup: originalTemplate, idList: newIds, startingCount: nextCount, batchSize: batchSize), parent: parent)
+            let nextPage = GQLQuery(name: query.name, rootElement: GQLBatchGroup(templateGroup: originalTemplate, idList: newIds, startingCount: nextCount, batchLimit: batchLimit), parent: parent)
             extraQueries.append(nextPage)
         }
 

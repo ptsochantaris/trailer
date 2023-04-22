@@ -18,14 +18,19 @@ struct GQLQuery {
         perNodeBlock = perNode
     }
 
-    static func batching(_ name: String, fields: [GQLElement], idList: [String], batchSize: Int, perNode: PerNodeBlock? = nil) -> LinkedList<GQLQuery> {
+    static func batching(_ name: String, fields: [GQLElement], idList: [String], perNode: PerNodeBlock? = nil) -> LinkedList<GQLQuery> {
         var list = idList
         let queries = LinkedList<GQLQuery>()
+        let template = GQLGroup(name: "items", fields: fields)
+        
+        let batchLimit = GQLBatchGroup.recommendedLimit(for: template)
+        DLog("(GQL '\(name)') Batch size: \(batchLimit)")
+
         while !list.isEmpty {
-            let segment = list.prefix(batchSize)
+            let segment = list.prefix(batchLimit)
             list.removeFirst(segment.count)
 
-            let batchGroup = GQLBatchGroup(templateGroup: GQLGroup(name: "items", fields: fields), idList: Array(segment), batchSize: batchSize)
+            let batchGroup = GQLBatchGroup(templateGroup: template, idList: Array(segment), batchLimit: batchLimit)
             let query = GQLQuery(name: name, rootElement: batchGroup, perNode: perNode)
             queries.append(query)
         }

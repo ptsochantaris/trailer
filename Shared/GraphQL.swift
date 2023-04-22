@@ -204,7 +204,7 @@ enum GraphQL {
             let ids = items.compactMap(\.nodeId)
             var nodes = [String: LinkedList<GQLNode>]()
             let serverName = server.label ?? "<no label>"
-            let queries = GQLQuery.batching("\(serverName): \(name)", fields: fields, idList: ids, batchSize: 100) { node in
+            let queries = GQLQuery.batching("\(serverName): \(name)", fields: fields, idList: ids) { node in
                 let type = node.elementType
                 if let existingList = nodes[type] {
                     existingList.append(node)
@@ -393,7 +393,10 @@ enum GraphQL {
         }
 
         let prGroup = GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 1, includeRepo: true)])
-        let group = GQLBatchGroup(templateGroup: prGroup, idList: prsToCheck.compactMap(\.nodeId), batchSize: 100)
+        let batchLimit = GQLBatchGroup.recommendedLimit(for: prGroup)
+        DLog("(GQL 'Closed Authored PRs') Batch size: \(batchLimit)")
+        
+        let group = GQLBatchGroup(templateGroup: prGroup, idList: prsToCheck.compactMap(\.nodeId), batchLimit: batchLimit)
         let nodes = LinkedList<GQLNode>()
         let query = GQLQuery(name: "Closed Authored PRs", rootElement: group, allowsEmptyResponse: true) { node in
             node.forcedUpdate = true
@@ -502,12 +505,12 @@ enum GraphQL {
             }
 
             if idsForReposInThisServerWantingLatestPrs.count > 0 {
-                let q = GQLQuery.batching("\(serverLabel): Updated PRs", fields: [latestPrsFragment], idList: Array(idsForReposInThisServerWantingLatestPrs), batchSize: 10, perNode: perNodeBlock)
+                let q = GQLQuery.batching("\(serverLabel): Updated PRs", fields: [latestPrsFragment], idList: Array(idsForReposInThisServerWantingLatestPrs), perNode: perNodeBlock)
                 queriesForServer.append(contentsOf: q)
             }
 
             if idsForReposInThisServerWantingAllOpenPrs.count > 0 {
-                let q = GQLQuery.batching("\(serverLabel): Open PRs", fields: [allOpenPrsFragment], idList: Array(idsForReposInThisServerWantingAllOpenPrs), batchSize: 100, perNode: perNodeBlock)
+                let q = GQLQuery.batching("\(serverLabel): Open PRs", fields: [allOpenPrsFragment], idList: Array(idsForReposInThisServerWantingAllOpenPrs), perNode: perNodeBlock)
                 queriesForServer.append(contentsOf: q)
             }
 
@@ -582,12 +585,12 @@ enum GraphQL {
             }
 
             if idsForReposInThisServerWantingLatestIssues.count > 0 {
-                let q = GQLQuery.batching("\(serverLabel): Updated Issues", fields: [latestIssuesFragment], idList: Array(idsForReposInThisServerWantingLatestIssues), batchSize: 10, perNode: perNodeBlock)
+                let q = GQLQuery.batching("\(serverLabel): Updated Issues", fields: [latestIssuesFragment], idList: Array(idsForReposInThisServerWantingLatestIssues), perNode: perNodeBlock)
                 queriesForServer.append(contentsOf: q)
             }
 
             if idsForReposInThisServerWantingAllOpenIssues.count > 0 {
-                let q = GQLQuery.batching("\(serverLabel): Open Issues", fields: [allOpenIssuesFragment], idList: Array(idsForReposInThisServerWantingAllOpenIssues), batchSize: 100, perNode: perNodeBlock)
+                let q = GQLQuery.batching("\(serverLabel): Open Issues", fields: [allOpenIssuesFragment], idList: Array(idsForReposInThisServerWantingAllOpenIssues), perNode: perNodeBlock)
                 queriesForServer.append(contentsOf: q)
             }
 
