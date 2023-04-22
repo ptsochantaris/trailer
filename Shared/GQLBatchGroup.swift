@@ -21,7 +21,16 @@ struct GQLBatchGroup: GQLScanning {
         nextCount = index
         self.batchSize = batchSize
     }
-
+    
+    var nodeCost: Int {
+        if let templateGroup = idsToGroups.values.first {
+            let count = pageOfIds.count
+            return count + count * templateGroup.nodeCost
+        } else {
+            return 0
+        }
+    }
+    
     var queryText: String {
         if let templateGroup = idsToGroups.values.first {
             return "nodes(ids: [\"" + pageOfIds.joined(separator: "\",\"") + "\"]) { " + templateGroup.fields.map(\.queryText).joined(separator: " ") + " }"
@@ -38,10 +47,10 @@ struct GQLBatchGroup: GQLScanning {
         return res
     }
 
-    private var pageOfIds: [String] {
+    private var pageOfIds: ArraySlice<String> {
         let k = idsToGroups.keys.sorted()
-        let max = min(batchSize, k.count)
-        return Array(k[0 ..< max])
+        let chunkLimit = min(batchSize, k.count)
+        return k[0 ..< chunkLimit]
     }
 
     func scan(query: GQLQuery, pageData: Any, parent: GQLNode?) async -> LinkedList<GQLQuery> {

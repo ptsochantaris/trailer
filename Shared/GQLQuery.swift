@@ -49,13 +49,6 @@ struct GQLQuery {
         fragmentQueryText + " { " + rootQueryText + " rateLimit { limit cost remaining resetAt nodeCount } }"
     }
 
-    private static let qlQueue: OperationQueue = {
-        let q = OperationQueue()
-        q.maxConcurrentOperationCount = 2
-        q.qualityOfService = .background
-        return q
-    }()
-
     var logPrefix: String {
         "(GQL '\(name)') "
     }
@@ -84,10 +77,14 @@ struct GQLQuery {
             }
 
             apiStats = ApiStats.fromV4(json: json["data"] as? [AnyHashable: Any])
-            if let s = apiStats {
-                DLog("\(logPrefix)Received page (Cost: \(s.cost), Remaining: \(s.remaining)/\(s.limit) - Node Count: \(s.nodeCount))")
+            let expectedNodeCost = self.rootElement.nodeCost
+            if let apiStats {
+                DLog("\(logPrefix)Received page (Cost: \(apiStats.cost), Remaining: \(apiStats.remaining)/\(apiStats.limit) - Expected Count: \(expectedNodeCost) - Returned Count: \(apiStats.nodeCount))")
+                if expectedNodeCost != apiStats.nodeCount {
+                    DLog("Warning: Mismatched expected and received node count!")
+                }
             } else {
-                DLog("\(logPrefix)Received page (No stats)")
+                DLog("\(logPrefix)Received page (No stats) - Expected Count: \(expectedNodeCost)")
             }
 
             let allData = json["data"] as? [AnyHashable: Any]

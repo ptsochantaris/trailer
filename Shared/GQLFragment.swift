@@ -2,10 +2,14 @@ import Foundation
 
 struct GQLFragment: GQLScanning, Hashable {
     let name: String
-
+    
     private let elements: [GQLElement]
     private let type: String
 
+    var nodeCost: Int {
+        elements.reduce(0) { $0 + $1.nodeCost }
+    }
+    
     var queryText: String {
         "... \(name)"
     }

@@ -28,7 +28,16 @@ struct GQLGroup: GQLScanning {
         noPaging = group.noPaging
         self.lastCursor = lastCursor
     }
-
+    
+    var nodeCost: Int {
+        let fieldCost = fields.reduce(0) { $0 + $1.nodeCost }
+        if pageSize == 0 {
+            return fieldCost
+        }
+        let count = onlyLast ? 1 : pageSize
+        return count + fieldCost * count
+    }
+    
     var queryText: String {
         var query = name
         let brackets = LinkedList<String>()
