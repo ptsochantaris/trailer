@@ -90,7 +90,7 @@ enum GraphQL {
                     idField,
                     GQLGroup(name: "requestedReviewer", fields: [userFragment, teamFragment, mannequinFragment])
                 ])
-                elements.append(GQLGroup(name: "reviewRequests", fields: [requestFragment], pageSize: 100))
+                elements.append(GQLGroup(name: "reviewRequests", fields: [requestFragment], paging: .max))
             }
 
             if steps.contains(.reviews) {
@@ -108,7 +108,7 @@ enum GraphQL {
                     GQLField(name: "updatedAt"),
                     GQLGroup(name: "author", fields: [userFragment])
                 ])
-                elements.append(GQLGroup(name: "reviews", fields: [reviewFragment], pageSize: 100))
+                elements.append(GQLGroup(name: "reviews", fields: [reviewFragment], paging: .max))
             }
 
             if steps.contains(.statuses) {
@@ -123,13 +123,13 @@ enum GraphQL {
                 elements.append(GQLGroup(name: "commits", fields: [
                     GQLGroup(name: "commit", fields: [
                         GQLGroup(name: "checkSuites", fields: [
-                            GQLGroup(name: "checkRuns", fields: [checkFragment], pageSize: 50, noPaging: true)
-                        ], pageSize: 10, noPaging: true),
+                            GQLGroup(name: "checkRuns", fields: [checkFragment], paging: .first(count: 50, paging: false))
+                        ], paging: .first(count: 10, paging: false)),
                         GQLGroup(name: "status", fields: [
                             GQLGroup(name: "contexts", fields: [statusFragment])
                         ])
                     ])
-                ], pageSize: 1, onlyLast: true))
+                ], paging: .last(count: 1)))
             }
         }
 
@@ -148,7 +148,7 @@ enum GraphQL {
                 GQLField(name: "createdAt"),
                 GQLGroup(name: "user", fields: [userFragment])
             ])
-            elements.append(GQLGroup(name: "reactions", fields: [reactionFragment], pageSize: 100))
+            elements.append(GQLGroup(name: "reactions", fields: [reactionFragment], paging: .max))
         }
 
         if steps.contains(.comments) {
@@ -158,7 +158,7 @@ enum GraphQL {
                 }
             }
             let commentFragment = GQLFragment(on: "IssueComment", elements: commentFields)
-            elements.append(GQLGroup(name: "comments", fields: [commentFragment], pageSize: 100))
+            elements.append(GQLGroup(name: "comments", fields: [commentFragment], paging: .max))
         }
 
         let fields = [GQLFragment(on: typeName, elements: Array(elements))]
@@ -175,7 +175,7 @@ enum GraphQL {
 
         let itemFragment = GQLFragment(on: "IssueComment", elements: [
             idField,
-            GQLGroup(name: "reactions", fields: [reactionFragment], pageSize: 100)
+            GQLGroup(name: "reactions", fields: [reactionFragment], paging: .max)
         ])
 
         try await process(name: "Comment Reactions", items: comments, fields: [itemFragment])
@@ -186,7 +186,7 @@ enum GraphQL {
 
         let itemFragment = GQLFragment(on: "PullRequestReview", elements: [
             idField,
-            GQLGroup(name: "comments", fields: [commentFragment], pageSize: 100)
+            GQLGroup(name: "comments", fields: [commentFragment], paging: .max)
         ])
 
         try await process(name: "Review Comments", items: reviews, fields: [itemFragment])
@@ -273,8 +273,8 @@ enum GraphQL {
             GQLField(name: "url"),
             GQLGroup(name: "milestone", fields: [milestoneFragment]),
             GQLGroup(name: "author", fields: [userFragment]),
-            GQLGroup(name: "assignees", fields: [userFragment], pageSize: assigneesAndLabelPageSize),
-            GQLGroup(name: "labels", fields: [labelFragment], pageSize: assigneesAndLabelPageSize),
+            GQLGroup(name: "assignees", fields: [userFragment], paging: .first(count: assigneesAndLabelPageSize, paging: true)),
+            GQLGroup(name: "labels", fields: [labelFragment], paging: .first(count: assigneesAndLabelPageSize, paging: true)),
             GQLField(name: "headRefOid"),
             GQLField(name: "mergeable"),
             GQLField(name: "additions"),
@@ -304,8 +304,8 @@ enum GraphQL {
             GQLField(name: "url"),
             GQLGroup(name: "milestone", fields: [milestoneFragment]),
             GQLGroup(name: "author", fields: [userFragment]),
-            GQLGroup(name: "assignees", fields: [userFragment], pageSize: assigneesAndLabelPageSize),
-            GQLGroup(name: "labels", fields: [labelFragment], pageSize: assigneesAndLabelPageSize)
+            GQLGroup(name: "assignees", fields: [userFragment], paging: .first(count: assigneesAndLabelPageSize, paging: true)),
+            GQLGroup(name: "labels", fields: [labelFragment], paging: .first(count: assigneesAndLabelPageSize, paging: true))
         ]
         if includeRepo {
             elements.append(GQLGroup(name: "repository", fields: [repositoryFragment]))
@@ -317,7 +317,7 @@ enum GraphQL {
         await withTaskGroup(of: Void.self) { group in
             for server in servers {
                 if Settings.queryAuthoredPRs {
-                    let g = GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 20, includeRepo: true)], extraParams: ["states": "OPEN"], pageSize: 100)
+                    let g = GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 20, includeRepo: true)], extraParams: ["states": "OPEN"], paging: .max)
                     group.addTask { @MainActor in
                         if let nodes = await fetchAllAuthoredItems(from: server, fields: [g]) {
                             await checkAuthoredPrClosures(nodes: nodes, in: server)
@@ -334,7 +334,7 @@ enum GraphQL {
         await withTaskGroup(of: Void.self) { group in
             for server in servers {
                 if Settings.queryAuthoredIssues {
-                    let g = GQLGroup(name: "issues", fields: [issueFragment(assigneesAndLabelPageSize: 20, includeRepo: true)], extraParams: ["states": "OPEN"], pageSize: 100)
+                    let g = GQLGroup(name: "issues", fields: [issueFragment(assigneesAndLabelPageSize: 20, includeRepo: true)], extraParams: ["states": "OPEN"], paging: .max)
                     group.addTask { @MainActor in
                         if let nodes = await fetchAllAuthoredItems(from: server, fields: [g]) {
                             checkAuthoredIssueClosures(nodes: nodes, in: server)
@@ -426,22 +426,22 @@ enum GraphQL {
 
     private static let latestPrsFragment = GQLFragment(on: "Repository", elements: [
         idField,
-        GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["orderBy": "{direction: DESC, field: UPDATED_AT}"], pageSize: 20)
+        GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["orderBy": "{direction: DESC, field: UPDATED_AT}"], paging: .first(count: 20, paging: true))
     ])
 
     private static let latestIssuesFragment = GQLFragment(on: "Repository", elements: [
         idField,
-        GQLGroup(name: "issues", fields: [issueFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["orderBy": "{direction: DESC, field: UPDATED_AT}"], pageSize: 40)
+        GQLGroup(name: "issues", fields: [issueFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["orderBy": "{direction: DESC, field: UPDATED_AT}"], paging: .first(count: 40, paging: true))
     ])
 
     private static let allOpenPrsFragment = GQLFragment(on: "Repository", elements: [
         idField,
-        GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["states": "OPEN"], pageSize: 50)
+        GQLGroup(name: "pullRequests", fields: [prFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["states": "OPEN"], paging: .first(count: 50, paging: true))
     ])
 
     private static let allOpenIssuesFragment = GQLFragment(on: "Repository", elements: [
         idField,
-        GQLGroup(name: "issues", fields: [issueFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["states": "OPEN"], pageSize: 50)
+        GQLGroup(name: "issues", fields: [issueFragment(assigneesAndLabelPageSize: 20, includeRepo: false)], extraParams: ["states": "OPEN"], paging: .first(count: 50, paging: true))
     ])
 
     static func fetchAllSubscribedPrs(from repos: [Repo]) async {

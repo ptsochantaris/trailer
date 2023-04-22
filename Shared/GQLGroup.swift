@@ -1,20 +1,20 @@
 import Foundation
 
 struct GQLGroup: GQLScanning {
+    enum Paging {
+        case none, first(count: Int, paging: Bool), last(count: Int), max
+    }
+
     let name: String
     let fields: [GQLElement]
-    private let pageSize: Int
-    private let onlyLast: Bool
-    private let noPaging: Bool
+    let paging: Paging
     private let extraParams: [String: String]?
     private let lastCursor: String?
-
-    init(name: String, fields: [GQLElement], extraParams: [String: String]? = nil, pageSize: Int = 0, onlyLast: Bool = false, noPaging: Bool = false) {
+    
+    init(name: String, fields: [GQLElement], extraParams: [String: String]? = nil, paging: Paging = .none) {
         self.name = name
         self.fields = fields
-        self.pageSize = pageSize
-        self.onlyLast = onlyLast
-        self.noPaging = noPaging || onlyLast
+        self.paging = paging
         self.extraParams = extraParams
         lastCursor = nil
     }
@@ -22,37 +22,49 @@ struct GQLGroup: GQLScanning {
     init(group: GQLGroup, name: String? = nil, lastCursor: String? = nil) {
         self.name = name ?? group.name
         fields = group.fields
-        pageSize = group.pageSize
-        onlyLast = group.onlyLast
+        paging = group.paging
         extraParams = group.extraParams
-        noPaging = group.noPaging
         self.lastCursor = lastCursor
     }
-    
+            
     var nodeCost: Int {
         let fieldCost = fields.reduce(0) { $0 + $1.nodeCost }
-        if pageSize == 0 {
+        switch paging {
+        case .none:
             return fieldCost
+            
+        case .max:
+            return 100 + fieldCost * 100
+            
+        case let .first(count, _), let .last(count):
+            return count + fieldCost * count
         }
-        let count = onlyLast ? 1 : pageSize
-        return count + fieldCost * count
     }
     
     var queryText: String {
         var query = name
         let brackets = LinkedList<String>()
 
-        if pageSize > 0 {
-            if onlyLast {
-                brackets.append("last: 1")
-            } else {
-                brackets.append("first: \(pageSize)")
-                if let lastCursor {
-                    brackets.append("after: \"\(lastCursor)\"")
-                }
+        switch paging {
+        case .none:
+            break
+            
+        case let .last(count):
+            brackets.append("last: \(count)")
+            
+        case .max:
+            brackets.append("first: 100")
+            if let lastCursor {
+                brackets.append("after: \"\(lastCursor)\"")
+            }
+
+        case let .first(count, useCursor):
+            brackets.append("first: \(count)")
+            if useCursor, let lastCursor {
+                brackets.append("after: \"\(lastCursor)\"")
             }
         }
-
+        
         if let e = extraParams {
             for (k, v) in e {
                 brackets.append("\(k): \(v)")
@@ -65,16 +77,24 @@ struct GQLGroup: GQLScanning {
 
         let fieldsText = "__typename " + fields.map(\.queryText).joined(separator: " ")
 
-        if pageSize > 0 {
-            if noPaging {
-                query += " { edges { node { " + fieldsText + " } } }"
-            } else {
-                query += " { edges { node { " + fieldsText + " } cursor } pageInfo { hasNextPage } }"
-            }
-        } else {
+        switch paging {
+        case .none:
             query += " { " + fieldsText + " }"
-        }
 
+        case let .first(_, paging):
+            if paging {
+                query += " { edges { node { " + fieldsText + " } cursor } pageInfo { hasNextPage } }"
+            } else {
+                query += " { edges { node { " + fieldsText + " } } }"
+            }
+
+        case .max:
+            query += " { edges { node { " + fieldsText + " } cursor } pageInfo { hasNextPage } }"
+
+        case .last:
+            query += " { edges { node { " + fieldsText + " } } }"
+        }
+        
         return query
     }
 
