@@ -113,17 +113,13 @@ extension API {
                     }
                 }
             }
+            
             let newOrUpdatedIssues = DataItem.newOrUpdatedItems(of: Issue.self, in: moc, fromSuccessfulSyncOnly: true)
+            try await GraphQL.update(for: newOrUpdatedIssues, steps: steps)
 
-            try await withThrowingTaskGroup(of: Void.self) { group in
-                group.addTask { @MainActor in
-                    if Settings.notifyOnItemReactions {
-                        let ri = Issue.reactionCheckBatch(for: Issue.self, in: moc)
-                        try await GraphQL.update(for: ri, steps: [.reactions])
-                    }
-                }
-
-                try await GraphQL.update(for: newOrUpdatedIssues, steps: steps)
+            if Settings.notifyOnItemReactions {
+                let ri = Issue.reactionCheckBatch(for: Issue.self, in: moc)
+                try await GraphQL.update(for: ri, steps: [.reactions])
             }
         }
 
