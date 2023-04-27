@@ -1,7 +1,8 @@
 import Foundation
 
 struct GQLBatchGroup: GQLScanning {
-    let name = "nodes"
+    let id: UUID
+    let name: String
 
     private let idsToGroups: [String: GQLGroup]
     private let originalTemplate: GQLGroup
@@ -9,6 +10,8 @@ struct GQLBatchGroup: GQLScanning {
     private let batchLimit: Int
 
     init(templateGroup: GQLGroup, idList: [String], startingCount: Int = 0, batchLimit: Int) {
+        id = UUID()
+        name = "nodes"
         var index = startingCount
         var id2g = [String: GQLGroup]()
         id2g.reserveCapacity(idList.count)
@@ -20,6 +23,32 @@ struct GQLBatchGroup: GQLScanning {
         idsToGroups = id2g
         nextCount = index
         self.batchLimit = batchLimit
+    }
+    
+    init(cloning: GQLBatchGroup, idsToGroups: [String: GQLGroup]) {
+        self.id = cloning.id
+        self.name = cloning.name
+        self.idsToGroups = idsToGroups
+        self.originalTemplate = cloning.originalTemplate
+        self.nextCount = cloning.nextCount
+        self.batchLimit = cloning.batchLimit
+    }
+    
+    func asShell(for element: GQLElement) -> GQLElement? {
+        if id == element.id {
+            return element
+        }
+        
+        var replacementIdsToGroups = [String: GQLGroup]()
+        for (id, group) in idsToGroups {
+            if let groupShell = group.asShell(for: element) as? GQLGroup {
+                replacementIdsToGroups[id] = groupShell
+            }
+        }
+        if replacementIdsToGroups.isEmpty {
+            return nil
+        }
+        return GQLBatchGroup(cloning: self, idsToGroups: replacementIdsToGroups)
     }
     
     static func recommendedLimit(for template: GQLGroup) -> Int {

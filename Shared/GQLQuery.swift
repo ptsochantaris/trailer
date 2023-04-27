@@ -5,8 +5,8 @@ import NIOCore
 struct GQLQuery {
     let name: String
     let perNodeBlock: PerNodeBlock?
-
-    private let rootElement: GQLScanning
+    let rootElement: GQLScanning
+    
     private let parent: GQLNode?
     private let allowsEmptyResponse: Bool
 
@@ -16,6 +16,14 @@ struct GQLQuery {
         self.name = name
         self.allowsEmptyResponse = allowsEmptyResponse
         perNodeBlock = perNode
+    }
+    
+    init(from query: GQLQuery, with newRootElement: GQLScanning) {
+        self.rootElement = newRootElement
+        self.parent = query.parent
+        self.name = query.name
+        self.allowsEmptyResponse = query.allowsEmptyResponse
+        self.perNodeBlock = query.perNodeBlock
     }
 
     static func batching(_ name: String, fields: [GQLElement], idList: [String], perNode: PerNodeBlock? = nil) -> LinkedList<GQLQuery> {
@@ -38,8 +46,8 @@ struct GQLQuery {
     }
 
     private var rootQueryText: String {
-        if let parentItem = parent {
-            return "node(id: \"\(parentItem.id)\") { ... on \(parentItem.elementType) { " + rootElement.queryText + " } }"
+        if let parent {
+            return "node(id: \"\(parent.id)\") { ... on \(parent.elementType) { " + rootElement.queryText + " } }"
         } else {
             return rootElement.queryText
         }
@@ -103,17 +111,16 @@ struct GQLQuery {
                 }
             }
 
-            let r = rootElement
-            guard let topData = data[r.name] else {
+            guard let topData = data[rootElement.name] else {
                 if allowsEmptyResponse {
                     return apiStats
                 } else {
                     throw API.apiError("\(logPrefix)No data in JSON")
                 }
             }
-
+            
             do {
-                let extraQueries = await r.scan(query: self, pageData: topData, parent: parent)
+                let extraQueries = await rootElement.scan(query: self, pageData: topData, parent: parent)
                 if extraQueries.count == 0 {
                     DLog("\(logPrefix)Parsed all pages")
                 } else {

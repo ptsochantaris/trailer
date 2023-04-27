@@ -13,7 +13,7 @@ typealias PerNodeBlock = @NodeActor (GQLNode) async throws -> Void
 enum GraphQL {
     private static let nodeBlockMax = 2000
 
-    private static let idField = GQLField(name: "id")
+    static let idField = GQLField(name: "id")
 
     private static let nameWithOwnerField = GQLField(name: "nameWithOwner")
 

@@ -1,6 +1,7 @@
 import Foundation
 
 struct GQLFragment: GQLScanning, Hashable {
+    let id: UUID
     let name: String
     
     private let elements: [GQLElement]
@@ -12,6 +13,21 @@ struct GQLFragment: GQLScanning, Hashable {
     
     var queryText: String {
         "... \(name)"
+    }
+    
+    func asShell(for element: GQLElement) -> GQLElement? {
+        if element.id == id {
+            return element
+        }
+        
+        var elementsToKeep = elements.compactMap { $0.asShell(for: element) }
+        if elementsToKeep.isEmpty {
+            return nil
+        }
+        if let idField = elements.first(where: { $0.name == GraphQL.idField.name }) {
+            elementsToKeep.append(idField)
+        }
+        return GQLFragment(cloning: self, elements: elementsToKeep)
     }
 
     var declaration: String {
@@ -26,7 +42,15 @@ struct GQLFragment: GQLScanning, Hashable {
         return res
     }
 
+    init(cloning: GQLFragment, elements: [GQLElement]) {
+        self.id = cloning.id
+        self.name = cloning.name
+        self.type = cloning.type
+        self.elements = elements
+    }
+
     init(on type: String, elements: [GQLElement]) {
+        id = UUID()
         name = type.lowercased() + "Fragment"
         self.type = type
         self.elements = elements

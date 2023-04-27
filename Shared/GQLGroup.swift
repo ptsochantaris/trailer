@@ -5,6 +5,7 @@ struct GQLGroup: GQLScanning {
         case none, first(count: Int, paging: Bool), last(count: Int), max
     }
 
+    let id: UUID
     let name: String
     let fields: [GQLElement]
     let paging: Paging
@@ -12,6 +13,7 @@ struct GQLGroup: GQLScanning {
     private let lastCursor: String?
     
     init(name: String, fields: [GQLElement], extraParams: [String: String]? = nil, paging: Paging = .none) {
+        id = UUID()
         self.name = name
         self.fields = fields
         self.paging = paging
@@ -19,14 +21,27 @@ struct GQLGroup: GQLScanning {
         lastCursor = nil
     }
 
-    init(group: GQLGroup, name: String? = nil, lastCursor: String? = nil) {
+    init(group: GQLGroup, name: String? = nil, lastCursor: String? = nil, replacedFields: [GQLElement]? = nil) {
+        self.id = group.id
         self.name = name ?? group.name
-        fields = group.fields
+        fields = replacedFields ?? group.fields
         paging = group.paging
         extraParams = group.extraParams
         self.lastCursor = lastCursor
     }
-            
+    
+    func asShell(for element: GQLElement) -> GQLElement? {
+        if element.id == id {
+            return element
+        }
+        
+        let replacementFields = fields.compactMap { $0.asShell(for: element) }
+        if replacementFields.isEmpty {
+            return nil
+        }
+        return GQLGroup(group: self, replacedFields: replacementFields)
+    }
+
     var nodeCost: Int {
         let fieldCost = fields.reduce(0) { $0 + $1.nodeCost }
         switch paging {
@@ -150,8 +165,10 @@ struct GQLGroup: GQLScanning {
            let latestCursor = edges.last?["cursor"] as? String,
            let pageInfo, pageInfo["hasNextPage"] as? Bool == true {
             let newGroup = GQLGroup(group: self, lastCursor: latestCursor)
-            let nextPage = GQLQuery(name: query.name, rootElement: newGroup, parent: parent, perNode: query.perNodeBlock)
-            extraQueries.append(nextPage)
+            if let shellRootElement = query.rootElement.asShell(for: newGroup) as? GQLScanning {
+                let nextPage = GQLQuery(from: query, with: shellRootElement)
+                extraQueries.append(nextPage)
+            }
         }
         return extraQueries
     }
