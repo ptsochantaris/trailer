@@ -4,20 +4,22 @@ struct GQLGroup: GQLScanning {
     enum Paging {
         case none, first(count: Int, paging: Bool), last(count: Int), max
     }
+    
+    typealias Param = (name: String, value: LosslessStringConvertible)
 
     let id: UUID
     let name: String
     let fields: [GQLElement]
     let paging: Paging
-    private let extraParams: [String: String]?
+    private let extraParams: [Param]
     private let lastCursor: String?
     
-    init(name: String, fields: [GQLElement], extraParams: [String: String]? = nil, paging: Paging = .none) {
+    init(_ name: String, _ params: Param..., paging: Paging = .none, @GQLElementsBuilder fields: () -> [GQLElement]) {
         id = UUID()
         self.name = name
-        self.fields = fields
+        self.fields = fields()
         self.paging = paging
-        self.extraParams = extraParams
+        self.extraParams = params
         lastCursor = nil
     }
 
@@ -80,12 +82,14 @@ struct GQLGroup: GQLScanning {
             }
         }
         
-        if let e = extraParams {
-            for (k, v) in e {
-                brackets.append("\(k): \(v)")
+        for param in extraParams {
+            if let value = param.value as? String, let firstChar = value.first, firstChar != "[", firstChar != "{" {
+                brackets.append("\(param.name): \"\(value)\"")
+            } else {
+                brackets.append("\(param.name): \(param.value)")
             }
         }
-
+        
         if brackets.count > 0 {
             query += "(" + brackets.joined(separator: ", ") + ")"
         }

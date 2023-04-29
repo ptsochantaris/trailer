@@ -49,11 +49,11 @@ struct GQLFragment: GQLScanning, Hashable {
         self.elements = elements
     }
 
-    init(on type: String, elements: [GQLElement]) {
+    init(on type: String, @GQLElementsBuilder elements: () -> [GQLElement]) {
         id = UUID()
         name = type.lowercased() + "Fragment"
         self.type = type
-        self.elements = elements
+        self.elements = elements()
     }
 
     func scan(query: GQLQuery, pageData: Any, parent: GQLNode?) async -> LinkedList<GQLQuery> {

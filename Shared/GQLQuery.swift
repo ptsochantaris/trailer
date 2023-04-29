@@ -26,10 +26,10 @@ struct GQLQuery {
         self.perNodeBlock = query.perNodeBlock
     }
 
-    static func batching(_ name: String, fields: [GQLElement], idList: [String], perNode: PerNodeBlock? = nil) -> LinkedList<GQLQuery> {
+    static func batching(_ name: String, idList: [String], perNode: PerNodeBlock? = nil, @GQLElementsBuilder fields: () -> [GQLElement]) -> LinkedList<GQLQuery> {
         var list = idList
         let queries = LinkedList<GQLQuery>()
-        let template = GQLGroup(name: "items", fields: fields)
+        let template = GQLGroup("items", fields: fields)
         
         let batchLimit = GQLBatchGroup.recommendedLimit(for: template)
         DLog("(GQL '\(name)') Batch size: \(batchLimit)")
@@ -140,7 +140,7 @@ struct GQLQuery {
 
     static func runQueries(queries: LinkedList<GQLQuery>, on path: String, token: String) async throws -> ApiStats? {
         try await withThrowingTaskGroup(of: ApiStats?.self, returning: ApiStats?.self) { group in
-            let gateKeeper = Gate(tickets: 3)
+            let gateKeeper = Gate(tickets: 1)
 
             for query in queries {
                 group.addTask { @MainActor in

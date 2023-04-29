@@ -85,7 +85,9 @@ struct GQLBatchGroup: GQLScanning {
     private var pageOfIds: ArraySlice<String> {
         let k = idsToGroups.keys.sorted()
         let chunkLimit = min(batchLimit, k.count)
-        return k[0 ..< chunkLimit]
+        let res = k[0 ..< chunkLimit]
+        assert(res.count <= 100)
+        return res
     }
 
     func scan(query: GQLQuery, pageData: Any, parent: GQLNode?) async -> LinkedList<GQLQuery> {
@@ -94,7 +96,7 @@ struct GQLBatchGroup: GQLScanning {
 
         let extraQueries = LinkedList<GQLQuery>()
 
-        let page = pageOfIds
+        let page = Set(pageOfIds)
         let newIds = idsToGroups.keys.filter { !page.contains($0) }
         if !newIds.isEmpty {
             let nextPage = GQLQuery(name: query.name, rootElement: GQLBatchGroup(templateGroup: originalTemplate, idList: newIds, startingCount: nextCount, batchLimit: batchLimit), parent: parent)
