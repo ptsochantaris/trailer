@@ -26,23 +26,11 @@ struct GQLQuery {
         self.perNodeBlock = query.perNodeBlock
     }
 
-    static func batching(_ name: String, idList: [String], perNode: PerNodeBlock? = nil, @GQLElementsBuilder fields: () -> [GQLElement]) -> LinkedList<GQLQuery> {
-        var list = idList
-        let queries = LinkedList<GQLQuery>()
+    static func batching(_ name: String, idList: [String], perNode: PerNodeBlock? = nil, @GQLElementsBuilder fields: () -> [GQLElement]) -> GQLQuery {
         let template = GQLGroup("items", fields: fields)
-        
-        let batchLimit = GQLBatchGroup.recommendedLimit(for: template)
-        DLog("(GQL '\(name)') Batch size: \(batchLimit)")
-
-        while !list.isEmpty {
-            let segment = list.prefix(batchLimit)
-            list.removeFirst(segment.count)
-
-            let batchGroup = GQLBatchGroup(templateGroup: template, idList: Array(segment), batchLimit: batchLimit)
-            let query = GQLQuery(name: name, rootElement: batchGroup, perNode: perNode)
-            queries.append(query)
-        }
-        return queries
+        let batchGroup = GQLBatchGroup(templateGroup: template, idList: idList)
+        DLog("\(name) - batching ID fetch in chunks of: \(batchGroup.batchLimit)")
+        return GQLQuery(name: name, rootElement: batchGroup, perNode: perNode)
     }
 
     private var rootQueryText: String {
@@ -65,6 +53,16 @@ struct GQLQuery {
     var logPrefix: String {
         "(GQL '\(name)') "
     }
+    
+    private static let gateKeeper = Gate(tickets: 3)
+    
+    private static func fetchData(for request: HTTPClientRequest, attempts: Int) async throws -> Any {
+        await gateKeeper.takeTicket()
+        defer {
+            gateKeeper.relaxedReturnTicket()
+        }
+        return try await HTTP.getJsonData(for: request, attempts: attempts, checkCache: false).json
+    }
 
     func run(for url: String, authToken: String, attempts: Int = 5) async throws -> ApiStats? {
         let Q = queryText
@@ -72,21 +70,22 @@ struct GQLQuery {
             DLog("\(logPrefix)Fetching: \(Q)")
         }
 
-        var r = HTTPClientRequest(url: url)
-        r.method = .POST
+        var request = HTTPClientRequest(url: url)
+        request.method = .POST
         let data = try! JSONEncoder().encode(["query": Q])
-        r.body = .bytes(ByteBuffer(bytes: data))
-        r.headers.add(name: "Authorization", value: "bearer \(authToken)")
+        request.body = .bytes(ByteBuffer(bytes: data))
+        request.headers.add(name: "Authorization", value: "bearer \(authToken)")
 
         Task { @MainActor in
             API.currentOperationName = name
         }
 
         var apiStats: ApiStats?
+
         do {
-            let json = try await HTTP.getJsonData(for: r, attempts: attempts, checkCache: false).json
+            let json = try await GQLQuery.fetchData(for: request, attempts: attempts)
             guard let json = json as? [AnyHashable: Any] else {
-                throw API.apiError("\(logPrefix)Invalid JSON")
+                throw API.apiError("\(logPrefix)Retuned data is not JSON")
             }
 
             apiStats = ApiStats.fromV4(json: json["data"] as? [AnyHashable: Any])
@@ -119,6 +118,8 @@ struct GQLQuery {
                 }
             }
             
+            DLog("\(logPrefix)Scanning result")
+            
             do {
                 let extraQueries = await rootElement.scan(query: self, pageData: topData, parent: parent)
                 if extraQueries.count == 0 {
@@ -140,14 +141,8 @@ struct GQLQuery {
 
     static func runQueries(queries: LinkedList<GQLQuery>, on path: String, token: String) async throws -> ApiStats? {
         try await withThrowingTaskGroup(of: ApiStats?.self, returning: ApiStats?.self) { group in
-            let gateKeeper = Gate(tickets: 1)
-
             for query in queries {
                 group.addTask { @MainActor in
-                    await gateKeeper.takeTicket()
-                    defer {
-                        gateKeeper.relaxedReturnTicket()
-                    }
                     if let stats = try await query.run(for: path, authToken: token) {
                         return stats
                     }

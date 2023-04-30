@@ -58,6 +58,12 @@ struct GQLGroup: GQLScanning {
         }
     }
     
+    var recommendedLimit: Int {
+        let templateCost = Float(nodeCost)
+        let estimatedBatchSize = (500000 / templateCost).rounded(.down)
+        return min(100, max(1, Int(estimatedBatchSize)))
+    }
+    
     var queryText: String {
         var query = name
         let brackets = LinkedList<String>()

@@ -3,34 +3,24 @@ import Foundation
 struct GQLBatchGroup: GQLScanning {
     let id: UUID
     let name: String
+    let batchLimit: Int
 
-    private let idsToGroups: [String: GQLGroup]
-    private let originalTemplate: GQLGroup
-    private let nextCount: Int
-    private let batchLimit: Int
-
-    init(templateGroup: GQLGroup, idList: [String], startingCount: Int = 0, batchLimit: Int) {
+    private let idList: [String]
+    private let templateGroup: GQLGroup
+        
+    init(templateGroup: GQLGroup, idList: [String]) {
         id = UUID()
         name = "nodes"
-        var index = startingCount
-        var id2g = [String: GQLGroup]()
-        id2g.reserveCapacity(idList.count)
-        for id in idList {
-            id2g[id] = GQLGroup(group: templateGroup, name: "\(templateGroup.name)\(index)")
-            index += 1
-        }
-        originalTemplate = templateGroup
-        idsToGroups = id2g
-        nextCount = index
-        self.batchLimit = batchLimit
+        batchLimit = templateGroup.recommendedLimit
+        self.templateGroup = templateGroup
+        self.idList = idList        
     }
     
-    init(cloning: GQLBatchGroup, idsToGroups: [String: GQLGroup]) {
+    init(cloning: GQLBatchGroup, templateGroup: GQLGroup, idList: [String]) {
         self.id = cloning.id
         self.name = cloning.name
-        self.idsToGroups = idsToGroups
-        self.originalTemplate = cloning.originalTemplate
-        self.nextCount = cloning.nextCount
+        self.idList = idList
+        self.templateGroup = templateGroup
         self.batchLimit = cloning.batchLimit
     }
     
@@ -39,79 +29,54 @@ struct GQLBatchGroup: GQLScanning {
             return element
         }
         
-        var replacementIdsToGroups = [String: GQLGroup]()
-        for (id, group) in idsToGroups {
-            if let groupShell = group.asShell(for: element) as? GQLGroup {
-                replacementIdsToGroups[id] = groupShell
-            }
+        if let shellGroup = templateGroup.asShell(for: element) as? GQLGroup {
+            return GQLBatchGroup(cloning: self, templateGroup: shellGroup, idList: idList)
         }
-        if replacementIdsToGroups.isEmpty {
-            return nil
-        }
-        return GQLBatchGroup(cloning: self, idsToGroups: replacementIdsToGroups)
+        
+        return nil
     }
-    
-    static func recommendedLimit(for template: GQLGroup) -> Int {
-        let templateCost = Float(template.nodeCost)
-        let estimatedBatchSize = (500000 / templateCost).rounded(.down)
-        return min(100, max(1, Int(estimatedBatchSize)))
-    }
-    
+        
     var nodeCost: Int {
-        if let templateGroup = idsToGroups.values.first {
-            let count = pageOfIds.count
-            return count + count * templateGroup.nodeCost
-        } else {
-            return 0
-        }
+        let count = min(idList.count, batchLimit)
+        return count + count * templateGroup.nodeCost
     }
     
     var queryText: String {
-        if let templateGroup = idsToGroups.values.first {
-            return "nodes(ids: [\"" + pageOfIds.joined(separator: "\",\"") + "\"]) { " + templateGroup.fields.map(\.queryText).joined(separator: " ") + " }"
-        } else {
-            return ""
-        }
+        "nodes(ids: [\"" + pageOfIds.joined(separator: "\",\"") + "\"]) { " + templateGroup.fields.map(\.queryText).joined(separator: " ") + " }"
     }
 
     var fragments: LinkedList<GQLFragment> {
-        let res = LinkedList<GQLFragment>()
-        for list in idsToGroups.values {
-            res.append(contentsOf: list.fragments)
-        }
-        return res
+        templateGroup.fragments
     }
 
     private var pageOfIds: ArraySlice<String> {
-        let k = idsToGroups.keys.sorted()
-        let chunkLimit = min(batchLimit, k.count)
-        let res = k[0 ..< chunkLimit]
-        assert(res.count <= 100)
-        return res
+        idList.prefix(batchLimit)
+    }
+    
+    private var remainingIds: ArraySlice<String> {
+        idList.dropFirst(batchLimit)
     }
 
     func scan(query: GQLQuery, pageData: Any, parent: GQLNode?) async -> LinkedList<GQLQuery> {
-        // DLog("\(query.logPrefix)Scanning batch group \(name)")
         guard let nodes = pageData as? [Any] else { return LinkedList<GQLQuery>() }
 
         let extraQueries = LinkedList<GQLQuery>()
 
-        let page = Set(pageOfIds)
-        let newIds = idsToGroups.keys.filter { !page.contains($0) }
-        if !newIds.isEmpty {
-            let nextPage = GQLQuery(name: query.name, rootElement: GQLBatchGroup(templateGroup: originalTemplate, idList: newIds, startingCount: nextCount, batchLimit: batchLimit), parent: parent)
-            extraQueries.append(nextPage)
-        }
-
-        for n in nodes {
-            if let n = n as? [AnyHashable: Any], let id = n["id"] as? String, let group = idsToGroups[id] {
-                let newQueries = await group.scan(query: query, pageData: n, parent: parent)
+        for pageData in nodes {
+            if let pageData = pageData as? [AnyHashable: Any] {
+                let newQueries = await templateGroup.scan(query: query, pageData: pageData, parent: parent)
                 extraQueries.append(contentsOf: newQueries)
             }
         }
 
+        let newIds = remainingIds
+        if !newIds.isEmpty {
+            let nextPage = GQLQuery(name: query.name, rootElement: GQLBatchGroup(templateGroup: templateGroup, idList: Array(newIds)), parent: parent)
+            extraQueries.append(nextPage)
+        }
+
         if extraQueries.count > 0 {
-            DLog("\(query.logPrefix)(Group: \(name)) - Will need further paging")
+            DLog("\(query.logPrefix)(Group: \(name)) - Will need to perform \(extraQueries.count) more queries")
         }
         return extraQueries
     }
