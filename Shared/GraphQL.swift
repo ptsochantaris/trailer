@@ -234,10 +234,10 @@ enum GraphQL {
                 }
             }
             
-            let query = GQLQuery.batching("\(serverName): \(name)", idList: ids, perNode: nodeBlock, fields: fields)
+            let queries = GQLQuery.batching("\(serverName): \(name)", idList: ids, perNode: nodeBlock, fields: fields)
 
             do {
-                try await server.run(queries: LinkedList(value: query))
+                try await server.run(queries: queries)
                 processor.add(chunk: .init(nodes: nodes, server: server, parentType: parentType, moreComing: false))
                 await processor.waitForCompletion()
             } catch {
@@ -523,12 +523,12 @@ enum GraphQL {
 
             if idsForReposInThisServerWantingLatestPrs.count > 0 {
                 let q = GQLQuery.batching("\(serverLabel): Updated PRs", idList: Array(idsForReposInThisServerWantingLatestPrs), perNode: perNodeBlock) { latestPrsFragment }
-                queriesForServer.append(q)
+                queriesForServer.append(contentsOf: q)
             }
 
             if idsForReposInThisServerWantingAllOpenPrs.count > 0 {
                 let q = GQLQuery.batching("\(serverLabel): Open PRs", idList: Array(idsForReposInThisServerWantingAllOpenPrs), perNode: perNodeBlock) { allOpenPrsFragment }
-                queriesForServer.append(q)
+                queriesForServer.append(contentsOf: q)
             }
 
             do {
@@ -603,12 +603,12 @@ enum GraphQL {
 
             if idsForReposInThisServerWantingLatestIssues.count > 0 {
                 let q = GQLQuery.batching("\(serverLabel): Updated Issues", idList: Array(idsForReposInThisServerWantingLatestIssues), perNode: perNodeBlock) { latestIssuesFragment }
-                queriesForServer.append(q)
+                queriesForServer.append(contentsOf: q)
             }
 
             if idsForReposInThisServerWantingAllOpenIssues.count > 0 {
                 let q = GQLQuery.batching("\(serverLabel): Open Issues", idList: Array(idsForReposInThisServerWantingAllOpenIssues), perNode: perNodeBlock) { allOpenIssuesFragment }
-                queriesForServer.append(q)
+                queriesForServer.append(contentsOf: q)
             }
 
             do {

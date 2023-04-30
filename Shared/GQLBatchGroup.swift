@@ -3,17 +3,16 @@ import Foundation
 struct GQLBatchGroup: GQLScanning {
     let id: UUID
     let name: String
-    let batchLimit: Int
-
+    
     private let idList: [String]
     private let templateGroup: GQLGroup
         
     init(templateGroup: GQLGroup, idList: [String]) {
-        id = UUID()
-        name = "nodes"
-        batchLimit = templateGroup.recommendedLimit
+        self.id = UUID()
+        self.name = "nodes"
         self.templateGroup = templateGroup
-        self.idList = idList        
+        self.idList = idList
+        assert(idList.count <= 100)
     }
     
     init(cloning: GQLBatchGroup, templateGroup: GQLGroup, idList: [String]) {
@@ -21,7 +20,7 @@ struct GQLBatchGroup: GQLScanning {
         self.name = cloning.name
         self.idList = idList
         self.templateGroup = templateGroup
-        self.batchLimit = cloning.batchLimit
+        assert(idList.count <= 100)
     }
     
     func asShell(for element: GQLElement) -> GQLElement? {
@@ -37,26 +36,18 @@ struct GQLBatchGroup: GQLScanning {
     }
         
     var nodeCost: Int {
-        let count = min(idList.count, batchLimit)
+        let count = idList.count
         return count + count * templateGroup.nodeCost
     }
     
     var queryText: String {
-        "nodes(ids: [\"" + pageOfIds.joined(separator: "\",\"") + "\"]) { " + templateGroup.fields.map(\.queryText).joined(separator: " ") + " }"
+        "nodes(ids: [\"" + idList.joined(separator: "\",\"") + "\"]) { " + templateGroup.fields.map(\.queryText).joined(separator: " ") + " }"
     }
 
     var fragments: LinkedList<GQLFragment> {
         templateGroup.fragments
     }
-
-    private var pageOfIds: ArraySlice<String> {
-        idList.prefix(batchLimit)
-    }
     
-    private var remainingIds: ArraySlice<String> {
-        idList.dropFirst(batchLimit)
-    }
-
     func scan(query: GQLQuery, pageData: Any, parent: GQLNode?) async -> LinkedList<GQLQuery> {
         guard let nodes = pageData as? [Any] else { return LinkedList<GQLQuery>() }
 
@@ -69,15 +60,6 @@ struct GQLBatchGroup: GQLScanning {
             }
         }
 
-        let newIds = remainingIds
-        if !newIds.isEmpty {
-            let nextPage = GQLQuery(name: query.name, rootElement: GQLBatchGroup(templateGroup: templateGroup, idList: Array(newIds)), parent: parent)
-            extraQueries.append(nextPage)
-        }
-
-        if extraQueries.count > 0 {
-            DLog("\(query.logPrefix)(Group: \(name)) - Will need to perform \(extraQueries.count) more queries")
-        }
         return extraQueries
     }
 }

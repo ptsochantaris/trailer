@@ -26,11 +26,20 @@ struct GQLQuery {
         self.perNodeBlock = query.perNodeBlock
     }
 
-    static func batching(_ name: String, idList: [String], perNode: PerNodeBlock? = nil, @GQLElementsBuilder fields: () -> [GQLElement]) -> GQLQuery {
+    static func batching(_ name: String, idList: [String], perNode: PerNodeBlock? = nil, @GQLElementsBuilder fields: () -> [GQLElement]) -> LinkedList<GQLQuery> {
+        var list = ArraySlice(idList)
         let template = GQLGroup("items", fields: fields)
-        let batchGroup = GQLBatchGroup(templateGroup: template, idList: idList)
-        DLog("\(name) - batching ID fetch in chunks of: \(batchGroup.batchLimit)")
-        return GQLQuery(name: name, rootElement: batchGroup, perNode: perNode)
+        let batchLimit = template.recommendedLimit
+        let queries = LinkedList<GQLQuery>()
+
+        while !list.isEmpty {
+            let chunk  = Array(list.prefix(batchLimit))
+            let batchGroup = GQLBatchGroup(templateGroup: template, idList: chunk)
+            let query = GQLQuery(name: name, rootElement: batchGroup, perNode: perNode)
+            queries.append(query)
+            list = list.dropFirst(batchLimit)
+        }
+        return queries
     }
 
     private var rootQueryText: String {
