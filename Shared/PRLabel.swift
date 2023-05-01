@@ -10,7 +10,7 @@ final class PRLabel: DataItem {
     @NSManaged var pullRequests: Set<PullRequest>
     @NSManaged var issues: Set<Issue>
 
-    static func sync(from nodes: LinkedList<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
+    static func sync(from nodes: LinkedList<GraphQL.Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
         syncItems(of: PRLabel.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { label, node in
             guard
                 let parent = node.parent else { return }

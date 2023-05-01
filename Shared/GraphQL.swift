@@ -1,74 +1,44 @@
 import CoreData
 import Foundation
 
-@globalActor
-enum NodeActor {
-    actor ActorType {}
-    static let shared = ActorType()
-}
-
-typealias PerNodeBlock = @NodeActor (GQLNode) async throws -> Void
-
 @MainActor
 enum GraphQL {
+    @globalActor
+    enum NodeActor {
+        actor ActorType {}
+        static let shared = ActorType()
+    }
+
+    typealias PerNodeBlock = @NodeActor (Node) async throws -> Void
+
     private static let nodeBlockMax = 2000
 
-    static let idField = GQLField("id")
+    static let idField = Field("id")
 
-    private static let nameWithOwnerField = GQLField("nameWithOwner")
+    private static let nameWithOwnerField = Field("nameWithOwner")
 
-    private static let userFragment = GQLFragment(on: "User") {
+    private static let userFragment = Fragment(on: "User") {
         idField
-        GQLField("login")
-        GQLField("avatarUrl")
+        Field("login")
+        Field("avatarUrl")
     }
 
-    private static let userIdFragment = GQLFragment(on: "User") {
-        idField
-    }
-
-    private static let mannequinFragment = GQLFragment(on: "Mannequin") {
-        idField
-        GQLField("login")
-        GQLField("avatarUrl")
-    }
-
-    private static let teamFragment = GQLFragment(on: "Team") {
-        idField
-        GQLField("slug")
-    }
-
-    @GQLElementsBuilder
-    private static func commentFields() -> [any GQLElement] {
-        idField
-        GQLField("body")
-        GQLField("url")
-        GQLField("createdAt")
-        GQLField("updatedAt")
-        GQLGroup("author") { userFragment }
-    }
-
-    private static let statusFragment = GQLFragment(on: "StatusContext") {
-        idField
-        GQLField("context")
-        GQLField("description")
-        GQLField("state")
-        GQLField("targetUrl")
-        GQLField("createdAt")
-    }
-
-    private static let checkFragment = GQLFragment(on: "CheckRun") {
-        idField
-        GQLField("name")
-        GQLField("conclusion")
-        GQLField("startedAt")
-        GQLField("completedAt")
-        GQLField("permalink")
+    private static func commentGroup(for typeName: String) -> Group {
+        Group("comments", paging: .max) {
+            Fragment(on: typeName) {
+                idField
+                Field("body")
+                Field("url")
+                Field("createdAt")
+                Field("updatedAt")
+                Group("author") { userFragment }
+            }
+        }
     }
 
     static func testApi(to apiServer: ApiServer) async throws {
         var gotUserNode = false
-        let testQuery = GQLQuery(name: "Testing", rootElement: GQLGroup("viewer") { userFragment }) { node in
+        let testQuery = Query(name: "Testing", rootElement: Group("viewer") { userFragment }) { node in
             DLog("Got a node, type: \(node.elementType), id: \(node.id)")
             if node.elementType == "User" {
                 gotUserNode = true
@@ -82,40 +52,16 @@ enum GraphQL {
 
     static func update<T: ListableItem>(for items: [T], steps: API.SyncSteps) async throws {
         let typeName = String(describing: T.self)
-
-        let elements = LinkedList<any GQLElement>(value: idField)
-
+        
         if let prs = items as? [PullRequest] {
-            if steps.contains(.reviewRequests) {
-                let requestFragment = GQLFragment(on: "ReviewRequest") {
-                    idField
-                    GQLGroup("requestedReviewer") {
-                        userFragment
-                        teamFragment
-                        mannequinFragment
-                    }
-                }
-                elements.append(GQLGroup("reviewRequests", paging: .max) { requestFragment })
-            }
-
             if steps.contains(.reviews) {
                 prs.forEach {
                     $0.reviews.forEach {
                         $0.postSyncAction = PostSyncAction.delete.rawValue
                     }
                 }
-
-                let reviewFragment = GQLFragment(on: "PullRequestReview") {
-                    idField
-                    GQLField("body")
-                    GQLField("state")
-                    GQLField("createdAt")
-                    GQLField("updatedAt")
-                    GQLGroup("author") { userFragment }
-                }
-                elements.append(GQLGroup("reviews", paging: .max) { reviewFragment })
             }
-
+            
             if steps.contains(.statuses) {
                 let now = Date()
                 prs.forEach {
@@ -124,26 +70,9 @@ enum GraphQL {
                         $0.postSyncAction = PostSyncAction.delete.rawValue
                     }
                 }
-
-                elements.append(
-                    GQLGroup("commits", paging: .last(count: 1)) {
-                        GQLGroup("commit") {
-                            GQLGroup("checkSuites", paging: .first(count: 10, paging: false)) {
-                                GQLGroup("checkRuns", paging: .first(count: 50, paging: false)) {
-                                    checkFragment
-                                }
-                            }
-                            GQLGroup("status") {
-                                GQLGroup("contexts") {
-                                    statusFragment
-                                }
-                            }
-                        }
-                    }
-                )
             }
         }
-
+        
         if steps.contains(.reactions) {
             let now = Date()
             items.forEach {
@@ -152,58 +81,127 @@ enum GraphQL {
                     $0.postSyncAction = PostSyncAction.delete.rawValue
                 }
             }
-            
-            let reactionFragment = GQLFragment(on: "Reaction") {
-                idField
-                GQLField("content")
-                GQLField("createdAt")
-                GQLGroup("user") { userFragment }
-            }
-            elements.append(GQLGroup("reactions", paging: .max) { reactionFragment })
         }
-
+        
         if steps.contains(.comments) {
             items.forEach {
                 $0.comments.forEach {
                     $0.postSyncAction = PostSyncAction.delete.rawValue
                 }
             }
-            let commentFragment = GQLFragment(on: "IssueComment", elements: commentFields)
-            elements.append(GQLGroup("comments", paging: .max) { commentFragment })
         }
-
+        
         try await process(name: steps.toString, items: items, parentType: T.self) {
-            GQLFragment(on: typeName) {
-                Array(elements)
+            Fragment(on: typeName) {
+                idField
+                
+                if items is [PullRequest] {
+                    if steps.contains(.reviewRequests) {
+                        Group("reviewRequests", paging: .max) {
+                            Fragment(on: "ReviewRequest") {
+                                idField
+                                Group("requestedReviewer") {
+                                    userFragment
+                                    Fragment(on: "Team") {
+                                        idField
+                                        Field("slug")
+                                    }
+                                    Fragment(on: "Mannequin") {
+                                        idField
+                                        Field("login")
+                                        Field("avatarUrl")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    if steps.contains(.reviews) {
+                        Group("reviews", paging: .max) {
+                            Fragment(on: "PullRequestReview") {
+                                idField
+                                Field("body")
+                                Field("state")
+                                Field("createdAt")
+                                Field("updatedAt")
+                                Group("author") { userFragment }
+                            }
+                        }
+                    }
+                    
+                    if steps.contains(.statuses) {
+                        Group("commits", paging: .last(count: 1)) {
+                            Group("commit") {
+                                Group("checkSuites", paging: .first(count: 10, paging: false)) {
+                                    Group("checkRuns", paging: .first(count: 50, paging: false)) {
+                                        Fragment(on: "CheckRun") {
+                                            idField
+                                            Field("name")
+                                            Field("conclusion")
+                                            Field("startedAt")
+                                            Field("completedAt")
+                                            Field("permalink")
+                                        }
+                                    }
+                                }
+                                Group("status") {
+                                    Group("contexts") {
+                                        Fragment(on: "StatusContext") {
+                                            idField
+                                            Field("context")
+                                            Field("description")
+                                            Field("state")
+                                            Field("targetUrl")
+                                            Field("createdAt")
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                if steps.contains(.reactions) {
+                    Group("reactions", paging: .max) {
+                        Fragment(on: "Reaction") {
+                            idField
+                            Field("content")
+                            Field("createdAt")
+                            Group("user") { userFragment }
+                        }
+                    }
+                }
+                
+                if steps.contains(.comments) {
+                    commentGroup(for: "IssueComment")
+                }
             }
         }
     }
 
     static func updateReactions(for comments: [PRComment]) async throws {
-        let reactionFragment = GQLFragment(on: "Reaction") {
-            idField
-            GQLField("content")
-            GQLField("createdAt")
-            GQLGroup("user") { userFragment }
+        try await process(name: "Comment Reactions", items: comments) {
+            Fragment(on: "IssueComment") {
+                idField
+                Group("reactions", paging: .max) {
+                    Fragment(on: "Reaction") {
+                        idField
+                        Field("content")
+                        Field("createdAt")
+                        Group("user") { userFragment }
+                    }
+                }
+            }
         }
-
-        let itemFragment = GQLFragment(on: "IssueComment") {
-            idField
-            GQLGroup("reactions", paging: .max) { reactionFragment }
-        }
-
-        try await process(name: "Comment Reactions", items: comments) { itemFragment }
     }
 
     static func updateComments(for reviews: [Review]) async throws {
-        let commentFragment = GQLFragment(on: "PullRequestReviewComment", elements: commentFields)
-
-        let itemFragment = GQLFragment(on: "PullRequestReview") {
-            idField
-            GQLGroup("comments", paging: .max) { commentFragment }
+        try await process(name: "Review Comments", items: reviews) {
+            Fragment(on: "PullRequestReview") {
+                idField
+                commentGroup(for: "PullRequestReviewComment")
+            }
         }
-
-        try await process(name: "Review Comments", items: reviews) { itemFragment }
     }
 
     private static func process(name: String, items: [DataItem], parentType: (some ListableItem).Type? = nil, @GQLElementsBuilder fields: () -> [any GQLElement]) async throws {
@@ -211,19 +209,19 @@ enum GraphQL {
             return
         }
 
-        let processor = GQLProcessor()
+        let processor = Processor()
         let itemsByServer = Dictionary(grouping: items) { $0.apiServer }
         var count = 0
         for (server, items) in itemsByServer {
             let ids = items.compactMap(\.nodeId)
-            var nodes = [String: LinkedList<GQLNode>]()
+            var nodes = [String: LinkedList<Node>]()
             let serverName = server.label ?? "<no label>"
-            let nodeBlock = { (node: GQLNode) in
+            let nodeBlock = { (node: Node) in
                 let type = node.elementType
                 if let existingList = nodes[type] {
                     existingList.append(node)
                 } else {
-                    nodes[type] = LinkedList<GQLNode>(value: node)
+                    nodes[type] = LinkedList<Node>(value: node)
                 }
 
                 count += 1
@@ -234,7 +232,7 @@ enum GraphQL {
                 }
             }
             
-            let queries = GQLQuery.batching("\(serverName): \(name)", idList: ids, perNode: nodeBlock, fields: fields)
+            let queries = Query.batching("\(serverName): \(name)", idList: ids, perNode: nodeBlock, fields: fields)
 
             do {
                 try await server.run(queries: queries)
@@ -247,76 +245,76 @@ enum GraphQL {
         }
     }
 
-    private static var milestoneFragment = GQLFragment(on: "Milestone") {
-        GQLField("title")
+    private static var milestoneFragment = Fragment(on: "Milestone") {
+        Field("title")
     }
 
-    private static var labelFragment = GQLFragment(on: "Label") {
+    private static var labelFragment = Fragment(on: "Label") {
         idField
-        GQLField("name")
-        GQLField("color")
-        GQLField("createdAt")
-        GQLField("updatedAt")
+        Field("name")
+        Field("color")
+        Field("createdAt")
+        Field("updatedAt")
     }
 
-    private static var repositoryFragment = GQLFragment(on: "Repository") {
+    private static var repositoryFragment = Fragment(on: "Repository") {
         idField
-        GQLField("createdAt")
-        GQLField("updatedAt")
-        GQLField("isFork")
-        GQLField("isArchived")
-        GQLField("nameWithOwner")
-        GQLField("url")
-        GQLField("isPrivate")
-        GQLGroup("owner") { idField }
+        Field("createdAt")
+        Field("updatedAt")
+        Field("isFork")
+        Field("isArchived")
+        Field("nameWithOwner")
+        Field("url")
+        Field("isPrivate")
+        Group("owner") { idField }
     }
 
-    private static func prFragment(assigneesAndLabelPageSize: Int, includeRepo: Bool) -> GQLFragment {
-        GQLFragment(on: "PullRequest") {
+    private static func prFragment(assigneesAndLabelPageSize: Int, includeRepo: Bool) -> Fragment {
+        Fragment(on: "PullRequest") {
             idField
-            GQLField("bodyText")
-            GQLField("state")
-            GQLField("createdAt")
-            GQLField("updatedAt")
-            GQLField("number")
-            GQLField("title")
-            GQLField("url")
-            GQLGroup("milestone") { milestoneFragment }
-            GQLGroup("author") { userFragment }
-            GQLGroup("assignees", paging: .first(count: assigneesAndLabelPageSize, paging: true)) { userFragment }
-            GQLGroup("labels", paging: .first(count: assigneesAndLabelPageSize, paging: true)) { labelFragment }
-            GQLField("headRefOid")
-            GQLField("mergeable")
-            GQLField("additions")
-            GQLField("deletions")
-            GQLField("headRefName")
-            GQLField("baseRefName")
-            GQLField("isDraft")
-            GQLGroup("mergedBy") { userIdFragment }
-            GQLGroup("baseRepository") { nameWithOwnerField }
-            GQLGroup("headRepository") { nameWithOwnerField }
+            Field("bodyText")
+            Field("state")
+            Field("createdAt")
+            Field("updatedAt")
+            Field("number")
+            Field("title")
+            Field("url")
+            Group("milestone") { milestoneFragment }
+            Group("author") { userFragment }
+            Group("assignees", paging: .first(count: assigneesAndLabelPageSize, paging: true)) { userFragment }
+            Group("labels", paging: .first(count: assigneesAndLabelPageSize, paging: true)) { labelFragment }
+            Field("headRefOid")
+            Field("mergeable")
+            Field("additions")
+            Field("deletions")
+            Field("headRefName")
+            Field("baseRefName")
+            Field("isDraft")
+            Group("mergedBy") { Fragment(on: "User") { idField } }
+            Group("baseRepository") { nameWithOwnerField }
+            Group("headRepository") { nameWithOwnerField }
             if includeRepo {
-                GQLGroup("repository") { repositoryFragment }
+                Group("repository") { repositoryFragment }
             }
         }
     }
 
-    private static func issueFragment(assigneesAndLabelPageSize: Int, includeRepo: Bool) -> GQLFragment {
-        GQLFragment(on: "Issue") {
+    private static func issueFragment(assigneesAndLabelPageSize: Int, includeRepo: Bool) -> Fragment {
+        Fragment(on: "Issue") {
             idField
-            GQLField("bodyText")
-            GQLField("state")
-            GQLField("createdAt")
-            GQLField("updatedAt")
-            GQLField("number")
-            GQLField("title")
-            GQLField("url")
-            GQLGroup("milestone") { milestoneFragment }
-            GQLGroup("author") { userFragment }
-            GQLGroup("assignees", paging: .first(count: assigneesAndLabelPageSize, paging: true)) { userFragment }
-            GQLGroup("labels", paging: .first(count: assigneesAndLabelPageSize, paging: true)) { labelFragment }
+            Field("bodyText")
+            Field("state")
+            Field("createdAt")
+            Field("updatedAt")
+            Field("number")
+            Field("title")
+            Field("url")
+            Group("milestone") { milestoneFragment }
+            Group("author") { userFragment }
+            Group("assignees", paging: .first(count: assigneesAndLabelPageSize, paging: true)) { userFragment }
+            Group("labels", paging: .first(count: assigneesAndLabelPageSize, paging: true)) { labelFragment }
             if includeRepo {
-                GQLGroup("repository") { repositoryFragment }
+                Group("repository") { repositoryFragment }
             }
         }
     }
@@ -325,7 +323,7 @@ enum GraphQL {
         await withTaskGroup(of: Void.self) { group in
             for server in servers {
                 if Settings.queryAuthoredPRs {
-                    let g = GQLGroup("pullRequests", ("states", "[OPEN]"), paging: .max) {
+                    let g = Group("pullRequests", ("states", "[OPEN]"), paging: .max) {
                         prFragment(assigneesAndLabelPageSize: 20, includeRepo: true)
                     }
                     group.addTask { @MainActor in
@@ -344,7 +342,7 @@ enum GraphQL {
         await withTaskGroup(of: Void.self) { group in
             for server in servers {
                 if Settings.queryAuthoredIssues {
-                    let g = GQLGroup("issues", ("states", "[OPEN]"), paging: .max) {
+                    let g = Group("issues", ("states", "[OPEN]"), paging: .max) {
                         issueFragment(assigneesAndLabelPageSize: 20, includeRepo: true)
                     }
                     group.addTask { @MainActor in
@@ -359,17 +357,17 @@ enum GraphQL {
         }
     }
 
-    static func fetchAllAuthoredItems(from server: ApiServer, @GQLElementsBuilder fields: () -> [any GQLElement]) async -> [String: LinkedList<GQLNode>]? {
+    static func fetchAllAuthoredItems(from server: ApiServer, @GQLElementsBuilder fields: () -> [any GQLElement]) async -> [String: LinkedList<Node>]? {
         var count = 0
-        var nodes = [String: LinkedList<GQLNode>]()
-        let group = GQLGroup("viewer", fields: fields)
-        let processor = GQLProcessor()
-        let authoredItemsQuery = GQLQuery(name: "Authored Items", rootElement: group) { node in
+        var nodes = [String: LinkedList<Node>]()
+        let group = Group("viewer", fields: fields)
+        let processor = Processor()
+        let authoredItemsQuery = Query(name: "Authored Items", rootElement: group) { node in
             let type = node.elementType
             if let existingList = nodes[type] {
                 existingList.append(node)
             } else {
-                nodes[type] = LinkedList<GQLNode>(value: node)
+                nodes[type] = LinkedList<Node>(value: node)
             }
 
             count += 1
@@ -391,7 +389,7 @@ enum GraphQL {
         }
     }
 
-    private static func checkAuthoredPrClosures(nodes: [String: LinkedList<GQLNode>], in server: ApiServer) async {
+    private static func checkAuthoredPrClosures(nodes: [String: LinkedList<Node>], in server: ApiServer) async {
         let prsToCheck = LinkedList<PullRequest>()
         let fetchedPrIds = Set(nodes["PullRequest"]?.map(\.id) ?? [])
         for repo in server.repos.filter({ $0.displayPolicyForPrs == RepoDisplayPolicy.authoredOnly.rawValue }) {
@@ -404,16 +402,16 @@ enum GraphQL {
             return
         }
 
-        let prGroup = GQLGroup("pullRequests") { prFragment(assigneesAndLabelPageSize: 1, includeRepo: true) }
-        let group = GQLBatchGroup(templateGroup: prGroup, idList: prsToCheck.compactMap(\.nodeId))
-        let nodes = LinkedList<GQLNode>()
-        let query = GQLQuery(name: "Closed Authored PRs", rootElement: group, allowsEmptyResponse: true) { node in
+        let prGroup = Group("pullRequests") { prFragment(assigneesAndLabelPageSize: 1, includeRepo: true) }
+        let group = BatchGroup(templateGroup: prGroup, idList: prsToCheck.compactMap(\.nodeId))
+        let nodes = LinkedList<Node>()
+        let query = Query(name: "Closed Authored PRs", rootElement: group, allowsEmptyResponse: true) { node in
             node.forcedUpdate = true
             nodes.append(node)
         }
         do {
             try await server.run(queries: LinkedList(value: query))
-            let processor = GQLProcessor()
+            let processor = Processor()
             processor.add(chunk: .init(nodes: ["PullRequest": nodes], server: server, parentType: nil, moreComing: false))
             await processor.waitForCompletion()
         } catch {
@@ -421,7 +419,7 @@ enum GraphQL {
         }
     }
 
-    private static func checkAuthoredIssueClosures(nodes: [String: LinkedList<GQLNode>], in server: ApiServer) {
+    private static func checkAuthoredIssueClosures(nodes: [String: LinkedList<Node>], in server: ApiServer) {
         let fetchedIssueIds = Set(nodes["Issue"]?.map(\.id) ?? []) // investigate missing issues
         for repo in server.repos.filter({ $0.displayPolicyForIssues == RepoDisplayPolicy.authoredOnly.rawValue }) {
             for issue in repo.issues where !fetchedIssueIds.contains(issue.nodeId ?? "") {
@@ -433,30 +431,30 @@ enum GraphQL {
 
     private static let alreadyParsed = NSError(domain: "com.housetrip.Trailer.parsing", code: 1, userInfo: [NSLocalizedDescriptionKey: "Node already parsed in previous sync"])
 
-    private static let latestPrsFragment = GQLFragment(on: "Repository") {
+    private static let latestPrsFragment = Fragment(on: "Repository") {
         idField
-        GQLGroup("pullRequests", ("orderBy", "{direction: DESC, field: UPDATED_AT}"), paging: .first(count: 20, paging: true)) {
+        Group("pullRequests", ("orderBy", "{direction: DESC, field: UPDATED_AT}"), paging: .first(count: 20, paging: true)) {
             prFragment(assigneesAndLabelPageSize: 20, includeRepo: false)
         }
     }
 
-    private static let latestIssuesFragment = GQLFragment(on: "Repository") {
+    private static let latestIssuesFragment = Fragment(on: "Repository") {
         idField
-        GQLGroup("issues", ("orderBy", "{direction: DESC, field: UPDATED_AT}"), paging: .first(count: 40, paging: true)) {
+        Group("issues", ("orderBy", "{direction: DESC, field: UPDATED_AT}"), paging: .first(count: 40, paging: true)) {
             issueFragment(assigneesAndLabelPageSize: 20, includeRepo: false)
         }
     }
 
-    private static let allOpenPrsFragment = GQLFragment(on: "Repository") {
+    private static let allOpenPrsFragment = Fragment(on: "Repository") {
         idField
-        GQLGroup("pullRequests", ("states", "[OPEN]"), paging: .first(count: 50, paging: true)) {
+        Group("pullRequests", ("states", "[OPEN]"), paging: .first(count: 50, paging: true)) {
             prFragment(assigneesAndLabelPageSize: 20, includeRepo: false)
         }
     }
 
-    private static let allOpenIssuesFragment = GQLFragment(on: "Repository") {
+    private static let allOpenIssuesFragment = Fragment(on: "Repository") {
         idField
-        GQLGroup("issues", ("states", "[OPEN]"), paging: .first(count: 50, paging: true)) {
+        Group("issues", ("states", "[OPEN]"), paging: .first(count: 50, paging: true)) {
             issueFragment(assigneesAndLabelPageSize: 20, includeRepo: false)
         }
     }
@@ -475,11 +473,11 @@ enum GraphQL {
             }
         }
         
-        let processor = GQLProcessor()
+        let processor = Processor()
 
         for (server, reposInThisServer) in reposByServer {
             var count = 0
-            var nodes = [String: LinkedList<GQLNode>]()
+            var nodes = [String: LinkedList<Node>]()
 
             let perNodeBlock: PerNodeBlock = { node in
 
@@ -487,7 +485,7 @@ enum GraphQL {
                 if let existingList = nodes[type] {
                     existingList.append(node)
                 } else {
-                    nodes[type] = LinkedList<GQLNode>(value: node)
+                    nodes[type] = LinkedList<Node>(value: node)
                 }
 
                 if type == "PullRequest",
@@ -495,7 +493,7 @@ enum GraphQL {
                    let updatedAt = node.jsonPayload["updatedAt"] as? String,
                    let d = DataItem.parseGH8601(updatedAt),
                    d < prRepoIdToLatestExistingUpdate[repo.id]! {
-                    throw GraphQL.alreadyParsed
+                    throw alreadyParsed
                 }
 
                 count += 1
@@ -506,7 +504,7 @@ enum GraphQL {
                 }
             }
 
-            let queriesForServer = LinkedList<GQLQuery>()
+            let queriesForServer = LinkedList<Query>()
             let serverLabel = server.label ?? "<no label>"
 
             let idsForReposInThisServerWantingAllOpenPrs = LinkedList<String>()
@@ -522,12 +520,12 @@ enum GraphQL {
             }
 
             if idsForReposInThisServerWantingLatestPrs.count > 0 {
-                let q = GQLQuery.batching("\(serverLabel): Updated PRs", idList: Array(idsForReposInThisServerWantingLatestPrs), perNode: perNodeBlock) { latestPrsFragment }
+                let q = Query.batching("\(serverLabel): Updated PRs", idList: Array(idsForReposInThisServerWantingLatestPrs), perNode: perNodeBlock) { latestPrsFragment }
                 queriesForServer.append(contentsOf: q)
             }
 
             if idsForReposInThisServerWantingAllOpenPrs.count > 0 {
-                let q = GQLQuery.batching("\(serverLabel): Open PRs", idList: Array(idsForReposInThisServerWantingAllOpenPrs), perNode: perNodeBlock) { allOpenPrsFragment }
+                let q = Query.batching("\(serverLabel): Open PRs", idList: Array(idsForReposInThisServerWantingAllOpenPrs), perNode: perNodeBlock) { allOpenPrsFragment }
                 queriesForServer.append(contentsOf: q)
             }
 
@@ -555,11 +553,11 @@ enum GraphQL {
             }
         }
         
-        let processor = GQLProcessor()
+        let processor = Processor()
 
         for (server, reposInThisServer) in reposByServer {
             var count = 0
-            var nodes = [String: LinkedList<GQLNode>]()
+            var nodes = [String: LinkedList<Node>]()
 
             let perNodeBlock: PerNodeBlock = { node in
 
@@ -567,7 +565,7 @@ enum GraphQL {
                 if let existingList = nodes[type] {
                     existingList.append(node)
                 } else {
-                    nodes[type] = LinkedList<GQLNode>(value: node)
+                    nodes[type] = LinkedList<Node>(value: node)
                 }
 
                 if type == "Issue",
@@ -575,7 +573,7 @@ enum GraphQL {
                    let updatedAt = node.jsonPayload["updatedAt"] as? String,
                    let d = DataItem.parseGH8601(updatedAt),
                    d < issueRepoIdToLatestExistingUpdate[repo.id]! {
-                    throw GraphQL.alreadyParsed
+                    throw alreadyParsed
                 }
 
                 count += 1
@@ -586,7 +584,7 @@ enum GraphQL {
                 }
             }
 
-            let queriesForServer = LinkedList<GQLQuery>()
+            let queriesForServer = LinkedList<Query>()
             let serverLabel = server.label ?? "<no label>"
 
             let idsForReposInThisServerWantingAllOpenIssues = LinkedList<String>()
@@ -602,12 +600,12 @@ enum GraphQL {
             }
 
             if idsForReposInThisServerWantingLatestIssues.count > 0 {
-                let q = GQLQuery.batching("\(serverLabel): Updated Issues", idList: Array(idsForReposInThisServerWantingLatestIssues), perNode: perNodeBlock) { latestIssuesFragment }
+                let q = Query.batching("\(serverLabel): Updated Issues", idList: Array(idsForReposInThisServerWantingLatestIssues), perNode: perNodeBlock) { latestIssuesFragment }
                 queriesForServer.append(contentsOf: q)
             }
 
             if idsForReposInThisServerWantingAllOpenIssues.count > 0 {
-                let q = GQLQuery.batching("\(serverLabel): Open Issues", idList: Array(idsForReposInThisServerWantingAllOpenIssues), perNode: perNodeBlock) { allOpenIssuesFragment }
+                let q = Query.batching("\(serverLabel): Open Issues", idList: Array(idsForReposInThisServerWantingAllOpenIssues), perNode: perNodeBlock) { allOpenIssuesFragment }
                 queriesForServer.append(contentsOf: q)
             }
 

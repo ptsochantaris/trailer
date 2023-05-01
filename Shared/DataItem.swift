@@ -302,7 +302,7 @@ class DataItem: NSManagedObject {
         return Date(timeIntervalSince1970: TimeInterval(t))
     }
 
-    private func populate(type: (some DataItem).Type, node: GQLNode) {
+    private func populate(type: (some DataItem).Type, node: GraphQL.Node) {
         let info = node.jsonPayload
         let entityName = String(describing: type)
 
@@ -364,7 +364,7 @@ class DataItem: NSManagedObject {
         }
     }
 
-    static func syncItems<T: DataItem>(of type: T.Type, from nodes: LinkedList<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache, perItemCallback: (T, GQLNode) -> Void) {
+    static func syncItems<T: DataItem>(of type: T.Type, from nodes: LinkedList<GraphQL.Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache, perItemCallback: (T, GraphQL.Node) -> Void) {
         let validNodes = nodes.filter { !($0.parent?.creationSkipped ?? false) }
         if validNodes.isEmpty {
             return
@@ -401,5 +401,5 @@ class DataItem: NSManagedObject {
         }
     }
 
-    class func shouldCreate(from _: GQLNode) -> Bool { true }
+    class func shouldCreate(from _: GraphQL.Node) -> Bool { true }
 }

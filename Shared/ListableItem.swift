@@ -98,7 +98,7 @@ class ListableItem: DataItem {
         return Array(items)
     }
 
-    final func baseNodeSync(node: GQLNode, parent: Repo) {
+    final func baseNodeSync(node: GraphQL.Node, parent: Repo) {
         repo = parent
 
         let info = node.jsonPayload
@@ -1178,7 +1178,7 @@ class ListableItem: DataItem {
         return CSSearchableItem(uniqueIdentifier: uri, domainIdentifier: nil, attributeSet: s)
     }
 
-    override final class func shouldCreate(from node: GQLNode) -> Bool {
+    override final class func shouldCreate(from node: GraphQL.Node) -> Bool {
         if node.jsonPayload["state"] as? String == "OPEN" {
             return true
         }

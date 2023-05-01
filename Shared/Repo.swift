@@ -22,7 +22,7 @@ final class Repo: DataItem {
         updatedAt = updatedAt?.addingTimeInterval(-1)
     }
 
-    static func sync(from nodes: LinkedList<GQLNode>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
+    static func sync(from nodes: LinkedList<GraphQL.Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
         syncItems(of: Repo.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { repo, node in
 
             var neededByAuthoredPr = false
