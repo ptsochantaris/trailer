@@ -52,7 +52,7 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
         UIToolbar.appearance().tintColor = UIColor(named: "apptint")
 
         BGTaskScheduler.shared.register(forTaskWithIdentifier: "com.housetrip.mobile.trailer.ios.PocketTrailer.refresh", using: .main) { [weak self] task in
-            guard let task = task as? BGProcessingTask, DataManager.appIsConfigured, let self else {
+            guard let self, let task = task as? BGProcessingTask, DataManager.appIsConfigured else {
                 return
             }
             backgroundProcessing = task
