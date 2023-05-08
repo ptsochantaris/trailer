@@ -64,7 +64,7 @@ extension GraphQL {
             "(GQL '\(name)') "
         }
 
-        private static let gateKeeper = Gate(tickets: 3)
+        private static let gateKeeper = Gate(tickets: 2)
 
         private static func fetchData(for request: HTTPClientRequest, attempts: Int) async throws -> Any {
             await gateKeeper.takeTicket()

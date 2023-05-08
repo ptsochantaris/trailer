@@ -187,6 +187,8 @@
 		16DEA936235C6EDA004589B3 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16DEA935235C6EDA004589B3 /* main.swift */; };
 		16DEA937235C6F00004589B3 /* TrailerLauncher.app in Resources */ = {isa = PBXBuildFile; fileRef = 16DEA922235C6D7C004589B3 /* TrailerLauncher.app */; };
 		16DEA93D235C6F69004589B3 /* TrailerLauncher.app in Embed Helper */ = {isa = PBXBuildFile; fileRef = 16DEA922235C6D7C004589B3 /* TrailerLauncher.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		16E1C1DC2A096AC1006DDE7F /* FoundationJson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E1C1DB2A096AC1006DDE7F /* FoundationJson.swift */; };
+		16E1C1DD2A096AC1006DDE7F /* FoundationJson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E1C1DB2A096AC1006DDE7F /* FoundationJson.swift */; };
 		16E93D121AB467DA00CA967E /* PRListController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E93D111AB467DA00CA967E /* PRListController.swift */; };
 		16E93D141AB4680F00CA967E /* PRDetailController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E93D131AB4680F00CA967E /* PRDetailController.swift */; };
 		16E93D171AB46CE600CA967E /* LabelRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E93D161AB46CE600CA967E /* LabelRow.swift */; };
@@ -460,6 +462,7 @@
 		16DEA932235C6DC0004589B3 /* LauncherCommon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LauncherCommon.swift; sourceTree = "<group>"; };
 		16DEA935235C6EDA004589B3 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		16E07C831D2DC31300B0525C /* Trailer 30.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 30.xcdatamodel"; sourceTree = "<group>"; };
+		16E1C1DB2A096AC1006DDE7F /* FoundationJson.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoundationJson.swift; sourceTree = "<group>"; };
 		16E93D111AB467DA00CA967E /* PRListController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PRListController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16E93D131AB4680F00CA967E /* PRDetailController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PRDetailController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16E93D161AB46CE600CA967E /* LabelRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LabelRow.swift; sourceTree = "<group>"; };
@@ -623,6 +626,7 @@
 				16039A822969827C00CC73F4 /* HTTPCache.swift */,
 				16B8179A29B29F1B009A49EB /* Gate.swift */,
 				16968559296A3E6800D7BD9B /* LinkedList.swift */,
+				16E1C1DB2A096AC1006DDE7F /* FoundationJson.swift */,
 			);
 			name = Logic;
 			sourceTree = "<group>";
@@ -1308,6 +1312,7 @@
 				160CA03B23A65152003FA0D8 /* GQLGroup.swift in Sources */,
 				160CA03123A65152003FA0D8 /* GQLQuery.swift in Sources */,
 				166A84C01A4582C100A3B292 /* ServerDetailViewController.swift in Sources */,
+				16E1C1DD2A096AC1006DDE7F /* FoundationJson.swift in Sources */,
 				169B92971CC52C05002774A8 /* SnoozePreset.swift in Sources */,
 				164841001AD198A6009E6383 /* WatchManager.swift in Sources */,
 				167B10581E6A86A300B0E1AE /* Review.swift in Sources */,
@@ -1408,6 +1413,7 @@
 				16DEA933235C6DC0004589B3 /* LauncherCommon.swift in Sources */,
 				167B10571E6A86A300B0E1AE /* Review.swift in Sources */,
 				16B3B34F1A34E990000BE6CC /* Trailer.xcdatamodeld in Sources */,
+				16E1C1DC2A096AC1006DDE7F /* FoundationJson.swift in Sources */,
 				1633C1921ABCEC4A0086C692 /* Issue.swift in Sources */,
 				1694008C1E7AAE32002C5DAD /* Reaction.swift in Sources */,
 			);

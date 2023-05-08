@@ -32,7 +32,7 @@ extension GraphQL {
                     DLog("Processing GQL nodes: \(chunk.report)")
                     await process(chunk: chunk)
                     if !chunk.moreComing {
-                        break
+                        queue.finish()
                     }
                 }
             }

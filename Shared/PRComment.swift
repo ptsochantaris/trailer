@@ -106,7 +106,7 @@ final class PRComment: DataItem {
     private func fill(from info: JSON) {
         body = info["body"] as? String
 
-        if let id = info["pull_request_review_id"] as? Int, let moc = managedObjectContext, let r = Review.review(with: id, in: moc) {
+        if let id = info["pull_request_review_id"] as? Int64, let moc = managedObjectContext, let r = Review.review(with: id, in: moc) {
             review = r
         } else {
             review = nil

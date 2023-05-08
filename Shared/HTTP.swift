@@ -60,9 +60,7 @@ enum HTTP {
         if case .success = result, Settings.dumpAPIResponsesInConsole {
             DLog("API data from %@: %@", S(request.url), data.description)
         }
-        let json = try await Task.detached {
-            try JSONSerialization.jsonObject(with: data.asData)
-        }.value
+        let json = try FoundationJson.jsonObject(with: data.asData)
         return (json, result)
     }
 

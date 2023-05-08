@@ -2,8 +2,6 @@ import AsyncHTTPClient
 import CommonCrypto
 import CoreData
 
-typealias JSON = [String: Any]
-
 extension String {
     private func sha1() -> Data {
         utf8CString.withUnsafeBytes { bytes -> Data in
@@ -187,14 +185,15 @@ enum API {
         }
         DataItem.nukeDeletedItems(in: syncMoc)
         DataItem.nukeOrphanedItems(in: syncMoc)
-        await DataManager.postProcessAllItems(in: syncMoc)
 
         do {
             if syncMoc.hasChanges {
                 DLog("Committing synced data")
                 try syncMoc.save()
                 DLog("Synced data committed")
-                await DataManager.saveDB()
+                await DataManager.saveDB() // get IDs
+                await DataManager.postProcessAllItems(in: DataManager.main)
+                await DataManager.saveDB() // store completed state
             } else {
                 DLog("No changes, skipping commit")
             }
