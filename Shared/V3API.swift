@@ -84,7 +84,7 @@ extension API {
                             var numbers = Set<Int64>()
                             var foundLastEvent = false
                             for event in data {
-                                if let eventId = event["id"] as? Int64, let issue = event["issue"] as? [AnyHashable: Any], let issueNumber = issue["number"] as? Int64 {
+                                if let eventId = event["id"] as? Int64, let issue = event["issue"] as? JSON, let issueNumber = issue["number"] as? Int64 {
                                     if r.lastScannedIssueEventId == 0 {
                                         r.lastScannedIssueEventId = eventId
                                     }
@@ -397,8 +397,8 @@ extension API {
             let (data, _, result) = try await RestAccess.getData(in: path, from: pullRequest.apiServer)
             switch result {
             case .success:
-                if let d = data as? [AnyHashable: Any] {
-                    if let mergeInfo = d["merged_by"] as? [AnyHashable: Any], let mergeUserId = mergeInfo["node_id"] as? String {
+                if let d = data as? JSON {
+                    if let mergeInfo = d["merged_by"] as? JSON, let mergeUserId = mergeInfo["node_id"] as? String {
                         pullRequest.mergedByNodeId = mergeUserId
                         pullRequest.stateChanged = ListableItem.StateChange.merged.rawValue
                         pullRequest.postSyncAction = PostSyncAction.isUpdated.rawValue // let handleMerging() decide
@@ -447,14 +447,14 @@ extension API {
                     var reviewUsers = Set<String>()
                     var reviewTeams = Set<String>()
 
-                    if let userList = data as? [[AnyHashable: Any]] {
+                    if let userList = data as? [JSON] {
                         // Legacy API results
                         for userName in userList.compactMap({ $0["login"] as? String }) {
                             reviewUsers.insert(userName)
                         }
                         p.checkAndStoreReviewAssignments(reviewUsers, reviewTeams)
 
-                    } else if let data = data as? [AnyHashable: Any], let userList = data["users"] as? [[AnyHashable: Any]], let teamList = data["teams"] as? [[AnyHashable: Any]] {
+                    } else if let data = data as? JSON, let userList = data["users"] as? [JSON], let teamList = data["teams"] as? [JSON] {
                         // New API results
                         for userName in userList.compactMap({ $0["login"] as? String }) {
                             reviewUsers.insert(userName)
@@ -580,7 +580,7 @@ extension API {
                     group.addTask { @MainActor in
                         do {
                             let (data, _, _) = try await RestAccess.getData(in: issueLink, from: apiServer)
-                            if let d = data as? [AnyHashable: Any] {
+                            if let d = data as? JSON {
                                 p.processAssignmentStatus(from: d, idField: "node_id")
                             }
                         } catch {

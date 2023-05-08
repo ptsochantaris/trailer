@@ -45,7 +45,7 @@ final class PRComment: DataItem {
             comment.body = info["body"] as? String
             comment.webUrl = info["url"] as? String
 
-            if let userInfo = info["author"] as? [AnyHashable: Any] {
+            if let userInfo = info["author"] as? JSON {
                 comment.userName = userInfo["login"] as? String
                 comment.userNodeId = userInfo["id"] as? String
                 comment.avatarUrl = userInfo["avatarUrl"] as? String
@@ -53,7 +53,7 @@ final class PRComment: DataItem {
         }
     }
 
-    static func syncComments(from data: [[AnyHashable: Any]]?, parent: ListableItem, moc: NSManagedObjectContext) async {
+    static func syncComments(from data: [JSON]?, parent: ListableItem, moc: NSManagedObjectContext) async {
         let parentId = parent.objectID
         await v3items(with: data, type: PRComment.self, serverId: parent.apiServer.objectID, moc: moc) { item, info, newOrUpdated, syncMoc in
             if newOrUpdated, let parent = try? syncMoc.existingObject(with: parentId) as? ListableItem {
@@ -61,7 +61,7 @@ final class PRComment: DataItem {
                 item.issue = parent as? Issue
                 item.fill(from: info)
                 item.fastForwardIfNeeded(parent: parent)
-                item.reactionsUrl = (info["reactions"] as? [AnyHashable: Any])?["url"] as? String
+                item.reactionsUrl = (info["reactions"] as? JSON)?["url"] as? String
             }
         }
     }
@@ -103,16 +103,16 @@ final class PRComment: DataItem {
         }
     }
 
-    private func fill(from info: [AnyHashable: Any]) {
+    private func fill(from info: JSON) {
         body = info["body"] as? String
 
-        if let id = info["pull_request_review_id"] as? Int64, let moc = managedObjectContext, let r = Review.review(with: id, in: moc) {
+        if let id = info["pull_request_review_id"] as? Int, let moc = managedObjectContext, let r = Review.review(with: id, in: moc) {
             review = r
         } else {
             review = nil
         }
 
-        if let userInfo = info["user"] as? [AnyHashable: Any] {
+        if let userInfo = info["user"] as? JSON {
             userName = userInfo["login"] as? String
             avatarUrl = userInfo["avatar_url"] as? String
             userNodeId = userInfo["node_id"] as? String
@@ -121,8 +121,8 @@ final class PRComment: DataItem {
         if let href = info["html_url"] as? String {
             webUrl = href
 
-        } else if let links = info["_links"] as? [AnyHashable: Any],
-                  let html = links["html"] as? [AnyHashable: Any],
+        } else if let links = info["_links"] as? JSON,
+                  let html = links["html"] as? JSON,
                   let href = html["href"] as? String {
             webUrl = href
         }

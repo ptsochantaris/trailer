@@ -93,7 +93,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate, NSControlTextEditingDele
             alert.informativeText = "This tab contains your watchlist, with view settings for each repository. Be sure to enable only the repos you need, in order to keep API usage low. Trailer will load data from the active repositories once you close the preferences window.\n\nYou can tweak options & behaviour from the other tabs.\n\nTrailer has read-only access to your GitHub data, so feel free to experiment, you can't damage your data or settings on GitHub."
             alert.addButton(withTitle: "OK")
             alert.runModal()
-            
+
         } else {
             let alert = NSAlert()
             alert.messageText = "Syncing with this server failed - please check that your network connection is working and that you have pasted your token correctly"

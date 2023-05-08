@@ -53,18 +53,18 @@ class DataItem: NSManagedObject {
         return try! moc.fetch(f)
     }
 
-    static func v3items<T: DataItem>(with data: [[AnyHashable: Any]]?,
+    static func v3items<T: DataItem>(with data: [JSON]?,
                                      type: T.Type,
                                      serverId: NSManagedObjectID,
                                      prefetchRelationships: [String]? = nil,
                                      createNewItems: Bool = true,
                                      moc: NSManagedObjectContext,
-                                     postProcessCallback: @escaping (T, [AnyHashable: Any], Bool, NSManagedObjectContext) -> Void) async {
+                                     postProcessCallback: @escaping (T, JSON, Bool, NSManagedObjectContext) -> Void) async {
         guard let infos = data, !infos.isEmpty else { return }
 
         var legacyIdsToNodeIds = [Int64: String]()
 
-        var nodeIdsToInfo = [String: [AnyHashable: Any]]()
+        var nodeIdsToInfo = [String: JSON]()
         for info in infos {
             let nodeId = info["node_id"] as! String
             nodeIdsToInfo[nodeId] = info

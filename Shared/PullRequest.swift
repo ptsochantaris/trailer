@@ -32,7 +32,7 @@ final class PullRequest: ListableItem {
     static func sync(from nodes: LinkedList<GraphQL.Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
         syncItems(of: PullRequest.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { pr, node in
             guard node.created || node.updated,
-                  let parentId = node.parent?.id ?? (node.jsonPayload["repository"] as? [AnyHashable: Any])?["id"] as? String,
+                  let parentId = node.parent?.id ?? (node.jsonPayload["repository"] as? JSON)?["id"] as? String,
                   let parent = DataItem.parent(of: Repo.self, with: parentId, in: moc, parentCache: parentCache)
             else { return }
 
@@ -46,14 +46,14 @@ final class PullRequest: ListableItem {
             pr.linesAdded = json["additions"] as? Int64 ?? 0
             pr.linesRemoved = json["deletions"] as? Int64 ?? 0
             pr.mergeCommitSha = json["headRefOid"] as? String
-            pr.mergedByNodeId = (json["mergedBy"] as? [AnyHashable: Any])?["id"] as? String
+            pr.mergedByNodeId = (json["mergedBy"] as? JSON)?["id"] as? String
             pr.baseNodeSync(node: node, parent: parent)
             pr.reviewers = "" // will be populated by the review request API calls
             pr.teamReviewers = "" // will be populated by the review request API calls
 
             let headRefName = json["headRefName"] as? String
             if let headRefName,
-               let headRepoName = (json["headRepository"] as? [AnyHashable: Any])?["nameWithOwner"] as? String {
+               let headRepoName = (json["headRepository"] as? JSON)?["nameWithOwner"] as? String {
                 pr.headLabel = headRepoName + ":" + headRefName
             } else {
                 pr.headLabel = nil
@@ -62,7 +62,7 @@ final class PullRequest: ListableItem {
 
             let baseRefName = json["baseRefName"] as? String
             if let baseRefName,
-               let baseRepoName = (json["baseRepository"] as? [AnyHashable: Any])?["nameWithOwner"] as? String {
+               let baseRepoName = (json["baseRepository"] as? JSON)?["nameWithOwner"] as? String {
                 pr.baseLabel = baseRepoName + ":" + baseRefName
             } else {
                 pr.baseLabel = nil
@@ -78,7 +78,7 @@ final class PullRequest: ListableItem {
         repo.apiUrl?.appending(pathComponent: "statuses").appending(pathComponent: mergeCommitSha ?? "")
     }
 
-    static func syncPullRequests(from data: [[AnyHashable: Any]]?, in repo: Repo, moc: NSManagedObjectContext) async {
+    static func syncPullRequests(from data: [JSON]?, in repo: Repo, moc: NSManagedObjectContext) async {
         let apiServer = repo.apiServer
         let apiServerUserId = apiServer.userNodeId
         let repoId = repo.objectID
@@ -87,10 +87,10 @@ final class PullRequest: ListableItem {
                 let repo = try! syncMoc.existingObject(with: repoId) as! Repo
                 item.baseSync(from: info, in: repo)
 
-                let baseInfo = info["base"] as? [AnyHashable: Any]
+                let baseInfo = info["base"] as? JSON
                 item.baseLabel = baseInfo?["label"] as? String
 
-                let headInfo = info["head"] as? [AnyHashable: Any]
+                let headInfo = info["head"] as? JSON
                 item.headRefName = headInfo?["ref"] as? String
                 item.headLabel = headInfo?["label"] as? String
 
@@ -99,7 +99,7 @@ final class PullRequest: ListableItem {
 
                 if
                     let newHeadCommitSha = headInfo?["sha"] as? String,
-                    let commitUserInfo = headInfo?["user"] as? [AnyHashable: Any],
+                    let commitUserInfo = headInfo?["user"] as? JSON,
                     let newHeadCommitUserId = commitUserInfo["node_id"] as? String {
                     let currentSha = item.mergeCommitSha
                     if currentSha != nil, currentSha != newHeadCommitSha, apiServerUserId != newHeadCommitUserId {

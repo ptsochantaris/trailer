@@ -16,7 +16,7 @@ final class Issue: ListableItem {
         syncItems(of: Issue.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { issue, node in
 
             guard node.created || node.updated,
-                  let parentId = node.parent?.id ?? (node.jsonPayload["repository"] as? [AnyHashable: Any])?["id"] as? String,
+                  let parentId = node.parent?.id ?? (node.jsonPayload["repository"] as? JSON)?["id"] as? String,
                   let parent = DataItem.parent(of: Repo.self, with: parentId, in: moc, parentCache: parentCache)
             else { return }
 
@@ -24,7 +24,7 @@ final class Issue: ListableItem {
         }
     }
 
-    static func syncIssues(from data: [[AnyHashable: Any]]?, in repo: Repo, moc: NSManagedObjectContext) async {
+    static func syncIssues(from data: [JSON]?, in repo: Repo, moc: NSManagedObjectContext) async {
         let apiServer = repo.apiServer
         let repoId = repo.objectID
 

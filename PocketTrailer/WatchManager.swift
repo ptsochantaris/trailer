@@ -30,7 +30,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
         DataManager.dataFilesDirectory.appendingPathComponent("overview.plist")
     }
 
-    func session(_: WCSession, didReceiveMessage message: [String: Any], replyHandler: @escaping ([String: Any]) -> Void) {
+    func session(_: WCSession, didReceiveMessage message: JSON, replyHandler: @escaping (JSON) -> Void) {
         Task {
             let reply = await handle(message: message)
             replyHandler(reply)
@@ -44,7 +44,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
     }
 
     @MainActor
-    private func handle(message: [String: Any]) async -> [String: Any] {
+    private func handle(message: JSON) async -> JSON {
         switch S(message["command"] as? String) {
         case "refresh":
             let status = await app.startRefresh()
@@ -112,8 +112,8 @@ final class WatchManager: NSObject, WCSessionDelegate {
     }
 
     @MainActor
-    private func processList(message: [String: Any]) async -> [String: Any] {
-        var result = [String: Any]()
+    private func processList(message: JSON) async -> JSON {
+        var result = JSON()
 
         switch S(message["list"] as? String) {
         case "overview":
@@ -144,14 +144,14 @@ final class WatchManager: NSObject, WCSessionDelegate {
         }
     }
 
-    private func reportFailure(reason: String, result: [String: Any]) -> [String: Any] {
+    private func reportFailure(reason: String, result: JSON) -> JSON {
         var r = result
         r["error"] = true
         r["status"] = reason
         return r
     }
 
-    private func reportSuccess(result: [String: Any]) -> [String: Any] {
+    private func reportSuccess(result: JSON) -> JSON {
         var r = result
         r["status"] = "Success"
         return r
@@ -160,7 +160,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
     ////////////////////////////
 
     @MainActor
-    private func buildItemList(type: String, sectionIndex: Int64, from: Int, apiServerUri: String, group: String, count: Int, onlyUnread: Bool) async -> [String: Any] {
+    private func buildItemList(type: String, sectionIndex: Int64, from: Int, apiServerUri: String, group: String, count: Int, onlyUnread: Bool) async -> JSON {
         let showLabels = Settings.showLabels
         let entity: ListableItem.Type
         if type == "prs" {
@@ -189,11 +189,11 @@ final class WatchManager: NSObject, WCSessionDelegate {
     }
 
     @MainActor
-    private func baseDataForItem(item: ListableItem, showLabels: Bool) -> [String: Any] {
+    private func baseDataForItem(item: ListableItem, showLabels: Bool) -> JSON {
         let font = UIFont.systemFont(ofSize: UIFont.systemFontSize)
         let smallFont = UIFont.systemFont(ofSize: UIFont.systemFontSize - 4)
 
-        var itemData: [String: Any] = [
+        var itemData: JSON = [
             "commentCount": item.totalComments,
             "unreadCount": item.unreadComments,
             "localId": item.objectID.uriRepresentation().absoluteString,
@@ -213,8 +213,8 @@ final class WatchManager: NSObject, WCSessionDelegate {
     }
 
     @MainActor
-    private func labelsForItem(item: ListableItem) -> [[String: Any]] {
-        var labels = [[String: Any]]()
+    private func labelsForItem(item: ListableItem) -> [JSON] {
+        var labels = [JSON]()
         for l in item.labels {
             labels.append([
                 "color": l.colorForDisplay,
@@ -225,8 +225,8 @@ final class WatchManager: NSObject, WCSessionDelegate {
     }
 
     @MainActor
-    private func statusLinesForPr(pr: PullRequest) -> [[String: Any]] {
-        var statusLines = [[String: Any]]()
+    private func statusLinesForPr(pr: PullRequest) -> [JSON] {
+        var statusLines = [JSON]()
         for status in pr.displayedStatuses {
             statusLines.append([
                 "color": status.colorForDisplay,
@@ -251,8 +251,8 @@ final class WatchManager: NSObject, WCSessionDelegate {
     }
 
     @MainActor
-    private func commentsForItem(item: ListableItem) -> [[String: Any]] {
-        var comments = [[String: Any]]()
+    private func commentsForItem(item: ListableItem) -> [JSON] {
+        var comments = [JSON]()
         for comment in item.sortedComments(using: .orderedDescending) {
             comments.append([
                 "user": S(comment.userName),
@@ -267,11 +267,11 @@ final class WatchManager: NSObject, WCSessionDelegate {
     //////////////////////////////
 
     @MainActor
-    private func buildOverview() async -> [String: Any] {
+    private func buildOverview() async -> JSON {
         let allViewCriteria = popupManager.masterController.allTabSets.map(\.viewCriterion)
 
         return await DataManager.runInChild(of: DataManager.main) { tempMoc in
-            var views = [[String: Any]]()
+            var views = [JSON]()
             var totalUnreadPrCount = 0
             var totalUnreadIssueCount = 0
 
@@ -306,15 +306,15 @@ final class WatchManager: NSObject, WCSessionDelegate {
                     "merged": mergedPrs, "closed": closedPrs, "other": otherPrs, "snoozed": snoozedPrs,
                     "total": totalPrs, "total_open": totalOpenPrs, "unread": unreadPrCount,
                     "error": totalPrs == 0 ? PullRequest.reasonForEmpty(with: nil, criterion: c).string : ""
-                ] as [String: Any]
-                
+                ] as JSON
+
                 let issueList = [
                     "mine": myIssues, "participated": participatedIssues, "mentioned": mentionedIssues,
                     "closed": closedIssues, "other": otherIssues, "snoozed": snoozedIssues,
                     "total": totalIssues, "total_open": totalOpenIssues, "unread": unreadIssueCount,
                     "error": totalIssues == 0 ? Issue.reasonForEmpty(with: nil, criterion: c).string : ""
-                ] as [String: Any]
-                
+                ] as JSON
+
                 views.append([
                     "title": S(c?.label),
                     "apiUri": S(c?.apiServerId?.uriRepresentation().absoluteString),

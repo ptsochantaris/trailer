@@ -401,7 +401,7 @@ enum DataManager {
         }
     }
 
-    static func info(for item: DataItem) -> [String: Any] {
+    static func info(for item: DataItem) -> JSON {
         if let item = item as? PRComment {
             let uri = item.objectID.uriRepresentation().absoluteString
             let parentUri = item.parent?.objectID.uriRepresentation().absoluteString ?? ""

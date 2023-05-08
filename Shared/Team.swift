@@ -14,10 +14,10 @@ final class Team: DataItem {
         return try? moc.fetch(f).first
     }
 
-    static func syncTeams(from data: [[AnyHashable: Any]]?, serverId: NSManagedObjectID, moc: NSManagedObjectContext) async {
+    static func syncTeams(from data: [JSON]?, serverId: NSManagedObjectID, moc: NSManagedObjectContext) async {
         await v3items(with: data, type: Team.self, serverId: serverId, moc: moc) { item, info, _, _ in
             let slug = S(info["slug"] as? String)
-            let org = S((info["organization"] as? [AnyHashable: Any])?["login"] as? String)
+            let org = S((info["organization"] as? JSON)?["login"] as? String)
             item.slug = slug
             item.organisationLogin = org
             if slug.isEmpty || org.isEmpty {

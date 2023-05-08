@@ -2,6 +2,8 @@ import AsyncHTTPClient
 import CommonCrypto
 import CoreData
 
+typealias JSON = [String: Any]
+
 extension String {
     private func sha1() -> Data {
         utf8CString.withUnsafeBytes { bytes -> Data in
@@ -342,7 +344,7 @@ enum API {
         let path = "\(server.apiPath ?? "")/repos/\(fullName)"
         do {
             let (data, _, _) = try await RestAccess.getData(in: path, from: server)
-            if let repoData = data as? [AnyHashable: Any] {
+            if let repoData = data as? JSON {
                 await Repo.syncRepos(from: [repoData], server: server, addNewRepos: true, manuallyAdded: true, moc: moc)
             }
         } catch {
@@ -353,8 +355,8 @@ enum API {
 
     static func fetchAllRepos(owner: String, from server: ApiServer, moc: NSManagedObjectContext) async throws {
         let userPath = "\(server.apiPath ?? "")/users/\(owner)/repos"
-        let userTask = Task { () -> [[AnyHashable: Any]] in
-            var userList = [[AnyHashable: Any]]()
+        let userTask = Task { () -> [JSON] in
+            var userList = [JSON]()
             let result = await RestAccess.getPagedData(at: userPath, from: server) { data, _ -> Bool in
                 if let data {
                     userList.append(contentsOf: data)
@@ -374,8 +376,8 @@ enum API {
         }
 
         let orgPath = "\(server.apiPath ?? "")/orgs/\(owner)/repos"
-        let orgTask = Task { () -> [[AnyHashable: Any]] in
-            var orgList = [[AnyHashable: Any]]()
+        let orgTask = Task { () -> [JSON] in
+            var orgList = [JSON]()
             let result = await RestAccess.getPagedData(at: orgPath, from: server) { data, _ -> Bool in
                 if let data {
                     orgList.append(contentsOf: data)
@@ -409,7 +411,7 @@ enum API {
         for apiServer in configuredServers {
             do {
                 let (data, _, _) = try await RestAccess.getData(in: "/user", from: apiServer)
-                if let d = data as? [AnyHashable: Any] {
+                if let d = data as? JSON {
                     apiServer.userName = d["login"] as? String
                     apiServer.userNodeId = d["node_id"] as? String
                 } else {

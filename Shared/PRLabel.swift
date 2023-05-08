@@ -37,11 +37,11 @@ final class PRLabel: DataItem {
         }
     }
 
-    private static func labels(from data: [[AnyHashable: Any]]?, fromParent: ListableItem, postProcessCallback: (PRLabel, [AnyHashable: Any]) -> Void) {
+    private static func labels(from data: [JSON]?, fromParent: ListableItem, postProcessCallback: (PRLabel, JSON) -> Void) {
         guard let infos = data, !infos.isEmpty else { return }
 
         var namesOfItems = [String]()
-        var namesToInfo = [String: [AnyHashable: Any]]()
+        var namesToInfo = [String: JSON]()
         for info in infos {
             if let name = info["name"] as? String {
                 namesOfItems.append(name)
@@ -88,7 +88,7 @@ final class PRLabel: DataItem {
         }
     }
 
-    static func syncLabels(from info: [[AnyHashable: Any]]?, withParent: ListableItem) {
+    static func syncLabels(from info: [JSON]?, withParent: ListableItem) {
         labels(from: info, fromParent: withParent) { label, info in
             if let c = info["color"] as? String {
                 label.color = parse(from: c)

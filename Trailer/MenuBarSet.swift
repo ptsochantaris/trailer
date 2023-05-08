@@ -51,16 +51,16 @@ final class MenuBarSet {
         prFilterTimer = PopTimer(timeInterval: 0.2) { [weak self] in
             Task { [weak self] in
                 guard let self else { return }
-                await self.updatePrMenu()
-                self.prMenu.scrollToTop()
+                await updatePrMenu()
+                prMenu.scrollToTop()
             }
         }
 
         issuesFilterTimer = PopTimer(timeInterval: 0.2) { [weak self] in
             Task { [weak self] in
                 guard let self else { return }
-                await self.updateIssuesMenu()
-                self.issuesMenu.scrollToTop()
+                await updateIssuesMenu()
+                issuesMenu.scrollToTop()
             }
         }
     }
@@ -192,7 +192,7 @@ final class MenuBarSet {
         }
     }
 
-    private func compare(dictionary from: [AnyHashable: Any], to: [AnyHashable: Any]) -> Bool {
+    private func compare(dictionary from: JSON, to: JSON) -> Bool {
         for (key, value) in from {
             if let v = to[key] {
                 if String(describing: v) != String(describing: value) {

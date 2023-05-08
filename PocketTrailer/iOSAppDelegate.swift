@@ -55,7 +55,7 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
             guard let task = task as? BGProcessingTask, DataManager.appIsConfigured, let self else {
                 return
             }
-            self.backgroundProcessing = task
+            backgroundProcessing = task
             Task {
                 await self.startRefresh()
             }

@@ -11,8 +11,8 @@ final class PopTimer {
         if cancel == nil {
             cancel = publisher.debounce(for: stride, scheduler: RunLoop.main).sink { [weak self] _ in
                 guard let self else { return }
-                self.cancel = nil
-                self.callback()
+                cancel = nil
+                callback()
             }
         }
         publisher.send()

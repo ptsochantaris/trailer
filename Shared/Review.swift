@@ -24,7 +24,7 @@ final class Review: DataItem {
                 continue
             }
 
-            if let reviewerJson = node.jsonPayload["requestedReviewer"] as? [AnyHashable: Any] {
+            if let reviewerJson = node.jsonPayload["requestedReviewer"] as? JSON {
                 if let login = reviewerJson["login"] as? String {
                     var previous = prIdsToAssignedUsers[parentId]
                     previous?.insert(login)
@@ -72,18 +72,18 @@ final class Review: DataItem {
             }
 
             review.body = info["body"] as? String
-            review.username = (info["author"] as? [AnyHashable: Any])?["login"] as? String
+            review.username = (info["author"] as? JSON)?["login"] as? String
         }
     }
 
-    static func syncReviews(from data: [[AnyHashable: Any]]?, withParent: PullRequest, moc: NSManagedObjectContext) async {
+    static func syncReviews(from data: [JSON]?, withParent: PullRequest, moc: NSManagedObjectContext) async {
         let parentId = withParent.objectID
         let apiServerId = withParent.apiServer.objectID
         await v3items(with: data, type: Review.self, serverId: apiServerId, moc: moc) { item, info, isNewOrUpdated, syncMoc in
             if isNewOrUpdated, let parent = try? syncMoc.existingObject(with: parentId) as? PullRequest {
                 item.pullRequest = parent
                 item.body = info["body"] as? String
-                item.username = (info["user"] as? [AnyHashable: Any])?["login"] as? String
+                item.username = (info["user"] as? JSON)?["login"] as? String
             }
             let newState = info["state"] as? String
             item.check(newState: newState)

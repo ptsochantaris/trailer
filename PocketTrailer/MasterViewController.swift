@@ -732,7 +732,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         tabs.removeFromSuperview()
     }
 
-    func localNotificationSelected(userInfo: [AnyHashable: Any], action: String) {
+    func localNotificationSelected(userInfo: JSON, action: String) {
         var urlToOpen = userInfo[NOTIFICATION_URL_KEY] as? String
         var relatedItem: ListableItem?
 

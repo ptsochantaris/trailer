@@ -353,8 +353,8 @@ struct ApiStats {
         return ApiStats(nodeCount: 0, cost: 1, remaining: remaining, limit: limit, resetAt: date)
     }
 
-    static func fromV4(json: [AnyHashable: Any]?) -> ApiStats? {
-        guard let info = json?["rateLimit"] as? [AnyHashable: Any] else { return nil }
+    static func fromV4(json: JSON?) -> ApiStats? {
+        guard let info = json?["rateLimit"] as? JSON else { return nil }
         let date = apiDateFormatter.date(from: info["resetAt"] as? String ?? "")
         return ApiStats(nodeCount: info["nodeCount"] as? Int64 ?? 0,
                         cost: info["cost"] as? Int64 ?? 0,

@@ -52,7 +52,7 @@ enum GraphQL {
 
     static func update<T: ListableItem>(for items: [T], steps: API.SyncSteps) async throws {
         let typeName = String(describing: T.self)
-        
+
         if let prs = items as? [PullRequest] {
             if steps.contains(.reviews) {
                 prs.forEach {
@@ -61,7 +61,7 @@ enum GraphQL {
                     }
                 }
             }
-            
+
             if steps.contains(.statuses) {
                 let now = Date()
                 prs.forEach {
@@ -72,7 +72,7 @@ enum GraphQL {
                 }
             }
         }
-        
+
         if steps.contains(.reactions) {
             let now = Date()
             items.forEach {
@@ -82,7 +82,7 @@ enum GraphQL {
                 }
             }
         }
-        
+
         if steps.contains(.comments) {
             items.forEach {
                 $0.comments.forEach {
@@ -90,11 +90,11 @@ enum GraphQL {
                 }
             }
         }
-        
+
         try await process(name: steps.toString, items: items, parentType: T.self) {
             Fragment(on: typeName) {
                 idField
-                
+
                 if items is [PullRequest] {
                     if steps.contains(.reviewRequests) {
                         Group("reviewRequests", paging: .max) {
@@ -115,7 +115,7 @@ enum GraphQL {
                             }
                         }
                     }
-                    
+
                     if steps.contains(.reviews) {
                         Group("reviews", paging: .max) {
                             Fragment(on: "PullRequestReview") {
@@ -128,7 +128,7 @@ enum GraphQL {
                             }
                         }
                     }
-                    
+
                     if steps.contains(.statuses) {
                         Group("commits", paging: .last(count: 1)) {
                             Group("commit") {
@@ -160,7 +160,7 @@ enum GraphQL {
                         }
                     }
                 }
-                
+
                 if steps.contains(.reactions) {
                     Group("reactions", paging: .max) {
                         Fragment(on: "Reaction") {
@@ -171,7 +171,7 @@ enum GraphQL {
                         }
                     }
                 }
-                
+
                 if steps.contains(.comments) {
                     commentGroup(for: "IssueComment")
                 }
@@ -231,7 +231,7 @@ enum GraphQL {
                     nodes.removeAll(keepingCapacity: true)
                 }
             }
-            
+
             let queries = Query.batching("\(serverName): \(name)", idList: ids, perNode: nodeBlock, fields: fields)
 
             do {
@@ -472,7 +472,7 @@ enum GraphQL {
                 }
             }
         }
-        
+
         let processor = Processor()
 
         for (server, reposInThisServer) in reposByServer {
@@ -552,7 +552,7 @@ enum GraphQL {
                 }
             }
         }
-        
+
         let processor = Processor()
 
         for (server, reposInThisServer) in reposByServer {

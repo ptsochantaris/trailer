@@ -29,7 +29,7 @@ final class Reaction: DataItem {
             let info = node.jsonPayload
             reaction.content = info["content"] as? String
 
-            if let user = info["user"] as? [AnyHashable: Any] {
+            if let user = info["user"] as? JSON {
                 reaction.userName = user["login"] as? String
                 reaction.avatarUrl = user["avatarUrl"] as? String
                 reaction.userNodeId = user["id"] as? String
@@ -37,7 +37,7 @@ final class Reaction: DataItem {
         }
     }
 
-    static func syncReactions(from data: [[AnyHashable: Any]]?, commentId: NSManagedObjectID, serverId: NSManagedObjectID, moc: NSManagedObjectContext) async {
+    static func syncReactions(from data: [JSON]?, commentId: NSManagedObjectID, serverId: NSManagedObjectID, moc: NSManagedObjectContext) async {
         await v3items(with: data, type: Reaction.self, serverId: serverId, moc: moc) { item, info, isNewOrUpdated, syncMoc in
             if isNewOrUpdated, let parent = try? syncMoc.existingObject(with: commentId) as? PRComment {
                 item.pullRequest = nil
@@ -48,7 +48,7 @@ final class Reaction: DataItem {
         }
     }
 
-    static func syncReactions(from data: [[AnyHashable: Any]]?, parentId: NSManagedObjectID, serverId: NSManagedObjectID, moc: NSManagedObjectContext) async {
+    static func syncReactions(from data: [JSON]?, parentId: NSManagedObjectID, serverId: NSManagedObjectID, moc: NSManagedObjectContext) async {
         await v3items(with: data, type: Reaction.self, serverId: serverId, moc: moc) { item, info, isNewOrUpdated, syncMoc in
             if isNewOrUpdated {
                 let parent = try! syncMoc.existingObject(with: parentId)
@@ -60,9 +60,9 @@ final class Reaction: DataItem {
         }
     }
 
-    private func fill(from info: [AnyHashable: Any]) {
+    private func fill(from info: JSON) {
         content = info["content"] as? String
-        if let user = info["user"] as? [AnyHashable: Any] {
+        if let user = info["user"] as? JSON {
             userName = user["login"] as? String
             avatarUrl = user["avatar_url"] as? String
             userNodeId = user["node_id"] as? String
@@ -85,7 +85,7 @@ final class Reaction: DataItem {
         userNodeId == apiServer.userNodeId || userNodeId == apiServer.userNodeId
     }
 
-    static func changesDetected(in reactions: Set<Reaction>, from info: [AnyHashable: Any]) -> String? {
+    static func changesDetected(in reactions: Set<Reaction>, from info: JSON) -> String? {
         var counts = [String: Int]()
         for r in reactions {
             if let c = r.content {

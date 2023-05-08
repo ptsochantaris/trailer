@@ -45,7 +45,7 @@ final class Repo: DataItem {
                 repo.webUrl = json["url"] as? String
                 repo.inaccessible = false
                 repo.archived = json["isArchived"] as? Bool ?? false
-                repo.ownerNodeId = (json["owner"] as? [AnyHashable: Any])?["id"] as? String
+                repo.ownerNodeId = (json["owner"] as? JSON)?["id"] as? String
                 if node.created {
                     repo.displayPolicyForPrs = Int64(Settings.displayPolicyForNewPrs)
                     repo.displayPolicyForIssues = Int64(Settings.displayPolicyForNewIssues)
@@ -61,10 +61,10 @@ final class Repo: DataItem {
         }
     }
 
-    static func syncRepos(from data: [[AnyHashable: Any]]?, server: ApiServer, addNewRepos: Bool, manuallyAdded: Bool, moc: NSManagedObjectContext) async {
+    static func syncRepos(from data: [JSON]?, server: ApiServer, addNewRepos: Bool, manuallyAdded: Bool, moc: NSManagedObjectContext) async {
         let filteredData = data?.filter { info -> Bool in
             if info["private"] as? Bool ?? false {
-                if let permissions = info["permissions"] as? [AnyHashable: Any] {
+                if let permissions = info["permissions"] as? JSON {
                     let pull = permissions["pull"] as? Bool ?? false
                     let push = permissions["push"] as? Bool ?? false
                     let admin = permissions["admin"] as? Bool ?? false
@@ -88,7 +88,7 @@ final class Repo: DataItem {
                 item.webUrl = info["html_url"] as? String
                 item.inaccessible = false
                 item.archived = info["archived"] as? Bool ?? false
-                item.ownerNodeId = (info["owner"] as? [AnyHashable: Any])?["node_id"] as? String
+                item.ownerNodeId = (info["owner"] as? JSON)?["node_id"] as? String
                 item.manuallyAdded = manuallyAdded
                 if item.postSyncAction == PostSyncAction.isNew.rawValue {
                     item.displayPolicyForPrs = Int64(Settings.displayPolicyForNewPrs)

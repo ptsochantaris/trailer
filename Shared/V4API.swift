@@ -113,7 +113,7 @@ extension API {
                     }
                 }
             }
-            
+
             let newOrUpdatedIssues = DataItem.newOrUpdatedItems(of: Issue.self, in: moc, fromSuccessfulSyncOnly: true)
             try await GraphQL.update(for: newOrUpdatedIssues, steps: steps)
 

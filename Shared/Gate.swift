@@ -1,5 +1,5 @@
-import Foundation
 import AsyncAlgorithms
+import Foundation
 
 public final actor Gate {
     private let queue = AsyncChannel<Void>()
@@ -19,7 +19,7 @@ public final actor Gate {
     }
 
     public func returnTicket() async {
-        await queue.send(Void())
+        await queue.send(())
     }
 
     public nonisolated func relaxedReturnTicket() {

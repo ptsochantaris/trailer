@@ -11,7 +11,7 @@ final class PRStatus: DataItem {
 
     override var alternateCreationDate: Bool { true }
 
-    static func syncStatuses(from data: [[AnyHashable: Any]]?, pullRequest: PullRequest, moc: NSManagedObjectContext) async {
+    static func syncStatuses(from data: [JSON]?, pullRequest: PullRequest, moc: NSManagedObjectContext) async {
         let pullRequestId = pullRequest.objectID
         let serverId = pullRequest.apiServer.objectID
         await v3items(with: data, type: PRStatus.self, serverId: serverId, moc: moc) { item, info, isNewOrUpdated, syncMoc in

@@ -1,5 +1,5 @@
-import Foundation
 import AsyncAlgorithms
+import Foundation
 
 extension GraphQL {
     final class Processor {
@@ -8,7 +8,7 @@ extension GraphQL {
             let server: ApiServer
             let parentType: ListableItem.Type?
             let moreComing: Bool
-            
+
             var report: String {
                 var components = [String]()
                 for (type, list) in nodes {
@@ -20,11 +20,11 @@ extension GraphQL {
                 return components.joined(separator: ", ")
             }
         }
-        
+
         private let queue = AsyncChannel<Chunk>()
-        
+
         private var ingest: Task<Void, Never>?
-        
+
         init() {
             ingest = Task.detached { [weak self] in
                 guard let self else { return }
@@ -37,27 +37,27 @@ extension GraphQL {
                 }
             }
         }
-        
+
         func waitForCompletion() async {
             await ingest?.value
         }
-        
+
         func add(chunk: Chunk) {
             Task {
                 await queue.send(chunk)
             }
         }
-        
+
         private func process(chunk: Chunk) async {
             guard chunk.nodes.count > 0, let moc = chunk.server.managedObjectContext else { return }
             await DataManager.runInChild(of: moc) { child in
                 guard let server = try? child.existingObject(with: chunk.server.objectID) as? ApiServer else {
                     return
                 }
-                
+
                 let parentCache = FetchCache()
                 // Order must be fixed, since labels may refer to PRs or Issues, ensure they are created first
-                
+
                 if let nodeList = chunk.nodes["Repository"] {
                     Repo.sync(from: nodeList, on: server, moc: child, parentCache: parentCache)
                 }

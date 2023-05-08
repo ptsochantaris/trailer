@@ -106,7 +106,7 @@ class ListableItem: DataItem {
         number = info["number"] as? Int64 ?? 0
         title = info["title"] as? String ?? "(No title)"
         body = info["bodyText"] as? String
-        milestone = (info["milestone"] as? [AnyHashable: Any])?["title"] as? String
+        milestone = (info["milestone"] as? JSON)?["title"] as? String
         draft = info["isDraft"] as? Bool ?? false
 
         let newCondition: Int64
@@ -129,15 +129,15 @@ class ListableItem: DataItem {
 
         condition = newCondition
 
-        if let user = info["author"] as? [AnyHashable: Any] {
+        if let user = info["author"] as? JSON {
             userLogin = user["login"] as? String
             userAvatarUrl = user["avatarUrl"] as? String
             userNodeId = user["id"] as? String
         }
 
-        let i: [[AnyHashable: Any]]
-        if let assignees = (info["assignees"] as? [AnyHashable: Any])?["edges"] as? [[AnyHashable: Any]] {
-            i = assignees.compactMap { $0["node"] as? [AnyHashable: Any] }
+        let i: [JSON]
+        if let assignees = (info["assignees"] as? JSON)?["edges"] as? [JSON] {
+            i = assignees.compactMap { $0["node"] as? JSON }
         } else {
             i = []
         }
@@ -149,16 +149,16 @@ class ListableItem: DataItem {
         }
     }
 
-    final func baseSync(from info: [AnyHashable: Any], in parentRepo: Repo) {
+    final func baseSync(from info: JSON, in parentRepo: Repo) {
         repo = parentRepo
         url = info["url"] as? String
-        number = info["number"] as? Int64 ?? 0
+        number = Int64(info["number"] as? Int ?? 0)
         title = info["title"] as? String ?? "(No title)"
         body = info["body"] as? String
-        milestone = (info["milestone"] as? [AnyHashable: Any])?["title"] as? String
+        milestone = (info["milestone"] as? JSON)?["title"] as? String
         draft = info["draft"] as? Bool ?? false
 
-        if let userInfo = info["user"] as? [AnyHashable: Any] {
+        if let userInfo = info["user"] as? JSON {
             userLogin = userInfo["login"] as? String
             userAvatarUrl = userInfo["avatar_url"] as? String
             userNodeId = userInfo["node_id"] as? String
@@ -171,11 +171,11 @@ class ListableItem: DataItem {
         Section(rawValue: sectionIndex) ?? .none
     }
 
-    final func processAssignmentStatus(from info: [AnyHashable: Any]?, idField: String) {
+    final func processAssignmentStatus(from info: JSON?, idField: String) {
         let myIdOnThisRepo = repo.apiServer.userNodeId
         var assigneeNames = [String]()
 
-        func checkAndStoreAssigneeName(from assignee: [AnyHashable: Any]) -> Bool {
+        func checkAndStoreAssigneeName(from assignee: JSON) -> Bool {
             if let name = assignee["login"] as? String, let assigneeId = assignee[idField] as? String {
                 let shouldBeAssignedToMe = assigneeId == myIdOnThisRepo
                 assigneeNames.append(name)
@@ -187,11 +187,11 @@ class ListableItem: DataItem {
 
         var foundAssignmentToMe = false
 
-        if let assignees = info?["assignees"] as? [[AnyHashable: Any]], !assignees.isEmpty {
+        if let assignees = info?["assignees"] as? [JSON], !assignees.isEmpty {
             for assignee in assignees where checkAndStoreAssigneeName(from: assignee) {
                 foundAssignmentToMe = true
             }
-        } else if let assignee = info?["assignee"] as? [AnyHashable: Any] {
+        } else if let assignee = info?["assignee"] as? JSON {
             foundAssignmentToMe = checkAndStoreAssigneeName(from: assignee)
         }
 
@@ -538,7 +538,7 @@ class ListableItem: DataItem {
             }
         }
 
-        if targetSection != .none && shouldMoveToSnoozing {
+        if targetSection != .none, shouldMoveToSnoozing {
             targetSection = .snoozed
         }
 
@@ -576,13 +576,13 @@ class ListableItem: DataItem {
             } else {
                 reviewCount = 0
             }
-            
+
             totalComments = Int64(comments.count)
-            + (context.notifyOnItemReactions ? Int64(reactions.count) : 0)
-            + (context.notifyOnCommentReactions ? countCommentReactions : 0)
-            + reviewCount
+                + (context.notifyOnItemReactions ? Int64(reactions.count) : 0)
+                + (context.notifyOnCommentReactions ? countCommentReactions : 0)
+                + reviewCount
         }
-        
+
         sectionIndex = targetSection.rawValue
     }
 
@@ -679,7 +679,7 @@ class ListableItem: DataItem {
             var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0
             color.getRed(&r, green: &g, blue: &b, alpha: nil)
             let lum = 0.2126 * r + 0.7152 * g + 0.0722 * b
-            return (lum < 0.5)
+            return lum < 0.5
         }
 
         let labelAttributes: [NSAttributedString.Key: Any] = [.font: labelFont, .baselineOffset: 0]
@@ -1085,7 +1085,7 @@ class ListableItem: DataItem {
     private static let isUnmergeablePredicate = NSPredicate(format: "isMergeable == false")
 
     @MainActor
-    static func relatedItems(from notificationUserInfo: [AnyHashable: Any]) -> (PRComment?, ListableItem)? {
+    static func relatedItems(from notificationUserInfo: JSON) -> (PRComment?, ListableItem)? {
         var item: ListableItem?
         var comment: PRComment?
         if let cid = notificationUserInfo[COMMENT_ID_KEY] as? String, let itemId = DataManager.id(for: cid), let c = existingObject(with: itemId) as? PRComment {

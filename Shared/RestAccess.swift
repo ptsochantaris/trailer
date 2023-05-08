@@ -8,7 +8,7 @@ enum RestAccess {
         var nextIncrement: TimeInterval
     }
 
-    static func getPagedData(at path: String, from server: ApiServer, startingFrom page: Int = 1, perPage: @MainActor @escaping ([[AnyHashable: Any]]?, Bool) async -> Bool) async -> DataResult {
+    static func getPagedData(at path: String, from server: ApiServer, startingFrom page: Int = 1, perPage: @MainActor @escaping ([JSON]?, Bool) async -> Bool) async -> DataResult {
         if path.isEmpty {
             // handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
             return .success(headers: [:], cachedIn: nil)
@@ -17,7 +17,7 @@ enum RestAccess {
         do {
             let p = page > 1 ? "\(path)?page=\(page)&per_page=100" : "\(path)?per_page=100"
             let (data, lastPage, result) = try await getData(in: p, from: server)
-            if await perPage(data as? [[AnyHashable: Any]], lastPage) || lastPage {
+            if await perPage(data as? [JSON], lastPage) || lastPage {
                 return result
             } else {
                 return await getPagedData(at: path, from: server, startingFrom: page + 1, perPage: perPage)
@@ -29,7 +29,7 @@ enum RestAccess {
 
     static func testApi(to apiServer: ApiServer) async throws {
         let (_, data) = try await start(call: "/user", on: apiServer, triggeredByUser: true, attempts: 1)
-        if let d = data as? [AnyHashable: Any], let userName = d["login"] as? String, let userId = d["id"] as? Int64 {
+        if let d = data as? JSON, let userName = d["login"] as? String, let userId = d["id"] as? Int {
             if userName.isEmpty || userId <= 0 {
                 let localError = API.apiError("Could not read a valid user record from this endpoint")
                 throw localError
