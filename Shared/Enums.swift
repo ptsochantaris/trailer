@@ -1,6 +1,6 @@
 import Foundation
 
-enum Section: Int64 {
+enum Section: Int {
     case none, mine, participated, mentioned, merged, closed, all, snoozed
     static let prMenuTitles = ["", "Mine", "Participated", "Mentioned", "Recently Merged", "Recently Closed", "All Pull Requests", "Snoozed"]
     var prMenuName: String { Section.prMenuTitles[Int(rawValue)] }
@@ -18,14 +18,6 @@ enum Section: Int64 {
     var movePolicyName: String { Section.movePolicyNames[Int(rawValue)] }
 
     var intValue: Int { Int(rawValue) }
-
-    init?(_ rawValue: Int) {
-        self.init(rawValue: Int64(rawValue))
-    }
-
-    init?(_ rawValue: Int64) {
-        self.init(rawValue: rawValue)
-    }
 
     static let nonZeroPredicate = NSPredicate(format: "sectionIndex > 0")
 

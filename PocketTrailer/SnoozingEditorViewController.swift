@@ -55,8 +55,8 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
             let all = SnoozePreset.allSnoozePresets(in: DataManager.main)
             if let index = all.firstIndex(of: this), index > 0 {
                 let other = all[index - 1]
-                other.sortOrder = Int64(index)
-                this.sortOrder = Int64(index - 1)
+                other.sortOrder = index
+                this.sortOrder = index - 1
                 updateView()
             }
         }
@@ -74,8 +74,8 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
             let all = SnoozePreset.allSnoozePresets(in: DataManager.main)
             if let index = all.firstIndex(of: this), index < all.count - 1 {
                 let other = all[index + 1]
-                other.sortOrder = Int64(index)
-                this.sortOrder = Int64(index + 1)
+                other.sortOrder = index
+                this.sortOrder = index + 1
                 updateView()
             }
         }
@@ -179,7 +179,7 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
         }
     }
 
-    private func detailColor(for number: Int64) -> UIColor {
+    private func detailColor(for number: Int) -> UIColor {
         if typeSelector.selectedSegmentIndex == 0 {
             if number == 0 {
                 return UIColor.tertiaryLabel
@@ -299,11 +299,11 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
             let s = picker.selectedRow(inComponent: 0)
             switch p {
             case .Day:
-                snoozeItem?.day = Int64(s)
+                snoozeItem?.day = s
             case .Hour:
-                snoozeItem?.hour = Int64(s)
+                snoozeItem?.hour = s
             case .Minute:
-                snoozeItem?.minute = Int64(s)
+                snoozeItem?.minute = s
             }
             updateView()
         }

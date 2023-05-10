@@ -65,13 +65,13 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
                 cell.accessoryType = (special || Int(repo.displayPolicyForPrs) == indexPath.row) ? .checkmark : .none
                 let name = special ? RepoDisplayPolicy.authoredOnly.name : RepoDisplayPolicy.labels[indexPath.row]
                 cell.textLabel?.text = name
-                cell.textLabel?.textColor = RepoDisplayPolicy(indexPath.row)?.color
+                cell.textLabel?.textColor = RepoDisplayPolicy(rawValue: indexPath.row)?.color
             case 1:
                 let special = (indexPath.row == 0 && repo.displayPolicyForIssues == RepoDisplayPolicy.authoredOnly.rawValue)
                 cell.accessoryType = (special || Int(repo.displayPolicyForIssues) == indexPath.row) ? .checkmark : .none
                 let name = special ? RepoDisplayPolicy.authoredOnly.name : RepoDisplayPolicy.labels[indexPath.row]
                 cell.textLabel?.text = name
-                cell.textLabel?.textColor = RepoDisplayPolicy(indexPath.row)?.color
+                cell.textLabel?.textColor = RepoDisplayPolicy(rawValue: indexPath.row)?.color
             case 2:
                 cell.accessoryType = (Int(repo.itemHidingPolicy) == indexPath.row) ? .checkmark : .none
                 cell.textLabel?.text = RepoHidingPolicy.labels[indexPath.row]
@@ -83,11 +83,11 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
             case 0:
                 cell.accessoryType = (allPrsIndex == indexPath.row) ? .checkmark : .none
                 cell.textLabel?.text = RepoDisplayPolicy.labels[indexPath.row]
-                cell.textLabel?.textColor = RepoDisplayPolicy(indexPath.row)?.color
+                cell.textLabel?.textColor = RepoDisplayPolicy(rawValue: indexPath.row)?.color
             case 1:
                 cell.accessoryType = (allIssuesIndex == indexPath.row) ? .checkmark : .none
                 cell.textLabel?.text = RepoDisplayPolicy.labels[indexPath.row]
-                cell.textLabel?.textColor = RepoDisplayPolicy(indexPath.row)?.color
+                cell.textLabel?.textColor = RepoDisplayPolicy(rawValue: indexPath.row)?.color
             case 2:
                 cell.accessoryType = (allHidingIndex == indexPath.row) ? .checkmark : .none
                 cell.textLabel?.text = RepoHidingPolicy.labels[indexPath.row]
@@ -119,7 +119,7 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
             if indexPath.section == 0 {
                 allPrsIndex = indexPath.row
                 for r in repos {
-                    r.displayPolicyForPrs = Int64(allPrsIndex)
+                    r.displayPolicyForPrs = allPrsIndex
                     if allPrsIndex != RepoDisplayPolicy.hide.intValue {
                         r.resetSyncState()
                     }
@@ -127,7 +127,7 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
             } else if indexPath.section == 1 {
                 allIssuesIndex = indexPath.row
                 for r in repos {
-                    r.displayPolicyForIssues = Int64(allIssuesIndex)
+                    r.displayPolicyForIssues = allIssuesIndex
                     if allIssuesIndex != RepoDisplayPolicy.hide.intValue {
                         r.resetSyncState()
                     }
@@ -135,21 +135,21 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
             } else {
                 allHidingIndex = indexPath.row
                 for r in repos {
-                    r.itemHidingPolicy = Int64(allHidingIndex)
+                    r.itemHidingPolicy = allHidingIndex
                 }
             }
         } else if indexPath.section == 0 {
-            repo?.displayPolicyForPrs = Int64(indexPath.row)
+            repo?.displayPolicyForPrs = indexPath.row
             if indexPath.row != RepoDisplayPolicy.hide.intValue {
                 repo?.resetSyncState()
             }
         } else if indexPath.section == 1 {
-            repo?.displayPolicyForIssues = Int64(indexPath.row)
+            repo?.displayPolicyForIssues = indexPath.row
             if indexPath.row != RepoDisplayPolicy.hide.intValue {
                 repo?.resetSyncState()
             }
         } else {
-            repo?.itemHidingPolicy = Int64(indexPath.row)
+            repo?.itemHidingPolicy = indexPath.row
         }
         tableView.reloadData()
         commit()

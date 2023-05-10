@@ -59,7 +59,8 @@ final class SectionController: CommonController {
     }
 
     private func sectionFrom(apiName: String) -> Section {
-        Section(Section.apiTitles.firstIndex(of: apiName)!)!
+        let index = Section.apiTitles.firstIndex(of: apiName)!
+        return Section(rawValue: index)!
     }
 
     func resetUI() {

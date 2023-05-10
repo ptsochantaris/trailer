@@ -21,27 +21,27 @@ struct PostProcessContext {
 }
 
 class ListableItem: DataItem {
-    enum StateChange: Int64 {
+    enum StateChange: Int {
         case none, reopened, merged, closed
     }
 
     @NSManaged var assignedToMe: Bool
     @NSManaged var assigneeName: String? // note: This now could be a list of names, delimited with a ","
     @NSManaged var body: String?
-    @NSManaged var condition: Int64
+    @NSManaged var condition: Int
     @NSManaged var isNewAssignment: Bool
     @NSManaged var repo: Repo
     @NSManaged var title: String?
-    @NSManaged var totalComments: Int64
-    @NSManaged var unreadComments: Int64
+    @NSManaged var totalComments: Int
+    @NSManaged var unreadComments: Int
     @NSManaged var url: String?
     @NSManaged var userAvatarUrl: String?
     @NSManaged var userNodeId: String?
     @NSManaged var userLogin: String?
-    @NSManaged var sectionIndex: Int64
+    @NSManaged var sectionIndex: Int
     @NSManaged var latestReadCommentDate: Date?
-    @NSManaged var stateChanged: Int64
-    @NSManaged var number: Int64
+    @NSManaged var stateChanged: Int
+    @NSManaged var number: Int
     @NSManaged var announced: Bool
     @NSManaged var muted: Bool
     @NSManaged var wasAwokenFromSnooze: Bool
@@ -103,13 +103,13 @@ class ListableItem: DataItem {
 
         let info = node.jsonPayload
         url = info["url"] as? String
-        number = info["number"] as? Int64 ?? 0
+        number = info["number"] as? Int ?? 0
         title = info["title"] as? String ?? "(No title)"
         body = info["bodyText"] as? String
         milestone = (info["milestone"] as? JSON)?["title"] as? String
         draft = info["isDraft"] as? Bool ?? false
 
-        let newCondition: Int64
+        let newCondition: Int
         switch info["state"] as? String {
         case "MERGED": newCondition = ItemCondition.merged.rawValue
         case "CLOSED": newCondition = ItemCondition.closed.rawValue
@@ -152,7 +152,7 @@ class ListableItem: DataItem {
     final func baseSync(from info: JSON, in parentRepo: Repo) {
         repo = parentRepo
         url = info["url"] as? String
-        number = Int64(info["number"] as? Int ?? 0)
+        number = info["number"] as? Int ?? 0
         title = info["title"] as? String ?? "(No title)"
         body = info["body"] as? String
         milestone = (info["milestone"] as? JSON)?["title"] as? String
@@ -362,7 +362,7 @@ class ListableItem: DataItem {
     }
 
     final var canBadge: Bool {
-        if let section = Section(sectionIndex) {
+        if let section = Section(rawValue: sectionIndex) {
             return canBadge(in: section)
         }
         return false
@@ -451,17 +451,17 @@ class ListableItem: DataItem {
         } else if assignedToParticipated || commentedByMe || reviewedByMe {
             return .participated
 
-        } else if let p = self as? PullRequest, Int64(Settings.assignedReviewHandlingPolicy) > Section.none.rawValue, p.assignedForReview {
-            return Section(Settings.assignedReviewHandlingPolicy)!
+        } else if let p = self as? PullRequest, Settings.assignedReviewHandlingPolicy > Section.none.rawValue, p.assignedForReview {
+            return Section(rawValue: Settings.assignedReviewHandlingPolicy)!
 
-        } else if Int64(Settings.newMentionMovePolicy) > Section.none.rawValue, contains(terms: ["@\(S(apiServer.userName))"]) {
-            return Section(Settings.newMentionMovePolicy)!
+        } else if Settings.newMentionMovePolicy > Section.none.rawValue, contains(terms: ["@\(S(apiServer.userName))"]) {
+            return Section(rawValue: Settings.newMentionMovePolicy)!
 
-        } else if Int64(Settings.teamMentionMovePolicy) > Section.none.rawValue, contains(terms: apiServer.teams.compactMap(\.calculatedReferral)) {
-            return Section(Settings.teamMentionMovePolicy)!
+        } else if Settings.teamMentionMovePolicy > Section.none.rawValue, contains(terms: apiServer.teams.compactMap(\.calculatedReferral)) {
+            return Section(rawValue: Settings.teamMentionMovePolicy)!
 
-        } else if Int64(Settings.newItemInOwnedRepoMovePolicy) > Section.none.rawValue, repo.isMine {
-            return Section(Settings.newItemInOwnedRepoMovePolicy)!
+        } else if Settings.newItemInOwnedRepoMovePolicy > Section.none.rawValue, repo.isMine {
+            return Section(rawValue: Settings.newItemInOwnedRepoMovePolicy)!
 
         } else {
             return .all
@@ -570,15 +570,15 @@ class ListableItem: DataItem {
         }
 
         if targetSection != .none {
-            let reviewCount: Int64
+            let reviewCount: Int
             if let p = self as? PullRequest, context.shouldSyncReviews || context.shouldSyncReviewAssignments {
-                reviewCount = Int64(p.reviews.count)
+                reviewCount = p.reviews.count
             } else {
                 reviewCount = 0
             }
 
-            totalComments = Int64(comments.count)
-                + (context.notifyOnItemReactions ? Int64(reactions.count) : 0)
+            totalComments = comments.count
+                + (context.notifyOnItemReactions ? reactions.count : 0)
                 + (context.notifyOnCommentReactions ? countCommentReactions : 0)
                 + reviewCount
         }
@@ -586,10 +586,10 @@ class ListableItem: DataItem {
         sectionIndex = targetSection.rawValue
     }
 
-    private var countCommentReactions: Int64 {
-        var count: Int64 = 0
+    private var countCommentReactions: Int {
+        var count = 0
         for c in comments {
-            count += Int64(c.reactions.count)
+            count += c.reactions.count
         }
         return count
     }
@@ -602,8 +602,8 @@ class ListableItem: DataItem {
         comments.filter { !$0.isMine && ($0.createdAt ?? .distantPast) > since }
     }
 
-    private final func countOthersComments(since: Date, context: PostProcessContext) -> Int64 {
-        var count: Int64 = 0
+    private final func countOthersComments(since: Date, context: PostProcessContext) -> Int {
+        var count = 0
         for c in comments {
             if !c.isMine, (c.createdAt ?? .distantPast) > since {
                 count += 1
@@ -859,7 +859,7 @@ class ListableItem: DataItem {
     }
 
     class func badgeCount(from fetch: NSFetchRequest<some ListableItem>, in moc: NSManagedObjectContext) -> Int {
-        var badgeCount: Int64 = 0
+        var badgeCount = 0
         fetch.returnsObjectsAsFaults = false
         for i in try! moc.fetch(fetch) {
             badgeCount += i.unreadComments
@@ -883,7 +883,7 @@ class ListableItem: DataItem {
             let negative = term.hasPrefix("!")
             let T = negative ? String(term.dropFirst()) : term
             let P: NSPredicate
-            if numeric, let n = UInt64(T) {
+            if numeric, let n = UInt(T) {
                 P = NSPredicate(format: format, n)
             } else {
                 P = NSPredicate(format: format, T)
@@ -967,7 +967,7 @@ class ListableItem: DataItem {
     private static let filterStatusPredicate = "SUBQUERY(statuses, $status, $status.descriptionText contains[cd] %@).@count > 0"
 
     @MainActor
-    static func requestForItems<T: ListableItem>(of itemType: T.Type, withFilter: String?, sectionIndex: Int64, criterion: GroupingCriterion? = nil, onlyUnread: Bool = false, excludeSnoozed: Bool = false) -> NSFetchRequest<T> {
+    static func requestForItems<T: ListableItem>(of itemType: T.Type, withFilter: String?, sectionIndex: Int, criterion: GroupingCriterion? = nil, onlyUnread: Bool = false, excludeSnoozed: Bool = false) -> NSFetchRequest<T> {
         let andPredicates = LinkedList<NSPredicate>()
 
         if onlyUnread {
@@ -1302,7 +1302,7 @@ class ListableItem: DataItem {
         var actions: [MenuAction] = [.copy, .openRepo]
 
         if !isSnoozing {
-            let section = Section(sectionIndex) ?? .none
+            let section = Section(rawValue: sectionIndex) ?? .none
             if section.shouldBadgeComments {
                 if hasUnreadCommentsOrAlert {
                     actions.append(.markRead)

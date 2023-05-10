@@ -1,11 +1,11 @@
 import CoreData
 
 final class SnoozePreset: NSManagedObject {
-    @NSManaged var day: Int64
-    @NSManaged var hour: Int64
-    @NSManaged var minute: Int64
+    @NSManaged var day: Int
+    @NSManaged var hour: Int
+    @NSManaged var minute: Int
 
-    @NSManaged var sortOrder: Int64
+    @NSManaged var sortOrder: Int
     @NSManaged var duration: Bool
 
     @NSManaged var wakeOnComment: Bool
@@ -82,14 +82,14 @@ final class SnoozePreset: NSManagedObject {
     static func newSnoozePreset(in moc: NSManagedObjectContext) -> SnoozePreset {
         let s = NSEntityDescription.insertNewObject(forEntityName: "SnoozePreset", into: moc) as! SnoozePreset
         s.duration = true
-        s.sortOrder = Int64.max
+        s.sortOrder = Int.max
         setSortOrders(in: moc)
         return s
     }
 
     static func setSortOrders(in moc: NSManagedObjectContext) {
         // Sanity to prevent sorting confusion later
-        var c: Int64 = 0
+        var c = 0
         for i in allSnoozePresets(in: moc) {
             i.sortOrder = c
             c += 1

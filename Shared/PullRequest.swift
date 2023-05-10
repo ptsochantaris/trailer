@@ -11,8 +11,8 @@ final class PullRequest: ListableItem {
     @NSManaged var reviewers: String
     @NSManaged var teamReviewers: String
     @NSManaged var mergedByNodeId: String?
-    @NSManaged var linesAdded: Int64
-    @NSManaged var linesRemoved: Int64
+    @NSManaged var linesAdded: Int
+    @NSManaged var linesRemoved: Int
     @NSManaged var isMergeable: Bool
     @NSManaged var headRefName: String?
     @NSManaged var headLabel: String?
@@ -43,8 +43,8 @@ final class PullRequest: ListableItem {
             } else {
                 pr.isMergeable = true
             }
-            pr.linesAdded = json["additions"] as? Int64 ?? 0
-            pr.linesRemoved = json["deletions"] as? Int64 ?? 0
+            pr.linesAdded = json["additions"] as? Int ?? 0
+            pr.linesRemoved = json["deletions"] as? Int ?? 0
             pr.mergeCommitSha = json["headRefOid"] as? String
             pr.mergedByNodeId = (json["mergedBy"] as? JSON)?["id"] as? String
             pr.baseNodeSync(node: node, parent: parent)

@@ -77,14 +77,14 @@ extension API {
                             DLog("First event check for this repo. Let's ensure all items are marked as updated")
                             for i in r.pullRequests { i.setToUpdatedIfIdle() }
                             for i in r.issues { i.setToUpdatedIfIdle() }
-                            r.lastScannedIssueEventId = data.first!["id"] as? Int64 ?? 0
+                            r.lastScannedIssueEventId = data.first!["id"] as? Int ?? 0
                             return true
 
                         } else {
-                            var numbers = Set<Int64>()
+                            var numbers = Set<Int>()
                             var foundLastEvent = false
                             for event in data {
-                                if let eventId = event["id"] as? Int64, let issue = event["issue"] as? JSON, let issueNumber = issue["number"] as? Int64 {
+                                if let eventId = event["id"] as? Int, let issue = event["issue"] as? JSON, let issueNumber = issue["number"] as? Int {
                                     if r.lastScannedIssueEventId == 0 {
                                         r.lastScannedIssueEventId = eventId
                                     }

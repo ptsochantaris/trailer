@@ -7,8 +7,8 @@ final class ApiServer: NSManagedObject {
     @NSManaged var label: String?
     @NSManaged var lastSyncSucceeded: Bool
     @NSManaged var reportRefreshFailures: Bool
-    @NSManaged var requestsLimit: Int64
-    @NSManaged var requestsRemaining: Int64
+    @NSManaged var requestsLimit: Int
+    @NSManaged var requestsRemaining: Int
     @NSManaged var resetDate: Date?
     @NSManaged var userName: String?
     @NSManaged var webPath: String?

@@ -7,7 +7,7 @@ final class PRListController: CommonController {
 
     @IBOutlet private var markReeadButton: WKInterfaceButton!
 
-    private var sectionIndex: Int64!
+    private var sectionIndex: Int!
     private var type: String!
     private var selectedIndex: Int?
 
@@ -24,7 +24,7 @@ final class PRListController: CommonController {
 
     override func awake(withContext context: Any?) {
         let c = context as! [AnyHashable: Any]
-        sectionIndex = (c[SECTION_KEY] as! Int64)
+        sectionIndex = (c[SECTION_KEY] as! Int)
         type = (c[TYPE_KEY] as! String)
         onlyUnread = (c[UNREAD_KEY] as! Bool)
 
@@ -38,7 +38,7 @@ final class PRListController: CommonController {
         _statusLabel = statusLabel
         super.awake(withContext: context)
 
-        if let s = Section(sectionIndex) {
+        if let s = Section(rawValue: sectionIndex) {
             setTitle(s.watchMenuName)
         } else {
             setTitle("All Unread")

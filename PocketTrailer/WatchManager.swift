@@ -123,7 +123,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
         case "item_list":
             return await buildItemList(
                 type: message["type"] as! String,
-                sectionIndex: message["sectionIndex"] as! Int64,
+                sectionIndex: message["sectionIndex"] as! Int,
                 from: message["from"] as! Int,
                 apiServerUri: message["apiUri"] as! String,
                 group: message["group"] as! String,
@@ -160,7 +160,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
     ////////////////////////////
 
     @MainActor
-    private func buildItemList(type: String, sectionIndex: Int64, from: Int, apiServerUri: String, group: String, count: Int, onlyUnread: Bool) async -> JSON {
+    private func buildItemList(type: String, sectionIndex: Int, from: Int, apiServerUri: String, group: String, count: Int, onlyUnread: Bool) async -> JSON {
         let showLabels = Settings.showLabels
         let entity: ListableItem.Type
         if type == "prs" {

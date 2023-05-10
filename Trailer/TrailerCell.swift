@@ -358,7 +358,7 @@ final class TrailerCell: NSTableCellView {
     private var newBackground: FilledView?
     private var countView: CenterTextField?
 
-    func addCounts(total: Int64, unread: Int64, alert: Bool, faded: Bool, centerY: CGFloat) {
+    func addCounts(total: Int, unread: Int, alert: Bool, faded: Bool, centerY: CGFloat) {
         if total == 0 && !alert {
             return
         }

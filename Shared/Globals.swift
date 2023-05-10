@@ -109,7 +109,7 @@ func bootUp() {
 
 //////////////////////// Enums
 
-enum ItemCondition: Int64 {
+enum ItemCondition: Int {
     case open, closed, merged
 
     private static var predicateMatchCache = [ItemCondition: NSPredicate]()
@@ -137,7 +137,7 @@ enum StatusFilter: Int {
     case all, include, exclude
 }
 
-enum PostSyncAction: Int64 {
+enum PostSyncAction: Int {
     case doNothing, delete, isNew, isUpdated
 
     private static var predicateMatchCache = [PostSyncAction: NSPredicate]()
@@ -217,7 +217,7 @@ enum AssignmentPolicy: Int {
     }
 }
 
-enum RepoDisplayPolicy: Int64, CaseIterable {
+enum RepoDisplayPolicy: Int, CaseIterable {
     case hide = 0
     case mine = 1
     case mineAndPaticipated = 2
@@ -277,14 +277,6 @@ enum RepoDisplayPolicy: Int64, CaseIterable {
     }
 
     var intValue: Int { Int(rawValue) }
-
-    init?(_ rawValue: Int64) {
-        self.init(rawValue: rawValue)
-    }
-
-    init?(_ rawValue: Int) {
-        self.init(rawValue: Int64(rawValue))
-    }
 }
 
 enum DraftHandlingPolicy: Int {
@@ -292,7 +284,7 @@ enum DraftHandlingPolicy: Int {
     static let labels = ["Do Nothing", "Display in Title", "Hide"]
 }
 
-enum RepoHidingPolicy: Int64 {
+enum RepoHidingPolicy: Int {
     case noHiding, hideMyAuthoredPrs, hideMyAuthoredIssues, hideAllMyAuthoredItems, hideOthersPrs, hideOthersIssues, hideAllOthersItems
     static let labels = ["No Filter", "Hide My PRs", "Hide My Issues", "Hide All Mine", "Hide Others PRs", "Hide Others Issues", "Hide All Others"]
     static let policies = [noHiding, hideMyAuthoredPrs, hideMyAuthoredIssues, hideAllMyAuthoredItems, hideOthersPrs, hideOthersIssues, hideAllOthersItems]
@@ -320,12 +312,8 @@ enum RepoHidingPolicy: Int64 {
         RepoHidingPolicy.colors[Int(rawValue)]
     }
 
-    init?(_ rawValue: Int64) {
-        self.init(rawValue: rawValue)
-    }
-
     init?(_ rawValue: Int) {
-        self.init(rawValue: Int64(rawValue))
+        self.init(rawValue: rawValue)
     }
 }
 
@@ -338,7 +326,7 @@ let apiDateFormatter: DateFormatter = {
 }()
 
 struct ApiStats {
-    let nodeCount, cost, remaining, limit: Int64
+    let nodeCount, cost, remaining, limit: Int
     let resetAt: Date?
 
     static func fromV3(headers: HTTPHeaders) -> ApiStats {
@@ -348,18 +336,18 @@ struct ApiStats {
         } else {
             date = nil
         }
-        let remaining = Int64(headers["x-ratelimit-remaining"].first ?? "") ?? 10000
-        let limit = Int64(headers["x-ratelimit-limit"].first ?? "") ?? 10000
+        let remaining = Int(headers["x-ratelimit-remaining"].first ?? "") ?? 10000
+        let limit = Int(headers["x-ratelimit-limit"].first ?? "") ?? 10000
         return ApiStats(nodeCount: 0, cost: 1, remaining: remaining, limit: limit, resetAt: date)
     }
 
     static func fromV4(json: JSON?) -> ApiStats? {
         guard let info = json?["rateLimit"] as? JSON else { return nil }
         let date = apiDateFormatter.date(from: info["resetAt"] as? String ?? "")
-        return ApiStats(nodeCount: info["nodeCount"] as? Int64 ?? 0,
-                        cost: info["cost"] as? Int64 ?? 0,
-                        remaining: info["remaining"] as? Int64 ?? 10000,
-                        limit: info["limit"] as? Int64 ?? 10000,
+        return ApiStats(nodeCount: info["nodeCount"] as? Int ?? 0,
+                        cost: info["cost"] as? Int ?? 0,
+                        remaining: info["remaining"] as? Int ?? 10000,
+                        limit: info["limit"] as? Int ?? 10000,
                         resetAt: date)
     }
 

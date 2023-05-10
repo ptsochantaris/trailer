@@ -4,7 +4,7 @@ typealias FetchCache = NSCache<NSString, NSManagedObject>
 
 class DataItem: NSManagedObject {
     @NSManaged var nodeId: String?
-    @NSManaged var postSyncAction: Int64
+    @NSManaged var postSyncAction: Int
     @NSManaged var createdAt: Date?
     @NSManaged var updatedAt: Date?
     @NSManaged var apiServer: ApiServer
@@ -62,13 +62,13 @@ class DataItem: NSManagedObject {
                                      postProcessCallback: @escaping (T, JSON, Bool, NSManagedObjectContext) -> Void) async {
         guard let infos = data, !infos.isEmpty else { return }
 
-        var legacyIdsToNodeIds = [Int64: String]()
+        var legacyIdsToNodeIds = [Int: String]()
 
         var nodeIdsToInfo = [String: JSON]()
         for info in infos {
             let nodeId = info["node_id"] as! String
             nodeIdsToInfo[nodeId] = info
-            if let legacyId = info["id"] as? Int64 { // TODO: only do this if migration not yet recorded
+            if let legacyId = info["id"] as? Int { // TODO: only do this if migration not yet recorded
                 legacyIdsToNodeIds[legacyId] = nodeId
             }
         }
@@ -85,7 +85,7 @@ class DataItem: NSManagedObject {
             let legacyServerIds = legacyIdsToNodeIds.map { k, _ in k }
             f.predicate = NSPredicate(format: "serverId in %@ and apiServer == %@", legacyServerIds, serverId)
             for item in try! child.fetch(f) {
-                if let legacyId = item.value(forKey: "serverId") as? Int64 {
+                if let legacyId = item.value(forKey: "serverId") as? Int {
                     if let nodeId = legacyIdsToNodeIds[legacyId] {
                         item.nodeId = nodeId
                         item.setValue(nil, forKey: "serverId")

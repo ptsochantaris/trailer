@@ -984,7 +984,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     }
 
     @IBAction private func allPrsPolicySelected(_ sender: NSPopUpButton) {
-        let index = Int64(sender.indexOfSelectedItem - 1)
+        let index = sender.indexOfSelectedItem - 1
         if index < 0 { return }
 
         for r in affectedReposFromSelection {
@@ -997,7 +997,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     }
 
     @IBAction private func allIssuesPolicySelected(_ sender: NSPopUpButton) {
-        let index = Int64(sender.indexOfSelectedItem - 1)
+        let index = sender.indexOfSelectedItem - 1
         if index < 0 { return }
 
         for r in affectedReposFromSelection {
@@ -1010,7 +1010,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     }
 
     @IBAction private func allHidingPolicySelected(_ sender: NSPopUpButton) {
-        let index = Int64(sender.indexOfSelectedItem - 1)
+        let index = sender.indexOfSelectedItem - 1
         if index < 0 { return }
 
         for r in affectedReposFromSelection {
@@ -1687,7 +1687,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
                     self.windowController?.window?.makeFirstResponder(tv)
                 }
 
-            } else if let index = object as? Int64 {
+            } else if let index = object as? Int {
                 if tableColumn?.identifier.rawValue == "prs" {
                     r.displayPolicyForPrs = index
                 } else if tableColumn?.identifier.rawValue == "issues" {
@@ -1924,13 +1924,13 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     @IBAction private func snoozeOptionsChanged(_: NSPopUpButton) {
         if let s = selectedSnoozePreset {
             if s.duration {
-                s.day = Int64(snoozeDurationDays.indexOfSelectedItem)
-                s.hour = Int64(snoozeDurationHours.indexOfSelectedItem)
-                s.minute = Int64(snoozeDurationMinutes.indexOfSelectedItem)
+                s.day = snoozeDurationDays.indexOfSelectedItem
+                s.hour = snoozeDurationHours.indexOfSelectedItem
+                s.minute = snoozeDurationMinutes.indexOfSelectedItem
             } else {
-                s.day = Int64(snoozeDateTimeDay.indexOfSelectedItem)
-                s.hour = Int64(snoozeDateTimeHour.indexOfSelectedItem)
-                s.minute = Int64(snoozeDateTimeMinute.indexOfSelectedItem)
+                s.day = snoozeDateTimeDay.indexOfSelectedItem
+                s.hour = snoozeDateTimeHour.indexOfSelectedItem
+                s.minute = snoozeDateTimeMinute.indexOfSelectedItem
             }
             commitSnoozeSettings()
         }
@@ -1941,8 +1941,8 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
             let all = SnoozePreset.allSnoozePresets(in: DataManager.main)
             if let index = all.firstIndex(of: this), index > 0 {
                 let other = all[index - 1]
-                other.sortOrder = Int64(index)
-                this.sortOrder = Int64(index - 1)
+                other.sortOrder = index
+                this.sortOrder = index - 1
                 snoozePresetsList.selectRowIndexes(IndexSet(integer: index - 1), byExtendingSelection: false)
                 commitSnoozeSettings()
             }
@@ -1954,8 +1954,8 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
             let all = SnoozePreset.allSnoozePresets(in: DataManager.main)
             if let index = all.firstIndex(of: this), index < all.count - 1 {
                 let other = all[index + 1]
-                other.sortOrder = Int64(index)
-                this.sortOrder = Int64(index + 1)
+                other.sortOrder = index
+                this.sortOrder = index + 1
                 snoozePresetsList.selectRowIndexes(IndexSet(integer: index + 1), byExtendingSelection: false)
                 commitSnoozeSettings()
             }

@@ -6,15 +6,15 @@ final class Repo: DataItem {
     @NSManaged var groupLabel: String?
     @NSManaged var inaccessible: Bool
     @NSManaged var webUrl: String?
-    @NSManaged var displayPolicyForPrs: Int64
-    @NSManaged var displayPolicyForIssues: Int64
-    @NSManaged var itemHidingPolicy: Int64
+    @NSManaged var displayPolicyForPrs: Int
+    @NSManaged var displayPolicyForIssues: Int
+    @NSManaged var itemHidingPolicy: Int
     @NSManaged var pullRequests: Set<PullRequest>
     @NSManaged var issues: Set<Issue>
     @NSManaged var ownerNodeId: String?
     @NSManaged var manuallyAdded: Bool
     @NSManaged var archived: Bool
-    @NSManaged var lastScannedIssueEventId: Int64
+    @NSManaged var lastScannedIssueEventId: Int
 
     override func resetSyncState() {
         super.resetSyncState()
@@ -47,8 +47,8 @@ final class Repo: DataItem {
                 repo.archived = json["isArchived"] as? Bool ?? false
                 repo.ownerNodeId = (json["owner"] as? JSON)?["id"] as? String
                 if node.created {
-                    repo.displayPolicyForPrs = Int64(Settings.displayPolicyForNewPrs)
-                    repo.displayPolicyForIssues = Int64(Settings.displayPolicyForNewIssues)
+                    repo.displayPolicyForPrs = Settings.displayPolicyForNewPrs
+                    repo.displayPolicyForIssues = Settings.displayPolicyForNewIssues
                 }
             }
 
@@ -91,8 +91,8 @@ final class Repo: DataItem {
                 item.ownerNodeId = (info["owner"] as? JSON)?["node_id"] as? String
                 item.manuallyAdded = manuallyAdded
                 if item.postSyncAction == PostSyncAction.isNew.rawValue {
-                    item.displayPolicyForPrs = Int64(Settings.displayPolicyForNewPrs)
-                    item.displayPolicyForIssues = Int64(Settings.displayPolicyForNewIssues)
+                    item.displayPolicyForPrs = Settings.displayPolicyForNewPrs
+                    item.displayPolicyForIssues = Settings.displayPolicyForNewIssues
                 }
             }
         }
@@ -247,7 +247,7 @@ final class Repo: DataItem {
         return try! DataManager.main.fetch(f)
     }
 
-    func markItemsAsUpdated(with numbers: Set<Int64>) {
+    func markItemsAsUpdated(with numbers: Set<Int>) {
         let predicate = NSPredicate(format: "(number IN %@) AND (repo == %@)", numbers, self)
 
         func mark<T>(type: T.Type) where T: ListableItem {

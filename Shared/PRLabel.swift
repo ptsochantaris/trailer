@@ -4,7 +4,7 @@ import CoreData
 #endif
 
 final class PRLabel: DataItem {
-    @NSManaged var color: Int64
+    @NSManaged var color: Int
     @NSManaged var name: String?
 
     @NSManaged var pullRequests: Set<PullRequest>
@@ -99,12 +99,12 @@ final class PRLabel: DataItem {
         }
     }
 
-    private static func parse(from hex: String) -> Int64 {
+    private static func parse(from hex: String) -> Int {
         let safe = hex.trim.trimmingCharacters(in: CharacterSet.symbols)
         let s = Scanner(string: safe)
         var result: UInt64 = 0
         s.scanHexInt64(&result)
-        return Int64(result)
+        return Int(result)
     }
 
     var colorForDisplay: COLOR_CLASS {
