@@ -30,30 +30,23 @@ final class FoundationJson {
     // MARK: Generic Value Parsing
     
     private func parseValue() throws -> Any? {
-        var whitespace = 0
-        while let byte = peek(offset: whitespace) {
+        while let byte = peek() {
             switch byte {
             case UInt8._quote:
-                readerIndex += whitespace
                 return try readString()
             case ._openbrace:
-                readerIndex += whitespace
                 return try parseObject()
             case ._openbracket:
-                readerIndex += whitespace
                 return try parseArray()
             case UInt8._charF, UInt8._charT:
-                readerIndex += whitespace
                 return try readBool()
             case UInt8._charN:
-                readerIndex += whitespace
                 try readNull()
                 return nil
             case UInt8._minus, UInt8._zero ... UInt8._nine:
-                readerIndex += whitespace
                 return try parseNumber()
             case ._newline, ._return, ._space, ._tab:
-                whitespace += 1
+                readerIndex += 1
                 continue
             default:
                 throw JSONError.unexpectedCharacter(ascii: byte, characterIndex: readerIndex)
@@ -176,13 +169,13 @@ final class FoundationJson {
         readerIndex += 1
         return res
     }
-    
+
     private func peek(offset: Int = 0) -> UInt8? {
-        guard readerIndex + offset < endIndex else {
+        let index = readerIndex + offset
+        guard index < endIndex else {
             return nil
         }
-        
-        return array[readerIndex + offset]
+        return array[index]
     }
     
     @discardableResult
@@ -330,7 +323,7 @@ final class FoundationJson {
             return count
         }
     }
-    
+
     private func parseEscapeSequence() throws -> String {
         precondition(read() == ._backslash, "Expected to have an backslash first")
         guard let ascii = read() else {
@@ -578,12 +571,9 @@ final class FoundationJson {
     
     static func jsonObject(with data: Data) throws -> Any {
         do {
-            let parser = FoundationJson(bytes: Array(data))
-            if let result = try parser.parse() {
-                return result
-            } else {
-                return NSNull()
-            }
+            let array = [UInt8](data)
+            let parser = FoundationJson(bytes: array)
+            return try parser.parse() ?? NSNull()
             
         } catch let error as JSONError {
             switch error {
