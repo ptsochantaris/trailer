@@ -60,7 +60,12 @@ enum HTTP {
         if case .success = result, Settings.dumpAPIResponsesInConsole {
             DLog("API data from %@: %@", S(request.url), data.description)
         }
-        let json = try FoundationJson.jsonObject(with: data.asData)
+        let json: Any
+        if #available(macOS 11.0, iOS 14, *) {
+            json = try FoundationJson.jsonObject(with: data.asData)
+        } else {
+            json = try JSONSerialization.jsonObject(with: data.asData, options: [])
+        }
         return (json, result)
     }
 
