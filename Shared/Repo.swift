@@ -169,7 +169,8 @@ final class Repo: DataItem {
         let p = NSPredicate(format: "displayPolicyForPrs > 0 or displayPolicyForIssues > 0")
         if let c = criterion {
             switch c {
-            case let .group(g): // special case will never need exclusion
+            case let .group(g):
+                // special case will never need exclusion
                 let rp = NSPredicate(format: "groupLabel == %@", g)
                 f.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [rp, p])
             case .server:

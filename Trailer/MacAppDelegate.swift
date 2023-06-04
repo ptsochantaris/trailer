@@ -402,19 +402,17 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
             window.table.selectRowIndexes(IndexSet(integer: reSelectIndex), byExtendingSelection: false)
         }
 
-        if let u = urlToOpen {
-            openItem(URL(string: u)!)
+        if let u = urlToOpen, let url = URL(string: u) {
+            openItem(url)
         }
     }
 
     func show(menu: MenuWindow) {
-        if !menu.isVisible {
-            if let w = visibleWindow {
-                w.closeMenu()
-            }
-
-            menu.size(andShow: true)
+        if menu.isVisible {
+            return
         }
+        visibleWindow?.closeMenu()
+        menu.size(andShow: true)
     }
 
     @MainActor
@@ -654,7 +652,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         }
         return .terminateLater
     }
-    
+
     func windowDidBecomeKey(_ notification: Notification) {
         if let window = notification.object as? MenuWindow {
             if ignoreNextFocusLoss {
@@ -896,7 +894,8 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                 // DLog("Keycode: %@", incomingEvent.keyCode)
 
                 switch incomingEvent.keyCode {
-                case 123, 124: // left, right
+                case 123, 124:
+                    // left, right
                     if !incomingEvent.modifierFlags.contains([.command, .option]) {
                         return incomingEvent
                     }
@@ -922,7 +921,8 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                     }
                     return nil
 
-                case 125: // down
+                case 125:
+                    // down
                     if incomingEvent.modifierFlags.contains(.shift) {
                         return incomingEvent
                     }
@@ -937,7 +937,8 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                     S.scrollTo(index: i, inMenu: w)
                     return nil
 
-                case 126: // up
+                case 126:
+                    // up
                     if incomingEvent.modifierFlags.contains(.shift) {
                         return incomingEvent
                     }
@@ -951,7 +952,8 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                     S.scrollTo(index: i, inMenu: w)
                     return nil
 
-                case 36: // enter
+                case 36:
+                    // enter
                     if let c = NSTextInputContext.current, c.client.hasMarkedText() {
                         return incomingEvent
                     }
@@ -961,7 +963,8 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                     }
                     return nil
 
-                case 53: // escape
+                case 53:
+                    // escape
                     w.closeMenu()
                     return nil
 

@@ -118,7 +118,8 @@ enum HTTP {
                     return (result: .notFound, data: ByteBuffer())
                 case 410:
                     return (result: .deleted, data: ByteBuffer())
-                case 502, 503: // in case of throttle or ongoing GH deployment
+                case 502, 503:
+                    // in case of throttle or ongoing GH deployment
                     throw API.apiError("HTTP Code \(code) received")
                 case 400...:
                     return (result: .failed(code: code), data: ByteBuffer())

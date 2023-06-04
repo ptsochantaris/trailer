@@ -227,7 +227,9 @@ enum DataManager {
     }
 
     static func sendNotificationsIndexAndSave() async {
-        preferencesDirty = false
+        await saveDB() // get IDs
+
+        await postProcessAllItems(in: main)
 
         await processNotificationsForItems(of: PullRequest.self, newNotification: .newPr, reopenedNotification: .prReopened, assignmentNotification: .newPrAssigned)
 
@@ -238,31 +240,35 @@ enum DataManager {
         await processStatusNotifications()
 
         await runInChild(of: main) { child in
+            let nothing = PostSyncAction.doNothing.rawValue
+
             for r in DataItem.newOrUpdatedItems(of: Reaction.self, in: child) {
                 r.checkNotifications()
-                r.postSyncAction = PostSyncAction.doNothing.rawValue
+                r.postSyncAction = nothing
             }
 
             for r in DataItem.newOrUpdatedItems(of: Review.self, in: child) {
-                r.postSyncAction = PostSyncAction.doNothing.rawValue
+                r.postSyncAction = nothing
             }
 
             for r in DataItem.newOrUpdatedItems(of: PRComment.self, in: child) {
-                r.postSyncAction = PostSyncAction.doNothing.rawValue
+                r.postSyncAction = nothing
             }
 
             for p in DataItem.newOrUpdatedItems(of: PullRequest.self, in: child) {
-                p.postSyncAction = PostSyncAction.doNothing.rawValue
+                p.postSyncAction = nothing
             }
 
             for i in DataItem.newOrUpdatedItems(of: Issue.self, in: child) {
-                i.postSyncAction = PostSyncAction.doNothing.rawValue
+                i.postSyncAction = nothing
             }
         }
 
-        await saveDB()
+        await saveDB() // commit all changes
 
         NotificationQueue.commit()
+
+        preferencesDirty = false
     }
 
     private static func updateIndexingFromScratch() async {

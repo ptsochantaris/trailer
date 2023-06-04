@@ -186,25 +186,21 @@ enum API {
         DataItem.nukeDeletedItems(in: syncMoc)
         DataItem.nukeOrphanedItems(in: syncMoc)
 
-        do {
-            if syncMoc.hasChanges {
+        if syncMoc.hasChanges {
+            do {
                 DLog("Committing synced data")
                 try syncMoc.save()
                 DLog("Synced data committed")
-                await DataManager.saveDB() // get IDs
-                await DataManager.postProcessAllItems(in: DataManager.main)
-                await DataManager.saveDB() // store completed state
-            } else {
-                DLog("No changes, skipping commit")
+                await DataManager.sendNotificationsIndexAndSave()
+            } catch {
+                DLog("Committing sync failed: %@", error.localizedDescription)
             }
-        } catch {
-            DLog("Committing sync failed: %@", error.localizedDescription)
+        } else {
+            DLog("No changes, skipping commit")
         }
 
         isRefreshing = false
         currentOperationCount -= 1
-
-        await DataManager.sendNotificationsIndexAndSave()
     }
 
     static var lastSuccessfulSyncAt: String {
@@ -281,7 +277,8 @@ enum API {
         do {
             let (code, _) = try await RestAccess.start(call: "/rate_limit", on: server, triggeredByUser: true)
             switch code {
-            case .notFound: // is GE account
+            case .notFound:
+                // is GE account
                 return ApiStats.noLimits
             case .deleted, .failed:
                 break

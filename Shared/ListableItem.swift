@@ -305,11 +305,24 @@ class ListableItem: DataItem {
         postProcess()
     }
 
-    final func shouldKeep(accordingTo policy: Int) -> Bool {
-        let s = sectionIndex
-        return policy == HandlingPolicy.keepAll.rawValue
-            || (policy == HandlingPolicy.keepMineAndParticipated.rawValue && (s == Section.mine.rawValue || s == Section.participated.rawValue))
-            || (policy == HandlingPolicy.keepMine.rawValue && s == Section.mine.rawValue)
+    final func shouldKeep(accordingTo policy: Int) -> Bool { // issue: item has already been moved at this point
+        let policy = HandlingPolicy(rawValue: policy)
+
+        switch policy {
+        case .keepAll:
+            return true
+
+        case .keepMineAndParticipated:
+            let preConditionSection = preferredSection(takingItemConditionIntoAccount: false)
+            return preConditionSection == .mine || preConditionSection == .participated
+
+        case .keepMine:
+            let preConditionSection = preferredSection(takingItemConditionIntoAccount: false)
+            return preConditionSection == .mine
+
+        case .keepNone, .none:
+            return false
+        }
     }
 
     final var shouldSkipNotifications: Bool {
@@ -435,14 +448,14 @@ class ListableItem: DataItem {
         wasAwokenFromSnooze = explicityAwoke
     }
 
-    private func preferredSection(evaluateConditionToo: Bool) -> Section {
+    private func preferredSection(takingItemConditionIntoAccount: Bool) -> Section {
         if Settings.draftHandlingPolicy == DraftHandlingPolicy.hide.rawValue && draft {
             return .none
 
-        } else if evaluateConditionToo && condition == ItemCondition.merged.rawValue {
+        } else if takingItemConditionIntoAccount && condition == ItemCondition.merged.rawValue {
             return .merged
 
-        } else if evaluateConditionToo && condition == ItemCondition.closed.rawValue {
+        } else if takingItemConditionIntoAccount && condition == ItemCondition.closed.rawValue {
             return .closed
 
         } else if createdByMe || assignedToMySection {
@@ -474,7 +487,7 @@ class ListableItem: DataItem {
         }
 
         if targetSection == .closed || targetSection == .merged {
-            return preferredSection(evaluateConditionToo: false).shouldBadgeComments
+            return preferredSection(takingItemConditionIntoAccount: false).shouldBadgeComments
         }
 
         return true
@@ -485,7 +498,7 @@ class ListableItem: DataItem {
             disableSnoozing(explicityAwoke: true)
         }
 
-        var targetSection = preferredSection(evaluateConditionToo: true)
+        var targetSection = preferredSection(takingItemConditionIntoAccount: true)
 
         if targetSection != .none {
             switch self is Issue ? repo.displayPolicyForIssues : repo.displayPolicyForPrs {
