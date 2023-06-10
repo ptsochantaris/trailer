@@ -1,10 +1,3 @@
-//
-//  MainView.swift
-//  Trailer
-//
-//  Created by Paul Tsochantaris on 24/05/2022.
-//
-
 import SwiftUI
 
 struct SectionView: View {

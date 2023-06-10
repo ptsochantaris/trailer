@@ -3,3 +3,4 @@
 --redundanttype inferred
 --disable wrapMultilineStatementBraces, wrapConditionalBodies, wrapAttributes
 --enable sortedSwitchCases
+-header ""

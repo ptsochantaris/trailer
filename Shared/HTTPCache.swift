@@ -1,6 +1,5 @@
 import Foundation
 import NIOCore
-import NIOHTTP1
 
 final actor HTTPCache {
     private let cacheDirectory: String = {

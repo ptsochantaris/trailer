@@ -1,7 +1,3 @@
-//  Tweaked from Data+Compression:
-//  Created by Lee Morgan on 7/17/15.
-//  Copyright © 2015 Lee Morgan. All rights reserved.
-
 import Compression
 import Foundation
 

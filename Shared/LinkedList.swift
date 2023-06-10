@@ -1,10 +1,3 @@
-//
-//  LinkedList.swift
-//  trailer
-//
-//  Created by Paul Tsochantaris on 07/01/2023.
-//
-
 import Foundation
 
 final class LinkedList<Value>: Sequence {

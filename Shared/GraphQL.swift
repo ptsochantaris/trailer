@@ -1,4 +1,3 @@
-import CoreData
 import Foundation
 
 @MainActor

@@ -1,10 +1,3 @@
-//
-//  PocketTrailer_Widget.swift
-//  PocketTrailer Widget
-//
-//  Created by Paul Tsochantaris on 24/05/2022.
-//
-
 import SwiftUI
 import WidgetKit
 

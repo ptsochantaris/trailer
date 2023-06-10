@@ -1,10 +1,3 @@
-//
-//  HTTP.swift
-//  Trailer
-//
-//  Created by Paul Tsochantaris on 22/05/2022.
-//
-
 import AsyncHTTPClient
 import Foundation
 import NIOCore
