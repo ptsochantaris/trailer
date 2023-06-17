@@ -12,7 +12,7 @@ import Foundation
 typealias JSON = [String: Any]
 
 @available(macOS 11.0, iOS 14.0, *)
-extension [UInt8].SubSequence {
+extension ArraySlice<UInt8> {
     var asString: String {
         String(unsafeUninitializedCapacity: count) { pointer in
             _ = pointer.initialize(fromContentsOf: self)
@@ -88,10 +88,9 @@ final class FoundationJson {
 
         // parse values
         while true {
-            guard let value = try parseValue() else {
-                continue
+            if let value = try parseValue() {
+                array.append(value)
             }
-            array.append(value)
 
             // consume the whitespace after the value before the comma
             let ascii = try consumeWhitespace()
