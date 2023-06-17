@@ -135,7 +135,7 @@ enum HTTP {
                     DLog("Will pause and retry call to %@", request.url)
                     try? await Task.sleep(nanoseconds: 5 * NSEC_PER_SEC)
                 } else {
-                    DLog("Failed API call to %@", request.url)
+                    DLog("Failed call to %@", request.url)
                     throw error
                 }
             }

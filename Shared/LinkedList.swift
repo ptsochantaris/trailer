@@ -1,11 +1,11 @@
 import Foundation
 
 final class LinkedList<Value>: Sequence {
-    final class Node<Value> {
-        fileprivate let value: Value
-        fileprivate var next: Node<Value>?
+    final class Node<T> {
+        fileprivate let value: T
+        fileprivate var next: Node<T>?
 
-        init(_ value: Value, _ next: Node<Value>?) {
+        init(_ value: T, _ next: Node<T>?) {
             self.value = value
             self.next = next
         }
