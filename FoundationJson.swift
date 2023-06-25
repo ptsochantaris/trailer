@@ -49,13 +49,13 @@ final class FoundationJson {
             case ._openbracket:
                 return try parseArray()
             case ._charF:
-                try consumeFalse()
+                try skip(4)
                 return false
             case ._charT:
-                try consumeTrue()
+                try skip(3)
                 return true
             case ._charN:
-                try consumeNull()
+                try skip(3)
                 return nil
             case ._minus:
                 return try parseNumber(positive: false)
@@ -194,43 +194,11 @@ final class FoundationJson {
         throw JSONError.unexpectedEndOfFile
     }
 
-    private func consumeFalse() throws {
-        guard read() == ._charA,
-              read() == ._charL,
-              read() == ._charS,
-              read() == ._charE
-        else {
-            if readerIndex >= endIndex {
-                throw JSONError.unexpectedEndOfFile
-            }
+    private func skip(_ num: Int) throws {
+        readerIndex += num
 
-            throw JSONError.unexpectedCharacter(ascii: peekPrevious(), characterIndex: readerIndex - 1)
-        }
-    }
-
-    private func consumeTrue() throws {
-        guard read() == ._charR,
-              read() == ._charU,
-              read() == ._charE
-        else {
-            if readerIndex >= endIndex {
-                throw JSONError.unexpectedEndOfFile
-            }
-
-            throw JSONError.unexpectedCharacter(ascii: peekPrevious(), characterIndex: readerIndex - 1)
-        }
-    }
-
-    private func consumeNull() throws {
-        guard read() == ._charU,
-              read() == ._charL,
-              read() == ._charL
-        else {
-            if readerIndex >= endIndex {
-                throw JSONError.unexpectedEndOfFile
-            }
-
-            throw JSONError.unexpectedCharacter(ascii: peekPrevious(), characterIndex: readerIndex - 1)
+        guard readerIndex < endIndex else {
+            throw JSONError.unexpectedEndOfFile
         }
     }
 
@@ -426,12 +394,11 @@ final class FoundationJson {
     }
 
     private func parseNumber(positive: Bool) throws -> Any {
-        var pastControlChar: ControlCharacter = .operand
         let startIndex = readerIndex - 1
 
+        var pastControlChar: ControlCharacter = .operand
         var numbersSinceControlChar = positive
 
-        // parse everything else
         while let byte = read() {
             switch byte {
             case ._zero ... ._nine:
@@ -466,20 +433,35 @@ final class FoundationJson {
                 }
 
                 readerIndex -= 1
-                let stringValue = array[startIndex ..< readerIndex].asString
                 switch pastControlChar {
                 case .decimalPoint:
+                    let stringValue = array[startIndex ..< readerIndex].asString
                     guard let result = Float(stringValue) else {
                         throw JSONError.numberIsNotRepresentableInSwift(parsed: stringValue)
                     }
                     return result
                 case .exp, .expOperator:
+                    let stringValue = array[startIndex ..< readerIndex].asString
                     throw JSONError.numberIsNotRepresentableInSwift(parsed: stringValue)
                 case .operand:
-                    guard let result = Int(stringValue) else {
-                        throw JSONError.numberIsNotRepresentableInSwift(parsed: stringValue)
+                    let numberIndex: Int
+                    var dec: Int
+                    if positive {
+                        numberIndex = startIndex
+                        dec = 1
+                    } else {
+                        numberIndex = startIndex + 1
+                        dec = -1
                     }
-                    return result
+
+                    var index = readerIndex
+                    var total = 0
+                    while index > numberIndex {
+                        index -= 1
+                        total += Int(array[index] - 48) * dec
+                        dec *= 10
+                    }
+                    return total
                 }
 
             default:
