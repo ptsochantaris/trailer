@@ -52,10 +52,10 @@ final class Repo: DataItem {
                 }
             }
 
-            if neededByAuthoredPr, repo.displayPolicyForPrs == RepoDisplayPolicy.hide.rawValue {
+            if neededByAuthoredPr, repo.displayPolicyForPrs == RepoDisplayPolicy.hide.rawValue, !(repo.archived && Settings.hideArchivedRepos) {
                 repo.displayPolicyForPrs = RepoDisplayPolicy.authoredOnly.rawValue
             }
-            if neededByAuthoredIssue, repo.displayPolicyForIssues == RepoDisplayPolicy.hide.rawValue {
+            if neededByAuthoredIssue, repo.displayPolicyForIssues == RepoDisplayPolicy.hide.rawValue, !(repo.archived && Settings.hideArchivedRepos) {
                 repo.displayPolicyForIssues = RepoDisplayPolicy.authoredOnly.rawValue
             }
         }
