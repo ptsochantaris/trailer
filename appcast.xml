@@ -3,8 +3,29 @@
 	<channel>
 		<title>Trailer Changelog</title>
 		<link>http://ptsochantaris.github.io/trailer/appcast.xml</link>
-		<description>Managing Pull Requests and Issues, For GitHub and GitHub Enterprise.</description>
+		<description>Managing Pull Requests and Issues, for GitHub and GitHub Enterprise.</description>
 		<language>en</language>
+
+        <item>
+            <title>Version 1.8.0</title>
+            <sparkle:minimumSystemVersion>10.15.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[<font face="sans-serif" size="3"><ul>
+                <li>Significant optimisations to performance throughout, from HTTP requests, parsing queries, processing items, app responsiveness while syncing, and especially updating menus in macOS.</li>
+                <li>A (first) round of improvements to the ageing codebase :)</li>
+                <li>Many small fixes, partly as a consequence of the cleanup.</li>
+                <li>Fixed an issue where items that were open at the time a repo was archived will no longer be listed.</li>
+                <li>Fixed an issue where closed and merged items that were kept on the list could not be opened.</li>
+                <li>Corrections to Spotlight integration.</li>
+                </ul>
+                </font>]]></description>
+            <pubDate>Sat, 1 Jul 2023 13:00:00 +0000</pubDate>
+            <enclosure
+            url="https://github.com/ptsochantaris/trailer/releases/download/1.8.0/Trailer-180.zip"
+            sparkle:version="1647"
+            sparkle:shortVersionString="1.8.0"
+            sparkle:dsaSignature="MC0CFQC+7M93YqjXXV0RRTHyfOy27MyrKwIULDZsVWWwODICxN9fsFNxTHPK3Ks="
+            type="application/octet-stream"/>
+        </item>
 
         <item>
             <title>Version 1.7.6</title>
