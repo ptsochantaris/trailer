@@ -1,11 +1,25 @@
 import Foundation
 
-final class GQLField: GQLElement {
-    let name: String
-    var queryText: String { return name }
-    var fragments: [GQLFragment] { return [] }
-    
-    init(name: String) {
-        self.name = name
+extension GraphQL {
+    static let emptyList = LinkedList<Fragment>()
+
+    struct Field: GQLElement {
+        let id = UUID()
+        let name: String
+        var queryText: String { name }
+        let fragments = emptyList
+        let nodeCost = 0
+
+        init(_ name: String) {
+            self.name = name
+        }
+
+        func asShell(for element: GQLElement) -> GQLElement? {
+            if element.id == id {
+                return element
+            } else {
+                return nil
+            }
+        }
     }
 }

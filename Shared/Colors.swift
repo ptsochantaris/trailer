@@ -1,60 +1,47 @@
 #if os(iOS)
-import UIKit
-typealias COLOR_CLASS = UIColor
+    import UIKit
+    typealias COLOR_CLASS = UIColor
 
 #elseif os(OSX)
-import Foundation
-typealias COLOR_CLASS = NSColor
+    import Cocoa
+    typealias COLOR_CLASS = NSColor
 
 #endif
 
 extension COLOR_CLASS {
     static var appGreen: COLOR_CLASS {
-        if #available(macOS 10.13, iOS 13, *) {
-            return COLOR_CLASS(named: "appGreen")!
-        } else {
-            return COLOR_CLASS(red: 0.3, green: 0.6, blue: 0.2, alpha: 1.0)
-        }
+        COLOR_CLASS(named: "appGreen")!
     }
 
     static var appYellow: COLOR_CLASS {
-        if #available(macOS 10.13, iOS 13, *) {
-            return COLOR_CLASS(named: "appYellow")!
-        } else {
-            return COLOR_CLASS(red: 0.6, green: 0.6, blue: 0.0, alpha: 1.0)
-        }
+        COLOR_CLASS(named: "appYellow")!
     }
-    
+
     static var appRed: COLOR_CLASS {
-        if #available(macOS 10.13, iOS 13, *) {
-            return COLOR_CLASS(named: "appRed")!
-        } else {
-            return COLOR_CLASS(red: 0.7, green: 0.2, blue: 0.2, alpha: 1.0)
-        }
+        COLOR_CLASS(named: "appRed")!
     }
-    
+
     static var appLabel: COLOR_CLASS {
         #if os(iOS)
-        return .label
+            return .label
         #elseif os(OSX)
-        return .labelColor
-        #endif
-    }
-    
-    static var appSecondaryLabel: COLOR_CLASS {
-        #if os(iOS)
-        return .secondaryLabel
-        #elseif os(OSX)
-        return .secondaryLabelColor
-        #endif
-    }
-    
-    static var appTertiaryLabel: COLOR_CLASS {
-        #if os(iOS)
-        return .tertiaryLabel
-        #elseif os(OSX)
-        return .tertiaryLabelColor
+            return .labelColor
         #endif
     }
 
+    static var appSecondaryLabel: COLOR_CLASS {
+        #if os(iOS)
+            return .secondaryLabel
+        #elseif os(OSX)
+            return .secondaryLabelColor
+        #endif
+    }
+
+    static var appTertiaryLabel: COLOR_CLASS {
+        #if os(iOS)
+            return .tertiaryLabel
+        #elseif os(OSX)
+            return .tertiaryLabelColor
+        #endif
+    }
 }

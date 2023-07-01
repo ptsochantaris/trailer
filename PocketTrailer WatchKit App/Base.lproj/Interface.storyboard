@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="15702" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="AgC-eL-Hgc">
+<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="20037" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="AgC-eL-Hgc">
     <device id="watch38"/>
     <dependencies>
         <deployment identifier="watchOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15704"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="15501"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="20006"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
     </dependencies>
     <scenes>
@@ -18,24 +18,9 @@
                         </label>
                         <table alignment="center" verticalAlignment="center" id="be2-ie-h5R">
                             <items>
-                                <tableRow identifier="UpdatedRow" id="cao-u7-yKA" userLabel="UpdatedRow" customClass="UpdatedRow" customModule="PocketTrailer_WatchKit_App" customModuleProvider="target">
-                                    <group key="rootItem" width="1" height="0.0" alignment="left" id="eob-2K-fzX">
-                                        <items>
-                                            <label alignment="left" verticalAlignment="center" text="Updated X Y Z" id="l4Y-8i-gK1">
-                                                <color key="textColor" cocoaTouchSystemColor="lightTextColor"/>
-                                                <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
-                                            </label>
-                                        </items>
-                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                    </group>
-                                    <connections>
-                                        <outlet property="updatedLabel" destination="l4Y-8i-gK1" id="qaz-h4-q3q"/>
-                                    </connections>
-                                </tableRow>
                                 <tableRow identifier="TitleRow" selectable="NO" id="tHv-Jj-a9y" customClass="TitleRow" customModule="PocketTrailer_WatchKit_App" customModuleProvider="target">
                                     <group key="rootItem" width="1" height="0.0" alignment="left" layout="vertical" id="GaG-l4-Bqp">
                                         <items>
-                                            <group height="10" alignment="left" id="0Pl-kz-IQE"/>
                                             <group width="1" alignment="center" verticalAlignment="center" spacing="4" id="mWo-dt-dzr">
                                                 <items>
                                                     <imageView width="14" height="14" alignment="left" verticalAlignment="center" image="GlancePrs" contentMode="scaleAspectFit" id="wN9-X6-5fx">
@@ -92,38 +77,43 @@
                                 </tableRow>
                             </items>
                         </table>
+                        <button width="1" alignment="left" verticalAlignment="bottom" hidden="YES" title="Clear Merged" id="S3o-6p-35D">
+                            <connections>
+                                <action selector="clearMergedSelected" destination="AgC-eL-Hgc" id="a3B-fz-iwX"/>
+                            </connections>
+                        </button>
+                        <button width="1" alignment="left" verticalAlignment="bottom" hidden="YES" title="Clear Closed" id="HMY-hm-xfa">
+                            <connections>
+                                <action selector="clearClosedSelected" destination="AgC-eL-Hgc" id="Ntb-9t-4AE"/>
+                            </connections>
+                        </button>
+                        <button width="1" alignment="left" verticalAlignment="bottom" hidden="YES" title="Mark as Read" id="qsL-5I-LhV">
+                            <connections>
+                                <action selector="markAllReadSelected" destination="AgC-eL-Hgc" id="cOB-yl-2Ns"/>
+                            </connections>
+                        </button>
+                        <button width="1" alignment="left" verticalAlignment="bottom" hidden="YES" title="Start Refresh" id="kNh-80-30W">
+                            <connections>
+                                <action selector="refreshSelected" destination="AgC-eL-Hgc" id="zgJ-4G-deM"/>
+                            </connections>
+                        </button>
+                        <label alignment="center" verticalAlignment="bottom" hidden="YES" text="Updated X Y Z" id="l4Y-8i-gK1">
+                            <color key="textColor" systemColor="lightTextColor"/>
+                            <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
+                        </label>
                     </items>
-                    <menu key="menu" id="FvI-zq-Wrb">
-                        <items>
-                            <menuItem title="Merged" icon="trash" id="QVP-Uy-Uq0">
-                                <connections>
-                                    <action selector="clearMergedSelected" destination="AgC-eL-Hgc" id="hYL-Bu-k6C"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Closed" icon="trash" id="dwd-8r-puY">
-                                <connections>
-                                    <action selector="clearClosedSelected" destination="AgC-eL-Hgc" id="SIg-1X-7Em"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="All Read" icon="accept" id="q8E-ew-SbG">
-                                <connections>
-                                    <action selector="markAllReadSelected" destination="AgC-eL-Hgc" id="fW1-vU-1ry"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Refresh" icon="repeat" id="JUU-7X-dfp">
-                                <connections>
-                                    <action selector="refreshSelected" destination="AgC-eL-Hgc" id="T4H-b9-mvE"/>
-                                </connections>
-                            </menuItem>
-                        </items>
-                    </menu>
                     <connections>
+                        <outlet property="clearClosedButton" destination="HMY-hm-xfa" id="lUm-s0-Lck"/>
+                        <outlet property="clearMergedButton" destination="S3o-6p-35D" id="6S0-JN-J6A"/>
+                        <outlet property="markReeadButton" destination="qsL-5I-LhV" id="ZYr-Eh-BCq"/>
+                        <outlet property="startRefreshButton" destination="kNh-80-30W" id="baA-bR-ybr"/>
                         <outlet property="statusLabel" destination="tZx-Xo-NwI" id="PUL-4Q-1WY"/>
                         <outlet property="table" destination="be2-ie-h5R" id="Lhy-Wj-Csa"/>
+                        <outlet property="updatedLabel" destination="l4Y-8i-gK1" id="wZO-V5-L82"/>
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="-136" y="-43"/>
+            <point key="canvasLocation" x="-135" y="-94"/>
         </scene>
         <!--ListController-->
         <scene sceneID="ox7-bJ-gA7">
@@ -189,28 +179,20 @@
                                 </tableRow>
                             </items>
                         </table>
+                        <button width="1" alignment="left" verticalAlignment="bottom" hidden="YES" title="Mark as Read" id="Jpv-PE-Siu">
+                            <connections>
+                                <action selector="markAllReadSelected" destination="Sqe-dw-Y9B" id="Dai-Dg-QGB"/>
+                            </connections>
+                        </button>
                     </items>
-                    <menu key="menu" id="dyj-Bd-XZp">
-                        <items>
-                            <menuItem title="All Read" icon="accept" id="ht7-Y3-Qkk">
-                                <connections>
-                                    <action selector="markAllReadSelected" destination="Sqe-dw-Y9B" id="OO3-8A-VBq"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Refresh" icon="repeat" id="pbf-Br-uiM">
-                                <connections>
-                                    <action selector="refreshSelected" destination="Sqe-dw-Y9B" id="On1-u5-oWO"/>
-                                </connections>
-                            </menuItem>
-                        </items>
-                    </menu>
                     <connections>
+                        <outlet property="markReeadButton" destination="Jpv-PE-Siu" id="bjn-iE-8Gs"/>
                         <outlet property="statusLabel" destination="2Zp-yv-wv1" id="HEf-5X-yG4"/>
                         <outlet property="table" destination="XeC-bN-XlT" id="eNr-td-1B9"/>
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="110" y="9"/>
+            <point key="canvasLocation" x="140" y="160"/>
         </scene>
         <!--DetailController-->
         <scene sceneID="Y5a-NZ-okm">
@@ -294,35 +276,29 @@
                                 </tableRow>
                             </items>
                         </table>
+                        <button width="1" alignment="left" verticalAlignment="bottom" hidden="YES" title="Mark as Read" id="kXW-Oy-0rx">
+                            <connections>
+                                <action selector="markAllReadSelected" destination="Hgm-oe-oa5" id="Tkh-GI-XYn"/>
+                            </connections>
+                        </button>
+                        <button width="1" alignment="left" verticalAlignment="bottom" hidden="YES" title="View in App" id="Hrw-Ba-VCj">
+                            <connections>
+                                <action selector="openOnDeviceSelected" destination="Hgm-oe-oa5" id="KgI-1l-fBc"/>
+                            </connections>
+                        </button>
                     </items>
-                    <menu key="menu" id="VYe-CG-2Yp">
-                        <items>
-                            <menuItem title="View In PocketTrailer" icon="info" id="GEJ-q9-0tT">
-                                <connections>
-                                    <action selector="openOnDeviceSelected" destination="Hgm-oe-oa5" id="JZO-fC-lyj"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Read" icon="accept" id="k8l-cP-NWU">
-                                <connections>
-                                    <action selector="markAllReadSelected" destination="Hgm-oe-oa5" id="WKv-dl-KVs"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Refresh" icon="repeat" id="cqe-Ie-HAm">
-                                <connections>
-                                    <action selector="refreshSelected" destination="Hgm-oe-oa5" id="GnJ-EP-gnj"/>
-                                </connections>
-                            </menuItem>
-                        </items>
-                    </menu>
                     <connections>
+                        <outlet property="markReadButton" destination="kXW-Oy-0rx" id="oR7-Mz-ZC0"/>
+                        <outlet property="openInAppButton" destination="Hrw-Ba-VCj" id="V2P-Ef-Z2E"/>
                         <outlet property="statusLabel" destination="Adx-ov-WlP" id="yr1-Fc-kGN"/>
                         <outlet property="table" destination="nDu-Js-IyV" id="LiY-op-bsm"/>
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="331" y="-43"/>
+            <point key="canvasLocation" x="-135" y="283"/>
         </scene>
     </scenes>
+    <color key="tintColor" name="apptint"/>
     <resources>
         <image name="GlanceIssues" width="99.5" height="100"/>
         <image name="GlancePrs" width="80" height="100"/>
@@ -332,6 +308,8 @@
         <namedColor name="apptint">
             <color red="0.20299999415874481" green="0.43000000715255737" blue="0.71799999475479126" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
+        <systemColor name="lightTextColor">
+            <color white="1" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
     </resources>
-    <color key="tintColor" name="apptint"/>
 </document>

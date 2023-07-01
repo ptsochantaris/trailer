@@ -1,57 +1,56 @@
+import Cocoa
 
 private final class TextFieldCellTextView: NSTextView, NSTextViewDelegate {
-	override func keyDown(with event: NSEvent) {
-		let modifiers = event.modifierFlags
-		if modifiers.contains(.command), let textView = window?.firstResponder as? NSTextView {
+    override func keyDown(with event: NSEvent) {
+        let modifiers = event.modifierFlags
+        if modifiers.contains(.command), let textView = window?.firstResponder as? NSTextView {
+            let range = textView.selectedRange()
+            let selected = range.length > 0
+            let keyCode = event.keyCode
 
-			let range = textView.selectedRange()
-			let selected = range.length > 0
-			let keyCode = event.keyCode
+            if keyCode == 6 { // command + Z
+                if let undoManager = textView.undoManager {
+                    if modifiers.contains(.shift) {
+                        if undoManager.canRedo {
+                            undoManager.redo()
+                            return
+                        }
+                    } else {
+                        if undoManager.canUndo {
+                            undoManager.undo()
+                            return
+                        }
+                    }
+                }
+            } else if keyCode == 7, selected { // command + X
+                textView.cut(self)
+                return
 
-			if keyCode == 6 { //command + Z
-				if let undoManager = textView.undoManager {
-					if modifiers.contains(.shift) {
-						if undoManager.canRedo {
-							undoManager.redo()
-							return
-						}
-					} else {
-						if undoManager.canUndo {
-							undoManager.undo()
-							return
-						}
-					}
-				}
-			} else if keyCode == 7 && selected { // command + X
-				textView.cut(self)
-				return
+            } else if keyCode == 8, selected { // command + C
+                textView.copy(self)
+                return
 
-			} else if keyCode == 8 && selected { // command + C
-				textView.copy(self)
-				return
-
-			} else if keyCode == 9 { // command + V
-				textView.paste(self)
-				return
-			}
-            
+            } else if keyCode == 9 { // command + V
+                textView.paste(self)
+                return
+            }
         }
 
-		super.keyDown(with: event)
-	}
-    
-    override func insertNewline(_ sender: Any?) {
+        super.keyDown(with: event)
+    }
+
+    override func insertNewline(_: Any?) {
         window?.makeFirstResponder(nextResponder)
     }
-    
+
     var originalText: String?
-    override func cancelOperation(_ sender: Any?) {
+    override func cancelOperation(_: Any?) {
         if let o = originalText {
-            self.string = o
+            string = o
         }
         window?.makeFirstResponder(nextResponder)
     }
-    
+
     override func viewDidMoveToSuperview() {
         if superview != nil {
             originalText = textContainer?.textView?.string
@@ -60,10 +59,9 @@ private final class TextFieldCellTextView: NSTextView, NSTextViewDelegate {
 }
 
 final class TextFieldCell: NSTextFieldCell {
-    private lazy var tfctv: TextFieldCellTextView = {
-        return TextFieldCellTextView()
-    }()
-	override func fieldEditor(for controlView: NSView) -> NSTextView? {
-        return tfctv
-	}
+    private lazy var tfctv = TextFieldCellTextView()
+
+    override func fieldEditor(for _: NSView) -> NSTextView? {
+        tfctv
+    }
 }

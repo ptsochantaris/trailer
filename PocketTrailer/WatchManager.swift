@@ -1,436 +1,384 @@
-
-import UIKit
 import CoreData
+import UIKit
 import WatchConnectivity
 
-final class WatchManager : NSObject, WCSessionDelegate {
+final class WatchManager: NSObject, WCSessionDelegate {
+    private var session: WCSession?
 
-	private var session: WCSession?
+    override init() {
+        super.init()
+        if WCSession.isSupported() {
+            session = WCSession.default
+            session?.delegate = self
+            session?.activate()
+        }
 
-	override init() {
-		super.init()
-		if WCSession.isSupported() {
-			session = WCSession.default
-			session?.delegate = self
-			session?.activate()
-		}
-	}
-
-	func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
-		if session.isPaired, session.isWatchAppInstalled, activationState == .activated {
-            DispatchQueue.main.async { [weak self] in
-                guard let S = self else { return }
-				S.sendOverview()
-			}
-		}
-	}
-
-	func sessionReachabilityDidChange(_ session: WCSession) {
-		if session.isPaired, session.isWatchAppInstalled, session.activationState == .activated, session.isReachable {
-            DispatchQueue.main.async { [weak self] in
-                guard let S = self else { return }
-				S.sendOverview()
-			}
-		}
-	}
-
-	func sessionDidDeactivate(_ session: WCSession) {}
-
-	func sessionDidBecomeInactive(_ session: WCSession) {}
-
-	private func sendOverview() {
-
-        guard let session = session,
-            session.isPaired,
-            session.isWatchAppInstalled,
-            session.activationState == .activated,
-            let overview = NSDictionary(contentsOf: overviewPath)
-            else { return }
-        
-        do {
-            try session.updateApplicationContext(["overview": overview])
-        } catch {
-            DLog("Error updating watch session: %@", error.localizedDescription)
+        NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: .main) { [weak self] _ in
+            Task { [weak self] in
+                _ = await self?.buildOverview()
+            }
         }
     }
 
-    private var updateGroup: DispatchGroup?
+    func session(_: WCSession, activationDidCompleteWith _: WCSessionActivationState, error _: Error?) {}
+
+    func sessionDidDeactivate(_: WCSession) {}
+
+    func sessionDidBecomeInactive(_: WCSession) {}
+
+    private var overviewPath: URL {
+        DataManager.dataFilesDirectory.appendingPathComponent("overview.plist")
+    }
+
+    func session(_: WCSession, didReceiveMessage message: JSON, replyHandler: @escaping (JSON) -> Void) {
+        Task {
+            let reply = await handle(message: message)
+            replyHandler(reply)
+        }
+    }
+
     func updateContext() {
-        let u = DispatchGroup()
-        u.enter()
-        updateGroup = u
-        BackgroundTask.registerForBackground()
-		buildOverview { overview in
-			(overview as NSDictionary).write(to: self.overviewPath, atomically: true)
-			self.sendOverview()
-            u.leave()
-            self.updateGroup = nil
-            BackgroundTask.unregisterForBackground()
-		}
-	}
-    func waitForUpdate(callback: @escaping ()->Void) {
-        if let u = updateGroup {
-            u.notify(queue: .main, execute: callback)
-        } else {
-            callback()
+        if let session, session.isReachable {
+            session.sendMessage(["newInfoAvailable": true], replyHandler: nil)
         }
     }
 
-	private var overviewPath: URL {
-		return DataManager.dataFilesDirectory.appendingPathComponent("overview.plist")
-	}
+    @MainActor
+    private func handle(message: JSON) async -> JSON {
+        switch S(message["command"] as? String) {
+        case "refresh":
+            let status = await app.startRefresh()
+            switch status {
+            case .started:
+                return reportSuccess(result: [:])
+            case .noNetwork:
+                return reportFailure(reason: "Can't refresh, check your Internet connection.", result: [:])
+            case .alreadyRefreshing:
+                return reportFailure(reason: "Already refreshing, please wait.", result: [:])
+            case .noConfiguredServers:
+                return reportFailure(reason: "Can't refresh, there are no configured servers.", result: [:])
+            }
 
-	func session(_ session: WCSession, didReceiveMessage message: [String : Any], replyHandler: @escaping ([String : Any]) -> Void) {
-        DispatchQueue.main.async { [weak self] in
-            guard let S = self else { return }
-			S.handle(message: message, replyHandler: replyHandler)
-		}
-	}
+        case "overview":
+            return await processList(message: message)
 
-	private func handle(message: [String : Any], replyHandler: @escaping ([String : Any]) -> Void) {
+        case "openItem":
+            if let itemId = message["localId"] as? String {
+                popupManager.masterController.highightItemWithUriPath(uriPath: itemId)
+            }
+            return await processList(message: message)
 
-		switch(S(message["command"] as? String)) {
+        case "opencomment":
+            if let itemId = message["id"] as? String {
+                popupManager.masterController.openCommentWithId(cId: itemId)
+            }
+            return await processList(message: message)
 
-		case "refresh":
-			let status = app.startRefresh()
-			switch status {
-			case .started:
-				reportSuccess(result: [:], replyHandler: replyHandler)
-			case .noNetwork:
-				reportFailure(reason: "Can't refresh, check your Internet connection.", result: [:], replyHandler: replyHandler)
-			case .alreadyRefreshing:
-				reportFailure(reason: "Already refreshing, please wait.", result: [:], replyHandler: replyHandler)
-			case .noConfiguredServers:
-				reportFailure(reason: "Can't refresh, there are no configured servers.", result: [:], replyHandler: replyHandler)
-			}
+        case "clearAllMerged":
+            app.clearAllMerged()
+            return await processList(message: message)
 
-		case "openItem":
-			if let itemId = message["localId"] as? String {
-				popupManager.masterController.highightItemWithUriPath(uriPath: itemId)
-			}
-			processList(message: message, replyHandler: replyHandler)
+        case "clearAllClosed":
+            app.clearAllClosed()
+            return await processList(message: message)
 
-		case "opencomment":
-			if let itemId = message["id"] as? String {
-				popupManager.masterController.openCommentWithId(cId: itemId)
-			}
-			processList(message: message, replyHandler: replyHandler)
+        case "markEverythingRead":
+            app.markEverythingRead()
+            return await processList(message: message)
 
-		case "clearAllMerged":
-			app.clearAllMerged()
-			processList(message: message, replyHandler: replyHandler)
+        case "markItemsRead":
+            if let
+                uri = message["localId"] as? String,
+                let oid = DataManager.id(for: uri),
+                let dataItem = existingObject(with: oid) as? ListableItem,
+                dataItem.hasUnreadCommentsOrAlert {
+                dataItem.catchUpWithComments()
 
-		case "clearAllClosed":
-			app.clearAllClosed()
-			processList(message: message, replyHandler: replyHandler)
+            } else if let uris = message["itemUris"] as? [String] {
+                for uri in uris {
+                    if let
+                        oid = DataManager.id(for: uri),
+                        let dataItem = existingObject(with: oid) as? ListableItem,
+                        dataItem.hasUnreadCommentsOrAlert {
+                        dataItem.catchUpWithComments()
+                    }
+                }
+            }
+            return await processList(message: message)
 
-		case "markEverythingRead":
-			app.markEverythingRead()
-			processList(message: message, replyHandler: replyHandler)
+        default:
+            return await processList(message: message)
+        }
+    }
 
-		case "markItemsRead":
-			if let
-				uri = message["localId"] as? String,
-				let oid = DataManager.id(for: uri),
-				let dataItem = existingObject(with: oid) as? ListableItem,
-				dataItem.hasUnreadCommentsOrAlert {
+    @MainActor
+    private func processList(message: JSON) async -> JSON {
+        var result = JSON()
 
-				dataItem.catchUpWithComments()
+        switch S(message["list"] as? String) {
+        case "overview":
+            result["result"] = await buildOverview()
+            return reportSuccess(result: result)
 
-			} else if let uris = message["itemUris"] as? [String] {
-				for uri in uris {
-					if let
-						oid = DataManager.id(for: uri),
-						let dataItem = existingObject(with: oid) as? ListableItem,
-						dataItem.hasUnreadCommentsOrAlert {
+        case "item_list":
+            return await buildItemList(
+                type: message["type"] as! String,
+                sectionIndex: message["sectionIndex"] as! Int,
+                from: message["from"] as! Int,
+                apiServerUri: message["apiUri"] as! String,
+                group: message["group"] as! String,
+                count: message["count"] as! Int,
+                onlyUnread: message["onlyUnread"] as! Bool
+            )
 
-						dataItem.catchUpWithComments()
-					}
-				}
-			}
-			processList(message: message, replyHandler: replyHandler)
+        case "item_detail":
+            if let lid = message["localId"] as? String, let details = buildItemDetail(localId: lid) {
+                result["result"] = details
+                return reportSuccess(result: result)
+            } else {
+                return reportFailure(reason: "Item Not Found", result: result)
+            }
 
-		case "needsOverview":
-			sendOverview()
-			reportSuccess(result: [:], replyHandler: replyHandler)
+        default:
+            return reportSuccess(result: result)
+        }
+    }
 
-		default:
-			processList(message: message, replyHandler: replyHandler)
-		}
-	}
+    private func reportFailure(reason: String, result: JSON) -> JSON {
+        var r = result
+        r["error"] = true
+        r["status"] = reason
+        return r
+    }
 
-	private func processList(message: [String : Any], replyHandler: @escaping ([String : Any]) -> Void) {
+    private func reportSuccess(result: JSON) -> JSON {
+        var r = result
+        r["status"] = "Success"
+        return r
+    }
 
-		var result = [String : Any]()
+    ////////////////////////////
 
-		switch(S(message["list"] as? String)) {
+    @MainActor
+    private func buildItemList(type: String, sectionIndex: Int, from: Int, apiServerUri: String, group: String, count: Int, onlyUnread: Bool) async -> JSON {
+        let showLabels = Settings.showLabels
+        let entity: ListableItem.Type
+        if type == "prs" {
+            entity = PullRequest.self
+        } else {
+            entity = Issue.self
+        }
 
-		case "overview":
-			buildOverview { [weak self] overview in
-				result["result"] = overview
-				self?.reportSuccess(result: result, replyHandler: replyHandler)
-			}
+        let f: NSFetchRequest<ListableItem>
+        if !apiServerUri.isEmpty, let aid = DataManager.id(for: apiServerUri) {
+            let criterion = GroupingCriterion.server(aid)
+            f = ListableItem.requestForItems(of: entity, withFilter: nil, sectionIndex: sectionIndex, criterion: criterion, onlyUnread: onlyUnread)
+        } else if !group.isEmpty {
+            let criterion = GroupingCriterion.group(group)
+            f = ListableItem.requestForItems(of: entity, withFilter: nil, sectionIndex: sectionIndex, criterion: criterion, onlyUnread: onlyUnread)
+        } else {
+            f = ListableItem.requestForItems(of: entity, withFilter: nil, sectionIndex: sectionIndex, onlyUnread: onlyUnread)
+        }
 
-		case "item_list":
-			buildItemList(type: message["type"] as! String,
-			              sectionIndex: message["sectionIndex"] as! Int64,
-			              from: message["from"] as! Int,
-			              apiServerUri: message["apiUri"] as! String,
-			              group: message["group"] as! String,
-			              count: message["count"] as! Int,
-			              onlyUnread: message["onlyUnread"] as! Bool,
-			              replyHandler: replyHandler)
+        f.fetchOffset = from
+        f.fetchLimit = count
 
-		case "item_detail":
-			if let lid = message["localId"] as? String, let details = buildItemDetail(localId: lid) {
-				result["result"] = details
-				reportSuccess(result: result, replyHandler: replyHandler)
-			} else {
-				reportFailure(reason: "Item Not Found", result: result, replyHandler: replyHandler)
-			}
+        let items = try! DataManager.main.fetch(f).map { self.baseDataForItem(item: $0, showLabels: showLabels) }
+        let compressedData = (try? NSKeyedArchiver.archivedData(withRootObject: items, requiringSecureCoding: false).data(operation: .compress)) ?? Data()
+        return ["result": compressedData]
+    }
 
-		default:
-			reportSuccess(result: result, replyHandler: replyHandler)
-		}
-	}
+    @MainActor
+    private func baseDataForItem(item: ListableItem, showLabels: Bool) -> JSON {
+        let font = UIFont.systemFont(ofSize: UIFont.systemFontSize)
+        let smallFont = UIFont.systemFont(ofSize: UIFont.systemFontSize - 4)
 
-	private func reportFailure(reason: String, result: [String : Any], replyHandler: ([String : Any]) -> Void) {
-		var r = result
-		r["error"] = true
-		r["status"] = reason
-		replyHandler(r)
-	}
+        var itemData: JSON = [
+            "commentCount": item.totalComments,
+            "unreadCount": item.unreadComments,
+            "localId": item.objectID.uriRepresentation().absoluteString,
+            "title": item.title(with: font, labelFont: font, titleColor: .white, numberColor: .gray),
+            "subtitle": item.subtitle(with: smallFont, lightColor: .lightGray, darkColor: .gray, separator: "\n"),
+            "labels": item.labelsAttributedString(labelFont: smallFont) ?? emptyAttributedString,
+            "reviews": (item as? PullRequest)?.reviewsAttributedString(labelFont: smallFont) ?? emptyAttributedString
+        ]
 
-	private func reportSuccess(result: [String : Any], replyHandler: ([String : Any]) -> Void) {
-		var r = result
-		r["status"] = "Success"
-		replyHandler(r)
-	}
-
-	////////////////////////////
-
-	private func buildItemList(type: String, sectionIndex: Int64, from: Int, apiServerUri: String, group: String, count: Int, onlyUnread: Bool, replyHandler: @escaping ([String : Any]) -> Void) {
-
-		let showLabels = Settings.showLabels
-		let entity: ListableItem.Type
-		if type == "prs" {
-			entity = PullRequest.self
-		} else {
-			entity = Issue.self
-		}
-
-		let f: NSFetchRequest<ListableItem>
-		if !apiServerUri.isEmpty, let aid = DataManager.id(for: apiServerUri) {
-			let criterion = GroupingCriterion(apiServerId: aid)
-			f = ListableItem.requestForItems(of: entity, withFilter: nil, sectionIndex: sectionIndex, criterion: criterion, onlyUnread: onlyUnread)
-		} else if !group.isEmpty {
-			let criterion = GroupingCriterion(repoGroup: group)
-			f = ListableItem.requestForItems(of: entity, withFilter: nil, sectionIndex: sectionIndex, criterion: criterion, onlyUnread: onlyUnread)
-		} else {
-			f = ListableItem.requestForItems(of: entity, withFilter: nil, sectionIndex: sectionIndex, onlyUnread: onlyUnread)
-		}
-
-		f.fetchOffset = from
-		f.fetchLimit = count
-
-		let tempMoc = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-		tempMoc.undoManager = nil
-		tempMoc.persistentStoreCoordinator = DataManager.main.persistentStoreCoordinator
-		tempMoc.perform { [weak self] in
-			let items = try! tempMoc.fetch(f).map { self?.baseDataForItem(item: $0, showLabels: showLabels) }
-			let compressedData = (try? NSKeyedArchiver.archivedData(withRootObject: items, requiringSecureCoding: false).data(operation: .compress)) ?? Data()
-			replyHandler(["result" : compressedData])
-		}
-	}
-
-	private func baseDataForItem(item: ListableItem, showLabels: Bool) -> [String : Any] {
-
-		let font = UIFont.systemFont(ofSize: UIFont.systemFontSize)
-		let smallFont = UIFont.systemFont(ofSize: UIFont.systemFontSize-4)
-
-		var itemData: [String : Any] = [
-			"commentCount": item.totalComments,
-			"unreadCount": item.unreadComments,
-			"localId": item.objectID.uriRepresentation().absoluteString,
-            "title" : item.title(with: font, labelFont: font, titleColor: .white, numberColor: .gray),
-            "subtitle" : item.subtitle(with: smallFont, lightColor: .lightGray, darkColor: .gray, separator: "\n"),
-            "labels" : item.labelsAttributedString(labelFont: smallFont) ?? emptyAttributedString,
-            "reviews" : (item as? PullRequest)?.reviewsAttributedString(labelFont: smallFont) ?? emptyAttributedString,
-			]
-
-		if showLabels {
-			itemData["labels"] = labelsForItem(item: item)
-		}
+        if showLabels {
+            itemData["labels"] = labelsForItem(item: item)
+        }
         if let item = item as? PullRequest, item.section.shouldListStatuses {
-			itemData["statuses"] = statusLinesForPr(pr: item)
-		}
-		return itemData
-	}
+            itemData["statuses"] = statusLinesForPr(pr: item)
+        }
+        return itemData
+    }
 
-	private func labelsForItem(item: ListableItem) -> [[String : Any]] {
-		var labels = [[String : Any]]()
-		for l in item.labels {
-			labels.append([
-				"color": l.colorForDisplay,
-				"text": S(l.name)
-				])
-		}
-		return labels
-	}
+    @MainActor
+    private func labelsForItem(item: ListableItem) -> [JSON] {
+        var labels = [JSON]()
+        for l in item.labels {
+            labels.append([
+                "color": l.colorForDisplay,
+                "text": S(l.name)
+            ])
+        }
+        return labels
+    }
 
-	private func statusLinesForPr(pr: PullRequest) -> [[String : Any]] {
-		var statusLines = [[String : Any]]()
-		for status in pr.displayedStatuses {
-			statusLines.append([
-				"color": status.colorForDisplay,
-				"text": S(status.descriptionText)
-				])
-		}
-		return statusLines
-	}
+    @MainActor
+    private func statusLinesForPr(pr: PullRequest) -> [JSON] {
+        var statusLines = [JSON]()
+        for status in pr.displayedStatuses {
+            statusLines.append([
+                "color": status.colorForDisplay,
+                "text": S(status.descriptionText)
+            ])
+        }
+        return statusLines
+    }
 
-	/////////////////////////////
+    /////////////////////////////
 
-	private func buildItemDetail(localId: String) -> Data? {
-		if let oid = DataManager.id(for: localId), let item = existingObject(with: oid) as? ListableItem {
-			var result = baseDataForItem(item: item, showLabels: Settings.showLabels)
-			result["description"] = item.body
-			result["comments"] = commentsForItem(item: item)
+    @MainActor
+    private func buildItemDetail(localId: String) -> Data? {
+        if let oid = DataManager.id(for: localId), let item = existingObject(with: oid) as? ListableItem {
+            var result = baseDataForItem(item: item, showLabels: Settings.showLabels)
+            result["description"] = item.body
+            result["comments"] = commentsForItem(item: item)
 
             return try? NSKeyedArchiver.archivedData(withRootObject: result, requiringSecureCoding: false).data(operation: .compress)
-		}
-		return nil
-	}
+        }
+        return nil
+    }
 
-	private func commentsForItem(item: ListableItem) -> [[String : Any]] {
-		var comments = [[String : Any]]()
-		for comment in item.sortedComments(using: .orderedDescending) {
-			comments.append([
-				"user": S(comment.userName),
-				"date": comment.createdAt ?? .distantPast,
-				"text": S(comment.body),
-				"mine": comment.isMine
-				])
-		}
-		return comments
-	}
+    @MainActor
+    private func commentsForItem(item: ListableItem) -> [JSON] {
+        var comments = [JSON]()
+        for comment in item.sortedComments(using: .orderedDescending) {
+            comments.append([
+                "user": S(comment.userName),
+                "date": comment.createdAt ?? .distantPast,
+                "text": S(comment.body),
+                "mine": comment.isMine
+            ])
+        }
+        return comments
+    }
 
-	//////////////////////////////
+    //////////////////////////////
 
-	private func buildOverview(completion: @escaping ([String:Any])->Void) {
+    @MainActor
+    private func buildOverview() async -> JSON {
+        let allViewCriteria = popupManager.masterController.allTabSets.map(\.viewCriterion)
 
-		//DLog("Building remote overview")
+        return await DataManager.runInChild(of: DataManager.main) { tempMoc in
+            var views = [JSON]()
+            var totalUnreadPrCount = 0
+            var totalUnreadIssueCount = 0
 
-        let allViewCriteria = popupManager.masterController.allTabSets.map { $0.viewCriterion }
+            for c in allViewCriteria {
+                let myPrs = WatchManager.counts(for: PullRequest.self, in: .mine, criterion: c, moc: tempMoc)
+                let participatedPrs = WatchManager.counts(for: PullRequest.self, in: .participated, criterion: c, moc: tempMoc)
+                let mentionedPrs = WatchManager.counts(for: PullRequest.self, in: .mentioned, criterion: c, moc: tempMoc)
+                let mergedPrs = WatchManager.counts(for: PullRequest.self, in: .merged, criterion: c, moc: tempMoc)
+                let closedPrs = WatchManager.counts(for: PullRequest.self, in: .closed, criterion: c, moc: tempMoc)
+                let otherPrs = WatchManager.counts(for: PullRequest.self, in: .all, criterion: c, moc: tempMoc)
+                let snoozedPrs = WatchManager.counts(for: PullRequest.self, in: .snoozed, criterion: c, moc: tempMoc)
+                let totalPrs = [myPrs, participatedPrs, mentionedPrs, mergedPrs, closedPrs, otherPrs, snoozedPrs].reduce(0) { $0 + $1["total"]! }
 
-		let tempMoc = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-		tempMoc.undoManager = nil
-        tempMoc.parent = DataManager.main
-		tempMoc.perform {
+                let totalOpenPrs = WatchManager.countOpenAndVisible(of: PullRequest.self, criterion: c, moc: tempMoc)
+                let unreadPrCount = PullRequest.badgeCount(in: tempMoc, criterion: c)
+                totalUnreadPrCount += unreadPrCount
 
-			var views = [[String : Any]]()
+                let myIssues = WatchManager.counts(for: Issue.self, in: .mine, criterion: c, moc: tempMoc)
+                let participatedIssues = WatchManager.counts(for: Issue.self, in: .participated, criterion: c, moc: tempMoc)
+                let mentionedIssues = WatchManager.counts(for: Issue.self, in: .mentioned, criterion: c, moc: tempMoc)
+                let closedIssues = WatchManager.counts(for: Issue.self, in: .closed, criterion: c, moc: tempMoc)
+                let otherIssues = WatchManager.counts(for: Issue.self, in: .all, criterion: c, moc: tempMoc)
+                let snoozedIssues = WatchManager.counts(for: Issue.self, in: .snoozed, criterion: c, moc: tempMoc)
+                let totalIssues = [myIssues, participatedIssues, mentionedIssues, closedIssues, otherIssues, snoozedIssues].reduce(0) { $0 + $1["total"]! }
 
-			var totalUnreadPrCount = 0
-			var totalUnreadIssueCount = 0
+                let totalOpenIssues = WatchManager.countOpenAndVisible(of: Issue.self, criterion: c, moc: tempMoc)
+                let unreadIssueCount = Issue.badgeCount(in: tempMoc, criterion: c)
+                totalUnreadIssueCount += unreadIssueCount
 
-			for c in allViewCriteria {
+                let prList = [
+                    "mine": myPrs, "participated": participatedPrs, "mentioned": mentionedPrs,
+                    "merged": mergedPrs, "closed": closedPrs, "other": otherPrs, "snoozed": snoozedPrs,
+                    "total": totalPrs, "total_open": totalOpenPrs, "unread": unreadPrCount,
+                    "error": totalPrs == 0 ? PullRequest.reasonForEmpty(with: nil, criterion: c).string : ""
+                ] as JSON
 
-				let myPrs = WatchManager.counts(for: PullRequest.self, in: .mine, criterion: c, moc: tempMoc)
-				let participatedPrs = WatchManager.counts(for: PullRequest.self, in: .participated, criterion: c, moc: tempMoc)
-				let mentionedPrs = WatchManager.counts(for: PullRequest.self, in: .mentioned, criterion: c, moc: tempMoc)
-				let mergedPrs = WatchManager.counts(for: PullRequest.self, in: .merged, criterion: c, moc: tempMoc)
-				let closedPrs = WatchManager.counts(for: PullRequest.self, in: .closed, criterion: c, moc: tempMoc)
-				let otherPrs = WatchManager.counts(for: PullRequest.self, in: .all, criterion: c, moc: tempMoc)
-				let snoozedPrs = WatchManager.counts(for: PullRequest.self, in: .snoozed, criterion: c, moc: tempMoc)
-				let totalPrs = [ myPrs, participatedPrs, mentionedPrs, mergedPrs, closedPrs, otherPrs, snoozedPrs ].reduce(0, { $0 + $1["total"]! })
+                let issueList = [
+                    "mine": myIssues, "participated": participatedIssues, "mentioned": mentionedIssues,
+                    "closed": closedIssues, "other": otherIssues, "snoozed": snoozedIssues,
+                    "total": totalIssues, "total_open": totalOpenIssues, "unread": unreadIssueCount,
+                    "error": totalIssues == 0 ? Issue.reasonForEmpty(with: nil, criterion: c).string : ""
+                ] as JSON
 
-				let totalOpenPrs = WatchManager.countOpenAndVisible(of: PullRequest.self, criterion: c, moc: tempMoc)
-				let unreadPrCount = PullRequest.badgeCount(in: tempMoc, criterion: c)
-				totalUnreadPrCount += unreadPrCount
+                views.append([
+                    "title": S(c?.label),
+                    "apiUri": S(c?.apiServerId?.uriRepresentation().absoluteString),
+                    "prs": prList,
+                    "issues": issueList
+                ])
+            }
+            let badgeCount = totalUnreadPrCount + totalUnreadIssueCount
+            Task { @MainActor in
+                UIApplication.shared.applicationIconBadgeNumber = badgeCount
+            }
+            return [
+                "views": views,
+                "preferIssues": Settings.preferIssuesInWatch,
+                "lastUpdated": Settings.lastSuccessfulRefresh ?? .distantPast
+            ]
+        }
+    }
 
-				let myIssues = WatchManager.counts(for: Issue.self, in: .mine, criterion: c, moc: tempMoc)
-				let participatedIssues = WatchManager.counts(for: Issue.self, in: .participated, criterion: c, moc: tempMoc)
-				let mentionedIssues = WatchManager.counts(for: Issue.self, in: .mentioned, criterion: c, moc: tempMoc)
-				let closedIssues = WatchManager.counts(for: Issue.self, in: .closed, criterion: c, moc: tempMoc)
-				let otherIssues = WatchManager.counts(for: Issue.self, in: .all, criterion: c, moc: tempMoc)
-				let snoozedIssues = WatchManager.counts(for: Issue.self, in: .snoozed, criterion: c, moc: tempMoc)
-				let totalIssues = [ myIssues, participatedIssues, mentionedIssues, closedIssues, otherIssues, snoozedIssues ].reduce(0, { $0 + $1["total"]! })
+    @MainActor
+    private static func counts(for type: (some ListableItem).Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> [String: Int] {
+        ["total": countItems(of: type, in: section, criterion: criterion, moc: moc),
+         "unread": badgeCount(for: type, in: section, criterion: criterion, moc: moc)]
+    }
 
-				let totalOpenIssues = WatchManager.countOpenAndVisible(of: Issue.self, criterion: c, moc: tempMoc)
-				let unreadIssueCount = Issue.badgeCount(in: tempMoc, criterion: c)
-				totalUnreadIssueCount += unreadIssueCount
+    @MainActor
+    private static func countallItems<T: ListableItem>(of type: T.Type, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> Int {
+        let f = NSFetchRequest<T>(entityName: String(describing: type))
+        f.includesSubentities = false
+        let p = Settings.hideUncommentedItems
+            ? NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, type.includeInUnreadPredicate])
+            : Section.nonZeroPredicate
+        DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc)
+        return try! moc.count(for: f)
+    }
 
-				views.append([
-					"title": S(c?.label),
-					"apiUri": S(c?.apiServerId?.uriRepresentation().absoluteString),
-					"prs": [
-						"mine": myPrs, "participated": participatedPrs, "mentioned": mentionedPrs,
-						"merged": mergedPrs, "closed": closedPrs, "other": otherPrs, "snoozed": snoozedPrs,
-						"total": totalPrs, "total_open": totalOpenPrs, "unread": unreadPrCount,
-						"error": totalPrs == 0 ? PullRequest.reasonForEmpty(with: nil, criterion: c).string : ""
-					],
-					"issues": [
-						"mine": myIssues, "participated": participatedIssues, "mentioned": mentionedIssues,
-						"closed": closedIssues, "other": otherIssues, "snoozed": snoozedIssues,
-						"total": totalIssues, "total_open": totalOpenIssues, "unread": unreadIssueCount,
-						"error": totalIssues == 0 ? Issue.reasonForEmpty(with: nil, criterion: c).string : ""
-					]])
-			}
+    @MainActor
+    private static func countItems<T: ListableItem>(of type: T.Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> Int {
+        let f = NSFetchRequest<T>(entityName: String(describing: type))
+        f.includesSubentities = false
+        let p = Settings.hideUncommentedItems
+            ? NSCompoundPredicate(type: .and, subpredicates: [section.matchingPredicate, type.includeInUnreadPredicate])
+            : section.matchingPredicate
+        DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc)
+        return try! moc.count(for: f)
+    }
 
-            DLog("Remote overview updated")
+    @MainActor
+    private static func badgeCount<T: ListableItem>(for type: T.Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> Int {
+        let f = NSFetchRequest<T>(entityName: String(describing: type))
+        f.includesSubentities = false
+        let p = NSCompoundPredicate(type: .and, subpredicates: [section.matchingPredicate, type.includeInUnreadPredicate])
+        DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc)
+        return ListableItem.badgeCount(from: f, in: moc)
+    }
 
-			DispatchQueue.main.async {
-				completion([
-					"views": views,
-					"preferIssues": Settings.preferIssuesInWatch,
-					"lastUpdated": Settings.lastSuccessfulRefresh ?? .distantPast
-					])
-				UIApplication.shared.applicationIconBadgeNumber = totalUnreadPrCount + totalUnreadIssueCount
-			}
-		}
-	}
-
-	private static func counts<T: ListableItem>(for type: T.Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> [String : Int] {
-		return ["total": countItems(of: type, in: section, criterion: criterion, moc: moc),
-		        "unread": badgeCount(for: type, in: section, criterion: criterion, moc: moc)]
-	}
-
-	private static func countallItems<T: ListableItem>(of type: T.Type, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> Int {
-		let f = NSFetchRequest<T>(entityName: String(describing: type))
-		f.includesSubentities = false
-		let p = Settings.hideUncommentedItems
-			? NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, type.includeInUnreadPredicate])
-			: Section.nonZeroPredicate
-		DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc)
-		return try! moc.count(for: f)
-	}
-
-	private static func countItems<T: ListableItem>(of type: T.Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> Int {
-		let f = NSFetchRequest<T>(entityName: String(describing: type))
-		f.includesSubentities = false
-		let p = Settings.hideUncommentedItems
-			? NSCompoundPredicate(type: .and, subpredicates: [section.matchingPredicate, type.includeInUnreadPredicate])
-			: section.matchingPredicate
-		DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc)
-		return try! moc.count(for: f)
-	}
-
-	private static func badgeCount<T: ListableItem>(for type: T.Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> Int {
-		let f = NSFetchRequest<T>(entityName: String(describing: type))
-		f.includesSubentities = false
-		let p = NSCompoundPredicate(type: .and, subpredicates: [section.matchingPredicate, type.includeInUnreadPredicate])
-		DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc)
-		return ListableItem.badgeCount(from: f, in: moc)
-	}
-
-	private static func countOpenAndVisible<T: ListableItem>(of type: T.Type, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> Int {
-		let f = NSFetchRequest<T>(entityName: String(describing: type))
-		f.includesSubentities = false
-		let p = Settings.hideUncommentedItems
-			? NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, ItemCondition.open.matchingPredicate, type.includeInUnreadPredicate])
-			: NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, ItemCondition.open.matchingPredicate])
-		DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc)
-		return try! moc.count(for: f)
-	}
-
+    @MainActor
+    private static func countOpenAndVisible<T: ListableItem>(of type: T.Type, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> Int {
+        let f = NSFetchRequest<T>(entityName: String(describing: type))
+        f.includesSubentities = false
+        let p = Settings.hideUncommentedItems
+            ? NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, ItemCondition.open.matchingPredicate, type.includeInUnreadPredicate])
+            : NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, ItemCondition.open.matchingPredicate])
+        DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc)
+        return try! moc.count(for: f)
+    }
 }

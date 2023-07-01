@@ -1,30 +1,33 @@
-
-import Foundation
 import CoreData
+import Foundation
 
-final class NotificationQueue {
+enum NotificationQueue {
+    private static var queue = LinkedList<(NotificationType, NSManagedObjectID)>()
 
-	private static var queue = [(NotificationType, NSManagedObjectID)]()
-
-	static func add(type: NotificationType, for item: DataItem) {
+    static func add(type: NotificationType, for item: DataItem) {
         try? item.managedObjectContext?.obtainPermanentIDs(for: [item])
-        queue.append((type, item.objectID))
-	}
+        let oid = item.objectID
+        Task { @MainActor in
+            queue.append((type, oid))
+        }
+    }
 
-	static func clear() {
-		queue.removeAll()
-	}
+    @MainActor
+    static func clear() {
+        queue.removeAll()
+    }
 
-    static func commit(moc: NSManagedObjectContext) {
-        queue.forEach { type, itemId in
+    @MainActor
+    static func commit() {
+        let moc = DataManager.main
+        while let (type, itemId) = queue.pop() {
             if let storedItem = try? moc.existingObject(with: itemId) as? DataItem, storedItem.apiServer.lastSyncSucceeded {
                 #if os(iOS)
-                NotificationManager.postNotification(type: type, for: storedItem)
+                    NotificationManager.postNotification(type: type, for: storedItem)
                 #else
-                app.postNotification(type: type, for: storedItem)
+                    app.postNotification(type: type, for: storedItem)
                 #endif
             }
-		}
-        clear()
-	}
+        }
+    }
 }

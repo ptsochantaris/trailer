@@ -1,64 +1,67 @@
 import Foundation
 
-final class GQLBatchGroup: GQLScanning {
-	let name = "nodes"
+extension GraphQL {
+    struct BatchGroup: GQLScanning {
+        let id: UUID
+        let name: String
 
-	private var idsToGroups = [String : GQLGroup]()
-	private let originalTemplate: GQLGroup
-	private let nextCount: Int
-    private let batchSize: Int
+        private let idList: [String]
+        private let templateGroup: Group
 
-    init(templateGroup: GQLGroup, idList: [String], startingCount: Int = 0, batchSize: Int) {
-        originalTemplate = templateGroup
-		var index = startingCount
-		for id in idList {
-            let t = GQLGroup(group: templateGroup, name: templateGroup.name + "\(index)")
-			idsToGroups[id] = t
-			index += 1
-		}
-		nextCount = index
-        self.batchSize = batchSize
-	}
+        init(templateGroup: Group, idList: [String]) {
+            id = UUID()
+            name = "nodes"
+            self.templateGroup = templateGroup
+            self.idList = idList
+            assert(idList.count <= 100)
+        }
 
-	var queryText: String {
-		if let templateGroup = idsToGroups.values.first {
-			return "nodes(ids: [\"" + pageOfIds.joined(separator: "\",\"") + "\"]) { " + templateGroup.fields.map { $0.queryText }.joined(separator: " ") + " }"
-		} else {
-			return ""
-		}
-	}
+        init(cloning: BatchGroup, templateGroup: Group, idList: [String]) {
+            id = cloning.id
+            name = cloning.name
+            self.idList = idList
+            self.templateGroup = templateGroup
+            assert(idList.count <= 100)
+        }
 
-	var fragments: [GQLFragment] { idsToGroups.values.reduce([]) { $0 + $1.fragments } }
+        func asShell(for element: GQLElement) -> GQLElement? {
+            if id == element.id {
+                return element
+            }
 
-	private var pageOfIds: [String] {
-		let k = idsToGroups.keys.sorted()
-		let max = min(batchSize, k.count)
-		return Array(k[0 ..< max])
-	}
+            if let shellGroup = templateGroup.asShell(for: element) as? Group {
+                return BatchGroup(cloning: self, templateGroup: shellGroup, idList: idList)
+            }
 
-	func scan(query: GQLQuery, pageData: Any, parent: GQLNode?) -> [GQLQuery] {
-        //DLog("\(query.logPrefix)Scanning batch group \(name)")
-		guard let nodes = pageData as? [Any] else { return [] }
+            return nil
+        }
 
-		var extraQueries = [GQLQuery]()
+        var nodeCost: Int {
+            let count = idList.count
+            return count + count * templateGroup.nodeCost
+        }
 
-		let page = pageOfIds
-		let newIds = idsToGroups.keys.filter { !page.contains($0) }
-		if !newIds.isEmpty {
-			let nextPage = GQLQuery(name: query.name, rootElement: GQLBatchGroup(templateGroup: originalTemplate, idList: newIds, startingCount: nextCount, batchSize: batchSize), parent: parent)
-			extraQueries.append(nextPage)
-		}
+        var queryText: String {
+            "nodes(ids: [\"" + idList.joined(separator: "\",\"") + "\"]) { " + templateGroup.fields.map(\.queryText).joined(separator: " ") + " }"
+        }
 
-		for n in nodes {
-			if let n = n as? [AnyHashable : Any], let id = n["id"] as? String, let group = idsToGroups[id] {
-				let newQueries = group.scan(query: query, pageData: n, parent: parent)
-				extraQueries.append(contentsOf: newQueries)
-			}
-		}
+        var fragments: LinkedList<Fragment> {
+            templateGroup.fragments
+        }
 
-		if !extraQueries.isEmpty {
-			DLog("\(query.logPrefix)\(name) - Will need further paging")
-		}
-		return extraQueries
-	}
+        func scan(query: Query, pageData: Any, parent: Node?) async -> LinkedList<Query> {
+            guard let nodes = pageData as? [Any] else { return LinkedList<Query>() }
+
+            let extraQueries = LinkedList<Query>()
+
+            for pageData in nodes {
+                if let pageData = pageData as? JSON {
+                    let newQueries = await templateGroup.scan(query: query, pageData: pageData, parent: parent)
+                    extraQueries.append(contentsOf: newQueries)
+                }
+            }
+
+            return extraQueries
+        }
+    }
 }

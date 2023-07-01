@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -104,7 +104,7 @@
                                                 <rect key="frame" x="224" y="17" width="15" height="102"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
-                                            <tableHeaderView key="headerView" id="GLY-La-oaP">
+                                            <tableHeaderView key="headerView" wantsLayer="YES" id="GLY-La-oaP">
                                                 <rect key="frame" x="0.0" y="0.0" width="238" height="17"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </tableHeaderView>
@@ -124,11 +124,11 @@
                                             <rect key="frame" x="271" y="13" width="630" height="410"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <view key="contentView" id="dmv-7W-2qn">
-                                                <rect key="frame" x="3" y="3" width="624" height="392"/>
+                                                <rect key="frame" x="4" y="5" width="622" height="390"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="k1C-rR-Wxu">
-                                                        <rect key="frame" x="197" y="7" width="80" height="32"/>
+                                                        <rect key="frame" x="196" y="7" width="80" height="32"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                         <buttonCell key="cell" type="push" title="Delete" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="y4c-TX-UeH">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -139,7 +139,7 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Tu3-cb-beM">
-                                                        <rect key="frame" x="15" y="7" width="66" height="32"/>
+                                                        <rect key="frame" x="14" y="7" width="66" height="32"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                         <buttonCell key="cell" type="push" title="Test" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="QdL-bA-0NX">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -150,7 +150,7 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ifm-A1-rdj">
-                                                        <rect key="frame" x="410" y="7" width="192" height="32"/>
+                                                        <rect key="frame" x="408" y="7" width="192" height="32"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                         <buttonCell key="cell" type="push" title="Reset to GitHub Defaults" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="zqK-DJ-JcO">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -161,7 +161,7 @@
                                                         </connections>
                                                     </button>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2GE-sm-VZ0">
-                                                        <rect key="frame" x="6" y="315" width="90" height="20"/>
+                                                        <rect key="frame" x="6" y="313" width="90" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="v3 API Path" id="3XX-k0-LtU">
                                                             <font key="font" metaFont="message" size="11"/>
@@ -170,7 +170,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4td-hc-6rZ">
-                                                        <rect key="frame" x="6" y="174" width="90" height="68"/>
+                                                        <rect key="frame" x="6" y="172" width="90" height="68"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" id="Bam-mX-Su4">
                                                             <font key="font" metaFont="message" size="11"/>
@@ -182,7 +182,7 @@ Token</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1id-1Q-2Pc">
-                                                        <rect key="frame" x="6" y="347" width="90" height="20"/>
+                                                        <rect key="frame" x="6" y="345" width="90" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Name" id="Wcj-U6-Jja">
                                                             <font key="font" metaFont="message" size="11"/>
@@ -191,7 +191,7 @@ Token</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cAh-gg-Wqn">
-                                                        <rect key="frame" x="6" y="251" width="90" height="20"/>
+                                                        <rect key="frame" x="6" y="249" width="90" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Web Front End" id="vhl-W9-zqM">
                                                             <font key="font" metaFont="message" size="11"/>
@@ -200,7 +200,7 @@ Token</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CT9-ev-oP0">
-                                                        <rect key="frame" x="102" y="254" width="504" height="24"/>
+                                                        <rect key="frame" x="102" y="252" width="502" height="24"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="https://github.com" drawsBackground="YES" usesSingleLineMode="YES" id="5Ai-jn-gsl">
                                                             <font key="font" metaFont="system"/>
@@ -212,7 +212,7 @@ Token</string>
                                                         </connections>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yUS-Pw-j0m">
-                                                        <rect key="frame" x="102" y="190" width="504" height="57"/>
+                                                        <rect key="frame" x="102" y="188" width="502" height="57"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="border" drawsBackground="YES" id="9um-Bk-bLh">
                                                             <font key="font" metaFont="system"/>
@@ -225,7 +225,7 @@ Token</string>
                                                         </connections>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9xz-I3-HQw">
-                                                        <rect key="frame" x="102" y="318" width="504" height="24"/>
+                                                        <rect key="frame" x="102" y="316" width="502" height="24"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="https://api.github.com (for GE: https://server/api/v3)" drawsBackground="YES" usesSingleLineMode="YES" id="DuA-I1-PSV">
                                                             <font key="font" metaFont="system"/>
@@ -237,7 +237,7 @@ Token</string>
                                                         </connections>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5aH-Vs-4Lj">
-                                                        <rect key="frame" x="6" y="283" width="90" height="20"/>
+                                                        <rect key="frame" x="6" y="281" width="90" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="v4 API Path" id="Xc9-HE-Oom">
                                                             <font key="font" metaFont="message" size="11"/>
@@ -246,7 +246,7 @@ Token</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Bi3-xh-wlg">
-                                                        <rect key="frame" x="102" y="350" width="504" height="24"/>
+                                                        <rect key="frame" x="102" y="348" width="502" height="24"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="GitHub" drawsBackground="YES" usesSingleLineMode="YES" id="rBJ-1n-RRX">
                                                             <font key="font" metaFont="system"/>
@@ -258,7 +258,7 @@ Token</string>
                                                         </connections>
                                                     </textField>
                                                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="q1S-M3-nh6">
-                                                        <rect key="frame" x="240" y="52" width="130" height="17"/>
+                                                        <rect key="frame" x="237" y="52" width="130" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                         <buttonCell key="cell" type="inline" title="Existing Tokens" bezelStyle="inline" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="OhE-A7-jdY">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -269,7 +269,7 @@ Token</string>
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8qJ-4h-rPj">
-                                                        <rect key="frame" x="464" y="52" width="130" height="17"/>
+                                                        <rect key="frame" x="461" y="52" width="130" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                         <buttonCell key="cell" type="inline" title="Watchlist" bezelStyle="inline" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="gyy-PC-Gia">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -280,7 +280,7 @@ Token</string>
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9sX-2X-O8K">
-                                                        <rect key="frame" x="24" y="52" width="130" height="17"/>
+                                                        <rect key="frame" x="23" y="52" width="130" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                         <buttonCell key="cell" type="inline" title="Create Token" bezelStyle="inline" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2vK-1D-pyW">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -291,7 +291,7 @@ Token</string>
                                                         </connections>
                                                     </button>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" setsMaxLayoutWidthAtFirstLayout="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qmh-MC-rEN">
-                                                        <rect key="frame" x="105" y="162" width="350" height="22"/>
+                                                        <rect key="frame" x="105" y="160" width="350" height="22"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" id="fPH-KZ-x5J">
                                                             <font key="font" metaFont="label" size="9"/>
@@ -301,7 +301,7 @@ Token</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="97p-7q-Kd5">
-                                                        <rect key="frame" x="105" y="138" width="350" height="18"/>
+                                                        <rect key="frame" x="105" y="136" width="350" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Report syncing problems with this server" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="SQa-fC-sUh">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -312,7 +312,7 @@ Token</string>
                                                         </connections>
                                                     </button>
                                                     <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KSf-5a-vXT">
-                                                        <rect key="frame" x="102" y="286" width="502" height="24"/>
+                                                        <rect key="frame" x="102" y="284" width="500" height="24"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="https://api.github.com/graphql (for GE: https://server/api/graphql)" drawsBackground="YES" id="jyV-JW-SFT">
                                                             <font key="font" metaFont="system"/>
@@ -359,7 +359,7 @@ Token</string>
                                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                         <tableColumns>
-                                                            <tableColumn identifier="repos" editable="NO" width="369" minWidth="100" maxWidth="10000" id="nW5-Ng-D0l">
+                                                            <tableColumn identifier="repos" editable="NO" width="389" minWidth="100" maxWidth="10000" id="nW5-Ng-D0l">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Watched Repository">
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.33333298560000002" alpha="1" colorSpace="calibratedWhite"/>
@@ -408,7 +408,7 @@ Token</string>
                                                                 </popUpButtonCell>
                                                                 <sortDescriptor key="sortDescriptorPrototype" selector="compare:" sortKey="displayPolicyForPrs" ascending="NO"/>
                                                             </tableColumn>
-                                                            <tableColumn identifier="issues" editable="NO" width="110" minWidth="40" maxWidth="1000" id="P1T-D7-Rnp" userLabel="Issues">
+                                                            <tableColumn identifier="issues" editable="NO" width="102" minWidth="40" maxWidth="1000" id="P1T-D7-Rnp" userLabel="Issues">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Issues">
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.33333298560000002" alpha="1" colorSpace="calibratedWhite"/>
@@ -420,7 +420,7 @@ Token</string>
                                                                 </popUpButtonCell>
                                                                 <sortDescriptor key="sortDescriptorPrototype" selector="compare:" sortKey="displayPolicyForIssues" ascending="NO"/>
                                                             </tableColumn>
-                                                            <tableColumn identifier="fork" editable="NO" width="24" minWidth="10" maxWidth="3.4028234663852886e+38" id="RB5-FQ-ycS" userLabel="Forked">
+                                                            <tableColumn identifier="fork" editable="NO" width="32" minWidth="10" maxWidth="3.4028234663852886e+38" id="RB5-FQ-ycS" userLabel="Forked">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Fork">
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -440,14 +440,14 @@ Token</string>
                                                 </subviews>
                                             </clipView>
                                             <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="SMx-sS-Tdd">
-                                                <rect key="frame" x="1" y="303" width="805" height="16"/>
+                                                <rect key="frame" x="1" y="303" width="869" height="16"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
                                             <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="IrO-ah-oEe">
                                                 <rect key="frame" x="224" y="17" width="15" height="102"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
-                                            <tableHeaderView key="headerView" id="qia-ub-v1J">
+                                            <tableHeaderView key="headerView" wantsLayer="YES" id="qia-ub-v1J">
                                                 <rect key="frame" x="0.0" y="0.0" width="869" height="17"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </tableHeaderView>
@@ -456,11 +456,11 @@ Token</string>
                                             <rect key="frame" x="19" y="5" width="471" height="60"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                             <view key="contentView" id="NJP-dt-zeu">
-                                                <rect key="frame" x="3" y="3" width="465" height="42"/>
+                                                <rect key="frame" x="4" y="5" width="463" height="40"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BQ4-pw-I0b">
-                                                        <rect key="frame" x="4" y="14" width="109" height="17"/>
+                                                        <rect key="frame" x="3.5" y="12.5" width="109" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Pull Requests:" id="EiN-MI-aPn">
                                                             <font key="font" metaFont="system"/>
@@ -469,7 +469,7 @@ Token</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LVp-LL-LY1">
-                                                        <rect key="frame" x="243" y="15" width="71" height="17"/>
+                                                        <rect key="frame" x="241.5" y="13.5" width="71" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Issues:" id="AR6-vN-PIV">
                                                             <font key="font" metaFont="system"/>
@@ -478,7 +478,7 @@ Token</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mod-Tl-ijj">
-                                                        <rect key="frame" x="114" y="8" width="131" height="26"/>
+                                                        <rect key="frame" x="113" y="7" width="131" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="L9t-Id-6Gk">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -490,7 +490,7 @@ Token</string>
                                                         </connections>
                                                     </popUpButton>
                                                     <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZgQ-VU-aMD">
-                                                        <rect key="frame" x="316" y="8" width="131" height="26"/>
+                                                        <rect key="frame" x="314" y="7" width="131" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="z9W-lk-3Nx">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -504,20 +504,8 @@ Token</string>
                                                 </subviews>
                                             </view>
                                         </box>
-                                        <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mZx-Vy-AUF">
-                                            <rect key="frame" x="651" y="71" width="120" height="26"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                                            <popUpButtonCell key="cell" type="bevel" bezelStyle="regularSquare" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ovF-8L-cM3">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="menu"/>
-                                                <menu key="menu" title="State" showsStateColumn="NO" id="hlb-wI-4bK"/>
-                                            </popUpButtonCell>
-                                            <connections>
-                                                <action selector="allPrsPolicySelected:" target="vQH-WF-vh2" id="ePN-ey-nO0"/>
-                                            </connections>
-                                        </popUpButton>
                                         <searchField wantsLayer="YES" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Qfh-lH-HFg">
-                                            <rect key="frame" x="22" y="73" width="472" height="22"/>
+                                            <rect key="frame" x="22" y="73" width="441" height="22"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                             <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" placeholderString="Filter…" usesSingleLineMode="YES" bezelStyle="round" id="dZ4-dF-dkV">
                                                 <font key="font" metaFont="cellTitle"/>
@@ -528,30 +516,6 @@ Token</string>
                                                 <outlet property="delegate" destination="vQH-WF-vh2" id="wSo-04-QiJ"/>
                                             </connections>
                                         </searchField>
-                                        <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gC3-is-WyN">
-                                            <rect key="frame" x="775" y="71" width="120" height="26"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                                            <popUpButtonCell key="cell" type="bevel" bezelStyle="regularSquare" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="t23-3c-Lhx">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="menu"/>
-                                                <menu key="menu" title="State" showsStateColumn="NO" id="9Lk-Xv-uvP"/>
-                                            </popUpButtonCell>
-                                            <connections>
-                                                <action selector="allIssuesPolicySelected:" target="vQH-WF-vh2" id="5Ps-b5-xSR"/>
-                                            </connections>
-                                        </popUpButton>
-                                        <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8qH-xP-gTK">
-                                            <rect key="frame" x="500" y="71" width="147" height="26"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                                            <popUpButtonCell key="cell" type="bevel" bezelStyle="regularSquare" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="J36-7q-zgd">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="menu"/>
-                                                <menu key="menu" title="State" showsStateColumn="NO" id="wgs-wx-ojZ"/>
-                                            </popUpButtonCell>
-                                            <connections>
-                                                <action selector="allHidingPolicySelected:" target="vQH-WF-vh2" id="Ntp-YN-OWp"/>
-                                            </connections>
-                                        </popUpButton>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="job-mY-WCa">
                                             <rect key="frame" x="783" y="10" width="112" height="32"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
@@ -563,6 +527,42 @@ Token</string>
                                                 <action selector="advancedSelected:" target="vQH-WF-vh2" id="oUW-kJ-sxc"/>
                                             </connections>
                                         </button>
+                                        <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mZx-Vy-AUF">
+                                            <rect key="frame" x="621" y="70" width="136" height="26"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                            <popUpButtonCell key="cell" type="bevel" bezelStyle="regularSquare" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ovF-8L-cM3">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="menu"/>
+                                                <menu key="menu" title="State" showsStateColumn="NO" id="hlb-wI-4bK"/>
+                                            </popUpButtonCell>
+                                            <connections>
+                                                <action selector="allPrsPolicySelected:" target="vQH-WF-vh2" id="ePN-ey-nO0"/>
+                                            </connections>
+                                        </popUpButton>
+                                        <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gC3-is-WyN">
+                                            <rect key="frame" x="759" y="70" width="137" height="26"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                            <popUpButtonCell key="cell" type="bevel" bezelStyle="regularSquare" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="t23-3c-Lhx">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="menu"/>
+                                                <menu key="menu" title="State" showsStateColumn="NO" id="9Lk-Xv-uvP"/>
+                                            </popUpButtonCell>
+                                            <connections>
+                                                <action selector="allIssuesPolicySelected:" target="vQH-WF-vh2" id="5Ps-b5-xSR"/>
+                                            </connections>
+                                        </popUpButton>
+                                        <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8qH-xP-gTK">
+                                            <rect key="frame" x="468" y="70" width="151" height="26"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                            <popUpButtonCell key="cell" type="bevel" bezelStyle="regularSquare" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="J36-7q-zgd">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="menu"/>
+                                                <menu key="menu" title="State" showsStateColumn="NO" id="wgs-wx-ojZ"/>
+                                            </popUpButtonCell>
+                                            <connections>
+                                                <action selector="allHidingPolicySelected:" target="vQH-WF-vh2" id="Ntp-YN-OWp"/>
+                                            </connections>
+                                        </popUpButton>
                                     </subviews>
                                 </view>
                             </tabViewItem>
@@ -579,11 +579,11 @@ Token</string>
                                                     <rect key="frame" x="503" y="290" width="344" height="112"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                                     <view key="contentView" id="Feb-GG-39G">
-                                                        <rect key="frame" x="3" y="3" width="338" height="94"/>
+                                                        <rect key="frame" x="4" y="5" width="336" height="92"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="afo-70-80J">
-                                                                <rect key="frame" x="18" y="18" width="142" height="25"/>
+                                                                <rect key="frame" x="18" y="16" width="142" height="25"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="check" title="Reverse direction" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="6ye-0C-sLV">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -594,7 +594,7 @@ Token</string>
                                                                 </connections>
                                                             </button>
                                                             <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TqD-G8-E24">
-                                                                <rect key="frame" x="173" y="18" width="155" height="25"/>
+                                                                <rect key="frame" x="173" y="16" width="155" height="25"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="check" title="Bunch by repository" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="AYd-ds-ReS">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -605,7 +605,7 @@ Token</string>
                                                                 </connections>
                                                             </button>
                                                             <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bWX-fP-uhd">
-                                                                <rect key="frame" x="17" y="49" width="306" height="26"/>
+                                                                <rect key="frame" x="17" y="47" width="306" height="26"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="PQf-4J-ChU">
                                                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -626,7 +626,7 @@ Token</string>
                                                     </view>
                                                 </box>
                                                 <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="14" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" fixedFrame="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TRE-eo-aLK">
-                                                    <rect key="frame" x="18" y="46" width="395" height="346"/>
+                                                    <rect key="frame" x="18" y="45" width="395" height="346"/>
                                                     <subviews>
                                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="Efg-Id-lOP">
                                                             <rect key="frame" x="-2" y="329" width="336" height="18"/>
@@ -828,11 +828,11 @@ Token</string>
                                                     <rect key="frame" x="502" y="202" width="345" height="84"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                                     <view key="contentView" id="Fun-OY-4yH">
-                                                        <rect key="frame" x="3" y="3" width="339" height="66"/>
+                                                        <rect key="frame" x="4" y="5" width="337" height="64"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Cpe-1u-UbD">
-                                                                <rect key="frame" x="17" y="21" width="306" height="26"/>
+                                                                <rect key="frame" x="17" y="19" width="306" height="26"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <popUpButtonCell key="cell" type="push" title="Do Nothing" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="k6A-y3-mud" id="pj8-Vh-2mr">
                                                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -856,11 +856,11 @@ Token</string>
                                                     <rect key="frame" x="503" y="125" width="345" height="73"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                                     <view key="contentView" id="evv-lI-oOm">
-                                                        <rect key="frame" x="3" y="3" width="339" height="55"/>
+                                                        <rect key="frame" x="4" y="5" width="337" height="53"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lB5-eS-YSK">
-                                                                <rect key="frame" x="17" y="10" width="306" height="26"/>
+                                                                <rect key="frame" x="17" y="8" width="306" height="26"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <popUpButtonCell key="cell" type="push" title="Do nothing" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="9TM-I1-9UP" id="rPe-gD-wp2">
                                                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -880,15 +880,15 @@ Token</string>
                                                         </subviews>
                                                     </view>
                                                 </box>
-                                                <box autoresizesSubviews="NO" fixedFrame="YES" boxType="secondary" borderType="line" title="Refreshing" translatesAutoresizingMaskIntoConstraints="NO" id="zpr-xa-Rug">
+                                                <box autoresizesSubviews="NO" fixedFrame="YES" borderType="line" title="Refreshing" translatesAutoresizingMaskIntoConstraints="NO" id="zpr-xa-Rug">
                                                     <rect key="frame" x="502" y="16" width="346" height="104"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                                     <view key="contentView" id="LeE-vI-Qal">
-                                                        <rect key="frame" x="3" y="3" width="340" height="86"/>
+                                                        <rect key="frame" x="4" y="5" width="338" height="84"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="INA-l0-fZh">
-                                                                <rect key="frame" x="304" y="15" width="19" height="27"/>
+                                                                <rect key="frame" x="304" y="13" width="19" height="27"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <stepperCell key="cell" continuous="YES" alignment="left" increment="10" minValue="60" maxValue="3600" doubleValue="60" id="EvF-c3-Alv"/>
                                                                 <connections>
@@ -896,7 +896,7 @@ Token</string>
                                                                 </connections>
                                                             </stepper>
                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Zu0-k7-csJ">
-                                                                <rect key="frame" x="41" y="20" width="263" height="17"/>
+                                                                <rect key="frame" x="41" y="18" width="263" height="17"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Refresh items every 3600 seconds" id="tcS-Fj-NKu">
                                                                     <font key="font" metaFont="system"/>
@@ -905,7 +905,7 @@ Token</string>
                                                                 </textFieldCell>
                                                             </textField>
                                                             <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ueT-Kq-j9E">
-                                                                <rect key="frame" x="41" y="51" width="281" height="18"/>
+                                                                <rect key="frame" x="41" y="49" width="281" height="18"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="check" title="Gray menubar count when refreshing" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="4bJ-dN-Uhp">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -936,11 +936,11 @@ Token</string>
                                                     <rect key="frame" x="17" y="87" width="406" height="135"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                     <view key="contentView" id="abN-WY-hap">
-                                                        <rect key="frame" x="3" y="3" width="400" height="117"/>
+                                                        <rect key="frame" x="4" y="5" width="398" height="115"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <tokenField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xuj-Mv-Ff1">
-                                                                <rect key="frame" x="13" y="16" width="374" height="87"/>
+                                                                <rect key="frame" x="13" y="16" width="372" height="85"/>
                                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                 <tokenFieldCell key="cell" selectable="YES" editable="YES" borderStyle="bezel" alignment="left" placeholderString="Comma separated list of labels (case/accent insensitive)" drawsBackground="YES" allowsEditingTextAttributes="YES" tokenStyle="rounded" id="HVp-Uo-dvL">
                                                                     <font key="font" metaFont="cellTitle"/>
@@ -954,15 +954,15 @@ Token</string>
                                                         </subviews>
                                                     </view>
                                                 </box>
-                                                <box autoresizesSubviews="NO" fixedFrame="YES" boxType="secondary" borderType="line" title="When searching, check…" translatesAutoresizingMaskIntoConstraints="NO" id="qj6-v4-SsR">
+                                                <box autoresizesSubviews="NO" fixedFrame="YES" borderType="bezel" title="When searching, check…" translatesAutoresizingMaskIntoConstraints="NO" id="qj6-v4-SsR">
                                                     <rect key="frame" x="433" y="87" width="162" height="274"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                     <view key="contentView" id="Cga-gV-Gct">
-                                                        <rect key="frame" x="3" y="3" width="156" height="256"/>
+                                                        <rect key="frame" x="4" y="5" width="154" height="254"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="9" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" fixedFrame="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="q4B-nm-QwQ">
-                                                                <rect key="frame" x="23" y="22" width="83" height="216"/>
+                                                                <rect key="frame" x="23" y="20" width="83" height="216"/>
                                                                 <subviews>
                                                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="2cb-4y-Hdc">
                                                                         <rect key="frame" x="-2" y="199" width="53" height="18"/>
@@ -1085,11 +1085,11 @@ Token</string>
                                                     <rect key="frame" x="17" y="226" width="406" height="135"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                     <view key="contentView" id="y34-kJ-3XG">
-                                                        <rect key="frame" x="3" y="3" width="400" height="117"/>
+                                                        <rect key="frame" x="4" y="5" width="398" height="115"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <tokenField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="y6m-3H-gTe">
-                                                                <rect key="frame" x="13" y="16" width="374" height="87"/>
+                                                                <rect key="frame" x="13" y="16" width="372" height="85"/>
                                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                 <tokenFieldCell key="cell" selectable="YES" editable="YES" borderStyle="bezel" alignment="left" placeholderString="Comma separated list of usernames (case/accent insensitive, without the '@' prefix)" drawsBackground="YES" allowsEditingTextAttributes="YES" tokenStyle="rounded" id="x2t-Bq-4zJ">
                                                                     <font key="font" metaFont="cellTitle"/>
@@ -1136,11 +1136,11 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                         <rect key="frame" x="72" y="19" width="413" height="66"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="uFz-cS-CJ4">
-                                                            <rect key="frame" x="3" y="3" width="407" height="48"/>
+                                                            <rect key="frame" x="4" y="5" width="405" height="46"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ptr-tf-eNM">
-                                                                    <rect key="frame" x="58" y="17" width="166" height="18"/>
+                                                                    <rect key="frame" x="58" y="15" width="166" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="All merged items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="XJl-yt-Rm9">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1151,7 +1151,7 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                                     </connections>
                                                                 </button>
                                                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="w0K-BS-Gti">
-                                                                    <rect key="frame" x="228" y="17" width="156" height="18"/>
+                                                                    <rect key="frame" x="228" y="15" width="156" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="All closed items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="oXu-x0-6b5">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1319,11 +1319,11 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                         <rect key="frame" x="443" y="268" width="230" height="51"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="CDr-sW-N4t">
-                                                            <rect key="frame" x="0.0" y="0.0" width="230" height="36"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="230" height="39"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dTC-mN-8dT">
-                                                                    <rect key="frame" x="-2" y="11" width="224" height="26"/>
+                                                                    <rect key="frame" x="-2" y="14" width="224" height="26"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="Orl-5l-pm6">
                                                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1348,11 +1348,11 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                         <rect key="frame" x="443" y="223" width="230" height="51"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="5aL-sj-f6p">
-                                                            <rect key="frame" x="0.0" y="0.0" width="230" height="36"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="230" height="39"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gM2-vc-gT5">
-                                                                    <rect key="frame" x="-2" y="11" width="224" height="26"/>
+                                                                    <rect key="frame" x="-2" y="14" width="224" height="26"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="48k-UQ-iYR">
                                                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1377,11 +1377,11 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                         <rect key="frame" x="443" y="178" width="230" height="51"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="8jk-qP-cR3">
-                                                            <rect key="frame" x="0.0" y="0.0" width="230" height="36"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="230" height="39"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tH9-aj-JJe">
-                                                                    <rect key="frame" x="-2" y="11" width="224" height="26"/>
+                                                                    <rect key="frame" x="-2" y="14" width="224" height="26"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="udd-YY-bnD">
                                                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1417,11 +1417,11 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                         <rect key="frame" x="8" y="53" width="655" height="111"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="3Av-Xm-Bwe">
-                                                            <rect key="frame" x="3" y="3" width="649" height="93"/>
+                                                            <rect key="frame" x="4" y="5" width="647" height="91"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <tokenField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DTL-cq-VaA">
-                                                                    <rect key="frame" x="13" y="16" width="623" height="63"/>
+                                                                    <rect key="frame" x="13" y="16" width="621" height="61"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <tokenFieldCell key="cell" selectable="YES" editable="YES" borderStyle="bezel" alignment="left" placeholderString="Comma separated list of usernames (case/accent insensitive, without the '@' prefix)" drawsBackground="YES" allowsEditingTextAttributes="YES" tokenStyle="rounded" id="i7v-35-449">
                                                                         <font key="font" metaFont="cellTitle"/>
@@ -1457,11 +1457,11 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                         <rect key="frame" x="119" y="203" width="315" height="46"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="eGN-JN-FT6">
-                                                            <rect key="frame" x="0.0" y="0.0" width="315" height="31"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="315" height="34"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="c3C-Sm-aRL">
-                                                                    <rect key="frame" x="-2" y="6" width="320" height="26"/>
+                                                                    <rect key="frame" x="-2" y="9" width="320" height="26"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="UcN-MJ-hZX">
                                                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1486,11 +1486,11 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                         <rect key="frame" x="39" y="36" width="475" height="154"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="FlM-UP-339">
-                                                            <rect key="frame" x="3" y="3" width="469" height="136"/>
+                                                            <rect key="frame" x="4" y="5" width="467" height="134"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="W7P-8B-zzm">
-                                                                    <rect key="frame" x="18" y="105" width="349" height="18"/>
+                                                                    <rect key="frame" x="18" y="103" width="349" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="Someone requests changes to a PR I created…" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="p1O-O4-Ugb">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1501,7 +1501,7 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                                     </connections>
                                                                 </button>
                                                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cUX-93-pkY">
-                                                                    <rect key="frame" x="18" y="75" width="349" height="18"/>
+                                                                    <rect key="frame" x="18" y="73" width="349" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="Someone accepts changes on a PR I created…" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="pNh-wM-EPz">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1512,7 +1512,7 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                                     </connections>
                                                                 </button>
                                                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8kt-mf-c4i">
-                                                                    <rect key="frame" x="18" y="45" width="349" height="18"/>
+                                                                    <rect key="frame" x="18" y="43" width="349" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="Someone dismisses a review on a PR I created…" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="edL-Bg-Zov">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1523,7 +1523,7 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                                     </connections>
                                                                 </button>
                                                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="z39-OC-9iv">
-                                                                    <rect key="frame" x="18" y="15" width="349" height="18"/>
+                                                                    <rect key="frame" x="18" y="13" width="349" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="Someone assigns me a PR to review" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="THH-72-g8l">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1534,7 +1534,7 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                                     </connections>
                                                                 </button>
                                                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4hX-kx-RH5">
-                                                                    <rect key="frame" x="371" y="105" width="84" height="18"/>
+                                                                    <rect key="frame" x="371" y="103" width="84" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="…or All" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="Rbb-Fj-bP3">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1545,7 +1545,7 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                                     </connections>
                                                                 </button>
                                                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Cle-hT-Lca">
-                                                                    <rect key="frame" x="371" y="75" width="84" height="18"/>
+                                                                    <rect key="frame" x="371" y="73" width="84" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="…or All" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="5eI-7r-swf">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1556,7 +1556,7 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                                     </connections>
                                                                 </button>
                                                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jjg-cq-Lfe">
-                                                                    <rect key="frame" x="371" y="45" width="84" height="18"/>
+                                                                    <rect key="frame" x="371" y="43" width="84" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="…or All" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="26G-BO-CIp">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1622,11 +1622,11 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                         <rect key="frame" x="123" y="201" width="566" height="84"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="IBf-ZQ-tKp">
-                                                            <rect key="frame" x="3" y="3" width="560" height="78"/>
+                                                            <rect key="frame" x="4" y="5" width="558" height="76"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ccb-WQ-p0n">
-                                                                    <rect key="frame" x="18" y="45" width="526" height="18"/>
+                                                                    <rect key="frame" x="18" y="43" width="526" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="Count &amp; post notifications when someone adds a reaction to PRs or issues" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="2SI-4J-Y6e">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1637,7 +1637,7 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                                     </connections>
                                                                 </button>
                                                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6X8-zY-Oss">
-                                                                    <rect key="frame" x="18" y="17" width="526" height="18"/>
+                                                                    <rect key="frame" x="18" y="15" width="526" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="Count &amp; post notifications when someone adds a reaction to comments" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Rli-RA-Aa4">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1775,11 +1775,11 @@ Tip: Reactions are treated like comments, i.e. the rules about being notified on
                                                         <rect key="frame" x="438" y="16" width="156" height="119"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="rls-wT-KTt">
-                                                            <rect key="frame" x="3" y="3" width="150" height="101"/>
+                                                            <rect key="frame" x="4" y="5" width="148" height="99"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" fixedFrame="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cam-gt-1yf">
-                                                                    <rect key="frame" x="12" y="11" width="75" height="79"/>
+                                                                    <rect key="frame" x="12" y="9" width="75" height="79"/>
                                                                     <subviews>
                                                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2m4-V1-HTR">
                                                                             <rect key="frame" x="-2" y="62" width="71" height="18"/>
@@ -1946,11 +1946,11 @@ Tip: Reactions are treated like comments, i.e. the rules about being notified on
                                             <rect key="frame" x="411" y="81" width="475" height="342"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="brd-Ee-rdq">
-                                                <rect key="frame" x="3" y="3" width="469" height="324"/>
+                                                <rect key="frame" x="4" y="5" width="467" height="322"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Cwe-AT-ISF">
-                                                        <rect key="frame" x="59" y="284" width="363" height="18"/>
+                                                        <rect key="frame" x="59" y="282" width="363" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="radio" title="For a certain amount of time" bezelStyle="regularSquare" imagePosition="left" alignment="left" enabled="NO" inset="2" id="gmO-x6-lxq">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1961,7 +1961,7 @@ Tip: Reactions are treated like comments, i.e. the rules about being notified on
                                                         </connections>
                                                     </button>
                                                     <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vch-ax-HsD">
-                                                        <rect key="frame" x="58" y="248" width="115" height="26"/>
+                                                        <rect key="frame" x="58" y="246" width="115" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="dH8-z8-RVI">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1973,7 +1973,7 @@ Tip: Reactions are treated like comments, i.e. the rules about being notified on
                                                         </connections>
                                                     </popUpButton>
                                                     <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="c3Y-1q-UD3">
-                                                        <rect key="frame" x="183" y="248" width="115" height="26"/>
+                                                        <rect key="frame" x="183" y="246" width="115" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="gau-PU-aUA">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1985,7 +1985,7 @@ Tip: Reactions are treated like comments, i.e. the rules about being notified on
                                                         </connections>
                                                     </popUpButton>
                                                     <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Yq0-Of-I1d">
-                                                        <rect key="frame" x="308" y="248" width="115" height="26"/>
+                                                        <rect key="frame" x="308" y="246" width="115" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="1Ge-1e-b8J">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1997,7 +1997,7 @@ Tip: Reactions are treated like comments, i.e. the rules about being notified on
                                                         </connections>
                                                     </popUpButton>
                                                     <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="PLV-LI-rNE">
-                                                        <rect key="frame" x="183" y="174" width="115" height="26"/>
+                                                        <rect key="frame" x="183" y="172" width="115" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="H86-ef-er1">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -2020,7 +2020,7 @@ Tip: Reactions are treated like comments, i.e. the rules about being notified on
                                                         </connections>
                                                     </button>
                                                     <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="51F-wD-jRc">
-                                                        <rect key="frame" x="58" y="174" width="115" height="26"/>
+                                                        <rect key="frame" x="58" y="172" width="115" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="gl7-xO-9dz">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -2038,7 +2038,7 @@ Tip: Reactions are treated like comments, i.e. the rules about being notified on
                                                         </connections>
                                                     </popUpButton>
                                                     <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xLn-A0-wrg">
-                                                        <rect key="frame" x="308" y="174" width="115" height="26"/>
+                                                        <rect key="frame" x="308" y="172" width="115" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="vus-t5-ks8">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -2050,7 +2050,7 @@ Tip: Reactions are treated like comments, i.e. the rules about being notified on
                                                         </connections>
                                                     </popUpButton>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nPv-hg-fBq">
-                                                        <rect key="frame" x="59" y="210" width="363" height="18"/>
+                                                        <rect key="frame" x="59" y="208" width="363" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="radio" title="Until a specific day and/or time" bezelStyle="regularSquare" imagePosition="left" alignment="left" enabled="NO" inset="2" id="rgO-Bp-SJN">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2072,7 +2072,7 @@ Tip: Reactions are treated like comments, i.e. the rules about being notified on
                                                         </connections>
                                                     </button>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="If1-BU-NTa">
-                                                        <rect key="frame" x="296" y="254" width="13" height="17"/>
+                                                        <rect key="frame" x="296" y="252" width="13" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="+" id="59O-bO-PLd">
                                                             <font key="font" metaFont="systemBold"/>
@@ -2081,7 +2081,7 @@ Tip: Reactions are treated like comments, i.e. the rules about being notified on
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fvg-Jr-yj9">
-                                                        <rect key="frame" x="173" y="181" width="8" height="17"/>
+                                                        <rect key="frame" x="173" y="179" width="8" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title=":" id="kRd-Z6-wfs">
                                                             <font key="font" metaFont="systemBold"/>
@@ -2090,7 +2090,7 @@ Tip: Reactions are treated like comments, i.e. the rules about being notified on
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="izk-el-koB">
-                                                        <rect key="frame" x="298" y="181" width="8" height="17"/>
+                                                        <rect key="frame" x="298" y="179" width="8" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title=":" id="PHm-t1-ITC">
                                                             <font key="font" metaFont="systemBold"/>
@@ -2099,7 +2099,7 @@ Tip: Reactions are treated like comments, i.e. the rules about being notified on
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Erq-u5-k78">
-                                                        <rect key="frame" x="171" y="254" width="13" height="17"/>
+                                                        <rect key="frame" x="171" y="252" width="13" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="+" id="z33-tA-HN2">
                                                             <font key="font" metaFont="systemBold"/>
@@ -2119,14 +2119,14 @@ Tip: Reactions are treated like comments, i.e. the rules about being notified on
                                                         </connections>
                                                     </button>
                                                     <box fixedFrame="YES" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="pbf-db-SIs">
-                                                        <rect key="frame" x="71" y="65" width="338" height="93"/>
+                                                        <rect key="frame" x="71" y="63" width="338" height="93"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="K6S-4l-zny">
-                                                            <rect key="frame" x="3" y="3" width="332" height="87"/>
+                                                            <rect key="frame" x="4" y="5" width="330" height="85"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="NE3-PR-Phy">
-                                                                    <rect key="frame" x="195" y="60" width="141" height="18"/>
+                                                                    <rect key="frame" x="195" y="58" width="141" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="New Comment" bezelStyle="regularSquare" imagePosition="left" enabled="NO" state="on" inset="2" id="Dfl-A9-ds3">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2137,7 +2137,7 @@ Tip: Reactions are treated like comments, i.e. the rules about being notified on
                                                                     </connections>
                                                                 </button>
                                                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4Ur-l6-h07">
-                                                                    <rect key="frame" x="195" y="35" width="141" height="18"/>
+                                                                    <rect key="frame" x="195" y="33" width="141" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="New Mention" bezelStyle="regularSquare" imagePosition="left" enabled="NO" state="on" inset="2" id="5Yo-0V-ewK">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2148,7 +2148,7 @@ Tip: Reactions are treated like comments, i.e. the rules about being notified on
                                                                     </connections>
                                                                 </button>
                                                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Dx8-7R-3BT">
-                                                                    <rect key="frame" x="195" y="10" width="141" height="18"/>
+                                                                    <rect key="frame" x="195" y="8" width="141" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="Status Update" bezelStyle="regularSquare" imagePosition="left" enabled="NO" state="on" inset="2" id="IG5-pU-aH6">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2159,7 +2159,7 @@ Tip: Reactions are treated like comments, i.e. the rules about being notified on
                                                                     </connections>
                                                                 </button>
                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VAS-24-rnN">
-                                                                    <rect key="frame" x="13" y="59" width="178" height="17"/>
+                                                                    <rect key="frame" x="13" y="57" width="178" height="17"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" enabled="NO" sendsActionOnEndEditing="YES" title="Wake up immediately on…" id="1Hr-HN-RQ9">
                                                                         <font key="font" metaFont="system"/>
@@ -2253,11 +2253,11 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                         <rect key="frame" x="197" y="33" width="311" height="72"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="Ohw-ph-0Fy">
-                                                            <rect key="frame" x="3" y="3" width="305" height="66"/>
+                                                            <rect key="frame" x="4" y="5" width="303" height="64"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="OTk-Ox-H64">
-                                                                    <rect key="frame" x="65" y="8" width="32" height="48"/>
+                                                                    <rect key="frame" x="65" y="6" width="32" height="48"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="⌘" bezelStyle="regularSquare" imagePosition="below" alignment="center" state="on" inset="2" id="2C7-5G-Bbq">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2268,7 +2268,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                                     </connections>
                                                                 </button>
                                                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="O1l-SB-DuQ">
-                                                                    <rect key="frame" x="16" y="8" width="47" height="49"/>
+                                                                    <rect key="frame" x="16" y="6" width="47" height="49"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="Ctrl" bezelStyle="regularSquare" imagePosition="below" alignment="center" state="on" inset="2" id="BAQ-zu-sCJ">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2279,7 +2279,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                                     </connections>
                                                                 </button>
                                                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bU3-sU-lpP">
-                                                                    <rect key="frame" x="107" y="8" width="32" height="48"/>
+                                                                    <rect key="frame" x="107" y="6" width="32" height="48"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="⌥" bezelStyle="regularSquare" imagePosition="below" alignment="center" state="on" inset="2" id="1Dw-J0-OqT">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2290,7 +2290,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                                     </connections>
                                                                 </button>
                                                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lZd-Lq-W4x">
-                                                                    <rect key="frame" x="149" y="8" width="32" height="48"/>
+                                                                    <rect key="frame" x="149" y="6" width="32" height="48"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="⇧" bezelStyle="regularSquare" imagePosition="below" alignment="center" state="on" inset="2" id="mH2-wN-xSJ">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2301,7 +2301,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                                     </connections>
                                                                 </button>
                                                                 <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="x9b-Wa-04i">
-                                                                    <rect key="frame" x="219" y="30" width="75" height="26"/>
+                                                                    <rect key="frame" x="219" y="28" width="75" height="26"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="kAr-DO-sx7">
                                                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -2313,7 +2313,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                                     </connections>
                                                                 </popUpButton>
                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3nJ-Zt-Ieo">
-                                                                    <rect key="frame" x="191" y="29" width="24" height="29"/>
+                                                                    <rect key="frame" x="191" y="27" width="24" height="29"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="+" id="JnN-B0-qck">
                                                                         <font key="font" metaFont="system" size="24"/>
@@ -2361,7 +2361,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" borderType="none" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="YKc-0b-31j">
-                                            <rect key="frame" x="99" y="14" width="724" height="399"/>
+                                            <rect key="frame" x="98" y="14" width="724" height="399"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <view key="contentView" id="J19-q6-ceE">
                                                 <rect key="frame" x="0.0" y="0.0" width="724" height="399"/>
@@ -2371,11 +2371,11 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                         <rect key="frame" x="17" y="278" width="321" height="105"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="GhS-Tk-g7Z">
-                                                            <rect key="frame" x="3" y="3" width="315" height="87"/>
+                                                            <rect key="frame" x="4" y="5" width="313" height="85"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qos-T0-XKj">
-                                                                    <rect key="frame" x="28" y="21" width="273" height="18"/>
+                                                                    <rect key="frame" x="28" y="19" width="273" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="Dump API responses to the console" bezelStyle="regularSquare" imagePosition="left" inset="2" id="Lyr-pU-rjn">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2386,7 +2386,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                                     </connections>
                                                                 </button>
                                                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3fA-qA-38f">
-                                                                    <rect key="frame" x="28" y="51" width="273" height="18"/>
+                                                                    <rect key="frame" x="28" y="49" width="273" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="Log activity to the console" bezelStyle="regularSquare" imagePosition="left" inset="2" id="MMo-8R-lBl">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2403,11 +2403,11 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                         <rect key="frame" x="340" y="10" width="367" height="174"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="vwB-kq-RKD">
-                                                            <rect key="frame" x="3" y="3" width="361" height="156"/>
+                                                            <rect key="frame" x="4" y="5" width="359" height="154"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" setsMaxLayoutWidthAtFirstLayout="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="zef-fb-l71">
-                                                                    <rect key="frame" x="18" y="20" width="325" height="49"/>
+                                                                    <rect key="frame" x="18" y="18" width="325" height="49"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" alignment="center" title="Settings last exported to 'fileName.trailerSettings' at 11/22/33 11:22:33PM" id="Amb-JA-EhL">
                                                                         <font key="font" metaFont="label" size="9"/>
@@ -2416,7 +2416,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                                     </textFieldCell>
                                                                 </textField>
                                                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="pwT-Fi-3FC">
-                                                                    <rect key="frame" x="30" y="75" width="300" height="18"/>
+                                                                    <rect key="frame" x="30" y="73" width="300" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="Repeat last export whenever settings change" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="vNH-wV-xlW">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2427,7 +2427,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                                     </connections>
                                                                 </button>
                                                                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nki-sn-lQo">
-                                                                    <rect key="frame" x="180" y="104" width="110" height="32"/>
+                                                                    <rect key="frame" x="180" y="102" width="110" height="32"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="push" title="Export…" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="7Ff-bF-xyw">
                                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2438,7 +2438,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                                     </connections>
                                                                 </button>
                                                                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Jbm-ZN-x5E">
-                                                                    <rect key="frame" x="70" y="104" width="110" height="32"/>
+                                                                    <rect key="frame" x="70" y="102" width="110" height="32"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="push" title="Import…" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="GTK-8s-emk">
                                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2455,11 +2455,11 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                         <rect key="frame" x="340" y="277" width="367" height="106"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="AHg-rp-Lzn">
-                                                            <rect key="frame" x="3" y="3" width="361" height="88"/>
+                                                            <rect key="frame" x="4" y="5" width="359" height="86"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vcg-xx-N3A">
-                                                                    <rect key="frame" x="28" y="52" width="315" height="18"/>
+                                                                    <rect key="frame" x="28" y="50" width="315" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="Check for new Trailer releases automatically" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="a4y-qa-v3Z">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2470,7 +2470,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                                     </connections>
                                                                 </button>
                                                                 <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="AT5-aS-AgQ">
-                                                                    <rect key="frame" x="309" y="21" width="19" height="27"/>
+                                                                    <rect key="frame" x="309" y="19" width="19" height="27"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <stepperCell key="cell" continuous="YES" alignment="left" minValue="1" maxValue="1024" doubleValue="1" id="Lkq-hS-bCt"/>
                                                                     <connections>
@@ -2478,7 +2478,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                                     </connections>
                                                                 </stepper>
                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hkX-Jd-o2h">
-                                                                    <rect key="frame" x="41" y="27" width="265" height="17"/>
+                                                                    <rect key="frame" x="41" y="25" width="265" height="17"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="…every X hours" id="WVl-6O-rdk">
                                                                         <font key="font" metaFont="system"/>
@@ -2487,14 +2487,14 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                                     </textFieldCell>
                                                                 </textField>
                                                                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="PiT-m5-30d">
-                                                                    <rect key="frame" x="37" y="17" width="109" height="32"/>
+                                                                    <rect key="frame" x="37" y="15" width="109" height="32"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="push" title="Check Now" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ME3-g3-Yt9">
                                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                         <font key="font" metaFont="system"/>
                                                                     </buttonCell>
                                                                     <connections>
-                                                                        <action selector="checkForUpdates:" target="cxZ-vL-Iwq" id="oT4-Z9-cGz"/>
+                                                                        <action selector="checkForUpdatesWithSender:" target="vQH-WF-vh2" id="gmU-Lu-xQg"/>
                                                                     </connections>
                                                                 </button>
                                                             </subviews>
@@ -2504,11 +2504,11 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                         <rect key="frame" x="17" y="188" width="690" height="86"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="qnd-bj-xce">
-                                                            <rect key="frame" x="3" y="3" width="684" height="68"/>
+                                                            <rect key="frame" x="4" y="5" width="682" height="66"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9gm-ih-X7o">
-                                                                    <rect key="frame" x="307" y="37" width="273" height="22"/>
+                                                                    <rect key="frame" x="307" y="35" width="273" height="22"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Leave blank for default web browser." drawsBackground="YES" usesSingleLineMode="YES" id="t25-pY-N42">
                                                                         <font key="font" metaFont="system"/>
@@ -2520,7 +2520,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                                     </connections>
                                                                 </textField>
                                                                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="f0r-DQ-NTj">
-                                                                    <rect key="frame" x="583" y="30" width="89" height="32"/>
+                                                                    <rect key="frame" x="583" y="28" width="89" height="32"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="push" title="Select…" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="jHC-aM-3Iu">
                                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2531,7 +2531,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                                     </connections>
                                                                 </button>
                                                                 <textField verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BEH-9y-PVP">
-                                                                    <rect key="frame" x="307" y="11" width="273" height="22"/>
+                                                                    <rect key="frame" x="307" y="9" width="273" height="22"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Leave blank for default web browser." drawsBackground="YES" usesSingleLineMode="YES" id="aGU-m9-BfF">
                                                                         <font key="font" metaFont="system"/>
@@ -2543,7 +2543,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                                     </connections>
                                                                 </textField>
                                                                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="P0V-lJ-DMI">
-                                                                    <rect key="frame" x="583" y="4" width="89" height="32"/>
+                                                                    <rect key="frame" x="583" y="2" width="89" height="32"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="push" title="Select…" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="67W-4i-3Kz">
                                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2554,7 +2554,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                                     </connections>
                                                                 </button>
                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="y59-AI-alE">
-                                                                    <rect key="frame" x="18" y="40" width="283" height="17"/>
+                                                                    <rect key="frame" x="18" y="38" width="283" height="17"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Open item pages with:" id="xMd-Tl-ZFz">
                                                                         <font key="font" metaFont="system"/>
@@ -2563,7 +2563,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                                     </textFieldCell>
                                                                 </textField>
                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="C1i-Nc-BNl">
-                                                                    <rect key="frame" x="18" y="14" width="283" height="17"/>
+                                                                    <rect key="frame" x="18" y="12" width="283" height="17"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Open other web pages with:" id="KwE-2o-pyn">
                                                                         <font key="font" metaFont="system"/>
@@ -2578,11 +2578,11 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                         <rect key="frame" x="17" y="10" width="321" height="174"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="bUx-OP-Dhm">
-                                                            <rect key="frame" x="3" y="3" width="315" height="156"/>
+                                                            <rect key="frame" x="4" y="5" width="313" height="154"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mAO-dK-3gu">
-                                                                    <rect key="frame" x="91" y="23" width="132" height="32"/>
+                                                                    <rect key="frame" x="91" y="21" width="132" height="32"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="push" title="Reload All Data" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="z4d-2n-KBm">
                                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2593,7 +2593,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                                     </connections>
                                                                 </button>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" setsMaxLayoutWidthAtFirstLayout="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GJv-R5-Ddl">
-                                                                    <rect key="frame" x="18" y="54" width="279" height="77"/>
+                                                                    <rect key="frame" x="18" y="52" width="279" height="77"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" alignment="center" id="OcC-wh-2vb">
                                                                         <font key="font" metaFont="message" size="11"/>
@@ -2762,7 +2762,5 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
             </connections>
             <point key="canvasLocation" x="221" y="164"/>
         </window>
-        <customObject id="cxZ-vL-Iwq" customClass="SUUpdater"/>
-        <userDefaultsController representsSharedInstance="YES" id="GWg-nl-JjT"/>
     </objects>
 </document>

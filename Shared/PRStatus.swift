@@ -1,46 +1,47 @@
+import CoreData
 import Foundation
 
 final class PRStatus: DataItem {
-
     @NSManaged var descriptionText: String?
     @NSManaged var state: String?
-	@NSManaged var context: String?
+    @NSManaged var context: String?
     @NSManaged var targetUrl: String?
 
-	@NSManaged var pullRequest: PullRequest
-    
+    @NSManaged var pullRequest: PullRequest
+
     override var alternateCreationDate: Bool { true }
 
-	static func syncStatuses(from data: [[AnyHashable : Any]]?, pullRequest: PullRequest) {
-		items(with: data, type: PRStatus.self, server: pullRequest.apiServer) { item, info, isNewOrUpdated in
-			if isNewOrUpdated {
-				item.state = info["state"] as? String
-				item.context = info["context"] as? String
-				item.targetUrl = info["target_url"] as? String
-				item.pullRequest = pullRequest
+    static func syncStatuses(from data: [JSON]?, pullRequest: PullRequest, moc: NSManagedObjectContext) async {
+        let pullRequestId = pullRequest.objectID
+        let serverId = pullRequest.apiServer.objectID
+        await v3items(with: data, type: PRStatus.self, serverId: serverId, moc: moc) { item, info, isNewOrUpdated, syncMoc in
+            if isNewOrUpdated, let pr = try? syncMoc.existingObject(with: pullRequestId) as? PullRequest {
+                item.state = info["state"] as? String
+                item.context = info["context"] as? String
+                item.targetUrl = info["target_url"] as? String
+                item.pullRequest = pr
 
-				if let ds = info["description"] as? String {
-					item.descriptionText = ds.trim
-				}
-			}
-		}
-	}
-    
-    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer) {
-        syncItems(of: PRStatus.self, from: nodes, on: server) { status, node in
+                if let ds = info["description"] as? String {
+                    item.descriptionText = ds.trim
+                }
+            }
+        }
+    }
+
+    static func sync(from nodes: LinkedList<GraphQL.Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
+        syncItems(of: PRStatus.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { status, node in
             guard node.created || node.updated,
-                let parentId = node.parent?.id,
-                let moc = server.managedObjectContext
-                else { return }
+                  let parentId = node.parent?.id
+            else { return }
 
             if node.created {
-                if let parent = DataItem.item(of: PullRequest.self, with: parentId, in: moc) {
+                if let parent = DataItem.parent(of: PullRequest.self, with: parentId, in: moc, parentCache: parentCache) {
                     status.pullRequest = parent
                 } else {
                     DLog("Warning: PRStatus without parent")
                 }
             }
-            
+
             let info = node.jsonPayload
             if node.elementType == "CheckRun" {
                 status.state = (info["conclusion"] as? String)?.lowercased()
@@ -55,28 +56,28 @@ final class PRStatus: DataItem {
             }
         }
     }
-    
-	var colorForDisplay: COLOR_CLASS {
-		switch S(state) {
-        case "", "skipped", "neutral":
+
+    var colorForDisplay: COLOR_CLASS {
+        switch S(state) {
+        case "", "neutral", "skipped":
             return .appSecondaryLabel
-		case "pending", "expected":
+        case "expected", "pending":
             return .appYellow
-		case "success":
+        case "success":
             return .appGreen
-		default:
+        default:
             return .appRed
-		}
-	}
+        }
+    }
 
-	var displayText: String {
-		var text: String
+    var displayText: String {
+        var text: String
 
-		switch S(state) {
+        switch S(state) {
         case "":
             text = "⏺ "
-		case "pending", "expected":
-			text = "⚡️ "
+        case "expected", "pending":
+            text = "⚡️ "
         case "skipped":
             text = "⏭ "
         case "neutral":
@@ -85,24 +86,24 @@ final class PRStatus: DataItem {
             text = "⚠️ "
         case "cancelled":
             text = "⛔️ "
-		case "success":
-			text = "✅ "
-		default:
-			text = "❌ "
-		}
+        case "success":
+            text = "✅ "
+        default:
+            text = "❌ "
+        }
 
         if let c = context, !c.isEmpty {
-            if c == nodeId, let createdAt = createdAt {
+            if c == nodeId, let createdAt {
                 text += shortDateFormatter.string(from: createdAt)
             } else {
                 text += c
             }
-		}
+        }
 
-		if let t = descriptionText, !t.isEmpty {
-			text += " - \(t)"
-		}
+        if let t = descriptionText, !t.isEmpty {
+            text += " - \(t)"
+        }
 
-		return text
-	}
+        return text
+    }
 }

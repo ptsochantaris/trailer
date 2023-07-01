@@ -1,43 +1,40 @@
 import CoreData
 #if os(iOS)
-	import UIKit
+    import UIKit
 #endif
 
 final class PullRequest: ListableItem {
-
-	@NSManaged var lastStatusNotified: String?
-	@NSManaged var mergeCommitSha: String?
-	@NSManaged var hasNewCommits: Bool
-	@NSManaged var assignedForReview: Bool
-	@NSManaged var reviewers: String
-	@NSManaged var teamReviewers: String
+    @NSManaged var lastStatusNotified: String?
+    @NSManaged var mergeCommitSha: String?
+    @NSManaged var hasNewCommits: Bool
+    @NSManaged var assignedForReview: Bool
+    @NSManaged var reviewers: String
+    @NSManaged var teamReviewers: String
     @NSManaged var mergedByNodeId: String?
-    @NSManaged var linesAdded: Int64
-    @NSManaged var linesRemoved: Int64
+    @NSManaged var linesAdded: Int
+    @NSManaged var linesRemoved: Int
     @NSManaged var isMergeable: Bool
     @NSManaged var headRefName: String?
     @NSManaged var headLabel: String?
     @NSManaged var baseLabel: String?
 
-	@NSManaged var statuses: Set<PRStatus>
-	@NSManaged var reviews: Set<Review>
-    
+    @NSManaged var statuses: Set<PRStatus>
+    @NSManaged var reviews: Set<Review>
+
     override var webUrl: String? {
-        return super.webUrl?.appending(pathComponent: "pull").appending(pathComponent: String(number))
+        super.webUrl?.appending(pathComponent: "pull").appending(pathComponent: String(number))
     }
-    
+
     static func mostRecentItemUpdate(in repo: Repo) -> Date {
-        return repo.pullRequests.reduce(.distantPast) { max($0, $1.updatedAt ?? .distantPast) }
+        repo.pullRequests.reduce(.distantPast) { max($0, $1.updatedAt ?? .distantPast) }
     }
-        
-    static func sync(from nodes: ContiguousArray<GQLNode>, on server: ApiServer) {
-        syncItems(of: PullRequest.self, from: nodes, on: server) { pr, node in
-            
+
+    static func sync(from nodes: LinkedList<GraphQL.Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
+        syncItems(of: PullRequest.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { pr, node in
             guard node.created || node.updated,
-                let parentId = node.parent?.id ?? (node.jsonPayload["repository"] as? [AnyHashable: Any])?["id"] as? String,
-                let moc = server.managedObjectContext,
-                let parent = DataItem.item(of: Repo.self, with: parentId, in: moc)
-                else { return }
+                  let parentId = node.parent?.id ?? (node.jsonPayload["repository"] as? JSON)?["id"] as? String,
+                  let parent = DataItem.parent(of: Repo.self, with: parentId, in: moc, parentCache: parentCache)
+            else { return }
 
             let json = node.jsonPayload
 
@@ -46,17 +43,17 @@ final class PullRequest: ListableItem {
             } else {
                 pr.isMergeable = true
             }
-            pr.linesAdded = json["additions"] as? Int64 ?? 0
-            pr.linesRemoved = json["deletions"] as? Int64 ?? 0
+            pr.linesAdded = json["additions"] as? Int ?? 0
+            pr.linesRemoved = json["deletions"] as? Int ?? 0
             pr.mergeCommitSha = json["headRefOid"] as? String
-            pr.mergedByNodeId = (json["mergedBy"] as? [AnyHashable: Any])?["id"] as? String
-            pr.baseNodeSync(nodeJson: json, parent: parent)
+            pr.mergedByNodeId = (json["mergedBy"] as? JSON)?["id"] as? String
+            pr.baseNodeSync(node: node, parent: parent)
             pr.reviewers = "" // will be populated by the review request API calls
             pr.teamReviewers = "" // will be populated by the review request API calls
-            
+
             let headRefName = json["headRefName"] as? String
-            if let headRefName = headRefName,
-               let headRepoName = (json["headRepository"] as? [AnyHashable: Any])?["nameWithOwner"] as? String {
+            if let headRefName,
+               let headRepoName = (json["headRepository"] as? JSON)?["nameWithOwner"] as? String {
                 pr.headLabel = headRepoName + ":" + headRefName
             } else {
                 pr.headLabel = nil
@@ -64,8 +61,8 @@ final class PullRequest: ListableItem {
             pr.headRefName = headRefName
 
             let baseRefName = json["baseRefName"] as? String
-            if let baseRefName = baseRefName,
-               let baseRepoName = (json["baseRepository"] as? [AnyHashable: Any])?["nameWithOwner"] as? String {
+            if let baseRefName,
+               let baseRepoName = (json["baseRepository"] as? JSON)?["nameWithOwner"] as? String {
                 pr.baseLabel = baseRepoName + ":" + baseRefName
             } else {
                 pr.baseLabel = nil
@@ -74,188 +71,189 @@ final class PullRequest: ListableItem {
     }
 
     var reviewCommentLink: String? {
-        return repo.apiUrl?.appending(pathComponent: "pulls").appending(pathComponent: String(number)).appending(pathComponent: "comments")
+        repo.apiUrl?.appending(pathComponent: "pulls").appending(pathComponent: String(number)).appending(pathComponent: "comments")
     }
-    
+
     var statusesLink: String? {
-        return repo.apiUrl?.appending(pathComponent: "statuses").appending(pathComponent: mergeCommitSha ?? "")
+        repo.apiUrl?.appending(pathComponent: "statuses").appending(pathComponent: mergeCommitSha ?? "")
     }
-    
-	static func syncPullRequests(from data: [[AnyHashable : Any]]?, in repo: Repo) {
+
+    static func syncPullRequests(from data: [JSON]?, in repo: Repo, moc: NSManagedObjectContext) async {
         let apiServer = repo.apiServer
         let apiServerUserId = apiServer.userNodeId
-		items(with: data, type: PullRequest.self, server: apiServer) { item, info, isNewOrUpdated in
-			if isNewOrUpdated {
+        let repoId = repo.objectID
+        await v3items(with: data, type: PullRequest.self, serverId: apiServer.objectID, moc: moc) { item, info, isNewOrUpdated, syncMoc in
+            if isNewOrUpdated {
+                let repo = try! syncMoc.existingObject(with: repoId) as! Repo
+                item.baseSync(from: info, in: repo)
 
-				item.baseSync(from: info, in: repo)
-
-                let baseInfo = info["base"] as? [AnyHashable: Any]
+                let baseInfo = info["base"] as? JSON
                 item.baseLabel = baseInfo?["label"] as? String
 
-                let headInfo = info["head"] as? [AnyHashable: Any]
+                let headInfo = info["head"] as? JSON
                 item.headRefName = headInfo?["ref"] as? String
                 item.headLabel = headInfo?["label"] as? String
-                
+
                 item.reviewers = ""
                 item.teamReviewers = ""
 
                 if
                     let newHeadCommitSha = headInfo?["sha"] as? String,
-                    let commitUserInfo = headInfo?["user"] as? [AnyHashable: Any],
+                    let commitUserInfo = headInfo?["user"] as? JSON,
                     let newHeadCommitUserId = commitUserInfo["node_id"] as? String {
-                    
                     let currentSha = item.mergeCommitSha
-                    if currentSha != nil && currentSha != newHeadCommitSha && apiServerUserId != newHeadCommitUserId {
+                    if currentSha != nil, currentSha != newHeadCommitSha, apiServerUserId != newHeadCommitUserId {
                         item.hasNewCommits = Settings.markPrsAsUnreadOnNewCommits && item.postSyncAction != PostSyncAction.isNew.rawValue
                     }
                     item.mergeCommitSha = newHeadCommitSha
                 }
-			}
+            }
             if item.condition == ItemCondition.closed.rawValue {
                 item.stateChanged = StateChange.reopened.rawValue
             }
-			item.condition = ItemCondition.open.rawValue
+            item.condition = ItemCondition.open.rawValue
             item.isMergeable = true // always, for v3 API
-		}
-	}
-
-	override var searchKeywords: [String] {
-		return ["PR", "Pull Request", "PRs", "Pull Requests"] + super.searchKeywords
-	}
-
-	override var hasUnreadCommentsOrAlert: Bool {
-		return super.hasUnreadCommentsOrAlert || hasNewCommits
-	}
-
-	override var reviewedByMe: Bool {
-		for r in reviews {
-			if r.isMine {
-				return true
-			}
-		}
-		return false
-	}
-    
-	func checkAndStoreReviewAssignments(_ reviewerNames: Set<String>, _ reviewerTeams: Set<String>) {
-		reviewers = reviewerNames.joined(separator: ",")
-		teamReviewers = reviewerTeams.joined(separator: ",")
-		var assigned = reviewerNames.contains(S(apiServer.userName))
-		if !assigned {
-			for myTeamName in apiServer.teams.compactMap({ $0.slug }) {
-				if reviewerTeams.contains(myTeamName) {
-					assigned = true // TODO: have a separate notification for this
-					break
-				}
-			}
-		}
-		let shouldNotify = assigned && !assignedForReview
-		assignedForReview = assigned
-        if shouldNotify && Settings.notifyOnReviewAssignments {
-            NotificationQueue.add(type: .assignedForReview, for: self)
         }
-	}
+    }
 
-	static func allMerged(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, includeAllGroups: Bool = false) -> [PullRequest] {
-		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
-		f.returnsObjectsAsFaults = false
-		f.includesSubentities = false
-		let p = ItemCondition.merged.matchingPredicate
-		add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc, includeAllGroups: includeAllGroups)
-		return try! moc.fetch(f)
-	}
+    override var searchKeywords: [String] {
+        ["PR", "Pull Request", "PRs", "Pull Requests"] + super.searchKeywords
+    }
 
-	static func allClosed(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, includeAllGroups: Bool = false) -> [PullRequest] {
-		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
-		f.returnsObjectsAsFaults = false
-		f.includesSubentities = false
-		let p = ItemCondition.closed.matchingPredicate
-		add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc, includeAllGroups: includeAllGroups)
-		return try! moc.fetch(f)
-	}
+    override var hasUnreadCommentsOrAlert: Bool {
+        super.hasUnreadCommentsOrAlert || hasNewCommits
+    }
 
-	override class func hasOpen(in moc: NSManagedObjectContext, criterion: GroupingCriterion?) -> Bool {
-		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
-		f.includesSubentities = false
-		f.fetchLimit = 1
-		add(criterion: criterion, toFetchRequest: f, originalPredicate: ItemCondition.open.matchingPredicate, in: moc)
-		return try! moc.count(for: f) > 0
-	}
+    override var reviewedByMe: Bool {
+        reviews.contains { $0.isMine }
+    }
 
-	static func markEverythingRead(in section: Section, in moc: NSManagedObjectContext) {
-		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
-		f.returnsObjectsAsFaults = false
-		f.includesSubentities = false
-		if section != .none {
-			f.predicate = section.matchingPredicate
-		}
-		for pr in try! moc.fetch(f) {
-			pr.catchUpWithComments()
-		}
-	}
+    func checkAndStoreReviewAssignments(_ reviewerNames: Set<String>, _ reviewerTeams: Set<String>) {
+        var assigned = reviewerNames.contains(S(apiServer.userName))
+        let assignedToTeam: Bool
+        if assigned {
+            assignedToTeam = false
+        } else {
+            let myTeamNames = apiServer.teams.compactMap(\.slug)
+            assigned = myTeamNames.contains { reviewerTeams.contains($0) }
+            assignedToTeam = assigned
+        }
+        if assigned, !assignedForReview, Settings.notifyOnReviewAssignments {
+            if assignedToTeam {
+                NotificationQueue.add(type: .assignedToTeamForReview, for: self)
+            } else {
+                NotificationQueue.add(type: .assignedForReview, for: self)
+            }
+        }
+        assignedForReview = assigned
+        reviewers = reviewerNames.joined(separator: ",")
+        teamReviewers = reviewerTeams.joined(separator: ",")
+    }
 
-	override func catchUpWithComments() {
-		hasNewCommits = false
-		super.catchUpWithComments()
-	}
+    @MainActor
+    static func allMerged(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, includeAllGroups: Bool = false) -> [PullRequest] {
+        let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
+        f.returnsObjectsAsFaults = false
+        f.includesSubentities = false
+        let p = ItemCondition.merged.matchingPredicate
+        add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc, includeAllGroups: includeAllGroups)
+        return try! moc.fetch(f)
+    }
 
-	override class func badgeCount<T: ListableItem>(from fetch: NSFetchRequest<T>, in moc: NSManagedObjectContext) -> Int {
-		var badgeCount = super.badgeCount(from: fetch, in: moc)
-		if Settings.markPrsAsUnreadOnNewCommits {
-			for i in try! moc.fetch(fetch) {
-				if let i = i as? PullRequest, i.hasNewCommits {
-					badgeCount += 1
-				}
-			}
-		}
-		return badgeCount
-	}
+    @MainActor
+    static func allClosed(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, includeAllGroups: Bool = false) -> [PullRequest] {
+        let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
+        f.returnsObjectsAsFaults = false
+        f.includesSubentities = false
+        let p = ItemCondition.closed.matchingPredicate
+        add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc, includeAllGroups: includeAllGroups)
+        return try! moc.fetch(f)
+    }
 
-	static func badgeCount(in section: Section, in moc: NSManagedObjectContext) -> Int {
-		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
-		f.includesSubentities = false
-		f.predicate = NSCompoundPredicate(type: .and, subpredicates: [section.matchingPredicate, includeInUnreadPredicate])
-		return badgeCount(from: f, in: moc)
-	}
+    override class func hasOpen(in moc: NSManagedObjectContext, criterion: GroupingCriterion?) -> Bool {
+        let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
+        f.includesSubentities = false
+        f.fetchLimit = 1
+        add(criterion: criterion, toFetchRequest: f, originalPredicate: ItemCondition.open.matchingPredicate, in: moc)
+        return try! moc.count(for: f) > 0
+    }
 
-	static func badgeCount(in moc: NSManagedObjectContext) -> Int {
-		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
-		f.includesSubentities = false
-		f.predicate = NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, includeInUnreadPredicate])
-		return badgeCount(from: f, in: moc)
-	}
+    static func markEverythingRead(in section: Section, in moc: NSManagedObjectContext) {
+        let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
+        f.returnsObjectsAsFaults = false
+        f.includesSubentities = false
+        if section != .none {
+            f.predicate = section.matchingPredicate
+        }
+        for pr in try! moc.fetch(f) {
+            pr.catchUpWithComments()
+        }
+    }
 
-	static func badgeCount(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
-		let f = requestForItems(of: PullRequest.self, withFilter: nil, sectionIndex: -1, criterion: criterion)
-		return badgeCount(from: f, in: moc)
-	}
+    override func catchUpWithComments() {
+        hasNewCommits = false
+        super.catchUpWithComments()
+    }
 
-	private static let _unreadOrNewCommitsPredicate = NSPredicate(format: "unreadComments > 0 or hasNewCommits == YES")
-	override class var includeInUnreadPredicate: NSPredicate {
-		return Settings.markPrsAsUnreadOnNewCommits ? _unreadOrNewCommitsPredicate : super.includeInUnreadPredicate
-	}
+    override class func badgeCount(from fetch: NSFetchRequest<some ListableItem>, in moc: NSManagedObjectContext) -> Int {
+        var badgeCount = super.badgeCount(from: fetch, in: moc)
+        if Settings.markPrsAsUnreadOnNewCommits {
+            for i in try! moc.fetch(fetch) {
+                if let i = i as? PullRequest, i.hasNewCommits {
+                    badgeCount += 1
+                }
+            }
+        }
+        return badgeCount
+    }
 
-	func shouldBeCheckedForRedStatuses(in section: Section) -> Bool {
-		if Settings.hidePrsThatArentPassing {
-			if Settings.hidePrsThatDontPassOnlyInAll {
-				return section == .all
-			} else {
-				return section == .mine || section == .participated || section == .all
-			}
-		}
-		return false
-	}
+    static func badgeCount(in section: Section, in moc: NSManagedObjectContext) -> Int {
+        let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
+        f.includesSubentities = false
+        f.predicate = NSCompoundPredicate(type: .and, subpredicates: [section.matchingPredicate, includeInUnreadPredicate])
+        return badgeCount(from: f, in: moc)
+    }
+
+    static func badgeCount(in moc: NSManagedObjectContext) -> Int {
+        let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
+        f.includesSubentities = false
+        f.predicate = NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, includeInUnreadPredicate])
+        return badgeCount(from: f, in: moc)
+    }
+
+    @MainActor
+    static func badgeCount(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
+        let f = requestForItems(of: PullRequest.self, withFilter: nil, sectionIndex: -1, criterion: criterion)
+        return badgeCount(from: f, in: moc)
+    }
+
+    private static let _unreadOrNewCommitsPredicate = NSPredicate(format: "unreadComments > 0 or hasNewCommits == YES")
+    override class var includeInUnreadPredicate: NSPredicate {
+        Settings.markPrsAsUnreadOnNewCommits ? _unreadOrNewCommitsPredicate : super.includeInUnreadPredicate
+    }
+
+    func shouldBeCheckedForRedStatuses(in section: Section) -> Bool {
+        if Settings.hidePrsThatArentPassing {
+            if Settings.hidePrsThatDontPassOnlyInAll {
+                return section == .all
+            } else {
+                return section == .mine || section == .participated || section == .all
+            }
+        }
+        return false
+    }
 
     static func statusCheckBatch(in moc: NSManagedObjectContext) -> [PullRequest] {
         let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
         f.predicate = NSPredicate(format: "apiServer.lastSyncSucceeded == YES")
         f.sortDescriptors = [
             NSSortDescriptor(key: "lastStatusScan", ascending: true),
-            NSSortDescriptor(key: "updatedAt", ascending: false),
+            NSSortDescriptor(key: "updatedAt", ascending: false)
         ]
         let prs = try! moc.fetch(f)
-            .filter { $0.section.shouldCheckStatuses }
+            .filter(\.section.shouldCheckStatuses)
             .prefix(Settings.statusItemRefreshBatchSize)
-        
+
         prs.forEach {
             $0.statuses.forEach {
                 $0.postSyncAction = PostSyncAction.delete.rawValue
@@ -263,16 +261,15 @@ final class PullRequest: ListableItem {
         }
         return Array(prs)
     }
-    
-	var displayedStatuses: [PRStatus] {
 
-		var contexts = [String : PRStatus]()
+    var displayedStatuses: [PRStatus] {
+        var contexts = [String: PRStatus]()
         let red = Settings.showStatusesRed
         let yellow = Settings.showStatusesYellow
         let green = Settings.showStatusesGreen
         let gray = Settings.showStatusesGray
         let filteredStatuses: Set<PRStatus>
-        if red && yellow && green && gray {
+        if red, yellow, green, gray {
             filteredStatuses = statuses
         } else {
             filteredStatuses = statuses.filter {
@@ -284,58 +281,58 @@ final class PullRequest: ListableItem {
                 return false
             }
         }
-		let sortedStatuses = filteredStatuses.sorted { $1.createdBefore($0) }
-		for s in sortedStatuses {
-			let context = s.context ?? "//NO CONTEXT/-/"
-			if let latestStatusInContext = contexts[context] {
-				if latestStatusInContext.createdBefore(s) {
-					contexts[context] = s
-				}
-			} else {
-				contexts[context] = s
-			}
-		}
+        let sortedStatuses = filteredStatuses.sorted { $1.createdBefore($0) }
+        for s in sortedStatuses {
+            let context = s.context ?? "//NO CONTEXT/-/"
+            if let latestStatusInContext = contexts[context] {
+                if latestStatusInContext.createdBefore(s) {
+                    contexts[context] = s
+                }
+            } else {
+                contexts[context] = s
+            }
+        }
 
-		var statusList = Array(contexts.values)
+        var statusList = Array(contexts.values)
 
-		let mode = Settings.statusFilteringMode
-		if mode != StatusFilter.all.rawValue {
-			let terms = Settings.statusFilteringTerms
-			if !terms.isEmpty {
-				let inclusive = mode == StatusFilter.include.rawValue
-				// contains(a) or contains(b) or contains(c)  -vs-  not(contains(a) or contains(b) or contains(c))
+        let mode = Settings.statusFilteringMode
+        if mode != StatusFilter.all.rawValue {
+            let terms = Settings.statusFilteringTerms
+            if !terms.isEmpty {
+                let inclusive = mode == StatusFilter.include.rawValue
+                // contains(a) or contains(b) or contains(c)  -vs-  not(contains(a) or contains(b) or contains(c))
 
-				statusList = statusList.filter {
-					for t in terms {
-						if let d = $0.descriptionText, d.localizedCaseInsensitiveContains(t) {
-							return inclusive
-						}
-					}
-					return !inclusive
-				}
-			}
-		}
+                statusList = statusList.filter {
+                    for t in terms {
+                        if let d = $0.descriptionText, d.localizedCaseInsensitiveContains(t) {
+                            return inclusive
+                        }
+                    }
+                    return !inclusive
+                }
+            }
+        }
 
-		return statusList.sorted { $0.createdBefore($1) }
-	}
+        return statusList.sorted { $0.createdBefore($1) }
+    }
 
-	var labelsLink: String? {
-		return issueUrl?.appending(pathComponent: "labels")
-	}
+    var labelsLink: String? {
+        issueUrl?.appending(pathComponent: "labels")
+    }
 
-	@objc var sectionName: String {
-		return Section.prMenuTitles[Int(sectionIndex)]
-	}
-        
+    @objc var sectionName: String {
+        Section.prMenuTitles[Int(sectionIndex)]
+    }
+
     var shouldAnnounceStatus: Bool {
-        return canBadge && (Settings.notifyOnStatusUpdatesForAllPrs || createdByMe || assignedToParticipated || assignedToMySection)
+        canBadge && (Settings.notifyOnStatusUpdatesForAllPrs || createdByMe || assignedToParticipated || assignedToMySection)
     }
 
     func linesAttributedString(labelFont: FONT_CLASS) -> NSAttributedString? {
         let added = linesAdded
         let removed = linesRemoved
-        
-        if added == 0 && removed == 0 {
+
+        if added == 0, removed == 0 {
             return nil
         }
 
@@ -358,13 +355,12 @@ final class PullRequest: ListableItem {
     }
 
     func reviewsAttributedString(labelFont: FONT_CLASS) -> NSAttributedString? {
-        
         if !Settings.displayReviewsOnItems {
             return nil
         }
-        
+
         let res = NSMutableAttributedString()
-        
+
         if Settings.showRequestedTeamReviews {
             let teamReviewRequests = teamReviewers.components(separatedBy: ",")
             let names = teamReviewRequests.compactMap {
@@ -379,9 +375,9 @@ final class PullRequest: ListableItem {
                 res.append(NSAttributedString(string: "Reviews asked from \(names)", attributes: a))
             }
         }
-        
+
         var latestReviewByUser = [String: Review]()
-        reviews.filter { $0.affectsBottomLine }.sorted { $0.createdBefore($1) }.forEach {
+        reviews.filter(\.affectsBottomLine).sorted { $0.createdBefore($1) }.forEach {
             if let userName = $0.username {
                 // Do not take any review state into account if the user is still marked as a reviewer
                 latestReviewByUser[userName] = reviewers.contains(userName) ? nil : $0
@@ -389,12 +385,10 @@ final class PullRequest: ListableItem {
         }
 
         if !latestReviewByUser.isEmpty || !reviewers.isEmpty {
-
             let reviews = latestReviewByUser.values.sorted { $0.createdBefore($1) }
 
             let approvers = reviews.filter { $0.state == Review.State.APPROVED.rawValue }
             if !approvers.isEmpty {
-
                 let a = [NSAttributedString.Key.font: labelFont, NSAttributedString.Key.foregroundColor: COLOR_CLASS.appGreen]
 
                 if res.length > 0 {
@@ -414,13 +408,12 @@ final class PullRequest: ListableItem {
 
             let requesters = reviews.filter { $0.state == Review.State.CHANGES_REQUESTED.rawValue }
             if !requesters.isEmpty {
-
                 let a = [NSAttributedString.Key.font: labelFont, NSAttributedString.Key.foregroundColor: COLOR_CLASS.appRed]
 
                 if res.length > 0 {
                     res.append(NSAttributedString(string: "\n", attributes: a))
                 }
-                
+
                 var count = 0
                 for r in requesters {
                     let name = r.username!.replacingOccurrences(of: " ", with: "\u{a0}")
@@ -432,11 +425,10 @@ final class PullRequest: ListableItem {
                 }
             }
 
-            let approverNames = approvers.compactMap { $0.username }
-            let requesterNames = requesters.compactMap { $0.username }
+            let approverNames = approvers.compactMap(\.username)
+            let requesterNames = requesters.compactMap(\.username)
             let otherReviewers = reviewers.components(separatedBy: ",").filter { !($0.isEmpty || approverNames.contains($0) || requesterNames.contains($0)) }
             if !otherReviewers.isEmpty {
-
                 let a = [NSAttributedString.Key.font: labelFont, NSAttributedString.Key.foregroundColor: COLOR_CLASS.appYellow]
 
                 if res.length > 0 {
@@ -454,10 +446,11 @@ final class PullRequest: ListableItem {
                 }
             }
         }
-        
+
         return res
     }
-    
+
+    @MainActor
     final func handleMerging() {
         let byUserId = mergedByNodeId
         let myUserId = apiServer.userNodeId
@@ -472,14 +465,14 @@ final class PullRequest: ListableItem {
             DLog("Merged PR was hidden, won't announce")
             managedObjectContext?.delete(self)
 
-        } else if byUserId == myUserId && Settings.dontKeepPrsMergedByMe {
+        } else if byUserId == myUserId, Settings.dontKeepPrsMergedByMe {
             DLog("Will not keep PR merged by me")
             managedObjectContext?.delete(self)
 
         } else if shouldKeep(accordingTo: Settings.mergeHandlingPolicy) {
             DLog("Will keep merged PR")
             keep(as: .merged, notification: .prMerged)
-            
+
         } else {
             DLog("Will not keep merged PR")
             managedObjectContext?.delete(self)

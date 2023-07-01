@@ -1,6 +1,5 @@
-
 import UIKit
 
 final class CustomRepoCell: UITableViewCell {
-	@IBOutlet var repoLabel: UILabel!
+    @IBOutlet var repoLabel: UILabel!
 }

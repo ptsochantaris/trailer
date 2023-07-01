@@ -1,5 +1,5 @@
-import Foundation
 import CoreData
+import Foundation
 
 extension API {
     static func canUseV4API(for moc: NSManagedObjectContext) -> String? {
@@ -8,7 +8,7 @@ extension API {
             DLog("Warning: Some servers have a blank v4 API path")
             return Settings.v4DAPIessage
         }
-        
+
         if DataItem.nullNodeIdItems(of: Repo.self, in: moc) > 0 {
             DLog("Warning: Some repos still have a null node ID")
             return Settings.v4DBMessage
@@ -16,51 +16,38 @@ extension API {
 
         return nil
     }
-    
+
     // MARK: V4 API
-    
+
     struct SyncSteps: OptionSet {
         let rawValue: Int
-        
-        static let reactions         = SyncSteps(rawValue: 1 << 0)
-        static let reviews           = SyncSteps(rawValue: 1 << 1)
-        static let comments          = SyncSteps(rawValue: 1 << 2)
-        static let reviewRequests    = SyncSteps(rawValue: 1 << 3)
-        static let statuses          = SyncSteps(rawValue: 1 << 4)
-        
+
+        static let reactions = SyncSteps(rawValue: 1 << 0)
+        static let reviews = SyncSteps(rawValue: 1 << 1)
+        static let comments = SyncSteps(rawValue: 1 << 2)
+        static let reviewRequests = SyncSteps(rawValue: 1 << 3)
+        static let statuses = SyncSteps(rawValue: 1 << 4)
+
         var toString: String {
             var ret = [String]()
-            if self.contains(.reactions) { ret.append("Reactions") }
-            if self.contains(.reviews) { ret.append("Reviews") }
-            if self.contains(.comments) { ret.append("Comments") }
-            if self.contains(.reviewRequests) { ret.append("Requests") }
-            if self.contains(.statuses) { ret.append("Statuses") }
+            if contains(.reactions) { ret.append("Reactions") }
+            if contains(.reviews) { ret.append("Reviews") }
+            if contains(.comments) { ret.append("Comments") }
+            if contains(.reviewRequests) { ret.append("Requests") }
+            if contains(.statuses) { ret.append("Statuses") }
             return ret.joined(separator: ", ")
         }
     }
-    
-    static func v4Sync(to moc: NSManagedObjectContext, newOrUpdatedPrs: [PullRequest], newOrUpdatedIssues: [Issue], with group: DispatchGroup) {
+
+    static func v4Sync(_ repos: [Repo], to moc: NSManagedObjectContext) async throws {
+        let servers = ApiServer.allApiServers(in: moc).filter(\.goodToGo)
+
         var steps: SyncSteps = [.comments]
 
         if shouldSyncReviewAssignments {
             steps.insert(.reviewRequests)
         }
 
-        if Settings.notifyOnItemReactions {
-            steps.insert(.reactions)
-        }
-
-        if Settings.showStatusItems {
-            steps.insert(.statuses)
-        } else {
-            for p in DataItem.allItems(of: PullRequest.self, in: moc) {
-                p.lastStatusScan = nil
-                p.statuses.forEach {
-                    $0.postSyncAction = PostSyncAction.delete.rawValue
-                }
-            }
-        }
-        
         if shouldSyncReviews {
             steps.insert(.reviews)
         } else {
@@ -68,81 +55,86 @@ extension API {
                 r.postSyncAction = PostSyncAction.delete.rawValue
             }
         }
-        
-        v4_sync(to: moc, prs: newOrUpdatedPrs, issues: newOrUpdatedIssues, steps: steps) { error in
-            if Settings.notifyOnCommentReactions {
-                let comments = PRComment.commentsThatNeedReactionsToBeRefreshed(in: moc)
-                for c in comments {
-                    c.pendingReactionScan = false
-                    for r in c.reactions {
-                        r.postSyncAction = PostSyncAction.delete.rawValue
+
+        let prTask = Task {
+            await withTaskGroup(of: Void.self) { group in
+                if !servers.isEmpty {
+                    group.addTask { @MainActor in
+                        await GraphQL.fetchAllAuthoredPrs(from: servers)
                     }
                 }
-                GraphQL.updateReactions(for: comments, moc: moc) { error in
-                    group.leave()
+                if !repos.isEmpty {
+                    group.addTask { @MainActor in
+                        await GraphQL.fetchAllSubscribedPrs(from: repos)
+                    }
                 }
-                
-            } else {
-                group.leave()
             }
-        }
-    }
-        
-    private static func v4_sync(to moc: NSManagedObjectContext, prs: [PullRequest], issues: [Issue], steps: SyncSteps, callback: @escaping (Error?)->Void) {
-        var steps = steps
-        
-        let group = DispatchGroup()
-        var finalError: Error?
-        
-        if steps.contains(.statuses) {
-            group.enter()
-            let prs = PullRequest.statusCheckBatch(in: moc)
-            GraphQL.update(for: prs, of: PullRequest.self, in: moc, steps: [.statuses]) { error in
-                if let error = error { finalError = error }
-                group.leave()
+            let newOrUpdatedPrs = DataItem.newOrUpdatedItems(of: PullRequest.self, in: moc, fromSuccessfulSyncOnly: true)
+
+            try await withThrowingTaskGroup(of: Void.self) { group in
+                if Settings.showStatusItems {
+                    group.addTask { @MainActor in
+                        let prs = PullRequest.statusCheckBatch(in: moc)
+                        try await GraphQL.update(for: prs, steps: [.statuses])
+                    }
+                } else {
+                    for p in DataItem.allItems(of: PullRequest.self, in: moc) {
+                        p.lastStatusScan = nil
+                        p.statuses.forEach {
+                            $0.postSyncAction = PostSyncAction.delete.rawValue
+                        }
+                    }
+                }
+                if Settings.notifyOnItemReactions {
+                    group.addTask { @MainActor in
+                        let rp = PullRequest.reactionCheckBatch(for: PullRequest.self, in: moc)
+                        try await GraphQL.update(for: rp, steps: [.reactions])
+                    }
+                }
+                try await group.waitForAll()
             }
-            steps.remove(.statuses)
-        }
-        
-        if steps.contains(.reactions) {
-            let rp = PullRequest.reactionCheckBatch(for: PullRequest.self, in: moc)
-            group.enter()
-            GraphQL.update(for: rp, of: PullRequest.self, in: moc, steps: [.reactions]) { error in
-                if let error = error { finalError = error }
-                group.leave()
-            }
-            
-            let ri = Issue.reactionCheckBatch(for: Issue.self, in: moc)
-            group.enter()
-            GraphQL.update(for: ri, of: Issue.self, in: moc, steps: [.reactions]) { error in
-                if let error = error { finalError = error }
-                group.leave()
-            }
-            steps.remove(.reactions)
+
+            try await GraphQL.update(for: newOrUpdatedPrs, steps: steps)
+
+            let reviews = DataItem.newOrUpdatedItems(of: Review.self, in: moc, fromSuccessfulSyncOnly: true)
+            try await GraphQL.updateComments(for: reviews)
         }
 
-        group.enter()
-        GraphQL.update(for: prs, of: PullRequest.self, in: moc, steps: steps) { error in
-            if let error = error {
-                finalError = error
-                group.leave()
-            } else {
-                let reviews = DataItem.newOrUpdatedItems(of: Review.self, in: moc, fromSuccessfulSyncOnly: true)
-                GraphQL.updateComments(for: reviews, moc: moc) { error in // must run after fetching reviews
-                    if let error = error { finalError = error }
-                    group.leave()
+        let issueTask = Task {
+            await withTaskGroup(of: Void.self) { group in
+                if !servers.isEmpty {
+                    group.addTask { @MainActor in
+                        await GraphQL.fetchAllAuthoredIssues(from: servers)
+                    }
+                }
+                if !repos.isEmpty {
+                    group.addTask { @MainActor in
+                        await GraphQL.fetchAllSubscribedIssues(from: repos)
+                    }
                 }
             }
+
+            let newOrUpdatedIssues = DataItem.newOrUpdatedItems(of: Issue.self, in: moc, fromSuccessfulSyncOnly: true)
+            try await GraphQL.update(for: newOrUpdatedIssues, steps: steps)
+
+            if Settings.notifyOnItemReactions {
+                let ri = Issue.reactionCheckBatch(for: Issue.self, in: moc)
+                try await GraphQL.update(for: ri, steps: [.reactions])
+            }
         }
-        
-        group.enter()
-        GraphQL.update(for: issues, of: Issue.self, in: moc, steps: steps) { error in
-            if let error = error { finalError = error }
-            group.leave()
-        }
-        
-        group.notify(queue: .main) {
-            callback(finalError)
+
+        try await prTask.value
+        try await issueTask.value
+
+        if Settings.notifyOnCommentReactions {
+            let comments = PRComment.commentsThatNeedReactionsToBeRefreshed(in: moc)
+            for c in comments {
+                c.pendingReactionScan = false
+                for r in c.reactions {
+                    r.postSyncAction = PostSyncAction.delete.rawValue
+                }
+            }
+            try await GraphQL.updateReactions(for: comments)
         }
     }
 }

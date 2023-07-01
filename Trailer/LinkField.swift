@@ -1,14 +1,12 @@
+import Cocoa
 
 extension NSColor {
+    @MainActor
     var highlighted: NSColor {
         if app.theme == .light {
-            if #available(macOS 10.14, *) {
-                return .controlAccentColor
-            } else {
-                return .blue
-            }
+            return .controlAccentColor
         }
-        guard let c = self.cgColor.components, c.count > 2 else {
+        guard let c = cgColor.components, c.count > 2 else {
             return self
         }
         let r = min(1, c[0] + 0.3)
@@ -20,101 +18,98 @@ extension NSColor {
 }
 
 final class LinkField: CenterTextField {
+    var targetUrl: String?
+    var needsCommand = false
 
-	var targetUrl: String?
-	var needsCommand = false
+    var highlight = false
+    var normalColor: NSColor?
 
-	var highlight = false
-	var normalColor: NSColor?
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        let check = attributedStringValue.boundingRect(with: bounds.size, options: stringDrawingOptions)
 
-	override func viewDidMoveToWindow() {
-		super.viewDidMoveToWindow()
-		let check = attributedStringValue .boundingRect(with: bounds.size, options: stringDrawingOptions)
+        let newArea = NSTrackingArea(rect: check,
+                                     options: [.mouseEnteredAndExited, .mouseMoved, .activeInKeyWindow],
+                                     owner: self,
+                                     userInfo: nil)
 
-		let newArea = NSTrackingArea(rect: check,
-		                             options: [.mouseEnteredAndExited, .mouseMoved, .activeInKeyWindow],
-		                             owner: self,
-		                             userInfo: nil)
+        addTrackingArea(newArea)
 
-		addTrackingArea(newArea)
+        if let point = window?.mouseLocationOutsideOfEventStream, check.contains(point) {
+            mouseEntered(with: NSEvent())
+        }
+    }
 
-		if let point = window?.mouseLocationOutsideOfEventStream, NSPointInRect(point, check) {
-			mouseEntered(with: NSEvent())
-		}
-	}
+    override func resetCursorRects() {
+        super.resetCursorRects()
+        if highlight {
+            let check = attributedStringValue.boundingRect(with: bounds.size, options: stringDrawingOptions)
+            addCursorRect(check, cursor: NSCursor.pointingHand)
+        }
+    }
 
-	override func resetCursorRects() {
-		super.resetCursorRects()
-		if highlight {
+    override func mouseExited(with _: NSEvent) {
+        highlight = false
+        if targetUrl != nil {
+            textColor = normalColor
+            window?.invalidateCursorRects(for: self)
+        }
+    }
 
-			let check = attributedStringValue.boundingRect(with: bounds.size, options: stringDrawingOptions)
-			addCursorRect(check, cursor: NSCursor.pointingHand)
-		}
-	}
+    override func mouseEntered(with theEvent: NSEvent) {
+        normalColor = textColor
+        checkMove(from: theEvent)
+    }
 
-	override func mouseExited(with theEvent: NSEvent) {
-		highlight = false
-		if targetUrl != nil {
-			textColor = normalColor
-			window?.invalidateCursorRects(for: self)
-		}
-	}
+    override func mouseMoved(with theEvent: NSEvent) {
+        checkMove(from: theEvent)
+    }
 
-	override func mouseEntered(with theEvent: NSEvent) {
-		normalColor = textColor
-		checkMove(from: theEvent)
-	}
-
-	override func mouseMoved(with theEvent: NSEvent) {
-		checkMove(from: theEvent)
-	}
-
-	private func checkMove(from theEvent: NSEvent) {
-		if targetUrl != nil {
-			if highlight {
-				if needsCommand && !theEvent.modifierFlags.contains(.command) {
-					highlight = false
-					textColor = normalColor
-					window?.invalidateCursorRects(for: self)
-				}
-			} else {
-				if !needsCommand || theEvent.modifierFlags.contains(.command) {
-					highlight = true
+    private func checkMove(from theEvent: NSEvent) {
+        if targetUrl != nil {
+            if highlight {
+                if needsCommand, !theEvent.modifierFlags.contains(.command) {
+                    highlight = false
+                    textColor = normalColor
+                    window?.invalidateCursorRects(for: self)
+                }
+            } else {
+                if !needsCommand || theEvent.modifierFlags.contains(.command) {
+                    highlight = true
                     textColor = normalColor?.highlighted
-					window?.invalidateCursorRects(for: self)
-				}
-			}
-		}
-	}
+                    window?.invalidateCursorRects(for: self)
+                }
+            }
+        }
+    }
 
-	override func mouseDown(with theEvent: NSEvent) { }
+    override func mouseDown(with _: NSEvent) {}
 
-	override func mouseUp(with theEvent: NSEvent) {
-		if targetUrl == nil {
-			selectParentPr(from: theEvent)
-		} else {
-			if needsCommand {
-				if theEvent.modifierFlags.contains(.command) {
-					if theEvent.modifierFlags.contains(.option) {
-						app.ignoreNextFocusLoss = true
-					}
-					mouseExited(with: theEvent)
-					openLink(URL(string: targetUrl!)!)
-				} else {
-					selectParentPr(from: theEvent)
-				}
-			} else {
-				mouseExited(with: theEvent)
-				openLink(URL(string: targetUrl!)!)
-			}
-		}
-	}
-	
-	private func selectParentPr(from theEvent: NSEvent) {
-		if let parentView = nextResponder as? TrailerCell, let pr = parentView.associatedDataItem {
-			let isAlternative = theEvent.modifierFlags.contains(.option)
-			app.selected(pr, alternativeSelect: isAlternative, window: window)
-		}
-	}
+    override func mouseUp(with theEvent: NSEvent) {
+        if targetUrl == nil {
+            selectParentPr(from: theEvent)
+        } else {
+            if needsCommand {
+                if theEvent.modifierFlags.contains(.command) {
+                    if theEvent.modifierFlags.contains(.option) {
+                        app.ignoreNextFocusLoss = true
+                    }
+                    mouseExited(with: theEvent)
+                    openLink(URL(string: targetUrl!)!)
+                } else {
+                    selectParentPr(from: theEvent)
+                }
+            } else {
+                mouseExited(with: theEvent)
+                openLink(URL(string: targetUrl!)!)
+            }
+        }
+    }
 
+    private func selectParentPr(from theEvent: NSEvent) {
+        if let parentView = nextResponder as? TrailerCell, let pr = parentView.associatedDataItem {
+            let isAlternative = theEvent.modifierFlags.contains(.option)
+            app.selected(pr, alternativeSelect: isAlternative, window: window)
+        }
+    }
 }

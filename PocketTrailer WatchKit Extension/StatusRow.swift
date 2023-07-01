@@ -1,4 +1,3 @@
-
 import WatchKit
 
 final class StatusRow: NSObject {

@@ -1,0 +1,23 @@
+disabled_rules:
+  - identifier_name
+  - line_length
+  - trailing_whitespace
+  - force_cast
+  - file_length
+  - function_body_length
+  - nesting
+  - type_body_length
+  - type_name
+  - function_parameter_count
+  - unused_setter_value
+  - cyclomatic_complexity
+  - force_try
+  - notification_center_detachment
+  - large_tuple
+  - inclusive_language
+
+analyzer_rules:
+  - explicit_self
+
+excluded:
+  - Pods

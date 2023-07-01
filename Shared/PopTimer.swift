@@ -1,29 +1,36 @@
-
+import Combine
 import Foundation
 
 final class PopTimer {
+    private let publisher = PassthroughSubject<Void, Never>()
+    private let stride: RunLoop.SchedulerTimeType.Stride
+    private let callback: () -> Void
+    private var cancel: Cancellable?
 
-	private var popTimer: Timer?
-	private let timeInterval: TimeInterval
-	private let callback: Completion
+    func push() {
+        if cancel == nil {
+            cancel = publisher.debounce(for: stride, scheduler: RunLoop.main).sink { [weak self] _ in
+                guard let self else { return }
+                cancel = nil
+                callback()
+            }
+        }
+        publisher.send()
+    }
 
-	func push() {
-		popTimer = Timer(repeats: false, interval: timeInterval) { [weak self] in
-			self?.abort()
-			self?.callback()
-		}
-	}
+    func abort() {
+        if let c = cancel {
+            c.cancel()
+            cancel = nil
+        }
+    }
 
-	func abort() {
-		popTimer = nil
-	}
+    var isPushed: Bool {
+        cancel != nil
+    }
 
-	var isRunning: Bool {
-		return popTimer != nil
-	}
-
-	init(timeInterval: TimeInterval, callback: @escaping Completion) {
-		self.timeInterval = timeInterval
-		self.callback = callback
-	}
+    init(timeInterval: TimeInterval, callback: @escaping () -> Void) {
+        self.stride = RunLoop.SchedulerTimeType.Stride(timeInterval)
+        self.callback = callback
+    }
 }

@@ -1,11 +1,7 @@
-
 import UIKit
 
 extension UINavigationController {
-
-	open override var disablesAutomaticKeyboardDismissal: Bool {
-		get {
-			return topViewController!.disablesAutomaticKeyboardDismissal
-		}
-	}
+    override open var disablesAutomaticKeyboardDismissal: Bool {
+        topViewController!.disablesAutomaticKeyboardDismissal
+    }
 }

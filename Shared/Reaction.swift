@@ -1,23 +1,23 @@
-final class Reaction: DataItem {
+import CoreData
 
-	@NSManaged var content: String?
-	@NSManaged var userName: String?
-	@NSManaged var avatarUrl: String?
+final class Reaction: DataItem {
+    @NSManaged var content: String?
+    @NSManaged var userName: String?
+    @NSManaged var avatarUrl: String?
     @NSManaged var userNodeId: String?
 
-	@NSManaged var pullRequest: PullRequest?
-	@NSManaged var issue: Issue?
-	@NSManaged var comment: PRComment?
-    
-    static func sync<T: DataItem>(from nodes: ContiguousArray<GQLNode>, for parentType: T.Type, on server: ApiServer) {
-        syncItems(of: Reaction.self, from: nodes, on: server) { reaction, node in
+    @NSManaged var pullRequest: PullRequest?
+    @NSManaged var issue: Issue?
+    @NSManaged var comment: PRComment?
+
+    static func sync(from nodes: LinkedList<GraphQL.Node>, for parentType: (some DataItem).Type, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
+        syncItems(of: Reaction.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { reaction, node in
             guard node.created || node.updated,
-                let parentId = node.parent?.id,
-                let moc = server.managedObjectContext
-                else { return }
-            
+                  let parentId = node.parent?.id
+            else { return }
+
             if node.created {
-                let parent = DataItem.item(of: parentType, with: parentId, in: moc)
+                let parent = DataItem.parent(of: parentType, with: parentId, in: moc, parentCache: parentCache)
                 reaction.pullRequest = parent as? PullRequest
                 reaction.issue = parent as? Issue
                 reaction.comment = parent as? PRComment
@@ -25,51 +25,53 @@ final class Reaction: DataItem {
                     DLog("Warning: Reaction without parent")
                 }
             }
-            
+
             let info = node.jsonPayload
             reaction.content = info["content"] as? String
 
-            if let user = info["user"] as? [AnyHashable:Any] {
+            if let user = info["user"] as? JSON {
                 reaction.userName = user["login"] as? String
                 reaction.avatarUrl = user["avatarUrl"] as? String
                 reaction.userNodeId = user["id"] as? String
             }
         }
     }
-        
-	static func syncReactions(from data: [[AnyHashable : Any]]?, comment: PRComment) {
-		items(with: data, type: Reaction.self, server: comment.apiServer) { item, info, isNewOrUpdated in
-			if isNewOrUpdated {
+
+    static func syncReactions(from data: [JSON]?, commentId: NSManagedObjectID, serverId: NSManagedObjectID, moc: NSManagedObjectContext) async {
+        await v3items(with: data, type: Reaction.self, serverId: serverId, moc: moc) { item, info, isNewOrUpdated, syncMoc in
+            if isNewOrUpdated, let parent = try? syncMoc.existingObject(with: commentId) as? PRComment {
                 item.pullRequest = nil
                 item.issue = nil
-				item.comment = comment
-				item.fill(from: info)
-			}
-		}
-	}
+                item.comment = parent
+                item.fill(from: info)
+            }
+        }
+    }
 
-	static func syncReactions(from data: [[AnyHashable : Any]]?, parent: ListableItem) {
-		items(with: data, type: Reaction.self, server: parent.apiServer) { item, info, isNewOrUpdated in
-			if isNewOrUpdated {
-				item.pullRequest = parent as? PullRequest
-				item.issue = parent as? Issue
+    static func syncReactions(from data: [JSON]?, parentId: NSManagedObjectID, serverId: NSManagedObjectID, moc: NSManagedObjectContext) async {
+        await v3items(with: data, type: Reaction.self, serverId: serverId, moc: moc) { item, info, isNewOrUpdated, syncMoc in
+            if isNewOrUpdated {
+                let parent = try! syncMoc.existingObject(with: parentId)
+                item.pullRequest = parent as? PullRequest
+                item.issue = parent as? Issue
                 item.comment = nil
-				item.fill(from: info)
-			}
-		}
-	}
+                item.fill(from: info)
+            }
+        }
+    }
 
-	private func fill(from info: [AnyHashable : Any]) {
-		content = info["content"] as? String
-		if let user = info["user"] as? [AnyHashable:Any] {
-			userName = user["login"] as? String
-			avatarUrl = user["avatar_url"] as? String
-			userNodeId = user["node_id"] as? String
-		}
-	}
-    
+    private func fill(from info: JSON) {
+        content = info["content"] as? String
+        if let user = info["user"] as? JSON {
+            userName = user["login"] as? String
+            avatarUrl = user["avatar_url"] as? String
+            userNodeId = user["node_id"] as? String
+        }
+    }
+
+    @MainActor
     func checkNotifications() {
-        if postSyncAction == PostSyncAction.isNew.rawValue && !isMine {
+        if postSyncAction == PostSyncAction.isNew.rawValue, !isMine {
             if let parentItem = (pullRequest ?? issue), Settings.notifyOnItemReactions, parentItem.canBadge {
                 NotificationQueue.add(type: .newReaction, for: self)
 
@@ -79,44 +81,44 @@ final class Reaction: DataItem {
         }
     }
 
-	var isMine: Bool {
-        return userNodeId == apiServer.userNodeId || userNodeId == apiServer.userNodeId
-	}
+    var isMine: Bool {
+        userNodeId == apiServer.userNodeId || userNodeId == apiServer.userNodeId
+    }
 
-	static func changesDetected(in reactions: Set<Reaction>, from info: [AnyHashable : Any]) -> String? {
-		var counts = [String:Int]()
-		for r in reactions {
-			if let c = r.content {
-				if let existingCount = counts[c] {
-					counts[c] = existingCount + 1
-				} else {
-					counts[c] = 1
-				}
-			}
-		}
+    static func changesDetected(in reactions: Set<Reaction>, from info: JSON) -> String? {
+        var counts = [String: Int]()
+        for r in reactions {
+            if let c = r.content {
+                if let existingCount = counts[c] {
+                    counts[c] = existingCount + 1
+                } else {
+                    counts[c] = 1
+                }
+            }
+        }
 
-		for type in ["+1", "-1", "laugh", "confused", "heart", "hooray", "rocket", "eyes", "thumbs_up", "thumbs_down"] {
-			let serverCount = info[type] as? Int ?? 0
-			let localCount = counts[type] ?? 0
-			if serverCount != localCount {
-				return info["url"] as? String
-			}
-		}
+        for type in ["+1", "-1", "laugh", "confused", "heart", "hooray", "rocket", "eyes", "thumbs_up", "thumbs_down"] {
+            let serverCount = info[type] as? Int ?? 0
+            let localCount = counts[type] ?? 0
+            if serverCount != localCount {
+                return info["url"] as? String
+            }
+        }
 
-		return nil
-	}
+        return nil
+    }
 
-	var displaySymbol: String {
+    var displaySymbol: String {
         switch S(content).lowercased() {
-		case "+1", "thumbs_up": return "👍"
-		case "-1", "thumbs_down": return "👎"
-		case "laugh": return "😄"
-		case "confused": return "😕"
-		case "heart": return "❤️"
-		case "hooray": return "🎉"
+        case "+1", "thumbs_up": return "👍"
+        case "-1", "thumbs_down": return "👎"
+        case "laugh": return "😄"
+        case "confused": return "😕"
+        case "heart": return "❤️"
+        case "hooray": return "🎉"
         case "rocket": return "🚀"
         case "eyes": return "👀"
-		default: return "<unknown>"
-		}
-	}
+        default: return "<unknown>"
+        }
+    }
 }

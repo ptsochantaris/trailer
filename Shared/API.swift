@@ -1,182 +1,86 @@
-
-import CoreData
-#if os(iOS)
-	import UIKit
-#endif
 import CommonCrypto
+import CoreData
 
-final class API {
-
-	static var currentNetworkStatus = NetworkStatus.NotReachable
-    
-	private static let cacheDirectory = { ()->String in
-		let fileManager = FileManager.default
-		let appSupportURL = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!
-		return appSupportURL.appendingPathComponent("com.housetrip.Trailer").path
-	}()
-
-	private static let sessionCallbackQueue: OperationQueue = {
-		let o = OperationQueue()
-        o.qualityOfService = .utility
-		o.maxConcurrentOperationCount = 1 // has to be one, as per API spec
-		return o
-	}()
-        
-    private static var urlSessionConfig: URLSessionConfiguration {
-        #if DEBUG
-            #if os(iOS)
-                let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-iOS-Development"
-            #else
-                let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-macOS-Development"
-            #endif
-        #else
-            #if os(iOS)
-                let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-iOS-Release"
-            #else
-                let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-macOS-Release"
-            #endif
-        #endif
-
-        let config = URLSessionConfiguration.default
-        config.httpShouldUsePipelining = true
-        config.httpAdditionalHeaders = ["User-Agent" : userAgent]
-        config.urlCache = URLCache(memoryCapacity: 32 * 1024 * 1024, diskCapacity: 1024 * 1024 * 1024, diskPath: cacheDirectory)
-        return config
-    }
-
-    private static let urlSession: URLSession = {
-        return URLSession(configuration: urlSessionConfig, delegate: nil, delegateQueue: sessionCallbackQueue)
-    }()
-    
-    private static let imageQueue: OperationQueue = {
-        let q = OperationQueue()
-        q.maxConcurrentOperationCount = 8
-        q.qualityOfService = .background
-        return q
-    }()
-    
-    static func task(for request: URLRequest, completion: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
-        return urlSession.dataTask(with: request, completionHandler: completion)
-    }
-    
-    private final class ApiOperation: BlockOperation {
-        var onRun: (()->Void)?
-        override func start() {
-            onRun?()
-            super.start()
+extension String {
+    private func sha1() -> Data {
+        utf8CString.withUnsafeBytes { bytes -> Data in
+            let len = Int(CC_SHA1_DIGEST_LENGTH)
+            var digest = [UInt8](repeating: 0, count: len)
+            CC_SHA1(bytes.baseAddress, CC_LONG(bytes.count), &digest)
+            return Data(bytes: digest, count: len)
         }
     }
-    
-    static func submitDataTask(_ task: URLSessionDataTask, on queue: OperationQueue, onRun: (()->Void)? = nil) {
-        currentOperationCount += 1
-        let group = DispatchGroup()
-        group.enter()
-        
-        var previousState = task.state
-        var o: NSKeyValueObservation? = task.observe(\.state) { t, _ in
-            let newState = t.state
-            if previousState != newState {
-                if previousState == .running && newState != .running {
-                    group.leave()
-                } else if previousState != .running && newState == .running {
-                    onRun?()
-                }
-                previousState = newState
-            }
-        }
-        
-        queue.addOperation {
-            task.resume()
-            group.wait()
-            withExtendedLifetime(o) {
-                withExtendedLifetime(task) {
-                    o = nil
-                    currentOperationCount -= 1
+
+    var fileHash: String {
+        sha1().base64EncodedString().replacingOccurrences(of: "/", with: "-")
+    }
+}
+
+@MainActor
+enum API {
+    static var currentNetworkStatus = NetworkStatus.NotReachable
+
+    private static let reachability = Reachability()
+
+    static func setup() {
+        reachability.startNotifier()
+
+        let n = reachability.status
+        DLog("Network is %@", n.name)
+        currentNetworkStatus = n
+
+        NotificationCenter.default.addObserver(forName: ReachabilityChangedNotification, object: nil, queue: .main) { _ in
+            Task { @MainActor in
+                checkNetworkAvailability()
+                if currentNetworkStatus != .NotReachable {
+                    await app.startRefreshIfItIsDue()
                 }
             }
         }
     }
 
-	private static let reachability = Reachability()
+    private static func checkNetworkAvailability() {
+        let newStatus = reachability.status
+        if newStatus != currentNetworkStatus {
+            currentNetworkStatus = newStatus
+            DLog("Network changed to %@", newStatus.name)
+        }
+    }
 
-	static func setup() {
+    static var hasNetworkConnection: Bool {
+        DLog("Actively verifying reported network availability state…")
+        let previousNetworkStatus = currentNetworkStatus
+        checkNetworkAvailability()
+        if previousNetworkStatus != currentNetworkStatus {
+            DLog("Network state seems to have changed without having been notified, noted")
+        } else {
+            DLog("No change to network state")
+        }
+        return currentNetworkStatus != .NotReachable
+    }
 
-		reachability.startNotifier()
+    /////////////////////////////////////////////////////// Utilities
 
-		let n = reachability.status
-		DLog("Network is %@", n.name)
-		currentNetworkStatus = n
-
-		let fileManager = FileManager.default
-		if fileManager.fileExists(atPath: cacheDirectory) {
-			expireOldImageCacheEntries()
-		} else {
-			try! fileManager.createDirectory(atPath: cacheDirectory, withIntermediateDirectories: true, attributes: nil)
-		}
-
-		NotificationCenter.default.addObserver(forName: ReachabilityChangedNotification, object: nil, queue: .main) { n in
-			checkNetworkAvailability()
-			if currentNetworkStatus != .NotReachable {
-				app.startRefreshIfItIsDue()
-			}
-		}
-	}
-
-	private static func checkNetworkAvailability() {
-		let newStatus = reachability.status
-		if newStatus != currentNetworkStatus {
-			currentNetworkStatus = newStatus
-			DLog("Network changed to %@", newStatus.name)
-			RestAccess.clearAllBadLinks()
-		}
-	}
-
-	static var hasNetworkConnection: Bool {
-		DLog("Actively verifying reported network availability state…")
-		let previousNetworkStatus = currentNetworkStatus
-		checkNetworkAvailability()
-		if previousNetworkStatus != currentNetworkStatus {
-			DLog("Network state seems to have changed without having been notified, noted")
-		} else {
-			DLog("No change to network state")
-		}
-		return currentNetworkStatus != .NotReachable
-	}
-
-	/////////////////////////////////////////////////////// Utilities
-    
     static var currentOperationName = lastSuccessfulSyncAt {
         didSet {
-            assert(Thread.isMainThread)
             DLog("Status update: \(currentOperationName)")
             NotificationCenter.default.post(name: .SyncProgressUpdate, object: nil)
         }
     }
-    private static var currentOperationCount = 0 {
+
+    static var currentOperationCount = 0 {
         didSet {
-            let newValue = currentOperationCount
-            DispatchQueue.main.async {
-                if oldValue == 0 && newValue > 0 {
-                    #if os(iOS)
-                    BackgroundTask.registerForBackground()
-                    #endif
-                } else if oldValue > 0 && newValue == 0 {
-                    #if os(iOS)
-                    BackgroundTask.unregisterForBackground()
-                    #endif
-                }
-                
-                if isRefreshing && currentOperationName.hasPrefix("Fetching…") {
-                    if newValue > 1 {
-                        currentOperationName = "Fetching… (\(newValue) calls queued)"
-                    } else {
-                        currentOperationName = "Fetching…"
-                    }
+            if isRefreshing, currentOperationName.hasPrefix("Fetching…") {
+                let newValue = currentOperationCount
+                if newValue > 1 {
+                    currentOperationName = "Fetching… (\(newValue) calls queued)"
+                } else {
+                    currentOperationName = "Fetching…"
                 }
             }
         }
     }
-    
+
     static var isRefreshing = false {
         didSet {
             if oldValue == isRefreshing {
@@ -201,134 +105,46 @@ final class API {
         }
     }
 
-    static var shouldSyncReactions: Bool {
-        return Settings.notifyOnItemReactions || Settings.notifyOnCommentReactions
-    }
-    static var shouldSyncReviews: Bool {
-        return Settings.displayReviewsOnItems || Settings.notifyOnReviewDismissals || Settings.notifyOnReviewAcceptances || Settings.notifyOnReviewChangeRequests
-    }
-    static var shouldSyncReviewAssignments: Bool {
-        return Settings.displayReviewsOnItems || Settings.showRequestedTeamReviews || Settings.notifyOnReviewAssignments || (Int64(Settings.assignedReviewHandlingPolicy) != Section.none.rawValue)
+    nonisolated static var shouldSyncReactions: Bool {
+        Settings.notifyOnItemReactions || Settings.notifyOnCommentReactions
     }
 
-	///////////////////////////////////////////////////////// Images
-
-	private static func expireOldImageCacheEntries() {
-		let now = Date()
-		let fileManager = FileManager.default
-		for f in try! fileManager.contentsOfDirectory(atPath: cacheDirectory) where f.hasPrefix("imgc-") {
-            do {
-                let path = cacheDirectory.appending(pathComponent: f)
-                let attributes = try fileManager.attributesOfItem(atPath: path)
-                if let date = attributes[.creationDate] as? Date, now.timeIntervalSince(date) > 3600 * 24 {
-                    try? fileManager.removeItem(atPath: path)
-                }
-            } catch {
-                DLog("File error when removing old cached image: %@", error.localizedDescription)
-            }
-		}
-	}
-
-    private static func sha1(_ input: String) -> Data {
-        return input.utf8CString.withUnsafeBytes { bytes -> Data in
-            let len = Int(CC_SHA1_DIGEST_LENGTH)
-            var digest = [UInt8](repeating: 0, count: len)
-            CC_SHA1(bytes.baseAddress, CC_LONG(bytes.count), &digest)
-            return Data(bytes: digest, count: len)
-        }
+    nonisolated static var shouldSyncReviews: Bool {
+        Settings.displayReviewsOnItems || Settings.notifyOnReviewDismissals || Settings.notifyOnReviewAcceptances || Settings.notifyOnReviewChangeRequests
     }
 
-	@discardableResult
-	static func haveCachedAvatar(from path: String, callback: @escaping (IMAGE_CLASS?, String) -> Void) -> Bool {
+    nonisolated static var shouldSyncReviewAssignments: Bool {
+        Settings.displayReviewsOnItems || Settings.showRequestedTeamReviews || Settings.notifyOnReviewAssignments || (Settings.assignedReviewHandlingPolicy != Section.none.rawValue)
+    }
 
-		func getImage(at imagePath: String, completion: @escaping (Data?) -> Void) {
+    ////////////////////////////////////// API interface
 
-			guard let url = URL(string: imagePath) else {
-				completion(nil)
-				return
-			}
-            
-			let task = urlSession.dataTask(with: url) { data, response, error in
-				if error == nil, let d = data, let r = response as? HTTPURLResponse, r.statusCode < 300, r.expectedContentLength == Int64(d.count) {
-					completion(d)
-				} else {
-					completion(nil)
-				}
-			}
-            
-            submitDataTask(task, on: imageQueue)
-		}
+    static func performSync() async {
+        let syncMoc = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
+        syncMoc.undoManager = nil
+        syncMoc.parent = DataManager.main
 
-		let connector = path.contains("?") ? "&" : "?"
-        let absolutePath = "\(path)\(connector)s=128"
-        let hash = sha1("\(absolutePath) \(currentAppVersion)").base64EncodedString()
-		let cachePath = cacheDirectory.appending(pathComponent: "imgc-\(hash)")
-
-        let fileManager = FileManager.default
-        if fileManager.fileExists(atPath: cachePath) {
-            if let imgData = try? Data(contentsOf: URL(fileURLWithPath: cachePath)), let r = IMAGE_CLASS(data: imgData) {
-                DispatchQueue.main.async {
-                    callback(r, cachePath)
-                }
-                return true
-            } else {
-                try? fileManager.removeItem(atPath: cachePath)
-            }
-        }
-
-        #if os(iOS)
-        BackgroundTask.registerForBackground()
-        #endif
-		getImage(at: absolutePath) { data in
-			// in thread
-			var result: IMAGE_CLASS?
-            if let d = data, let i = IMAGE_CLASS(data: d) {
-                result = i
-                try? d.write(to: URL(fileURLWithPath: cachePath))
-            }
-            DispatchQueue.main.async {
-				callback(result, cachePath)
-				#if os(iOS)
-                BackgroundTask.unregisterForBackground()
-				#endif
-			}
-		}
-		return false
-	}
-
-	////////////////////////////////////// API interface
-
-	static func performSync() {
-
-        let syncContext = DataManager.buildChildContext()
-
-        if Settings.useV4API && canUseV4API(for: syncContext) != nil {
+        if Settings.useV4API && canUseV4API(for: syncMoc) != nil {
             return
         }
-        
+
         isRefreshing = true
         currentOperationCount += 1
         currentOperationName = "Fetching…"
 
-		let shouldRefreshReposToo = lastRepoCheck == .distantPast
-			|| (Date().timeIntervalSince(lastRepoCheck) > TimeInterval(Settings.newRepoCheckPeriod * 3600))
-			|| !Repo.anyVisibleRepos(in: syncContext)
-        
-		if shouldRefreshReposToo {
-			fetchRepositories(to: syncContext) {
-				sync(to: syncContext)
-			}
-		} else {
-			ApiServer.resetSyncSuccess(in: syncContext)
-			ensureApiServersHaveUserIds(in: syncContext) {
-				sync(to: syncContext)
-			}
-		}
-	}
-    
-    private static func sync(to moc: NSManagedObjectContext) {
-        
-        let disabledRepos = Repo.unsyncableRepos(in: moc)
+        let lastCheck = lastRepoCheck
+        let shouldRefreshReposToo = lastCheck == .distantPast
+            || (Date().timeIntervalSince(lastCheck) > TimeInterval(Settings.newRepoCheckPeriod * 3600))
+            || !Repo.anyVisibleRepos(in: syncMoc)
+
+        if shouldRefreshReposToo {
+            await fetchRepositories(to: syncMoc)
+        } else {
+            ApiServer.resetSyncSuccess(in: syncMoc)
+            await ensureApiServersHaveUserIds(in: syncMoc)
+        }
+
+        let disabledRepos = Repo.unsyncableRepos(in: syncMoc)
         disabledRepos.forEach {
             $0.pullRequests.forEach {
                 $0.postSyncAction = PostSyncAction.delete.rawValue
@@ -338,354 +154,271 @@ final class API {
             }
         }
 
-        let repos = Repo.syncableRepos(in: moc)
-        let itemGroup = DispatchGroup()
-        let v4Mode = Settings.useV4API
+        let repos = Repo.syncableRepos(in: syncMoc)
 
-        if v4Mode {
-            let servers = ApiServer.allApiServers(in: moc).filter { $0.goodToGo }
-            if !servers.isEmpty {
-                GraphQL.fetchAllAuthoredItems(from: servers, group: itemGroup)
+        DLog("Will sync items from: %@", repos.compactMap(\.fullName).joined(separator: ", "))
+
+        if Settings.useV4API {
+            do {
+                try await v4Sync(repos, to: syncMoc)
+            } catch {
+                DLog("Sync aborted due to error")
             }
-            if !repos.isEmpty {
-                GraphQL.fetchAllSubscribedItems(from: repos, group: itemGroup)
-            }
+
         } else {
-            v3_fetchItems(for: repos, to: moc, group: itemGroup)
-        }
-        
-        let postItemGroup = DispatchGroup()
-        postItemGroup.enter()
-        itemGroup.notify(queue: .main) {
-            let reposWithSomeItems = repos.filter { !$0.issues.isEmpty || !$0.pullRequests.isEmpty }
-            if v4Mode {
-                let newOrUpdatedPrs = DataItem.newOrUpdatedItems(of: PullRequest.self, in: moc, fromSuccessfulSyncOnly: true)
-                let newOrUpdatedIssues = DataItem.newOrUpdatedItems(of: Issue.self, in: moc, fromSuccessfulSyncOnly: true)
-                v4Sync(to: moc, newOrUpdatedPrs: newOrUpdatedPrs, newOrUpdatedIssues: newOrUpdatedIssues, with: postItemGroup)
-            } else {
-                V3_markExtraUpdatedItems(from: reposWithSomeItems, to: moc) {
-                    let newOrUpdatedPrs = DataItem.newOrUpdatedItems(of: PullRequest.self, in: moc, fromSuccessfulSyncOnly: true)
-                    let newOrUpdatedIssues = DataItem.newOrUpdatedItems(of: Issue.self, in: moc, fromSuccessfulSyncOnly: true)
-                    v3Sync(to: moc, newOrUpdatedPrs: newOrUpdatedPrs, newOrUpdatedIssues: newOrUpdatedIssues, with: postItemGroup)
-                }
-            }
-        }
-        
-        postItemGroup.notify(queue: .main) {
-            completeSync(in: moc)
-        }
-	}
-
-	private static func completeSync(in moc: NSManagedObjectContext) {
-
-        let processMoc = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        processMoc.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
-        processMoc.undoManager = nil
-        processMoc.parent = moc
-        processMoc.perform {
-            // discard any changes related to any failed API server
-            for apiServer in ApiServer.allApiServers(in: processMoc) where !apiServer.lastSyncSucceeded {
-                apiServer.rollBackAllUpdates(in: processMoc)
-                apiServer.lastSyncSucceeded = false // we just wiped all changes, but want to keep this one
-            }
-            DataItem.nukeDeletedItems(in: processMoc)
-            DataItem.nukeOrphanedItems(in: processMoc)
-            DataManager.postProcessAllItems(in: processMoc)
-            if processMoc.hasChanges {
-                try? processMoc.save()
-            }
-            DispatchQueue.main.async {
-                completeSync2(in: moc)
-            }
+            await v3Sync(repos, to: syncMoc)
         }
 
-        let total = moc.updatedObjects.count + moc.insertedObjects.count + moc.deletedObjects.count
+        // Transfer done, process
+        let total = syncMoc.updatedObjects.count + syncMoc.insertedObjects.count + syncMoc.deletedObjects.count
         if total > 1, let totalText = numberFormatter.string(for: total) {
             currentOperationName = "Processing \(totalText) items…"
         } else {
             currentOperationName = "Processing update…"
         }
-        DLog("Caching \(numberFormatter.string(for: URLCache.shared.currentMemoryUsage) ?? "") bytes in memory")
-        DLog("Caching \(numberFormatter.string(for: URLCache.shared.currentDiskUsage) ?? "") bytes on disk")
-	}
-    
-    private static func completeSync2(in moc: NSManagedObjectContext) {
-        do {
-            if moc.hasChanges {
-                DLog("Committing synced data")
-                try moc.save()
-                DLog("Synced data committed")
-            } else {
-                DLog("No changes, skipping commit")
-            }
-        } catch {
-            DLog("Committing sync failed: %@", error.localizedDescription)
+
+        // discard any changes related to any failed API server
+        for apiServer in ApiServer.allApiServers(in: syncMoc) where !apiServer.lastSyncSucceeded {
+            apiServer.rollBackAllUpdates(in: syncMoc)
+            apiServer.lastSyncSucceeded = false // we just wiped all changes, but want to keep this one
         }
-        
+        DataItem.nukeDeletedItems(in: syncMoc)
+        DataItem.nukeOrphanedItems(in: syncMoc)
+
+        if syncMoc.hasChanges {
+            do {
+                DLog("Committing synced data")
+                try syncMoc.save()
+                DLog("Synced data committed")
+                await DataManager.sendNotificationsIndexAndSave()
+            } catch {
+                DLog("Committing sync failed: %@", error.localizedDescription)
+            }
+        } else {
+            DLog("No changes, skipping commit")
+        }
+
         isRefreshing = false
         currentOperationCount -= 1
-        
-        DataManager.sendNotificationsIndexAndSave()
     }
-    
+
     static var lastSuccessfulSyncAt: String {
         let last = Settings.lastSuccessfulRefresh ?? Date()
         return agoFormat(prefix: "updated", since: last).capitalFirstLetter
     }
 
-	private static func fetchUserTeams(from server: ApiServer, callback: @escaping Completion) {
-		for t in server.teams {
-			t.postSyncAction = PostSyncAction.delete.rawValue
-		}
-
-        RestAccess.getPagedData(at: "/user/teams", from: server, perPageCallback: { data, lastPage in
-			Team.syncTeams(from: data, server: server)
-			return false
-		}) { success, resultCode in
-			if !success {
-				server.lastSyncSucceeded = false
-			}
-			callback()
-		}
-	}
-
-	static func fetchRepositories(to moc: NSManagedObjectContext, callback: @escaping Completion) {
-        
-		ApiServer.resetSyncSuccess(in: moc)
-        RestAccess.clearAllBadLinks() // otherwise inaccessible repos may get a cached error response, even if they have become available
-
-        let group = DispatchGroup()
-        
-        group.enter()
-		syncUserDetails(in: moc) {
-            
-			for r in DataItem.items(of: Repo.self, surviving: true, in: moc) {
-                r.postSyncAction = r.shouldBeWipedIfNotInWatchlist ? PostSyncAction.delete.rawValue : PostSyncAction.doNothing.rawValue
-			}
-
-            let goodToGoServers = ApiServer.allApiServers(in: moc).filter { $0.goodToGo }
-			for apiServer in goodToGoServers {
-                
-                group.enter()
-                syncWatchedRepos(from: apiServer) {
-                    group.leave()
-                }
-                
-                group.enter()
-				syncManuallyAddedRepos(from: apiServer) {
-                    group.leave()
-                }
-                
-                group.enter()
-				fetchUserTeams(from: apiServer) {
-                    group.leave()
-                }
-			}
-            
-            group.leave() // syncUserDetails
-		}
-        
-        group.notify(queue: .main) {
-            if Settings.hideArchivedRepos { Repo.hideArchivedRepos(in: moc) }
-            for r in DataItem.newItems(of: Repo.self, in: moc) {
-                if r.shouldSync {
-                    NotificationQueue.add(type: .newRepoAnnouncement, for: r)
-                }
-            }
-            lastRepoCheck = Date()
-            callback()
+    private static func fetchUserTeams(from server: ApiServer, moc: NSManagedObjectContext) async {
+        for t in server.teams {
+            t.postSyncAction = PostSyncAction.delete.rawValue
         }
-	}
 
-	private static func ensureApiServersHaveUserIds(in moc: NSManagedObjectContext, callback: @escaping Completion) {
-		var needToCheck = false
-		for apiServer in ApiServer.allApiServers(in: moc) {
-            if apiServer.userNodeId == nil || (apiServer.userName?.isEmpty ?? true) {
-				needToCheck = true
-				break
-			}
-		}
+        let serverId = server.objectID
+        let result = await RestAccess.getPagedData(at: "/user/teams", from: server) { data, _ in
+            await Team.syncTeams(from: data, serverId: serverId, moc: moc)
+            return false
+        }
+        switch result {
+        case .success:
+            break
+        case .deleted, .failed, .notFound:
+            server.lastSyncSucceeded = false
+        }
+    }
 
-		if needToCheck {
-			DLog("Some API servers don't have user details yet, will bring user credentials down for them")
-			syncUserDetails(in: moc, callback: callback)
-		} else {
-			callback()
-		}
-	}
+    // moc must have been created in an @APIActor task
+    static func fetchRepositories(to moc: NSManagedObjectContext) async {
+        ApiServer.resetSyncSuccess(in: moc)
 
-	private static func getRateLimit(from server: ApiServer, callback: @escaping (_ limits: ApiStats?)->Void) {
+        await syncUserDetails(in: moc)
 
-        RestAccess.start(call: "/rate_limit", on: server, triggeredByUser: true) { code, headers, data, error, shouldRetry in
+        for r in DataItem.items(of: Repo.self, surviving: true, in: moc) {
+            r.postSyncAction = r.shouldBeWipedIfNotInWatchlist ? PostSyncAction.delete.rawValue : PostSyncAction.doNothing.rawValue
+        }
 
-			if error == nil, let h = headers {
-				callback(ApiStats.fromV3(headers: h))
-			} else if code == 404, let d = data as? [AnyHashable : Any], let m = d["message"] as? String, m != "Not Found" { // is GE account
-				callback(ApiStats.noLimits)
-			} else {
-				callback(nil)
-			}
-		}
-	}
-
-	static func updateLimitsFromServer() {
-		let configuredServers = ApiServer.allApiServers(in: DataManager.main).filter { $0.goodToGo }
-		for apiServer in configuredServers {
-			getRateLimit(from: apiServer) { limits in
-				if let l = limits {
-					apiServer.updateApiStats(l)
-				}
-			}
-		}
-	}
-
-	private static func syncManuallyAddedRepos(from server: ApiServer, callback: @escaping Completion) {
-		if !server.lastSyncSucceeded {
-			callback()
-			return
-		}
-
-		let repos = server.repos.filter { $0.manuallyAdded }
-        let group = DispatchGroup()
-		for repo in repos {
-            group.enter()
-            fetchRepo(fullName: repo.fullName ?? "", from: server) { error in
-                if error != nil {
-                    server.lastSyncSucceeded = false
+        let goodToGoServers = ApiServer.allApiServers(in: moc).filter(\.goodToGo)
+        await withTaskGroup(of: Void.self) { group in
+            for apiServer in goodToGoServers {
+                group.addTask { @MainActor in
+                    await syncWatchedRepos(from: apiServer, moc: moc)
                 }
-                group.leave()
+                group.addTask { @MainActor in
+                    await syncManuallyAddedRepos(from: apiServer, moc: moc)
+                }
+                group.addTask { @MainActor in
+                    await fetchUserTeams(from: apiServer, moc: moc)
+                }
             }
-		}
-        group.notify(queue: .main, execute: callback)
-	}
+        }
 
-	private static func syncWatchedRepos(from server: ApiServer, callback: @escaping Completion) {
+        if Settings.hideArchivedRepos { Repo.hideArchivedRepos(in: moc) }
+        for r in DataItem.newItems(of: Repo.self, in: moc) where r.shouldSync {
+            NotificationQueue.add(type: .newRepoAnnouncement, for: r)
+        }
+        lastRepoCheck = Date()
+    }
 
-		if !server.lastSyncSucceeded {
-			callback()
-			return
-		}
+    private static func ensureApiServersHaveUserIds(in moc: NSManagedObjectContext) async {
+        var needToCheck = false
+        for apiServer in ApiServer.allApiServers(in: moc) {
+            if apiServer.userNodeId == nil || (apiServer.userName?.isEmpty ?? true) {
+                needToCheck = true
+                break
+            }
+        }
 
-		let createNewRepos = Settings.automaticallyRemoveDeletedReposFromWatchlist
-		RestAccess.getPagedData(at: "/user/subscriptions", from: server, perPageCallback: { data, lastPage in
-			Repo.syncRepos(from: data, server: server, addNewRepos: createNewRepos, manuallyAdded: false)
-			return false
-		}) { success, resultCode in
-			if !success {
-				server.lastSyncSucceeded = false
-			} else if !Settings.automaticallyRemoveDeletedReposFromWatchlist { // Ignore any missing repos in all cases if deleteGoneRepos is false
-				let reposThatWouldBeDeleted = Repo.items(of: Repo.self, surviving: false, in: server.managedObjectContext!)
-				for r in reposThatWouldBeDeleted {
-					r.postSyncAction = PostSyncAction.doNothing.rawValue
-				}
-			}
-			callback()
-		}
-	}
+        if needToCheck {
+            DLog("Some API servers don't have user details yet, will bring user credentials down for them")
+            await syncUserDetails(in: moc)
+        }
+    }
 
-	static func fetchRepo(fullName: String, from server: ApiServer, completion: @escaping (Error?) -> Void) {
-		let path = "\(server.apiPath ?? "")/repos/\(fullName)"
-        RestAccess.getData(in: path, from: server) { data, lastPage, resultCode in
-			if let repoData = data as? [AnyHashable : Any] {
-				Repo.syncRepos(from: [repoData], server: server, addNewRepos: true, manuallyAdded: true)
-				completion(nil)
-			} else {
-				let error = apiError("Operation failed with code \(resultCode)")
-				completion(error)
-			}
-		}
-	}
+    private static func getRateLimit(from server: ApiServer) async -> ApiStats? {
+        do {
+            let (code, _) = try await RestAccess.start(call: "/rate_limit", on: server, triggeredByUser: true)
+            switch code {
+            case .notFound:
+                // is GE account
+                return ApiStats.noLimits
+            case .deleted, .failed:
+                break
+            case let .success(headers, _):
+                return ApiStats.fromV3(headers: headers)
+            }
+        } catch {}
+        return nil
+    }
 
-	static func fetchAllRepos(owner: String, from server: ApiServer, completion: @escaping (Error?) -> Void) {
-		let group = DispatchGroup()
+    static func updateLimitsFromServer() async {
+        let configuredServers = ApiServer.allApiServers(in: DataManager.main).filter(\.goodToGo)
+        for apiServer in configuredServers {
+            if let l = await getRateLimit(from: apiServer) {
+                apiServer.updateApiStats(l)
+            }
+        }
+    }
 
-		group.enter()
-		var userError: Error?
-		var userList = [[AnyHashable : Any]]()
-		let userPath = "\(server.apiPath ?? "")/users/\(owner)/repos"
-		RestAccess.getPagedData(at: userPath, from: server, perPageCallback: { data, lastPage -> Bool in
-			if let data = data {
-				userList.append(contentsOf: data)
-			}
-			return false
-		}, finalCallback: { success, resultCode in
-			if !success {
-				userError = apiError("Operation failed with code \(resultCode)")
-			}
-			group.leave()
-		})
+    private static func syncManuallyAddedRepos(from server: ApiServer, moc: NSManagedObjectContext) async {
+        if !server.lastSyncSucceeded {
+            return
+        }
 
-		group.enter()
-		var orgError: Error?
-		var orgList = [[AnyHashable : Any]]()
-		let orgPath = "\(server.apiPath ?? "")/orgs/\(owner)/repos"
-		RestAccess.getPagedData(at: orgPath, from: server, perPageCallback: { data, lastPage -> Bool in
-			if let data = data {
-				orgList.append(contentsOf: data)
-			}
-			return false
-		}, finalCallback: { success, resultCode in
-			if !success {
-				orgError = apiError("Operation failed with code \(resultCode)")
-			}
-			group.leave()
-		})
+        let repos = server.repos.filter(\.manuallyAdded)
+        for repo in repos {
+            do {
+                try await fetchRepo(fullName: repo.fullName ?? "", from: server, moc: moc)
+            } catch {
+                server.lastSyncSucceeded = false
+            }
+        }
+    }
 
-		group.notify(queue: .main) {
-			if let orgError = orgError as NSError?, let userError = userError as NSError? {
-				if orgError.code == 404 {
-					completion(userError)
-				} else {
-					completion(orgError)
-				}
-			} else {
-				Repo.syncRepos(from: userList+orgList, server: server, addNewRepos: true, manuallyAdded: true)
-				completion(nil)
-			}
-		}
-	}
+    private static func syncWatchedRepos(from server: ApiServer, moc: NSManagedObjectContext) async {
+        if !server.lastSyncSucceeded {
+            return
+        }
 
-	static func fetchRepo(named: String, owner: String, from server: ApiServer, completion: @escaping (Error?) -> Void) {
-		fetchRepo(fullName: "\(owner)/\(named)", from: server, completion: completion)
-	}
+        let createNewRepos = Settings.automaticallyRemoveDeletedReposFromWatchlist
+        let result = await RestAccess.getPagedData(at: "/user/subscriptions", from: server) { data, _ in
+            await Repo.syncRepos(from: data, server: server, addNewRepos: createNewRepos, manuallyAdded: false, moc: moc)
+            return false
+        }
+        switch result {
+        case .success:
+            if !Settings.automaticallyRemoveDeletedReposFromWatchlist { // Ignore any missing repos in all cases if deleteGoneRepos is false
+                let reposThatWouldBeDeleted = Repo.items(of: Repo.self, surviving: false, in: server.managedObjectContext!)
+                for r in reposThatWouldBeDeleted {
+                    r.postSyncAction = PostSyncAction.doNothing.rawValue
+                }
+            }
+        case .deleted, .failed, .notFound:
+            server.lastSyncSucceeded = false
+        }
+    }
 
-	private static func syncUserDetails(in moc: NSManagedObjectContext, callback: @escaping Completion) {
+    static func fetchRepo(fullName: String, from server: ApiServer, moc: NSManagedObjectContext) async throws {
+        let path = "\(server.apiPath ?? "")/repos/\(fullName)"
+        do {
+            let (data, _, _) = try await RestAccess.getData(in: path, from: server)
+            if let repoData = data as? JSON {
+                await Repo.syncRepos(from: [repoData], server: server, addNewRepos: true, manuallyAdded: true, moc: moc)
+            }
+        } catch {
+            let resultCode = (error as NSError).code
+            throw apiError("Operation failed with code \(resultCode)")
+        }
+    }
 
-		let configuredServers = ApiServer.allApiServers(in: moc).filter { $0.goodToGo }
-        let group = DispatchGroup()
-		for apiServer in configuredServers {
-            group.enter()
-            RestAccess.getData(in: "/user", from: apiServer) { data, lastPage, resultCode in
+    static func fetchAllRepos(owner: String, from server: ApiServer, moc: NSManagedObjectContext) async throws {
+        let userPath = "\(server.apiPath ?? "")/users/\(owner)/repos"
+        let userTask = Task { () -> [JSON] in
+            var userList = [JSON]()
+            let result = await RestAccess.getPagedData(at: userPath, from: server) { data, _ -> Bool in
+                if let data {
+                    userList.append(contentsOf: data)
+                }
+                return false
+            }
+            switch result {
+            case .success:
+                return userList
+            case .notFound:
+                throw apiError("Operation failed with code 404")
+            case .deleted:
+                throw apiError("Operation failed with code 410")
+            case let .failed(code):
+                throw apiError("Operation failed with code \(code)")
+            }
+        }
 
-				if let d = data as? [AnyHashable : Any] {
-					apiServer.userName = d["login"] as? String
+        let orgPath = "\(server.apiPath ?? "")/orgs/\(owner)/repos"
+        let orgTask = Task { () -> [JSON] in
+            var orgList = [JSON]()
+            let result = await RestAccess.getPagedData(at: orgPath, from: server) { data, _ -> Bool in
+                if let data {
+                    orgList.append(contentsOf: data)
+                }
+                return false
+            }
+            switch result {
+            case .success:
+                return orgList
+            case .notFound:
+                throw apiError("Operation failed with code 404")
+            case .deleted:
+                throw apiError("Operation failed with code 410")
+            case let .failed(code):
+                throw apiError("Operation failed with code \(code)")
+            }
+        }
+
+        let userList = try await userTask.value
+        let orgList = try await orgTask.value
+
+        await Repo.syncRepos(from: userList + orgList, server: server, addNewRepos: true, manuallyAdded: true, moc: moc)
+    }
+
+    static func fetchRepo(named: String, owner: String, from server: ApiServer, moc: NSManagedObjectContext) async throws {
+        try await fetchRepo(fullName: "\(owner)/\(named)", from: server, moc: moc)
+    }
+
+    private static func syncUserDetails(in moc: NSManagedObjectContext) async {
+        let configuredServers = ApiServer.allApiServers(in: moc).filter(\.goodToGo)
+        for apiServer in configuredServers {
+            do {
+                let (data, _, _) = try await RestAccess.getData(in: "/user", from: apiServer)
+                if let d = data as? JSON {
+                    apiServer.userName = d["login"] as? String
                     apiServer.userNodeId = d["node_id"] as? String
-				} else {
-					apiServer.lastSyncSucceeded = false
-				}
-                group.leave()
-			}
-		}
-        group.notify(queue: .main, execute: callback)
-	}
+                } else {
+                    apiServer.lastSyncSucceeded = false
+                }
+            } catch {
+                apiServer.lastSyncSucceeded = false
+            }
+        }
+    }
 
-	static func testApi(to apiServer: ApiServer, callback: @escaping (Error?) -> Void) {
-
-        RestAccess.start(call: "/user", on: apiServer, triggeredByUser: true) { code, headers, data, error, shouldRetry in
-			if let d = data as? [AnyHashable : Any], let userName = d["login"] as? String, let userId = d["id"] as? Int64, error == nil {
-				if userName.isEmpty || userId <= 0 {
-					let localError = apiError("Could not read a valid user record from this endpoint")
-					callback(localError)
-				} else {
-					callback(error)
-				}
-			} else {
-				callback(error)
-			}
-		}
-	}
-
-	static func apiError(_ message: String) -> Error {
-		return NSError(domain: "API Error", code: -1, userInfo: [NSLocalizedDescriptionKey: message])
-	}
+    nonisolated static func apiError(_ message: String) -> Error {
+        NSError(domain: "API Error", code: -1, userInfo: [NSLocalizedDescriptionKey: message])
+    }
 }

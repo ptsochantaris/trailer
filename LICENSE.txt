@@ -1,6 +1,6 @@
 The MIT License (MIT)
 
-Copyright (c) 2014-2021 Paul Tsochantaris
+Copyright (c) 2014-2022 Paul Tsochantaris
 Parts copyright (c) 2013-2014 HouseTrip Ltd.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

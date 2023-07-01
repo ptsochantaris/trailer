@@ -1,11 +1,9 @@
-
 import UIKit
 
 final class CommentBlacklistViewController: UITableViewController {
-    
     enum Mode {
         case commentAuthors, labels, itemAuthors
-        
+
         var title: String {
             switch self {
             case .commentAuthors: return "Block Commenters"
@@ -13,7 +11,7 @@ final class CommentBlacklistViewController: UITableViewController {
             case .itemAuthors: return "Block Authors"
             }
         }
-        
+
         var placeholder: String {
             switch self {
             case .commentAuthors: return "Username"
@@ -21,7 +19,7 @@ final class CommentBlacklistViewController: UITableViewController {
             case .itemAuthors: return "Username"
             }
         }
-        
+
         var inputTitle: String {
             switch self {
             case .commentAuthors: return "Block commenter"
@@ -29,7 +27,7 @@ final class CommentBlacklistViewController: UITableViewController {
             case .itemAuthors: return "Block author"
             }
         }
-        
+
         var inputText: String {
             switch self {
             case .commentAuthors: return "Comments from this user will not produce notifications"
@@ -38,45 +36,45 @@ final class CommentBlacklistViewController: UITableViewController {
             }
         }
     }
-    
+
     var mode = Mode.commentAuthors
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.navigationItem.title = self.mode.title
+        navigationItem.title = mode.title
     }
 
-	override func numberOfSections(in tableView: UITableView) -> Int {
-		return getBlacklist().isEmpty ? 0 : 1
-	}
+    override func numberOfSections(in _: UITableView) -> Int {
+        getBlacklist().isEmpty ? 0 : 1
+    }
 
-	override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-		return true
-	}
+    override func tableView(_: UITableView, canEditRowAt _: IndexPath) -> Bool {
+        true
+    }
 
-	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		return getBlacklist().count
-	}
+    override func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
+        getBlacklist().count
+    }
 
-	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCell(withIdentifier: "UsernameCell", for: indexPath)
-		cell.textLabel?.text = getBlacklist()[indexPath.row]
-		return cell
-	}
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "UsernameCell", for: indexPath)
+        cell.textLabel?.text = getBlacklist()[indexPath.row]
+        return cell
+    }
 
-	override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-		if editingStyle == .delete {
-			var blackList = getBlacklist()
-			blackList.remove(at: indexPath.row)
-			storeBlacklist(blackList)
-			if blackList.isEmpty { // last delete
-				tableView.deleteSections(IndexSet(integer: 0), with: .fade)
-			} else {
-				tableView.deleteRows(at: [indexPath], with: .fade)
-			}
-		}
-	}
-    
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            var blackList = getBlacklist()
+            blackList.remove(at: indexPath.row)
+            storeBlacklist(blackList)
+            if blackList.isEmpty { // last delete
+                tableView.deleteSections(IndexSet(integer: 0), with: .fade)
+            } else {
+                tableView.deleteRows(at: [indexPath], with: .fade)
+            }
+        }
+    }
+
     private func getBlacklist() -> [String] {
         switch mode {
         case .commentAuthors:
@@ -87,7 +85,7 @@ final class CommentBlacklistViewController: UITableViewController {
             return Settings.itemAuthorBlacklist
         }
     }
-    
+
     private func storeBlacklist(_ newList: [String]) {
         switch mode {
         case .commentAuthors:
@@ -97,28 +95,29 @@ final class CommentBlacklistViewController: UITableViewController {
         case .itemAuthors:
             Settings.itemAuthorBlacklist = newList
         }
-        DataManager.postProcessAllItems()
+        Task {
+            await DataManager.postProcessAllItems(in: DataManager.main)
+        }
     }
 
-	@IBAction private func addSelected() {
-
+    @IBAction private func addSelected() {
         let a = UIAlertController(title: mode.inputTitle, message: mode.inputText, preferredStyle: .alert)
-		a.addTextField { textField in
+        a.addTextField { textField in
             textField.placeholder = self.mode.placeholder
-		}
-		a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-		a.addAction(UIAlertAction(title: "Block", style: .default) { action in
+        }
+        a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        a.addAction(UIAlertAction(title: "Block", style: .default) { _ in
 
-			guard let tf = a.textFields?.first, let n = tf.text?.trim else {
+            guard let tf = a.textFields?.first, let n = tf.text?.trim else {
                 return
             }
 
             let name = n.hasPrefix("@") ? String(n.dropFirst()) : n
 
-            DispatchQueue.main.async { [weak self] in
+            Task { @MainActor [weak self] in
                 guard let S = self else { return }
                 var blackList = S.getBlacklist()
-                if !name.isEmpty && !blackList.contains(name) {
+                if !name.isEmpty, !blackList.contains(name) {
                     blackList.append(name)
                     S.storeBlacklist(blackList)
                     let ip = IndexPath(row: blackList.count - 1, section: 0)
@@ -129,8 +128,8 @@ final class CommentBlacklistViewController: UITableViewController {
                     }
                 }
             }
-		})
+        })
 
-		present(a, animated: true)
-	}
+        present(a, animated: true)
+    }
 }
