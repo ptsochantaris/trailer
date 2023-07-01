@@ -68,7 +68,7 @@ class DataItem: NSManagedObject {
         for info in infos {
             let nodeId = info["node_id"] as! String
             nodeIdsToInfo[nodeId] = info
-            if let legacyId = info["id"] as? Int { // TODO: only do this if migration not yet recorded
+            if let legacyId = info["id"] as? Int {
                 legacyIdsToNodeIds[legacyId] = nodeId
             }
         }
@@ -82,19 +82,21 @@ class DataItem: NSManagedObject {
             f.returnsObjectsAsFaults = false
             f.includesSubentities = false
 
-            let legacyServerIds = legacyIdsToNodeIds.map { k, _ in k }
-            f.predicate = NSPredicate(format: "serverId in %@ and apiServer == %@", legacyServerIds, serverId)
-            for item in try! child.fetch(f) {
-                if let legacyId = item.value(forKey: "serverId") as? Int {
-                    if let nodeId = legacyIdsToNodeIds[legacyId] {
-                        item.nodeId = nodeId
-                        item.setValue(nil, forKey: "serverId")
-                        DLog("Migrated \(entityName) from legacy ID \(legacyId) to node ID \(nodeId)")
+            let legacyServerIds = Array(legacyIdsToNodeIds.keys)
+            if !legacyServerIds.isEmpty {
+                f.predicate = NSPredicate(format: "nodeId == nil and serverId in %@ and apiServer == %@", legacyServerIds, serverId)
+                for item in try! child.fetch(f) {
+                    if let legacyId = item.value(forKey: "serverId") as? Int {
+                        if let nodeId = legacyIdsToNodeIds[legacyId] {
+                            item.nodeId = nodeId
+                            item.setValue(nil, forKey: "serverId")
+                            DLog("Migrated \(entityName) from legacy ID \(legacyId) to node ID \(nodeId)")
+                        } else {
+                            DLog("Warning: Migration failed for \(entityName) with legacy ID \(legacyId), could not find node ID")
+                        }
                     } else {
-                        DLog("Warning: Migration failed for \(entityName) with legacy ID \(legacyId), could not find node ID")
+                        DLog("Warning: Migration failed for \(entityName) - could not read legacy ID!")
                     }
-                } else {
-                    DLog("Warning: Migration failed for \(entityName) - could not read legacy ID!")
                 }
             }
 
@@ -121,7 +123,7 @@ class DataItem: NSManagedObject {
                 }
             }
 
-            if !createNewItems { return }
+            guard createNewItems else { return }
 
             for nodeId in nodeIdsOfItems {
                 if let info = nodeIdsToInfo[nodeId], let apiServer = try? child.existingObject(with: serverId) as? ApiServer {
