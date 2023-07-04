@@ -220,14 +220,14 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         switch type {
         case .newMention:
             guard let c = item as? PRComment, let parent = c.parent, !parent.shouldSkipNotifications else { return }
-            notification.title = "@\(S(c.userName)) Mentioned You:"
+            notification.title = "@\(c.userName.orEmpty) Mentioned You:"
             notification.subtitle = c.notificationSubtitle
             notification.informativeText = c.body
             addPotentialExtraActions()
 
         case .newComment:
             guard let c = item as? PRComment, let parent = c.parent, !parent.shouldSkipNotifications else { return }
-            notification.title = "@\(S(c.userName)) Commented:"
+            notification.title = "@\(c.userName.orEmpty) Commented:"
             notification.subtitle = c.notificationSubtitle
             notification.informativeText = c.body
             addPotentialExtraActions()
@@ -314,7 +314,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
             guard let r = item as? Review else { return }
             let p = r.pullRequest
             if p.shouldSkipNotifications { return }
-            notification.title = "@\(S(r.username)) Approved Changes"
+            notification.title = "@\(r.username.orEmpty) Approved Changes"
             notification.subtitle = p.title
             notification.informativeText = r.body
             notification.contentImage = #imageLiteral(resourceName: "approvesChangesIcon")
@@ -324,7 +324,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
             guard let r = item as? Review else { return }
             let p = r.pullRequest
             if p.shouldSkipNotifications { return }
-            notification.title = "@\(S(r.username)) Requests Changes"
+            notification.title = "@\(r.username.orEmpty) Requests Changes"
             notification.subtitle = p.title
             notification.informativeText = r.body
             notification.contentImage = #imageLiteral(resourceName: "requestsChangesIcon")
@@ -334,7 +334,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
             guard let r = item as? Review else { return }
             let p = r.pullRequest
             if p.shouldSkipNotifications { return }
-            notification.title = "@\(S(r.username)) Dismissed A Review"
+            notification.title = "@\(r.username.orEmpty) Dismissed A Review"
             notification.subtitle = p.title
             notification.informativeText = r.body
             addPotentialExtraActions()
@@ -356,7 +356,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         case .newReaction:
             guard let r = item as? Reaction else { return }
             notification.title = r.displaySymbol
-            notification.subtitle = "@\(S(r.userName))"
+            notification.subtitle = "@\(r.userName.orEmpty)"
             if let c = r.comment, let p = c.pullRequest, !p.shouldSkipNotifications {
                 notification.informativeText = c.body
                 addPotentialExtraActions()
@@ -591,7 +591,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         let url = URL(fileURLWithPath: filename)
         let ext = url.pathExtension
         if ext == "trailerSettings" {
-            DLog("Will open %@", url.absoluteString)
+            DLog("Will open \(url.absoluteString)")
             Task {
                 await tryLoadSettings(from: url, skipConfirm: Settings.dontConfirmSettingsImport)
             }
@@ -680,7 +680,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
             let howLongAgo = Date().timeIntervalSince(l).rounded()
             let howLongUntilNextSync = Settings.refreshPeriod - howLongAgo
             if howLongUntilNextSync > 0 {
-                DLog("No need to refresh yet, will refresh in %@ sec", howLongUntilNextSync)
+                DLog("No need to refresh yet, will refresh in \(howLongUntilNextSync) sec")
                 setupRefreshTask(in: howLongUntilNextSync)
                 return
             }
@@ -693,7 +693,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         for apiServer in ApiServer.allApiServers(in: DataManager.main) {
             if apiServer.goodToGo, apiServer.hasApiLimit, let resetDate = apiServer.resetDate {
                 if apiServer.shouldReportOverTheApiLimit {
-                    let apiLabel = S(apiServer.label)
+                    let apiLabel = apiServer.label.orEmpty
                     let resetDateString = itemDateFormatter.string(from: resetDate)
 
                     let alert = NSAlert()
@@ -702,7 +702,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                     _ = alert.addButton(withTitle: "OK")
                     _ = alert.runModal()
                 } else if apiServer.shouldReportCloseToApiLimit {
-                    let apiLabel = S(apiServer.label)
+                    let apiLabel = apiServer.label.orEmpty
                     let resetDateString = itemDateFormatter.string(from: resetDate)
 
                     let alert = NSAlert()

@@ -81,13 +81,13 @@ final class PRComment: DataItem {
         }
         if contains(terms: ["@\(apiServer.userName!)"]) {
             if parent.isSnoozing, parent.shouldWakeOnMention {
-                DLog("Waking up snoozed item ID %@ because of mention", parent.nodeId ?? "<no ID>")
+                DLog("Waking up snoozed item ID \(parent.nodeId ?? "<no ID>") because of mention")
                 parent.wakeUp()
             }
             NotificationQueue.add(type: .newMention, for: self)
         } else if !isMine {
             if parent.isSnoozing, parent.shouldWakeOnComment {
-                DLog("Waking up snoozed item ID %@ because of posted comment", parent.nodeId ?? "<no ID>")
+                DLog("Waking up snoozed item ID \(parent.nodeId ?? "<no ID>") because of posted comment")
                 parent.wakeUp()
             }
             guard !Settings.disableAllCommentNotifications, let authorName = userName else {
@@ -95,9 +95,9 @@ final class PRComment: DataItem {
             }
             let blocked = Settings.commentAuthorBlacklist.contains { authorName.compare($0, options: [.caseInsensitive, .diacriticInsensitive]) == .orderedSame }
             if blocked {
-                DLog("Blocked notification for user '%@' as their name is on the blacklist", authorName)
+                DLog("Blocked notification for user '\(authorName)' as their name is on the blacklist")
             } else {
-                DLog("User '%@' not on blacklist, can post notification", authorName)
+                DLog("User '\(authorName)' not on blacklist, can post notification")
                 NotificationQueue.add(type: .newComment, for: self)
             }
         }

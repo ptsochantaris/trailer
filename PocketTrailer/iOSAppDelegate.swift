@@ -118,7 +118,7 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
             let howLongAgo = Date().timeIntervalSince(l).rounded()
             let howLongUntilNextSync = Settings.backgroundRefreshPeriod - howLongAgo
             if howLongUntilNextSync > 0 {
-                DLog("No need to refresh yet, will refresh in %@ sec", howLongUntilNextSync)
+                DLog("No need to refresh yet, will refresh in \(howLongUntilNextSync) sec")
                 return
             }
         }
@@ -129,13 +129,13 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
         for apiServer in ApiServer.allApiServers(in: DataManager.main) {
             if apiServer.goodToGo, apiServer.hasApiLimit, let resetDate = apiServer.resetDate {
                 if apiServer.shouldReportOverTheApiLimit {
-                    let apiLabel = S(apiServer.label)
+                    let apiLabel = apiServer.label.orEmpty
                     let resetDateString = itemDateFormatter.string(from: resetDate)
 
                     showMessage("\(apiLabel) API request usage is over the limit!",
                                 "Your request cannot be completed until GitHub resets your hourly API allowance at \(resetDateString).\n\nIf you get this error often, try to make fewer manual refreshes or reducing the number of repos you are monitoring.\n\nYou can check your API usage at any time from the bottom of the preferences pane at any time.")
                 } else if apiServer.shouldReportCloseToApiLimit {
-                    let apiLabel = S(apiServer.label)
+                    let apiLabel = apiServer.label.orEmpty
                     let resetDateString = itemDateFormatter.string(from: resetDate)
 
                     showMessage("\(apiLabel) API request usage is close to full",

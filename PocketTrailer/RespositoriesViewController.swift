@@ -144,7 +144,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
                 if ApiServer.shouldReportRefreshFailure(in: tempContext) {
                     var errorServers = [String]()
                     for apiServer in ApiServer.allApiServers(in: tempContext) where apiServer.goodToGo && !apiServer.lastSyncSucceeded {
-                        errorServers.append(S(apiServer.label))
+                        errorServers.append(apiServer.label.orEmpty)
                     }
                     let serverNames = errorServers.joined(separator: ", ")
                     Task { @MainActor in
@@ -243,7 +243,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
         let titleColor: UIColor = repo.shouldSync ? UIColor.label : UIColor.tertiaryLabel
         let titleAttributes = [NSAttributedString.Key.foregroundColor: titleColor]
 
-        let title = NSMutableAttributedString(attributedString: NSAttributedString(string: S(repo.fullName), attributes: titleAttributes))
+        let title = NSMutableAttributedString(attributedString: NSAttributedString(string: repo.fullName.orEmpty, attributes: titleAttributes))
         title.append(NSAttributedString(string: "\n", attributes: titleAttributes))
         let groupTitle = groupTitleForRepo(repo: repo)
         title.append(groupTitle)
@@ -278,7 +278,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
     }
 
     private func titleForRepo(repo: Repo) -> NSAttributedString {
-        let fullName = S(repo.fullName)
+        let fullName = repo.fullName.orEmpty
         let text = repo.inaccessible ? "\(fullName) (inaccessible)" : fullName
         let color: UIColor = repo.shouldSync ? UIColor.label : UIColor.tertiaryLabel
         return NSAttributedString(string: text, attributes: [NSAttributedString.Key.foregroundColor: color])

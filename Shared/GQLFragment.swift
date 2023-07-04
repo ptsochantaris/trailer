@@ -57,18 +57,15 @@ extension GraphQL {
             self.elements = elements()
         }
 
-        func scan(query: Query, pageData: Any, parent: Node?) async -> LinkedList<Query> {
+        func scan(query: Query, pageData: Any, parent: Node?, extraQueries: LinkedList<Query>) async throws {
             // DLog("\(query.logPrefix)Scanning fragment \(name)")
-            guard let hash = pageData as? JSON else { return LinkedList<Query>() }
+            guard let hash = pageData as? JSON else { return }
 
-            let extraQueries = LinkedList<Query>()
             for element in elements {
                 if let element = element as? GQLScanning, let elementData = hash[element.name] {
-                    let newQueries = await element.scan(query: query, pageData: elementData, parent: parent)
-                    extraQueries.append(contentsOf: newQueries)
+                    try await element.scan(query: query, pageData: elementData, parent: parent, extraQueries: extraQueries)
                 }
             }
-            return extraQueries
         }
 
         func hash(into hasher: inout Hasher) {

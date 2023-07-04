@@ -85,7 +85,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
             view.endEditing(false)
             return false
         }
-        token = S(textField.text)
+        token = textField.text.orEmpty
         if let r = Range(range, in: token) {
             token = token.replacingCharacters(in: r, with: string)
         }

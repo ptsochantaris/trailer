@@ -45,7 +45,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
 
     @MainActor
     private func handle(message: JSON) async -> JSON {
-        switch S(message["command"] as? String) {
+        switch (message["command"] as? String).orEmpty {
         case "refresh":
             let status = await app.startRefresh()
             switch status {
@@ -115,7 +115,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
     private func processList(message: JSON) async -> JSON {
         var result = JSON()
 
-        switch S(message["list"] as? String) {
+        switch (message["list"] as? String).orEmpty {
         case "overview":
             result["result"] = await buildOverview()
             return reportSuccess(result: result)
@@ -218,7 +218,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
         for l in item.labels {
             labels.append([
                 "color": l.colorForDisplay,
-                "text": S(l.name)
+                "text": l.name.orEmpty
             ])
         }
         return labels
@@ -230,7 +230,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
         for status in pr.displayedStatuses {
             statusLines.append([
                 "color": status.colorForDisplay,
-                "text": S(status.descriptionText)
+                "text": status.descriptionText.orEmpty
             ])
         }
         return statusLines
@@ -255,9 +255,9 @@ final class WatchManager: NSObject, WCSessionDelegate {
         var comments = [JSON]()
         for comment in item.sortedComments(using: .orderedDescending) {
             comments.append([
-                "user": S(comment.userName),
+                "user": comment.userName.orEmpty,
                 "date": comment.createdAt ?? .distantPast,
-                "text": S(comment.body),
+                "text": comment.body.orEmpty,
                 "mine": comment.isMine
             ])
         }
@@ -316,8 +316,8 @@ final class WatchManager: NSObject, WCSessionDelegate {
                 ] as JSON
 
                 views.append([
-                    "title": S(c?.label),
-                    "apiUri": S(c?.apiServerId?.uriRepresentation().absoluteString),
+                    "title": (c?.label).orEmpty,
+                    "apiUri": (c?.apiServerId?.uriRepresentation().absoluteString).orEmpty,
                     "prs": prList,
                     "issues": issueList
                 ])

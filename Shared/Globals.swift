@@ -82,15 +82,9 @@ let itemDateFormatter: DateFormatter = {
 
 import os.log
 
-func DLog(_ message: String, _ arg1: @autoclosure () -> Any? = nil, _ arg2: @autoclosure () -> Any? = nil, _ arg3: @autoclosure () -> Any? = nil, _ arg4: @autoclosure () -> Any? = nil, _ arg5: @autoclosure () -> Any? = nil) {
+func DLog(_ message: @autoclosure () -> String) {
     if Settings.logActivityToConsole {
-        let message = String(format: message,
-                             String(describing: arg1() ?? "(nil)"),
-                             String(describing: arg2() ?? "(nil)"),
-                             String(describing: arg3() ?? "(nil)"),
-                             String(describing: arg4() ?? "(nil)"),
-                             String(describing: arg5() ?? "(nil)"))
-        os_log("%{public}@", message)
+        os_log("%{public}@", message())
     }
 }
 
@@ -360,14 +354,14 @@ struct ApiStats {
     }
 }
 
-var currentAppVersion: String {
-    S(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String)
-}
+let currentAppVersion: String = {
+    (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String).orEmpty
+}()
 
-var versionString: String {
-    let buildNumber = S(Bundle.main.infoDictionary?["CFBundleVersion"] as? String)
+let versionString: String = {
+    let buildNumber = (Bundle.main.infoDictionary?["CFBundleVersion"] as? String).orEmpty
     return "Version \(currentAppVersion) (\(buildNumber))"
-}
+}()
 
 #if os(OSX)
 

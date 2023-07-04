@@ -43,12 +43,12 @@ final class ServersViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ServerCell", for: indexPath)
         if let T = cell.textLabel, let D = cell.detailTextLabel {
             let a = allServers[indexPath.row]
-            if S(a.authToken).isEmpty {
+            if a.authToken.isEmpty {
                 T.textColor = .appRed
-                T.text = "\(S(a.label)) (needs token!)"
+                T.text = "\(a.label.orEmpty) (needs token!)"
             } else if !a.lastSyncSucceeded {
                 T.textColor = .appRed
-                T.text = "\(S(a.label)) (last sync failed)"
+                T.text = "\(a.label.orEmpty) (last sync failed)"
             } else {
                 T.textColor = UIColor.label
                 T.text = a.label

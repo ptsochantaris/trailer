@@ -49,19 +49,12 @@ extension GraphQL {
             templateGroup.fragments
         }
 
-        func scan(query: Query, pageData: Any, parent: Node?) async -> LinkedList<Query> {
-            guard let nodes = pageData as? [Any] else { return LinkedList<Query>() }
+        func scan(query: Query, pageData: Any, parent: Node?, extraQueries: LinkedList<Query>) async throws {
+            guard let nodes = pageData as? [Any] else { return }
 
-            let extraQueries = LinkedList<Query>()
-
-            for pageData in nodes {
-                if let pageData = pageData as? JSON {
-                    let newQueries = await templateGroup.scan(query: query, pageData: pageData, parent: parent)
-                    extraQueries.append(contentsOf: newQueries)
-                }
+            for pageData in nodes.compactMap({ $0 as? JSON }) {
+                try await templateGroup.scan(query: query, pageData: pageData, parent: parent, extraQueries: extraQueries)
             }
-
-            return extraQueries
         }
     }
 }

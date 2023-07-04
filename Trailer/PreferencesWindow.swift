@@ -1183,7 +1183,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
             if ApiServer.shouldReportRefreshFailure(in: DataManager.main) {
                 var errorServers = [String]()
                 for apiServer in ApiServer.allApiServers(in: DataManager.main) where apiServer.goodToGo && !apiServer.lastSyncSucceeded {
-                    errorServers.append(S(apiServer.label))
+                    errorServers.append(apiServer.label.orEmpty)
                 }
 
                 let serverNames = errorServers.joined(separator: ", ")
@@ -1255,7 +1255,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         s.beginSheetModal(for: self) { response in
             if response == .OK, let url = s.url {
                 _ = Settings.writeToURL(url)
-                DLog("Exported settings to %@", url.absoluteString)
+                DLog("Exported settings to \(url.absoluteString)")
             }
         }
     }
@@ -1399,13 +1399,13 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
 
     private func fillServerApiFormFromSelectedServer() {
         if let apiServer = selectedServer {
-            apiServerName.stringValue = S(apiServer.label)
-            apiServerWebPath.stringValue = S(apiServer.webPath)
-            apiServerApiPath.stringValue = S(apiServer.apiPath)
-            apiServerGraphQLPath.stringValue = S(apiServer.graphQLPath)
-            apiServerAuthToken.stringValue = S(apiServer.authToken)
+            apiServerName.stringValue = apiServer.label.orEmpty
+            apiServerWebPath.stringValue = apiServer.webPath.orEmpty
+            apiServerApiPath.stringValue = apiServer.apiPath.orEmpty
+            apiServerGraphQLPath.stringValue = apiServer.graphQLPath.orEmpty
+            apiServerAuthToken.stringValue = apiServer.authToken.orEmpty
             apiServerSelectedBox.title = apiServer.label ?? "New Server"
-            apiServerTestButton.isEnabled = !S(apiServer.authToken).isEmpty
+            apiServerTestButton.isEnabled = !apiServer.authToken.isEmpty
             apiServerDeleteButton.isEnabled = (ApiServer.countApiServers(in: DataManager.main) > 1)
             apiServerReportError.integerValue = apiServer.reportRefreshFailures ? 1 : 0
         }
@@ -1418,7 +1418,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
             apiServer.graphQLPath = apiServerGraphQLPath.stringValue.trim
             apiServer.webPath = apiServerWebPath.stringValue.trim
             apiServer.authToken = apiServerAuthToken.stringValue.trim
-            apiServerTestButton.isEnabled = !S(apiServer.authToken).isEmpty
+            apiServerTestButton.isEnabled = !apiServer.authToken.isEmpty
             serverList.reloadData()
             serversDirty = true
             deferredUpdateTimer.push()
@@ -1573,7 +1573,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
             if tid == "repos" {
                 cell.isEnabled = true
                 let r = repos[row]
-                let repoName = S(r.fullName)
+                let repoName = r.fullName.orEmpty
                 let title = r.inaccessible ? "\(repoName) (inaccessible)" : repoName
                 let textColor = (row == tv.selectedRow) ? .selectedControlTextColor : (r.shouldSync ? .textColor : NSColor.textColor.withAlphaComponent(0.4))
                 cell.attributedStringValue = NSAttributedString(string: title, attributes: [NSAttributedString.Key.foregroundColor: textColor])
@@ -1582,7 +1582,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
                     let r = repos[row]
                     menuCell.isEnabled = true
                     menuCell.placeholderString = "None"
-                    menuCell.stringValue = S(r.groupLabel)
+                    menuCell.stringValue = r.groupLabel.orEmpty
                 }
             } else if let menuCell = cell as? NSPopUpButtonCell {
                 menuCell.removeAllItems()
@@ -1628,7 +1628,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
             let allServers = ApiServer.allApiServers(in: DataManager.main)
             let apiServer = allServers[row]
             if tid == "server" {
-                cell.title = S(apiServer.label)
+                cell.title = apiServer.label.orEmpty
                 let tc = c as! NSTextFieldCell
                 if apiServer.lastSyncSucceeded {
                     tc.textColor = .textColor
@@ -1676,7 +1676,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         if tv === projectsTable {
             let r = repos[row]
             if tableColumn?.identifier.rawValue == "group" {
-                let g = S(object as? String)
+                let g = (object as? String).orEmpty
                 let newValue = g.isEmpty ? nil : g
                 if newValue != r.groupLabel {
                     r.groupLabel = newValue

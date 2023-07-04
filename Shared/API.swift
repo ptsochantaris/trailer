@@ -26,7 +26,7 @@ enum API {
         reachability.startNotifier()
 
         let n = reachability.status
-        DLog("Network is %@", n.name)
+        DLog("Network is \(n.name)")
         currentNetworkStatus = n
 
         NotificationCenter.default.addObserver(forName: ReachabilityChangedNotification, object: nil, queue: .main) { _ in
@@ -43,7 +43,7 @@ enum API {
         let newStatus = reachability.status
         if newStatus != currentNetworkStatus {
             currentNetworkStatus = newStatus
-            DLog("Network changed to %@", newStatus.name)
+            DLog("Network changed to \(newStatus.name)")
         }
     }
 
@@ -156,7 +156,7 @@ enum API {
 
         let repos = Repo.syncableRepos(in: syncMoc)
 
-        DLog("Will sync items from: %@", repos.compactMap(\.fullName).joined(separator: ", "))
+        DLog("Will sync items from: \(repos.compactMap(\.fullName).joined(separator: ", "))")
 
         if Settings.useV4API {
             do {
@@ -192,7 +192,7 @@ enum API {
                 DLog("Synced data committed")
                 await DataManager.sendNotificationsIndexAndSave()
             } catch {
-                DLog("Committing sync failed: %@", error.localizedDescription)
+                DLog("Committing sync failed: \(error.localizedDescription)")
             }
         } else {
             DLog("No changes, skipping commit")

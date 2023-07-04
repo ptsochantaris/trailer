@@ -64,7 +64,7 @@ final class PRLabel: DataItem {
         for i in existingItems {
             if let name = i.name, let idx = namesOfItems.firstIndex(of: name), let info = namesToInfo[name] {
                 namesOfItems.remove(at: idx)
-                DLog("Updating Label: %@", name)
+                DLog("Updating Label: \(name)")
                 if i.nodeId == nil, let nodeId = info["node_id"] as? String { // migrate
                     i.nodeId = nodeId
                     DLog("Migrated label '\(name)' with node ID \(nodeId)")
@@ -75,7 +75,7 @@ final class PRLabel: DataItem {
 
         for name in namesOfItems {
             if let info = namesToInfo[name] {
-                DLog("Creating Label: %@", name)
+                DLog("Creating Label: \(name)")
                 let i = NSEntityDescription.insertNewObject(forEntityName: "PRLabel", into: fromParent.managedObjectContext!) as! PRLabel
                 i.name = name
                 i.nodeId = info["node_id"] as? String

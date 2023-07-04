@@ -30,7 +30,7 @@ final class ImportExport: NSObject, UIDocumentPickerDelegate {
 
     func documentPicker(_: UIDocumentPickerViewController, didPickDocumentAt url: URL) {
         if tempUrl == nil {
-            DLog("Will import settings from %@", url.absoluteString)
+            DLog("Will import settings from \(url.absoluteString)")
             Task {
                 if await settingsManager.loadSettingsFrom(url: url, confirmFromView: parentVC) {
                     await parentVC.dismiss(animated: false)
@@ -38,7 +38,7 @@ final class ImportExport: NSObject, UIDocumentPickerDelegate {
                 documentInteractionCleanup()
             }
         } else {
-            DLog("Saved settings to %@", url.absoluteString)
+            DLog("Saved settings to \(url.absoluteString)")
             documentInteractionCleanup()
         }
     }
@@ -53,7 +53,7 @@ final class ImportExport: NSObject, UIDocumentPickerDelegate {
             do {
                 try FileManager.default.removeItem(at: t)
             } catch {
-                DLog("Temporary file cleanup error: %@", error.localizedDescription)
+                DLog("Temporary file cleanup error: \(error.localizedDescription)")
             }
             tempUrl = nil
         }

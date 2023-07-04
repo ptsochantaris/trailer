@@ -132,27 +132,23 @@ extension GraphQL {
             return res
         }
 
-        @discardableResult
-        private func scanNode(_ node: JSON, query: Query, parent: Node?) async throws -> LinkedList<Query> {
+        private func scanNode(_ node: JSON, query: Query, parent: Node?, extraQueries: LinkedList<Query>) async throws {
             let thisObject: Node?
 
-            if let typeName = node["__typename"] as? String, let id = node["id"] as? String {
-                let o = Node(id: id, elementType: typeName, jsonPayload: node, parent: parent)
-                try await query.perNodeBlock?(o)
+            if let o = Node(jsonPayload: node, parent: parent) {
                 thisObject = o
+                try await query.perNodeBlock?(o)
 
             } else { // we're a container, not an object, unwrap this level and recurse into it
                 thisObject = parent
             }
 
-            let extraQueries = LinkedList<Query>()
-
             for field in fields {
                 if let fragment = field as? Fragment {
-                    await extraQueries.append(contentsOf: fragment.scan(query: query, pageData: node, parent: thisObject))
+                    try await fragment.scan(query: query, pageData: node, parent: thisObject, extraQueries: extraQueries)
 
                 } else if let ingestable = field as? GQLScanning, let fieldData = node[field.name] {
-                    await extraQueries.append(contentsOf: ingestable.scan(query: query, pageData: fieldData, parent: thisObject))
+                    try await ingestable.scan(query: query, pageData: fieldData, parent: thisObject, extraQueries: extraQueries)
                 }
             }
 
@@ -164,63 +160,64 @@ extension GraphQL {
                     DLog("\(query.logPrefix)(Node in: \(name)) will need further paging: \(count) new queries")
                 }
             }
-
-            return extraQueries
         }
 
-        private func scanPage(_ edges: [JSON], pageInfo: JSON?, query: Query, parent: Node?) async throws -> LinkedList<Query> {
-            let extraQueries = LinkedList<Query>()
-            
-            for e in edges {
-                if let node = e["node"] as? JSON {
-                    try await extraQueries.append(contentsOf: scanNode(node, query: query, parent: parent))
+        private func scanPage(_ edges: [JSON], pageInfo: JSON?, query: Query, parent: Node?, extraQueries: LinkedList<Query>) async throws {
+            do {
+                for e in edges {
+                    if let node = e["node"] as? JSON {
+                        try await scanNode(node, query: query, parent: parent, extraQueries: extraQueries)
+                    }
                 }
-            }
-            if let latestCursor = edges.last?["cursor"] as? String,
-               let pageInfo, pageInfo["hasNextPage"] as? Bool == true,
-               let parentId = parent?.id {
-                let newGroup = Group(cloning: self, lastCursor: latestCursor)
-                if let shellRootElement = query.rootElement.asShell(for: newGroup, batchRootId: parentId) as? GQLScanning {
-                    let nextPage = Query(from: query, with: shellRootElement)
-                    extraQueries.append(nextPage)
+                
+                if let latestCursor = edges.last?["cursor"] as? String,
+                   let pageInfo, pageInfo["hasNextPage"] as? Bool == true,
+                   let parentId = parent?.id {
+                    let newGroup = Group(cloning: self, lastCursor: latestCursor)
+                    if let shellRootElement = query.rootElement.asShell(for: newGroup, batchRootId: parentId) as? GQLScanning {
+                        let nextPage = Query(from: query, with: shellRootElement)
+                        extraQueries.append(nextPage)
+                    }
                 }
+
+            } catch GQLError.alreadyParsed {
+                // exhausted new nodes
             }
 
             if extraQueries.count > 0 {
                 DLog("\(query.logPrefix)(Page in: \(name)) will need further paging: \(extraQueries.count) new queries")
             }
-
-            return extraQueries
         }
         
-        private func scanList(nodes: [JSON], query: Query, parent: Node?) async throws -> LinkedList<Query> {
-            let extraQueries = LinkedList<Query>()
-            for node in nodes {
-                try await extraQueries.append(contentsOf: scanNode(node, query: query, parent: parent))
+        private func scanList(nodes: [JSON], query: Query, parent: Node?, extraQueries: LinkedList<Query>) async throws {
+            do {
+                for node in nodes {
+                    try await scanNode(node, query: query, parent: parent, extraQueries: extraQueries)
+                }
+            } catch GQLError.alreadyParsed {
+                // exhausted new nodes
             }
+            
             if extraQueries.count > 0 {
                 DLog("\(query.logPrefix)(Group: \(name)) will need further paging: \(extraQueries.count) new queries")
             }
-            return extraQueries
         }
 
-        func scan(query: Query, pageData: Any, parent: Node?) async -> LinkedList<Query> {
-            do {
-                if let hash = pageData as? JSON {
-                    if let edges = hash["edges"] as? [JSON] {
-                        return try await scanPage(edges, pageInfo: hash["pageInfo"] as? JSON, query: query, parent: parent)
-                    } else {
-                        return try await scanNode(hash, query: query, parent: parent)
+        func scan(query: Query, pageData: Any, parent: Node?, extraQueries: LinkedList<Query>) async throws {
+            if let hash = pageData as? JSON {
+                if let edges = hash["edges"] as? [JSON] {
+                    try await scanPage(edges, pageInfo: hash["pageInfo"] as? JSON, query: query, parent: parent, extraQueries: extraQueries)
+                } else {
+                    do {
+                        try await scanNode(hash, query: query, parent: parent, extraQueries: extraQueries)
+                    } catch GQLError.alreadyParsed {
+                        // not a new node, ignore
                     }
-                    
-                } else if let nodes = pageData as? [JSON] {
-                    return try await scanList(nodes: nodes, query: query, parent: parent)
                 }
-            } catch {
-                DLog("\(query.logPrefix)(Group: \(name)) parsing failed")
+                
+            } else if let nodes = pageData as? [JSON] {
+                try await scanList(nodes: nodes, query: query, parent: parent, extraQueries: extraQueries)
             }
-            
-            return LinkedList<Query>()
         }
     }
 }

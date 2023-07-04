@@ -58,7 +58,7 @@ final class ApiServer: NSManagedObject {
     }
 
     var goodToGo: Bool {
-        !S(authToken).isEmpty
+        !authToken.isEmpty
     }
 
     @MainActor
@@ -79,7 +79,7 @@ final class ApiServer: NSManagedObject {
     func deleteEverything() {
         guard let moc = managedObjectContext else { return }
 
-        DLog("Wiping all data for API server %@", label ?? "<no API server name>")
+        DLog("Wiping all data for API server \(label ?? "<no API server name>")")
 
         let categories: [Set<NSManagedObject>] = [pullRequests, issues, labels, teams, comments, statuses, reviews, reactions]
         categories.forEach { set in
@@ -138,7 +138,7 @@ final class ApiServer: NSManagedObject {
 
     @MainActor
     static func someServersHaveAuthTokens(in moc: NSManagedObjectContext) -> Bool {
-        for apiServer in allApiServers(in: moc) where !S(apiServer.authToken).isEmpty {
+        for apiServer in allApiServers(in: moc) where !apiServer.authToken.isEmpty {
             return true
         }
         return false
@@ -151,7 +151,7 @@ final class ApiServer: NSManagedObject {
     }
 
     func rollBackAllUpdates(in moc: NSManagedObjectContext) {
-        DLog("Rolling back changes for failed sync on API server '%@'", label)
+        DLog("Rolling back changes for failed sync on API server '\(label.orEmpty)'")
         for set in [repos, pullRequests, comments, statuses, labels, issues, teams, reviews, reactions] as [Set<DataItem>] {
             var i = set.makeIterator()
             while let dataItem = i.next() {
@@ -179,14 +179,14 @@ final class ApiServer: NSManagedObject {
         try await withThrowingTaskGroup(of: Void.self) { group in
             if let graphQLPath {
                 group.addTask { @MainActor in
-                    DLog("Checking GraphQL interface on \(S(graphQLPath))")
+                    DLog("Checking GraphQL interface on \(graphQLPath)")
                     try await GraphQL.testApi(to: self)
                 }
             }
 
             if let apiPath {
                 group.addTask { @MainActor in
-                    DLog("Checking REST interface on \(S(apiPath))")
+                    DLog("Checking REST interface on \(apiPath)")
                     try await RestAccess.testApi(to: self)
                 }
             }

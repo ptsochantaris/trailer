@@ -60,7 +60,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
         Task {
             do {
                 try await apiServer.test()
-                showMessage("API seems OK for \(S(apiServer.label))", nil)
+                showMessage("API seems OK for \(apiServer.label.orEmpty)", nil)
             } catch {
                 showMessage("The test failed", error.localizedDescription)
             }
@@ -89,7 +89,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
     }
 
     private func processTokenState(from tokenText: String?) {
-        if S(tokenText).isEmpty {
+        if tokenText.isEmpty {
             authTokenLabel.textColor = .appRed
             testButton.isEnabled = false
             testButton.alpha = 0.6
@@ -120,7 +120,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
             return false
         }
         if textField === authToken {
-            let toReplace = S(textField.text)
+            let toReplace = textField.text.orEmpty
             if let r = Range(range, in: toReplace) {
                 let newToken = toReplace.replacingCharacters(in: r, with: string)
                 processTokenState(from: newToken)

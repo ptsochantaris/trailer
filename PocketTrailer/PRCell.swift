@@ -138,9 +138,9 @@ final class PRCell: UITableViewCell {
             if muted {
                 title = "(Muted) - \(title)"
             }
-            accessibilityLabel = "\(title), \(S(unreadCount.text)) unread comments, \(S(readCount.text)) total comments, \(pullRequest.accessibleSubtitle). \(totalStatuses) statuses: \(statusString)"
+            accessibilityLabel = "\(title), \(unreadCount.text.orEmpty) unread comments, \(readCount.text.orEmpty) total comments, \(pullRequest.accessibleSubtitle). \(totalStatuses) statuses: \(statusString)"
         } else {
-            accessibilityLabel = "\(pullRequest.accessibleTitle), \(S(unreadCount.text)) unread comments, \(S(readCount.text)) total comments, \(pullRequest.accessibleSubtitle)"
+            accessibilityLabel = "\(pullRequest.accessibleTitle), \(unreadCount.text.orEmpty) unread comments, \(readCount.text.orEmpty) total comments, \(pullRequest.accessibleSubtitle)"
         }
     }
 
@@ -167,7 +167,7 @@ final class PRCell: UITableViewCell {
         if muted {
             title = "(Muted) - \(title)"
         }
-        accessibilityLabel = "\(title), \(S(unreadCount.text)) unread comments, \(S(readCount.text)) total comments, \(issue.accessibleSubtitle)"
+        accessibilityLabel = "\(title), \(unreadCount.text.orEmpty) unread comments, \(readCount.text.orEmpty) total comments, \(issue.accessibleSubtitle)"
     }
 
     private func setCountsImageAndFade(item: ListableItem, muted: Bool) {

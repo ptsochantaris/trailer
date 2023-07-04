@@ -109,7 +109,7 @@ final class Reaction: DataItem {
     }
 
     var displaySymbol: String {
-        switch S(content).lowercased() {
+        switch content.orEmpty.lowercased() {
         case "+1", "thumbs_up": return "👍"
         case "-1", "thumbs_down": return "👎"
         case "laugh": return "😄"

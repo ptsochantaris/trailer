@@ -65,12 +65,12 @@ enum DataManager {
 
         let d = UserDefaults.standard
         if let legacyAuthToken = d.object(forKey: "GITHUB_AUTH_TOKEN") as? String {
-            var legacyApiHost = S(d.object(forKey: "API_BACKEND_SERVER") as? String)
+            var legacyApiHost = (d.object(forKey: "API_BACKEND_SERVER") as? String).orEmpty
             if legacyApiHost.isEmpty { legacyApiHost = "api.github.com" }
 
-            let legacyApiPath = S(d.object(forKey: "API_SERVER_PATH") as? String)
+            let legacyApiPath = (d.object(forKey: "API_SERVER_PATH") as? String).orEmpty
 
-            var legacyWebHost = S(d.object(forKey: "API_FRONTEND_SERVER") as? String)
+            var legacyWebHost = (d.object(forKey: "API_FRONTEND_SERVER") as? String).orEmpty
             if legacyWebHost.isEmpty { legacyWebHost = "github.com" }
 
             let actualApiPath = "\(legacyApiHost)/\(legacyApiPath)".replacingOccurrences(of: "//", with: "/")
@@ -203,7 +203,7 @@ enum DataManager {
 
             for pr in latestStatuses.map(\.pullRequest) where pr.isSnoozing && pr.shouldWakeOnStatusChange && !coveredPrs.contains(pr.objectID) {
                 coveredPrs.insert(pr.objectID)
-                DLog("Waking up snoozed PR ID %@ because of a status update", pr.nodeId ?? "<no ID>")
+                DLog("Waking up snoozed PR ID \(pr.nodeId ?? "<no ID>") because of a status update")
                 pr.wakeUp()
             }
 
@@ -351,7 +351,7 @@ enum DataManager {
         do {
             try main.save()
         } catch {
-            DLog("Error while saving DB: %@", error.localizedDescription)
+            DLog("Error while saving DB: \(error.localizedDescription)")
         }
 
         Task {
@@ -511,7 +511,7 @@ enum DataManager {
         let documentsDirectory = dataFilesDirectory.path
         do {
             for file in try fm.contentsOfDirectory(atPath: documentsDirectory) where file.contains("Trailer.sqlite") {
-                DLog("Removing old database file: %@", file)
+                DLog("Removing old database file: \(file)")
                 try! fm.removeItem(atPath: documentsDirectory.appending(pathComponent: file))
             }
         } catch { /* no directory */ }
@@ -545,7 +545,7 @@ enum DataManager {
             do {
                 try fileManager.createDirectory(atPath: dataDir.path, withIntermediateDirectories: true, attributes: nil)
             } catch {
-                DLog("Database directory creation error: %@", error.localizedDescription)
+                DLog("Database directory creation error: \(error.localizedDescription)")
                 return nil
             }
         }
@@ -556,7 +556,7 @@ enum DataManager {
             DLog("Database setup complete")
             return persistentStoreCoordinator
         } catch {
-            DLog("Database setup error: %@", error.localizedDescription)
+            DLog("Database setup error: \(error.localizedDescription)")
             return nil
         }
     }()

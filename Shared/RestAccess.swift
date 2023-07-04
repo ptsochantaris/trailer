@@ -86,12 +86,12 @@ enum RestAccess {
     static func start(call path: String, on server: ApiServer, triggeredByUser: Bool, attempts: Int = 5) async throws -> (DataResult, Any?) {
         let apiServerLabel: String
         if server.lastSyncSucceeded || triggeredByUser {
-            apiServerLabel = S(server.label)
+            apiServerLabel = server.label.orEmpty
         } else {
             throw API.apiError("Sync has failed, skipping this call")
         }
 
-        let expandedPath = path.hasPrefix("/") ? S(server.apiPath).appending(pathComponent: path) : path
+        let expandedPath = path.hasPrefix("/") ? server.apiPath.orEmpty.appending(pathComponent: path) : path
 
         var request = HTTPClientRequest(url: expandedPath)
         var acceptTypes = [String]()
@@ -110,12 +110,12 @@ enum RestAccess {
 
         do {
             let (parsedData, result) = try await HTTP.getJsonData(for: request, attempts: attempts, checkCache: true)
-            DLog("(%@) GET %@ - RESULT: %@", apiServerLabel, expandedPath, result.logValue)
+            DLog("(\(apiServerLabel) GET \(expandedPath) - RESULT: \(result.logValue)")
             return (result, parsedData)
 
         } catch {
             let error = error as NSError
-            DLog("(%@) GET %@ - FAILED: (code %@) %@", apiServerLabel, expandedPath, error.code, error.localizedDescription)
+            DLog("(\(apiServerLabel) GET \(expandedPath) - FAILED: (code \(error.code) \(error.localizedDescription)")
             throw error
         }
     }

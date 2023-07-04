@@ -439,7 +439,13 @@ enum GraphQL {
         }
     }
 
-    private static let alreadyParsed = NSError(domain: "com.housetrip.Trailer.parsing", code: 1, userInfo: [NSLocalizedDescriptionKey: "Node already parsed in previous sync"])
+    enum GQLError: Error {
+        case alreadyParsed
+        
+        var localizedDescription: String {
+            "Node already parsed in previous sync"
+        }
+    }
 
     private static let latestPrsFragment = Fragment(on: "Repository") {
         idField
@@ -503,7 +509,7 @@ enum GraphQL {
                    let updatedAt = node.jsonPayload["updatedAt"] as? String,
                    let d = DataItem.parseGH8601(updatedAt),
                    d < prRepoIdToLatestExistingUpdate[repo.id]! {
-                    throw alreadyParsed
+                    throw GQLError.alreadyParsed
                 }
 
                 count += 1
@@ -583,7 +589,7 @@ enum GraphQL {
                    let updatedAt = node.jsonPayload["updatedAt"] as? String,
                    let d = DataItem.parseGH8601(updatedAt),
                    d < issueRepoIdToLatestExistingUpdate[repo.id]! {
-                    throw alreadyParsed
+                    throw GQLError.alreadyParsed
                 }
 
                 count += 1

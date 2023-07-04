@@ -6,7 +6,7 @@ import UserNotifications
 enum NotificationManager {
     static func handleLocalNotification(notification: UNNotificationContent, action: String) {
         if !notification.userInfo.isEmpty {
-            DLog("Received local notification: %@", notification.userInfo)
+            DLog("Received local notification: \(notification.userInfo)")
             popupManager.masterController.localNotificationSelected(userInfo: notification.userInfo, action: action)
         }
     }
@@ -37,7 +37,7 @@ enum NotificationManager {
             if success {
                 DLog("Successfully registered for local notifications")
             } else {
-                DLog("Registering for notifications failed: %@", error?.localizedDescription)
+                DLog("Registering for notifications failed: \((error?.localizedDescription).orEmpty)")
             }
         }
         n.delegate = delegate
@@ -49,14 +49,14 @@ enum NotificationManager {
         switch type {
         case .newMention:
             guard let c = item as? PRComment, let parent = c.parent, !parent.shouldSkipNotifications else { return }
-            notification.title = "@\(S(c.userName)) mentioned you:"
+            notification.title = "@\(c.userName.orEmpty) mentioned you:"
             notification.subtitle = c.notificationSubtitle
             if let b = c.body { notification.body = b }
             notification.categoryIdentifier = "mutable"
 
         case .newComment:
             guard let c = item as? PRComment, let parent = c.parent, !parent.shouldSkipNotifications else { return }
-            notification.title = "@\(S(c.userName)) commented:"
+            notification.title = "@\(c.userName.orEmpty) commented:"
             notification.subtitle = c.notificationSubtitle
             if let b = c.body { notification.body = b }
             notification.categoryIdentifier = "mutable"
@@ -92,13 +92,13 @@ enum NotificationManager {
         case .newRepoSubscribed:
             guard let r = item as? Repo else { return }
             notification.title = "New Repository Subscribed"
-            notification.body = S(r.fullName)
+            notification.body = r.fullName.orEmpty
             notification.categoryIdentifier = "repo"
 
         case .newRepoAnnouncement:
             guard let r = item as? Repo else { return }
             notification.title = "New Repository"
-            notification.body = S(r.fullName)
+            notification.body = r.fullName.orEmpty
             notification.categoryIdentifier = "repo"
 
         case .newPrAssigned:
@@ -147,7 +147,7 @@ enum NotificationManager {
             guard let r = item as? Review else { return }
             let p = r.pullRequest
             if p.shouldSkipNotifications { return }
-            notification.title = "@\(S(r.username)) Approved Changes"
+            notification.title = "@\(r.username.orEmpty) Approved Changes"
             if let t = p.title { notification.subtitle = t }
             if let b = r.body { notification.body = b }
             notification.categoryIdentifier = "mutable"
@@ -161,7 +161,7 @@ enum NotificationManager {
             guard let r = item as? Review else { return }
             let p = r.pullRequest
             if p.shouldSkipNotifications { return }
-            notification.title = "@\(S(r.username)) Requests Changes"
+            notification.title = "@\(r.username.orEmpty) Requests Changes"
             if let t = p.title { notification.subtitle = t }
             if let b = r.body { notification.body = b }
             notification.categoryIdentifier = "mutable"
@@ -175,7 +175,7 @@ enum NotificationManager {
             guard let r = item as? Review else { return }
             let p = r.pullRequest
             if p.shouldSkipNotifications { return }
-            notification.title = "@\(S(r.username)) Dismissed A Review"
+            notification.title = "@\(r.username.orEmpty) Dismissed A Review"
             if let t = p.title { notification.subtitle = t }
             if let b = r.body { notification.body = b }
             notification.categoryIdentifier = "mutable"
@@ -197,7 +197,7 @@ enum NotificationManager {
         case .newReaction:
             guard let r = item as? Reaction else { return }
             notification.title = r.displaySymbol
-            notification.subtitle = "@\(S(r.userName))"
+            notification.subtitle = "@\(r.userName.orEmpty)"
             if let c = r.comment, let p = c.pullRequest, !p.shouldSkipNotifications {
                 if let b = c.body { notification.body = b }
                 notification.categoryIdentifier = "mutable"

@@ -51,7 +51,7 @@ enum HTTP {
         }
         let (result, data) = try await getData(for: request, attempts: attempts, checkCache: checkCache)
         if case .success = result, Settings.dumpAPIResponsesInConsole {
-            DLog("API data from %@: %@", S(request.url), data.description)
+            DLog("API data from \(request.url): \(data.description)")
         }
         let json: Any
         if #available(macOS 11.0, iOS 14, *) {
@@ -132,10 +132,10 @@ enum HTTP {
             } catch {
                 attempt -= 1
                 if attempt > 0 {
-                    DLog("Will pause and retry call to %@", request.url)
+                    DLog("Will pause and retry call to \(request.url)")
                     try? await Task.sleep(nanoseconds: 5 * NSEC_PER_SEC)
                 } else {
-                    DLog("Failed call to %@", request.url)
+                    DLog("Failed call to \(request.url)")
                     throw error
                 }
             }

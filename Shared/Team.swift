@@ -16,8 +16,8 @@ final class Team: DataItem {
 
     static func syncTeams(from data: [JSON]?, serverId: NSManagedObjectID, moc: NSManagedObjectContext) async {
         await v3items(with: data, type: Team.self, serverId: serverId, moc: moc) { item, info, _, _ in
-            let slug = S(info["slug"] as? String)
-            let org = S((info["organization"] as? JSON)?["login"] as? String)
+            let slug = (info["slug"] as? String).orEmpty
+            let org = ((info["organization"] as? JSON)?["login"] as? String).orEmpty
             item.slug = slug
             item.organisationLogin = org
             if slug.isEmpty || org.isEmpty {

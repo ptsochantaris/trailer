@@ -113,13 +113,13 @@ final actor HTTPCache {
                 if let date = attributes[.creationDate] as? Date {
                     if now.timeIntervalSince(date) > (3600 * 24 * 30) {
                         try fileManager.removeItem(atPath: path)
-                        DLog("Removed old cached data: %@", path)
+                        DLog("Removed old cached data: \(path)")
                     }
                 } else {
-                    DLog("Removed cached data with no modification date: %@", path)
+                    DLog("Removed cached data with no modification date: \(path)")
                 }
             } catch {
-                DLog("File error when removing old cached data: %@", error.localizedDescription)
+                DLog("File error when removing old cached data: \(error.localizedDescription)")
             }
         }
     }

@@ -4,7 +4,7 @@ import Foundation
 extension API {
     static func canUseV4API(for moc: NSManagedObjectContext) -> String? {
         let servers = ApiServer.allApiServers(in: moc)
-        if servers.contains(where: { $0.goodToGo && S($0.graphQLPath).isEmpty }) {
+        if servers.contains(where: { $0.goodToGo && $0.graphQLPath.isEmpty }) {
             DLog("Warning: Some servers have a blank v4 API path")
             return Settings.v4DAPIessage
         }

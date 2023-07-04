@@ -110,7 +110,7 @@ class DataItem: NSManagedObject {
                 if let nodeId = i.nodeId, let info = nodeIdsToInfo[nodeId] {
                     let updatedDate = DataItem.parseGH8601(info["updated_at"] as? String) ?? i.createdAt ?? now
                     if updatedDate != i.updatedAt {
-                        DLog("Updating %@: %@ (v3)", entityName, nodeId)
+                        DLog("Updating \(entityName): \(nodeId) (v3)")
                         i.postSyncAction = PostSyncAction.isUpdated.rawValue
                         i.updatedAt = updatedDate
                         postProcessCallback(i, info, true, child)
@@ -127,7 +127,7 @@ class DataItem: NSManagedObject {
 
             for nodeId in nodeIdsOfItems {
                 if let info = nodeIdsToInfo[nodeId], let apiServer = try? child.existingObject(with: serverId) as? ApiServer {
-                    DLog("Creating %@: %@ (v3)", entityName, nodeId)
+                    DLog("Creating \(entityName): \(nodeId) (v3)")
                     let i = NSEntityDescription.insertNewObject(forEntityName: entityName, into: child) as! T
                     i.postSyncAction = PostSyncAction.isNew.rawValue
                     i.apiServer = apiServer
@@ -212,7 +212,7 @@ class DataItem: NSManagedObject {
             f.predicate = NSPredicate(format: query)
             let orphaned = try! moc.fetch(f)
             if !orphaned.isEmpty {
-                DLog("Nuking %@ \(typeName) items that no longer have a parent", orphaned.count)
+                DLog("Nuking \(orphaned.count) \(typeName) items that no longer have a parent")
                 for i in orphaned {
                     moc.delete(i)
                 }
@@ -230,7 +230,7 @@ class DataItem: NSManagedObject {
         func nukeDeletedItems(of type: (some DataItem).Type, in moc: NSManagedObjectContext) -> Int {
             let discarded = items(of: type, surviving: false, in: moc)
             if !discarded.isEmpty {
-                DLog("Nuking %@ %@ items marked for deletion", discarded.count, String(describing: type))
+                DLog("Nuking \(discarded.count) \(String(describing: type)) items marked for deletion")
                 for i in discarded {
                     moc.delete(i)
                 }
@@ -338,11 +338,11 @@ class DataItem: NSManagedObject {
         }
 
         if node.created {
-            DLog("Creating %@ ID: %@ (v4)", entityName, node.id)
+            DLog("Creating \(entityName) ID: \(node.id) (v4)")
             postSyncAction = PostSyncAction.isNew.rawValue
 
         } else if node.updated {
-            DLog("Updating %@ ID: %@ (v4)", entityName, node.id)
+            DLog("Updating \(entityName) ID: \(node.id) (v4)")
             postSyncAction = PostSyncAction.isUpdated.rawValue
 
         } else {

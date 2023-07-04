@@ -72,7 +72,7 @@ final class Repo: DataItem {
                     if pull || push || admin {
                         return true
                     } else if let fullName = info["full_name"] as? String {
-                        DLog("Watched private repository '%@' seems to be inaccessible, skipping", fullName)
+                        DLog("Watched private repository '\(fullName)' seems to be inaccessible, skipping")
                     }
                 }
                 return false

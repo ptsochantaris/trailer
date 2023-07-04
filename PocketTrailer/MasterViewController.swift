@@ -844,7 +844,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let v = tableView.dequeueReusableHeaderFooterView(withIdentifier: "SectionHeaderView") as! SectionHeaderView
-        let name = S(fetchedResultsController?.sections?[section].name)
+        let name = (fetchedResultsController?.sections?[section].name).orEmpty
         v.title.text = name.uppercased()
         if viewingPrs {
             if name == Section.closed.prMenuName {
@@ -987,7 +987,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         let snoozePresets = SnoozePreset.allSnoozePresets(in: DataManager.main)
         let hasPresets = !snoozePresets.isEmpty
         let a = UIAlertController(title: hasPresets ? "Snooze" : nil,
-                                  message: hasPresets ? S(i.title) : "You do not currently have any snoozing presets configured. Please add some in the relevant preferences tab.",
+                                  message: hasPresets ? i.title.orEmpty : "You do not currently have any snoozing presets configured. Please add some in the relevant preferences tab.",
                                   preferredStyle: .alert)
         for preset in snoozePresets {
             a.addAction(UIAlertAction(title: preset.listDescription, style: .default) { _ in

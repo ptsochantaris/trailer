@@ -97,7 +97,7 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
         table.reloadData()
         snoozeItem?.duration = typeSelector.selectedSegmentIndex == 0
         let total = SnoozePreset.allSnoozePresets(in: DataManager.main).count
-        let desc = S(snoozeItem?.listDescription)
+        let desc = (snoozeItem?.listDescription).orEmpty
         if total > 1 {
             let pos = (snoozeItem?.sortOrder ?? 0) + 1
             descriptionLabel.text = "\"\(desc)\"\n\(pos) of \(total) on the snooze menu"

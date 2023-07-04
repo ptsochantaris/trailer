@@ -9,7 +9,7 @@ final class CommentRow: NSObject {
     var commentId: String?
 
     func set(comment: [AnyHashable: Any], unreadCount: Int, unreadIndex: inout Int) {
-        let username = S(comment["user"] as? String)
+        let username = (comment["user"] as? String).orEmpty
         usernameL.setText("@\(username)")
         dateL.setText(shortDateFormatter.string(from: comment["date"] as! Date))
         commentL.setText(comment["text"] as? String)

@@ -125,7 +125,7 @@ enum Settings {
             repo.updatedAt = .distantPast
         }
 
-        for server in ApiServer.allApiServers(in: DataManager.main) where server.isGitHub && S(server.graphQLPath).isEmpty {
+        for server in ApiServer.allApiServers(in: DataManager.main) where server.isGitHub && server.graphQLPath.isEmpty {
             server.graphQLPath = "https://api.github.com/graphql"
         }
 
@@ -157,14 +157,14 @@ enum Settings {
         if let v = value {
             let vString = String(describing: v)
             if let p = previousValue, String(describing: p) == vString {
-                DLog("Setting %@ to identical value (%@), skipping", key, vString)
+                DLog("Setting \(key) to identical value (\(vString), skipping")
                 return
             } else {
                 sharedDefaults.set(v, forKey: key)
             }
         } else {
             if previousValue == nil {
-                DLog("Setting %@ to identical value (nil), skipping", key)
+                DLog("Setting \(key) to identical value (nil), skipping")
                 return
             } else {
                 sharedDefaults.removeObject(forKey: key)
@@ -172,9 +172,9 @@ enum Settings {
         }
 
         if let v = value {
-            DLog("Setting %@ to %@", key, String(describing: v))
+            DLog("Setting \(key) to \(String(describing: v))")
         } else {
-            DLog("Clearing option %@", key)
+            DLog("Clearing option \(key)")
         }
 
         Task { @MainActor in
@@ -234,14 +234,14 @@ enum Settings {
             return false
         }
         NotificationCenter.default.post(name: .SettingsExported, object: nil)
-        DLog("Written settings to %@", url.absoluteString)
+        DLog("Written settings to \(url.absoluteString)")
         return true
     }
 
     @MainActor
     static func readFromURL(_ url: URL) async -> Bool {
         if let settings = NSDictionary(contentsOf: url) {
-            DLog("Reading settings from %@", url.absoluteString)
+            DLog("Reading settings from \(url.absoluteString)")
             resetAllSettings()
             for k in allFields {
                 if let v = settings[k] {
@@ -396,7 +396,7 @@ enum Settings {
     }
 
     static var lastRunVersion: String {
-        get { S(get("LAST_RUN_VERSION_KEY") as? String) }
+        get { (get("LAST_RUN_VERSION_KEY") as? String).orEmpty }
         set { set("LAST_RUN_VERSION_KEY", newValue) }
     }
 

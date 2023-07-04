@@ -44,8 +44,13 @@ enum Section: Int {
     }
 }
 
-func S(_ s: String?) -> String {
-    s ?? ""
+extension String? {
+    var isEmpty: Bool {
+        return orEmpty.isEmpty
+    }
+    var orEmpty: String {
+        return self ?? ""
+    }
 }
 
 let shortDateFormatter: DateFormatter = {

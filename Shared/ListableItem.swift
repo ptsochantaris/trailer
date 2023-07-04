@@ -467,7 +467,7 @@ class ListableItem: DataItem {
         } else if let p = self as? PullRequest, Settings.assignedReviewHandlingPolicy > Section.none.rawValue, p.assignedForReview {
             return Section(rawValue: Settings.assignedReviewHandlingPolicy)!
 
-        } else if Settings.newMentionMovePolicy > Section.none.rawValue, contains(terms: ["@\(S(apiServer.userName))"]) {
+        } else if Settings.newMentionMovePolicy > Section.none.rawValue, contains(terms: ["@\(apiServer.userName.orEmpty)"]) {
             return Section(rawValue: Settings.newMentionMovePolicy)!
 
         } else if Settings.teamMentionMovePolicy > Section.none.rawValue, contains(terms: apiServer.teams.compactMap(\.calculatedReferral)) {
@@ -825,7 +825,7 @@ class ListableItem: DataItem {
         var components = [String]()
 
         if Settings.showReposInName {
-            components.append("Repository: \(S(repo.fullName))")
+            components.append("Repository: \(repo.fullName.orEmpty)")
         }
 
         if let l = userLogin {
@@ -1138,7 +1138,7 @@ class ListableItem: DataItem {
                         let r = n.request.identifier
                         let u = n.request.content.userInfo
                         if let notificationUri = u[LISTABLE_URI_KEY] as? String, notificationUri == uri {
-                            DLog("Removing related notification: %@", r)
+                            DLog("Removing related notification: \(r)")
                             nc.removeDeliveredNotifications(withIdentifiers: [r])
                         }
                     }
@@ -1180,13 +1180,13 @@ class ListableItem: DataItem {
         }
 
         let titleSuffix = labels.compactMap(\.name).reduce("") { $0 + " [\($1)]" }
-        s.title = "#\(number) - \(S(title))\(titleSuffix)"
+        s.title = "#\(number) - \(title.orEmpty)\(titleSuffix)"
 
         s.contentCreationDate = createdAt
         s.contentModificationDate = updatedAt
         s.keywords = searchKeywords
         s.creator = userLogin
-        s.contentDescription = "\(S(repo.fullName)) @\(S(userLogin)) - \(S(body?.trim))"
+        s.contentDescription = "\(repo.fullName.orEmpty) @\(userLogin.orEmpty) - \((body?.trim).orEmpty)"
 
         return CSSearchableItem(uniqueIdentifier: uri, domainIdentifier: nil, attributeSet: s)
     }
@@ -1219,7 +1219,7 @@ class ListableItem: DataItem {
         } else if API.isRefreshing {
             color = COLOR_CLASS.appSecondaryLabel
             message = "Refreshing information, please wait a moment…"
-        } else if !S(filterValue).isEmpty {
+        } else if !filterValue.isEmpty {
             color = COLOR_CLASS.appSecondaryLabel
             message = "There are no items matching this filter."
         } else if hasOpen(in: DataManager.main, criterion: criterion) {
@@ -1245,10 +1245,7 @@ class ListableItem: DataItem {
     }
 
     final func handleClosing() {
-        DLog("Detected closed item: %@, handling policy is %@, coming from section %@",
-             title,
-             Settings.closeHandlingPolicy,
-             sectionIndex)
+        DLog("Detected closed item: \(title.orEmpty), handling policy is \(Settings.closeHandlingPolicy), coming from section \(sectionIndex)")
 
         if !isVisibleOnMenu {
             DLog("Closed item was hidden, won't announce")
@@ -1267,7 +1264,7 @@ class ListableItem: DataItem {
     #if os(iOS)
         var dragItemForUrl: UIDragItem {
             let url = URL(string: urlForOpening ?? repo.webUrl ?? "") ?? URL(string: "https://github.com")!
-            let text = "#\(number) - \(S(title))"
+            let text = "#\(number) - \(title.orEmpty)"
             let provider = NSItemProvider(object: url as NSURL)
             provider.registerObject(text as NSString, visibility: .all)
             provider.suggestedName = text

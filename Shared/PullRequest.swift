@@ -129,7 +129,7 @@ final class PullRequest: ListableItem {
     }
 
     func checkAndStoreReviewAssignments(_ reviewerNames: Set<String>, _ reviewerTeams: Set<String>) {
-        var assigned = reviewerNames.contains(S(apiServer.userName))
+        var assigned = reviewerNames.contains(apiServer.userName.orEmpty)
         let assignedToTeam: Bool
         if assigned {
             assignedToTeam = false
@@ -454,12 +454,7 @@ final class PullRequest: ListableItem {
     final func handleMerging() {
         let byUserId = mergedByNodeId
         let myUserId = apiServer.userNodeId
-        DLog("Detected merged PR: %@ by user %@, local user id is: %@, handling policy is %@, coming from section %@",
-             title,
-             byUserId,
-             myUserId,
-             Settings.mergeHandlingPolicy,
-             sectionIndex)
+        DLog("Detected merged PR: \(title.orEmpty) by user \(byUserId.orEmpty), local user id is: \(myUserId.orEmpty), handling policy is \(Settings.mergeHandlingPolicy), coming from section \(sectionIndex)")
 
         if !isVisibleOnMenu {
             DLog("Merged PR was hidden, won't announce")

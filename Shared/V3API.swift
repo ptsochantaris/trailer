@@ -37,7 +37,7 @@ extension API {
 
             await withTaskGroup(of: Void.self) { group in
                 if r.displayPolicyForPrs != RepoDisplayPolicy.hide.rawValue {
-                    let repoFullName = S(r.fullName)
+                    let repoFullName = r.fullName.orEmpty
                     group.addTask { @MainActor in
                         let result = await RestAccess.getPagedData(at: "/repos/\(repoFullName)/pulls", from: apiServer) { data, _ in
                             await PullRequest.syncPullRequests(from: data, in: r, moc: moc)
@@ -48,7 +48,7 @@ extension API {
                 }
 
                 if r.displayPolicyForIssues != RepoDisplayPolicy.hide.rawValue {
-                    let repoFullName = S(r.fullName)
+                    let repoFullName = r.fullName.orEmpty
                     group.addTask { @MainActor in
                         let result = await RestAccess.getPagedData(at: "/repos/\(repoFullName)/issues", from: apiServer) { data, _ in
                             await Issue.syncIssues(from: data, in: r, moc: moc)
@@ -64,7 +64,7 @@ extension API {
     private static func markExtraUpdatedItems(from repos: [Repo]) async {
         await withTaskGroup(of: Void.self) { group in
             for r in repos {
-                let repoFullName = S(r.fullName)
+                let repoFullName = r.fullName.orEmpty
                 let lastLocalEvent = r.lastScannedIssueEventId
                 let isFirstEventSync = lastLocalEvent == 0
                 r.lastScannedIssueEventId = 0
@@ -370,7 +370,7 @@ extension API {
                 for l in p.reviews {
                     l.postSyncAction = PostSyncAction.delete.rawValue
                 }
-                let repoFullName = S(p.repo.fullName)
+                let repoFullName = p.repo.fullName.orEmpty
                 group.addTask { @MainActor in
                     let apiServer = p.apiServer
                     let result = await RestAccess.getPagedData(at: "/repos/\(repoFullName)/pulls/\(p.number)/reviews", from: apiServer) { data, _ in
@@ -388,9 +388,9 @@ extension API {
     }
 
     private static func investigatePrClosure(for pullRequest: PullRequest) async {
-        DLog("Checking closed PR to see if it was merged: %@", pullRequest.title)
+        DLog("Checking closed PR to see if it was merged: \(pullRequest.title.orEmpty)")
 
-        let repoFullName = S(pullRequest.repo.fullName)
+        let repoFullName = pullRequest.repo.fullName.orEmpty
         let path = "/repos/\(repoFullName)/pulls/\(pullRequest.number)"
 
         do {
@@ -442,7 +442,7 @@ extension API {
         await withThrowingTaskGroup(of: Void.self) { group in
             for p in prs {
                 group.addTask { @MainActor in
-                    let repoFullName = S(p.repo.fullName)
+                    let repoFullName = p.repo.fullName.orEmpty
                     let (data, _) = try await RestAccess.getRawData(at: "/repos/\(repoFullName)/pulls/\(p.number)/requested_reviewers", from: p.apiServer)
                     var reviewUsers = Set<String>()
                     var reviewTeams = Set<String>()

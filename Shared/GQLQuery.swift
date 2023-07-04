@@ -130,7 +130,8 @@ extension GraphQL {
 
                 DLog("\(logPrefix)Scanning result")
 
-                let extraQueries = await rootElement.scan(query: self, pageData: topData, parent: parent)
+                let extraQueries = LinkedList<Query>()
+                try await rootElement.scan(query: self, pageData: topData, parent: parent, extraQueries: extraQueries)
                 if extraQueries.count == 0 {
                     DLog("\(logPrefix)Parsed all pages")
                     return apiStats
