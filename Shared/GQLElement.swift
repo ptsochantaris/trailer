@@ -7,7 +7,7 @@ protocol GQLElement {
     var fragments: LinkedList<GraphQL.Fragment> { get }
     var nodeCost: Int { get }
 
-    func asShell(for element: GQLElement) -> GQLElement?
+    func asShell(for element: GQLElement, batchRootId: String?) -> GQLElement?
 }
 
 extension GraphQL {

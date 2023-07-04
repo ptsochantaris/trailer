@@ -130,18 +130,14 @@ extension GraphQL {
 
                 DLog("\(logPrefix)Scanning result")
 
-                do {
-                    let extraQueries = await rootElement.scan(query: self, pageData: topData, parent: parent)
-                    if extraQueries.count == 0 {
-                        DLog("\(logPrefix)Parsed all pages")
-                    } else {
-                        DLog("\(logPrefix)Needs more page data (\(extraQueries.count) queries)")
-                        return try await Query.runQueries(queries: extraQueries, on: url, token: authToken)
-                    }
-                } catch {
-                    DLog("\(logPrefix)No more page data needed: \(error.localizedDescription)")
+                let extraQueries = await rootElement.scan(query: self, pageData: topData, parent: parent)
+                if extraQueries.count == 0 {
+                    DLog("\(logPrefix)Parsed all pages")
+                    return apiStats
+                } else {
+                    DLog("\(logPrefix)Needs more page data (\(extraQueries.count) queries)")
+                    return try await Query.runQueries(queries: extraQueries, on: url, token: authToken)
                 }
-                return apiStats
 
             } catch {
                 DLog("\(logPrefix)Error: \(error.localizedDescription)")

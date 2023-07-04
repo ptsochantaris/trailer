@@ -33,12 +33,12 @@ extension GraphQL {
             self.lastCursor = lastCursor
         }
 
-        func asShell(for element: GQLElement) -> GQLElement? {
+        func asShell(for element: GQLElement, batchRootId: String?) -> GQLElement? {
             if element.id == id {
                 return element
             }
 
-            let replacementFields = fields.compactMap { $0.asShell(for: element) }
+            let replacementFields = fields.compactMap { $0.asShell(for: element, batchRootId: nil) }
             if replacementFields.isEmpty {
                 return nil
             }
@@ -156,6 +156,15 @@ extension GraphQL {
                 }
             }
 
+            let count = extraQueries.count
+            if count > 0 {
+                if let thisObject {
+                    DLog("\(query.logPrefix)(\(thisObject.elementType + ":" + thisObject.id) in: \(name)) will need further paging: \(count) new queries")
+                } else {
+                    DLog("\(query.logPrefix)(Node in: \(name)) will need further paging: \(count) new queries")
+                }
+            }
+
             return extraQueries
         }
 
@@ -176,10 +185,13 @@ extension GraphQL {
                let latestCursor = edges.last?["cursor"] as? String,
                let pageInfo, pageInfo["hasNextPage"] as? Bool == true {
                 let newGroup = Group(group: self, lastCursor: latestCursor)
-                if let shellRootElement = query.rootElement.asShell(for: newGroup) as? GQLScanning {
+                if let shellRootElement = query.rootElement.asShell(for: newGroup, batchRootId: parent?.id) as? GQLScanning {
                     let nextPage = Query(from: query, with: shellRootElement)
                     extraQueries.append(nextPage)
                 }
+            }
+            if extraQueries.count > 0 {
+                DLog("\(query.logPrefix)(Page in: \(name)) will need further paging: \(extraQueries.count) new queries")
             }
             return extraQueries
         }
@@ -202,11 +214,11 @@ extension GraphQL {
                         break
                     }
                 }
+                if extraQueries.count > 0 {
+                    DLog("\(query.logPrefix)(Group: \(name)) will need further paging: \(extraQueries.count) new queries")
+                }
             }
 
-            if extraQueries.count > 0 {
-                DLog("\(query.logPrefix)(Group: \(name)) will need further paging")
-            }
             return extraQueries
         }
     }

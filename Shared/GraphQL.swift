@@ -22,6 +22,21 @@ enum GraphQL {
         Field("avatarUrl")
     }
 
+    private static let mannequinFragment = Fragment(on: "Mannequin") {
+        idField
+        Field("login")
+        Field("avatarUrl")
+    }
+
+    private static let authorGroup = Group("author") {
+        userFragment
+        Fragment(on: "Bot") {
+            idField
+            Field("login")
+            Field("avatarUrl")
+        }
+    }
+
     private static func commentGroup(for typeName: String) -> Group {
         Group("comments", paging: .max) {
             Fragment(on: typeName) {
@@ -30,7 +45,7 @@ enum GraphQL {
                 Field("url")
                 Field("createdAt")
                 Field("updatedAt")
-                Group("author") { userFragment }
+                authorGroup
             }
         }
     }
@@ -101,14 +116,10 @@ enum GraphQL {
                                 idField
                                 Group("requestedReviewer") {
                                     userFragment
+                                    mannequinFragment
                                     Fragment(on: "Team") {
                                         idField
                                         Field("slug")
-                                    }
-                                    Fragment(on: "Mannequin") {
-                                        idField
-                                        Field("login")
-                                        Field("avatarUrl")
                                     }
                                 }
                             }
@@ -123,7 +134,7 @@ enum GraphQL {
                                 Field("state")
                                 Field("createdAt")
                                 Field("updatedAt")
-                                Group("author") { userFragment }
+                                authorGroup
                             }
                         }
                     }
@@ -279,7 +290,7 @@ enum GraphQL {
             Field("title")
             Field("url")
             Group("milestone") { milestoneFragment }
-            Group("author") { userFragment }
+            authorGroup
             Group("assignees", paging: .first(count: assigneesAndLabelPageSize, paging: true)) { userFragment }
             Group("labels", paging: .first(count: assigneesAndLabelPageSize, paging: true)) { labelFragment }
             Field("headRefOid")
@@ -309,7 +320,7 @@ enum GraphQL {
             Field("title")
             Field("url")
             Group("milestone") { milestoneFragment }
-            Group("author") { userFragment }
+            authorGroup
             Group("assignees", paging: .first(count: assigneesAndLabelPageSize, paging: true)) { userFragment }
             Group("labels", paging: .first(count: assigneesAndLabelPageSize, paging: true)) { labelFragment }
             if includeRepo {

@@ -14,7 +14,7 @@ extension GraphQL {
             self.name = name
         }
 
-        func asShell(for element: GQLElement) -> GQLElement? {
+        func asShell(for element: GQLElement, batchRootId: String?) -> GQLElement? {
             if element.id == id {
                 return element
             } else {

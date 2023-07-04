@@ -16,12 +16,12 @@ extension GraphQL {
             "... \(name)"
         }
 
-        func asShell(for element: GQLElement) -> GQLElement? {
+        func asShell(for element: GQLElement, batchRootId: String?) -> GQLElement? {
             if element.id == id {
                 return element
             }
 
-            var elementsToKeep = elements.compactMap { $0.asShell(for: element) }
+            var elementsToKeep = elements.compactMap { $0.asShell(for: element, batchRootId: nil) }
             if elementsToKeep.isEmpty {
                 return nil
             }

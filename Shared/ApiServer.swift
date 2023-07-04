@@ -315,8 +315,7 @@ final class ApiServer: NSManagedObject {
         let path = graphQLPath ?? ""
         let token = authToken ?? ""
 
-        let newStats = try await GraphQL.Query.runQueries(queries: queries, on: path, token: token)
-        if let newStats {
+        if let newStats = try await GraphQL.Query.runQueries(queries: queries, on: path, token: token) {
             updateApiStats(newStats)
         }
     }

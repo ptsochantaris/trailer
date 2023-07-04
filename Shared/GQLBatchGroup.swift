@@ -16,21 +16,21 @@ extension GraphQL {
             assert(idList.count <= 100)
         }
 
-        init(cloning: BatchGroup, templateGroup: Group, idList: [String]) {
+        init(cloning: BatchGroup, templateGroup: Group, rootId: String) {
             id = cloning.id
             name = cloning.name
-            self.idList = idList
+            self.idList = [rootId]
             self.templateGroup = templateGroup
             assert(idList.count <= 100)
         }
 
-        func asShell(for element: GQLElement) -> GQLElement? {
+        func asShell(for element: GQLElement, batchRootId: String?) -> GQLElement? {
             if id == element.id {
                 return element
             }
 
-            if let shellGroup = templateGroup.asShell(for: element) as? Group {
-                return BatchGroup(cloning: self, templateGroup: shellGroup, idList: idList)
+            if let batchRootId, let shellGroup = templateGroup.asShell(for: element, batchRootId: nil) as? Group {
+                return BatchGroup(cloning: self, templateGroup: shellGroup, rootId: batchRootId)
             }
 
             return nil
