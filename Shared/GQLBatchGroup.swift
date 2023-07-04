@@ -16,7 +16,7 @@ extension GraphQL {
             assert(idList.count <= 100)
         }
 
-        init(cloning: BatchGroup, templateGroup: Group, rootId: String) {
+        private init(cloning: BatchGroup, templateGroup: Group, rootId: String) {
             id = cloning.id
             name = cloning.name
             self.idList = [rootId]

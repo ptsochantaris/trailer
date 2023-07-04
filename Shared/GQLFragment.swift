@@ -43,7 +43,7 @@ extension GraphQL {
             return res
         }
 
-        init(cloning: Fragment, elements: [GQLElement]) {
+        private init(cloning: Fragment, elements: [GQLElement]) {
             id = cloning.id
             name = cloning.name
             type = cloning.type
