@@ -10,6 +10,29 @@
             <title>Version 1.8.0</title>
             <sparkle:minimumSystemVersion>10.15.0</sparkle:minimumSystemVersion>
             <description><![CDATA[<font face="sans-serif" size="3"><ul>
+                <li>Corrects an issue related to filtering out items created by bot users, and some corner cases in v4 syncing</li>
+                <li>From 1.8.0:</li>
+                <li>Significant optimisations to performance throughout, from HTTP requests, parsing queries, processing items, app responsiveness while syncing, and especially updating menus in macOS.</li>
+                <li>A (first) round of improvements to the ageing codebase :)</li>
+                <li>Many small fixes, partly as a consequence of the cleanup.</li>
+                <li>Fixed an issue where items that were open at the time a repo was archived will no longer be listed.</li>
+                <li>Fixed an issue where closed and merged items that were kept on the list could not be opened.</li>
+                <li>Corrections to Spotlight integration.</li>
+                </ul>
+                </font>]]></description>
+            <pubDate>Tue, 4 Jul 2023 01:00:00 +0000</pubDate>
+            <enclosure
+            url="https://github.com/ptsochantaris/trailer/releases/download/1.8.1/Trailer-181.zip"
+            sparkle:version="1648"
+            sparkle:shortVersionString="1.8.1"
+            sparkle:dsaSignature="MC0CFQCl6Rpc4V0WVYQpxPi/U08cTQREBgIUP8CVLNain4YIdfu/iZZ/aJjgkno="
+            type="application/octet-stream"/>
+        </item>
+
+        <item>
+            <title>Version 1.8.0</title>
+            <sparkle:minimumSystemVersion>10.15.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[<font face="sans-serif" size="3"><ul>
                 <li>Significant optimisations to performance throughout, from HTTP requests, parsing queries, processing items, app responsiveness while syncing, and especially updating menus in macOS.</li>
                 <li>A (first) round of improvements to the ageing codebase :)</li>
                 <li>Many small fixes, partly as a consequence of the cleanup.</li>
