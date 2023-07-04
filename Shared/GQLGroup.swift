@@ -164,10 +164,8 @@ extension GraphQL {
 
         private func scanPage(_ edges: [JSON], pageInfo: JSON?, query: Query, parent: Node?, extraQueries: LinkedList<Query>) async throws {
             do {
-                for e in edges {
-                    if let node = e["node"] as? JSON {
-                        try await scanNode(node, query: query, parent: parent, extraQueries: extraQueries)
-                    }
+                for node in edges.compactMap({ $0["node"] as? JSON }) {
+                    try await scanNode(node, query: query, parent: parent, extraQueries: extraQueries)
                 }
                 
                 if let latestCursor = edges.last?["cursor"] as? String,

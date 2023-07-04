@@ -50,7 +50,7 @@ extension GraphQL {
         }
 
         func scan(query: Query, pageData: Any, parent: Node?, extraQueries: LinkedList<Query>) async throws {
-            guard let nodes = pageData as? [Any] else { return }
+            guard let nodes = pageData as? any Sequence else { return }
 
             for pageData in nodes.compactMap({ $0 as? JSON }) {
                 try await templateGroup.scan(query: query, pageData: pageData, parent: parent, extraQueries: extraQueries)
