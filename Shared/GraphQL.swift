@@ -441,7 +441,7 @@ enum GraphQL {
 
     enum GQLError: Error {
         case alreadyParsed
-        
+
         var localizedDescription: String {
             "Node already parsed in previous sync"
         }

@@ -46,10 +46,11 @@ enum Section: Int {
 
 extension String? {
     var isEmpty: Bool {
-        return orEmpty.isEmpty
+        orEmpty.isEmpty
     }
+
     var orEmpty: String {
-        return self ?? ""
+        self ?? ""
     }
 }
 

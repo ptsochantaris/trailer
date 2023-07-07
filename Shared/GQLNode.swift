@@ -15,7 +15,7 @@ extension GraphQL {
             guard let id = jsonPayload["id"] as? String,
                   let elementType = jsonPayload["__typename"] as? String
             else { return nil }
-            
+
             self.id = id
             self.elementType = elementType
             self.jsonPayload = jsonPayload

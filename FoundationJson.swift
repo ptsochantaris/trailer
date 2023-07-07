@@ -12,7 +12,7 @@ import Foundation
 typealias JSON = [String: Any]
 
 @available(macOS 11.0, iOS 14.0, *)
-extension ArraySlice<UInt8> {
+private extension Slice<UnsafeRawBufferPointer> {
     var asString: String {
         String(unsafeUninitializedCapacity: count) { pointer in
             _ = pointer.initialize(fromContentsOf: self)
@@ -23,11 +23,11 @@ extension ArraySlice<UInt8> {
 
 @available(macOS 11.0, iOS 14.0, *)
 final class FoundationJson {
-    private let array: [UInt8]
+    private let array: UnsafeRawBufferPointer
     private let endIndex: Int
     private var readerIndex = 0
 
-    init(bytes: [UInt8]) {
+    init(bytes: UnsafeRawBufferPointer) {
         array = bytes
         endIndex = bytes.endIndex
     }
@@ -175,10 +175,6 @@ final class FoundationJson {
         return array[readerIndex]
     }
 
-    private func peekPrevious() -> UInt8 {
-        array[readerIndex - 1]
-    }
-
     @discardableResult
     private func consumeWhitespace() throws -> UInt8 {
         while readerIndex < endIndex {
@@ -194,6 +190,7 @@ final class FoundationJson {
         throw JSONError.unexpectedEndOfFile
     }
 
+    @inline(__always)
     private func skip(_ num: Int) throws {
         readerIndex += num
 
@@ -254,15 +251,9 @@ final class FoundationJson {
                     }
                     stringStartIndex = readerIndex
 
-                } catch let EscapedSequenceError.unexpectedEscapedCharacter(ascii, failureIndex) {
+                } catch let error as EscapedSequenceError {
                     output! += array[currentCharIndex ..< readerIndex].asString
-                    throw JSONError.unexpectedEscapedCharacter(ascii: ascii, in: output!, index: failureIndex)
-                } catch let EscapedSequenceError.expectedLowSurrogateUTF8SequenceAfterHighSurrogate(failureIndex) {
-                    output! += array[currentCharIndex ..< readerIndex].asString
-                    throw JSONError.expectedLowSurrogateUTF8SequenceAfterHighSurrogate(in: output!, index: failureIndex)
-                } catch let EscapedSequenceError.couldNotCreateUnicodeScalarFromUInt32(failureIndex, unicodeScalarValue) {
-                    output! += array[currentCharIndex ..< readerIndex].asString
-                    throw JSONError.couldNotCreateUnicodeScalarFromUInt32(in: output!, index: failureIndex, unicodeScalarValue: unicodeScalarValue)
+                    throw JSONError.faultyEscapeSequence(error, in: output!)
                 }
 
             default:
@@ -326,17 +317,13 @@ final class FoundationJson {
             let lowValue = UInt32(lowSurrogateBitBattern - 0xDC00)
             let unicodeValue = highValue + lowValue + 0x10000
             guard let unicode = Unicode.Scalar(unicodeValue) else {
-                throw EscapedSequenceError.couldNotCreateUnicodeScalarFromUInt32(
-                    index: readerIndex, unicodeScalarValue: unicodeValue
-                )
+                throw EscapedSequenceError.couldNotCreateUnicodeScalarFromUInt32(index: readerIndex, unicodeScalarValue: unicodeValue)
             }
             return unicode
         }
 
         guard let unicode = Unicode.Scalar(bitPattern) else {
-            throw EscapedSequenceError.couldNotCreateUnicodeScalarFromUInt32(
-                index: readerIndex, unicodeScalarValue: UInt32(bitPattern)
-            )
+            throw EscapedSequenceError.couldNotCreateUnicodeScalarFromUInt32(index: readerIndex, unicodeScalarValue: UInt32(bitPattern))
         }
         return unicode
     }
@@ -411,7 +398,7 @@ final class FoundationJson {
                 pastControlChar = .decimalPoint
                 numbersSinceControlChar = false
 
-            case ._charCapitalE, ._charE:
+            case ._charE, ._charCapitalE:
                 guard numbersSinceControlChar,
                       pastControlChar == .operand || pastControlChar == .decimalPoint
                 else {
@@ -477,80 +464,47 @@ final class FoundationJson {
         return array[readerIndex...].asString
     }
 
-    private enum JSONError: Swift.Error, Equatable {
-        case cannotConvertInputDataToUTF8
+    private enum JSONError: Error {
         case unexpectedCharacter(ascii: UInt8, characterIndex: Int)
         case unexpectedEndOfFile
-        case tooManyNestedArraysOrDictionaries(characterIndex: Int)
+        case faultyEscapeSequence(EscapedSequenceError, in: String)
         case invalidHexDigitSequence(String, index: Int)
-        case unexpectedEscapedCharacter(ascii: UInt8, in: String, index: Int)
         case unescapedControlCharacterInString(ascii: UInt8, in: String, index: Int)
-        case expectedLowSurrogateUTF8SequenceAfterHighSurrogate(in: String, index: Int)
-        case couldNotCreateUnicodeScalarFromUInt32(in: String, index: Int, unicodeScalarValue: UInt32)
         case numberIsNotRepresentableInSwift(parsed: String)
         case invalidUTF8Sequence(Data, characterIndex: Int)
+
+        var localizedDescription: String {
+            switch self {
+            case let .faultyEscapeSequence(error, text):
+                switch error {
+                case .couldNotCreateUnicodeScalarFromUInt32:
+                    return "Unable to convert hex escape sequence (no high character) to UTF8-encoded character. Text: \(text)"
+                case .expectedLowSurrogateUTF8SequenceAfterHighSurrogate:
+                    return "Unexpected end of file during string parse (expected low-surrogate code point but did not find one). Text: \(text)"
+                case .unexpectedEscapedCharacter:
+                    return "Invalid escape sequence. Text: \(text)"
+                }
+            case .unexpectedEndOfFile:
+                return "Unexpected end of file during JSON parse."
+            case let .unexpectedCharacter(_, characterIndex):
+                return "Invalid value around character \(characterIndex)."
+            case let .invalidHexDigitSequence(string, index: index):
+                return #"Invalid hex encoded sequence in "\#(string)" at \#(index)."#
+            case .unescapedControlCharacterInString(ascii: let ascii, in: _, index: let index) where ascii == UInt8._backslash:
+                return #"Invalid escape sequence around character \#(index)."#
+            case .unescapedControlCharacterInString(ascii: _, in: _, index: let index):
+                return #"Unescaped control character around character \#(index)."#
+            case let .numberIsNotRepresentableInSwift(parsed: parsed):
+                return #"Number \#(parsed) is not representable in Swift."#
+            case let .invalidUTF8Sequence(data, characterIndex: index):
+                return #"Invalid UTF-8 sequence \#(data) starting from character \#(index)."#
+            }
+        }
     }
 
     static func jsonObject(with data: Data) throws -> Any {
-        do {
-            let array = [UInt8](data)
-            let parser = FoundationJson(bytes: array)
-            return try parser.parse() ?? NSNull()
-
-        } catch let error as JSONError {
-            switch error {
-            case .cannotConvertInputDataToUTF8:
-                throw NSError(domain: NSCocoaErrorDomain, code: CocoaError.propertyListReadCorrupt.rawValue, userInfo: [
-                    NSDebugDescriptionErrorKey: "Cannot convert input string to valid utf8 input."
-                ])
-            case .unexpectedEndOfFile:
-                throw NSError(domain: NSCocoaErrorDomain, code: CocoaError.propertyListReadCorrupt.rawValue, userInfo: [
-                    NSDebugDescriptionErrorKey: "Unexpected end of file during JSON parse."
-                ])
-            case let .unexpectedCharacter(_, characterIndex):
-                throw NSError(domain: NSCocoaErrorDomain, code: CocoaError.propertyListReadCorrupt.rawValue, userInfo: [
-                    NSDebugDescriptionErrorKey: "Invalid value around character \(characterIndex)."
-                ])
-            case .expectedLowSurrogateUTF8SequenceAfterHighSurrogate:
-                throw NSError(domain: NSCocoaErrorDomain, code: CocoaError.propertyListReadCorrupt.rawValue, userInfo: [
-                    NSDebugDescriptionErrorKey: "Unexpected end of file during string parse (expected low-surrogate code point but did not find one)."
-                ])
-            case .couldNotCreateUnicodeScalarFromUInt32:
-                throw NSError(domain: NSCocoaErrorDomain, code: CocoaError.propertyListReadCorrupt.rawValue, userInfo: [
-                    NSDebugDescriptionErrorKey: "Unable to convert hex escape sequence (no high character) to UTF8-encoded character."
-                ])
-            case let .unexpectedEscapedCharacter(_, _, index):
-                // we lower the failure index by one to match the darwin implementations counting
-                throw NSError(domain: NSCocoaErrorDomain, code: CocoaError.propertyListReadCorrupt.rawValue, userInfo: [
-                    NSDebugDescriptionErrorKey: "Invalid escape sequence around character \(index - 1)."
-                ])
-            case let .tooManyNestedArraysOrDictionaries(characterIndex: characterIndex):
-                throw NSError(domain: NSCocoaErrorDomain, code: CocoaError.propertyListReadCorrupt.rawValue, userInfo: [
-                    NSDebugDescriptionErrorKey: "Too many nested arrays or dictionaries around character \(characterIndex + 1)."
-                ])
-            case let .invalidHexDigitSequence(string, index: index):
-                throw NSError(domain: NSCocoaErrorDomain, code: CocoaError.propertyListReadCorrupt.rawValue, userInfo: [
-                    NSDebugDescriptionErrorKey: #"Invalid hex encoded sequence in "\#(string)" at \#(index)."#
-                ])
-            case .unescapedControlCharacterInString(ascii: let ascii, in: _, index: let index) where ascii == UInt8._backslash:
-                throw NSError(domain: NSCocoaErrorDomain, code: CocoaError.propertyListReadCorrupt.rawValue, userInfo: [
-                    NSDebugDescriptionErrorKey: #"Invalid escape sequence around character \#(index)."#
-                ])
-            case .unescapedControlCharacterInString(ascii: _, in: _, index: let index):
-                throw NSError(domain: NSCocoaErrorDomain, code: CocoaError.propertyListReadCorrupt.rawValue, userInfo: [
-                    NSDebugDescriptionErrorKey: #"Unescaped control character around character \#(index)."#
-                ])
-            case let .numberIsNotRepresentableInSwift(parsed: parsed):
-                throw NSError(domain: NSCocoaErrorDomain, code: CocoaError.propertyListReadCorrupt.rawValue, userInfo: [
-                    NSDebugDescriptionErrorKey: #"Number \#(parsed) is not representable in Swift."#
-                ])
-            case let .invalidUTF8Sequence(data, characterIndex: index):
-                throw NSError(domain: NSCocoaErrorDomain, code: CocoaError.propertyListReadCorrupt.rawValue, userInfo: [
-                    NSDebugDescriptionErrorKey: #"Invalid UTF-8 sequence \#(data) starting from character \#(index)."#
-                ])
-            }
-        } catch {
-            preconditionFailure("Only `JSONError` expected")
+        try data.withUnsafeBytes { buffer in
+            try FoundationJson(bytes: buffer).parse() ?? (NSNull() as Any)
         }
     }
 }

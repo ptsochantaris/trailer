@@ -33,7 +33,7 @@ extension GraphQL {
             self.lastCursor = lastCursor
         }
 
-        func asShell(for element: GQLElement, batchRootId: String?) -> GQLElement? {
+        func asShell(for element: GQLElement, batchRootId _: String?) -> GQLElement? {
             if element.id == id {
                 return element
             }
@@ -167,7 +167,7 @@ extension GraphQL {
                 for node in edges.compactMap({ $0["node"] as? JSON }) {
                     try await scanNode(node, query: query, parent: parent, extraQueries: extraQueries)
                 }
-                
+
                 if let latestCursor = edges.last?["cursor"] as? String,
                    let pageInfo, pageInfo["hasNextPage"] as? Bool == true,
                    let parentId = parent?.id {
@@ -186,7 +186,7 @@ extension GraphQL {
                 DLog("\(query.logPrefix)(Page in: \(name)) will need further paging: \(extraQueries.count) new queries")
             }
         }
-        
+
         private func scanList(nodes: [JSON], query: Query, parent: Node?, extraQueries: LinkedList<Query>) async throws {
             do {
                 for node in nodes {
@@ -195,7 +195,7 @@ extension GraphQL {
             } catch GQLError.alreadyParsed {
                 // exhausted new nodes
             }
-            
+
             if extraQueries.count > 0 {
                 DLog("\(query.logPrefix)(Group: \(name)) will need further paging: \(extraQueries.count) new queries")
             }
@@ -212,7 +212,7 @@ extension GraphQL {
                         // not a new node, ignore
                     }
                 }
-                
+
             } else if let nodes = pageData as? [JSON] {
                 try await scanList(nodes: nodes, query: query, parent: parent, extraQueries: extraQueries)
             }
