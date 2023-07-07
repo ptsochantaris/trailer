@@ -105,6 +105,8 @@
 		16878B8223C50D8A00F2213B /* GQLScanning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16878B8123C50D8A00F2213B /* GQLScanning.swift */; };
 		16878B8323C50D8A00F2213B /* GQLScanning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16878B8123C50D8A00F2213B /* GQLScanning.swift */; };
 		168839C71DEF8C3B002D9448 /* ImportExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 168839C61DEF8C3B002D9448 /* ImportExport.swift */; };
+		168924532A58BC2A0094F0D1 /* TrailerJson in Frameworks */ = {isa = PBXBuildFile; productRef = 168924522A58BC2A0094F0D1 /* TrailerJson */; };
+		168924552A58BC7A0094F0D1 /* TrailerJson in Frameworks */ = {isa = PBXBuildFile; productRef = 168924542A58BC7A0094F0D1 /* TrailerJson */; };
 		168BA31C283CC475005D09EE /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 168BA31A283CC310005D09EE /* MainView.swift */; };
 		168BA31D283CC59E005D09EE /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1664CBC91B7796840006BDE7 /* Enums.swift */; };
 		168BC6C417EC2DF000BC4584 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 168BC6C217EC2DF000BC4584 /* MainMenu.xib */; };
@@ -187,8 +189,6 @@
 		16DEA936235C6EDA004589B3 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16DEA935235C6EDA004589B3 /* main.swift */; };
 		16DEA937235C6F00004589B3 /* TrailerLauncher.app in Resources */ = {isa = PBXBuildFile; fileRef = 16DEA922235C6D7C004589B3 /* TrailerLauncher.app */; };
 		16DEA93D235C6F69004589B3 /* TrailerLauncher.app in Embed Helper */ = {isa = PBXBuildFile; fileRef = 16DEA922235C6D7C004589B3 /* TrailerLauncher.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		16E1C1DC2A096AC1006DDE7F /* FoundationJson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E1C1DB2A096AC1006DDE7F /* FoundationJson.swift */; };
-		16E1C1DD2A096AC1006DDE7F /* FoundationJson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E1C1DB2A096AC1006DDE7F /* FoundationJson.swift */; };
 		16E93D121AB467DA00CA967E /* PRListController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E93D111AB467DA00CA967E /* PRListController.swift */; };
 		16E93D141AB4680F00CA967E /* PRDetailController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E93D131AB4680F00CA967E /* PRDetailController.swift */; };
 		16E93D171AB46CE600CA967E /* LabelRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E93D161AB46CE600CA967E /* LabelRow.swift */; };
@@ -462,7 +462,6 @@
 		16DEA932235C6DC0004589B3 /* LauncherCommon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LauncherCommon.swift; sourceTree = "<group>"; };
 		16DEA935235C6EDA004589B3 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		16E07C831D2DC31300B0525C /* Trailer 30.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 30.xcdatamodel"; sourceTree = "<group>"; };
-		16E1C1DB2A096AC1006DDE7F /* FoundationJson.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoundationJson.swift; sourceTree = "<group>"; };
 		16E93D111AB467DA00CA967E /* PRListController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PRListController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16E93D131AB4680F00CA967E /* PRDetailController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PRDetailController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16E93D161AB46CE600CA967E /* LabelRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LabelRow.swift; sourceTree = "<group>"; };
@@ -491,6 +490,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				16039A812969817B00CC73F4 /* AsyncHTTPClient in Frameworks */,
+				168924552A58BC7A0094F0D1 /* TrailerJson in Frameworks */,
 				16A1E44329F2FBCA007684D0 /* AsyncAlgorithms in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -507,6 +507,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				168924532A58BC2A0094F0D1 /* TrailerJson in Frameworks */,
 				167E80F42517EC1700ED9A67 /* CoreSpotlight.framework in Frameworks */,
 				16039A7F296973E300CC73F4 /* AsyncHTTPClient in Frameworks */,
 				16BF673D283B1B9D0028EC13 /* Sparkle.framework in Frameworks */,
@@ -626,7 +627,6 @@
 				16039A822969827C00CC73F4 /* HTTPCache.swift */,
 				16B8179A29B29F1B009A49EB /* Gate.swift */,
 				16968559296A3E6800D7BD9B /* LinkedList.swift */,
-				16E1C1DB2A096AC1006DDE7F /* FoundationJson.swift */,
 			);
 			name = Logic;
 			sourceTree = "<group>";
@@ -985,6 +985,7 @@
 			packageProductDependencies = (
 				16039A802969817B00CC73F4 /* AsyncHTTPClient */,
 				16A1E44229F2FBCA007684D0 /* AsyncAlgorithms */,
+				168924542A58BC7A0094F0D1 /* TrailerJson */,
 			);
 			productName = PocketTrailer;
 			productReference = 1628A6B118789E73005EDA69 /* PocketTrailer.app */;
@@ -1027,6 +1028,7 @@
 			packageProductDependencies = (
 				16039A7E296973E300CC73F4 /* AsyncHTTPClient */,
 				16A1E44029F2FBB6007684D0 /* AsyncAlgorithms */,
+				168924522A58BC2A0094F0D1 /* TrailerJson */,
 			);
 			productName = Trailer;
 			productReference = 168BC6AA17EC2DF000BC4584 /* Trailer.app */;
@@ -1124,6 +1126,7 @@
 			packageReferences = (
 				16039A7D296973E300CC73F4 /* XCRemoteSwiftPackageReference "async-http-client" */,
 				16A1E43F29F2FBB6007684D0 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
+				168924512A58BC2A0094F0D1 /* XCRemoteSwiftPackageReference "trailer-json" */,
 			);
 			productRefGroup = 168BC6AB17EC2DF000BC4584 /* Products */;
 			projectDirPath = "";
@@ -1312,7 +1315,6 @@
 				160CA03B23A65152003FA0D8 /* GQLGroup.swift in Sources */,
 				160CA03123A65152003FA0D8 /* GQLQuery.swift in Sources */,
 				166A84C01A4582C100A3B292 /* ServerDetailViewController.swift in Sources */,
-				16E1C1DD2A096AC1006DDE7F /* FoundationJson.swift in Sources */,
 				169B92971CC52C05002774A8 /* SnoozePreset.swift in Sources */,
 				164841001AD198A6009E6383 /* WatchManager.swift in Sources */,
 				167B10581E6A86A300B0E1AE /* Review.swift in Sources */,
@@ -1413,7 +1415,6 @@
 				16DEA933235C6DC0004589B3 /* LauncherCommon.swift in Sources */,
 				167B10571E6A86A300B0E1AE /* Review.swift in Sources */,
 				16B3B34F1A34E990000BE6CC /* Trailer.xcdatamodeld in Sources */,
-				16E1C1DC2A096AC1006DDE7F /* FoundationJson.swift in Sources */,
 				1633C1921ABCEC4A0086C692 /* Issue.swift in Sources */,
 				1694008C1E7AAE32002C5DAD /* Reaction.swift in Sources */,
 			);
@@ -1643,8 +1644,8 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 1.8.2;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MARKETING_VERSION = 1.8.3;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_SWIFT_FLAGS = "-D DEBUG";
 				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = "debug-only";
@@ -1705,8 +1706,8 @@
 					"@executable_path/../Frameworks",
 				);
 				LLVM_LTO = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 1.8.2;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MARKETING_VERSION = 1.8.3;
 				SEPARATE_STRIP = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_DISABLE_SAFETY_CHECKS = YES;
@@ -2007,6 +2008,14 @@
 				minimumVersion = 1.0.0;
 			};
 		};
+		168924512A58BC2A0094F0D1 /* XCRemoteSwiftPackageReference "trailer-json" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ptsochantaris/trailer-json";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		16A1E43F29F2FBB6007684D0 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-async-algorithms";
@@ -2027,6 +2036,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 16039A7D296973E300CC73F4 /* XCRemoteSwiftPackageReference "async-http-client" */;
 			productName = AsyncHTTPClient;
+		};
+		168924522A58BC2A0094F0D1 /* TrailerJson */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 168924512A58BC2A0094F0D1 /* XCRemoteSwiftPackageReference "trailer-json" */;
+			productName = TrailerJson;
+		};
+		168924542A58BC7A0094F0D1 /* TrailerJson */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 168924512A58BC2A0094F0D1 /* XCRemoteSwiftPackageReference "trailer-json" */;
+			productName = TrailerJson;
 		};
 		16A1E44029F2FBB6007684D0 /* AsyncAlgorithms */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -1,4 +1,5 @@
 import CoreData
+import TrailerJson
 
 final class Review: DataItem {
     @NSManaged var body: String?

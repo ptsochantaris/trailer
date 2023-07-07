@@ -2,6 +2,7 @@ import AsyncHTTPClient
 import Foundation
 import NIOCore
 import NIOHTTP1
+import TrailerJson
 
 enum DataResult {
     case success(headers: HTTPHeaders, cachedIn: String?), notFound, deleted, failed(code: UInt)
@@ -53,13 +54,8 @@ enum HTTP {
         if case .success = result, Settings.dumpAPIResponsesInConsole {
             DLog("API data from \(request.url): \(data.description)")
         }
-        let json: Any
-        if #available(macOS 11.0, iOS 14, *) {
-            json = try FoundationJson.jsonObject(with: data.asData)
-        } else {
-            json = try JSONSerialization.jsonObject(with: data.asData, options: [])
-        }
-        return (json, result)
+        let json = try data.withVeryUnsafeBytes({ try TrailerJson(bytes: $0).parse() as? JSON })
+        return (json ?? NSNull(), result)
     }
 
     private static let getCache = HTTPCache()

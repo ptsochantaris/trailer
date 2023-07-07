@@ -1,6 +1,7 @@
 import AsyncHTTPClient
 import Foundation
 import NIOCore
+import TrailerJson
 
 extension GraphQL {
     struct Query {

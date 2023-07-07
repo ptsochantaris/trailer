@@ -1,4 +1,5 @@
 import CoreData
+import TrailerJson
 
 final class Reaction: DataItem {
     @NSManaged var content: String?

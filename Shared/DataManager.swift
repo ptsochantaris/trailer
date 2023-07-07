@@ -1,5 +1,6 @@
 import CoreData
 import CoreSpotlight
+import TrailerJson
 
 extension NSManagedObjectContext {
     func buildChildContext() -> NSManagedObjectContext {

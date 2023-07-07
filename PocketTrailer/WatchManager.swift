@@ -1,6 +1,7 @@
 import CoreData
 import UIKit
 import WatchConnectivity
+import TrailerJson
 
 final class WatchManager: NSObject, WCSessionDelegate {
     private var session: WCSession?

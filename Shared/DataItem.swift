@@ -1,4 +1,5 @@
 import CoreData
+import TrailerJson
 
 typealias FetchCache = NSCache<NSString, NSManagedObject>
 

@@ -1,5 +1,6 @@
 import CoreData
 import Foundation
+import TrailerJson
 
 final class PRComment: DataItem {
     @NSManaged var avatarUrl: String?

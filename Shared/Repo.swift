@@ -1,4 +1,5 @@
 import CoreData
+import TrailerJson
 
 final class Repo: DataItem {
     @NSManaged var fork: Bool

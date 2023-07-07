@@ -1,5 +1,6 @@
 import CoreData
 import Foundation
+import TrailerJson
 
 final class PRStatus: DataItem {
     @NSManaged var descriptionText: String?

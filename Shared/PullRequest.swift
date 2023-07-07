@@ -1,4 +1,5 @@
 import CoreData
+import TrailerJson
 #if os(iOS)
     import UIKit
 #endif

@@ -1,4 +1,5 @@
 import CoreData
+import TrailerJson
 
 final class Team: DataItem {
     @NSManaged var slug: String?

@@ -1,5 +1,6 @@
 import AsyncHTTPClient
 import Foundation
+import TrailerJson
 
 @MainActor
 enum RestAccess {

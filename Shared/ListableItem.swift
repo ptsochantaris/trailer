@@ -1,5 +1,6 @@
 import CoreData
 import CoreSpotlight
+import TrailerJson
 
 #if os(iOS)
     import MobileCoreServices

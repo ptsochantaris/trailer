@@ -1,5 +1,6 @@
 import CoreData
 import Foundation
+import TrailerJson
 
 extension API {
     private static func handleRepoSync(for repo: Repo, result: DataResult) {

@@ -1,4 +1,5 @@
 import Foundation
+import TrailerJson
 
 extension GraphQL {
     struct BatchGroup: GQLScanning {
