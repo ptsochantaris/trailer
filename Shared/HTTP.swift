@@ -4,6 +4,8 @@ import NIOCore
 import NIOHTTP1
 import TrailerJson
 
+typealias JSON = [String: Any]
+
 enum DataResult {
     case success(headers: HTTPHeaders, cachedIn: String?), notFound, deleted, failed(code: UInt)
 
@@ -54,7 +56,7 @@ enum HTTP {
         if case .success = result, Settings.dumpAPIResponsesInConsole {
             DLog("API data from \(request.url): \(data.description)")
         }
-        let json = try data.withVeryUnsafeBytes({ try TrailerJson(bytes: $0).parse() as? JSON })
+        let json = try data.withVeryUnsafeBytes { try TrailerJson.parse(bytes: $0) as? JSON }
         return (json ?? NSNull(), result)
     }
 
