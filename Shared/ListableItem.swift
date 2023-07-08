@@ -657,7 +657,7 @@ class ListableItem: DataItem {
     }
 
     final var accessibleTitle: String {
-        let components = LinkedList<String>()
+        let components = TrailerQL.List<String>()
         if let t = title {
             components.append(t)
         }
@@ -982,7 +982,7 @@ class ListableItem: DataItem {
 
     @MainActor
     static func requestForItems<T: ListableItem>(of itemType: T.Type, withFilter: String?, sectionIndex: Int, criterion: GroupingCriterion? = nil, onlyUnread: Bool = false, excludeSnoozed: Bool = false) -> NSFetchRequest<T> {
-        let andPredicates = LinkedList<NSPredicate>()
+        let andPredicates = TrailerQL.List<NSPredicate>()
 
         if onlyUnread {
             andPredicates.append(itemType.includeInUnreadPredicate)
@@ -1032,7 +1032,7 @@ class ListableItem: DataItem {
             check(forTag: "state") { statePredicate(from: $0, termAt: $1) }
 
             if !fi.isEmpty {
-                let predicates = LinkedList<NSPredicate>()
+                let predicates = TrailerQL.List<NSPredicate>()
                 let negative = fi.hasPrefix("!")
 
                 func appendPredicate(format: String, numeric: Bool) {
@@ -1060,7 +1060,7 @@ class ListableItem: DataItem {
             }
         }
 
-        let sortDescriptors = LinkedList<NSSortDescriptor>()
+        let sortDescriptors = TrailerQL.List<NSSortDescriptor>()
         sortDescriptors.append(NSSortDescriptor(key: "sectionIndex", ascending: true))
         if Settings.groupByRepo {
             sortDescriptors.append(NSSortDescriptor(key: "repo.fullName", ascending: true, selector: #selector(NSString.localizedCaseInsensitiveCompare)))

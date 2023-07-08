@@ -127,7 +127,7 @@ enum GraphQL {
         }
     }
 
-    static func runQueries(queries: LinkedList<TrailerQL.Query>, on path: String, token: String) async throws -> ApiStats? {
+    static func runQueries(queries: TrailerQL.List<TrailerQL.Query>, on path: String, token: String) async throws -> ApiStats? {
         try await withThrowingTaskGroup(of: ApiStats?.self, returning: ApiStats?.self) { group in
             for query in queries {
                 group.addTask { @MainActor in
@@ -305,14 +305,14 @@ enum GraphQL {
         var count = 0
         for (server, items) in itemsByServer {
             let ids = items.compactMap(\.nodeId)
-            var nodes = [String: LinkedList<TrailerQL.Node>]()
+            var nodes = [String: TrailerQL.List<TrailerQL.Node>]()
             let serverName = server.label ?? "<no label>"
             let nodeBlock = { (node: TrailerQL.Node) in
                 let type = node.elementType
                 if let existingList = nodes[type] {
                     existingList.append(node)
                 } else {
-                    nodes[type] = LinkedList<TrailerQL.Node>(value: node)
+                    nodes[type] = TrailerQL.List<TrailerQL.Node>(value: node)
                 }
 
                 count += 1
@@ -448,9 +448,9 @@ enum GraphQL {
         }
     }
 
-    static func fetchAllAuthoredItems(from server: ApiServer, @TrailerQL.ElementsBuilder fields: () -> [any Element]) async -> [String: LinkedList<TrailerQL.Node>]? {
+    static func fetchAllAuthoredItems(from server: ApiServer, @TrailerQL.ElementsBuilder fields: () -> [any Element]) async -> [String: TrailerQL.List<TrailerQL.Node>]? {
         var count = 0
-        var nodes = [String: LinkedList<TrailerQL.Node>]()
+        var nodes = [String: TrailerQL.List<TrailerQL.Node>]()
         let group = Group("viewer", fields: fields)
         let processor = Processor()
         let authoredItemsQuery = Query(name: "Authored Items", rootElement: group) { node in
@@ -458,7 +458,7 @@ enum GraphQL {
             if let existingList = nodes[type] {
                 existingList.append(node)
             } else {
-                nodes[type] = LinkedList<TrailerQL.Node>(value: node)
+                nodes[type] = TrailerQL.List<TrailerQL.Node>(value: node)
             }
 
             count += 1
@@ -469,7 +469,7 @@ enum GraphQL {
             }
         }
         do {
-            try await server.run(queries: LinkedList(value: authoredItemsQuery))
+            try await server.run(queries: TrailerQL.List(value: authoredItemsQuery))
             processor.add(chunk: .init(nodes: nodes, server: server, parentType: nil, moreComing: false))
             await processor.waitForCompletion()
             return nodes
@@ -480,8 +480,8 @@ enum GraphQL {
         }
     }
 
-    private static func checkAuthoredPrClosures(nodes: [String: LinkedList<TrailerQL.Node>], in server: ApiServer) async {
-        let prsToCheck = LinkedList<PullRequest>()
+    private static func checkAuthoredPrClosures(nodes: [String: TrailerQL.List<TrailerQL.Node>], in server: ApiServer) async {
+        let prsToCheck = TrailerQL.List<PullRequest>()
         let fetchedPrIds = Set(nodes["PullRequest"]?.map(\.id) ?? [])
         for repo in server.repos.filter({ $0.displayPolicyForPrs == RepoDisplayPolicy.authoredOnly.rawValue }) {
             for pr in repo.pullRequests where !fetchedPrIds.contains(pr.nodeId ?? "") {
@@ -495,13 +495,13 @@ enum GraphQL {
 
         let prGroup = Group("pullRequests") { prFragment(assigneesAndLabelPageSize: 1, includeRepo: true) }
         let group = TrailerQL.BatchGroup(templateGroup: prGroup, idList: prsToCheck.compactMap(\.nodeId))
-        let nodes = LinkedList<TrailerQL.Node>()
+        let nodes = TrailerQL.List<TrailerQL.Node>()
         let query = TrailerQL.Query(name: "Closed Authored PRs", rootElement: group, allowsEmptyResponse: true) { node in
             node.forcedUpdate = true
             nodes.append(node)
         }
         do {
-            try await server.run(queries: LinkedList(value: query))
+            try await server.run(queries: TrailerQL.List(value: query))
             let processor = Processor()
             processor.add(chunk: .init(nodes: ["PullRequest": nodes], server: server, parentType: nil, moreComing: false))
             await processor.waitForCompletion()
@@ -510,7 +510,7 @@ enum GraphQL {
         }
     }
 
-    private static func checkAuthoredIssueClosures(nodes: [String: LinkedList<TrailerQL.Node>], in server: ApiServer) {
+    private static func checkAuthoredIssueClosures(nodes: [String: TrailerQL.List<TrailerQL.Node>], in server: ApiServer) {
         let fetchedIssueIds = Set(nodes["Issue"]?.map(\.id) ?? []) // investigate missing issues
         for repo in server.repos.filter({ $0.displayPolicyForIssues == RepoDisplayPolicy.authoredOnly.rawValue }) {
             for issue in repo.issues where !fetchedIssueIds.contains(issue.nodeId ?? "") {
@@ -566,7 +566,7 @@ enum GraphQL {
 
         for (server, reposInThisServer) in reposByServer {
             var count = 0
-            var nodes = [String: LinkedList<TrailerQL.Node>]()
+            var nodes = [String: TrailerQL.List<TrailerQL.Node>]()
 
             let perNodeBlock: TrailerQL.PerNodeBlock = { node in
 
@@ -574,7 +574,7 @@ enum GraphQL {
                 if let existingList = nodes[type] {
                     existingList.append(node)
                 } else {
-                    nodes[type] = LinkedList<TrailerQL.Node>(value: node)
+                    nodes[type] = TrailerQL.List<TrailerQL.Node>(value: node)
                 }
 
                 if type == "PullRequest",
@@ -593,11 +593,11 @@ enum GraphQL {
                 }
             }
 
-            let queriesForServer = LinkedList<TrailerQL.Query>()
+            let queriesForServer = TrailerQL.List<TrailerQL.Query>()
             let serverLabel = server.label ?? "<no label>"
 
-            let idsForReposInThisServerWantingAllOpenPrs = LinkedList<String>()
-            let idsForReposInThisServerWantingLatestPrs = LinkedList<String>()
+            let idsForReposInThisServerWantingAllOpenPrs = TrailerQL.List<String>()
+            let idsForReposInThisServerWantingLatestPrs = TrailerQL.List<String>()
             for repo in reposInThisServer {
                 if let n = repo.nodeId {
                     if let last = prRepoIdToLatestExistingUpdate[n], last != .distantPast {
@@ -646,7 +646,7 @@ enum GraphQL {
 
         for (server, reposInThisServer) in reposByServer {
             var count = 0
-            var nodes = [String: LinkedList<TrailerQL.Node>]()
+            var nodes = [String: TrailerQL.List<TrailerQL.Node>]()
 
             let perNodeBlock: TrailerQL.PerNodeBlock = { node in
 
@@ -654,7 +654,7 @@ enum GraphQL {
                 if let existingList = nodes[type] {
                     existingList.append(node)
                 } else {
-                    nodes[type] = LinkedList<TrailerQL.Node>(value: node)
+                    nodes[type] = TrailerQL.List<TrailerQL.Node>(value: node)
                 }
 
                 if type == "Issue",
@@ -673,11 +673,11 @@ enum GraphQL {
                 }
             }
 
-            let queriesForServer = LinkedList<TrailerQL.Query>()
+            let queriesForServer = TrailerQL.List<TrailerQL.Query>()
             let serverLabel = server.label ?? "<no label>"
 
-            let idsForReposInThisServerWantingAllOpenIssues = LinkedList<String>()
-            let idsForReposInThisServerWantingLatestIssues = LinkedList<String>()
+            let idsForReposInThisServerWantingAllOpenIssues = TrailerQL.List<String>()
+            let idsForReposInThisServerWantingLatestIssues = TrailerQL.List<String>()
             for repo in reposInThisServer {
                 if let n = repo.nodeId {
                     if let last = issueRepoIdToLatestExistingUpdate[n], last != .distantPast {

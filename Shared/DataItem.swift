@@ -367,7 +367,7 @@ class DataItem: NSManagedObject {
         }
     }
 
-    static func syncItems<T: DataItem>(of type: T.Type, from nodes: LinkedList<TrailerQL.Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache, perItemCallback: (T, TrailerQL.Node) -> Void) {
+    static func syncItems<T: DataItem>(of type: T.Type, from nodes: TrailerQL.List<TrailerQL.Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache, perItemCallback: (T, TrailerQL.Node) -> Void) {
         let validNodes = nodes.filter { !($0.parent?.creationSkipped ?? false) }
         if validNodes.isEmpty {
             return

@@ -1,6 +1,5 @@
 import CoreData
 import Foundation
-
 import TrailerQL
 
 final class PRStatus: DataItem {
@@ -30,7 +29,7 @@ final class PRStatus: DataItem {
         }
     }
 
-    static func sync(from nodes: LinkedList<TrailerQL.Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
+    static func sync(from nodes: TrailerQL.List<TrailerQL.Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
         syncItems(of: PRStatus.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { status, node in
             guard node.created || node.updated,
                   let parentId = node.parent?.id

@@ -5,7 +5,7 @@ import TrailerQL
 extension GraphQL {
     final class Processor {
         struct Chunk {
-            let nodes: [String: LinkedList<TrailerQL.Node>]
+            let nodes: [String: TrailerQL.List<TrailerQL.Node>]
             let server: ApiServer
             let parentType: ListableItem.Type?
             let moreComing: Bool

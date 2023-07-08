@@ -1,9 +1,8 @@
 import CoreData
-
+import TrailerQL
 #if os(iOS)
     import UIKit
 #endif
-import TrailerQL
 
 final class PullRequest: ListableItem {
     @NSManaged var lastStatusNotified: String?
@@ -31,7 +30,7 @@ final class PullRequest: ListableItem {
         repo.pullRequests.reduce(.distantPast) { max($0, $1.updatedAt ?? .distantPast) }
     }
 
-    static func sync(from nodes: LinkedList<TrailerQL.Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
+    static func sync(from nodes: TrailerQL.List<TrailerQL.Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
         syncItems(of: PullRequest.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { pr, node in
             guard node.created || node.updated,
                   let parentId = node.parent?.id ?? (node.jsonPayload["repository"] as? JSON)?["id"] as? String,
