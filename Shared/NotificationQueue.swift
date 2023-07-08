@@ -3,7 +3,7 @@ import Foundation
 import TrailerQL
 
 enum NotificationQueue {
-    private static var queue = TrailerQL.List<(NotificationType, NSManagedObjectID)>()
+    private static var queue = List<(NotificationType, NSManagedObjectID)>()
 
     static func add(type: NotificationType, for item: DataItem) {
         try? item.managedObjectContext?.obtainPermanentIDs(for: [item])

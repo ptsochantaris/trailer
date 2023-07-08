@@ -15,7 +15,7 @@ final class Review: DataItem {
         case DISMISSED
     }
 
-    static func syncRequests(from nodes: TrailerQL.List<TrailerQL.Node>, moc: NSManagedObjectContext, parentCache: FetchCache) {
+    static func syncRequests(from nodes: List<Node>, moc: NSManagedObjectContext, parentCache: FetchCache) {
         var prIdsToAssignedUsers = [String: Set<String>]()
         var prIdsToAssignedTeams = [String: Set<String>]()
 
@@ -50,7 +50,7 @@ final class Review: DataItem {
         }
     }
 
-    static func sync(from nodes: TrailerQL.List<TrailerQL.Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
+    static func sync(from nodes: List<Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
         syncItems(of: Review.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { review, node in
 
             let info = node.jsonPayload

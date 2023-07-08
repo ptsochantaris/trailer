@@ -279,8 +279,8 @@ enum DataManager {
 
         DLog("Re-indexing spotlight")
 
-        let itemsToIndex = TrailerQL.List<CSSearchableItem>()
-        let itemsToRemove = TrailerQL.List<String>()
+        let itemsToIndex = List<CSSearchableItem>()
+        let itemsToRemove = List<String>()
 
         for pr in DataItem.allItems(of: PullRequest.self, in: main) {
             switch await pr.handleSpotlight() {
@@ -376,8 +376,8 @@ enum DataManager {
         guard CSSearchableIndex.isIndexingAvailable() else {
             return
         }
-        let urisToDelete = TrailerQL.List<String>()
-        let itemsToReIndex = TrailerQL.List<CSSearchableItem>()
+        let urisToDelete = List<String>()
+        let itemsToReIndex = List<CSSearchableItem>()
         for updatedItem in updates {
             guard let updatedItem = updatedItem as? ListableItem else {
                 continue

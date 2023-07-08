@@ -99,7 +99,7 @@ class ListableItem: DataItem {
         return Array(items)
     }
 
-    final func baseNodeSync(node: TrailerQL.Node, parent: Repo) {
+    final func baseNodeSync(node: Node, parent: Repo) {
         repo = parent
 
         let info = node.jsonPayload
@@ -657,7 +657,7 @@ class ListableItem: DataItem {
     }
 
     final var accessibleTitle: String {
-        let components = TrailerQL.List<String>()
+        let components = List<String>()
         if let t = title {
             components.append(t)
         }
@@ -982,7 +982,7 @@ class ListableItem: DataItem {
 
     @MainActor
     static func requestForItems<T: ListableItem>(of itemType: T.Type, withFilter: String?, sectionIndex: Int, criterion: GroupingCriterion? = nil, onlyUnread: Bool = false, excludeSnoozed: Bool = false) -> NSFetchRequest<T> {
-        let andPredicates = TrailerQL.List<NSPredicate>()
+        let andPredicates = List<NSPredicate>()
 
         if onlyUnread {
             andPredicates.append(itemType.includeInUnreadPredicate)
@@ -1032,7 +1032,7 @@ class ListableItem: DataItem {
             check(forTag: "state") { statePredicate(from: $0, termAt: $1) }
 
             if !fi.isEmpty {
-                let predicates = TrailerQL.List<NSPredicate>()
+                let predicates = List<NSPredicate>()
                 let negative = fi.hasPrefix("!")
 
                 func appendPredicate(format: String, numeric: Bool) {
@@ -1060,7 +1060,7 @@ class ListableItem: DataItem {
             }
         }
 
-        let sortDescriptors = TrailerQL.List<NSSortDescriptor>()
+        let sortDescriptors = List<NSSortDescriptor>()
         sortDescriptors.append(NSSortDescriptor(key: "sectionIndex", ascending: true))
         if Settings.groupByRepo {
             sortDescriptors.append(NSSortDescriptor(key: "repo.fullName", ascending: true, selector: #selector(NSString.localizedCaseInsensitiveCompare)))
@@ -1192,7 +1192,7 @@ class ListableItem: DataItem {
         return CSSearchableItem(uniqueIdentifier: uri, domainIdentifier: nil, attributeSet: s)
     }
 
-    override final class func shouldCreate(from node: TrailerQL.Node) -> Bool {
+    override final class func shouldCreate(from node: Node) -> Bool {
         if node.jsonPayload["state"] as? String == "OPEN" {
             return true
         }

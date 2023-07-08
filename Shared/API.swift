@@ -24,6 +24,7 @@ enum API {
 
     static func setup() {
         reachability.startNotifier()
+        GraphQL.setup()
 
         let n = reachability.status
         DLog("Network is \(n.name)")
