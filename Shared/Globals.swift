@@ -1,5 +1,5 @@
 import NIOHTTP1
-import TrailerJson
+
 #if os(iOS)
 
     import CoreData

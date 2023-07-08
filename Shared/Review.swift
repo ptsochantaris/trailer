@@ -1,5 +1,6 @@
 import CoreData
-import TrailerJson
+
+import TrailerQL
 
 final class Review: DataItem {
     @NSManaged var body: String?
@@ -15,7 +16,7 @@ final class Review: DataItem {
         case DISMISSED
     }
 
-    static func syncRequests(from nodes: LinkedList<GraphQL.Node>, moc: NSManagedObjectContext, parentCache: FetchCache) {
+    static func syncRequests(from nodes: LinkedList<TrailerQL.Node>, moc: NSManagedObjectContext, parentCache: FetchCache) {
         var prIdsToAssignedUsers = [String: Set<String>]()
         var prIdsToAssignedTeams = [String: Set<String>]()
 
@@ -50,7 +51,7 @@ final class Review: DataItem {
         }
     }
 
-    static func sync(from nodes: LinkedList<GraphQL.Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
+    static func sync(from nodes: LinkedList<TrailerQL.Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
         syncItems(of: Review.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { review, node in
 
             let info = node.jsonPayload
@@ -139,20 +140,3 @@ final class Review: DataItem {
         return s == State.CHANGES_REQUESTED.rawValue || s == State.APPROVED.rawValue || s == State.DISMISSED.rawValue
     }
 }
-
-/*
- PENDING
- A review that has not yet been submitted.
-
- COMMENTED
- An informational review.
-
- APPROVED
- A review allowing the pull request to merge.
-
- CHANGES_REQUESTED
- A review blocking the pull request from merging.
-
- DISMISSED
- A review that has been dismissed.
- */

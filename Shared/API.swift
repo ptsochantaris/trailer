@@ -1,6 +1,5 @@
 import CommonCrypto
 import CoreData
-import TrailerJson
 
 extension String {
     private func sha1() -> Data {

@@ -1,5 +1,5 @@
 import CoreData
-import TrailerJson
+import TrailerQL
 
 typealias FetchCache = NSCache<NSString, NSManagedObject>
 
@@ -305,7 +305,7 @@ class DataItem: NSManagedObject {
         return Date(timeIntervalSince1970: TimeInterval(t))
     }
 
-    private func populate(type: (some DataItem).Type, node: GraphQL.Node) {
+    private func populate(type: (some DataItem).Type, node: TrailerQL.Node) {
         let info = node.jsonPayload
         let entityName = String(describing: type)
 
@@ -367,7 +367,7 @@ class DataItem: NSManagedObject {
         }
     }
 
-    static func syncItems<T: DataItem>(of type: T.Type, from nodes: LinkedList<GraphQL.Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache, perItemCallback: (T, GraphQL.Node) -> Void) {
+    static func syncItems<T: DataItem>(of type: T.Type, from nodes: LinkedList<TrailerQL.Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache, perItemCallback: (T, TrailerQL.Node) -> Void) {
         let validNodes = nodes.filter { !($0.parent?.creationSkipped ?? false) }
         if validNodes.isEmpty {
             return
@@ -404,5 +404,5 @@ class DataItem: NSManagedObject {
         }
     }
 
-    class func shouldCreate(from _: GraphQL.Node) -> Bool { true }
+    class func shouldCreate(from _: TrailerQL.Node) -> Bool { true }
 }

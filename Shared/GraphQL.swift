@@ -1,22 +1,22 @@
+import AsyncHTTPClient
 import Foundation
+import NIOCore
+import TrailerQL
 
 @MainActor
 enum GraphQL {
-    @globalActor
-    enum NodeActor {
-        actor ActorType {}
-        static let shared = ActorType()
-    }
-
-    typealias PerNodeBlock = @NodeActor (Node) async throws -> Void
-
     private static let nodeBlockMax = 2000
 
-    static let idField = Field("id")
+    typealias Field = TrailerQL.Field
+    typealias Group = TrailerQL.Group
+    typealias Fragment = TrailerQL.Fragment
+    typealias Query = TrailerQL.Query
 
-    private static let nameWithOwnerField = Field("nameWithOwner")
+    private static let nameWithOwnerField = TrailerQL.Field("nameWithOwner")
 
-    private static let userFragment = Fragment(on: "User") {
+    private static let idField = TrailerQL.idField
+
+    private static let userFragment = TrailerQL.Fragment(on: "User") {
         idField
         Field("login")
         Field("avatarUrl")
@@ -58,9 +58,90 @@ enum GraphQL {
                 gotUserNode = true
             }
         }
-        _ = try await testQuery.run(for: apiServer.graphQLPath ?? "", authToken: apiServer.authToken ?? "", attempts: 1)
+        _ = try await run(testQuery, for: apiServer.graphQLPath ?? "", authToken: apiServer.authToken ?? "", attempts: 1)
         if !gotUserNode {
             throw API.apiError("Could not read a valid user record from this endpoint")
+        }
+    }
+
+    private static let gateKeeper = Gate(tickets: 2)
+
+    static func run(_ query: Query, for urlString: String, authToken: String, attempts: Int = 5) async throws -> ApiStats? {
+        Task { @MainActor in
+            API.currentOperationName = query.name
+        }
+
+        let Q = query.queryText
+        if Settings.dumpAPIResponsesInConsole {
+            DLog("\(query.logPrefix)Fetching: \(Q)")
+        }
+
+        guard let requestData = try? JSONSerialization.data(withJSONObject: ["query": Q]) else {
+            throw API.apiError("\(query.logPrefix)Could not serialise query")
+        }
+
+        var request = HTTPClientRequest(url: urlString)
+        request.method = .POST
+        request.body = .bytes(ByteBuffer(bytes: requestData))
+        request.headers.add(name: "Authorization", value: "bearer \(authToken)")
+
+        await gateKeeper.takeTicket()
+        defer {
+            gateKeeper.relaxedReturnTicket()
+        }
+
+        guard let json = try await HTTP.getJsonData(for: request, attempts: attempts, checkCache: false).json as? JSON else {
+            throw API.apiError("\(query.logPrefix)Retuned data is not JSON")
+        }
+
+        let apiStats = ApiStats.fromV4(json: json["data"] as? JSON)
+        let expectedNodeCost = query.nodeCost
+        if let apiStats {
+            DLog("\(query.logPrefix)Received page (Cost: \(apiStats.cost), Remaining: \(apiStats.remaining)/\(apiStats.limit) - Expected Count: \(expectedNodeCost) - Returned Count: \(apiStats.nodeCount))")
+            if expectedNodeCost != apiStats.nodeCount {
+                DLog("Warning: Mismatched expected and received node count!")
+            }
+        } else {
+            DLog("\(query.logPrefix)Received page (No stats) - Expected Count: \(expectedNodeCost)")
+        }
+
+        DLog("\(query.logPrefix)Scanning result")
+
+        do {
+            let extraQueries = try await query.processResponse(from: json)
+            if extraQueries.count > 0 {
+                DLog("\(query.logPrefix)Needs more page data (\(extraQueries.count) queries)")
+                return try await runQueries(queries: extraQueries, on: urlString, token: authToken)
+            }
+            DLog("\(query.logPrefix)Parsed all pages")
+            return apiStats
+
+        } catch {
+            let msg: String?
+            if let errors = json["errors"] as? [JSON] {
+                msg = errors.first?["message"] as? String
+            } else {
+                msg = json["message"] as? String
+            }
+            throw API.apiError("\(query.logPrefix)" + (msg ?? "Unspecified server error: \(json)"))
+        }
+    }
+
+    static func runQueries(queries: LinkedList<TrailerQL.Query>, on path: String, token: String) async throws -> ApiStats? {
+        try await withThrowingTaskGroup(of: ApiStats?.self, returning: ApiStats?.self) { group in
+            for query in queries {
+                group.addTask { @MainActor in
+                    if let stats = try await run(query, for: path, authToken: token) {
+                        return stats
+                    }
+                    return nil
+                }
+            }
+            var mostRecentNonNilStats: ApiStats?
+            for try await stats in group where stats != nil {
+                mostRecentNonNilStats = stats
+            }
+            return mostRecentNonNilStats
         }
     }
 
@@ -214,7 +295,7 @@ enum GraphQL {
         }
     }
 
-    private static func process(name: String, items: [DataItem], parentType: (some ListableItem).Type? = nil, @GQLElementsBuilder fields: () -> [any GQLElement]) async throws {
+    private static func process(name: String, items: [DataItem], parentType: (some ListableItem).Type? = nil, @TrailerQL.ElementsBuilder fields: () -> [any Element]) async throws {
         if items.isEmpty {
             return
         }
@@ -224,14 +305,14 @@ enum GraphQL {
         var count = 0
         for (server, items) in itemsByServer {
             let ids = items.compactMap(\.nodeId)
-            var nodes = [String: LinkedList<Node>]()
+            var nodes = [String: LinkedList<TrailerQL.Node>]()
             let serverName = server.label ?? "<no label>"
-            let nodeBlock = { (node: Node) in
+            let nodeBlock = { (node: TrailerQL.Node) in
                 let type = node.elementType
                 if let existingList = nodes[type] {
                     existingList.append(node)
                 } else {
-                    nodes[type] = LinkedList<Node>(value: node)
+                    nodes[type] = LinkedList<TrailerQL.Node>(value: node)
                 }
 
                 count += 1
@@ -367,9 +448,9 @@ enum GraphQL {
         }
     }
 
-    static func fetchAllAuthoredItems(from server: ApiServer, @GQLElementsBuilder fields: () -> [any GQLElement]) async -> [String: LinkedList<Node>]? {
+    static func fetchAllAuthoredItems(from server: ApiServer, @TrailerQL.ElementsBuilder fields: () -> [any Element]) async -> [String: LinkedList<TrailerQL.Node>]? {
         var count = 0
-        var nodes = [String: LinkedList<Node>]()
+        var nodes = [String: LinkedList<TrailerQL.Node>]()
         let group = Group("viewer", fields: fields)
         let processor = Processor()
         let authoredItemsQuery = Query(name: "Authored Items", rootElement: group) { node in
@@ -377,7 +458,7 @@ enum GraphQL {
             if let existingList = nodes[type] {
                 existingList.append(node)
             } else {
-                nodes[type] = LinkedList<Node>(value: node)
+                nodes[type] = LinkedList<TrailerQL.Node>(value: node)
             }
 
             count += 1
@@ -399,7 +480,7 @@ enum GraphQL {
         }
     }
 
-    private static func checkAuthoredPrClosures(nodes: [String: LinkedList<Node>], in server: ApiServer) async {
+    private static func checkAuthoredPrClosures(nodes: [String: LinkedList<TrailerQL.Node>], in server: ApiServer) async {
         let prsToCheck = LinkedList<PullRequest>()
         let fetchedPrIds = Set(nodes["PullRequest"]?.map(\.id) ?? [])
         for repo in server.repos.filter({ $0.displayPolicyForPrs == RepoDisplayPolicy.authoredOnly.rawValue }) {
@@ -413,9 +494,9 @@ enum GraphQL {
         }
 
         let prGroup = Group("pullRequests") { prFragment(assigneesAndLabelPageSize: 1, includeRepo: true) }
-        let group = BatchGroup(templateGroup: prGroup, idList: prsToCheck.compactMap(\.nodeId))
-        let nodes = LinkedList<Node>()
-        let query = Query(name: "Closed Authored PRs", rootElement: group, allowsEmptyResponse: true) { node in
+        let group = TrailerQL.BatchGroup(templateGroup: prGroup, idList: prsToCheck.compactMap(\.nodeId))
+        let nodes = LinkedList<TrailerQL.Node>()
+        let query = TrailerQL.Query(name: "Closed Authored PRs", rootElement: group, allowsEmptyResponse: true) { node in
             node.forcedUpdate = true
             nodes.append(node)
         }
@@ -429,7 +510,7 @@ enum GraphQL {
         }
     }
 
-    private static func checkAuthoredIssueClosures(nodes: [String: LinkedList<Node>], in server: ApiServer) {
+    private static func checkAuthoredIssueClosures(nodes: [String: LinkedList<TrailerQL.Node>], in server: ApiServer) {
         let fetchedIssueIds = Set(nodes["Issue"]?.map(\.id) ?? []) // investigate missing issues
         for repo in server.repos.filter({ $0.displayPolicyForIssues == RepoDisplayPolicy.authoredOnly.rawValue }) {
             for issue in repo.issues where !fetchedIssueIds.contains(issue.nodeId ?? "") {
@@ -439,38 +520,30 @@ enum GraphQL {
         }
     }
 
-    enum GQLError: Error {
-        case alreadyParsed
-
-        var localizedDescription: String {
-            "Node already parsed in previous sync"
-        }
-    }
-
     private static let latestPrsFragment = Fragment(on: "Repository") {
         idField
-        Group("pullRequests", ("orderBy", "{direction: DESC, field: UPDATED_AT}"), paging: .first(count: 20, paging: true)) {
+        TrailerQL.Group("pullRequests", ("orderBy", "{direction: DESC, field: UPDATED_AT}"), paging: .first(count: 20, paging: true)) {
             prFragment(assigneesAndLabelPageSize: 20, includeRepo: false)
         }
     }
 
     private static let latestIssuesFragment = Fragment(on: "Repository") {
         idField
-        Group("issues", ("orderBy", "{direction: DESC, field: UPDATED_AT}"), paging: .first(count: 40, paging: true)) {
+        TrailerQL.Group("issues", ("orderBy", "{direction: DESC, field: UPDATED_AT}"), paging: .first(count: 40, paging: true)) {
             issueFragment(assigneesAndLabelPageSize: 20, includeRepo: false)
         }
     }
 
     private static let allOpenPrsFragment = Fragment(on: "Repository") {
         idField
-        Group("pullRequests", ("states", "[OPEN]"), paging: .first(count: 50, paging: true)) {
+        TrailerQL.Group("pullRequests", ("states", "[OPEN]"), paging: .first(count: 50, paging: true)) {
             prFragment(assigneesAndLabelPageSize: 20, includeRepo: false)
         }
     }
 
     private static let allOpenIssuesFragment = Fragment(on: "Repository") {
         idField
-        Group("issues", ("states", "[OPEN]"), paging: .first(count: 50, paging: true)) {
+        TrailerQL.Group("issues", ("states", "[OPEN]"), paging: .first(count: 50, paging: true)) {
             issueFragment(assigneesAndLabelPageSize: 20, includeRepo: false)
         }
     }
@@ -493,15 +566,15 @@ enum GraphQL {
 
         for (server, reposInThisServer) in reposByServer {
             var count = 0
-            var nodes = [String: LinkedList<Node>]()
+            var nodes = [String: LinkedList<TrailerQL.Node>]()
 
-            let perNodeBlock: PerNodeBlock = { node in
+            let perNodeBlock: TrailerQL.PerNodeBlock = { node in
 
                 let type = node.elementType
                 if let existingList = nodes[type] {
                     existingList.append(node)
                 } else {
-                    nodes[type] = LinkedList<Node>(value: node)
+                    nodes[type] = LinkedList<TrailerQL.Node>(value: node)
                 }
 
                 if type == "PullRequest",
@@ -509,7 +582,7 @@ enum GraphQL {
                    let updatedAt = node.jsonPayload["updatedAt"] as? String,
                    let d = DataItem.parseGH8601(updatedAt),
                    d < prRepoIdToLatestExistingUpdate[repo.id]! {
-                    throw GQLError.alreadyParsed
+                    throw TQLError.alreadyParsed
                 }
 
                 count += 1
@@ -520,7 +593,7 @@ enum GraphQL {
                 }
             }
 
-            let queriesForServer = LinkedList<Query>()
+            let queriesForServer = LinkedList<TrailerQL.Query>()
             let serverLabel = server.label ?? "<no label>"
 
             let idsForReposInThisServerWantingAllOpenPrs = LinkedList<String>()
@@ -536,12 +609,12 @@ enum GraphQL {
             }
 
             if idsForReposInThisServerWantingLatestPrs.count > 0 {
-                let q = Query.batching("\(serverLabel): Updated PRs", idList: Array(idsForReposInThisServerWantingLatestPrs), perNode: perNodeBlock) { latestPrsFragment }
+                let q = TrailerQL.Query.batching("\(serverLabel): Updated PRs", idList: Array(idsForReposInThisServerWantingLatestPrs), perNode: perNodeBlock) { latestPrsFragment }
                 queriesForServer.append(contentsOf: q)
             }
 
             if idsForReposInThisServerWantingAllOpenPrs.count > 0 {
-                let q = Query.batching("\(serverLabel): Open PRs", idList: Array(idsForReposInThisServerWantingAllOpenPrs), perNode: perNodeBlock) { allOpenPrsFragment }
+                let q = TrailerQL.Query.batching("\(serverLabel): Open PRs", idList: Array(idsForReposInThisServerWantingAllOpenPrs), perNode: perNodeBlock) { allOpenPrsFragment }
                 queriesForServer.append(contentsOf: q)
             }
 
@@ -573,15 +646,15 @@ enum GraphQL {
 
         for (server, reposInThisServer) in reposByServer {
             var count = 0
-            var nodes = [String: LinkedList<Node>]()
+            var nodes = [String: LinkedList<TrailerQL.Node>]()
 
-            let perNodeBlock: PerNodeBlock = { node in
+            let perNodeBlock: TrailerQL.PerNodeBlock = { node in
 
                 let type = node.elementType
                 if let existingList = nodes[type] {
                     existingList.append(node)
                 } else {
-                    nodes[type] = LinkedList<Node>(value: node)
+                    nodes[type] = LinkedList<TrailerQL.Node>(value: node)
                 }
 
                 if type == "Issue",
@@ -589,7 +662,7 @@ enum GraphQL {
                    let updatedAt = node.jsonPayload["updatedAt"] as? String,
                    let d = DataItem.parseGH8601(updatedAt),
                    d < issueRepoIdToLatestExistingUpdate[repo.id]! {
-                    throw GQLError.alreadyParsed
+                    throw TQLError.alreadyParsed
                 }
 
                 count += 1
@@ -600,7 +673,7 @@ enum GraphQL {
                 }
             }
 
-            let queriesForServer = LinkedList<Query>()
+            let queriesForServer = LinkedList<TrailerQL.Query>()
             let serverLabel = server.label ?? "<no label>"
 
             let idsForReposInThisServerWantingAllOpenIssues = LinkedList<String>()
@@ -616,12 +689,12 @@ enum GraphQL {
             }
 
             if idsForReposInThisServerWantingLatestIssues.count > 0 {
-                let q = Query.batching("\(serverLabel): Updated Issues", idList: Array(idsForReposInThisServerWantingLatestIssues), perNode: perNodeBlock) { latestIssuesFragment }
+                let q = TrailerQL.Query.batching("\(serverLabel): Updated Issues", idList: Array(idsForReposInThisServerWantingLatestIssues), perNode: perNodeBlock) { latestIssuesFragment }
                 queriesForServer.append(contentsOf: q)
             }
 
             if idsForReposInThisServerWantingAllOpenIssues.count > 0 {
-                let q = Query.batching("\(serverLabel): Open Issues", idList: Array(idsForReposInThisServerWantingAllOpenIssues), perNode: perNodeBlock) { allOpenIssuesFragment }
+                let q = TrailerQL.Query.batching("\(serverLabel): Open Issues", idList: Array(idsForReposInThisServerWantingAllOpenIssues), perNode: perNodeBlock) { allOpenIssuesFragment }
                 queriesForServer.append(contentsOf: q)
             }
 

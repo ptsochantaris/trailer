@@ -1,5 +1,6 @@
 import CoreData
 import Foundation
+import TrailerQL
 
 enum NotificationQueue {
     private static var queue = LinkedList<(NotificationType, NSManagedObjectID)>()

@@ -1,5 +1,6 @@
 import CoreData
-import TrailerJson
+
+import TrailerQL
 
 final class Reaction: DataItem {
     @NSManaged var content: String?
@@ -11,7 +12,7 @@ final class Reaction: DataItem {
     @NSManaged var issue: Issue?
     @NSManaged var comment: PRComment?
 
-    static func sync(from nodes: LinkedList<GraphQL.Node>, for parentType: (some DataItem).Type, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
+    static func sync(from nodes: LinkedList<TrailerQL.Node>, for parentType: (some DataItem).Type, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
         syncItems(of: Reaction.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { reaction, node in
             guard node.created || node.updated,
                   let parentId = node.parent?.id

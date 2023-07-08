@@ -1,10 +1,11 @@
 import AsyncAlgorithms
 import Foundation
+import TrailerQL
 
 extension GraphQL {
     final class Processor {
         struct Chunk {
-            let nodes: [String: LinkedList<Node>]
+            let nodes: [String: LinkedList<TrailerQL.Node>]
             let server: ApiServer
             let parentType: ListableItem.Type?
             let moreComing: Bool

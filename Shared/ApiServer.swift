@@ -1,4 +1,5 @@
 import CoreData
+import TrailerQL
 
 final class ApiServer: NSManagedObject {
     @NSManaged var apiPath: String?
@@ -311,11 +312,11 @@ final class ApiServer: NSManagedObject {
     // MARK: GraphQL
 
     @MainActor
-    func run(queries: LinkedList<GraphQL.Query>) async throws {
+    func run(queries: LinkedList<TrailerQL.Query>) async throws {
         let path = graphQLPath ?? ""
         let token = authToken ?? ""
-
-        if let newStats = try await GraphQL.Query.runQueries(queries: queries, on: path, token: token) {
+        
+        if let newStats = try await GraphQL.runQueries(queries: queries, on: path, token: token) {
             updateApiStats(newStats)
         }
     }

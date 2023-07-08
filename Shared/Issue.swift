@@ -1,5 +1,6 @@
 import CoreData
-import TrailerJson
+
+import TrailerQL
 #if os(iOS)
     import UIKit
 #endif
@@ -13,7 +14,7 @@ final class Issue: ListableItem {
         super.webUrl?.appending(pathComponent: "issues").appending(pathComponent: String(number))
     }
 
-    static func sync(from nodes: LinkedList<GraphQL.Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
+    static func sync(from nodes: LinkedList<TrailerQL.Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
         syncItems(of: Issue.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { issue, node in
 
             guard node.created || node.updated,
