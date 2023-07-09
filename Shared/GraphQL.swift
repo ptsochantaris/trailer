@@ -16,16 +16,14 @@ enum GraphQL {
 
     private static let nameWithOwnerField = Field("nameWithOwner")
 
-    private static let idField = TQL.idField
-
     private static let userFragment = Fragment(on: "User") {
-        idField
+        Field.id
         Field("login")
         Field("avatarUrl")
     }
 
     private static let mannequinFragment = Fragment(on: "Mannequin") {
-        idField
+        Field.id
         Field("login")
         Field("avatarUrl")
     }
@@ -33,7 +31,7 @@ enum GraphQL {
     private static let authorGroup = Group("author") {
         userFragment
         Fragment(on: "Bot") {
-            idField
+            Field.id
             Field("login")
             Field("avatarUrl")
         }
@@ -42,7 +40,7 @@ enum GraphQL {
     private static func commentGroup(for typeName: String) -> Group {
         Group("comments", paging: .max) {
             Fragment(on: typeName) {
-                idField
+                Field.id
                 Field("body")
                 Field("url")
                 Field("createdAt")
@@ -196,18 +194,18 @@ enum GraphQL {
 
         try await process(name: steps.toString, items: items, parentType: T.self) {
             Fragment(on: typeName) {
-                idField
+                Field.id
 
                 if items is [PullRequest] {
                     if steps.contains(.reviewRequests) {
                         Group("reviewRequests", paging: .max) {
                             Fragment(on: "ReviewRequest") {
-                                idField
+                                Field.id
                                 Group("requestedReviewer") {
                                     userFragment
                                     mannequinFragment
                                     Fragment(on: "Team") {
-                                        idField
+                                        Field.id
                                         Field("slug")
                                     }
                                 }
@@ -218,7 +216,7 @@ enum GraphQL {
                     if steps.contains(.reviews) {
                         Group("reviews", paging: .max) {
                             Fragment(on: "PullRequestReview") {
-                                idField
+                                Field.id
                                 Field("body")
                                 Field("state")
                                 Field("createdAt")
@@ -234,7 +232,7 @@ enum GraphQL {
                                 Group("checkSuites", paging: .first(count: 10, paging: false)) {
                                     Group("checkRuns", paging: .first(count: 50, paging: false)) {
                                         Fragment(on: "CheckRun") {
-                                            idField
+                                            Field.id
                                             Field("name")
                                             Field("conclusion")
                                             Field("startedAt")
@@ -246,7 +244,7 @@ enum GraphQL {
                                 Group("status") {
                                     Group("contexts") {
                                         Fragment(on: "StatusContext") {
-                                            idField
+                                            Field.id
                                             Field("context")
                                             Field("description")
                                             Field("state")
@@ -263,7 +261,7 @@ enum GraphQL {
                 if steps.contains(.reactions) {
                     Group("reactions", paging: .max) {
                         Fragment(on: "Reaction") {
-                            idField
+                            Field.id
                             Field("content")
                             Field("createdAt")
                             Group("user") { userFragment }
@@ -281,10 +279,10 @@ enum GraphQL {
     static func updateReactions(for comments: [PRComment]) async throws {
         try await process(name: "Comment Reactions", items: comments) {
             Fragment(on: "IssueComment") {
-                idField
+                Field.id
                 Group("reactions", paging: .max) {
                     Fragment(on: "Reaction") {
-                        idField
+                        Field.id
                         Field("content")
                         Field("createdAt")
                         Group("user") { userFragment }
@@ -297,7 +295,7 @@ enum GraphQL {
     static func updateComments(for reviews: [Review]) async throws {
         try await process(name: "Review Comments", items: reviews) {
             Fragment(on: "PullRequestReview") {
-                idField
+                Field.id
                 commentGroup(for: "PullRequestReviewComment")
             }
         }
@@ -349,7 +347,7 @@ enum GraphQL {
     }
 
     private static var labelFragment = Fragment(on: "Label") {
-        idField
+        Field.id
         Field("name")
         Field("color")
         Field("createdAt")
@@ -357,7 +355,7 @@ enum GraphQL {
     }
 
     private static var repositoryFragment = Fragment(on: "Repository") {
-        idField
+        Field.id
         Field("createdAt")
         Field("updatedAt")
         Field("isFork")
@@ -365,12 +363,12 @@ enum GraphQL {
         Field("nameWithOwner")
         Field("url")
         Field("isPrivate")
-        Group("owner") { idField }
+        Group("owner") { Field.id }
     }
 
     private static func prFragment(assigneesAndLabelPageSize: Int, includeRepo: Bool) -> Fragment {
         Fragment(on: "PullRequest") {
-            idField
+            Field.id
             Field("bodyText")
             Field("state")
             Field("createdAt")
@@ -389,7 +387,7 @@ enum GraphQL {
             Field("headRefName")
             Field("baseRefName")
             Field("isDraft")
-            Group("mergedBy") { Fragment(on: "User") { idField } }
+            Group("mergedBy") { Fragment(on: "User") { Field.id } }
             Group("baseRepository") { nameWithOwnerField }
             Group("headRepository") { nameWithOwnerField }
             if includeRepo {
@@ -400,7 +398,7 @@ enum GraphQL {
 
     private static func issueFragment(assigneesAndLabelPageSize: Int, includeRepo: Bool) -> Fragment {
         Fragment(on: "Issue") {
-            idField
+            Field.id
             Field("bodyText")
             Field("state")
             Field("createdAt")
@@ -529,28 +527,28 @@ enum GraphQL {
     }
 
     private static let latestPrsFragment = Fragment(on: "Repository") {
-        idField
+        Field.id
         Group("pullRequests", ("orderBy", "{direction: DESC, field: UPDATED_AT}"), paging: .first(count: 20, paging: true)) {
             prFragment(assigneesAndLabelPageSize: 20, includeRepo: false)
         }
     }
 
     private static let latestIssuesFragment = Fragment(on: "Repository") {
-        idField
+        Field.id
         Group("issues", ("orderBy", "{direction: DESC, field: UPDATED_AT}"), paging: .first(count: 40, paging: true)) {
             issueFragment(assigneesAndLabelPageSize: 20, includeRepo: false)
         }
     }
 
     private static let allOpenPrsFragment = Fragment(on: "Repository") {
-        idField
+        Field.id
         Group("pullRequests", ("states", "[OPEN]"), paging: .first(count: 50, paging: true)) {
             prFragment(assigneesAndLabelPageSize: 20, includeRepo: false)
         }
     }
 
     private static let allOpenIssuesFragment = Fragment(on: "Repository") {
-        idField
+        Field.id
         Group("issues", ("states", "[OPEN]"), paging: .first(count: 50, paging: true)) {
             issueFragment(assigneesAndLabelPageSize: 20, includeRepo: false)
         }
