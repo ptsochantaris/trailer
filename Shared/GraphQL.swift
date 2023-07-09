@@ -329,7 +329,7 @@ enum GraphQL {
                 }
             }
 
-            let queries = Query.batching("\(serverName): \(name)", idList: ids, perNode: nodeBlock, fields: fields)
+            let queries = Query.batching("\(serverName): \(name)", groupName: "nodes", idList: ids, perNode: nodeBlock, fields: fields)
 
             do {
                 try await server.run(queries: queries)
@@ -500,7 +500,7 @@ enum GraphQL {
         }
 
         let prGroup = Group("pullRequests") { prFragment(assigneesAndLabelPageSize: 1, includeRepo: true) }
-        let group = BatchGroup(templateGroup: prGroup, idList: prsToCheck.compactMap(\.nodeId))
+        let group = BatchGroup(name: "nodes", templateGroup: prGroup, idList: prsToCheck.compactMap(\.nodeId))
         let nodes = Lista<Node>()
         let query = Query(name: "Closed Authored PRs", rootElement: group, allowsEmptyResponse: true) { node in
             node.forcedUpdate = true
@@ -615,12 +615,12 @@ enum GraphQL {
             }
 
             if idsForReposInThisServerWantingLatestPrs.count > 0 {
-                let q = Query.batching("\(serverLabel): Updated PRs", idList: Array(idsForReposInThisServerWantingLatestPrs), perNode: perNodeBlock) { latestPrsFragment }
+                let q = Query.batching("\(serverLabel): Updated PRs", groupName: "nodes", idList: Array(idsForReposInThisServerWantingLatestPrs), perNode: perNodeBlock) { latestPrsFragment }
                 queriesForServer.append(contentsOf: q)
             }
 
             if idsForReposInThisServerWantingAllOpenPrs.count > 0 {
-                let q = Query.batching("\(serverLabel): Open PRs", idList: Array(idsForReposInThisServerWantingAllOpenPrs), perNode: perNodeBlock) { allOpenPrsFragment }
+                let q = Query.batching("\(serverLabel): Open PRs", groupName: "nodes", idList: Array(idsForReposInThisServerWantingAllOpenPrs), perNode: perNodeBlock) { allOpenPrsFragment }
                 queriesForServer.append(contentsOf: q)
             }
 
@@ -695,12 +695,12 @@ enum GraphQL {
             }
 
             if idsForReposInThisServerWantingLatestIssues.count > 0 {
-                let q = Query.batching("\(serverLabel): Updated Issues", idList: Array(idsForReposInThisServerWantingLatestIssues), perNode: perNodeBlock) { latestIssuesFragment }
+                let q = Query.batching("\(serverLabel): Updated Issues", groupName: "nodes", idList: Array(idsForReposInThisServerWantingLatestIssues), perNode: perNodeBlock) { latestIssuesFragment }
                 queriesForServer.append(contentsOf: q)
             }
 
             if idsForReposInThisServerWantingAllOpenIssues.count > 0 {
-                let q = Query.batching("\(serverLabel): Open Issues", idList: Array(idsForReposInThisServerWantingAllOpenIssues), perNode: perNodeBlock) { allOpenIssuesFragment }
+                let q = Query.batching("\(serverLabel): Open Issues", groupName: "nodes", idList: Array(idsForReposInThisServerWantingAllOpenIssues), perNode: perNodeBlock) { allOpenIssuesFragment }
                 queriesForServer.append(contentsOf: q)
             }
 
