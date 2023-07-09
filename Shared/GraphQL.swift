@@ -66,7 +66,7 @@ enum GraphQL {
         }
     }
 
-    private static let gateKeeper = Gate(tickets: 2)
+    private static let gateKeeper = Gate(tickets: 1)
     
     private static func fetchData(from urlString: String, for query: Query, authToken: String, attempts: Int) async throws -> JSON {
         let Q = query.queryText
