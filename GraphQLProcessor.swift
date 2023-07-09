@@ -1,11 +1,12 @@
 import AsyncAlgorithms
 import Foundation
 import TrailerQL
+import Lista
 
 extension GraphQL {
     final class Processor {
         struct Chunk {
-            let nodes: [String: List<Node>]
+            let nodes: [String: Lista<Node>]
             let server: ApiServer
             let parentType: ListableItem.Type?
             let moreComing: Bool

@@ -1,6 +1,7 @@
 import CoreData
 import CoreSpotlight
 import TrailerQL
+import Lista
 
 #if os(iOS)
     import MobileCoreServices
@@ -657,7 +658,7 @@ class ListableItem: DataItem {
     }
 
     final var accessibleTitle: String {
-        let components = List<String>()
+        let components = Lista<String>()
         if let t = title {
             components.append(t)
         }
@@ -982,7 +983,7 @@ class ListableItem: DataItem {
 
     @MainActor
     static func requestForItems<T: ListableItem>(of itemType: T.Type, withFilter: String?, sectionIndex: Int, criterion: GroupingCriterion? = nil, onlyUnread: Bool = false, excludeSnoozed: Bool = false) -> NSFetchRequest<T> {
-        let andPredicates = List<NSPredicate>()
+        let andPredicates = Lista<NSPredicate>()
 
         if onlyUnread {
             andPredicates.append(itemType.includeInUnreadPredicate)
@@ -1032,7 +1033,7 @@ class ListableItem: DataItem {
             check(forTag: "state") { statePredicate(from: $0, termAt: $1) }
 
             if !fi.isEmpty {
-                let predicates = List<NSPredicate>()
+                let predicates = Lista<NSPredicate>()
                 let negative = fi.hasPrefix("!")
 
                 func appendPredicate(format: String, numeric: Bool) {
@@ -1060,7 +1061,7 @@ class ListableItem: DataItem {
             }
         }
 
-        let sortDescriptors = List<NSSortDescriptor>()
+        let sortDescriptors = Lista<NSSortDescriptor>()
         sortDescriptors.append(NSSortDescriptor(key: "sectionIndex", ascending: true))
         if Settings.groupByRepo {
             sortDescriptors.append(NSSortDescriptor(key: "repo.fullName", ascending: true, selector: #selector(NSString.localizedCaseInsensitiveCompare)))

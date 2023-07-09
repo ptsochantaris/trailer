@@ -167,6 +167,8 @@
 		16DD6AB01AE457C300145425 /* trailerDoc44.png in Resources */ = {isa = PBXBuildFile; fileRef = 16DD6AAC1AE457C300145425 /* trailerDoc44.png */; };
 		16DD6AB11AE457C300145425 /* trailerDoc64.png in Resources */ = {isa = PBXBuildFile; fileRef = 16DD6AAD1AE457C300145425 /* trailerDoc64.png */; };
 		16DD6AB21AE457C300145425 /* trailerDoc320.png in Resources */ = {isa = PBXBuildFile; fileRef = 16DD6AAE1AE457C300145425 /* trailerDoc320.png */; };
+		16DE55BB2A5A397700166337 /* Lista in Frameworks */ = {isa = PBXBuildFile; productRef = 16DE55BA2A5A397700166337 /* Lista */; };
+		16DE55BD2A5A398D00166337 /* Lista in Frameworks */ = {isa = PBXBuildFile; productRef = 16DE55BC2A5A398D00166337 /* Lista */; };
 		16DEA925235C6D7C004589B3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16DEA924235C6D7C004589B3 /* AppDelegate.swift */; };
 		16DEA933235C6DC0004589B3 /* LauncherCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16DEA932235C6DC0004589B3 /* LauncherCommon.swift */; };
 		16DEA934235C6DC0004589B3 /* LauncherCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16DEA932235C6DC0004589B3 /* LauncherCommon.swift */; };
@@ -464,6 +466,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				16DE55BD2A5A398D00166337 /* Lista in Frameworks */,
 				16039A812969817B00CC73F4 /* AsyncHTTPClient in Frameworks */,
 				165880CC2A59C2BC0012A2B7 /* TrailerQL in Frameworks */,
 				168924552A58BC7A0094F0D1 /* TrailerJson in Frameworks */,
@@ -483,6 +486,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				16DE55BB2A5A397700166337 /* Lista in Frameworks */,
 				168924532A58BC2A0094F0D1 /* TrailerJson in Frameworks */,
 				167E80F42517EC1700ED9A67 /* CoreSpotlight.framework in Frameworks */,
 				16039A7F296973E300CC73F4 /* AsyncHTTPClient in Frameworks */,
@@ -963,6 +967,7 @@
 				16A1E44229F2FBCA007684D0 /* AsyncAlgorithms */,
 				168924542A58BC7A0094F0D1 /* TrailerJson */,
 				165880CB2A59C2BC0012A2B7 /* TrailerQL */,
+				16DE55BC2A5A398D00166337 /* Lista */,
 			);
 			productName = PocketTrailer;
 			productReference = 1628A6B118789E73005EDA69 /* PocketTrailer.app */;
@@ -1007,6 +1012,7 @@
 				16A1E44029F2FBB6007684D0 /* AsyncAlgorithms */,
 				168924522A58BC2A0094F0D1 /* TrailerJson */,
 				165880C92A59C2AF0012A2B7 /* TrailerQL */,
+				16DE55BA2A5A397700166337 /* Lista */,
 			);
 			productName = Trailer;
 			productReference = 168BC6AA17EC2DF000BC4584 /* Trailer.app */;
@@ -1106,6 +1112,7 @@
 				16A1E43F29F2FBB6007684D0 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
 				168924512A58BC2A0094F0D1 /* XCRemoteSwiftPackageReference "trailer-json" */,
 				165880C82A59C2AF0012A2B7 /* XCRemoteSwiftPackageReference "trailer-ql" */,
+				16DE55B92A5A397700166337 /* XCRemoteSwiftPackageReference "lista" */,
 			);
 			productRefGroup = 168BC6AB17EC2DF000BC4584 /* Products */;
 			projectDirPath = "";
@@ -1993,6 +2000,14 @@
 				minimumVersion = 0.1.0;
 			};
 		};
+		16DE55B92A5A397700166337 /* XCRemoteSwiftPackageReference "lista" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ptsochantaris/lista";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -2035,6 +2050,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 16A1E43F29F2FBB6007684D0 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
 			productName = AsyncAlgorithms;
+		};
+		16DE55BA2A5A397700166337 /* Lista */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 16DE55B92A5A397700166337 /* XCRemoteSwiftPackageReference "lista" */;
+			productName = Lista;
+		};
+		16DE55BC2A5A398D00166337 /* Lista */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 16DE55B92A5A397700166337 /* XCRemoteSwiftPackageReference "lista" */;
+			productName = Lista;
 		};
 /* End XCSwiftPackageProductDependency section */
 

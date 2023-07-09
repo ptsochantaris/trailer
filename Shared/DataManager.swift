@@ -1,6 +1,7 @@
 import CoreData
 import CoreSpotlight
 import TrailerQL
+import Lista
 
 extension NSManagedObjectContext {
     func buildChildContext() -> NSManagedObjectContext {
@@ -279,8 +280,8 @@ enum DataManager {
 
         DLog("Re-indexing spotlight")
 
-        let itemsToIndex = List<CSSearchableItem>()
-        let itemsToRemove = List<String>()
+        let itemsToIndex = Lista<CSSearchableItem>()
+        let itemsToRemove = Lista<String>()
 
         for pr in DataItem.allItems(of: PullRequest.self, in: main) {
             switch await pr.handleSpotlight() {
@@ -376,8 +377,8 @@ enum DataManager {
         guard CSSearchableIndex.isIndexingAvailable() else {
             return
         }
-        let urisToDelete = List<String>()
-        let itemsToReIndex = List<CSSearchableItem>()
+        let urisToDelete = Lista<String>()
+        let itemsToReIndex = Lista<CSSearchableItem>()
         for updatedItem in updates {
             guard let updatedItem = updatedItem as? ListableItem else {
                 continue

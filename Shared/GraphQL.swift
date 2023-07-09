@@ -2,6 +2,7 @@ import AsyncHTTPClient
 import Foundation
 import NIOCore
 import TrailerQL
+import Lista
 
 @MainActor
 enum GraphQL {
@@ -134,7 +135,7 @@ enum GraphQL {
         }
     }
 
-    static func runQueries(queries: List<Query>, on path: String, token: String) async throws -> ApiStats? {
+    static func runQueries(queries: Lista<Query>, on path: String, token: String) async throws -> ApiStats? {
         try await withThrowingTaskGroup(of: ApiStats?.self, returning: ApiStats?.self) { group in
             for query in queries {
                 group.addTask {
@@ -312,14 +313,14 @@ enum GraphQL {
         var count = 0
         for (server, items) in itemsByServer {
             let ids = items.compactMap(\.nodeId)
-            var nodes = [String: List<Node>]()
+            var nodes = [String: Lista<Node>]()
             let serverName = server.label ?? "<no label>"
             let nodeBlock = { (node: Node) in
                 let type = node.elementType
                 if let existingList = nodes[type] {
                     existingList.append(node)
                 } else {
-                    nodes[type] = List<Node>(value: node)
+                    nodes[type] = Lista<Node>(value: node)
                 }
 
                 count += 1
@@ -455,9 +456,9 @@ enum GraphQL {
         }
     }
 
-    static func fetchAllAuthoredItems(from server: ApiServer, @ElementsBuilder fields: () -> [any Element]) async -> [String: List<Node>]? {
+    static func fetchAllAuthoredItems(from server: ApiServer, @ElementsBuilder fields: () -> [any Element]) async -> [String: Lista<Node>]? {
         var count = 0
-        var nodes = [String: List<Node>]()
+        var nodes = [String: Lista<Node>]()
         let group = Group("viewer", fields: fields)
         let processor = Processor()
         let authoredItemsQuery = Query(name: "Authored Items", rootElement: group) { node in
@@ -465,7 +466,7 @@ enum GraphQL {
             if let existingList = nodes[type] {
                 existingList.append(node)
             } else {
-                nodes[type] = List<Node>(value: node)
+                nodes[type] = Lista<Node>(value: node)
             }
 
             count += 1
@@ -476,7 +477,7 @@ enum GraphQL {
             }
         }
         do {
-            try await server.run(queries: List(value: authoredItemsQuery))
+            try await server.run(queries: Lista(value: authoredItemsQuery))
             processor.add(chunk: .init(nodes: nodes, server: server, parentType: nil, moreComing: false))
             await processor.waitForCompletion()
             return nodes
@@ -487,8 +488,8 @@ enum GraphQL {
         }
     }
 
-    private static func checkAuthoredPrClosures(nodes: [String: List<Node>], in server: ApiServer) async {
-        let prsToCheck = List<PullRequest>()
+    private static func checkAuthoredPrClosures(nodes: [String: Lista<Node>], in server: ApiServer) async {
+        let prsToCheck = Lista<PullRequest>()
         let fetchedPrIds = Set(nodes["PullRequest"]?.map(\.id) ?? [])
         for repo in server.repos.filter({ $0.displayPolicyForPrs == RepoDisplayPolicy.authoredOnly.rawValue }) {
             for pr in repo.pullRequests where !fetchedPrIds.contains(pr.nodeId ?? "") {
@@ -502,13 +503,13 @@ enum GraphQL {
 
         let prGroup = Group("pullRequests") { prFragment(assigneesAndLabelPageSize: 1, includeRepo: true) }
         let group = BatchGroup(templateGroup: prGroup, idList: prsToCheck.compactMap(\.nodeId))
-        let nodes = List<Node>()
+        let nodes = Lista<Node>()
         let query = Query(name: "Closed Authored PRs", rootElement: group, allowsEmptyResponse: true) { node in
             node.forcedUpdate = true
             nodes.append(node)
         }
         do {
-            try await server.run(queries: List(value: query))
+            try await server.run(queries: Lista(value: query))
             let processor = Processor()
             processor.add(chunk: .init(nodes: ["PullRequest": nodes], server: server, parentType: nil, moreComing: false))
             await processor.waitForCompletion()
@@ -517,7 +518,7 @@ enum GraphQL {
         }
     }
 
-    private static func checkAuthoredIssueClosures(nodes: [String: List<Node>], in server: ApiServer) {
+    private static func checkAuthoredIssueClosures(nodes: [String: Lista<Node>], in server: ApiServer) {
         let fetchedIssueIds = Set(nodes["Issue"]?.map(\.id) ?? []) // investigate missing issues
         for repo in server.repos.filter({ $0.displayPolicyForIssues == RepoDisplayPolicy.authoredOnly.rawValue }) {
             for issue in repo.issues where !fetchedIssueIds.contains(issue.nodeId ?? "") {
@@ -573,7 +574,7 @@ enum GraphQL {
 
         for (server, reposInThisServer) in reposByServer {
             var count = 0
-            var nodes = [String: List<Node>]()
+            var nodes = [String: Lista<Node>]()
 
             let perNodeBlock: Query.PerNodeBlock = { node in
 
@@ -581,7 +582,7 @@ enum GraphQL {
                 if let existingList = nodes[type] {
                     existingList.append(node)
                 } else {
-                    nodes[type] = List<Node>(value: node)
+                    nodes[type] = Lista<Node>(value: node)
                 }
 
                 if type == "PullRequest",
@@ -600,11 +601,11 @@ enum GraphQL {
                 }
             }
 
-            let queriesForServer = List<Query>()
+            let queriesForServer = Lista<Query>()
             let serverLabel = server.label ?? "<no label>"
 
-            let idsForReposInThisServerWantingAllOpenPrs = List<String>()
-            let idsForReposInThisServerWantingLatestPrs = List<String>()
+            let idsForReposInThisServerWantingAllOpenPrs = Lista<String>()
+            let idsForReposInThisServerWantingLatestPrs = Lista<String>()
             for repo in reposInThisServer {
                 if let n = repo.nodeId {
                     if let last = prRepoIdToLatestExistingUpdate[n], last != .distantPast {
@@ -653,7 +654,7 @@ enum GraphQL {
 
         for (server, reposInThisServer) in reposByServer {
             var count = 0
-            var nodes = [String: List<Node>]()
+            var nodes = [String: Lista<Node>]()
 
             let perNodeBlock: Query.PerNodeBlock = { node in
 
@@ -661,7 +662,7 @@ enum GraphQL {
                 if let existingList = nodes[type] {
                     existingList.append(node)
                 } else {
-                    nodes[type] = List<Node>(value: node)
+                    nodes[type] = Lista<Node>(value: node)
                 }
 
                 if type == "Issue",
@@ -680,11 +681,11 @@ enum GraphQL {
                 }
             }
 
-            let queriesForServer = List<Query>()
+            let queriesForServer = Lista<Query>()
             let serverLabel = server.label ?? "<no label>"
 
-            let idsForReposInThisServerWantingAllOpenIssues = List<String>()
-            let idsForReposInThisServerWantingLatestIssues = List<String>()
+            let idsForReposInThisServerWantingAllOpenIssues = Lista<String>()
+            let idsForReposInThisServerWantingLatestIssues = Lista<String>()
             for repo in reposInThisServer {
                 if let n = repo.nodeId {
                     if let last = issueRepoIdToLatestExistingUpdate[n], last != .distantPast {

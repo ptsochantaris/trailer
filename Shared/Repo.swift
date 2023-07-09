@@ -1,5 +1,6 @@
 import CoreData
 import TrailerQL
+import Lista
 
 final class Repo: DataItem {
     @NSManaged var fork: Bool
@@ -23,7 +24,7 @@ final class Repo: DataItem {
         updatedAt = updatedAt?.addingTimeInterval(-1)
     }
 
-    static func sync(from nodes: List<Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
+    static func sync(from nodes: Lista<Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
         syncItems(of: Repo.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { repo, node in
 
             var neededByAuthoredPr = false

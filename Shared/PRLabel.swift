@@ -1,5 +1,6 @@
 import CoreData
 import TrailerQL
+import Lista
 #if os(iOS)
     import UIKit
 #endif
@@ -11,7 +12,7 @@ final class PRLabel: DataItem {
     @NSManaged var pullRequests: Set<PullRequest>
     @NSManaged var issues: Set<Issue>
 
-    static func sync(from nodes: List<Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
+    static func sync(from nodes: Lista<Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
         syncItems(of: PRLabel.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { label, node in
             guard
                 let parent = node.parent else { return }

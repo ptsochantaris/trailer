@@ -1,5 +1,6 @@
 import CoreData
 import TrailerQL
+import Lista
 
 final class ApiServer: NSManagedObject {
     @NSManaged var apiPath: String?
@@ -312,7 +313,7 @@ final class ApiServer: NSManagedObject {
     // MARK: GraphQL
 
     @MainActor
-    func run(queries: List<Query>) async throws {
+    func run(queries: Lista<Query>) async throws {
         let path = graphQLPath ?? ""
         let token = authToken ?? ""
         

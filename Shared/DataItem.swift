@@ -1,5 +1,6 @@
 import CoreData
 import TrailerQL
+import Lista
 
 typealias FetchCache = NSCache<NSString, NSManagedObject>
 
@@ -367,7 +368,7 @@ class DataItem: NSManagedObject {
         }
     }
 
-    static func syncItems<T: DataItem>(of type: T.Type, from nodes: List<Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache, perItemCallback: (T, Node) -> Void) {
+    static func syncItems<T: DataItem>(of type: T.Type, from nodes: Lista<Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache, perItemCallback: (T, Node) -> Void) {
         let validNodes = nodes.filter { !($0.parent?.creationSkipped ?? false) }
         if validNodes.isEmpty {
             return
