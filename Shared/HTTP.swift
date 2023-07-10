@@ -56,7 +56,7 @@ enum HTTP {
         if case .success = result, Settings.dumpAPIResponsesInConsole {
             DLog("API data from \(request.url): \(data.description)")
         }
-        let json = try data.withVeryUnsafeBytes { try TrailerJson.parse(bytes: $0) as? JSON }
+        let json = try data.withVeryUnsafeBytes { try TrailerJson.parse(bytes: $0) }
         return (json ?? NSNull(), result)
     }
 
