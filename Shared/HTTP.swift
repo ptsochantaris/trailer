@@ -53,8 +53,8 @@ enum HTTP {
             gateKeeper.relaxedReturnTicket()
         }
         let (result, data) = try await getData(for: request, attempts: attempts, checkCache: checkCache)
-        if case .success = result, Settings.dumpAPIResponsesInConsole {
-            DLog("API data from \(request.url): \(data.description)")
+        if case .success = result, Settings.dumpAPIResponsesInConsole, let dataString = String(data: data.asData, encoding: .utf8) {
+            DLog("API data from \(request.url): \(dataString)")
         }
         let json = try data.withVeryUnsafeBytes { try TrailerJson.parse(bytes: $0) }
         return (json ?? NSNull(), result)

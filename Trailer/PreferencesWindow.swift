@@ -1444,6 +1444,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
 
     func windowWillClose(_: Notification) {
         advancedReposWindow?.close()
+        apiOptionsWindow?.close()
         if ApiServer.someServersHaveAuthTokens(in: DataManager.main), preferencesDirty {
             Task {
                 await app.startRefresh()
@@ -1960,6 +1961,26 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
                 commitSnoozeSettings()
             }
         }
+    }
+
+    private var apiOptionsWindowController: NSWindowController?
+    private var apiOptionsWindow: ApiOptionsWindow?
+    @IBAction private func apiOptionsSelected(_ sender: NSButton) {
+        if apiOptionsWindowController == nil {
+            apiOptionsWindowController = NSWindowController(windowNibName: NSNib.Name("ApiOptionsWindow"))
+        }
+        if let w = apiOptionsWindowController?.window as? ApiOptionsWindow {
+            w.prefs = self
+            w.level = .floating
+            w.center()
+            w.makeKeyAndOrderFront(self)
+            apiOptionsWindow = w
+        }
+    }
+
+    func closedApiOptionsWindow() {
+        apiOptionsWindow = nil
+        apiOptionsWindowController = nil
     }
 
     private var advancedReposWindowController: NSWindowController?

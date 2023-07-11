@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="16096" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="16096"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -17,7 +17,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="240" width="638" height="494"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1415"/>
             <view key="contentView" wantsLayer="YES" id="EiT-Mj-1SZ">
                 <rect key="frame" x="0.0" y="0.0" width="638" height="494"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -26,11 +26,11 @@
                         <rect key="frame" x="17" y="308" width="604" height="171"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <view key="contentView" id="VxC-k3-DWi">
-                            <rect key="frame" x="3" y="3" width="598" height="153"/>
+                            <rect key="frame" x="4" y="5" width="596" height="151"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WSa-Vr-bmX">
-                                    <rect key="frame" x="12" y="105" width="119" height="32"/>
+                                    <rect key="frame" x="10" y="103" width="119" height="32"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="push" title="Re-scan now" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="LYM-iR-irV">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -41,7 +41,7 @@
                                     </connections>
                                 </button>
                                 <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5ZD-lq-6Qf">
-                                    <rect key="frame" x="562" y="108" width="19" height="27"/>
+                                    <rect key="frame" x="560" y="106" width="19" height="27"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                     <stepperCell key="cell" continuous="YES" alignment="left" minValue="2" maxValue="99999" doubleValue="2" id="XP3-EO-76e"/>
                                     <connections>
@@ -49,7 +49,7 @@
                                     </connections>
                                 </stepper>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BAK-gw-nC7">
-                                    <rect key="frame" x="352" y="113" width="207" height="17"/>
+                                    <rect key="frame" x="350" y="111" width="207" height="17"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Re-scan every 2 hours" id="QBp-Kd-qzu">
                                         <font key="font" metaFont="system"/>
@@ -58,11 +58,11 @@
                                     </textFieldCell>
                                 </textField>
                                 <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="X9I-OD-5UZ">
-                                    <rect key="frame" x="133" y="115" width="16" height="16"/>
+                                    <rect key="frame" x="131" y="113" width="16" height="16"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 </progressIndicator>
                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KtQ-HN-5dD">
-                                    <rect key="frame" x="18" y="74" width="543" height="18"/>
+                                    <rect key="frame" x="18" y="72" width="543" height="18"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="check" title="Automatically add any new repos which were added to a remote watchlist" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Exf-EV-5GR">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -73,7 +73,7 @@
                                     </connections>
                                 </button>
                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jfq-yy-XJ6">
-                                    <rect key="frame" x="18" y="46" width="543" height="18"/>
+                                    <rect key="frame" x="18" y="44" width="543" height="18"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="check" title="Automatically remove any repos which were removed from a remote watchlist" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="APA-D6-Apr">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -84,7 +84,7 @@
                                     </connections>
                                 </button>
                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Fxz-mG-rT8">
-                                    <rect key="frame" x="18" y="19" width="543" height="18"/>
+                                    <rect key="frame" x="18" y="17" width="543" height="18"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="check" title="Automatically hide repositories that have been archived" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="6t1-GG-1BZ">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -101,11 +101,11 @@
                         <rect key="frame" x="17" y="201" width="604" height="103"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <view key="contentView" id="Ksb-TL-CLL">
-                            <rect key="frame" x="3" y="3" width="598" height="85"/>
+                            <rect key="frame" x="4" y="5" width="596" height="83"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ao9-HE-VzB">
-                                    <rect key="frame" x="18" y="49" width="301" height="18"/>
+                                    <rect key="frame" x="18" y="47" width="301" height="18"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="check" title="Sync PRs I authored in any repository (v4 API)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="gmb-NI-iE2">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -116,7 +116,7 @@
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KKy-mh-Psl">
-                                    <rect key="frame" x="18" y="22" width="315" height="18"/>
+                                    <rect key="frame" x="18" y="20" width="315" height="18"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="check" title="Sync issues I authored in any repository (v4 API)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="elw-Pb-lgG">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -133,11 +133,11 @@
                         <rect key="frame" x="17" y="96" width="604" height="101"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <view key="contentView" id="zZ4-Xe-BBh">
-                            <rect key="frame" x="3" y="3" width="598" height="83"/>
+                            <rect key="frame" x="4" y="5" width="596" height="81"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Vvh-bj-1RH">
-                                    <rect key="frame" x="320" y="45" width="34" height="17"/>
+                                    <rect key="frame" x="320" y="43" width="34" height="17"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="/" id="tPb-hC-IgX">
                                         <font key="font" metaFont="system"/>
@@ -146,7 +146,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Erw-bZ-KSm">
-                                    <rect key="frame" x="151" y="45" width="34" height="17"/>
+                                    <rect key="frame" x="151" y="43" width="34" height="17"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="/" id="Pu3-18-CCU">
                                         <font key="font" metaFont="system"/>
@@ -155,7 +155,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Yzx-Ii-QaS">
-                                    <rect key="frame" x="346" y="40" width="148" height="22"/>
+                                    <rect key="frame" x="346" y="38" width="146" height="22"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="repo name" drawsBackground="YES" id="ZRp-Dg-Lan">
                                         <font key="font" metaFont="system"/>
@@ -164,7 +164,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sDw-ab-qeW">
-                                    <rect key="frame" x="177" y="40" width="148" height="22"/>
+                                    <rect key="frame" x="177" y="38" width="146" height="22"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="org or owner" drawsBackground="YES" id="Te1-gJ-pPh">
                                         <font key="font" metaFont="system"/>
@@ -173,16 +173,16 @@
                                     </textFieldCell>
                                 </textField>
                                 <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2yd-xG-C2i">
-                                    <rect key="frame" x="18" y="37" width="141" height="26"/>
+                                    <rect key="frame" x="18" y="36" width="139" height="26"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                     <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="fp7-RG-tJa">
                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
+                                        <font key="font" metaFont="menu"/>
                                         <menu key="menu" id="jeu-29-d8Q"/>
                                     </popUpButtonCell>
                                 </popUpButton>
                                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Q1h-uY-gOT">
-                                    <rect key="frame" x="498" y="34" width="65" height="32"/>
+                                    <rect key="frame" x="498" y="32" width="65" height="32"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="push" title="Add" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="9qw-Qv-ckX">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -193,11 +193,11 @@
                                     </connections>
                                 </button>
                                 <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="FkL-l2-tI4">
-                                    <rect key="frame" x="567" y="44" width="16" height="16"/>
+                                    <rect key="frame" x="565" y="42" width="16" height="16"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 </progressIndicator>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eTz-ld-cu0">
-                                    <rect key="frame" x="166" y="19" width="391" height="14"/>
+                                    <rect key="frame" x="164" y="19" width="391" height="14"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Enter a star (*) as a repo name to add all repositories from this org/owner." id="f2i-oz-ksw">
                                         <font key="font" metaFont="message" size="11"/>
@@ -212,20 +212,20 @@
                         <rect key="frame" x="17" y="16" width="604" height="76"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <view key="contentView" id="e2D-86-0O2">
-                            <rect key="frame" x="3" y="3" width="598" height="58"/>
+                            <rect key="frame" x="4" y="5" width="596" height="56"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YIa-Bi-a4f">
-                                    <rect key="frame" x="18" y="15" width="480" height="26"/>
+                                    <rect key="frame" x="18" y="13" width="480" height="26"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="zet-Z6-Fkr">
                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
+                                        <font key="font" metaFont="menu"/>
                                         <menu key="menu" id="lsq-GS-HWb"/>
                                     </popUpButtonCell>
                                 </popUpButton>
                                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="U5Q-mA-E8g">
-                                    <rect key="frame" x="497" y="11" width="89" height="32"/>
+                                    <rect key="frame" x="497" y="9" width="89" height="32"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="push" title="Remove" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="iep-X5-cgF">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>

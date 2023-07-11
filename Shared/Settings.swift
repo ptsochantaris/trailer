@@ -23,7 +23,7 @@ enum Settings {
             "REMOVE_RELATED_NOTIFICATIONS_ON_ITEM_REMOVE", "HIDE_SNOOZED_ITEMS", "INCLUDE_MILESTONES_IN_FILTER", "INCLUDE_ASSIGNEE_NAMES_IN_FILTER", "API_SERVERS_IN_SEPARATE_MENUS", "ASSUME_READ_ITEM_IF_USER_HAS_NEWER_COMMENTS",
             "AUTO_SNOOZE_DAYS", "HIDE_MENUBAR_COUNTS", "AUTO_ADD_NEW_REPOS", "AUTO_REMOVE_DELETED_REPOS", "MARK_PRS_AS_UNREAD_ON_NEW_COMMITS", "SHOW_LABELS", "DISPLAY_REVIEW_CHANGE_REQUESTS", "SHOW_RELATIVE_DATES", "QUERY_AUTHORED_PRS", "QUERY_AUTHORED_ISSUES",
             "DISPLAY_MILESTONES", "DEFAULT_APP_FOR_OPENING_WEB", "DEFAULT_APP_FOR_OPENING_ITEMS", "HIDE_ARCHIVED_REPOS", "DRAFT_HANDLING_POLICY", "MARK_UNMERGEABLE_ITEMS", "SHOW_PR_LINES", "SCAN_CLOSED_AND_MERGED", "USE_V4_API", "REQUESTED_TEAM_REVIEWS",
-            "SHOW_STATUSES_GREEN", "SHOW_STATUSES_GRAY", "SHOW_STATUSES_YELLOW", "SHOW_STATUSES_RED", "SHOW_BASE_AND_HEAD_BRANCHES", "PERSISTED_TAB_FILTERS"
+            "SHOW_STATUSES_GREEN", "SHOW_STATUSES_GRAY", "SHOW_STATUSES_YELLOW", "SHOW_STATUSES_RED", "SHOW_BASE_AND_HEAD_BRANCHES", "PERSISTED_TAB_FILTERS", "PR_V4_SYNC_PAGE", "ISSUE_V4_SYNC_PAGE", "V4_THREAD_SYNC"
         ]
     }
 
@@ -262,6 +262,24 @@ enum Settings {
     }
 
     ///////////////////////////////// NUMBERS
+
+    static let prSyncPageSizeHelp = "The number of PRs to fetch per page when using v4 API. Raising it may make syncing faster but result in errors from GitHub."
+    static var prSyncPageSize: Int {
+        get { get("PR_V4_SYNC_PAGE") as? Int ?? 20 }
+        set { set("PR_V4_SYNC_PAGE", newValue) }
+    }
+    
+    static let issueSyncPageSizeHelp = "The number of Issues to fetch per page when using v4 API. Raising it may make syncing faster but result in errors from GitHub."
+    static var issueSyncPageSize: Int {
+        get { get("ISSUE_V4_SYNC_PAGE") as? Int ?? 20 }
+        set { set("ISSUE_V4_SYNC_PAGE", newValue) }
+    }
+
+    static let threadedSyncHelp = "Try two parallel queries to the server when using v4 API. Can greatly speed up incremental syncs but in some corner cases cause throttling by GitHub."
+    static var threadedSync: Bool {
+        get { get("V4_THREAD_SYNC") as? Bool ?? false }
+        set { set("V4_THREAD_SYNC", newValue) }
+    }
 
     static let autoSnoozeDurationHelp = "How many days before an item is automatically snoozed. An item is auto-snoozed forever but will wake up on any comment, mention, or status update."
     static var autoSnoozeDuration: Int {

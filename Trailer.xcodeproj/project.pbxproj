@@ -90,6 +90,8 @@
 		167E80F42517EC1700ED9A67 /* CoreSpotlight.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 167E80F32517EC1700ED9A67 /* CoreSpotlight.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		167F7BF623B38D4D00A01529 /* UpdatedRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 167F7BF523B38D4D00A01529 /* UpdatedRow.swift */; };
 		16813CBF1BA16D660020F8EB /* CommonController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16813CBE1BA16D660020F8EB /* CommonController.swift */; };
+		1686DEB72A5DD12000AED26E /* ApiOptionsWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1686DEB62A5DD12000AED26E /* ApiOptionsWindow.xib */; };
+		1686DEB92A5DD12C00AED26E /* ApiOptionsWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1686DEB82A5DD12C00AED26E /* ApiOptionsWindow.swift */; };
 		168839C71DEF8C3B002D9448 /* ImportExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 168839C61DEF8C3B002D9448 /* ImportExport.swift */; };
 		168924532A58BC2A0094F0D1 /* TrailerJson in Frameworks */ = {isa = PBXBuildFile; productRef = 168924522A58BC2A0094F0D1 /* TrailerJson */; };
 		168924552A58BC7A0094F0D1 /* TrailerJson in Frameworks */ = {isa = PBXBuildFile; productRef = 168924542A58BC7A0094F0D1 /* TrailerJson */; };
@@ -351,6 +353,8 @@
 		167F7BF523B38D4D00A01529 /* UpdatedRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdatedRow.swift; sourceTree = "<group>"; };
 		16813CBE1BA16D660020F8EB /* CommonController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = CommonController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		1686B1D41AE59AED009118C5 /* PocketTrailer.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PocketTrailer.entitlements; sourceTree = "<group>"; };
+		1686DEB62A5DD12000AED26E /* ApiOptionsWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ApiOptionsWindow.xib; sourceTree = "<group>"; };
+		1686DEB82A5DD12C00AED26E /* ApiOptionsWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiOptionsWindow.swift; sourceTree = "<group>"; };
 		168839C61DEF8C3B002D9448 /* ImportExport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImportExport.swift; sourceTree = "<group>"; };
 		168BA31A283CC310005D09EE /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		168BC6AA17EC2DF000BC4584 /* Trailer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Trailer.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -628,6 +632,8 @@
 				160FB1411AE3F7C700EB5C8E /* PreferencesWindow.xib */,
 				16DB793B1E326C950076A36D /* AdvancedReposWindow.swift */,
 				16DB793D1E326CD90076A36D /* AdvancedReposWindow.xib */,
+				1686DEB62A5DD12000AED26E /* ApiOptionsWindow.xib */,
+				1686DEB82A5DD12C00AED26E /* ApiOptionsWindow.swift */,
 			);
 			name = Windows;
 			sourceTree = "<group>";
@@ -1168,6 +1174,7 @@
 				164840C31ACFEFA9009E6383 /* MenuWindow.xib in Resources */,
 				16DB793E1E326CD90076A36D /* AdvancedReposWindow.xib in Resources */,
 				168BC6C917EC2DF000BC4584 /* Images.xcassets in Resources */,
+				1686DEB72A5DD12000AED26E /* ApiOptionsWindow.xib in Resources */,
 				16519EB41ACF0E91002171D0 /* Trailer.icns in Resources */,
 				168BC6C417EC2DF000BC4584 /* MainMenu.xib in Resources */,
 				16DEA937235C6F00004589B3 /* TrailerLauncher.app in Resources */,
@@ -1361,6 +1368,7 @@
 				162002DB1A2A545C00FF95F3 /* CenterTextFieldCell.swift in Sources */,
 				16B74E481A3B4AC800410EF6 /* PrTable.swift in Sources */,
 				16B8179C29B29F1B009A49EB /* Gate.swift in Sources */,
+				1686DEB92A5DD12C00AED26E /* ApiOptionsWindow.swift in Sources */,
 				16F0BAD623A53EB4002EC348 /* Colors.swift in Sources */,
 				1657230423AAA2AC00F597EF /* V3API.swift in Sources */,
 				16B3B3191A34E8E2000BE6CC /* DataItem.swift in Sources */,
@@ -1587,7 +1595,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1652;
+				CURRENT_PROJECT_VERSION = 1653;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -1613,7 +1621,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.8.2;
+				MARKETING_VERSION = 1.8.3;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_SWIFT_FLAGS = "-D DEBUG";
 				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = "debug-only";
@@ -1651,7 +1659,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1652;
+				CURRENT_PROJECT_VERSION = 1653;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEPLOYMENT_POSTPROCESSING = YES;
@@ -1675,7 +1683,7 @@
 				);
 				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.8.2;
+				MARKETING_VERSION = 1.8.3;
 				SEPARATE_STRIP = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_DISABLE_SAFETY_CHECKS = YES;

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -53,14 +53,14 @@
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <scrollView fixedFrame="YES" autohidesScrollers="YES" horizontalLineScroll="30" horizontalPageScroll="10" verticalLineScroll="30" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FEq-Qw-Vgd">
-                                            <rect key="frame" x="26" y="55" width="240" height="330"/>
+                                            <rect key="frame" x="26" y="55" width="240" height="335"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" heightSizable="YES"/>
                                             <clipView key="contentView" id="0eh-Pe-UwN">
-                                                <rect key="frame" x="1" y="1" width="238" height="328"/>
+                                                <rect key="frame" x="1" y="1" width="238" height="333"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="20" headerView="GLY-La-oaP" id="wPh-gi-N9t">
-                                                        <rect key="frame" x="0.0" y="0.0" width="238" height="311"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="238" height="316"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <size key="intercellSpacing" width="0.0" height="10"/>
                                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -97,7 +97,7 @@
                                                 </subviews>
                                             </clipView>
                                             <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="NXP-Pe-zjP">
-                                                <rect key="frame" x="1" y="313" width="238" height="16"/>
+                                                <rect key="frame" x="1" y="293" width="222" height="16"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
                                             <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="ktq-74-h3c">
@@ -327,7 +327,7 @@ Token</string>
                                             </view>
                                         </box>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7V9-LT-Yjg">
-                                            <rect key="frame" x="28" y="400" width="239" height="18"/>
+                                            <rect key="frame" x="28" y="400" width="181" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Use GitHub v4 API" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="x1T-eR-qup">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -335,6 +335,17 @@ Token</string>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="v4APISwitchChanged:" target="vQH-WF-vh2" id="J4j-TA-amZ"/>
+                                            </connections>
+                                        </button>
+                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gfr-Tt-Snk">
+                                            <rect key="frame" x="228" y="391" width="44" height="32"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="push" title="..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="FJ2-OK-RRf">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="smallSystem"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="apiOptionsSelected:" target="vQH-WF-vh2" id="HbM-UW-X9I"/>
                                             </connections>
                                         </button>
                                     </subviews>
@@ -350,7 +361,7 @@ Token</string>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <clipView key="contentView" id="hCD-zR-3bF">
                                                 <rect key="frame" x="1" y="1" width="869" height="318"/>
-                                                <autoresizingMask key="autoresizingMask"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" rowHeight="20" headerView="qia-ub-v1J" id="6pK-a1-URw">
                                                         <rect key="frame" x="0.0" y="0.0" width="869" height="301"/>
@@ -460,7 +471,7 @@ Token</string>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BQ4-pw-I0b">
-                                                        <rect key="frame" x="3.5" y="12.5" width="109" height="17"/>
+                                                        <rect key="frame" x="3" y="12" width="109" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Pull Requests:" id="EiN-MI-aPn">
                                                             <font key="font" metaFont="system"/>
@@ -469,7 +480,7 @@ Token</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LVp-LL-LY1">
-                                                        <rect key="frame" x="241.5" y="13.5" width="71" height="17"/>
+                                                        <rect key="frame" x="241" y="13" width="71" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Issues:" id="AR6-vN-PIV">
                                                             <font key="font" metaFont="system"/>
@@ -490,7 +501,7 @@ Token</string>
                                                         </connections>
                                                     </popUpButton>
                                                     <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZgQ-VU-aMD">
-                                                        <rect key="frame" x="314" y="7" width="131" height="26"/>
+                                                        <rect key="frame" x="313" y="7" width="131" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="z9W-lk-3Nx">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>

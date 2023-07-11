@@ -64,7 +64,8 @@ enum GraphQL {
         }
     }
 
-    private static let gateKeeper = Gate(tickets: 1)
+    private static let singleateKeeper = Gate(tickets: 1)
+    private static let multiGateKeeper = Gate(tickets: 2)
     
     private static func fetchData(from urlString: String, for query: Query, authToken: String, attempts: Int) async throws -> JSON {
         let Q = query.queryText
@@ -81,11 +82,21 @@ enum GraphQL {
         request.body = .bytes(ByteBuffer(bytes: requestData))
         request.headers.add(name: "Authorization", value: "bearer \(authToken)")
 
-        await gateKeeper.takeTicket()
-        defer {
-            gateKeeper.relaxedReturnTicket()
+        let threaded = Settings.threadedSync
+        if threaded {
+            await multiGateKeeper.takeTicket()
+        } else {
+            await singleateKeeper.takeTicket()
         }
-        
+
+        defer {
+            if threaded {
+                multiGateKeeper.relaxedReturnTicket()
+            } else {
+                singleateKeeper.relaxedReturnTicket()
+            }
+        }
+
         Task { @MainActor in
             API.currentOperationName = query.name
         }
@@ -525,32 +536,32 @@ enum GraphQL {
             }
         }
     }
-
-    private static let latestPrsFragment = Fragment(on: "Repository") {
+    
+    private static var latestPrsFragment = Fragment(on: "Repository") {
         Field.id
-        Group("pullRequests", ("orderBy", "{direction: DESC, field: UPDATED_AT}"), paging: .first(count: 20, paging: true)) {
-            prFragment(assigneesAndLabelPageSize: 20, includeRepo: false)
+        Group("pullRequests", ("orderBy", "{direction: DESC, field: UPDATED_AT}"), paging: .first(count: Settings.prSyncPageSize, paging: true)) {
+            prFragment(assigneesAndLabelPageSize: 10, includeRepo: false)
         }
     }
 
-    private static let latestIssuesFragment = Fragment(on: "Repository") {
+    private static var latestIssuesFragment = Fragment(on: "Repository") {
         Field.id
-        Group("issues", ("orderBy", "{direction: DESC, field: UPDATED_AT}"), paging: .first(count: 40, paging: true)) {
-            issueFragment(assigneesAndLabelPageSize: 20, includeRepo: false)
+        Group("issues", ("orderBy", "{direction: DESC, field: UPDATED_AT}"), paging: .first(count: Settings.issueSyncPageSize, paging: true)) {
+            issueFragment(assigneesAndLabelPageSize: 10, includeRepo: false)
         }
     }
 
-    private static let allOpenPrsFragment = Fragment(on: "Repository") {
+    private static var allOpenPrsFragment = Fragment(on: "Repository") {
         Field.id
-        Group("pullRequests", ("states", "[OPEN]"), paging: .first(count: 50, paging: true)) {
-            prFragment(assigneesAndLabelPageSize: 20, includeRepo: false)
+        Group("pullRequests", ("states", "[OPEN]"), paging: .first(count: Settings.prSyncPageSize, paging: true)) {
+            prFragment(assigneesAndLabelPageSize: 10, includeRepo: false)
         }
     }
 
-    private static let allOpenIssuesFragment = Fragment(on: "Repository") {
+    private static var allOpenIssuesFragment = Fragment(on: "Repository") {
         Field.id
-        Group("issues", ("states", "[OPEN]"), paging: .first(count: 50, paging: true)) {
-            issueFragment(assigneesAndLabelPageSize: 20, includeRepo: false)
+        Group("issues", ("states", "[OPEN]"), paging: .first(count: Settings.issueSyncPageSize, paging: true)) {
+            issueFragment(assigneesAndLabelPageSize: 10, includeRepo: false)
         }
     }
 
