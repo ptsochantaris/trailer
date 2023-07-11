@@ -7,7 +7,33 @@
 		<language>en</language>
 
         <item>
-            <title>Version 1.8.0</title>
+            <title>Version 1.8.2</title>
+            <sparkle:minimumSystemVersion>11.0.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[<font face="sans-serif" size="3"><ul>
+                <li>Slows down v4 API query rate to prevent failures due to server-side throttling</li>
+                <li>Includes a further round of technical cleanups</li>
+                <li>From 1.8.1:</li>
+                <li>Corrects an issue related to filtering out items created by bot users, and some corner cases in v4 syncing</li>
+                <li>From 1.8.0:</li>
+                <li>Significant optimisations to performance throughout, from HTTP requests, parsing queries, processing items, app responsiveness while syncing, and especially updating menus in macOS.</li>
+                <li>A (first) round of improvements to the ageing codebase :)</li>
+                <li>Many small fixes, partly as a consequence of the cleanup.</li>
+                <li>Fixed an issue where items that were open at the time a repo was archived will no longer be listed.</li>
+                <li>Fixed an issue where closed and merged items that were kept on the list could not be opened.</li>
+                <li>Corrections to Spotlight integration.</li>
+                </ul>
+                </font>]]></description>
+            <pubDate>Tue, 11 Jul 2023 14:00:00 +0000</pubDate>
+            <enclosure
+            url="https://github.com/ptsochantaris/trailer/releases/download/1.8.2/Trailer-182.zip"
+            sparkle:version="1652"
+            sparkle:shortVersionString="1.8.2"
+            sparkle:dsaSignature="MC0CFCLsdY3wadnd2mqBJx+38KUN8snuAhUAk5qJdwFSPPaiH/84N3BwYtzeZ0w="
+            type="application/octet-stream"/>
+        </item>
+        
+        <item>
+            <title>Version 1.8.1</title>
             <sparkle:minimumSystemVersion>10.15.0</sparkle:minimumSystemVersion>
             <description><![CDATA[<font face="sans-serif" size="3"><ul>
                 <li>Corrects an issue related to filtering out items created by bot users, and some corner cases in v4 syncing</li>
