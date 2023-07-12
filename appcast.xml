@@ -7,13 +7,13 @@
 		<language>en</language>
 
         <item>
-            <title>Version 1.8.2</title>
+            <title>Version 1.8.3</title>
             <sparkle:minimumSystemVersion>11.0.0</sparkle:minimumSystemVersion>
             <description><![CDATA[<font face="sans-serif" size="3"><ul>
-                <li>Slows down v4 API query rate to prevent failures due to server-side throttling</li>
-                <li>Includes a further round of technical cleanups</li>
-                <li>From 1.8.1:</li>
+                <li>To help keep the experience of using v4 API as stable as possible, this release adds an option screen for v4 API in the Servers section where you can customise the paging parameters to avoid GitHub errors. The defaults are quite conservative, so depending on how much data you sync, you may want to incrementally try increasing them, especially parallel queries.</li>
+                <li>From 1.8.x:</li>
                 <li>Corrects an issue related to filtering out items created by bot users, and some corner cases in v4 syncing</li>
+                <li>Includes a further round of technical cleanups</li>
                 <li>From 1.8.0:</li>
                 <li>Significant optimisations to performance throughout, from HTTP requests, parsing queries, processing items, app responsiveness while syncing, and especially updating menus in macOS.</li>
                 <li>A (first) round of improvements to the ageing codebase :)</li>
@@ -23,12 +23,12 @@
                 <li>Corrections to Spotlight integration.</li>
                 </ul>
                 </font>]]></description>
-            <pubDate>Tue, 11 Jul 2023 14:00:00 +0000</pubDate>
+            <pubDate>Tue, 12 Jul 2023 2:00:00 +0000</pubDate>
             <enclosure
-            url="https://github.com/ptsochantaris/trailer/releases/download/1.8.2/Trailer-182.zip"
-            sparkle:version="1652"
-            sparkle:shortVersionString="1.8.2"
-            sparkle:dsaSignature="MC0CFCLsdY3wadnd2mqBJx+38KUN8snuAhUAk5qJdwFSPPaiH/84N3BwYtzeZ0w="
+            url="https://github.com/ptsochantaris/trailer/releases/download/1.8.3/Trailer-183.zip"
+            sparkle:version="1655"
+            sparkle:shortVersionString="1.8.3"
+            sparkle:dsaSignature="MC4CFQCjEyDyl0/njiFo6oIKSvzmuS0uIAIVALWf5eMpaEgYXvdY6tOJFOD1C1nb"
             type="application/octet-stream"/>
         </item>
         
