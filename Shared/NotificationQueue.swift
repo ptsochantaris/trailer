@@ -1,7 +1,7 @@
 import CoreData
 import Foundation
-import TrailerQL
 import Lista
+import TrailerQL
 
 enum NotificationQueue {
     private static var queue = Lista<(NotificationType, NSManagedObjectID)>()

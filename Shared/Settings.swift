@@ -268,7 +268,7 @@ enum Settings {
         get { get("PR_V4_SYNC_PAGE") as? Int ?? 20 }
         set { set("PR_V4_SYNC_PAGE", newValue) }
     }
-    
+
     static let issueSyncPageSizeHelp = "The number of Issues to fetch per page when using v4 API. Raising it may make syncing faster but result in errors from GitHub."
     static var issueSyncPageSize: Int {
         get { get("ISSUE_V4_SYNC_PAGE") as? Int ?? 20 }

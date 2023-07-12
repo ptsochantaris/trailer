@@ -92,6 +92,7 @@
 		16813CBF1BA16D660020F8EB /* CommonController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16813CBE1BA16D660020F8EB /* CommonController.swift */; };
 		1686DEB72A5DD12000AED26E /* ApiOptionsWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1686DEB62A5DD12000AED26E /* ApiOptionsWindow.xib */; };
 		1686DEB92A5DD12C00AED26E /* ApiOptionsWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1686DEB82A5DD12C00AED26E /* ApiOptionsWindow.swift */; };
+		1686DEBB2A5E337C00AED26E /* ApiSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1686DEBA2A5E337C00AED26E /* ApiSettingsViewController.swift */; };
 		168839C71DEF8C3B002D9448 /* ImportExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 168839C61DEF8C3B002D9448 /* ImportExport.swift */; };
 		168924532A58BC2A0094F0D1 /* TrailerJson in Frameworks */ = {isa = PBXBuildFile; productRef = 168924522A58BC2A0094F0D1 /* TrailerJson */; };
 		168924552A58BC7A0094F0D1 /* TrailerJson in Frameworks */ = {isa = PBXBuildFile; productRef = 168924542A58BC7A0094F0D1 /* TrailerJson */; };
@@ -355,6 +356,7 @@
 		1686B1D41AE59AED009118C5 /* PocketTrailer.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PocketTrailer.entitlements; sourceTree = "<group>"; };
 		1686DEB62A5DD12000AED26E /* ApiOptionsWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ApiOptionsWindow.xib; sourceTree = "<group>"; };
 		1686DEB82A5DD12C00AED26E /* ApiOptionsWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiOptionsWindow.swift; sourceTree = "<group>"; };
+		1686DEBA2A5E337C00AED26E /* ApiSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiSettingsViewController.swift; sourceTree = "<group>"; };
 		168839C61DEF8C3B002D9448 /* ImportExport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImportExport.swift; sourceTree = "<group>"; };
 		168BA31A283CC310005D09EE /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		168BC6AA17EC2DF000BC4584 /* Trailer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Trailer.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -932,6 +934,7 @@
 				169205631E34DA9F00FB9547 /* CustomReposViewController.swift */,
 				169205671E34EB4D00FB9547 /* CustomRepoCell.swift */,
 				169205651E34DACA00FB9547 /* WatchlistSettingsViewController.swift */,
+				1686DEBA2A5E337C00AED26E /* ApiSettingsViewController.swift */,
 			);
 			name = Settings;
 			sourceTree = "<group>";
@@ -1248,6 +1251,7 @@
 				1606F1BB1A4703E60088368E /* iOSAppDelegate.swift in Sources */,
 				16B3B3201A34E8E2000BE6CC /* PRStatus.swift in Sources */,
 				16A69EDB1AC83020008231F9 /* ListableItem.swift in Sources */,
+				1686DEBB2A5E337C00AED26E /* ApiSettingsViewController.swift in Sources */,
 				164785AB1A2CE7BD00297764 /* Globals.swift in Sources */,
 				16C9A2761A44D12600EE54EC /* AboutTrailerViewController.swift in Sources */,
 				16CBE1C61A2DFBA500485053 /* Settings.swift in Sources */,
@@ -1595,7 +1599,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1653;
+				CURRENT_PROJECT_VERSION = 1654;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -1659,7 +1663,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1653;
+				CURRENT_PROJECT_VERSION = 1654;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEPLOYMENT_POSTPROCESSING = YES;

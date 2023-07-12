@@ -1,6 +1,6 @@
 import CoreData
-import TrailerQL
 import Lista
+import TrailerQL
 
 final class Repo: DataItem {
     @NSManaged var fork: Bool

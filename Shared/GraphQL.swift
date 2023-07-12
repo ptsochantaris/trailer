@@ -1,8 +1,8 @@
 import AsyncHTTPClient
 import Foundation
+import Lista
 import NIOCore
 import TrailerQL
-import Lista
 
 @MainActor
 enum GraphQL {
@@ -11,7 +11,7 @@ enum GraphQL {
             DLog(message)
         }
     }
-    
+
     private static let nodeBlockMax = 2000
 
     private static let nameWithOwnerField = Field("nameWithOwner")
@@ -66,7 +66,7 @@ enum GraphQL {
 
     private static let singleateKeeper = Gate(tickets: 1)
     private static let multiGateKeeper = Gate(tickets: 2)
-    
+
     private static func fetchData(from urlString: String, for query: Query, authToken: String, attempts: Int) async throws -> JSON {
         let Q = query.queryText
         if Settings.dumpAPIResponsesInConsole {
@@ -104,7 +104,7 @@ enum GraphQL {
         guard let json = try await HTTP.getJsonData(for: request, attempts: attempts, checkCache: false).json as? JSON else {
             throw API.apiError("\(query.logPrefix)Retuned data is not JSON")
         }
-        
+
         return json
     }
 
@@ -536,7 +536,7 @@ enum GraphQL {
             }
         }
     }
-    
+
     private static var latestPrsFragment = Fragment(on: "Repository") {
         Field.id
         Group("pullRequests", ("orderBy", "{direction: DESC, field: UPDATED_AT}"), paging: .first(count: Settings.prSyncPageSize, paging: true)) {

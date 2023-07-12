@@ -1,6 +1,6 @@
 import CoreData
-import TrailerQL
 import Lista
+import TrailerQL
 
 typealias FetchCache = NSCache<NSString, NSManagedObject>
 

@@ -1,6 +1,6 @@
 import CoreData
-import TrailerQL
 import Lista
+import TrailerQL
 #if os(iOS)
     import UIKit
 #endif

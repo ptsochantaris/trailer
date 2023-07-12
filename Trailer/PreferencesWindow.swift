@@ -1965,7 +1965,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
 
     private var apiOptionsWindowController: NSWindowController?
     private var apiOptionsWindow: ApiOptionsWindow?
-    @IBAction private func apiOptionsSelected(_ sender: NSButton) {
+    @IBAction private func apiOptionsSelected(_: NSButton) {
         if apiOptionsWindowController == nil {
             apiOptionsWindowController = NSWindowController(windowNibName: NSNib.Name("ApiOptionsWindow"))
         }

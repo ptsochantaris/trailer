@@ -102,7 +102,7 @@ final class ServersViewController: UITableViewController {
     }
 
     @IBAction private func apiToggleSelected(_ sender: UIBarButtonItem) {
-        let a = UIAlertController(title: "Switch API", message: Settings.useV4APIHelp, preferredStyle: .actionSheet)
+        let a = UIAlertController(title: "API Options", message: Settings.useV4APIHelp, preferredStyle: .actionSheet)
         a.addAction(UIAlertAction(title: "Use legacy v3 API", style: .default) { [weak self] _ in
             Settings.useV4API = false
             self?.apiChanged()
@@ -113,6 +113,13 @@ final class ServersViewController: UITableViewController {
             } else {
                 Settings.useV4API = true
                 self?.apiChanged()
+            }
+        })
+        a.addAction(UIAlertAction(title: "v4 API Options…", style: .default) { [weak self] _ in
+            if let error = API.canUseV4API(for: DataManager.main) {
+                showMessage(Settings.v4title, error)
+            } else {
+                self?.performSegue(withIdentifier: "apiOptions", sender: nil)
             }
         })
         a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))

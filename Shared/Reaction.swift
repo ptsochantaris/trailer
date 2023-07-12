@@ -1,6 +1,6 @@
 import CoreData
-import TrailerQL
 import Lista
+import TrailerQL
 
 final class Reaction: DataItem {
     @NSManaged var content: String?

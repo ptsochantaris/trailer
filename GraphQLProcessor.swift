@@ -1,7 +1,7 @@
 import AsyncAlgorithms
 import Foundation
-import TrailerQL
 import Lista
+import TrailerQL
 
 extension GraphQL {
     final class Processor {

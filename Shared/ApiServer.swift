@@ -1,6 +1,6 @@
 import CoreData
-import TrailerQL
 import Lista
+import TrailerQL
 
 final class ApiServer: NSManagedObject {
     @NSManaged var apiPath: String?
@@ -316,7 +316,7 @@ final class ApiServer: NSManagedObject {
     func run(queries: Lista<Query>) async throws {
         let path = graphQLPath ?? ""
         let token = authToken ?? ""
-        
+
         if let newStats = try await GraphQL.runQueries(queries: queries, on: path, token: token) {
             updateApiStats(newStats)
         }

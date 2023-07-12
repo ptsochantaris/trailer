@@ -1,7 +1,7 @@
 import CoreData
 import Foundation
-import TrailerQL
 import Lista
+import TrailerQL
 
 final class PRStatus: DataItem {
     @NSManaged var descriptionText: String?
