@@ -13,6 +13,8 @@ enum GraphQL {
     }
 
     private static let nodeBlockMax = 2000
+    
+    private static let maxBatchCost = 40_000 // GH claims 500_000 as a limit but anything over this risks timeouts
 
     private static let nameWithOwnerField = Field("nameWithOwner")
 
@@ -58,7 +60,7 @@ enum GraphQL {
                 gotUserNode = true
             }
         }
-        _ = try await run(testQuery, for: apiServer.graphQLPath ?? "", authToken: apiServer.authToken ?? "", attempts: 1)
+        _ = try await run(testQuery, for: apiServer.graphQLPath ?? "", authToken: apiServer.authToken ?? "", expectedNodeCost: nil, attempts: 1)
         if !gotUserNode {
             throw API.apiError("Could not read a valid user record from this endpoint")
         }
@@ -108,18 +110,29 @@ enum GraphQL {
         return json
     }
 
-    static func run(_ query: Query, for urlString: String, authToken: String, attempts: Int = 5) async throws -> ApiStats? {
+    static func run(_ query: Query, for urlString: String, authToken: String, expectedNodeCost: Int?, attempts: Int = 5) async throws -> ApiStats? {
+        if let expectedNodeCost {
+            DLog("\(query.logPrefix)Starting - Expected Count: \(expectedNodeCost)")
+        }
+        
         let json = try await fetchData(from: urlString, for: query, authToken: authToken, attempts: attempts)
 
         let apiStats = ApiStats.fromV4(json: json["data"] as? JSON)
-        let expectedNodeCost = query.nodeCost
-        if let apiStats {
-            DLog("\(query.logPrefix)Received page (Cost: \(apiStats.cost), Remaining: \(apiStats.remaining)/\(apiStats.limit) - Expected Count: \(expectedNodeCost) - Returned Count: \(apiStats.nodeCount))")
-            if expectedNodeCost != apiStats.nodeCount {
-                DLog("Warning: Mismatched expected and received node count!")
+        if let expectedNodeCost {
+            if let apiStats {
+                DLog("\(query.logPrefix)Received page (Cost: \(apiStats.cost), Remaining: \(apiStats.remaining)/\(apiStats.limit) - Expected Count: \(expectedNodeCost) - Returned Count: \(apiStats.nodeCount))")
+                if expectedNodeCost != apiStats.nodeCount {
+                    DLog("Warning: Mismatched expected and received node count!")
+                }
+            } else {
+                DLog("\(query.logPrefix)Received page (No stats) - Expected Count: \(expectedNodeCost)")
             }
         } else {
-            DLog("\(query.logPrefix)Received page (No stats) - Expected Count: \(expectedNodeCost)")
+            if let apiStats {
+                DLog("\(query.logPrefix)Received page (Cost: \(apiStats.cost), Remaining: \(apiStats.remaining)/\(apiStats.limit) - Returned Count: \(apiStats.nodeCount))")
+            } else {
+                DLog("\(query.logPrefix)Received page (No stats)")
+            }
         }
 
         DLog("\(query.logPrefix)Scanning result")
@@ -148,7 +161,7 @@ enum GraphQL {
         try await withThrowingTaskGroup(of: ApiStats?.self, returning: ApiStats?.self) { group in
             for query in queries {
                 group.addTask {
-                    if let stats = try await run(query, for: path, authToken: token) {
+                    if let stats = try await run(query, for: path, authToken: token, expectedNodeCost: query.nodeCost) {
                         return stats
                     }
                     return nil
@@ -340,7 +353,7 @@ enum GraphQL {
                 }
             }
 
-            let queries = Query.batching("\(serverName): \(name)", groupName: "nodes", idList: ids, perNode: nodeBlock, fields: fields)
+            let queries = Query.batching("\(serverName): \(name)", groupName: "nodes", idList: ids, maxCost: maxBatchCost, perNode: nodeBlock, fields: fields)
 
             do {
                 try await server.run(queries: queries)
@@ -626,12 +639,12 @@ enum GraphQL {
             }
 
             if idsForReposInThisServerWantingLatestPrs.count > 0 {
-                let q = Query.batching("\(serverLabel): Updated PRs", groupName: "nodes", idList: Array(idsForReposInThisServerWantingLatestPrs), perNode: perNodeBlock) { latestPrsFragment }
+                let q = Query.batching("\(serverLabel): Updated PRs", groupName: "nodes", idList: Array(idsForReposInThisServerWantingLatestPrs), maxCost: maxBatchCost, perNode: perNodeBlock) { latestPrsFragment }
                 queriesForServer.append(contentsOf: q)
             }
 
             if idsForReposInThisServerWantingAllOpenPrs.count > 0 {
-                let q = Query.batching("\(serverLabel): Open PRs", groupName: "nodes", idList: Array(idsForReposInThisServerWantingAllOpenPrs), perNode: perNodeBlock) { allOpenPrsFragment }
+                let q = Query.batching("\(serverLabel): Open PRs", groupName: "nodes", idList: Array(idsForReposInThisServerWantingAllOpenPrs), maxCost: maxBatchCost, perNode: perNodeBlock) { allOpenPrsFragment }
                 queriesForServer.append(contentsOf: q)
             }
 
@@ -706,12 +719,12 @@ enum GraphQL {
             }
 
             if idsForReposInThisServerWantingLatestIssues.count > 0 {
-                let q = Query.batching("\(serverLabel): Updated Issues", groupName: "nodes", idList: Array(idsForReposInThisServerWantingLatestIssues), perNode: perNodeBlock) { latestIssuesFragment }
+                let q = Query.batching("\(serverLabel): Updated Issues", groupName: "nodes", idList: Array(idsForReposInThisServerWantingLatestIssues), maxCost: maxBatchCost, perNode: perNodeBlock) { latestIssuesFragment }
                 queriesForServer.append(contentsOf: q)
             }
 
             if idsForReposInThisServerWantingAllOpenIssues.count > 0 {
-                let q = Query.batching("\(serverLabel): Open Issues", groupName: "nodes", idList: Array(idsForReposInThisServerWantingAllOpenIssues), perNode: perNodeBlock) { allOpenIssuesFragment }
+                let q = Query.batching("\(serverLabel): Open Issues", groupName: "nodes", idList: Array(idsForReposInThisServerWantingAllOpenIssues), maxCost: maxBatchCost, perNode: perNodeBlock) { allOpenIssuesFragment }
                 queriesForServer.append(contentsOf: q)
             }
 
