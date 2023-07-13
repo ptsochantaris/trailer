@@ -13,8 +13,8 @@ enum GraphQL {
     }
 
     private static let nodeBlockMax = 2000
-    
-    private static let maxBatchCost = 40_000 // GH claims 500_000 as a limit but anything over this risks timeouts
+
+    private static let maxBatchCost = 40000 // GH claims 500_000 as a limit but anything over this risks timeouts
 
     private static let nameWithOwnerField = Field("nameWithOwner")
 
@@ -40,7 +40,7 @@ enum GraphQL {
     }
 
     private static func commentGroup(for typeName: String) -> Group {
-        Group("comments", paging: .max) {
+        Group("comments", paging: .first(count: miscPageSize, paging: true)) {
             Fragment(on: typeName) {
                 Field.id
                 Field("body")
@@ -114,7 +114,7 @@ enum GraphQL {
         if let expectedNodeCost {
             DLog("\(query.logPrefix)Starting - Expected Count: \(expectedNodeCost)")
         }
-        
+
         let json = try await fetchData(from: urlString, for: query, authToken: authToken, attempts: attempts)
 
         let apiStats = ApiStats.fromV4(json: json["data"] as? JSON)
@@ -175,6 +175,10 @@ enum GraphQL {
         }
     }
 
+    private static var miscPageSize: Int {
+        max(Settings.prSyncPageSize, Settings.issueSyncPageSize)
+    }
+
     static func update<T: ListableItem>(for items: [T], steps: API.SyncSteps) async throws {
         let typeName = String(describing: T.self)
 
@@ -222,7 +226,7 @@ enum GraphQL {
 
                 if items is [PullRequest] {
                     if steps.contains(.reviewRequests) {
-                        Group("reviewRequests", paging: .max) {
+                        Group("reviewRequests", paging: .first(count: miscPageSize, paging: true)) {
                             Fragment(on: "ReviewRequest") {
                                 Field.id
                                 Group("requestedReviewer") {
@@ -238,7 +242,7 @@ enum GraphQL {
                     }
 
                     if steps.contains(.reviews) {
-                        Group("reviews", paging: .max) {
+                        Group("reviews", paging: .first(count: miscPageSize, paging: true)) {
                             Fragment(on: "PullRequestReview") {
                                 Field.id
                                 Field("body")
@@ -283,7 +287,7 @@ enum GraphQL {
                 }
 
                 if steps.contains(.reactions) {
-                    Group("reactions", paging: .max) {
+                    Group("reactions", paging: .first(count: miscPageSize, paging: true)) {
                         Fragment(on: "Reaction") {
                             Field.id
                             Field("content")
@@ -304,7 +308,7 @@ enum GraphQL {
         try await process(name: "Comment Reactions", items: comments) {
             Fragment(on: "IssueComment") {
                 Field.id
-                Group("reactions", paging: .max) {
+                Group("reactions", paging: .first(count: miscPageSize, paging: true)) {
                     Fragment(on: "Reaction") {
                         Field.id
                         Field("content")
@@ -444,7 +448,7 @@ enum GraphQL {
         await withTaskGroup(of: Void.self) { group in
             for server in servers {
                 if Settings.queryAuthoredPRs {
-                    let g = Group("pullRequests", ("states", "[OPEN]"), paging: .max) {
+                    let g = Group("pullRequests", ("states", "[OPEN]"), paging: .first(count: Settings.prSyncPageSize, paging: true)) {
                         prFragment(assigneesAndLabelPageSize: 20, includeRepo: true)
                     }
                     group.addTask { @MainActor in
@@ -463,7 +467,7 @@ enum GraphQL {
         await withTaskGroup(of: Void.self) { group in
             for server in servers {
                 if Settings.queryAuthoredIssues {
-                    let g = Group("issues", ("states", "[OPEN]"), paging: .max) {
+                    let g = Group("issues", ("states", "[OPEN]"), paging: .first(count: Settings.issueSyncPageSize, paging: true)) {
                         issueFragment(assigneesAndLabelPageSize: 20, includeRepo: true)
                     }
                     group.addTask { @MainActor in
