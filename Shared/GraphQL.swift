@@ -55,6 +55,17 @@ enum GraphQL {
             }
         }
         
+        var itemAccompanyingBatchCount: Int {
+            switch self {
+            case .high:
+                return 10000
+            case .normal:
+                return 6000
+            case .cautious:
+                return 2000
+            }
+        }
+        
         var largePageSize: Group.Paging {
             switch self {
             case .high:
@@ -283,7 +294,7 @@ enum GraphQL {
             }
         }
 
-        try await process(name: steps.toString, items: items, parentType: T.self, maxCost: 10000) {
+        try await process(name: steps.toString, items: items, parentType: T.self, maxCost: Profile.current.itemAccompanyingBatchCount) {
             Fragment(on: typeName) {
                 Field.id
 
@@ -368,7 +379,7 @@ enum GraphQL {
     }
 
     static func updateReactions(for comments: [PRComment]) async throws {
-        try await process(name: "Comment Reactions", items: comments, maxCost: 10000) {
+        try await process(name: "Comment Reactions", items: comments, maxCost: Profile.current.itemAccompanyingBatchCount) {
             Fragment(on: "IssueComment") {
                 Field.id
                 Group("reactions", paging: Profile.current.largePageSize) {
@@ -384,7 +395,7 @@ enum GraphQL {
     }
 
     static func updateComments(for reviews: [Review]) async throws {
-        try await process(name: "Review Comments", items: reviews, maxCost: 40000) {
+        try await process(name: "Review Comments", items: reviews, maxCost: Profile.current.itemAccompanyingBatchCount) {
             Fragment(on: "PullRequestReview") {
                 Field.id
                 commentGroup(for: "PullRequestReviewComment")
