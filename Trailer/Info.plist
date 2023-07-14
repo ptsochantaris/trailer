@@ -66,5 +66,7 @@
 	<string>https://ptsochantaris.github.io/trailer/appcast.xml</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>dsa_pub.pem</string>
+	<key>SUPublicEDKey</key>
+	<string>3J3ylE4CkXo8OIpjoaCcs1yn7c+H6gkQP++8ellRlHo=</string>
 </dict>
 </plist>
