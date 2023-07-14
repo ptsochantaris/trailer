@@ -3,11 +3,9 @@ import Cocoa
 final class ApiOptionsWindow: NSWindow, NSWindowDelegate {
     weak var prefs: PreferencesWindow?
 
-    @IBOutlet private var prPageLabel: NSTextField!
-    @IBOutlet private var issuePageLabel: NSTextField!
-
-    @IBOutlet private var prPageSlider: NSSlider!
-    @IBOutlet private var issuePageSlider: NSSlider!
+    @IBOutlet var highRadio: NSButton!
+    @IBOutlet var defaultRadio: NSButton!
+    @IBOutlet var safeRadio: NSButton!
 
     @IBOutlet private var threadCheckbox: NSButton!
 
@@ -16,35 +14,30 @@ final class ApiOptionsWindow: NSWindow, NSWindowDelegate {
         super.awakeFromNib()
         delegate = self
 
-        prPageLabel.toolTip = Settings.prSyncPageSizeHelp
-        prPageSlider.toolTip = Settings.prSyncPageSizeHelp
-
-        issuePageLabel.toolTip = Settings.issueSyncPageSizeHelp
-        issuePageSlider.toolTip = Settings.issueSyncPageSizeHelp
+        highRadio.toolTip = Settings.syncProfileHelp
+        defaultRadio.toolTip = Settings.syncProfileHelp
+        safeRadio.toolTip = Settings.syncProfileHelp
 
         threadCheckbox.toolTip = Settings.threadedSyncHelp
 
         updateUI()
     }
-
+    @IBAction func radioButtonSelected(_ sender: NSButton) {
+        if sender === safeRadio {
+            Settings.syncProfile = GraphQL.Profile.cautious.rawValue
+        } else if sender === defaultRadio {
+            Settings.syncProfile = GraphQL.Profile.normal.rawValue
+        } else if sender === highRadio {
+            Settings.syncProfile = GraphQL.Profile.high.rawValue
+        }
+    }
+    
     private func updateUI() {
         threadCheckbox.integerValue = Settings.threadedSync ? 1 : 0
-        prPageSlider.integerValue = Settings.prSyncPageSize
-        issuePageSlider.integerValue = Settings.issueSyncPageSize
-        prPageLabel.stringValue = "PR results page size: \(Settings.prSyncPageSize)"
-        issuePageLabel.stringValue = "Issue results page size: \(Settings.issueSyncPageSize)"
-    }
-
-    @IBAction private func prSliderChanged(_ sender: NSSlider) {
-        let value = sender.integerValue
-        Settings.prSyncPageSize = value
-        prPageLabel.stringValue = "PR results page size: \(value)"
-    }
-
-    @IBAction private func issueSliderChanged(_ sender: NSSlider) {
-        let value = sender.integerValue
-        Settings.issueSyncPageSize = value
-        issuePageLabel.stringValue = "Issue results page size: \(value)"
+        let profile = GraphQL.Profile(settingsValue: Settings.syncProfile)
+        highRadio.integerValue = profile == .high ? 1 : 0
+        defaultRadio.integerValue = profile == .normal ? 1 : 0
+        safeRadio.integerValue = profile == .cautious ? 1 : 0
     }
 
     @IBAction private func threadingToggled(_ sender: NSButton) {
@@ -52,8 +45,7 @@ final class ApiOptionsWindow: NSWindow, NSWindowDelegate {
     }
 
     @IBAction private func resetSelected(_: NSButton) {
-        Settings.prSyncPageSize = 20
-        Settings.issueSyncPageSize = 20
+        Settings.syncProfile = GraphQL.Profile.normal.rawValue
         Settings.threadedSync = false
         updateUI()
     }

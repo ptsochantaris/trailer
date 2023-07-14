@@ -16,37 +16,19 @@
         <window title="API Options" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="QvC-M9-y7g" customClass="ApiOptionsWindow" customModule="Trailer" customModuleProvider="target">
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="196" y="240" width="481" height="323"/>
+            <rect key="contentRect" x="196" y="240" width="481" height="246"/>
             <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1415"/>
             <view key="contentView" wantsLayer="YES" id="EiT-Mj-1SZ">
-                <rect key="frame" x="0.0" y="0.0" width="481" height="323"/>
+                <rect key="frame" x="0.0" y="0.0" width="481" height="246"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <box fixedFrame="YES" title="Options for V4 API sync" translatesAutoresizingMaskIntoConstraints="NO" id="Klt-fG-YQk">
-                        <rect key="frame" x="17" y="27" width="447" height="276"/>
+                    <box fixedFrame="YES" title="Options for V4 API sync queries" translatesAutoresizingMaskIntoConstraints="NO" id="Klt-fG-YQk">
+                        <rect key="frame" x="17" y="27" width="447" height="199"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <view key="contentView" id="NBP-Z5-dKm">
-                            <rect key="frame" x="4" y="5" width="439" height="256"/>
+                            <rect key="frame" x="4" y="5" width="439" height="179"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0i3-Dy-Z4A">
-                                    <rect key="frame" x="96" y="161" width="247" height="16"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                    <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Issue results page size" id="yDc-Je-YjX">
-                                        <font key="font" metaFont="smallSystem"/>
-                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    </textFieldCell>
-                                </textField>
-                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="09u-Cg-uX8">
-                                    <rect key="frame" x="96" y="220" width="247" height="16"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                    <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="PR results page size" id="80K-B8-upX">
-                                        <font key="font" metaFont="smallSystem"/>
-                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    </textFieldCell>
-                                </textField>
                                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xJD-Ku-8bF">
                                     <rect key="frame" x="18" y="24" width="219" height="18"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -58,22 +40,6 @@
                                         <action selector="threadingToggled:" target="QvC-M9-y7g" id="Yf9-aG-DGD"/>
                                     </connections>
                                 </button>
-                                <slider verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wY9-pI-bFj">
-                                    <rect key="frame" x="18" y="131" width="403" height="28"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                    <sliderCell key="cell" continuous="YES" state="on" alignment="left" minValue="1" maxValue="100" doubleValue="50" tickMarkPosition="above" sliderType="linear" id="e4b-PD-Pjh"/>
-                                    <connections>
-                                        <action selector="issueSliderChanged:" target="QvC-M9-y7g" id="bm6-jy-Uds"/>
-                                    </connections>
-                                </slider>
-                                <slider verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="F53-Jr-4Rb">
-                                    <rect key="frame" x="18" y="190" width="403" height="28"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                    <sliderCell key="cell" continuous="YES" state="on" alignment="left" minValue="1" maxValue="100" doubleValue="50" tickMarkPosition="above" sliderType="linear" id="ShU-cK-oMD"/>
-                                    <connections>
-                                        <action selector="prSliderChanged:" target="QvC-M9-y7g" id="5pi-62-OWM"/>
-                                    </connections>
-                                </slider>
                                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2ph-sL-wLJ">
                                     <rect key="frame" x="288" y="13" width="138" height="32"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
@@ -86,27 +52,77 @@
                                     </connections>
                                 </button>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QkA-AA-SM8">
-                                    <rect key="frame" x="18" y="74" width="403" height="44"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                    <textFieldCell key="cell" alignment="center" title="Setting these too high can cause throttling or query errors from GitHub" id="8w3-Ko-45N">
+                                    <rect key="frame" x="21" y="63" width="138" height="58"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMinY="YES"/>
+                                    <textFieldCell key="cell" alignment="center" title="More but smaller queries; higher API cost." id="8w3-Ko-45N">
                                         <font key="font" metaFont="smallSystem"/>
                                         <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
+                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HZG-nQ-Ou6">
+                                    <rect key="frame" x="279" y="63" width="138" height="58"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMinY="YES"/>
+                                    <textFieldCell key="cell" alignment="center" title="Fewer but larger queries; lower API cost, but risks API timeouts." id="yHX-C4-puR">
+                                        <font key="font" metaFont="smallSystem"/>
+                                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    </textFieldCell>
+                                </textField>
+                                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="axL-U5-dhK">
+                                    <rect key="frame" x="63" y="128" width="53" height="18"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <buttonCell key="cell" type="radio" title="Safe" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="JBo-dE-tQS">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="radioButtonSelected:" target="QvC-M9-y7g" id="YXL-cx-Ajg"/>
+                                    </connections>
+                                </button>
+                                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3rI-JF-7om">
+                                    <rect key="frame" x="320" y="128" width="55" height="18"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <buttonCell key="cell" type="radio" title="High" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="Uqc-z7-rYR">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="radioButtonSelected:" target="QvC-M9-y7g" id="Awn-3Z-f6J"/>
+                                    </connections>
+                                </button>
+                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="pYG-rB-gzo">
+                                    <rect key="frame" x="163" y="63" width="112" height="58"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMinY="YES"/>
+                                    <textFieldCell key="cell" alignment="center" title="Default balance between query sizes and API cost." id="ZZR-L0-vFZ">
+                                        <font key="font" metaFont="smallSystem"/>
+                                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    </textFieldCell>
+                                </textField>
+                                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2d5-nc-h0T">
+                                    <rect key="frame" x="183" y="128" width="70" height="18"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <buttonCell key="cell" type="radio" title="Default" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="fnD-dg-Iom">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="radioButtonSelected:" target="QvC-M9-y7g" id="TWe-bY-oYr"/>
+                                    </connections>
+                                </button>
                             </subviews>
                         </view>
                     </box>
                 </subviews>
             </view>
             <connections>
-                <outlet property="issuePageLabel" destination="0i3-Dy-Z4A" id="vh7-FT-wm6"/>
-                <outlet property="issuePageSlider" destination="wY9-pI-bFj" id="E5I-x9-cA2"/>
-                <outlet property="prPageLabel" destination="09u-Cg-uX8" id="sZJ-4S-nR4"/>
-                <outlet property="prPageSlider" destination="F53-Jr-4Rb" id="Zal-ld-Rk2"/>
+                <outlet property="defaultRadio" destination="2d5-nc-h0T" id="V8h-Si-AC2"/>
+                <outlet property="highRadio" destination="3rI-JF-7om" id="xsB-sE-MDC"/>
+                <outlet property="safeRadio" destination="axL-U5-dhK" id="7ij-y4-VYR"/>
                 <outlet property="threadCheckbox" destination="xJD-Ku-8bF" id="X5L-So-frP"/>
             </connections>
-            <point key="canvasLocation" x="-4.5" y="170.5"/>
+            <point key="canvasLocation" x="-4.5" y="132"/>
         </window>
     </objects>
 </document>

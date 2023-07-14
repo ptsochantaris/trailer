@@ -263,16 +263,10 @@ enum Settings {
 
     ///////////////////////////////// NUMBERS
 
-    static let prSyncPageSizeHelp = "The number of PRs to fetch per page when using v4 API. Raising it may make syncing faster but result in errors from GitHub."
-    static var prSyncPageSize: Int {
-        get { get("PR_V4_SYNC_PAGE") as? Int ?? 20 }
-        set { set("PR_V4_SYNC_PAGE", newValue) }
-    }
-
-    static let issueSyncPageSizeHelp = "The number of Issues to fetch per page when using v4 API. Raising it may make syncing faster but result in errors from GitHub."
-    static var issueSyncPageSize: Int {
-        get { get("ISSUE_V4_SYNC_PAGE") as? Int ?? 20 }
-        set { set("ISSUE_V4_SYNC_PAGE", newValue) }
+    static let syncProfileHelp = "Preferred balance between query size and safety when using v4 API."
+    static var syncProfile: Int {
+        get { get("PR_V4_SYNC_PROFILE") as? Int ?? 0 }
+        set { set("PR_V4_SYNC_PROFILE", newValue) }
     }
 
     static let threadedSyncHelp = "Try two parallel queries to the server when using v4 API. Can greatly speed up incremental syncs but in some corner cases cause throttling by GitHub."

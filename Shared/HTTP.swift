@@ -47,12 +47,12 @@ enum HTTP {
                                                                                        redirectConfiguration: .disallow,
                                                                                        decompression: .enabled(limit: .none)))
 
-    static func getJsonData(for request: HTTPClientRequest, attempts: Int, checkCache: Bool) async throws -> (json: Any, result: DataResult) {
+    static func getJsonData(for request: HTTPClientRequest, attempts: Int, checkCache: Bool, logPrefix: String? = nil) async throws -> (json: Any, result: DataResult) {
         await gateKeeper.takeTicket()
         defer {
             gateKeeper.relaxedReturnTicket()
         }
-        let (result, data) = try await getData(for: request, attempts: attempts, checkCache: checkCache)
+        let (result, data) = try await getData(for: request, attempts: attempts, checkCache: checkCache, logPrefix: logPrefix)
         if case .success = result, Settings.dumpAPIResponsesInConsole, let dataString = String(data: data.asData, encoding: .utf8) {
             DLog("API data from \(request.url): \(dataString)")
         }
@@ -62,7 +62,7 @@ enum HTTP {
 
     private static let getCache = HTTPCache()
 
-    static func getData(for request: HTTPClientRequest, attempts: Int, checkCache: Bool) async throws -> (result: DataResult, data: ByteBuffer) {
+    static func getData(for request: HTTPClientRequest, attempts: Int, checkCache: Bool, logPrefix: String? = nil) async throws -> (result: DataResult, data: ByteBuffer) {
         #if os(iOS)
             Task { @MainActor in
                 BackgroundTask.registerForBackground()
@@ -130,10 +130,10 @@ enum HTTP {
             } catch {
                 attempt -= 1
                 if attempt > 0 {
-                    DLog("Will pause and retry call to \(request.url)")
+                    DLog("\(logPrefix.orEmpty)Will pause and retry call to \(request.url) - \(error.localizedDescription)")
                     try? await Task.sleep(nanoseconds: 5 * NSEC_PER_SEC)
                 } else {
-                    DLog("Failed call to \(request.url)")
+                    DLog("\(logPrefix.orEmpty)Failed call to \(request.url) - \(error.localizedDescription)")
                     throw error
                 }
             }
