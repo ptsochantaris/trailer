@@ -18,6 +18,8 @@ final class Repo: DataItem {
     @NSManaged var archived: Bool
     @NSManaged var lastScannedIssueEventId: Int
 
+    override class var typeName: String { "Repo" }
+
     override func resetSyncState() {
         super.resetSyncState()
         lastScannedIssueEventId = 0
@@ -32,11 +34,11 @@ final class Repo: DataItem {
             if let parent = node.parent {
                 if parent.elementType == "PullRequest" {
                     neededByAuthoredPr = true
-                    DataItem.parent(of: PullRequest.self, with: parent.id, in: moc, parentCache: parentCache)?.repo = repo
+                    PullRequest.asParent(with: parent.id, in: moc, parentCache: parentCache)?.repo = repo
 
                 } else if parent.elementType == "Issue" {
                     neededByAuthoredIssue = true
-                    DataItem.parent(of: Issue.self, with: parent.id, in: moc, parentCache: parentCache)?.repo = repo
+                    Issue.asParent(with: parent.id, in: moc, parentCache: parentCache)?.repo = repo
                 }
             }
 
@@ -116,7 +118,7 @@ final class Repo: DataItem {
     @discardableResult
     static func hideArchivedRepos(in moc: NSManagedObjectContext) -> Bool {
         var madeChanges = false
-        for repo in Repo.allItems(of: Repo.self, in: moc) where repo.archived && repo.shouldSync {
+        for repo in Repo.allItems(in: moc) where repo.archived && repo.shouldSync {
             DLog("Auto-hiding archived repo ID \(repo.nodeId ?? "<no ID>")")
             repo.displayPolicyForPrs = RepoDisplayPolicy.hide.rawValue
             repo.displayPolicyForIssues = RepoDisplayPolicy.hide.rawValue
@@ -196,9 +198,9 @@ final class Repo: DataItem {
     static func mayProvideIssuesForDisplay(fromServerWithId id: NSManagedObjectID? = nil) -> Bool {
         let all: [Repo]
         if let serverId = id {
-            all = Repo.allItems(of: Repo.self, in: serverId, moc: DataManager.main)
+            all = Repo.allItems(in: serverId, moc: DataManager.main)
         } else {
-            all = Repo.allItems(of: Repo.self, in: DataManager.main)
+            all = Repo.allItems(in: DataManager.main)
         }
         return all.contains { $0.displayPolicyForIssues != RepoDisplayPolicy.hide.rawValue }
     }
@@ -207,16 +209,16 @@ final class Repo: DataItem {
     static func mayProvidePrsForDisplay(fromServerWithId id: NSManagedObjectID? = nil) -> Bool {
         let all: [Repo]
         if let serverId = id {
-            all = Repo.allItems(of: Repo.self, in: serverId, moc: DataManager.main)
+            all = Repo.allItems(in: serverId, moc: DataManager.main)
         } else {
-            all = Repo.allItems(of: Repo.self, in: DataManager.main)
+            all = Repo.allItems(in: DataManager.main)
         }
         return all.contains { $0.displayPolicyForPrs != RepoDisplayPolicy.hide.rawValue }
     }
 
     @MainActor
     static func allGroupLabels(in moc: NSManagedObjectContext) -> [String] {
-        let allRepos = allItems(of: Repo.self, in: moc)
+        let allRepos = allItems(in: moc)
         let labels = allRepos.compactMap { $0.displayPolicyForPrs > 0 || $0.displayPolicyForIssues > 0 ? $0.groupLabel : nil }
         return Set<String>(labels).sorted()
     }
@@ -254,7 +256,7 @@ final class Repo: DataItem {
         let predicate = NSPredicate(format: "(number IN %@) AND (repo == %@)", numbers, self)
 
         func mark<T>(type: T.Type) where T: ListableItem {
-            let f = NSFetchRequest<T>(entityName: String(describing: type))
+            let f = NSFetchRequest<T>(entityName: type.typeName)
             f.returnsObjectsAsFaults = false
             f.includesSubentities = false
             f.predicate = predicate

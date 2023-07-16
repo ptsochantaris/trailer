@@ -10,6 +10,8 @@ final class Review: DataItem {
     @NSManaged var pullRequest: PullRequest
     @NSManaged var comments: Set<PRComment>
 
+    override class var typeName: String { "Review" }
+
     enum State: String {
         case CHANGES_REQUESTED
         case APPROVED
@@ -43,7 +45,7 @@ final class Review: DataItem {
         for node in nodes {
             guard node.elementType == "ReviewRequest",
                   let parentId = node.parent?.id,
-                  let parent = DataItem.parent(of: PullRequest.self, with: parentId, in: moc, parentCache: parentCache) else {
+                  let parent = PullRequest.asParent(with: parentId, in: moc, parentCache: parentCache) else {
                 continue
             }
             parent.checkAndStoreReviewAssignments(prIdsToAssignedUsers[parentId] ?? [],
@@ -66,7 +68,7 @@ final class Review: DataItem {
             else { return }
 
             if node.created {
-                if let parent = DataItem.parent(of: PullRequest.self, with: parentId, in: moc, parentCache: parentCache) {
+                if let parent = PullRequest.asParent(with: parentId, in: moc, parentCache: parentCache) {
                     review.pullRequest = parent
                 } else {
                     DLog("Warning Review without parent")

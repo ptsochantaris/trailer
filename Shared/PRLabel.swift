@@ -12,15 +12,17 @@ final class PRLabel: DataItem {
     @NSManaged var pullRequests: Set<PullRequest>
     @NSManaged var issues: Set<Issue>
 
+    override class var typeName: String { "PRLabel" }
+
     static func sync(from nodes: Lista<Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
         syncItems(of: PRLabel.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { label, node in
             guard
                 let parent = node.parent else { return }
 
             if parent.updated || parent.created {
-                if parent.elementType == "PullRequest", let parentPr = DataItem.parent(of: PullRequest.self, with: parent.id, in: moc, parentCache: parentCache) {
+                if parent.elementType == "PullRequest", let parentPr = PullRequest.asParent(with: parent.id, in: moc, parentCache: parentCache) {
                     label.pullRequests.insert(parentPr)
-                } else if parent.elementType == "Issue", let parentIssue = DataItem.parent(of: Issue.self, with: parent.id, in: moc, parentCache: parentCache) {
+                } else if parent.elementType == "Issue", let parentIssue = Issue.asParent(with: parent.id, in: moc, parentCache: parentCache) {
                     label.issues.insert(parentIssue)
                 } else {
                     DLog("Warning: PRLabel without parent")

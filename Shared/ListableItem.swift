@@ -26,7 +26,7 @@ class ListableItem: DataItem {
     enum StateChange: Int {
         case none, reopened, merged, closed
     }
-
+    
     @NSManaged var assignedToMe: Bool
     @NSManaged var assigneeName: String? // note: This now could be a list of names, delimited with a ","
     @NSManaged var body: String?
@@ -78,7 +78,7 @@ class ListableItem: DataItem {
     }
 
     static func reactionCheckBatch<T: ListableItem>(for type: T.Type, in moc: NSManagedObjectContext) -> [T] {
-        let entityName = String(describing: type)
+        let entityName = typeName
         let f = NSFetchRequest<T>(entityName: entityName)
         f.predicate = NSPredicate(format: "apiServer.lastSyncSucceeded == YES")
         f.sortDescriptors = [
@@ -99,6 +99,8 @@ class ListableItem: DataItem {
         }
         return Array(items)
     }
+    
+    func handleMerging() {}
 
     final func baseNodeSync(node: Node, parent: Repo) {
         repo = parent
@@ -211,18 +213,6 @@ class ListableItem: DataItem {
         if postSyncAction == PostSyncAction.doNothing.rawValue {
             postSyncAction = PostSyncAction.isUpdated.rawValue
         }
-    }
-
-    static func active<T>(of type: T.Type, in moc: NSManagedObjectContext, visibleOnly: Bool) -> [T] where T: ListableItem {
-        let f = NSFetchRequest<T>(entityName: String(describing: type))
-        f.returnsObjectsAsFaults = false
-        f.includesSubentities = false
-        if visibleOnly {
-            f.predicate = NSCompoundPredicate(type: .or, subpredicates: [Section.mine.matchingPredicate, Section.participated.matchingPredicate, Section.all.matchingPredicate])
-        } else {
-            f.predicate = ItemCondition.open.matchingPredicate
-        }
-        return try! moc.fetch(f)
     }
 
     override final func resetSyncState() {
@@ -1077,7 +1067,7 @@ class ListableItem: DataItem {
 
         // DLog("%@", andPredicates)
 
-        let f = NSFetchRequest<T>(entityName: String(describing: itemType))
+        let f = NSFetchRequest<T>(entityName: itemType.typeName)
         f.fetchBatchSize = 50
         f.relationshipKeyPathsForPrefetching = (itemType == PullRequest.self) ? ["labels", "statuses", "reviews"] : ["labels"]
         f.returnsObjectsAsFaults = false

@@ -121,8 +121,8 @@ extension API {
         await fetchItems(for: repos, in: moc)
         let reposWithSomeItems = repos.filter { !$0.issues.isEmpty || !$0.pullRequests.isEmpty }
         await markExtraUpdatedItems(from: reposWithSomeItems)
-        let newOrUpdatedPrs = DataItem.newOrUpdatedItems(of: PullRequest.self, in: moc, fromSuccessfulSyncOnly: true)
-        let newOrUpdatedIssues = DataItem.newOrUpdatedItems(of: Issue.self, in: moc, fromSuccessfulSyncOnly: true)
+        let newOrUpdatedPrs = PullRequest.newOrUpdatedItems(in: moc, fromSuccessfulSyncOnly: true)
+        let newOrUpdatedIssues = Issue.newOrUpdatedItems(in: moc, fromSuccessfulSyncOnly: true)
 
         await withTaskGroup(of: Void.self) { group in
 
@@ -131,7 +131,7 @@ extension API {
                     await fetchStatusesForCurrentPullRequests(to: moc)
                 }
             } else {
-                for p in DataItem.allItems(of: PullRequest.self, in: moc) {
+                for p in PullRequest.allItems(in: moc) {
                     p.lastStatusScan = nil
                     p.statuses.forEach {
                         $0.postSyncAction = PostSyncAction.delete.rawValue
@@ -157,7 +157,7 @@ extension API {
                     await fetchLabelsForCurrentIssues(for: newOrUpdatedIssues)
                 }
             } else {
-                for l in DataItem.allItems(of: PRLabel.self, in: moc) {
+                for l in PRLabel.allItems(in: moc) {
                     l.postSyncAction = PostSyncAction.delete.rawValue
                 }
             }
@@ -183,7 +183,7 @@ extension API {
                         await fetchCommentsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
                     }
                 } else {
-                    for r in DataItem.allItems(of: Review.self, in: moc) {
+                    for r in Review.allItems(in: moc) {
                         r.postSyncAction = PostSyncAction.delete.rawValue
                     }
                     commentGroup.addTask { @MainActor in

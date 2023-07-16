@@ -12,6 +12,8 @@ final class Reaction: DataItem {
     @NSManaged var issue: Issue?
     @NSManaged var comment: PRComment?
 
+    override class var typeName: String { "Reaction" }
+
     static func sync(from nodes: Lista<Node>, for parentType: (some DataItem).Type, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
         syncItems(of: Reaction.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { reaction, node in
             guard node.created || node.updated,
@@ -19,7 +21,7 @@ final class Reaction: DataItem {
             else { return }
 
             if node.created {
-                let parent = DataItem.parent(of: parentType, with: parentId, in: moc, parentCache: parentCache)
+                let parent = parentType.asParent(with: parentId, in: moc, parentCache: parentCache)
                 reaction.pullRequest = parent as? PullRequest
                 reaction.issue = parent as? Issue
                 reaction.comment = parent as? PRComment

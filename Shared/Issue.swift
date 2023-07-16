@@ -6,6 +6,8 @@ import TrailerQL
 #endif
 
 final class Issue: ListableItem {
+    override class var typeName: String { "Issue" }
+
     static func mostRecentItemUpdate(in repo: Repo) -> Date {
         repo.issues.reduce(.distantPast) { max($0, $1.updatedAt ?? .distantPast) }
     }
@@ -19,13 +21,13 @@ final class Issue: ListableItem {
 
             guard node.created || node.updated,
                   let parentId = node.parent?.id ?? (node.jsonPayload["repository"] as? JSON)?["id"] as? String,
-                  let parent = DataItem.parent(of: Repo.self, with: parentId, in: moc, parentCache: parentCache)
+                  let parent = Repo.asParent(with: parentId, in: moc, parentCache: parentCache)
             else { return }
 
             issue.baseNodeSync(node: node, parent: parent)
         }
     }
-
+    
     static func syncIssues(from data: [JSON]?, in repo: Repo, moc: NSManagedObjectContext) async {
         let apiServer = repo.apiServer
         let repoId = repo.objectID

@@ -232,7 +232,7 @@ enum API {
 
         await syncUserDetails(in: moc)
 
-        for r in DataItem.items(of: Repo.self, surviving: true, in: moc) {
+        for r in Repo.items(surviving: true, in: moc) {
             r.postSyncAction = r.shouldBeWipedIfNotInWatchlist ? PostSyncAction.delete.rawValue : PostSyncAction.doNothing.rawValue
         }
 
@@ -252,7 +252,7 @@ enum API {
         }
 
         if Settings.hideArchivedRepos { Repo.hideArchivedRepos(in: moc) }
-        for r in DataItem.newItems(of: Repo.self, in: moc) where r.shouldSync {
+        for r in Repo.newItems(in: moc) where r.shouldSync {
             NotificationQueue.add(type: .newRepoAnnouncement, for: r)
         }
         lastRepoCheck = Date()
@@ -326,7 +326,7 @@ enum API {
         switch result {
         case .success:
             if !Settings.automaticallyRemoveDeletedReposFromWatchlist { // Ignore any missing repos in all cases if deleteGoneRepos is false
-                let reposThatWouldBeDeleted = Repo.items(of: Repo.self, surviving: false, in: server.managedObjectContext!)
+                let reposThatWouldBeDeleted = Repo.items(surviving: false, in: server.managedObjectContext!)
                 for r in reposThatWouldBeDeleted {
                     r.postSyncAction = PostSyncAction.doNothing.rawValue
                 }

@@ -13,6 +13,8 @@ final class PRStatus: DataItem {
 
     override var alternateCreationDate: Bool { true }
 
+    override class var typeName: String { "PRStatus" }
+
     static func syncStatuses(from data: [JSON]?, pullRequest: PullRequest, moc: NSManagedObjectContext) async {
         let pullRequestId = pullRequest.objectID
         let serverId = pullRequest.apiServer.objectID
@@ -37,7 +39,7 @@ final class PRStatus: DataItem {
             else { return }
 
             if node.created {
-                if let parent = DataItem.parent(of: PullRequest.self, with: parentId, in: moc, parentCache: parentCache) {
+                if let parent = PullRequest.asParent(with: parentId, in: moc, parentCache: parentCache) {
                     status.pullRequest = parent
                 } else {
                     DLog("Warning: PRStatus without parent")

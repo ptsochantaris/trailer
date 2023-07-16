@@ -9,7 +9,7 @@ extension API {
             return Settings.v4DAPIessage
         }
 
-        if DataItem.nullNodeIdItems(of: Repo.self, in: moc) > 0 {
+        if Repo.nullNodeIdItems(in: moc) > 0 {
             DLog("Warning: Some repos still have a null node ID")
             return Settings.v4DBMessage
         }
@@ -51,7 +51,7 @@ extension API {
         if shouldSyncReviews {
             steps.insert(.reviews)
         } else {
-            for r in DataItem.allItems(of: Review.self, in: moc) {
+            for r in Review.allItems(in: moc) {
                 r.postSyncAction = PostSyncAction.delete.rawValue
             }
         }
@@ -69,7 +69,7 @@ extension API {
                     }
                 }
             }
-            let newOrUpdatedPrs = DataItem.newOrUpdatedItems(of: PullRequest.self, in: moc, fromSuccessfulSyncOnly: true)
+            let newOrUpdatedPrs = PullRequest.newOrUpdatedItems(in: moc, fromSuccessfulSyncOnly: true)
 
             try await withThrowingTaskGroup(of: Void.self) { group in
                 if Settings.showStatusItems {
@@ -78,7 +78,7 @@ extension API {
                         try await GraphQL.update(for: prs, steps: [.statuses])
                     }
                 } else {
-                    for p in DataItem.allItems(of: PullRequest.self, in: moc) {
+                    for p in PullRequest.allItems(in: moc) {
                         p.lastStatusScan = nil
                         p.statuses.forEach {
                             $0.postSyncAction = PostSyncAction.delete.rawValue
@@ -96,7 +96,7 @@ extension API {
 
             try await GraphQL.update(for: newOrUpdatedPrs, steps: steps)
 
-            let reviews = DataItem.newOrUpdatedItems(of: Review.self, in: moc, fromSuccessfulSyncOnly: true)
+            let reviews = Review.newOrUpdatedItems(in: moc, fromSuccessfulSyncOnly: true)
             try await GraphQL.updateComments(for: reviews)
         }
 
@@ -114,7 +114,7 @@ extension API {
                 }
             }
 
-            let newOrUpdatedIssues = DataItem.newOrUpdatedItems(of: Issue.self, in: moc, fromSuccessfulSyncOnly: true)
+            let newOrUpdatedIssues = Issue.newOrUpdatedItems(in: moc, fromSuccessfulSyncOnly: true)
             try await GraphQL.update(for: newOrUpdatedIssues, steps: steps)
 
             if Settings.notifyOnItemReactions {

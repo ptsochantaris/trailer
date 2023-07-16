@@ -269,7 +269,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         updateReviewOptions()
 
         if !previousSync, API.shouldSyncReviews || API.shouldSyncReviewAssignments {
-            for p in DataItem.allItems(of: PullRequest.self, in: DataManager.main) {
+            for p in PullRequest.allItems(in: DataManager.main) {
                 p.resetSyncState()
             }
             preferencesDirty = true
@@ -360,7 +360,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
 
     private func showOptionalReviewAssignmentWarning(previousSync: Bool) {
         if !previousSync, API.shouldSyncReviews || API.shouldSyncReviewAssignments {
-            for p in DataItem.allItems(of: PullRequest.self, in: DataManager.main) {
+            for p in PullRequest.allItems(in: DataManager.main) {
                 p.resetSyncState()
             }
             preferencesDirty = true
@@ -1780,10 +1780,10 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     @IBAction private func autoSnoozeDurationChanged(_ sender: NSStepper) {
         Settings.autoSnoozeDuration = sender.integerValue
         fillSnoozingDropdowns()
-        for p in DataItem.allItems(of: PullRequest.self, in: DataManager.main) {
+        for p in PullRequest.allItems(in: DataManager.main) {
             p.wakeIfAutoSnoozed()
         }
-        for i in DataItem.allItems(of: Issue.self, in: DataManager.main) {
+        for i in Issue.allItems(in: DataManager.main) {
             i.wakeIfAutoSnoozed()
         }
         deferredUpdateTimer.push()

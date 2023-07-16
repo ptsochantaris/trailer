@@ -37,7 +37,7 @@ extension MenuWindow {
         }
 
         var uniqueIdentifier: String {
-            var segments = [String(describing: type)]
+            var segments = [type.typeName]
             if let viewCriterion {
                 segments.append(viewCriterion.label)
                 switch viewCriterion {

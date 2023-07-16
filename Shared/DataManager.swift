@@ -45,87 +45,172 @@ enum DataManager {
 
     private static func performVersionChangedTasks() {
         #if os(OSX)
-        // Unstick macOS notifications with custom actions but without an identifier, causes macOS to keep them forever
-        let nc = NSUserNotificationCenter.default
-        if nc.deliveredNotifications.contains(where: { $0.additionalActions != nil && $0.identifier == nil }) {
-            nc.removeAllDeliveredNotifications()
-        }
+            let nc = NSUserNotificationCenter.default
+
+            // Unstick macOS notifications with custom actions but without an identifier, causes macOS to keep them forever
+            for notification in nc.deliveredNotifications where notification.additionalActions != nil && notification.identifier == nil {
+                nc.removeAllDeliveredNotifications()
+                break
+            }
+
+            // Migrate delivered notifications from old keys
+            for notification in nc.deliveredNotifications {
+                if let userInfo = notification.userInfo, let u = (userInfo["pullRequestIdKey"] as? String) ?? (userInfo["issueIdKey"] as? String) ?? (userInfo["statusIdKey"] as? String) {
+                    notification.userInfo![LISTABLE_URI_KEY] = u
+                    notification.userInfo!["pullRequestIdKey"] = nil
+                    notification.userInfo!["issueIdKey"] = nil
+                    notification.userInfo!["statusIdKey"] = nil
+                    nc.deliver(notification)
+                }
+            }
         #endif
 
-        ApiServer.ensureAtLeastGithub(in: main)
-    }
+        let d = UserDefaults.standard
+        if let legacyAuthToken = d.object(forKey: "GITHUB_AUTH_TOKEN") as? String {
+            var legacyApiHost = (d.object(forKey: "API_BACKEND_SERVER") as? String).orEmpty
+            if legacyApiHost.isEmpty { legacyApiHost = "api.github.com" }
 
-    private static func processNotificationsForItems(of type: (some ListableItem).Type, newNotification: NotificationType, reopenedNotification: NotificationType, assignmentNotification: NotificationType, in child: NSManagedObjectContext) {
-        let items = DataItem.allItems(of: type, in: child)
-        for i in items {
-            if i.stateChanged != 0 {
-                switch i.stateChanged {
-                case ListableItem.StateChange.reopened.rawValue:
-                    NotificationQueue.add(type: reopenedNotification, for: i)
-                    i.announced = true
-                    
-                case ListableItem.StateChange.merged.rawValue:
-                    (i as? PullRequest)?.handleMerging()
-                    
-                case ListableItem.StateChange.closed.rawValue:
-                    i.handleClosing()
-                    
-                default: break
+            let legacyApiPath = (d.object(forKey: "API_SERVER_PATH") as? String).orEmpty
+
+            var legacyWebHost = (d.object(forKey: "API_FRONTEND_SERVER") as? String).orEmpty
+            if legacyWebHost.isEmpty { legacyWebHost = "github.com" }
+
+            let actualApiPath = "\(legacyApiHost)/\(legacyApiPath)".replacingOccurrences(of: "//", with: "/")
+
+            let newApiServer = ApiServer.addDefaultGithub(in: main)
+            newApiServer.apiPath = "https://\(actualApiPath)"
+            newApiServer.webPath = "https://\(legacyWebHost)"
+            newApiServer.authToken = legacyAuthToken
+            newApiServer.lastSyncSucceeded = true
+
+            d.removeObject(forKey: "API_BACKEND_SERVER")
+            d.removeObject(forKey: "API_SERVER_PATH")
+            d.removeObject(forKey: "API_FRONTEND_SERVER")
+            d.removeObject(forKey: "GITHUB_AUTH_TOKEN")
+        } else {
+            ApiServer.ensureAtLeastGithub(in: main)
+        }
+
+        DLog("Resetting sync state of everything")
+        ApiServer.resetSyncOfEverything()
+
+        DLog("Marking all unspecified (nil) announced flags as announced")
+        for i in PullRequest.allItems(in: main) where i.value(forKey: "announced") == nil {
+            i.announced = true
+        }
+        for i in Issue.allItems(in: main) where i.value(forKey: "announced") == nil {
+            i.announced = true
+        }
+
+        DLog("Migrating display policies")
+        for r in Repo.allItems(in: main) {
+            if let markedAsHidden = (r.value(forKey: "hidden") as AnyObject?)?.boolValue, markedAsHidden == true {
+                r.displayPolicyForPrs = RepoDisplayPolicy.hide.rawValue
+                r.displayPolicyForIssues = RepoDisplayPolicy.hide.rawValue
+            } else {
+                if let prDisplayPolicy = postMigrationRepoPrPolicy, r.value(forKey: "displayPolicyForPrs") == nil {
+                    r.displayPolicyForPrs = prDisplayPolicy.rawValue
                 }
-                i.stateChanged = 0
-                
-            } else if !i.createdByMe, i.isVisibleOnMenu {
-                if i.isNewAssignment {
-                    NotificationQueue.add(type: assignmentNotification, for: i)
-                    i.announced = true
-                    i.isNewAssignment = false
-                } else if !i.announced {
-                    NotificationQueue.add(type: newNotification, for: i)
-                    i.announced = true
+                if let issueDisplayPolicy = postMigrationRepoIssuePolicy, r.value(forKey: "displayPolicyForIssues") == nil {
+                    r.displayPolicyForIssues = issueDisplayPolicy.rawValue
                 }
             }
         }
+
+        DLog("Migrating snooze presets")
+        for s in SnoozePreset.allSnoozePresets(in: main) {
+            if let m = postMigrationSnoozeWakeOnComment {
+                s.wakeOnComment = m
+            }
+            if let m = postMigrationSnoozeWakeOnMention {
+                s.wakeOnMention = m
+            }
+            if let m = postMigrationSnoozeWakeOnStatusUpdate {
+                s.wakeOnStatusChange = m
+            }
+        }
+
+        for s in PRStatus.allItems(in: DataManager.main) where s.context == nil {
+            s.resetSyncState()
+        }
     }
 
-    private static func processCommentAndReviewNotifications(in child: NSManagedObjectContext) {
-        for c in PRComment.newItems(of: PRComment.self, in: child) {
-            c.processNotifications()
-            c.postSyncAction = PostSyncAction.doNothing.rawValue
-        }
-        
-        for r in Review.newOrUpdatedItems(of: Review.self, in: child) {
-            r.processNotifications()
-            r.postSyncAction = PostSyncAction.doNothing.rawValue
-        }
-    }
+    private static func processNotificationsForItems(of type: (some ListableItem).Type, newNotification: NotificationType, reopenedNotification: NotificationType, assignmentNotification: NotificationType) async {
+        await runInChild(of: main) { child in
+            for i in type.allItems(in: child) {
+                if i.stateChanged != 0 {
+                    switch i.stateChanged {
+                    case ListableItem.StateChange.reopened.rawValue:
+                        NotificationQueue.add(type: reopenedNotification, for: i)
+                        i.announced = true
 
-    private static func processStatusNotifications(in child: NSManagedObjectContext) {
-        let latestStatuses = PRStatus.newItems(of: PRStatus.self, in: child)
-        var coveredPrs = Set<NSManagedObjectID>()
-        if Settings.notifyOnStatusUpdates {
-            for pr in latestStatuses.map(\.pullRequest) where pr.shouldAnnounceStatus && !coveredPrs.contains(pr.objectID) {
-                coveredPrs.insert(pr.objectID)
-                if let s = pr.displayedStatuses.first {
-                    let displayText = s.descriptionText
-                    if pr.lastStatusNotified != displayText, pr.postSyncAction != PostSyncAction.isNew.rawValue {
-                        NotificationQueue.add(type: .newStatus, for: s)
-                        pr.lastStatusNotified = displayText
+                    case ListableItem.StateChange.merged.rawValue:
+                        i.handleMerging()
+
+                    case ListableItem.StateChange.closed.rawValue:
+                        i.handleClosing()
+
+                    default: break
                     }
-                } else {
-                    pr.lastStatusNotified = nil
+                    i.stateChanged = 0
+
+                } else if !i.createdByMe, i.isVisibleOnMenu {
+                    if i.isNewAssignment {
+                        NotificationQueue.add(type: assignmentNotification, for: i)
+                        i.announced = true
+                        i.isNewAssignment = false
+                    } else if !i.announced {
+                        NotificationQueue.add(type: newNotification, for: i)
+                        i.announced = true
+                    }
                 }
             }
-            coveredPrs.removeAll()
         }
-        
-        for pr in latestStatuses.map(\.pullRequest) where pr.isSnoozing && pr.shouldWakeOnStatusChange && !coveredPrs.contains(pr.objectID) {
-            coveredPrs.insert(pr.objectID)
-            DLog("Waking up snoozed PR ID \(pr.nodeId ?? "<no ID>") because of a status update")
-            pr.wakeUp()
+    }
+
+    private static func processCommentAndReviewNotifications() async {
+        await runInChild(of: main) { child in
+            for c in PRComment.newItems(in: child) {
+                c.processNotifications()
+                c.postSyncAction = PostSyncAction.doNothing.rawValue
+            }
+
+            for r in Review.newOrUpdatedItems(in: child) {
+                r.processNotifications()
+                r.postSyncAction = PostSyncAction.doNothing.rawValue
+            }
         }
-        
-        for s in latestStatuses {
-            s.postSyncAction = PostSyncAction.doNothing.rawValue
+    }
+
+    private static func processStatusNotifications() async {
+        await runInChild(of: main) { child in
+            let latestStatuses = PRStatus.newItems(in: child)
+            var coveredPrs = Set<NSManagedObjectID>()
+            if Settings.notifyOnStatusUpdates {
+                for pr in latestStatuses.map(\.pullRequest) where pr.shouldAnnounceStatus && !coveredPrs.contains(pr.objectID) {
+                    coveredPrs.insert(pr.objectID)
+                    if let s = pr.displayedStatuses.first {
+                        let displayText = s.descriptionText
+                        if pr.lastStatusNotified != displayText, pr.postSyncAction != PostSyncAction.isNew.rawValue {
+                            NotificationQueue.add(type: .newStatus, for: s)
+                            pr.lastStatusNotified = displayText
+                        }
+                    } else {
+                        pr.lastStatusNotified = nil
+                    }
+                }
+                coveredPrs.removeAll()
+            }
+
+            for pr in latestStatuses.map(\.pullRequest) where pr.isSnoozing && pr.shouldWakeOnStatusChange && !coveredPrs.contains(pr.objectID) {
+                coveredPrs.insert(pr.objectID)
+                DLog("Waking up snoozed PR ID \(pr.nodeId ?? "<no ID>") because of a status update")
+                pr.wakeUp()
+            }
+
+            for s in latestStatuses {
+                s.postSyncAction = PostSyncAction.doNothing.rawValue
+            }
         }
     }
 
@@ -147,35 +232,35 @@ enum DataManager {
 
         await postProcessAllItems(in: main)
 
+        await processNotificationsForItems(of: PullRequest.self, newNotification: .newPr, reopenedNotification: .prReopened, assignmentNotification: .newPrAssigned)
+
+        await processNotificationsForItems(of: Issue.self, newNotification: .newIssue, reopenedNotification: .issueReopened, assignmentNotification: .newIssueAssigned)
+
+        await processCommentAndReviewNotifications()
+
+        await processStatusNotifications()
+
         await runInChild(of: main) { child in
-            processNotificationsForItems(of: PullRequest.self, newNotification: .newPr, reopenedNotification: .prReopened, assignmentNotification: .newPrAssigned, in: child)
-
-            processNotificationsForItems(of: Issue.self, newNotification: .newIssue, reopenedNotification: .issueReopened, assignmentNotification: .newIssueAssigned, in: child)
-
-            processCommentAndReviewNotifications(in: child)
-
-            processStatusNotifications(in: child)
-
             let nothing = PostSyncAction.doNothing.rawValue
 
-            for r in DataItem.newOrUpdatedItems(of: Reaction.self, in: child) {
+            for r in Reaction.newOrUpdatedItems(in: child) {
                 r.checkNotifications()
                 r.postSyncAction = nothing
             }
 
-            for r in DataItem.newOrUpdatedItems(of: Review.self, in: child) {
+            for r in Review.newOrUpdatedItems(in: child) {
                 r.postSyncAction = nothing
             }
 
-            for r in DataItem.newOrUpdatedItems(of: PRComment.self, in: child) {
+            for r in PRComment.newOrUpdatedItems(in: child) {
                 r.postSyncAction = nothing
             }
 
-            for p in DataItem.newOrUpdatedItems(of: PullRequest.self, in: child) {
+            for p in PullRequest.newOrUpdatedItems(in: child) {
                 p.postSyncAction = nothing
             }
 
-            for i in DataItem.newOrUpdatedItems(of: Issue.self, in: child) {
+            for i in Issue.newOrUpdatedItems(in: child) {
                 i.postSyncAction = nothing
             }
         }
@@ -197,7 +282,7 @@ enum DataManager {
         let itemsToIndex = Lista<CSSearchableItem>()
         let itemsToRemove = Lista<String>()
 
-        for pr in DataItem.allItems(of: PullRequest.self, in: main) {
+        for pr in PullRequest.allItems(in: main) {
             switch await pr.handleSpotlight() {
             case let .needsIndexing(item):
                 itemsToIndex.append(item)
@@ -206,7 +291,7 @@ enum DataManager {
             }
         }
 
-        for issue in DataItem.allItems(of: Issue.self, in: main) {
+        for issue in Issue.allItems(in: main) {
             switch await issue.handleSpotlight() {
             case let .needsIndexing(item):
                 itemsToIndex.append(item)
@@ -379,22 +464,22 @@ enum DataManager {
         let postProcessContext = PostProcessContext()
 
         await withTaskGroup(of: Void.self) { group in
-            let prCount = DataItem.countItems(of: PullRequest.self, in: context)
+            let prCount = PullRequest.countItems(in: context)
             for i in stride(from: 0, to: prCount, by: increment) {
                 group.addTask {
                     await runInChild(of: context) { child in
-                        for p in DataItem.allItems(of: PullRequest.self, offset: i, count: increment, in: child, prefetchRelationships: ["comments", "reactions", "reviews"]) {
+                        for p in PullRequest.allItems(offset: i, count: increment, in: child, prefetchRelationships: ["comments", "reactions", "reviews"]) {
                             p.postProcess(context: postProcessContext)
                         }
                     }
                 }
             }
 
-            let issueCount = DataItem.countItems(of: Issue.self, in: context)
+            let issueCount = Issue.countItems(in: context)
             for i in stride(from: 0, to: issueCount, by: increment) {
                 group.addTask {
                     await runInChild(of: context) { child in
-                        for i in DataItem.allItems(of: Issue.self, offset: i, count: increment, in: child, prefetchRelationships: ["comments", "reactions"]) {
+                        for i in Issue.allItems(offset: i, count: increment, in: child, prefetchRelationships: ["comments", "reactions"]) {
                             i.postProcess(context: postProcessContext)
                         }
                     }

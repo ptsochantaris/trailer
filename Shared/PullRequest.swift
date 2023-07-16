@@ -22,6 +22,8 @@ final class PullRequest: ListableItem {
 
     @NSManaged var statuses: Set<PRStatus>
     @NSManaged var reviews: Set<Review>
+    
+    override class var typeName: String { "PullRequest" }
 
     override var webUrl: String? {
         super.webUrl?.appending(pathComponent: "pull").appending(pathComponent: String(number))
@@ -35,7 +37,7 @@ final class PullRequest: ListableItem {
         syncItems(of: PullRequest.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { pr, node in
             guard node.created || node.updated,
                   let parentId = node.parent?.id ?? (node.jsonPayload["repository"] as? JSON)?["id"] as? String,
-                  let parent = DataItem.parent(of: Repo.self, with: parentId, in: moc, parentCache: parentCache)
+                  let parent = Repo.asParent(with: parentId, in: moc, parentCache: parentCache)
             else { return }
 
             let json = node.jsonPayload
@@ -452,8 +454,7 @@ final class PullRequest: ListableItem {
         return res
     }
 
-    @MainActor
-    final func handleMerging() {
+    override final func handleMerging() {
         let byUserId = mergedByNodeId
         let myUserId = apiServer.userNodeId
         DLog("Detected merged PR: \(title.orEmpty) by user \(byUserId.orEmpty), local user id is: \(myUserId.orEmpty), handling policy is \(Settings.mergeHandlingPolicy), coming from section \(sectionIndex)")

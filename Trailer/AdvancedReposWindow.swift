@@ -72,7 +72,7 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
 
     private func updateRemovableRepos() {
         removeRepoList.removeAllItems()
-        let manuallyAddedRepos = Repo.allItems(of: Repo.self, in: DataManager.main).filter(\.manuallyAdded)
+        let manuallyAddedRepos = Repo.allItems(in: DataManager.main).filter(\.manuallyAdded)
         if manuallyAddedRepos.isEmpty {
             let m = NSMenuItem()
             m.title = "You have not added any custom repositories"
@@ -192,7 +192,7 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
                 do {
                     try await API.fetchAllRepos(owner: owner, from: server, moc: DataManager.main)
                     preferencesDirty = true
-                    let addedCount = Repo.newItems(of: Repo.self, in: DataManager.main).count
+                    let addedCount = Repo.newItems(in: DataManager.main).count
                     alert.messageText = "\(addedCount) repositories added for '\(owner)'"
                     if Settings.displayPolicyForNewPrs == Int(RepoDisplayPolicy.hide.rawValue), Settings.displayPolicyForNewIssues == Int(RepoDisplayPolicy.hide.rawValue) {
                         alert.informativeText = "WARNING: While \(addedCount) repositories have been added successfully to your list, your default settings specify that they should be hidden. You probably want to change their visibility from the repositories list."

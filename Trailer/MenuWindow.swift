@@ -126,7 +126,7 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
     }
 
     @IBAction func refreshSelected(_: NSMenuItem) {
-        if Repo.countItems(of: Repo.self, in: DataManager.main) == 0 {
+        if Repo.countItems(in: DataManager.main) == 0 {
             app.preferencesSelected()
             return
         }

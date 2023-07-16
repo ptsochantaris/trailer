@@ -307,7 +307,7 @@ enum GraphQL {
     }
 
     static func update<T: ListableItem>(for items: [T], steps: API.SyncSteps) async throws {
-        let typeName = String(describing: T.self)
+        let typeName = T.typeName
 
         if let prs = items as? [PullRequest] {
             if steps.contains(.reviews) {

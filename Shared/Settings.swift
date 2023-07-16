@@ -120,7 +120,7 @@ enum Settings {
             sharedDefaults.setValue(existingHidingSetting, forKey: "HIDE_NOTIFICATION_AVATARS_KEY")
         }
 
-        for repo in Repo.allItems(of: Repo.self, in: DataManager.main) where repo.value(forKey: "archived") == nil {
+        for repo in Repo.allItems(in: DataManager.main) where repo.value(forKey: "archived") == nil {
             repo.archived = false
             repo.updatedAt = .distantPast
         }

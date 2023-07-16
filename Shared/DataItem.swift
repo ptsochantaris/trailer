@@ -4,7 +4,134 @@ import TrailerQL
 
 typealias FetchCache = NSCache<NSString, NSManagedObject>
 
-class DataItem: NSManagedObject {
+protocol Querying: NSManagedObject {
+    static var typeName: String { get }
+}
+
+extension Querying {
+    static func allItems(offset: Int? = nil, count: Int? = nil, in moc: NSManagedObjectContext, prefetchRelationships: [String]? = nil) -> [Self] {
+        let f = NSFetchRequest<Self>(entityName: typeName)
+        f.relationshipKeyPathsForPrefetching = prefetchRelationships
+        if let offset {
+            f.fetchOffset = offset
+        }
+        if let count {
+            f.fetchLimit = count
+        }
+        f.returnsObjectsAsFaults = false
+        f.includesSubentities = false
+        return try! moc.fetch(f)
+    }
+
+    static func allItems(in serverId: NSManagedObjectID, moc: NSManagedObjectContext) -> [Self] {
+        let f = NSFetchRequest<Self>(entityName: typeName)
+        f.returnsObjectsAsFaults = false
+        f.predicate = NSPredicate(format: "apiServer == %@", serverId)
+        return try! moc.fetch(f)
+    }
+    
+    static func items(surviving: Bool, in moc: NSManagedObjectContext, prefetchRelationships: [String]? = nil) -> [Self] {
+        let f = NSFetchRequest<Self>(entityName: typeName)
+        f.relationshipKeyPathsForPrefetching = prefetchRelationships
+        f.includesSubentities = false
+        if surviving {
+            f.returnsObjectsAsFaults = false
+            f.predicate = PostSyncAction.delete.excludingPredicate
+        } else {
+            f.returnsObjectsAsFaults = true
+            f.predicate = PostSyncAction.delete.matchingPredicate
+        }
+        return try! moc.fetch(f)
+    }
+
+    static func newOrUpdatedItems(in moc: NSManagedObjectContext, fromSuccessfulSyncOnly: Bool = false) -> [Self] {
+        let f = NSFetchRequest<Self>(entityName: typeName)
+        f.returnsObjectsAsFaults = false
+        f.includesSubentities = false
+        let typePredicate = NSCompoundPredicate(type: .or, subpredicates: [PostSyncAction.isNew.matchingPredicate, PostSyncAction.isUpdated.matchingPredicate])
+        if fromSuccessfulSyncOnly {
+            f.predicate = NSCompoundPredicate(type: .and, subpredicates: [
+                NSPredicate(format: "apiServer.lastSyncSucceeded == YES"),
+                typePredicate
+            ])
+        } else {
+            f.predicate = typePredicate
+        }
+        return try! moc.fetch(f)
+    }
+
+    static func updatedItems(in moc: NSManagedObjectContext) -> [Self] {
+        let f = NSFetchRequest<Self>(entityName: typeName)
+        f.returnsObjectsAsFaults = false
+        f.includesSubentities = false
+        f.predicate = PostSyncAction.isUpdated.matchingPredicate
+        return try! moc.fetch(f)
+    }
+
+    static func newItems(in moc: NSManagedObjectContext) -> [Self] {
+        let f = NSFetchRequest<Self>(entityName: typeName)
+        f.returnsObjectsAsFaults = false
+        f.includesSubentities = false
+        f.predicate = PostSyncAction.isNew.matchingPredicate
+        return try! moc.fetch(f)
+    }
+    
+    static func asParent(with nodeId: String, in moc: NSManagedObjectContext, parentCache: FetchCache) -> Self? {
+        if let existingObject = parentCache.object(forKey: nodeId as NSString) as? Self {
+            return existingObject
+        }
+        let f = NSFetchRequest<Self>(entityName: typeName)
+        f.returnsObjectsAsFaults = true
+        f.includesSubentities = false
+        f.fetchLimit = 1
+        f.predicate = NSPredicate(format: "nodeId == %@", nodeId)
+        let object = try! moc.fetch(f).first
+        if let object {
+            parentCache.setObject(object, forKey: nodeId as NSString)
+        }
+        return object
+    }
+    
+    static func nuke(query: String, in moc: NSManagedObjectContext) {
+        let f = NSFetchRequest<Self>(entityName: typeName)
+        f.includesSubentities = false
+        f.predicate = NSPredicate(format: query)
+        let orphaned = try! moc.fetch(f)
+        if !orphaned.isEmpty {
+            DLog("Nuking \(orphaned.count) \(typeName) items that no longer have a parent")
+            for i in orphaned {
+                moc.delete(i)
+            }
+        }
+    }
+    
+    static func nukeDeletedItems(in moc: NSManagedObjectContext) -> Int {
+        let discarded = Self.items(surviving: false, in: moc)
+        if !discarded.isEmpty {
+            DLog("Nuking \(discarded.count) \(typeName) items marked for deletion")
+            for i in discarded {
+                moc.delete(i)
+            }
+        }
+        return discarded.count
+    }
+    
+    static func countItems(in moc: NSManagedObjectContext) -> Int {
+        let f = NSFetchRequest<Self>(entityName: typeName)
+        f.includesSubentities = false
+        return try! moc.count(for: f)
+    }
+
+    static func nullNodeIdItems(in moc: NSManagedObjectContext) -> Int {
+        let f = NSFetchRequest<Self>(entityName: typeName)
+        f.fetchLimit = 1
+        f.includesSubentities = false
+        f.predicate = NSPredicate(format: "nodeId == nil")
+        return try! moc.count(for: f)
+    }
+}
+
+class DataItem: NSManagedObject, Querying {
     @NSManaged var nodeId: String?
     @NSManaged var postSyncAction: Int
     @NSManaged var createdAt: Date?
@@ -13,6 +140,8 @@ class DataItem: NSManagedObject {
 
     var alternateCreationDate: Bool { false }
 
+    class var typeName: String { abort() }
+        
     func resetSyncState() {
         updatedAt = updatedAt?.addingTimeInterval(-1) ?? .distantPast
         apiServer.resetSyncState()
@@ -28,31 +157,6 @@ class DataItem: NSManagedObject {
         } else {
             return false
         }
-    }
-
-    static func allItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext, prefetchRelationships: [String]? = nil) -> [T] {
-        let f = NSFetchRequest<T>(entityName: String(describing: type))
-        f.relationshipKeyPathsForPrefetching = prefetchRelationships
-        f.returnsObjectsAsFaults = false
-        f.includesSubentities = false
-        return try! moc.fetch(f)
-    }
-
-    static func allItems<T: DataItem>(of type: T.Type, offset: Int, count: Int, in moc: NSManagedObjectContext, prefetchRelationships: [String]? = nil) -> [T] {
-        let f = NSFetchRequest<T>(entityName: String(describing: type))
-        f.relationshipKeyPathsForPrefetching = prefetchRelationships
-        f.fetchOffset = offset
-        f.fetchLimit = count
-        f.returnsObjectsAsFaults = false
-        f.includesSubentities = false
-        return try! moc.fetch(f)
-    }
-
-    static func allItems<T: DataItem>(of type: T.Type, in serverId: NSManagedObjectID, moc: NSManagedObjectContext) -> [T] {
-        let f = NSFetchRequest<T>(entityName: String(describing: type))
-        f.returnsObjectsAsFaults = false
-        f.predicate = NSPredicate(format: "apiServer == %@", serverId)
-        return try! moc.fetch(f)
     }
 
     static func v3items<T: DataItem>(with data: [JSON]?,
@@ -78,7 +182,7 @@ class DataItem: NSManagedObject {
         if nodeIdsToInfo.isEmpty { return }
 
         await DataManager.runInChild(of: moc) { child in
-            let entityName = String(describing: type)
+            let entityName = typeName
             let f = NSFetchRequest<T>(entityName: entityName)
             f.relationshipKeyPathsForPrefetching = prefetchRelationships
             f.returnsObjectsAsFaults = false
@@ -144,128 +248,26 @@ class DataItem: NSManagedObject {
         }
     }
 
-    static func parent<T: DataItem>(of type: T.Type, with nodeId: String, in moc: NSManagedObjectContext, parentCache: FetchCache) -> T? {
-        if let existingObject = parentCache.object(forKey: nodeId as NSString) as? T {
-            return existingObject
-        }
-        let f = NSFetchRequest<T>(entityName: String(describing: type))
-        f.returnsObjectsAsFaults = true
-        f.includesSubentities = false
-        f.fetchLimit = 1
-        f.predicate = NSPredicate(format: "nodeId == %@", nodeId)
-        let object = try! moc.fetch(f).first
-        if let object {
-            parentCache.setObject(object, forKey: nodeId as NSString)
-        }
-        return object
-    }
-
-    static func items<T: DataItem>(of type: T.Type, surviving: Bool, in moc: NSManagedObjectContext, prefetchRelationships: [String]? = nil) -> [T] {
-        let f = NSFetchRequest<T>(entityName: String(describing: type))
-        f.relationshipKeyPathsForPrefetching = prefetchRelationships
-        f.includesSubentities = false
-        if surviving {
-            f.returnsObjectsAsFaults = false
-            f.predicate = PostSyncAction.delete.excludingPredicate
-        } else {
-            f.returnsObjectsAsFaults = true
-            f.predicate = PostSyncAction.delete.matchingPredicate
-        }
-        return try! moc.fetch(f)
-    }
-
-    static func newOrUpdatedItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext, fromSuccessfulSyncOnly: Bool = false) -> [T] {
-        let f = NSFetchRequest<T>(entityName: String(describing: type))
-        f.returnsObjectsAsFaults = false
-        f.includesSubentities = false
-        let typePredicate = NSCompoundPredicate(type: .or, subpredicates: [PostSyncAction.isNew.matchingPredicate, PostSyncAction.isUpdated.matchingPredicate])
-        if fromSuccessfulSyncOnly {
-            f.predicate = NSCompoundPredicate(type: .and, subpredicates: [
-                NSPredicate(format: "apiServer.lastSyncSucceeded == YES"),
-                typePredicate
-            ])
-        } else {
-            f.predicate = typePredicate
-        }
-        return try! moc.fetch(f)
-    }
-
-    static func updatedItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext) -> [T] {
-        let f = NSFetchRequest<T>(entityName: String(describing: type))
-        f.returnsObjectsAsFaults = false
-        f.includesSubentities = false
-        f.predicate = PostSyncAction.isUpdated.matchingPredicate
-        return try! moc.fetch(f)
-    }
-
-    static func newItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext) -> [T] {
-        let f = NSFetchRequest<T>(entityName: String(describing: type))
-        f.returnsObjectsAsFaults = false
-        f.includesSubentities = false
-        f.predicate = PostSyncAction.isNew.matchingPredicate
-        return try! moc.fetch(f)
-    }
-
     static func nukeOrphanedItems(in moc: NSManagedObjectContext) {
-        func nuke<T: DataItem>(type: T.Type, query: String) {
-            let typeName = String(describing: type)
-            let f = NSFetchRequest<T>(entityName: typeName)
-            f.includesSubentities = false
-            f.predicate = NSPredicate(format: query)
-            let orphaned = try! moc.fetch(f)
-            if !orphaned.isEmpty {
-                DLog("Nuking \(orphaned.count) \(typeName) items that no longer have a parent")
-                for i in orphaned {
-                    moc.delete(i)
-                }
-            }
-        }
-
-        nuke(type: PRLabel.self, query: "pullRequests.@count == 0 and issues.@count == 0")
-        nuke(type: Review.self, query: "pullRequest == nil")
-        nuke(type: PRComment.self, query: "pullRequest == nil and issue == nil and review == nil")
-        nuke(type: PRStatus.self, query: "pullRequest == nil")
-        nuke(type: Reaction.self, query: "pullRequest == nil and issue == nil and comment == nil")
+        PRLabel.nuke(query: "pullRequests.@count == 0 and issues.@count == 0", in: moc)
+        Review.nuke(query: "pullRequest == nil", in: moc)
+        PRComment.nuke(query: "pullRequest == nil and issue == nil and review == nil", in: moc)
+        PRStatus.nuke(query: "pullRequest == nil", in: moc)
+        Reaction.nuke(query: "pullRequest == nil and issue == nil and comment == nil", in: moc)
     }
 
     static func nukeDeletedItems(in moc: NSManagedObjectContext) {
-        func nukeDeletedItems(of type: (some DataItem).Type, in moc: NSManagedObjectContext) -> Int {
-            let discarded = items(of: type, surviving: false, in: moc)
-            if !discarded.isEmpty {
-                DLog("Nuking \(discarded.count) \(String(describing: type)) items marked for deletion")
-                for i in discarded {
-                    moc.delete(i)
-                }
-            }
-            return discarded.count
-        }
-
         var count = 0
-        count += nukeDeletedItems(of: Repo.self, in: moc)
-        count += nukeDeletedItems(of: PullRequest.self, in: moc)
-        count += nukeDeletedItems(of: PRStatus.self, in: moc)
-        count += nukeDeletedItems(of: PRComment.self, in: moc)
-        count += nukeDeletedItems(of: PRLabel.self, in: moc)
-        count += nukeDeletedItems(of: Issue.self, in: moc)
-        count += nukeDeletedItems(of: Team.self, in: moc)
-        count += nukeDeletedItems(of: Review.self, in: moc)
-        count += nukeDeletedItems(of: Reaction.self, in: moc)
+        count += Repo.nukeDeletedItems(in: moc)
+        count += PullRequest.nukeDeletedItems(in: moc)
+        count += PRStatus.nukeDeletedItems(in: moc)
+        count += PRComment.nukeDeletedItems(in: moc)
+        count += PRLabel.nukeDeletedItems(in: moc)
+        count += Issue.nukeDeletedItems(in: moc)
+        count += Team.nukeDeletedItems(in: moc)
+        count += Review.nukeDeletedItems(in: moc)
+        count += Reaction.nukeDeletedItems(in: moc)
         DLog("Nuked total \(count) items marked for deletion")
-    }
-
-    static func countItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext) -> Int {
-        let f = NSFetchRequest<T>(entityName: String(describing: type))
-        f.includesSubentities = false
-        return try! moc.count(for: f)
-    }
-
-    static func nullNodeIdItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext) -> Int {
-        let entityName = String(describing: type)
-        let f = NSFetchRequest<T>(entityName: entityName)
-        f.fetchLimit = 1
-        f.includesSubentities = false
-        f.predicate = NSPredicate(format: "nodeId == nil")
-        return try! moc.count(for: f)
     }
 
     @MainActor
@@ -306,9 +308,9 @@ class DataItem: NSManagedObject {
         return Date(timeIntervalSince1970: TimeInterval(t))
     }
 
-    private func populate(type: (some DataItem).Type, node: Node) {
+    private func populate(node: Node) {
         let info = node.jsonPayload
-        let entityName = String(describing: type)
+        let entityName = Self.typeName
 
         let alternativeDate = alternateCreationDate
 
@@ -374,7 +376,7 @@ class DataItem: NSManagedObject {
             return
         }
 
-        let entityName = String(describing: type)
+        let entityName = typeName
         let f = NSFetchRequest<T>(entityName: entityName)
         f.returnsObjectsAsFaults = false
         f.includesSubentities = false
@@ -382,7 +384,7 @@ class DataItem: NSManagedObject {
         let existingItems = try! moc.fetch(f)
         let existingItemIds = existingItems.map(\.nodeId)
         var itemLookup = Dictionary(zip(existingItemIds, existingItems)) { one, two in
-            DLog("Warning: Duplicate item of type \(String(describing: type)) claiming to be node ID \(one.nodeId ?? "<no node id>") - will delete")
+            DLog("Warning: Duplicate item of type \(entityName) claiming to be node ID \(one.nodeId ?? "<no node id>") - will delete")
             two.postSyncAction = PostSyncAction.delete.rawValue
             return one
         }
@@ -390,14 +392,14 @@ class DataItem: NSManagedObject {
         for node in validNodes {
             if let existingItem = itemLookup[node.id] {
                 // there can be multiple updates for an item, because of multiple parents
-                existingItem.populate(type: T.self, node: node)
+                existingItem.populate(node: node)
                 perItemCallback(existingItem, node)
             } else if shouldCreate(from: node) {
                 // but only one creation
                 node.created = true
                 let item = NSEntityDescription.insertNewObject(forEntityName: entityName, into: moc) as! T
                 item.apiServer = server
-                item.populate(type: T.self, node: node)
+                item.populate(node: node)
                 parentCache.setObject(item, forKey: node.id as NSString)
                 itemLookup[node.id] = item
                 perItemCallback(item, node)
