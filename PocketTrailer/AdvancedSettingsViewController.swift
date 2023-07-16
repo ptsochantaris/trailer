@@ -518,7 +518,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
     private func showOptionalReviewWarning(previousSync: Bool) {
         if !previousSync, API.shouldSyncReviews || API.shouldSyncReviewAssignments {
-            for p in DataItem.allItems(of: PullRequest.self, in: DataManager.main) {
+            for p in PullRequest.allItems(in: DataManager.main) {
                 p.resetSyncState()
             }
             preferencesDirty = true

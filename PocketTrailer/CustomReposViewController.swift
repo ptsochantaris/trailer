@@ -5,7 +5,7 @@ final class CustomReposViewController: UIViewController, UITableViewDelegate, UI
     @IBOutlet private var table: UITableView!
 
     @objc private func updateRepos() {
-        repos = Repo.allItems(of: Repo.self, in: DataManager.main).filter(\.manuallyAdded)
+        repos = Repo.allItems(in: DataManager.main).filter(\.manuallyAdded)
         table.reloadData()
     }
 
@@ -111,7 +111,7 @@ final class CustomReposViewController: UIViewController, UITableViewDelegate, UI
                 do {
                     try await API.fetchAllRepos(owner: ownerName, from: server, moc: DataManager.main)
 
-                    let addedCount = Repo.newItems(of: Repo.self, in: DataManager.main).count
+                    let addedCount = Repo.newItems(in: DataManager.main).count
                     if Settings.displayPolicyForNewPrs == Int(RepoDisplayPolicy.hide.rawValue), Settings.displayPolicyForNewIssues == Int(RepoDisplayPolicy.hide.rawValue) {
                         showMessage("Repositories added", "WARNING: While \(addedCount) repositories have been added successfully to your list, your default settings specify that they should be hidden. You probably want to change their visibility in the main repositories list.")
                     } else {

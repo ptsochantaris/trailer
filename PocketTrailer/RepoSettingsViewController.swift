@@ -112,9 +112,9 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
         if repo == nil {
             let repos: [Repo]
             if let filter {
-                repos = Repo.allItems(of: Repo.self, in: DataManager.main).filter { $0.fullName?.localizedStandardContains(filter) ?? false }
+                repos = Repo.allItems(in: DataManager.main).filter { $0.fullName?.localizedStandardContains(filter) ?? false }
             } else {
-                repos = Repo.allItems(of: Repo.self, in: DataManager.main)
+                repos = Repo.allItems(in: DataManager.main)
             }
             if indexPath.section == 0 {
                 allPrsIndex = indexPath.row
