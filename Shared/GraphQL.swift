@@ -4,6 +4,59 @@ import Lista
 import NIOCore
 import TrailerQL
 
+extension Node {
+    var creationSkipped: Bool {
+        get {
+            return flags & 0b00000001 != 0
+        }
+        set {
+            if newValue {
+                flags |= 0b00000001
+            } else {
+                flags &= 0b11111110
+            }
+        }
+    }
+    var created: Bool {
+        get {
+            return flags & 0b00000010 != 0
+        }
+        set {
+            if newValue {
+                flags |= 0b00000010
+            } else {
+                flags &= 0b11111101
+            }
+        }
+    }
+
+    var updated: Bool {
+        get {
+            return flags & 0b00000100 != 0
+        }
+        set {
+            if newValue {
+                flags |= 0b00000100
+            } else {
+                flags &= 0b11111011
+            }
+        }
+    }
+
+    var forcedUpdate: Bool {
+        get {
+            return flags & 0b00001000 != 0
+        }
+        set {
+            if newValue {
+                flags |= 0b00001000
+            } else {
+                flags &= 0b11110111
+            }
+        }
+    }
+}
+
 @MainActor
 enum GraphQL {
     static func setup() {
