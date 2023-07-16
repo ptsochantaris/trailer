@@ -5,7 +5,7 @@ extension Data {
     enum Operation {
         case compress
         case decompress
-        
+
         var params: (flags: Int32, operation: compression_stream_operation) {
             switch self {
             case .compress:
@@ -59,13 +59,13 @@ extension Data {
                         stream.dst_ptr = dstBufferPtr
                         stream.dst_size = dstBufferSize
                     }
-                    
+
                 case COMPRESSION_STATUS_END:
                     if stream.dst_ptr > dstBufferPtr {
                         outputData.append(dstBufferPtr, count: stream.dst_ptr - dstBufferPtr)
                     }
                     return outputData
-                    
+
                 default: // COMPRESSION_STATUS_ERROR
                     return nil
                 }
