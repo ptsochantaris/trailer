@@ -90,16 +90,15 @@ final class WatchManager: NSObject, WCSessionDelegate {
             if let
                 uri = message["localId"] as? String,
                 let oid = DataManager.id(for: uri),
-                let dataItem = existingObject(with: oid) as? ListableItem,
+                let dataItem = try? DataManager.main.existingObject(with: oid) as? ListableItem,
                 dataItem.hasUnreadCommentsOrAlert {
                 dataItem.catchUpWithComments()
 
             } else if let uris = message["itemUris"] as? [String] {
                 for uri in uris {
-                    if let
-                        oid = DataManager.id(for: uri),
-                        let dataItem = existingObject(with: oid) as? ListableItem,
-                        dataItem.hasUnreadCommentsOrAlert {
+                    if let oid = DataManager.id(for: uri),
+                       let dataItem = try? DataManager.main.existingObject(with: oid) as? ListableItem,
+                       dataItem.hasUnreadCommentsOrAlert {
                         dataItem.catchUpWithComments()
                     }
                 }
@@ -240,7 +239,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
 
     @MainActor
     private func buildItemDetail(localId: String) -> Data? {
-        if let oid = DataManager.id(for: localId), let item = existingObject(with: oid) as? ListableItem {
+        if let oid = DataManager.id(for: localId), let item = try? DataManager.main.existingObject(with: oid) as? ListableItem {
             var result = baseDataForItem(item: item, showLabels: Settings.showLabels)
             result["description"] = item.body
             result["comments"] = commentsForItem(item: item)

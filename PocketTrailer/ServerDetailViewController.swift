@@ -19,9 +19,9 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        var a: ApiServer
+        let a: ApiServer
         if let sid = serverLocalId {
-            a = existingObject(with: sid) as! ApiServer
+            a = try! DataManager.main.existingObject(with: sid) as! ApiServer
         } else {
             a = ApiServer.addDefaultGithub(in: DataManager.main)
             view.isUserInteractionEnabled = false
@@ -71,7 +71,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
     @discardableResult
     private func updateServerFromForm() -> ApiServer? {
         if let sid = serverLocalId {
-            let a = existingObject(with: sid) as! ApiServer
+            let a = try! DataManager.main.existingObject(with: sid) as! ApiServer
             a.label = name.text?.trim
             a.apiPath = apiPath.text?.trim
             a.graphQLPath = graphQLPath.text?.trim
@@ -174,7 +174,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
     }
 
     private func deleteServer() async {
-        if let a = existingObject(with: serverLocalId!) {
+        if let a = try? DataManager.main.existingObject(with: serverLocalId!) {
             DataManager.main.delete(a)
             await DataManager.saveDB()
         }

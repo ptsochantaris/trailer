@@ -87,7 +87,7 @@ extension API {
                 }
                 if Settings.notifyOnItemReactions {
                     group.addTask { @MainActor in
-                        let rp = PullRequest.reactionCheckBatch(for: PullRequest.self, in: moc)
+                        let rp = PullRequest.reactionCheckBatch(in: moc)
                         try await GraphQL.update(for: rp, steps: [.reactions])
                     }
                 }
@@ -118,7 +118,7 @@ extension API {
             try await GraphQL.update(for: newOrUpdatedIssues, steps: steps)
 
             if Settings.notifyOnItemReactions {
-                let ri = Issue.reactionCheckBatch(for: Issue.self, in: moc)
+                let ri = Issue.reactionCheckBatch(in: moc)
                 try await GraphQL.update(for: ri, steps: [.reactions])
             }
         }

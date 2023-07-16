@@ -9,7 +9,7 @@ enum GroupingCriterion {
         case let .group(name):
             return name
         case let .server(aid):
-            let a = existingObject(with: aid) as? ApiServer
+            let a = try? DataManager.main.existingObject(with: aid) as? ApiServer
             return a?.label ?? "<none>"
         }
     }
@@ -20,7 +20,7 @@ enum GroupingCriterion {
         case let .group(name):
             return Repo.repos(for: name, in: DataManager.main).contains { !$0.apiServer.lastSyncSucceeded }
         case let .server(aid):
-            let a = existingObject(with: aid) as? ApiServer
+            let a = try? DataManager.main.existingObject(with: aid) as? ApiServer
             return !(a?.lastSyncSucceeded ?? true)
         }
     }

@@ -736,13 +736,13 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         var urlToOpen = userInfo[NOTIFICATION_URL_KEY] as? String
         var relatedItem: ListableItem?
 
-        if let commentId = DataManager.id(for: userInfo[COMMENT_ID_KEY] as? String), let c = existingObject(with: commentId) as? PRComment {
+        if let commentId = DataManager.id(for: userInfo[COMMENT_ID_KEY] as? String), let c = try? DataManager.main.existingObject(with: commentId) as? PRComment {
             relatedItem = c.parent
             if urlToOpen == nil {
                 urlToOpen = c.webUrl
             }
         } else if let uri = userInfo[LISTABLE_URI_KEY] as? String, let itemId = DataManager.id(for: uri) {
-            relatedItem = existingObject(with: itemId) as? ListableItem
+            relatedItem = try? DataManager.main.existingObject(with: itemId) as? ListableItem
         }
 
         if let item = relatedItem {
@@ -784,16 +784,15 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
     func highightItemWithUriPath(uriPath: String) {
         if
             let itemId = DataManager.id(for: uriPath),
-            let item = existingObject(with: itemId) as? ListableItem {
+            let item = try? DataManager.main.existingObject(with: itemId) as? ListableItem {
             selectTab(for: item, overrideUrl: nil, andOpen: false)
         }
     }
 
     func openCommentWithId(cId: String) {
-        if let
-            itemId = DataManager.id(for: cId),
-            let comment = existingObject(with: itemId) as? PRComment,
-            let item = comment.parent {
+        if let itemId = DataManager.id(for: cId),
+           let comment = try? DataManager.main.existingObject(with: itemId) as? PRComment,
+           let item = comment.parent {
             selectTab(for: item, overrideUrl: nil, andOpen: true)
         }
     }
@@ -836,7 +835,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
     }
 
     private func showDetail(url: URL, objectId: NSManagedObjectID) {
-        if let item = existingObject(with: objectId) as? ListableItem {
+        if let item = try? DataManager.main.existingObject(with: objectId) as? ListableItem {
             item.catchUpWithComments()
         }
         UIApplication.shared.open(url, options: [:])
@@ -968,7 +967,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         if let
             i = itemUri,
             let oid = DataManager.id(for: i),
-            let o = existingObject(with: oid) as? ListableItem {
+            let o = try? DataManager.main.existingObject(with: oid) as? ListableItem {
             o.catchUpWithComments()
         }
     }
@@ -977,7 +976,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         if let
             i = itemUri,
             let oid = DataManager.id(for: i),
-            let o = existingObject(with: oid) as? ListableItem {
+            let o = try? DataManager.main.existingObject(with: oid) as? ListableItem {
             o.latestReadCommentDate = .distantPast
             o.postProcess()
         }

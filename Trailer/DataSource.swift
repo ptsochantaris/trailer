@@ -79,7 +79,7 @@ extension MenuWindow {
         func tableView(_: NSTableView, viewFor _: NSTableColumn?, row: Int) -> NSView? {
             switch itemIds[row] {
             case let .id(id):
-                if let i = existingObject(with: id) as? ListableItem {
+                if let i = try? DataManager.main.existingObject(with: id) as? ListableItem {
                     return TrailerCell(item: i)
                 } else {
                     return nil
@@ -101,7 +101,7 @@ extension MenuWindow {
             case .section:
                 return nil
             case let .id(id):
-                return existingObject(with: id) as? ListableItem
+                return try? DataManager.main.existingObject(with: id) as? ListableItem
             }
         }
     }

@@ -68,11 +68,6 @@ let NOTIFICATION_URL_KEY = "urlKey"
 
 let emptyAttributedString = NSAttributedString()
 
-@MainActor
-func existingObject(with id: NSManagedObjectID) -> NSManagedObject? {
-    try? DataManager.main.existingObject(with: id)
-}
-
 let itemDateFormatter: DateFormatter = {
     let f = DateFormatter()
     f.dateStyle = .medium
@@ -165,10 +160,6 @@ enum SortingMethod: Int {
     static let reverseTitles = ["Youngest first", "Most recently active", "Reverse alphabetically", "Most lines added", "Most lines removed"]
     static let normalTitles = ["Oldest first", "Inactive for longest", "Alphabetically", "Least lines added", "Least lines removed"]
 
-    init?(_ rawValue: Int) {
-        self.init(rawValue: rawValue)
-    }
-
     var normalTitle: String {
         SortingMethod.normalTitles[rawValue]
     }
@@ -194,10 +185,6 @@ enum HandlingPolicy: Int {
     var name: String {
         HandlingPolicy.labels[rawValue]
     }
-
-    init?(_ rawValue: Int) {
-        self.init(rawValue: rawValue)
-    }
 }
 
 enum AssignmentPolicy: Int {
@@ -205,10 +192,6 @@ enum AssignmentPolicy: Int {
     static let labels = ["Move To Mine", "Move To Participated", "Do Nothing"]
     var name: String {
         AssignmentPolicy.labels[rawValue]
-    }
-
-    init?(_ rawValue: Int) {
-        self.init(rawValue: rawValue)
     }
 }
 
@@ -305,10 +288,6 @@ enum RepoHidingPolicy: Int {
 
     var color: COLOR_CLASS {
         RepoHidingPolicy.colors[Int(rawValue)]
-    }
-
-    init?(_ rawValue: Int) {
-        self.init(rawValue: rawValue)
     }
 }
 

@@ -22,7 +22,7 @@ final class PullRequest: ListableItem {
 
     @NSManaged var statuses: Set<PRStatus>
     @NSManaged var reviews: Set<Review>
-    
+
     override class var typeName: String { "PullRequest" }
 
     override var webUrl: String? {

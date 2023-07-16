@@ -27,7 +27,7 @@ final class Issue: ListableItem {
             issue.baseNodeSync(node: node, parent: parent)
         }
     }
-    
+
     static func syncIssues(from data: [JSON]?, in repo: Repo, moc: NSManagedObjectContext) async {
         let apiServer = repo.apiServer
         let repoId = repo.objectID

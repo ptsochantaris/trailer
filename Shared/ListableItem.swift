@@ -22,11 +22,46 @@ struct PostProcessContext {
     let notifyOnCommentReactions = Settings.notifyOnCommentReactions
 }
 
-class ListableItem: DataItem {
+protocol Listable: Querying {
+    var section: Section { get }
+    var sectionIndex: Int { get }
+    var comments: Set<PRComment> { get }
+    var reactions: Set<Reaction> { get }
+}
+
+extension Listable {
+    static func reactionCheckBatch(in moc: NSManagedObjectContext) -> [Self] {
+        let f = NSFetchRequest<Self>(entityName: typeName)
+        f.predicate = NSPredicate(format: "apiServer.lastSyncSucceeded == YES")
+        f.sortDescriptors = [
+            NSSortDescriptor(key: "lastReactionScan", ascending: true),
+            NSSortDescriptor(key: "updatedAt", ascending: false)
+        ]
+        let items = try! moc.fetch(f)
+            .filter(\.section.shouldListReactions)
+            .prefix(Settings.reactionScanningBatchSize)
+
+        for item in items {
+            for comment in item.comments {
+                comment.pendingReactionScan = comment.isMine
+            }
+            for reaction in item.reactions {
+                reaction.postSyncAction = PostSyncAction.delete.rawValue
+            }
+        }
+        return Array(items)
+    }
+
+    var section: Section {
+        Section(rawValue: sectionIndex) ?? .none
+    }
+}
+
+class ListableItem: DataItem, Listable {
     enum StateChange: Int {
         case none, reopened, merged, closed
     }
-    
+
     @NSManaged var assignedToMe: Bool
     @NSManaged var assigneeName: String? // note: This now could be a list of names, delimited with a ","
     @NSManaged var body: String?
@@ -57,8 +92,8 @@ class ListableItem: DataItem {
     @NSManaged var snoozeUntil: Date?
     @NSManaged var snoozingPreset: SnoozePreset?
 
-    @NSManaged var comments: Set<PRComment>
     @NSManaged var labels: Set<PRLabel>
+    @NSManaged var comments: Set<PRComment>
     @NSManaged var reactions: Set<Reaction>
 
     var webUrl: String? {
@@ -77,29 +112,6 @@ class ListableItem: DataItem {
         issueUrl?.appending(pathComponent: "reactions")
     }
 
-    static func reactionCheckBatch<T: ListableItem>(for type: T.Type, in moc: NSManagedObjectContext) -> [T] {
-        let entityName = typeName
-        let f = NSFetchRequest<T>(entityName: entityName)
-        f.predicate = NSPredicate(format: "apiServer.lastSyncSucceeded == YES")
-        f.sortDescriptors = [
-            NSSortDescriptor(key: "lastReactionScan", ascending: true),
-            NSSortDescriptor(key: "updatedAt", ascending: false)
-        ]
-        let items = try! moc.fetch(f)
-            .filter(\.section.shouldListReactions)
-            .prefix(Settings.reactionScanningBatchSize)
-
-        items.forEach {
-            $0.comments.forEach {
-                $0.pendingReactionScan = $0.isMine
-            }
-            $0.reactions.forEach {
-                $0.postSyncAction = PostSyncAction.delete.rawValue
-            }
-        }
-        return Array(items)
-    }
-    
     func handleMerging() {}
 
     final func baseNodeSync(node: Node, parent: Repo) {
@@ -169,10 +181,6 @@ class ListableItem: DataItem {
         }
 
         processAssignmentStatus(from: info, idField: "node_id")
-    }
-
-    var section: Section {
-        Section(rawValue: sectionIndex) ?? .none
     }
 
     final func processAssignmentStatus(from info: JSON?, idField: String) {
@@ -1057,7 +1065,7 @@ class ListableItem: DataItem {
             sortDescriptors.append(NSSortDescriptor(key: "repo.fullName", ascending: true, selector: #selector(NSString.localizedCaseInsensitiveCompare)))
         }
 
-        if let fieldName = SortingMethod(Settings.sortMethod)?.field {
+        if let fieldName = SortingMethod(rawValue: Settings.sortMethod)?.field {
             if fieldName == "title" {
                 sortDescriptors.append(NSSortDescriptor(key: fieldName, ascending: !Settings.sortDescending, selector: #selector(NSString.localizedCaseInsensitiveCompare)))
             } else {
@@ -1093,11 +1101,11 @@ class ListableItem: DataItem {
     static func relatedItems(from notificationUserInfo: JSON) -> (PRComment?, ListableItem)? {
         var item: ListableItem?
         var comment: PRComment?
-        if let cid = notificationUserInfo[COMMENT_ID_KEY] as? String, let itemId = DataManager.id(for: cid), let c = existingObject(with: itemId) as? PRComment {
+        if let cid = notificationUserInfo[COMMENT_ID_KEY] as? String, let itemId = DataManager.id(for: cid), let c = try? DataManager.main.existingObject(with: itemId) as? PRComment {
             comment = c
             item = c.parent
         } else if let pid = notificationUserInfo[LISTABLE_URI_KEY] as? String, let itemId = DataManager.id(for: pid) {
-            item = existingObject(with: itemId) as? ListableItem
+            item = try? DataManager.main.existingObject(with: itemId) as? ListableItem
         }
         if let i = item {
             return (comment, i)

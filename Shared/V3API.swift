@@ -141,11 +141,13 @@ extension API {
 
             if Settings.notifyOnItemReactions {
                 group.addTask { @MainActor in
-                    await fetchItemReactionsIfNeeded(for: PullRequest.self, to: moc)
+                    let items = PullRequest.reactionCheckBatch(in: moc)
+                    await fetchItemReactionsIfNeeded(for: items, to: moc)
                 }
 
                 group.addTask { @MainActor in
-                    await fetchItemReactionsIfNeeded(for: Issue.self, to: moc)
+                    let items = Issue.reactionCheckBatch(in: moc)
+                    await fetchItemReactionsIfNeeded(for: items, to: moc)
                 }
             }
 
@@ -253,8 +255,7 @@ extension API {
         }
     }
 
-    private static func fetchItemReactionsIfNeeded<T: ListableItem>(for type: T.Type, to moc: NSManagedObjectContext) async {
-        let items = T.reactionCheckBatch(for: type, in: moc)
+    private static func fetchItemReactionsIfNeeded(for items: [some ListableItem], to moc: NSManagedObjectContext) async {
         if items.isEmpty {
             return
         }

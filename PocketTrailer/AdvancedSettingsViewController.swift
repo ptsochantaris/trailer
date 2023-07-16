@@ -47,7 +47,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
         Setting(section: .Display,
                 title: "Assigned items",
                 description: "How to handle items that have been detected as assigned to you.",
-                valueDisplayed: { AssignmentPolicy(Settings.assignedPrHandlingPolicy)?.name }),
+                valueDisplayed: { AssignmentPolicy(rawValue: Settings.assignedPrHandlingPolicy)?.name }),
         Setting(section: .Display,
                 title: "Display repository names",
                 description: Settings.showReposInNameHelp,
@@ -287,11 +287,11 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
         Setting(section: .History,
                 title: "When something is merged",
                 description: Settings.mergeHandlingPolicyHelp,
-                valueDisplayed: { HandlingPolicy(Settings.mergeHandlingPolicy)?.name }),
+                valueDisplayed: { HandlingPolicy(rawValue: Settings.mergeHandlingPolicy)?.name }),
         Setting(section: .History,
                 title: "When something is closed",
                 description: Settings.closeHandlingPolicyHelp,
-                valueDisplayed: { HandlingPolicy(Settings.closeHandlingPolicy)?.name }),
+                valueDisplayed: { HandlingPolicy(rawValue: Settings.closeHandlingPolicy)?.name }),
         Setting(section: .History,
                 title: "Don't keep PRs merged by me",
                 description: Settings.dontKeepPrsMergedByMeHelp,
@@ -322,7 +322,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
                 title: "Criterion",
                 description: Settings.sortMethodHelp,
                 valueDisplayed: {
-                    if let m = SortingMethod(Settings.sortMethod) {
+                    if let m = SortingMethod(rawValue: Settings.sortMethod) {
                         return Settings.sortDescending ? m.reverseTitle : m.normalTitle
                     } else {
                         return nil

@@ -776,7 +776,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         if userActivity.activityType == CSSearchableItemActionType,
            let uriPath = userActivity.userInfo?[CSSearchableItemActivityIdentifier] as? String,
            let itemId = DataManager.id(for: uriPath),
-           let item = existingObject(with: itemId) as? ListableItem,
+           let item = try? DataManager.main.existingObject(with: itemId) as? ListableItem,
            let urlString = item.webUrl,
            let url = URL(string: urlString) {
             NSWorkspace.shared.open(url)

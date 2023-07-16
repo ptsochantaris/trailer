@@ -2,7 +2,6 @@ import Foundation
 import UIKit
 
 final class ApiSettingsViewController: UIViewController, UITextFieldDelegate {
-
     @IBOutlet private var highToggle: UISwitch!
     @IBOutlet private var highInfo: UILabel!
 
@@ -20,7 +19,7 @@ final class ApiSettingsViewController: UIViewController, UITextFieldDelegate {
         threadInfo.text = Settings.threadedSyncHelp
         updateUI()
     }
-    
+
     @IBAction func toggleSelected(_ sender: UISwitch) {
         if sender === highToggle {
             Settings.syncProfile = GraphQL.Profile.high.rawValue
@@ -31,7 +30,7 @@ final class ApiSettingsViewController: UIViewController, UITextFieldDelegate {
         }
         updateUI()
     }
-    
+
     @IBAction func defaultsSelected(_: UIBarButtonItem) {
         Settings.syncProfile = GraphQL.Profile.normal.rawValue
         Settings.threadedSync = false

@@ -22,6 +22,7 @@ final class ApiOptionsWindow: NSWindow, NSWindowDelegate {
 
         updateUI()
     }
+
     @IBAction func radioButtonSelected(_ sender: NSButton) {
         if sender === safeRadio {
             Settings.syncProfile = GraphQL.Profile.cautious.rawValue
@@ -31,7 +32,7 @@ final class ApiOptionsWindow: NSWindow, NSWindowDelegate {
             Settings.syncProfile = GraphQL.Profile.high.rawValue
         }
     }
-    
+
     private func updateUI() {
         threadCheckbox.integerValue = Settings.threadedSync ? 1 : 0
         let profile = GraphQL.Profile(settingsValue: Settings.syncProfile)

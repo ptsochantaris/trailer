@@ -280,7 +280,7 @@ final class TrailerCell: NSTableCellView {
     }
 
     @objc private func snoozeSelected(_ sender: NSMenuItem) {
-        if let item = associatedDataItem, let oid = sender.representedObject as? NSManagedObjectID, let snoozeItem = existingObject(with: oid) as? SnoozePreset {
+        if let item = associatedDataItem, let oid = sender.representedObject as? NSManagedObjectID, let snoozeItem = try? DataManager.main.existingObject(with: oid) as? SnoozePreset {
             item.snooze(using: snoozeItem)
             saveAndRequestMenuUpdate(item)
         }
@@ -330,7 +330,7 @@ final class TrailerCell: NSTableCellView {
     }
 
     var associatedDataItem: ListableItem? {
-        existingObject(with: dataItemId) as? ListableItem
+        try? DataManager.main.existingObject(with: dataItemId) as? ListableItem
     }
 
     override func updateTrackingAreas() {

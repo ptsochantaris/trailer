@@ -7,51 +7,52 @@ import TrailerQL
 extension Node {
     var creationSkipped: Bool {
         get {
-            return flags & 0b00000001 != 0
+            flags & 0b0000_0001 != 0
         }
         set {
             if newValue {
-                flags |= 0b00000001
+                flags |= 0b0000_0001
             } else {
-                flags &= 0b11111110
+                flags &= 0b1111_1110
             }
         }
     }
+
     var created: Bool {
         get {
-            return flags & 0b00000010 != 0
+            flags & 0b0000_0010 != 0
         }
         set {
             if newValue {
-                flags |= 0b00000010
+                flags |= 0b0000_0010
             } else {
-                flags &= 0b11111101
+                flags &= 0b1111_1101
             }
         }
     }
 
     var updated: Bool {
         get {
-            return flags & 0b00000100 != 0
+            flags & 0b0000_0100 != 0
         }
         set {
             if newValue {
-                flags |= 0b00000100
+                flags |= 0b0000_0100
             } else {
-                flags &= 0b11111011
+                flags &= 0b1111_1011
             }
         }
     }
 
     var forcedUpdate: Bool {
         get {
-            return flags & 0b00001000 != 0
+            flags & 0b0000_1000 != 0
         }
         set {
             if newValue {
-                flags |= 0b00001000
+                flags |= 0b0000_1000
             } else {
-                flags &= 0b11110111
+                flags &= 0b1111_0111
             }
         }
     }
@@ -66,16 +67,16 @@ enum GraphQL {
     }
 
     private static let nodeBlockMax = 2000
-    
+
     enum Profile: Int {
         case cautious = -10
         case normal = 0
         case high = 10
-        
+
         static var current: Profile {
             Profile(settingsValue: Settings.syncProfile)
         }
-        
+
         init(settingsValue: Int) {
             if settingsValue < 0 {
                 self = .cautious
@@ -85,7 +86,7 @@ enum GraphQL {
                 self = .normal
             }
         }
-        
+
         var itemInitialBatchCost: Int {
             switch self {
             case .high:
@@ -96,7 +97,7 @@ enum GraphQL {
                 return 2000
             }
         }
-        
+
         var itemIncrementalBatchCost: Int {
             switch self {
             case .high:
@@ -107,7 +108,7 @@ enum GraphQL {
                 return 2000
             }
         }
-        
+
         var itemAccompanyingBatchCount: Int {
             switch self {
             case .high:
@@ -118,11 +119,11 @@ enum GraphQL {
                 return 2000
             }
         }
-        
+
         var largePageSize: Group.Paging {
             switch self {
             case .high:
-                return.first(count: 80, paging: true)
+                return .first(count: 80, paging: true)
             case .normal:
                 return .first(count: 50, paging: true)
             case .cautious:
@@ -133,7 +134,7 @@ enum GraphQL {
         var mediumPageSize: Group.Paging {
             switch self {
             case .high:
-                return.first(count: 40, paging: true)
+                return .first(count: 40, paging: true)
             case .normal:
                 return .first(count: 20, paging: true)
             case .cautious:
@@ -148,7 +149,7 @@ enum GraphQL {
             case .normal:
                 return .first(count: 10, paging: true)
             case .high:
-                return.first(count: 20, paging: true)
+                return .first(count: 20, paging: true)
             }
         }
     }
@@ -188,7 +189,7 @@ enum GraphQL {
             }
         }
     }
-    
+
     static func testApi(to apiServer: ApiServer) async throws {
         var gotUserNode = false
         let testQuery = Query(name: "Testing", rootElement: Group("viewer") { userFragment }) { node in
@@ -237,7 +238,7 @@ enum GraphQL {
         guard let json = try await HTTP.getJsonData(for: request, attempts: attempts, checkCache: false, logPrefix: query.logPrefix).json as? JSON else {
             throw API.apiError("\(query.logPrefix)Retuned data is not JSON")
         }
-        
+
         return json
     }
 

@@ -29,7 +29,7 @@ extension Querying {
         f.predicate = NSPredicate(format: "apiServer == %@", serverId)
         return try! moc.fetch(f)
     }
-    
+
     static func items(surviving: Bool, in moc: NSManagedObjectContext, prefetchRelationships: [String]? = nil) -> [Self] {
         let f = NSFetchRequest<Self>(entityName: typeName)
         f.relationshipKeyPathsForPrefetching = prefetchRelationships
@@ -75,7 +75,7 @@ extension Querying {
         f.predicate = PostSyncAction.isNew.matchingPredicate
         return try! moc.fetch(f)
     }
-    
+
     static func asParent(with nodeId: String, in moc: NSManagedObjectContext, parentCache: FetchCache) -> Self? {
         if let existingObject = parentCache.object(forKey: nodeId as NSString) as? Self {
             return existingObject
@@ -91,7 +91,7 @@ extension Querying {
         }
         return object
     }
-    
+
     static func nuke(query: String, in moc: NSManagedObjectContext) {
         let f = NSFetchRequest<Self>(entityName: typeName)
         f.includesSubentities = false
@@ -104,7 +104,7 @@ extension Querying {
             }
         }
     }
-    
+
     static func nukeDeletedItems(in moc: NSManagedObjectContext) -> Int {
         let discarded = Self.items(surviving: false, in: moc)
         if !discarded.isEmpty {
@@ -115,7 +115,7 @@ extension Querying {
         }
         return discarded.count
     }
-    
+
     static func countItems(in moc: NSManagedObjectContext) -> Int {
         let f = NSFetchRequest<Self>(entityName: typeName)
         f.includesSubentities = false
@@ -141,7 +141,7 @@ class DataItem: NSManagedObject, Querying {
     var alternateCreationDate: Bool { false }
 
     class var typeName: String { abort() }
-        
+
     func resetSyncState() {
         updatedAt = updatedAt?.addingTimeInterval(-1) ?? .distantPast
         apiServer.resetSyncState()
@@ -160,7 +160,7 @@ class DataItem: NSManagedObject, Querying {
     }
 
     static func v3items<T: DataItem>(with data: [JSON]?,
-                                     type: T.Type,
+                                     type _: T.Type,
                                      serverId: NSManagedObjectID,
                                      prefetchRelationships: [String]? = nil,
                                      createNewItems: Bool = true,
@@ -370,7 +370,7 @@ class DataItem: NSManagedObject, Querying {
         }
     }
 
-    static func syncItems<T: DataItem>(of type: T.Type, from nodes: Lista<Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache, perItemCallback: (T, Node) -> Void) {
+    static func syncItems<T: DataItem>(of _: T.Type, from nodes: Lista<Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache, perItemCallback: (T, Node) -> Void) {
         let validNodes = nodes.filter { !($0.parent?.creationSkipped ?? false) }
         if validNodes.isEmpty {
             return

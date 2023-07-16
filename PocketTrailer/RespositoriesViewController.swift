@@ -309,7 +309,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
     }
 
     private func hidingTitleForRepo(repo: Repo) -> NSAttributedString {
-        let policy = RepoHidingPolicy(repo.itemHidingPolicy) ?? .noHiding
+        let policy = RepoHidingPolicy(rawValue: repo.itemHidingPolicy) ?? .noHiding
         return NSAttributedString(string: policy.name, attributes: attributes(for: policy))
     }
 
