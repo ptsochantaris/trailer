@@ -1,6 +1,8 @@
 import WatchConnectivity
 import WatchKit
 
+let allowedClasses = [NSArray.self, NSDictionary.self, NSMutableAttributedString.self, NSString.self, NSNumber.self, NSDate.self]
+
 final class PRListController: CommonController {
     @IBOutlet private var table: WKInterfaceTable!
     @IBOutlet private var statusLabel: WKInterfaceLabel!
@@ -110,8 +112,8 @@ final class PRListController: CommonController {
     override func update(from response: [AnyHashable: Any]) {
         guard let compressedData = response["result"] as? Data,
               let uncompressedData = compressedData.data(operation: .decompress),
-              let pageArray = try? NSKeyedUnarchiver.unarchivedObject(ofClass: NSArray.self, from: uncompressedData),
-              let page = pageArray as? [[AnyHashable: Any]]
+              let pageArray = try? NSKeyedUnarchiver.unarchivedObject(ofClasses: allowedClasses, from: uncompressedData),
+              let page = pageArray as? [[String: Any]]
         else { return }
         Task { @MainActor in
             completeUpdate(from: page)

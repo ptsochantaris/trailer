@@ -49,7 +49,7 @@ final class PRDetailController: CommonController {
     override func update(from response: [AnyHashable: Any]) {
         guard let compressedData = response["result"] as? Data,
               let uncompressedData = compressedData.data(operation: .decompress),
-              let itemInfo = try? NSKeyedUnarchiver.unarchivedObject(ofClass: NSDictionary.self, from: uncompressedData),
+              let itemInfo = try? NSKeyedUnarchiver.unarchivedObject(ofClasses: allowedClasses, from: uncompressedData),
               let item = itemInfo as? [AnyHashable: Any]
         else { return }
         Task { @MainActor in
