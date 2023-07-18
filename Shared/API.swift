@@ -163,7 +163,7 @@ enum API {
             do {
                 try await v4Sync(repos, to: syncMoc)
             } catch {
-                DLog("Sync aborted due to error")
+                DLog("Sync aborted due to error: \(error.localizedDescription)")
             }
 
         } else {

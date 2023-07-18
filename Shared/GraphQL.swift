@@ -214,7 +214,7 @@ enum GraphQL {
                 gotUserNode = true
             }
         }
-        _ = try await run(testQuery, for: apiServer.graphQLPath ?? "", authToken: apiServer.authToken ?? "", expectedNodeCost: nil, attempts: 1)
+        _ = try await run(testQuery, for: apiServer.graphQLPath ?? "", authToken: apiServer.authToken ?? "", expectedNodeCost: nil, attempts: 1) { _ in }
         if !gotUserNode {
             throw API.apiError("Could not read a valid user record from this endpoint")
         }
@@ -251,14 +251,14 @@ enum GraphQL {
             DLog("\(query.logPrefix)Fetching: \(Q)")
         }
 
-        guard let json = try await HTTP.getJsonData(for: request, attempts: attempts, checkCache: false, logPrefix: query.logPrefix).json as? JSON else {
+        guard let json = try await HTTP.getJsonData(for: request, attempts: attempts, checkCache: false, logPrefix: query.logPrefix, treatEmptyAsError: true).json as? JSON else {
             throw API.apiError("\(query.logPrefix)Retuned data is not JSON")
         }
 
         return json
     }
 
-    static func run(_ query: Query, for urlString: String, authToken: String, expectedNodeCost: Int?, attempts: Int = 5) async throws -> ApiStats? {
+    private static func run(_ query: Query, for urlString: String, authToken: String, expectedNodeCost: Int?, attempts: Int = 5, newStats: @escaping (ApiStats) -> Void) async throws {
         if let expectedNodeCost, Settings.dumpAPIResponsesInConsole {
             DLog("\(query.logPrefix)Queued - Expected Count: \(expectedNodeCost)")
         }
@@ -272,27 +272,25 @@ enum GraphQL {
                 if expectedNodeCost != apiStats.nodeCount {
                     DLog("Warning: Mismatched expected and received node count!")
                 }
+                newStats(apiStats)
             } else {
                 DLog("\(query.logPrefix)Received page (No stats) - Expected Count: \(expectedNodeCost)")
             }
         } else {
             if let apiStats {
                 DLog("\(query.logPrefix)Received page (Cost: \(apiStats.cost), Remaining: \(apiStats.remaining)/\(apiStats.limit) - Returned Count: \(apiStats.nodeCount))")
+                newStats(apiStats)
             } else {
                 DLog("\(query.logPrefix)Received page (No stats)")
             }
         }
-
-        DLog("\(query.logPrefix)Scanning result")
-
+        
         do {
             let extraQueries = try await query.processResponse(from: json)
             if extraQueries.count > 0 {
                 DLog("\(query.logPrefix)Needs more page data (\(extraQueries.count) queries)")
-                return try await runQueries(queries: extraQueries, on: urlString, token: authToken)
+                try await runQueries(queries: extraQueries, on: urlString, token: authToken, newStats: newStats)
             }
-            DLog("\(query.logPrefix)Parsed all pages")
-            return apiStats
 
         } catch {
             let msg: String?
@@ -305,21 +303,18 @@ enum GraphQL {
         }
     }
 
-    static func runQueries(queries: Lista<Query>, on path: String, token: String) async throws -> ApiStats? {
-        try await withThrowingTaskGroup(of: ApiStats?.self, returning: ApiStats?.self) { group in
+    static func runQueries(queries: Lista<Query>, on path: String, token: String, newStats: @escaping (ApiStats) -> Void) async throws {
+        try await withThrowingTaskGroup(of: Void.self) { group in
             for query in queries {
                 group.addTask {
-                    if let stats = try await run(query, for: path, authToken: token, expectedNodeCost: query.nodeCost) {
-                        return stats
+                    do {
+                        try await run(query, for: path, authToken: token, expectedNodeCost: query.nodeCost, newStats: newStats)
+                    } catch _ as CancellationError {
+                        // nothing to do here
                     }
-                    return nil
                 }
             }
-            var mostRecentNonNilStats: ApiStats?
-            for try await stats in group where stats != nil {
-                mostRecentNonNilStats = stats
-            }
-            return mostRecentNonNilStats
+            try await group.waitForAll()
         }
     }
 

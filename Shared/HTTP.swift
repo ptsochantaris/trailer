@@ -47,22 +47,27 @@ enum HTTP {
                                                                                        redirectConfiguration: .disallow,
                                                                                        decompression: .enabled(limit: .none)))
 
-    static func getJsonData(for request: HTTPClientRequest, attempts: Int, checkCache: Bool, logPrefix: String? = nil) async throws -> (json: Any, result: DataResult) {
+    static func getJsonData(for request: HTTPClientRequest, attempts: Int, checkCache: Bool, logPrefix: String? = nil, treatEmptyAsError: Bool = false) async throws -> (json: Any?, result: DataResult) {
         await gateKeeper.takeTicket()
         defer {
             gateKeeper.relaxedReturnTicket()
         }
-        let (result, data) = try await getData(for: request, attempts: attempts, checkCache: checkCache, logPrefix: logPrefix)
+        let (result, data) = try await getData(for: request, attempts: attempts, checkCache: checkCache, logPrefix: logPrefix, treatEmptyAsError: treatEmptyAsError)
         if case .success = result, Settings.dumpAPIResponsesInConsole, let dataString = String(data: data.asData, encoding: .utf8) {
             DLog("API data from \(request.url): \(dataString)")
         }
-        let json = try data.withVeryUnsafeBytes { try TrailerJson.parse(bytes: $0) }
-        return (json ?? NSNull(), result)
+        do {
+            let json = try data.withVeryUnsafeBytes { try TrailerJson.parse(bytes: $0) }
+            return (json, result)
+        } catch {
+            DLog("JSON error: \(error)")
+            throw error
+        }
     }
 
     private static let getCache = HTTPCache()
 
-    static func getData(for request: HTTPClientRequest, attempts: Int, checkCache: Bool, logPrefix: String? = nil) async throws -> (result: DataResult, data: ByteBuffer) {
+    static func getData(for request: HTTPClientRequest, attempts: Int, checkCache: Bool, logPrefix: String? = nil, treatEmptyAsError: Bool) async throws -> (result: DataResult, data: ByteBuffer) {
         #if os(iOS)
             Task { @MainActor in
                 BackgroundTask.registerForBackground()
@@ -91,7 +96,7 @@ enum HTTP {
             do {
                 let response = try await httpClient.execute(request, timeout: .seconds(60))
                 let code = response.status.code
-
+                
                 switch code {
                 case 304:
                     if let cachedEntry {
@@ -116,6 +121,9 @@ enum HTTP {
                     return (result: .failed(code: code), data: ByteBuffer())
                 default:
                     let data = try await response.body.collect(upTo: 10240 * 1024 * 1024) // 1Gb
+                    if data.readableBytes == 0, treatEmptyAsError {
+                        throw API.apiError("Zero bytes response not allowed in this context")
+                    }
                     if let etag = response.headers["ETag"].first {
                         let cached = HTTPCache.CachedResponse(bytes: data, etag: etag)
                         let key = request.url
@@ -127,6 +135,9 @@ enum HTTP {
                         return (.success(headers: response.headers, cachedIn: nil), data)
                     }
                 }
+            } catch let error as CancellationError {
+                throw error // no logging or retries
+                
             } catch {
                 attempt -= 1
                 if attempt > 0 {
@@ -152,7 +163,7 @@ enum HTTP {
         }
 
         let req = HTTPClientRequest(url: absolutePath)
-        let response = try await HTTP.getData(for: req, attempts: 1, checkCache: false)
+        let response = try await HTTP.getData(for: req, attempts: 1, checkCache: false, treatEmptyAsError: true)
         guard let i = IMAGE_CLASS(data: response.data.asData) else {
             throw API.apiError("Invalid image data")
         }
