@@ -4,7 +4,8 @@ final class ApiOptionsWindow: NSWindow, NSWindowDelegate {
     weak var prefs: PreferencesWindow?
 
     @IBOutlet var highRadio: NSButton!
-    @IBOutlet var defaultRadio: NSButton!
+    @IBOutlet var moderateRadio: NSButton!
+    @IBOutlet var lightRadio: NSButton!
     @IBOutlet var safeRadio: NSButton!
 
     @IBOutlet private var threadCheckbox: NSButton!
@@ -15,7 +16,8 @@ final class ApiOptionsWindow: NSWindow, NSWindowDelegate {
         delegate = self
 
         highRadio.toolTip = Settings.syncProfileHelp
-        defaultRadio.toolTip = Settings.syncProfileHelp
+        moderateRadio.toolTip = Settings.syncProfileHelp
+        lightRadio.toolTip = Settings.syncProfileHelp
         safeRadio.toolTip = Settings.syncProfileHelp
 
         threadCheckbox.toolTip = Settings.threadedSyncHelp
@@ -24,12 +26,14 @@ final class ApiOptionsWindow: NSWindow, NSWindowDelegate {
     }
 
     @IBAction func radioButtonSelected(_ sender: NSButton) {
-        if sender === safeRadio {
+        if sender === lightRadio {
             Settings.syncProfile = GraphQL.Profile.cautious.rawValue
-        } else if sender === defaultRadio {
-            Settings.syncProfile = GraphQL.Profile.normal.rawValue
+        } else if sender === moderateRadio {
+            Settings.syncProfile = GraphQL.Profile.moderate.rawValue
         } else if sender === highRadio {
             Settings.syncProfile = GraphQL.Profile.high.rawValue
+        } else if sender === safeRadio {
+            Settings.syncProfile = GraphQL.Profile.light.rawValue
         }
     }
 
@@ -37,8 +41,9 @@ final class ApiOptionsWindow: NSWindow, NSWindowDelegate {
         threadCheckbox.integerValue = Settings.threadedSync ? 1 : 0
         let profile = GraphQL.Profile(settingsValue: Settings.syncProfile)
         highRadio.integerValue = profile == .high ? 1 : 0
-        defaultRadio.integerValue = profile == .normal ? 1 : 0
-        safeRadio.integerValue = profile == .cautious ? 1 : 0
+        moderateRadio.integerValue = profile == .moderate ? 1 : 0
+        lightRadio.integerValue = profile == .cautious ? 1 : 0
+        safeRadio.integerValue = profile == .light ? 1 : 0
     }
 
     @IBAction private func threadingToggled(_ sender: NSButton) {
@@ -46,7 +51,7 @@ final class ApiOptionsWindow: NSWindow, NSWindowDelegate {
     }
 
     @IBAction private func resetSelected(_: NSButton) {
-        Settings.syncProfile = GraphQL.Profile.normal.rawValue
+        Settings.syncProfile = GraphQL.Profile.cautious.rawValue
         Settings.threadedSync = false
         updateUI()
     }

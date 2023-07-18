@@ -265,7 +265,7 @@ enum Settings {
 
     static let syncProfileHelp = "Preferred balance between query size and safety when using v4 API."
     static var syncProfile: Int {
-        get { get("PR_V4_SYNC_PROFILE") as? Int ?? 0 }
+        get { get("PR_V4_SYNC_PROFILE") as? Int ?? -10 }
         set { set("PR_V4_SYNC_PROFILE", newValue) }
     }
 

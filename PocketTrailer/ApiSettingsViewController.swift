@@ -3,13 +3,9 @@ import UIKit
 
 final class ApiSettingsViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet private var highToggle: UISwitch!
-    @IBOutlet private var highInfo: UILabel!
-
+    @IBOutlet private var moderateToggle: UISwitch!
     @IBOutlet private var defaultToggle: UISwitch!
-    @IBOutlet private var defaultInfo: UILabel!
-
-    @IBOutlet private var safeToggle: UISwitch!
-    @IBOutlet private var safeInfo: UILabel!
+    @IBOutlet private var lightToggle: UISwitch!
 
     @IBOutlet private var threadToggle: UISwitch!
     @IBOutlet private var threadInfo: UILabel!
@@ -20,19 +16,21 @@ final class ApiSettingsViewController: UIViewController, UITextFieldDelegate {
         updateUI()
     }
 
-    @IBAction func toggleSelected(_ sender: UISwitch) {
+    @IBAction private func toggleSelected(_ sender: UISwitch) {
         if sender === highToggle {
             Settings.syncProfile = GraphQL.Profile.high.rawValue
+        } else if sender === moderateToggle {
+            Settings.syncProfile = GraphQL.Profile.moderate.rawValue
         } else if sender === defaultToggle {
-            Settings.syncProfile = GraphQL.Profile.normal.rawValue
-        } else if sender === safeToggle {
             Settings.syncProfile = GraphQL.Profile.cautious.rawValue
+        } else if sender === lightToggle {
+            Settings.syncProfile = GraphQL.Profile.light.rawValue
         }
         updateUI()
     }
 
-    @IBAction func defaultsSelected(_: UIBarButtonItem) {
-        Settings.syncProfile = GraphQL.Profile.normal.rawValue
+    @IBAction private func defaultsSelected(_: UIBarButtonItem) {
+        Settings.syncProfile = GraphQL.Profile.cautious.rawValue
         Settings.threadedSync = false
         updateUI()
     }
@@ -40,8 +38,9 @@ final class ApiSettingsViewController: UIViewController, UITextFieldDelegate {
     private func updateUI() {
         let profile = GraphQL.Profile(settingsValue: Settings.syncProfile)
         highToggle.isOn = profile == .high
-        defaultToggle.isOn = profile == .normal
-        safeToggle.isOn = profile == .cautious
+        moderateToggle.isOn = profile == .moderate
+        defaultToggle.isOn = profile == .cautious
+        lightToggle.isOn = profile == .light
         threadToggle.isOn = Settings.threadedSync
     }
 
@@ -50,10 +49,12 @@ final class ApiSettingsViewController: UIViewController, UITextFieldDelegate {
 
         if highToggle.isOn {
             Settings.syncProfile = GraphQL.Profile.high.rawValue
+        } else if moderateToggle.isOn {
+            Settings.syncProfile = GraphQL.Profile.moderate.rawValue
         } else if defaultToggle.isOn {
-            Settings.syncProfile = GraphQL.Profile.normal.rawValue
-        } else {
             Settings.syncProfile = GraphQL.Profile.cautious.rawValue
+        } else if lightToggle.isOn {
+            Settings.syncProfile = GraphQL.Profile.light.rawValue
         }
         Settings.threadedSync = threadToggle.isOn
     }

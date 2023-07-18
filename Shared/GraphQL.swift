@@ -69,8 +69,9 @@ enum GraphQL {
     private static let nodeBlockMax = 2000
 
     enum Profile: Int {
+        case light = -20
         case cautious = -10
-        case normal = 0
+        case moderate = 0
         case high = 10
 
         static var current: Profile {
@@ -78,12 +79,15 @@ enum GraphQL {
         }
 
         init(settingsValue: Int) {
-            if settingsValue < 0 {
-                self = .cautious
-            } else if settingsValue > 0 {
+            switch settingsValue {
+            case 10:
                 self = .high
-            } else {
-                self = .normal
+            case 0:
+                self = .moderate
+            case -10:
+                self = .cautious
+            default:
+                self = .light
             }
         }
 
@@ -91,10 +95,12 @@ enum GraphQL {
             switch self {
             case .high:
                 return 40000
-            case .normal:
-                return 20000
+            case .moderate:
+                return 10000
             case .cautious:
                 return 2000
+            case .light:
+                return 1000
             }
         }
 
@@ -102,10 +108,12 @@ enum GraphQL {
             switch self {
             case .high:
                 return 20000
-            case .normal:
-                return 8000
+            case .moderate:
+                return 6000
             case .cautious:
                 return 2000
+            case .light:
+                return 1000
             }
         }
 
@@ -113,10 +121,12 @@ enum GraphQL {
             switch self {
             case .high:
                 return 10000
-            case .normal:
+            case .moderate:
                 return 6000
             case .cautious:
                 return 2000
+            case .light:
+                return 1000
             }
         }
 
@@ -124,10 +134,12 @@ enum GraphQL {
             switch self {
             case .high:
                 return .first(count: 80, paging: true)
-            case .normal:
+            case .moderate:
                 return .first(count: 50, paging: true)
             case .cautious:
                 return .first(count: 20, paging: true)
+            case .light:
+                return .first(count: 10, paging: true)
             }
         }
 
@@ -135,18 +147,22 @@ enum GraphQL {
             switch self {
             case .high:
                 return .first(count: 40, paging: true)
-            case .normal:
+            case .moderate:
                 return .first(count: 20, paging: true)
             case .cautious:
                 return .first(count: 10, paging: true)
+            case .light:
+                return .first(count: 8, paging: true)
             }
         }
 
         var smallPageSize: Group.Paging {
             switch self {
+            case .light:
+                return .first(count: 5, paging: true)
             case .cautious:
                 return .first(count: 5, paging: true)
-            case .normal:
+            case .moderate:
                 return .first(count: 10, paging: true)
             case .high:
                 return .first(count: 20, paging: true)
