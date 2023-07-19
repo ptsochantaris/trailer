@@ -251,7 +251,7 @@ enum GraphQL {
             DLog("\(query.logPrefix)Fetching: \(Q)")
         }
 
-        guard let json = try await HTTP.getJsonData(for: request, attempts: attempts, checkCache: false, logPrefix: query.logPrefix, treatEmptyAsError: true).json as? JSON else {
+        guard let json = try await HTTP.getJsonData(for: request, attempts: attempts, checkCache: false, logPrefix: query.logPrefix, retryOnInvalidJson: true).json as? JSON else {
             throw API.apiError("\(query.logPrefix)Retuned data is not JSON")
         }
 
@@ -288,7 +288,6 @@ enum GraphQL {
         do {
             let extraQueries = try await query.processResponse(from: json)
             if extraQueries.count > 0 {
-                DLog("\(query.logPrefix)Needs more page data (\(extraQueries.count) queries)")
                 try await runQueries(queries: extraQueries, on: urlString, token: authToken, newStats: newStats)
             }
 
