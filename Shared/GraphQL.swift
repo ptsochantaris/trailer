@@ -262,43 +262,61 @@ enum GraphQL {
         if let expectedNodeCost, Settings.dumpAPIResponsesInConsole {
             DLog("\(query.logPrefix)Queued - Expected Count: \(expectedNodeCost)")
         }
-
-        let json = try await fetchData(from: urlString, for: query, authToken: authToken, attempts: attempts)
-
-        let apiStats = ApiStats.fromV4(json: json["data"] as? JSON)
-        if let expectedNodeCost {
-            if let apiStats {
-                DLog("\(query.logPrefix)Received page (Cost: \(apiStats.cost), Remaining: \(apiStats.remaining)/\(apiStats.limit) - Expected Count: \(expectedNodeCost) - Returned Count: \(apiStats.nodeCount))")
-                if expectedNodeCost != apiStats.nodeCount {
-                    DLog("Warning: Mismatched expected and received node count!")
-                }
-                newStats(apiStats)
-            } else {
-                DLog("\(query.logPrefix)Received page (No stats) - Expected Count: \(expectedNodeCost)")
-            }
-        } else {
-            if let apiStats {
-                DLog("\(query.logPrefix)Received page (Cost: \(apiStats.cost), Remaining: \(apiStats.remaining)/\(apiStats.limit) - Returned Count: \(apiStats.nodeCount))")
-                newStats(apiStats)
-            } else {
-                DLog("\(query.logPrefix)Received page (No stats)")
-            }
-        }
         
-        do {
-            let extraQueries = try await query.processResponse(from: json)
-            if extraQueries.count > 0 {
-                try await runQueries(queries: extraQueries, on: urlString, token: authToken, newStats: newStats)
-            }
-
-        } catch {
-            let msg: String?
-            if let errors = json["errors"] as? [JSON] {
-                msg = errors.first?["message"] as? String
+        var currentAttempt = attempts
+        
+        while true {
+            let json = try await fetchData(from: urlString, for: query, authToken: authToken, attempts: attempts)
+            
+            let apiStats = ApiStats.fromV4(json: json["data"] as? JSON)
+            if let expectedNodeCost {
+                if let apiStats {
+                    DLog("\(query.logPrefix)Received page (Cost: \(apiStats.cost), Remaining: \(apiStats.remaining)/\(apiStats.limit) - Expected Count: \(expectedNodeCost) - Returned Count: \(apiStats.nodeCount))")
+                    if expectedNodeCost != apiStats.nodeCount {
+                        DLog("Warning: Mismatched expected and received node count!")
+                    }
+                    newStats(apiStats)
+                } else {
+                    DLog("\(query.logPrefix)Received page (No stats) - Expected Count: \(expectedNodeCost)")
+                }
             } else {
-                msg = json["message"] as? String
+                if let apiStats {
+                    DLog("\(query.logPrefix)Received page (Cost: \(apiStats.cost), Remaining: \(apiStats.remaining)/\(apiStats.limit) - Returned Count: \(apiStats.nodeCount))")
+                    newStats(apiStats)
+                } else {
+                    DLog("\(query.logPrefix)Received page (No stats)")
+                }
             }
-            throw API.apiError("\(query.logPrefix)" + (msg ?? "Unspecified server error: \(json)"))
+            
+            let errorMessage: String?
+            if json.keys.contains("data") {
+                errorMessage = nil
+            } else if let errors = json["errors"] as? [JSON] {
+                errorMessage = errors.first?["message"] as? String
+            } else {
+                errorMessage = json["message"] as? String
+            }
+            
+            if let errorMessage {
+                if currentAttempt > 0 {
+                    DLog("Retrying on GitHub error (attempts left: \(currentAttempt)): \(errorMessage)")
+                    try? await Task.sleep(nanoseconds: 5 * NSEC_PER_SEC)
+                    currentAttempt -= 1
+                    continue
+                }
+                throw API.apiError("\(query.logPrefix)\(errorMessage)")
+            }
+            
+            do {
+                let extraQueries = try await query.processResponse(from: json)
+                if extraQueries.count > 0 {
+                    try await runQueries(queries: extraQueries, on: urlString, token: authToken, newStats: newStats)
+                }
+                break
+                
+            } catch {
+                throw API.apiError("\(query.logPrefix)Error while parsing GraphQL response: \(error.localizedDescription) - in: \(json)")
+            }
         }
     }
 
