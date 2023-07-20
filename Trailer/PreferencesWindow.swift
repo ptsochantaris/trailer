@@ -44,7 +44,6 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     @IBOutlet private var checkForUpdatesLabel: NSTextField!
     @IBOutlet private var checkForUpdatesSelector: NSStepper!
     @IBOutlet private var openPrAtFirstUnreadComment: NSButton!
-    @IBOutlet private var logActivityToConsole: NSButton!
     @IBOutlet private var commentAuthorBlacklist: NSTokenField!
 
     // Repositories
@@ -156,7 +155,6 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     // Misc
     @IBOutlet private var repeatLastExportAutomatically: NSButton!
     @IBOutlet private var lastExportReport: NSTextField!
-    @IBOutlet private var dumpApiResponsesToConsole: NSButton!
     @IBOutlet private var defaultOpenApp: NSTextField!
     @IBOutlet private var defaultOpenLinks: NSTextField!
     @IBOutlet private var reloadAllData: NSButton!
@@ -489,8 +487,6 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         hidePrsThatDontPassOnlyInAll.toolTip = Settings.hidePrsThatDontPassOnlyInAllHelp
         showStatusesForAll.toolTip = Settings.showStatusesOnAllItemsHelp
         statusTermMenu.toolTip = Settings.statusFilteringTermsHelp
-        logActivityToConsole.toolTip = Settings.logActivityToConsoleHelp
-        dumpApiResponsesToConsole.toolTip = Settings.dumpAPIResponsesInConsoleHelp
         checkForUpdatesAutomatically.toolTip = Settings.checkForUpdatesAutomaticallyHelp
         snoozeWakeOnStatusUpdate.toolTip = Settings.snoozeWakeOnStatusUpdateHelp
         snoozeWakeOnMention.toolTip = Settings.snoozeWakeOnMentionHelp
@@ -611,8 +607,6 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         showStatusItems.integerValue = Settings.showStatusItems ? 1 : 0
         makeStatusItemsSelectable.integerValue = Settings.makeStatusItemsSelectable ? 1 : 0
         openPrAtFirstUnreadComment.integerValue = Settings.openPrAtFirstUnreadComment ? 1 : 0
-        logActivityToConsole.integerValue = Settings.logActivityToConsole ? 1 : 0
-        dumpApiResponsesToConsole.integerValue = Settings.dumpAPIResponsesInConsole ? 1 : 0
         hidePrsThatDontPass.integerValue = Settings.hidePrsThatArentPassing ? 1 : 0
         hidePrsThatDontPassOnlyInAll.integerValue = Settings.hidePrsThatDontPassOnlyInAll ? 1 : 0
         showStatusesForAll.integerValue = Settings.showStatusesOnAllItems ? 1 : 0
@@ -785,22 +779,6 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         deferredUpdateTimer.push()
     }
 
-    @IBAction private func logActivityToConsoleSelected(_ sender: NSButton) {
-        Settings.logActivityToConsole = (sender.integerValue == 1)
-        logActivityToConsole.integerValue = Settings.logActivityToConsole ? 1 : 0
-        if Settings.logActivityToConsole {
-            let alert = NSAlert()
-            alert.messageText = "Warning"
-            #if DEBUG
-                alert.informativeText = "Sorry, logging is always active in development versions"
-            #else
-                alert.informativeText = "Logging is a feature meant for error reporting, having it constantly enabled will cause this app to be less responsive, use more power, and constitute a security risk"
-            #endif
-            alert.addButton(withTitle: "OK")
-            alert.beginSheetModal(for: self)
-        }
-    }
-
     @IBAction private func selectDefaultAppSelected(_: NSButton) {
         let o = NSOpenPanel()
         o.title = "Select Application…"
@@ -830,17 +808,6 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
                 Settings.defaultAppForOpeningWeb = url.path
                 self?.defaultOpenLinks.stringValue = url.path
             }
-        }
-    }
-
-    @IBAction private func dumpApiResponsesToConsoleSelected(_ sender: NSButton) {
-        Settings.dumpAPIResponsesInConsole = (sender.integerValue == 1)
-        if Settings.dumpAPIResponsesInConsole {
-            let alert = NSAlert()
-            alert.messageText = "Warning"
-            alert.informativeText = "This is a feature meant for error reporting, having it constantly enabled will cause this app to be less responsive, use more power, and constitute a security risk"
-            alert.addButton(withTitle: "OK")
-            alert.beginSheetModal(for: self)
         }
     }
 
@@ -2001,5 +1968,25 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     func closedAdvancedWindow() {
         advancedReposWindow = nil
         advancedReposWindowController = nil
+    }
+
+    private var apiMonitorWindowController: NSWindowController?
+    private var apiMonitorWindow: ApiMonitorWindow?
+    @IBAction private func apiMonitorSelected(_: NSButton) {
+        if apiMonitorWindowController == nil {
+            apiMonitorWindowController = NSWindowController(windowNibName: NSNib.Name("ApiMonitorWindow"))
+        }
+        if let w = apiMonitorWindowController?.window as? ApiMonitorWindow {
+            w.prefs = self
+            w.level = .floating
+            w.center()
+            w.makeKeyAndOrderFront(self)
+            apiMonitorWindow = w
+        }
+    }
+
+    func closedApiMonitorWindow() {
+        apiMonitorWindow = nil
+        apiMonitorWindowController = nil
     }
 }

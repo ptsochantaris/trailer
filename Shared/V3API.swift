@@ -4,7 +4,7 @@ import Foundation
 extension API {
     private static func handleRepoSync(for repo: Repo, result: DataResult) {
         switch result {
-        case .success:
+        case .cancelled, .success:
             break // all good
         case .notFound:
             repo.inaccessible = true
@@ -108,7 +108,7 @@ extension API {
                         }
                     }
                     switch result {
-                    case .success: break
+                    case .cancelled, .success: break
                     case .deleted, .failed, .notFound:
                         apiServer.lastSyncSucceeded = false
                     }
@@ -245,6 +245,8 @@ extension API {
                         return false
                     }
                     switch result {
+                    case .cancelled:
+                        break
                     case .success:
                         c.pendingReactionScan = false
                     case .deleted, .failed, .notFound:
@@ -279,7 +281,8 @@ extension API {
                         return false
                     }
                     switch result {
-                    case .success: break
+                    case .cancelled, .success:
+                        break
                     case .deleted, .failed, .notFound:
                         apiServer.lastSyncSucceeded = false
                     }
@@ -311,7 +314,8 @@ extension API {
                                 return false
                             }
                             switch result {
-                            case .success: break
+                            case .cancelled, .success:
+                                break
                             case .deleted, .failed, .notFound:
                                 apiServer.lastSyncSucceeded = false
                             }
@@ -351,7 +355,8 @@ extension API {
                             return false
                         }
                         switch result {
-                        case .success: break
+                        case .cancelled, .success:
+                            break
                         case .deleted, .failed, .notFound:
                             apiServer.lastSyncSucceeded = false
                         }
@@ -379,7 +384,8 @@ extension API {
                         return false
                     }
                     switch result {
-                    case .success: break
+                    case .cancelled, .success:
+                        break
                     case .deleted, .failed, .notFound:
                         apiServer.lastSyncSucceeded = false
                     }
@@ -412,7 +418,7 @@ extension API {
             case .deleted, .notFound:
                 pullRequest.stateChanged = ListableItem.StateChange.closed.rawValue
                 pullRequest.postSyncAction = PostSyncAction.isUpdated.rawValue // let handleClosing() decide
-            case .failed:
+            case .cancelled, .failed:
                 pullRequest.postSyncAction = PostSyncAction.doNothing.rawValue // keep since we don't know what's going on here
                 pullRequest.apiServer.lastSyncSucceeded = false
             }
@@ -495,7 +501,7 @@ extension API {
                         return false
                     }
                     switch result {
-                    case .deleted, .notFound, .success:
+                    case .cancelled, .deleted, .notFound, .success:
                         break
                     case .failed:
                         apiServer.lastSyncSucceeded = false
@@ -527,7 +533,7 @@ extension API {
                         return false
                     }
                     switch result {
-                    case .deleted, .notFound, .success:
+                    case .cancelled, .deleted, .notFound, .success:
                         break
                     case .failed:
                         apiServer.lastSyncSucceeded = false
@@ -560,6 +566,8 @@ extension API {
                             return false
                         }
                         switch result {
+                        case .cancelled:
+                            break
                         case .deleted, .notFound, .success:
                             p.lastStatusScan = now
                         case .failed:

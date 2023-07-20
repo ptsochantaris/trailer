@@ -4,13 +4,14 @@ import TrailerJson
 typealias JSON = [String: Any]
 
 enum DataResult {
-    case success(headers: [AnyHashable: Any]), notFound, deleted, failed(code: Int)
+    case success(headers: [AnyHashable: Any]), notFound, deleted, failed(code: Int), cancelled
 
     var logValue: String {
         switch self {
         case .success: return "Success"
         case .deleted: return "Deleted"
         case .notFound: return "Not Found"
+        case .cancelled: return "Cancelled"
         case let .failed(code): return "Error Code \(code)"
         }
     }
@@ -49,7 +50,7 @@ enum HTTP {
             gateKeeper.relaxedReturnTicket()
         }
         let (result, data) = try await getData(for: request, attempts: attempts, logPrefix: logPrefix)
-        if case .success = result, Settings.dumpAPIResponsesInConsole, let dataString = String(data: data, encoding: .utf8) {
+        if case .success = result, monitoringLog, let dataString = String(data: data, encoding: .utf8) {
             DLog("API data from \(request.url?.absoluteString ?? "<nil>"): \(dataString)")
         }
         do {
@@ -79,7 +80,7 @@ enum HTTP {
         #endif
 
         var attempt = attempts
-        while attempt > 0 {
+        while true {
             do {
                 let response = try await urlSession.data(for: request)
                 guard let httpResponse = response.1 as? HTTPURLResponse else {
@@ -95,7 +96,7 @@ enum HTTP {
                     return (result: .notFound, data: Data())
                 case 410:
                     return (result: .deleted, data: Data())
-                case 502, 503:
+                case 403, 502, 503:
                     // in case of throttle or ongoing GH deployment
                     throw API.apiError("HTTP Code \(code) received")
                 case 400...:
@@ -103,10 +104,11 @@ enum HTTP {
                 default:
                     return (.success(headers: httpResponse.allHeaderFields), response.0)
                 }
-            } catch let error as CancellationError {
-                throw error // no logging or retries
-
             } catch {
+                if (error as NSError).code == -999 {
+                    return (.cancelled, Data())
+                }
+
                 attempt -= 1
                 if attempt > 0 {
                     let url = request.url?.absoluteString ?? "<nil>"
@@ -119,7 +121,6 @@ enum HTTP {
                 }
             }
         }
-        throw API.apiError("HTTP Error")
     }
 
     @discardableResult

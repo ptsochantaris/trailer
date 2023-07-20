@@ -97,7 +97,7 @@
                                                 </subviews>
                                             </clipView>
                                             <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="NXP-Pe-zjP">
-                                                <rect key="frame" x="1" y="293" width="222" height="16"/>
+                                                <rect key="frame" x="1" y="318" width="238" height="16"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
                                             <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="ktq-74-h3c">
@@ -361,7 +361,7 @@ Token</string>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <clipView key="contentView" id="hCD-zR-3bF">
                                                 <rect key="frame" x="1" y="1" width="869" height="318"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" rowHeight="20" headerView="qia-ub-v1J" id="6pK-a1-URw">
                                                         <rect key="frame" x="0.0" y="0.0" width="869" height="301"/>
@@ -2378,35 +2378,33 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                 <rect key="frame" x="0.0" y="0.0" width="724" height="399"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <box fixedFrame="YES" borderType="line" title="Logging" translatesAutoresizingMaskIntoConstraints="NO" id="AS8-n7-ngi">
+                                                    <box fixedFrame="YES" borderType="line" title="Live API Monitoring" translatesAutoresizingMaskIntoConstraints="NO" id="AS8-n7-ngi">
                                                         <rect key="frame" x="17" y="278" width="321" height="105"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="GhS-Tk-g7Z">
                                                             <rect key="frame" x="4" y="5" width="313" height="85"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qos-T0-XKj">
-                                                                    <rect key="frame" x="28" y="19" width="273" height="18"/>
+                                                                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="r5n-eI-XNp">
+                                                                    <rect key="frame" x="105" y="8" width="104" height="32"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                    <buttonCell key="cell" type="check" title="Dump API responses to the console" bezelStyle="regularSquare" imagePosition="left" inset="2" id="Lyr-pU-rjn">
-                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <buttonCell key="cell" type="push" title="Stream Log" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="b59-Ij-brH">
+                                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                         <font key="font" metaFont="system"/>
                                                                     </buttonCell>
                                                                     <connections>
-                                                                        <action selector="dumpApiResponsesToConsoleSelected:" target="vQH-WF-vh2" id="gGH-xy-vRV"/>
+                                                                        <action selector="apiMonitorSelected:" target="vQH-WF-vh2" id="kTn-wJ-3X4"/>
                                                                     </connections>
                                                                 </button>
-                                                                <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3fA-qA-38f">
-                                                                    <rect key="frame" x="28" y="49" width="273" height="18"/>
+                                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" setsMaxLayoutWidthAtFirstLayout="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="q4A-tm-mqN">
+                                                                    <rect key="frame" x="18" y="40" width="277" height="33"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                    <buttonCell key="cell" type="check" title="Log activity to the console" bezelStyle="regularSquare" imagePosition="left" inset="2" id="MMo-8R-lBl">
-                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                        <font key="font" metaFont="system"/>
-                                                                    </buttonCell>
-                                                                    <connections>
-                                                                        <action selector="logActivityToConsoleSelected:" target="vQH-WF-vh2" id="Ya2-VW-6pr"/>
-                                                                    </connections>
-                                                                </button>
+                                                                    <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" alignment="center" title="Stream app activity to help with debugging; affects performance when active." id="4Rc-P7-ocr">
+                                                                        <font key="font" metaFont="message" size="11"/>
+                                                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                    </textFieldCell>
+                                                                </textField>
                                                             </subviews>
                                                         </view>
                                                     </box>
@@ -2665,7 +2663,6 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="dontConfirmRemoveAllMerged" destination="ptr-tf-eNM" id="KHp-pR-L6T"/>
                 <outlet property="dontKeepPrsMergedByMe" destination="ZiV-Lz-lSl" id="oZV-a8-3NT"/>
                 <outlet property="draftHandlingPolicy" destination="Cpe-1u-UbD" id="UzH-7h-Uqx"/>
-                <outlet property="dumpApiResponsesToConsole" destination="qos-T0-XKj" id="1Cn-a4-l3d"/>
                 <outlet property="grayOutWhenRefreshing" destination="ueT-Kq-j9E" id="0DE-vy-hy2"/>
                 <outlet property="groupByRepo" destination="TqD-G8-E24" id="nQt-v1-4Mx"/>
                 <outlet property="hideAvatars" destination="3CV-9S-gLw" id="KZR-Gl-2lg"/>
@@ -2697,7 +2694,6 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="labelFilteringBlacklist" destination="xuj-Mv-Ff1" id="HwB-fT-Cal"/>
                 <outlet property="lastExportReport" destination="zef-fb-l71" id="ld1-mW-3n5"/>
                 <outlet property="launchAtStartup" destination="H3d-cL-Izf" id="3dL-Lp-v9U"/>
-                <outlet property="logActivityToConsole" destination="3fA-qA-38f" id="Vph-lO-Ng2"/>
                 <outlet property="makeStatusItemsSelectable" destination="KjN-FO-XTd" id="qFV-nW-SWA"/>
                 <outlet property="markUnmergeablePrs" destination="qXS-9a-Cpn" id="jNO-Gr-PY1"/>
                 <outlet property="newItemInOwnedRepoMovePolicy" destination="tH9-aj-JJe" id="dWN-Fr-u7n"/>

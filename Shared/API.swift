@@ -219,7 +219,7 @@ enum API {
             return false
         }
         switch result {
-        case .success:
+        case .cancelled, .success:
             break
         case .deleted, .failed, .notFound:
             server.lastSyncSucceeded = false
@@ -280,7 +280,7 @@ enum API {
             case .notFound:
                 // is GE account
                 return ApiStats.noLimits
-            case .deleted, .failed:
+            case .cancelled, .deleted, .failed:
                 break
             case let .success(headers):
                 return ApiStats.fromV3(headers: headers)
@@ -331,6 +331,8 @@ enum API {
                     r.postSyncAction = PostSyncAction.doNothing.rawValue
                 }
             }
+        case .cancelled:
+            break
         case .deleted, .failed, .notFound:
             server.lastSyncSucceeded = false
         }
@@ -362,6 +364,8 @@ enum API {
             switch result {
             case .success:
                 return userList
+            case .cancelled:
+                throw apiError("Operation cancelled")
             case .notFound:
                 throw apiError("Operation failed with code 404")
             case .deleted:
@@ -383,6 +387,8 @@ enum API {
             switch result {
             case .success:
                 return orgList
+            case .cancelled:
+                throw apiError("Operation cancelled")
             case .notFound:
                 throw apiError("Operation failed with code 404")
             case .deleted:

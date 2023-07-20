@@ -378,7 +378,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         Task {
             if !Settings.hideAvatarsInNotifications, let url = (item as? PRComment)?.avatarUrl ?? (item as? ListableItem)?.userAvatarUrl {
                 if let image = try? await HTTP.avatar(from: url) {
-                    await ImageCache.shared.store(image, from: url)
+                    _ = await ImageCache.shared.store(image, from: url)
                     notification.contentImage = image
                 }
             }

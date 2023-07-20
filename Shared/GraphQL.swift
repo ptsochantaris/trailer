@@ -240,7 +240,7 @@ enum GraphQL {
         let start = Date()
         defer {
             multiGateKeeper.relaxedReturnTicket()
-            if Settings.dumpAPIResponsesInConsole {
+            if monitoringLog {
                 DLog("\(query.logPrefix)Response time: \(-start.timeIntervalSinceNow) sec")
             }
         }
@@ -249,7 +249,7 @@ enum GraphQL {
             API.currentOperationName = query.name
         }
 
-        if Settings.dumpAPIResponsesInConsole {
+        if monitoringLog {
             DLog("\(query.logPrefix)Fetching: \(Q)")
         }
 
@@ -261,7 +261,7 @@ enum GraphQL {
     }
 
     private static func run(_ query: Query, for urlString: String, authToken: String, expectedNodeCost: Int?, attempts: Int = 5, newStats: @escaping (ApiStats) -> Void) async throws {
-        if let expectedNodeCost, Settings.dumpAPIResponsesInConsole {
+        if let expectedNodeCost, monitoringLog {
             DLog("\(query.logPrefix)Queued - Expected Count: \(expectedNodeCost)")
         }
 

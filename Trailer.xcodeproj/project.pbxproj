@@ -59,6 +59,8 @@
 		16522D791AB03AE500B1C3FB /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 16522D781AB03AE500B1C3FB /* Images.xcassets */; };
 		16522D851AB03AE500B1C3FB /* Interface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 16522D831AB03AE500B1C3FB /* Interface.storyboard */; };
 		16522D871AB03AE500B1C3FB /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 16522D861AB03AE500B1C3FB /* Images.xcassets */; };
+		1655FD5B2A69CA0D0087F439 /* ApiMonitorWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1655FD592A69CA0D0087F439 /* ApiMonitorWindow.swift */; };
+		1655FD5C2A69CA0D0087F439 /* ApiMonitorWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1655FD5A2A69CA0D0087F439 /* ApiMonitorWindow.xib */; };
 		1657230123AAA23500F597EF /* V4API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1657230023AAA23500F597EF /* V4API.swift */; };
 		1657230223AAA23500F597EF /* V4API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1657230023AAA23500F597EF /* V4API.swift */; };
 		1657230423AAA2AC00F597EF /* V3API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1657230323AAA2AC00F597EF /* V3API.swift */; };
@@ -324,6 +326,8 @@
 		16522D821AB03AE500B1C3FB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		16522D841AB03AE500B1C3FB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Interface.storyboard; sourceTree = "<group>"; };
 		16522D861AB03AE500B1C3FB /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		1655FD592A69CA0D0087F439 /* ApiMonitorWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApiMonitorWindow.swift; sourceTree = "<group>"; };
+		1655FD5A2A69CA0D0087F439 /* ApiMonitorWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ApiMonitorWindow.xib; sourceTree = "<group>"; };
 		16561EC81BDA8E90008DBAF3 /* Trailer 22.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 22.xcdatamodel"; sourceTree = "<group>"; };
 		1657230023AAA23500F597EF /* V4API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = V4API.swift; path = Shared/V4API.swift; sourceTree = "<group>"; };
 		1657230323AAA2AC00F597EF /* V3API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = V3API.swift; path = Shared/V3API.swift; sourceTree = "<group>"; };
@@ -625,6 +629,8 @@
 				168BC6C217EC2DF000BC4584 /* MainMenu.xib */,
 				160FB13F1AE3F78E00EB5C8E /* PreferencesWindow.swift */,
 				160FB1411AE3F7C700EB5C8E /* PreferencesWindow.xib */,
+				1655FD592A69CA0D0087F439 /* ApiMonitorWindow.swift */,
+				1655FD5A2A69CA0D0087F439 /* ApiMonitorWindow.xib */,
 				16DB793B1E326C950076A36D /* AdvancedReposWindow.swift */,
 				16DB793D1E326CD90076A36D /* AdvancedReposWindow.xib */,
 				1686DEB62A5DD12000AED26E /* ApiOptionsWindow.xib */,
@@ -1164,6 +1170,7 @@
 				1671A1231AC74BC30047440A /* SetupAssistant.xib in Resources */,
 				164840BF1ACFEA45009E6383 /* AboutWindow.xib in Resources */,
 				16B94072182D136700F32061 /* dsa_pub.pem in Resources */,
+				1655FD5C2A69CA0D0087F439 /* ApiMonitorWindow.xib in Resources */,
 				160FB1421AE3F7C700EB5C8E /* PreferencesWindow.xib in Resources */,
 				164840C31ACFEFA9009E6383 /* MenuWindow.xib in Resources */,
 				16DB793E1E326CD90076A36D /* AdvancedReposWindow.xib in Resources */,
@@ -1358,6 +1365,7 @@
 				162002DD1A2A58B900FF95F3 /* CenterTextField.swift in Sources */,
 				16358F3D1CF206CE0055F849 /* MenuBarSet.swift in Sources */,
 				162002E71A2A75BD00FF95F3 /* AvatarView.swift in Sources */,
+				1655FD5B2A69CA0D0087F439 /* ApiMonitorWindow.swift in Sources */,
 				16E7C20E2A69934900F72BFE /* ImageCache.swift in Sources */,
 				16BF6736283A2AE20028EC13 /* HTTP.swift in Sources */,
 				1664CBCA1B7796840006BDE7 /* Enums.swift in Sources */,
@@ -1590,7 +1598,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1667;
+				CURRENT_PROJECT_VERSION = 1669;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -1654,7 +1662,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1667;
+				CURRENT_PROJECT_VERSION = 1669;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEPLOYMENT_POSTPROCESSING = YES;

@@ -74,12 +74,19 @@ let itemDateFormatter: DateFormatter = {
     return f
 }()
 
-import os.log
+#if DEBUG
+    import os.log
+#endif
 
-func DLog(_ message: @autoclosure () -> String) {
-    if Settings.logActivityToConsole {
-        os_log("%{public}@", message())
+var monitoringLog = false
+
+func DLog(_ message: @escaping @autoclosure () -> String) {
+    if monitoringLog {
+        NotificationCenter.default.post(name: .LogMessagePosted, object: message)
     }
+    #if DEBUG
+        os_log("%{public}@", message())
+    #endif
 }
 
 let numberFormatter: NumberFormatter = {

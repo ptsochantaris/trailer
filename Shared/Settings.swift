@@ -565,18 +565,6 @@ enum Settings {
         set { set("OPEN_PR_AT_FIRST_UNREAD_COMMENT_KEY", newValue) }
     }
 
-    static let logActivityToConsoleHelp = "This is meant for troubleshooting and should be turned off usually, as it is a performance and security concern when activated. It will output detailed messages about the app's behaviour in the device console."
-    static var logActivityToConsole: Bool {
-        get {
-            #if DEBUG
-                return true
-            #else
-                return get("LOG_ACTIVITY_TO_CONSOLE_KEY") as? Bool ?? false
-            #endif
-        }
-        set { set("LOG_ACTIVITY_TO_CONSOLE_KEY", newValue) }
-    }
-
     static var hotkeyEnable: Bool {
         get { get("HOTKEY_ENABLE") as? Bool ?? false }
         set { set("HOTKEY_ENABLE", newValue) }
@@ -637,12 +625,6 @@ enum Settings {
     static var includeServersInFilter: Bool {
         get { get("INCLUDE_SERVERS_IN_FILTER") as? Bool ?? false }
         set { set("INCLUDE_SERVERS_IN_FILTER", newValue) }
-    }
-
-    static let dumpAPIResponsesInConsoleHelp = "This is meant for troubleshooting and should be turned off usually, as it is a performance and security concern when activated. It will output the full request and responses to and from API servers in the device console."
-    static var dumpAPIResponsesInConsole: Bool {
-        get { get("DUMP_API_RESPONSES_IN_CONSOLE") as? Bool ?? false }
-        set { set("DUMP_API_RESPONSES_IN_CONSOLE", newValue) }
     }
 
     static let hidePrsThatArentPassingHelp = "Hide PR items which have status items, but are not all green. Useful for hiding PRs which are not ready to review or those who have not passed certain checks yet."

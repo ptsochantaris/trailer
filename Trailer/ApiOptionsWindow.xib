@@ -92,7 +92,7 @@
                                     </connections>
                                 </button>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="pYG-rB-gzo">
-                                    <rect key="frame" x="122" y="78" width="102" height="58"/>
+                                    <rect key="frame" x="121" y="78" width="102" height="58"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" alignment="center" title="A conservative balance between query sizes and API cost" id="ZZR-L0-vFZ">
                                         <font key="font" metaFont="smallSystem"/>
