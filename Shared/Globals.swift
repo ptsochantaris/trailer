@@ -1,5 +1,3 @@
-import NIOHTTP1
-
 #if os(iOS)
 
     import CoreData
@@ -303,15 +301,15 @@ struct ApiStats {
     let nodeCount, cost, remaining, limit: Int
     let resetAt: Date?
 
-    static func fromV3(headers: HTTPHeaders) -> ApiStats {
+    static func fromV3(headers: [AnyHashable: Any]) -> ApiStats {
         let date: Date?
-        if let epochSeconds = headers["x-ratelimit-reset"].first, let t = TimeInterval(epochSeconds) {
+        if let epochSeconds = headers["x-ratelimit-reset"] as? String, let t = TimeInterval(epochSeconds) {
             date = Date(timeIntervalSince1970: t)
         } else {
             date = nil
         }
-        let remaining = Int(headers["x-ratelimit-remaining"].first ?? "") ?? 10000
-        let limit = Int(headers["x-ratelimit-limit"].first ?? "") ?? 10000
+        let remaining = Int(headers["x-ratelimit-remaining"] as? String ?? "") ?? 10000
+        let limit = Int(headers["x-ratelimit-limit"] as? String ?? "") ?? 10000
         return ApiStats(nodeCount: 0, cost: 1, remaining: remaining, limit: limit, resetAt: date)
     }
 

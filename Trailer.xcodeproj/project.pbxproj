@@ -7,10 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		16039A7F296973E300CC73F4 /* AsyncHTTPClient in Frameworks */ = {isa = PBXBuildFile; productRef = 16039A7E296973E300CC73F4 /* AsyncHTTPClient */; };
-		16039A812969817B00CC73F4 /* AsyncHTTPClient in Frameworks */ = {isa = PBXBuildFile; productRef = 16039A802969817B00CC73F4 /* AsyncHTTPClient */; };
-		16039A832969827C00CC73F4 /* HTTPCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16039A822969827C00CC73F4 /* HTTPCache.swift */; };
-		16039A842969827C00CC73F4 /* HTTPCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16039A822969827C00CC73F4 /* HTTPCache.swift */; };
 		1606F1BB1A4703E60088368E /* iOSAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1606F1BA1A4703E60088368E /* iOSAppDelegate.swift */; };
 		1606F1BD1A471CDC0088368E /* RespositoriesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1606F1BC1A471CDC0088368E /* RespositoriesViewController.swift */; };
 		160823F51A44997F006F91AD /* UINavigationControllerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160823F31A44982F006F91AD /* UINavigationControllerExtensions.swift */; };
@@ -177,6 +173,8 @@
 		16DEA937235C6F00004589B3 /* TrailerLauncher.app in Resources */ = {isa = PBXBuildFile; fileRef = 16DEA922235C6D7C004589B3 /* TrailerLauncher.app */; };
 		16DEA93D235C6F69004589B3 /* TrailerLauncher.app in Embed Helper */ = {isa = PBXBuildFile; fileRef = 16DEA922235C6D7C004589B3 /* TrailerLauncher.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		16E19E452A61551E0079118C /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 16E19E442A61551E0079118C /* Sparkle */; };
+		16E7C20E2A69934900F72BFE /* ImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E7C20D2A69934900F72BFE /* ImageCache.swift */; };
+		16E7C20F2A69934900F72BFE /* ImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E7C20D2A69934900F72BFE /* ImageCache.swift */; };
 		16E93D121AB467DA00CA967E /* PRListController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E93D111AB467DA00CA967E /* PRListController.swift */; };
 		16E93D141AB4680F00CA967E /* PRDetailController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E93D131AB4680F00CA967E /* PRDetailController.swift */; };
 		16E93D171AB46CE600CA967E /* LabelRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E93D161AB46CE600CA967E /* LabelRow.swift */; };
@@ -267,7 +265,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		16039A822969827C00CC73F4 /* HTTPCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HTTPCache.swift; path = Shared/HTTPCache.swift; sourceTree = "<group>"; };
 		1605EDCB1D58B71900D91F50 /* Trailer 31.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 31.xcdatamodel"; sourceTree = "<group>"; };
 		1606F1BA1A4703E60088368E /* iOSAppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = iOSAppDelegate.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		1606F1BC1A471CDC0088368E /* RespositoriesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = RespositoriesViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -442,6 +439,7 @@
 		16DEA932235C6DC0004589B3 /* LauncherCommon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LauncherCommon.swift; sourceTree = "<group>"; };
 		16DEA935235C6EDA004589B3 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		16E07C831D2DC31300B0525C /* Trailer 30.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 30.xcdatamodel"; sourceTree = "<group>"; };
+		16E7C20D2A69934900F72BFE /* ImageCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCache.swift; sourceTree = "<group>"; };
 		16E93D111AB467DA00CA967E /* PRListController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PRListController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16E93D131AB4680F00CA967E /* PRDetailController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PRDetailController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16E93D161AB46CE600CA967E /* LabelRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LabelRow.swift; sourceTree = "<group>"; };
@@ -470,7 +468,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				16DE55BD2A5A398D00166337 /* Lista in Frameworks */,
-				16039A812969817B00CC73F4 /* AsyncHTTPClient in Frameworks */,
 				165880CC2A59C2BC0012A2B7 /* TrailerQL in Frameworks */,
 				168924552A58BC7A0094F0D1 /* TrailerJson in Frameworks */,
 				16A1E44329F2FBCA007684D0 /* AsyncAlgorithms in Frameworks */,
@@ -493,7 +490,6 @@
 				16DE55BB2A5A397700166337 /* Lista in Frameworks */,
 				168924532A58BC2A0094F0D1 /* TrailerJson in Frameworks */,
 				167E80F42517EC1700ED9A67 /* CoreSpotlight.framework in Frameworks */,
-				16039A7F296973E300CC73F4 /* AsyncHTTPClient in Frameworks */,
 				165880CA2A59C2AF0012A2B7 /* TrailerQL in Frameworks */,
 				16A1E44129F2FBB6007684D0 /* AsyncAlgorithms in Frameworks */,
 			);
@@ -600,8 +596,8 @@
 				1668CFE71D5E16B70021CDC5 /* Reachability.swift */,
 				16901A441D659E9500141595 /* NotificationQueue.swift */,
 				160E19E11D672BD1006C1A59 /* PopTimer.swift */,
-				16039A822969827C00CC73F4 /* HTTPCache.swift */,
 				16B8179A29B29F1B009A49EB /* Gate.swift */,
+				16E7C20D2A69934900F72BFE /* ImageCache.swift */,
 			);
 			name = Logic;
 			sourceTree = "<group>";
@@ -968,7 +964,6 @@
 			);
 			name = PocketTrailer;
 			packageProductDependencies = (
-				16039A802969817B00CC73F4 /* AsyncHTTPClient */,
 				16A1E44229F2FBCA007684D0 /* AsyncAlgorithms */,
 				168924542A58BC7A0094F0D1 /* TrailerJson */,
 				165880CB2A59C2BC0012A2B7 /* TrailerQL */,
@@ -1013,7 +1008,6 @@
 			);
 			name = Trailer;
 			packageProductDependencies = (
-				16039A7E296973E300CC73F4 /* AsyncHTTPClient */,
 				16A1E44029F2FBB6007684D0 /* AsyncAlgorithms */,
 				168924522A58BC2A0094F0D1 /* TrailerJson */,
 				165880C92A59C2AF0012A2B7 /* TrailerQL */,
@@ -1114,7 +1108,6 @@
 			);
 			mainGroup = 168BC6A117EC2DF000BC4584;
 			packageReferences = (
-				16039A7D296973E300CC73F4 /* XCRemoteSwiftPackageReference "async-http-client" */,
 				16A1E43F29F2FBB6007684D0 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
 				168924512A58BC2A0094F0D1 /* XCRemoteSwiftPackageReference "trailer-json" */,
 				165880C82A59C2AF0012A2B7 /* XCRemoteSwiftPackageReference "trailer-ql" */,
@@ -1270,7 +1263,6 @@
 				165C49101BA63B45006BBCF5 /* AdvancedSettingsCell.swift in Sources */,
 				1657230523AAA2AC00F597EF /* V3API.swift in Sources */,
 				169205641E34DA9F00FB9547 /* CustomReposViewController.swift in Sources */,
-				16039A842969827C00CC73F4 /* HTTPCache.swift in Sources */,
 				164840FC1AD196D6009E6383 /* SettingsManager.swift in Sources */,
 				1657230923AAA3B000F597EF /* RestAccess.swift in Sources */,
 				1633C1931ABCEC4A0086C692 /* Issue.swift in Sources */,
@@ -1286,6 +1278,7 @@
 				164841021AD19933009E6383 /* NotificationManager.swift in Sources */,
 				16B3B3221A34E8E2000BE6CC /* PullRequest.swift in Sources */,
 				1664CBCB1B7796840006BDE7 /* Enums.swift in Sources */,
+				16E7C20F2A69934900F72BFE /* ImageCache.swift in Sources */,
 				16B3B3241A34E8E2000BE6CC /* Repo.swift in Sources */,
 				16C90F021B13BC180095E8D5 /* RepoSettingsViewController.swift in Sources */,
 				16B3B31E1A34E8E2000BE6CC /* PRLabel.swift in Sources */,
@@ -1365,6 +1358,7 @@
 				162002DD1A2A58B900FF95F3 /* CenterTextField.swift in Sources */,
 				16358F3D1CF206CE0055F849 /* MenuBarSet.swift in Sources */,
 				162002E71A2A75BD00FF95F3 /* AvatarView.swift in Sources */,
+				16E7C20E2A69934900F72BFE /* ImageCache.swift in Sources */,
 				16BF6736283A2AE20028EC13 /* HTTP.swift in Sources */,
 				1664CBCA1B7796840006BDE7 /* Enums.swift in Sources */,
 				162002DB1A2A545C00FF95F3 /* CenterTextFieldCell.swift in Sources */,
@@ -1380,7 +1374,6 @@
 				16B3B3171A34E8E2000BE6CC /* ApiServer.swift in Sources */,
 				161C959E1A3A36020019A577 /* MenuWindow.swift in Sources */,
 				16A69EDA1AC83020008231F9 /* ListableItem.swift in Sources */,
-				16039A832969827C00CC73F4 /* HTTPCache.swift in Sources */,
 				16CBE1C51A2DFBA500485053 /* Settings.swift in Sources */,
 				16D2B875251FA54E00D86C89 /* Enums+Settings.swift in Sources */,
 				16DC40FC1A3F591200BB361A /* TrailerCell.swift in Sources */,
@@ -1597,7 +1590,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1666;
+				CURRENT_PROJECT_VERSION = 1667;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -1661,7 +1654,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1666;
+				CURRENT_PROJECT_VERSION = 1667;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEPLOYMENT_POSTPROCESSING = YES;
@@ -1978,14 +1971,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		16039A7D296973E300CC73F4 /* XCRemoteSwiftPackageReference "async-http-client" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/swift-server/async-http-client.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
-			};
-		};
 		165880C82A59C2AF0012A2B7 /* XCRemoteSwiftPackageReference "trailer-ql" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ptsochantaris/trailer-ql";
@@ -2029,16 +2014,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		16039A7E296973E300CC73F4 /* AsyncHTTPClient */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 16039A7D296973E300CC73F4 /* XCRemoteSwiftPackageReference "async-http-client" */;
-			productName = AsyncHTTPClient;
-		};
-		16039A802969817B00CC73F4 /* AsyncHTTPClient */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 16039A7D296973E300CC73F4 /* XCRemoteSwiftPackageReference "async-http-client" */;
-			productName = AsyncHTTPClient;
-		};
 		165880C92A59C2AF0012A2B7 /* TrailerQL */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 165880C82A59C2AF0012A2B7 /* XCRemoteSwiftPackageReference "trailer-ql" */;

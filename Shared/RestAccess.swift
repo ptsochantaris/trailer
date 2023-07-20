@@ -1,4 +1,3 @@
-import AsyncHTTPClient
 import Foundation
 
 @MainActor
@@ -11,7 +10,7 @@ enum RestAccess {
     static func getPagedData(at path: String, from server: ApiServer, startingFrom page: Int = 1, perPage: @MainActor @escaping ([JSON]?, Bool) async -> Bool) async -> DataResult {
         if path.isEmpty {
             // handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
-            return .success(headers: [:], cachedIn: nil)
+            return .success(headers: [:])
         }
 
         do {
@@ -49,7 +48,7 @@ enum RestAccess {
 
         let (result, data) = try await start(call: path, on: server, triggeredByUser: false)
         var lastPage = true
-        if case let .success(allHeaders, _) = result {
+        if case let .success(allHeaders) = result {
             if let serverMoc = server.managedObjectContext {
                 #if os(iOS)
                     Task {
@@ -66,7 +65,7 @@ enum RestAccess {
                 #endif
             }
 
-            if let linkHeader = allHeaders["Link"].first {
+            if let linkHeader = allHeaders["Link"] as? String {
                 lastPage = !linkHeader.contains("rel=\"next\"")
             }
         }
@@ -76,7 +75,7 @@ enum RestAccess {
     static func getRawData(at path: String, from server: ApiServer) async throws -> (Any?, DataResult) {
         if path.isEmpty {
             // handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
-            return (nil, .success(headers: [:], cachedIn: nil))
+            return (nil, .success(headers: [:]))
         }
 
         let (data, _, result) = try await getData(in: "\(path)?per_page=100", from: server)
@@ -93,7 +92,10 @@ enum RestAccess {
 
         let expandedPath = path.hasPrefix("/") ? server.apiPath.orEmpty.appending(pathComponent: path) : path
 
-        var request = HTTPClientRequest(url: expandedPath)
+        guard let url = URL(string: expandedPath) else {
+            throw API.apiError("Invalid URL: \(expandedPath)")
+        }
+        var request = URLRequest(url: url)
         var acceptTypes = [String]()
         if API.shouldSyncReactions {
             acceptTypes.append("application/vnd.github.squirrel-girl-preview")
@@ -103,13 +105,13 @@ enum RestAccess {
         }
         acceptTypes.append("application/vnd.github.shadow-cat-preview+json") // draft indicators
         acceptTypes.append("application/vnd.github.v3+json")
-        request.headers.add(name: "Accept", value: acceptTypes.joined(separator: ", "))
+        request.setValue(acceptTypes.joined(separator: ", "), forHTTPHeaderField: "Accept")
         if let a = server.authToken {
-            request.headers.add(name: "Authorization", value: "token \(a)")
+            request.setValue("token \(a)", forHTTPHeaderField: "Authorization")
         }
 
         do {
-            let (parsedData, result) = try await HTTP.getJsonData(for: request, attempts: attempts, checkCache: true)
+            let (parsedData, result) = try await HTTP.getJsonData(for: request, attempts: attempts)
             DLog("(\(apiServerLabel) GET \(expandedPath) - RESULT: \(result.logValue)")
             return (result, parsedData)
 

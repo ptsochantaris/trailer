@@ -282,7 +282,7 @@ enum API {
                 return ApiStats.noLimits
             case .deleted, .failed:
                 break
-            case let .success(headers, _):
+            case let .success(headers):
                 return ApiStats.fromV3(headers: headers)
             }
         } catch {}

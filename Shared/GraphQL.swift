@@ -1,7 +1,5 @@
-import AsyncHTTPClient
 import Foundation
 import Lista
-import NIOCore
 import TrailerQL
 
 extension Node {
@@ -229,10 +227,14 @@ enum GraphQL {
             throw API.apiError("\(query.logPrefix)Could not serialise query")
         }
 
-        var request = HTTPClientRequest(url: urlString)
-        request.method = .POST
-        request.body = .bytes(ByteBuffer(bytes: requestData))
-        request.headers.add(name: "Authorization", value: "bearer \(authToken)")
+        guard let url = URL(string: urlString) else {
+            throw API.apiError("Invalid URL: \(urlString)")
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.httpBody = requestData
+        request.setValue("bearer \(authToken)", forHTTPHeaderField: "Authorization")
 
         await multiGateKeeper.takeTicket()
         let start = Date()
@@ -251,7 +253,7 @@ enum GraphQL {
             DLog("\(query.logPrefix)Fetching: \(Q)")
         }
 
-        guard let json = try await HTTP.getJsonData(for: request, attempts: attempts, checkCache: false, logPrefix: query.logPrefix, retryOnInvalidJson: true).json as? JSON else {
+        guard let json = try await HTTP.getJsonData(for: request, attempts: attempts, logPrefix: query.logPrefix, retryOnInvalidJson: true).json as? JSON else {
             throw API.apiError("\(query.logPrefix)Retuned data is not JSON")
         }
 
@@ -262,12 +264,12 @@ enum GraphQL {
         if let expectedNodeCost, Settings.dumpAPIResponsesInConsole {
             DLog("\(query.logPrefix)Queued - Expected Count: \(expectedNodeCost)")
         }
-        
+
         var currentAttempt = attempts
-        
+
         while true {
             let json = try await fetchData(from: urlString, for: query, authToken: authToken, attempts: attempts)
-            
+
             let apiStats = ApiStats.fromV4(json: json["data"] as? JSON)
             if let expectedNodeCost {
                 if let apiStats {
@@ -287,7 +289,7 @@ enum GraphQL {
                     DLog("\(query.logPrefix)Received page (No stats)")
                 }
             }
-            
+
             let errorMessage: String?
             if json.keys.contains("data") {
                 errorMessage = nil
@@ -296,7 +298,7 @@ enum GraphQL {
             } else {
                 errorMessage = json["message"] as? String
             }
-            
+
             if let errorMessage {
                 if currentAttempt > 0 {
                     DLog("Retrying on GitHub error (attempts left: \(currentAttempt)): \(errorMessage)")
@@ -306,14 +308,14 @@ enum GraphQL {
                 }
                 throw API.apiError("\(query.logPrefix)\(errorMessage)")
             }
-            
+
             do {
                 let extraQueries = try await query.processResponse(from: json)
                 if extraQueries.count > 0 {
                     try await runQueries(queries: extraQueries, on: urlString, token: authToken, newStats: newStats)
                 }
                 break
-                
+
             } catch {
                 throw API.apiError("\(query.logPrefix)Error while parsing GraphQL response: \(error.localizedDescription) - in: \(json)")
             }

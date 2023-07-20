@@ -1,13 +1,10 @@
-import AsyncHTTPClient
 import Foundation
-import NIOCore
-import NIOHTTP1
 import TrailerJson
 
 typealias JSON = [String: Any]
 
 enum DataResult {
-    case success(headers: HTTPHeaders, cachedIn: String?), notFound, deleted, failed(code: UInt)
+    case success(headers: [AnyHashable: Any]), notFound, deleted, failed(code: Int)
 
     var logValue: String {
         switch self {
@@ -19,60 +16,57 @@ enum DataResult {
     }
 }
 
-extension ByteBuffer {
-    var asData: Data {
-        Data(buffer: self)
-    }
-}
-
 enum HTTP {
     private static let gateKeeper = Gate(tickets: 8)
 
-    #if DEBUG
-        #if os(iOS)
-            private static let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-iOS-Development"
+    private static let urlSession: URLSession = {
+        #if DEBUG
+            #if os(iOS)
+                let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-iOS-Development"
+            #else
+                let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-macOS-Development"
+            #endif
         #else
-            private static let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-macOS-Development"
+            #if os(iOS)
+                let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-iOS-Release"
+            #else
+                let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-macOS-Release"
+            #endif
         #endif
-    #else
-        #if os(iOS)
-            private static let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-iOS-Release"
-        #else
-            private static let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-macOS-Release"
-        #endif
-    #endif
 
-    private static let httpClient = HTTPClient(eventLoopGroupProvider: .createNew,
-                                               configuration: HTTPClient.Configuration(certificateVerification: .fullVerification,
-                                                                                       redirectConfiguration: .disallow,
-                                                                                       decompression: .enabled(limit: .none)))
+        let config = URLSessionConfiguration.default
+        config.httpShouldUsePipelining = true
+        config.requestCachePolicy = .useProtocolCachePolicy
+        config.timeoutIntervalForRequest = 60
+        config.urlCache = URLCache(memoryCapacity: 32 * 1024 * 1024, diskCapacity: 1024 * 1024 * 1024, diskPath: ImageCache.shared.cacheDirectory)
+        config.httpAdditionalHeaders = ["User-Agent": userAgent]
+        return URLSession(configuration: config)
+    }()
 
-    static func getJsonData(for request: HTTPClientRequest, attempts: Int, checkCache: Bool, logPrefix: String? = nil, retryOnInvalidJson: Bool = false) async throws -> (json: Any?, result: DataResult) {
+    static func getJsonData(for request: URLRequest, attempts: Int, logPrefix: String? = nil, retryOnInvalidJson: Bool = false) async throws -> (json: Any?, result: DataResult) {
         await gateKeeper.takeTicket()
         defer {
             gateKeeper.relaxedReturnTicket()
         }
-        let (result, data) = try await getData(for: request, attempts: attempts, checkCache: checkCache, logPrefix: logPrefix)
-        if case .success = result, Settings.dumpAPIResponsesInConsole, let dataString = String(data: data.asData, encoding: .utf8) {
-            DLog("API data from \(request.url): \(dataString)")
+        let (result, data) = try await getData(for: request, attempts: attempts, logPrefix: logPrefix)
+        if case .success = result, Settings.dumpAPIResponsesInConsole, let dataString = String(data: data, encoding: .utf8) {
+            DLog("API data from \(request.url?.absoluteString ?? "<nil>"): \(dataString)")
         }
         do {
-            let json = try await Task.detached { try data.withVeryUnsafeBytes { try TrailerJson.parse(bytes: $0) } }.value
+            let json = try await Task.detached { try data.withUnsafeBytes { try TrailerJson.parse(bytes: $0) } }.value
             return (json, result)
         } catch {
             if retryOnInvalidJson, attempts > 1 {
                 DLog("Retrying on invalid JSON result (attempts left: \(attempts)): \(error)")
                 try? await Task.sleep(nanoseconds: 5 * NSEC_PER_SEC)
-                return try await getJsonData(for: request, attempts: attempts - 1, checkCache: checkCache, retryOnInvalidJson: true)
+                return try await getJsonData(for: request, attempts: attempts - 1, retryOnInvalidJson: true)
             }
             DLog("JSON error: \(error)")
             throw error
         }
     }
 
-    private static let getCache = HTTPCache()
-
-    static func getData(for request: HTTPClientRequest, attempts: Int, checkCache: Bool, logPrefix: String? = nil) async throws -> (result: DataResult, data: ByteBuffer) {
+    static func getData(for request: URLRequest, attempts: Int, logPrefix: String? = nil) async throws -> (result: DataResult, data: Data) {
         #if os(iOS)
             Task { @MainActor in
                 BackgroundTask.registerForBackground()
@@ -84,69 +78,43 @@ enum HTTP {
             }
         #endif
 
-        let cachedEntry: HTTPCache.CachedResponse?
-        var request = request
-        request.headers.add(name: "User-Agent", value: userAgent)
-        if checkCache {
-            cachedEntry = await getCache[request.url]
-            if let etag = cachedEntry?.etag {
-                request.headers.add(name: "If-None-Match", value: etag)
-            }
-        } else {
-            cachedEntry = nil
-        }
-
         var attempt = attempts
         while attempt > 0 {
             do {
-                let response = try await httpClient.execute(request, timeout: .seconds(60))
-                let code = response.status.code
-                
+                let response = try await urlSession.data(for: request)
+                guard let httpResponse = response.1 as? HTTPURLResponse else {
+                    throw API.apiError("Network response was not a HTTP response")
+                }
+
+                let code = httpResponse.statusCode
+
                 switch code {
                 case 304:
-                    if let cachedEntry {
-                        // DLog("304 - \(cachedEntry.etag) - \(request.url)")
-                        if let location = cachedEntry.cachedIn {
-                            Task {
-                                await getCache.touch(at: location)
-                            }
-                        }
-                        return (.success(headers: response.headers, cachedIn: cachedEntry.cachedIn), cachedEntry.bytes)
-                    } else {
-                        throw API.apiError("Unexpected 304 received")
-                    }
+                    throw API.apiError("Unexpected 304 received")
                 case 404:
-                    return (result: .notFound, data: ByteBuffer())
+                    return (result: .notFound, data: Data())
                 case 410:
-                    return (result: .deleted, data: ByteBuffer())
+                    return (result: .deleted, data: Data())
                 case 502, 503:
                     // in case of throttle or ongoing GH deployment
                     throw API.apiError("HTTP Code \(code) received")
                 case 400...:
-                    return (result: .failed(code: code), data: ByteBuffer())
+                    return (result: .failed(code: code), data: Data())
                 default:
-                    let data = try await response.body.collect(upTo: 10240 * 1024 * 1024) // 1Gb
-                    if let etag = response.headers["ETag"].first {
-                        let cached = HTTPCache.CachedResponse(bytes: data, etag: etag)
-                        let key = request.url
-                        Task {
-                            await getCache.set(response: cached, for: key) // sets the cache location as well
-                        }
-                        return (.success(headers: response.headers, cachedIn: cached.cachedIn), data)
-                    } else {
-                        return (.success(headers: response.headers, cachedIn: nil), data)
-                    }
+                    return (.success(headers: httpResponse.allHeaderFields), response.0)
                 }
             } catch let error as CancellationError {
                 throw error // no logging or retries
-                
+
             } catch {
                 attempt -= 1
                 if attempt > 0 {
-                    DLog("\(logPrefix.orEmpty)Will pause and retry call to \(request.url) - \(error.localizedDescription)")
+                    let url = request.url?.absoluteString ?? "<nil>"
+                    DLog("\(logPrefix.orEmpty)Will pause and retry call to \(url) - \(error.localizedDescription)")
                     try? await Task.sleep(nanoseconds: 5 * NSEC_PER_SEC)
                 } else {
-                    DLog("\(logPrefix.orEmpty)Failed call to \(request.url) - \(error.localizedDescription)")
+                    let url = request.url?.absoluteString ?? "<nil>"
+                    DLog("\(logPrefix.orEmpty)Failed call to \(url) - \(error.localizedDescription)")
                     throw error
                 }
             }
@@ -155,24 +123,19 @@ enum HTTP {
     }
 
     @discardableResult
-    static func avatar(from path: String) async throws -> (IMAGE_CLASS, String?) {
+    static func avatar(from path: String) async throws -> IMAGE_CLASS {
         let connector = path.contains("?") ? "&" : "?"
         let absolutePath = "\(path)\(connector)s=128"
 
-        // if image exists, return without checking in with the server
-        if let existingEntry = await getCache[absolutePath], let i = IMAGE_CLASS(data: existingEntry.bytes.asData) {
-            return (i, existingEntry.cachedIn)
+        guard let url = URL(string: absolutePath) else {
+            throw API.apiError("Invalid URL: \(absolutePath)")
         }
 
-        let req = HTTPClientRequest(url: absolutePath)
-        let response = try await HTTP.getData(for: req, attempts: 1, checkCache: false)
-        guard let i = IMAGE_CLASS(data: response.data.asData) else {
+        let req = URLRequest(url: url)
+        let response = try await HTTP.getData(for: req, attempts: 1)
+        guard let i = IMAGE_CLASS(data: response.data) else {
             throw API.apiError("Invalid image data")
         }
-        if case let .success(_, cachePath) = response.result {
-            return (i, cachePath)
-        } else {
-            return (i, nil)
-        }
+        return i
     }
 }

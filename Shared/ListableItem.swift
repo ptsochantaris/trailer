@@ -1175,8 +1175,8 @@ class ListableItem: DataItem, Listable {
     private final func indexForSpotlight(uri: String) async -> CSSearchableItem {
         let s = CSSearchableItemAttributeSet(itemContentType: "public.text")
 
-        if let i = userAvatarUrl, !Settings.hideAvatars, let cachePath = try? await HTTP.avatar(from: i).1 {
-            s.thumbnailURL = URL(fileURLWithPath: cachePath)
+        if let i = userAvatarUrl, !Settings.hideAvatars {
+            s.thumbnailURL = try? await ImageCache.shared.store(HTTP.avatar(from: i), from: i)
         }
 
         let titleSuffix = labels.compactMap(\.name).reduce("") { $0 + " [\($1)]" }
