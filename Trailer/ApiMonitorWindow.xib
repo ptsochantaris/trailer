@@ -56,6 +56,9 @@
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
+                        <connections>
+                            <action selector="copySelected:" target="QvC-M9-y7g" id="Jtg-wX-RTB"/>
+                        </connections>
                     </button>
                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="75w-a6-l1W">
                         <rect key="frame" x="18" y="21" width="146" height="18"/>
@@ -66,6 +69,17 @@
                         </buttonCell>
                         <connections>
                             <action selector="autoScrollSelected:" target="QvC-M9-y7g" id="rU1-ZA-MoF"/>
+                        </connections>
+                    </button>
+                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="PJo-FR-i4T">
+                        <rect key="frame" x="263" y="13" width="66" height="32"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                        <buttonCell key="cell" type="push" title="Clear" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="D1g-yi-aKE">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="clearSelected:" target="QvC-M9-y7g" id="6YT-gv-MBK"/>
                         </connections>
                     </button>
                 </subviews>

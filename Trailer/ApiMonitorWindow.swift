@@ -43,11 +43,17 @@ final class ApiMonitorWindow: NSWindow, NSWindowDelegate {
     }
 
     @IBAction private func copySelected(_: NSButton) {
-        if let log = textView.textStorage?.string {
+        if let log = textStorage?.string {
+            NSPasteboard.general.clearContents()
+            NSPasteboard.general.declareTypes([.string], owner: nil)
             NSPasteboard.general.setString(log, forType: .string)
         }
     }
-
+    
+    @IBAction private func clearSelected(_ sender: NSButton) {
+        textStorage.mutableString.deleteCharacters(in: NSRange(location: 0, length: textStorage.length))
+    }
+    
     @objc private func newMessage(_ notification: Notification) {
         guard let message = notification.object as? (() -> String) else {
             return
