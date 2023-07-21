@@ -98,7 +98,7 @@ extension Querying {
         f.predicate = NSPredicate(format: query)
         let orphaned = try! moc.fetch(f)
         if !orphaned.isEmpty {
-            DLog("Nuking \(orphaned.count) \(typeName) items that no longer have a parent")
+            Logging.log("Nuking \(orphaned.count) \(typeName) items that no longer have a parent")
             for i in orphaned {
                 moc.delete(i)
             }
@@ -108,7 +108,7 @@ extension Querying {
     static func nukeDeletedItems(in moc: NSManagedObjectContext) -> Int {
         let discarded = Self.items(surviving: false, in: moc)
         if !discarded.isEmpty {
-            DLog("Nuking \(discarded.count) \(typeName) items marked for deletion")
+            Logging.log("Nuking \(discarded.count) \(typeName) items marked for deletion")
             for i in discarded {
                 moc.delete(i)
             }
@@ -196,12 +196,12 @@ class DataItem: NSManagedObject, Querying {
                         if let nodeId = legacyIdsToNodeIds[legacyId] {
                             item.nodeId = nodeId
                             item.setValue(nil, forKey: "serverId")
-                            DLog("Migrated \(entityName) from legacy ID \(legacyId) to node ID \(nodeId)")
+                            Logging.log("Migrated \(entityName) from legacy ID \(legacyId) to node ID \(nodeId)")
                         } else {
-                            DLog("Warning: Migration failed for \(entityName) with legacy ID \(legacyId), could not find node ID")
+                            Logging.log("Warning: Migration failed for \(entityName) with legacy ID \(legacyId), could not find node ID")
                         }
                     } else {
-                        DLog("Warning: Migration failed for \(entityName) - could not read legacy ID!")
+                        Logging.log("Warning: Migration failed for \(entityName) - could not read legacy ID!")
                     }
                 }
             }
@@ -216,12 +216,12 @@ class DataItem: NSManagedObject, Querying {
                 if let nodeId = i.nodeId, let info = nodeIdsToInfo[nodeId] {
                     let updatedDate = DataItem.parseGH8601(info["updated_at"] as? String) ?? i.createdAt ?? now
                     if updatedDate != i.updatedAt {
-                        DLog("Updating \(entityName): \(nodeId) (v3)")
+                        Logging.log("Updating \(entityName): \(nodeId) (v3)")
                         i.postSyncAction = PostSyncAction.isUpdated.rawValue
                         i.updatedAt = updatedDate
                         postProcessCallback(i, info, true, child)
                     } else {
-                        // DLog("Skipping %@: %@",type,serverId)
+                        // Logging.log("Skipping %@: %@",type,serverId)
                         i.postSyncAction = PostSyncAction.doNothing.rawValue
                         postProcessCallback(i, info, false, child)
                     }
@@ -233,7 +233,7 @@ class DataItem: NSManagedObject, Querying {
 
             for nodeId in nodeIdsOfItems {
                 if let info = nodeIdsToInfo[nodeId], let apiServer = try? child.existingObject(with: serverId) as? ApiServer {
-                    DLog("Creating \(entityName): \(nodeId) (v3)")
+                    Logging.log("Creating \(entityName): \(nodeId) (v3)")
                     let i = NSEntityDescription.insertNewObject(forEntityName: entityName, into: child) as! T
                     i.postSyncAction = PostSyncAction.isNew.rawValue
                     i.apiServer = apiServer
@@ -267,7 +267,7 @@ class DataItem: NSManagedObject, Querying {
         count += Team.nukeDeletedItems(in: moc)
         count += Review.nukeDeletedItems(in: moc)
         count += Reaction.nukeDeletedItems(in: moc)
-        DLog("Nuked total \(count) items marked for deletion")
+        Logging.log("Nuked total \(count) items marked for deletion")
     }
 
     @MainActor
@@ -342,26 +342,26 @@ class DataItem: NSManagedObject, Querying {
         }
 
         if node.created {
-            DLog("Creating \(entityName) ID: \(node.id) (v4)")
+            Logging.log("Creating \(entityName) ID: \(node.id) (v4)")
             postSyncAction = PostSyncAction.isNew.rawValue
 
         } else if node.updated {
-            DLog("Updating \(entityName) ID: \(node.id) (v4)")
+            Logging.log("Updating \(entityName) ID: \(node.id) (v4)")
             postSyncAction = PostSyncAction.isUpdated.rawValue
 
         } else {
             /*
              switch PostSyncAction(rawValue: postSyncAction) {
              case .delete:
-                 DLog("Keeping %@ ID: %@", entityName, node.id)
+                 Logging.log("Keeping %@ ID: %@", entityName, node.id)
              case .doNothing:
-                 DLog("Ignoring %@ ID: %@", entityName, node.id)
+                 Logging.log("Ignoring %@ ID: %@", entityName, node.id)
              case .isNew:
-                 DLog("Is New %@ ID: %@", entityName, node.id)
+                 Logging.log("Is New %@ ID: %@", entityName, node.id)
              case .isUpdated:
-                 DLog("Is Updated %@ ID: %@", entityName, node.id)
+                 Logging.log("Is Updated %@ ID: %@", entityName, node.id)
              case .none:
-                 DLog("Other %@ ID: %@", entityName, node.id)
+                 Logging.log("Other %@ ID: %@", entityName, node.id)
              }
               */
             if postSyncAction == PostSyncAction.delete.rawValue {
@@ -384,7 +384,7 @@ class DataItem: NSManagedObject, Querying {
         let existingItems = try! moc.fetch(f)
         let existingItemIds = existingItems.map(\.nodeId)
         var itemLookup = Dictionary(zip(existingItemIds, existingItems)) { one, two in
-            DLog("Warning: Duplicate item of type \(entityName) claiming to be node ID \(one.nodeId ?? "<no node id>") - will delete")
+            Logging.log("Warning: Duplicate item of type \(entityName) claiming to be node ID \(one.nodeId ?? "<no node id>") - will delete")
             two.postSyncAction = PostSyncAction.delete.rawValue
             return one
         }

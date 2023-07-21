@@ -26,7 +26,7 @@ final class Reaction: DataItem {
                 reaction.issue = parent as? Issue
                 reaction.comment = parent as? PRComment
                 if parent == nil {
-                    DLog("Warning: Reaction without parent")
+                    Logging.log("Warning: Reaction without parent")
                 }
             }
 

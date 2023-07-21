@@ -76,7 +76,7 @@ final class Repo: DataItem {
                     if pull || push || admin {
                         return true
                     } else if let fullName = info["full_name"] as? String {
-                        DLog("Watched private repository '\(fullName)' seems to be inaccessible, skipping")
+                        Logging.log("Watched private repository '\(fullName)' seems to be inaccessible, skipping")
                     }
                 }
                 return false
@@ -119,7 +119,7 @@ final class Repo: DataItem {
     static func hideArchivedRepos(in moc: NSManagedObjectContext) -> Bool {
         var madeChanges = false
         for repo in Repo.allItems(in: moc) where repo.archived && repo.shouldSync {
-            DLog("Auto-hiding archived repo ID \(repo.nodeId ?? "<no ID>")")
+            Logging.log("Auto-hiding archived repo ID \(repo.nodeId ?? "<no ID>")")
             repo.displayPolicyForPrs = RepoDisplayPolicy.hide.rawValue
             repo.displayPolicyForIssues = RepoDisplayPolicy.hide.rawValue
             madeChanges = true
@@ -261,7 +261,7 @@ final class Repo: DataItem {
             f.includesSubentities = false
             f.predicate = predicate
             for i in try! managedObjectContext!.fetch(f) {
-                // DLog("Ensuring item '%@' in repo '%@' is marked as updated - reasons: %@", S(i.title), S(i.repo.fullName), reasons.joined(separator: ", "))
+                // Logging.log("Ensuring item '%@' in repo '%@' is marked as updated - reasons: %@", S(i.title), S(i.repo.fullName), reasons.joined(separator: ", "))
                 i.setToUpdatedIfIdle()
             }
         }

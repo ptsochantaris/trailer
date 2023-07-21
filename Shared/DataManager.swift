@@ -35,7 +35,7 @@ enum DataManager {
         guard let count = persistentStoreCoordinator?.persistentStores.count, count > 0 else { return }
 
         if Settings.lastRunVersion != versionString {
-            DLog("VERSION UPDATE MAINTENANCE NEEDED")
+            Logging.log("VERSION UPDATE MAINTENANCE NEEDED")
             performVersionChangedTasks()
             Settings.lastRunVersion = versionString
             migrated = true
@@ -91,10 +91,10 @@ enum DataManager {
             ApiServer.ensureAtLeastGithub(in: main)
         }
 
-        DLog("Resetting sync state of everything")
+        Logging.log("Resetting sync state of everything")
         ApiServer.resetSyncOfEverything()
 
-        DLog("Marking all unspecified (nil) announced flags as announced")
+        Logging.log("Marking all unspecified (nil) announced flags as announced")
         for i in PullRequest.allItems(in: main) where i.value(forKey: "announced") == nil {
             i.announced = true
         }
@@ -102,7 +102,7 @@ enum DataManager {
             i.announced = true
         }
 
-        DLog("Migrating display policies")
+        Logging.log("Migrating display policies")
         for r in Repo.allItems(in: main) {
             if let markedAsHidden = (r.value(forKey: "hidden") as AnyObject?)?.boolValue, markedAsHidden == true {
                 r.displayPolicyForPrs = RepoDisplayPolicy.hide.rawValue
@@ -117,7 +117,7 @@ enum DataManager {
             }
         }
 
-        DLog("Migrating snooze presets")
+        Logging.log("Migrating snooze presets")
         for s in SnoozePreset.allSnoozePresets(in: main) {
             if let m = postMigrationSnoozeWakeOnComment {
                 s.wakeOnComment = m
@@ -204,7 +204,7 @@ enum DataManager {
 
             for pr in latestStatuses.map(\.pullRequest) where pr.isSnoozing && pr.shouldWakeOnStatusChange && !coveredPrs.contains(pr.objectID) {
                 coveredPrs.insert(pr.objectID)
-                DLog("Waking up snoozed PR ID \(pr.nodeId ?? "<no ID>") because of a status update")
+                Logging.log("Waking up snoozed PR ID \(pr.nodeId ?? "<no ID>") because of a status update")
                 pr.wakeUp()
             }
 
@@ -277,7 +277,7 @@ enum DataManager {
             return
         }
 
-        DLog("Re-indexing spotlight")
+        Logging.log("Re-indexing spotlight")
 
         let itemsToIndex = Lista<CSSearchableItem>()
         let itemsToRemove = Lista<String>()
@@ -303,22 +303,22 @@ enum DataManager {
         let index = CSSearchableIndex.default()
 
         do {
-            DLog("Clearing spotlight indexes")
+            Logging.log("Clearing spotlight indexes")
             try await index.deleteAllSearchableItems()
         } catch {
-            DLog("Error clearing existing spotlight index: \(error.localizedDescription)")
+            Logging.log("Error clearing existing spotlight index: \(error.localizedDescription)")
         }
 
-        DLog("Comitting spotlight indexes")
+        Logging.log("Comitting spotlight indexes")
         if itemsToRemove.count > 0 {
-            DLog("De-indexing \(itemsToRemove.count) items...")
+            Logging.log("De-indexing \(itemsToRemove.count) items...")
             try? await index.deleteSearchableItems(withIdentifiers: Array(itemsToRemove))
         }
         if itemsToIndex.count > 0 {
-            DLog("Indexing \(itemsToIndex.count) items...")
+            Logging.log("Indexing \(itemsToIndex.count) items...")
             try? await index.indexSearchableItems(Array(itemsToIndex))
         }
-        DLog("Committed spotlight changes")
+        Logging.log("Committed spotlight changes")
     }
 
     static func saveDB() async {
@@ -327,7 +327,7 @@ enum DataManager {
         #endif
 
         guard main.hasChanges else {
-            DLog("No DB changes")
+            Logging.log("No DB changes")
             if migrated {
                 await processSpotlight(newItems: [])
             }
@@ -348,11 +348,11 @@ enum DataManager {
 
         let newObjects = main.insertedObjects
 
-        DLog("Saving DB")
+        Logging.log("Saving DB")
         do {
             try main.save()
         } catch {
-            DLog("Error while saving DB: \(error.localizedDescription)")
+            Logging.log("Error while saving DB: \(error.localizedDescription)")
         }
 
         Task {
@@ -399,11 +399,11 @@ enum DataManager {
         }
         let index = CSSearchableIndex.default()
         if urisToDelete.count > 0 {
-            DLog("Deleting spotlight indexes for \(urisToDelete.count) items")
+            Logging.log("Deleting spotlight indexes for \(urisToDelete.count) items")
             try? await index.deleteSearchableItems(withIdentifiers: Array(urisToDelete))
         }
         if itemsToReIndex.count > 0 {
-            DLog("Updating spotlight indexes for \(itemsToReIndex.count) items")
+            Logging.log("Updating spotlight indexes for \(itemsToReIndex.count) items")
             try? await index.indexSearchableItems(Array(itemsToReIndex))
         }
     }
@@ -486,7 +486,7 @@ enum DataManager {
                 }
             }
         }
-        DLog("Postprocess done - \(-start.timeIntervalSinceNow) sec")
+        Logging.log("Postprocess done - \(-start.timeIntervalSinceNow) sec")
     }
 
     static func id(for uriPath: String?) -> NSManagedObjectID? {
@@ -503,7 +503,7 @@ enum DataManager {
             let appSupportURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).last!
             let finalURL = appSupportURL.appendingPathComponent("com.housetrip.Trailer")
         #endif
-        DLog("Files in \(finalURL.path)")
+        Logging.log("Files in \(finalURL.path)")
         return finalURL
     }()
 
@@ -512,7 +512,7 @@ enum DataManager {
         let documentsDirectory = dataFilesDirectory.path
         do {
             for file in try fm.contentsOfDirectory(atPath: documentsDirectory) where file.contains("Trailer.sqlite") {
-                DLog("Removing old database file: \(file)")
+                Logging.log("Removing old database file: \(file)")
                 try! fm.removeItem(atPath: documentsDirectory.appending(pathComponent: file))
             }
         } catch { /* no directory */ }
@@ -536,7 +536,7 @@ enum DataManager {
 
         let dataDir = dataFilesDirectory
         let sqlStorePath = dataDir.appendingPathComponent("Trailer.sqlite")
-        DLog("DB: \(sqlStorePath.path)")
+        Logging.log("DB: \(sqlStorePath.path)")
         let fileManager = FileManager.default
         if fileManager.fileExists(atPath: sqlStorePath.path) {
             if let m = try? NSPersistentStoreCoordinator.metadataForPersistentStore(ofType: NSSQLiteStoreType, at: sqlStorePath, options: nil) {
@@ -546,7 +546,7 @@ enum DataManager {
             do {
                 try fileManager.createDirectory(atPath: dataDir.path, withIntermediateDirectories: true, attributes: nil)
             } catch {
-                DLog("Database directory creation error: \(error.localizedDescription)")
+                Logging.log("Database directory creation error: \(error.localizedDescription)")
                 return nil
             }
         }
@@ -554,10 +554,10 @@ enum DataManager {
         do {
             let persistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel: mom)
             try persistentStoreCoordinator.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: sqlStorePath, options: storeOptions)
-            DLog("Database setup complete")
+            Logging.log("Database setup complete")
             return persistentStoreCoordinator
         } catch {
-            DLog("Database setup error: \(error.localizedDescription)")
+            Logging.log("Database setup error: \(error.localizedDescription)")
             return nil
         }
     }()

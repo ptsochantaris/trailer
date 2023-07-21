@@ -266,7 +266,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
         if sizer == nil {
             sizer = tableView.dequeueReusableCell(withIdentifier: "Cell") as? RepoCell
         } else if let h = heightCache[indexPath] {
-            // DLog("using cached height for %@ - %@", indexPath.section, indexPath.row)
+            // Logging.log("using cached height for %@ - %@", indexPath.section, indexPath.row)
             return h
         }
         configureCell(sizer!, atIndexPath: indexPath)

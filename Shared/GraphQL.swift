@@ -60,7 +60,7 @@ extension Node {
 enum GraphQL {
     static func setup() {
         TQL.debugLog = { message in
-            DLog(message)
+            Logging.log(message)
         }
     }
 
@@ -207,14 +207,14 @@ enum GraphQL {
     static func testApi(to apiServer: ApiServer) async throws {
         var gotUserNode = false
         let testQuery = Query(name: "Testing", rootElement: Group("viewer") { userFragment }) { node in
-            DLog("Got a node, type: \(node.elementType), id: \(node.id)")
+            Logging.log("Got a node, type: \(node.elementType), id: \(node.id)")
             if node.elementType == "User" {
                 gotUserNode = true
             }
         }
         _ = try await run(testQuery, for: apiServer.graphQLPath ?? "", authToken: apiServer.authToken ?? "", expectedNodeCost: nil, attempts: 1) { _ in }
         if !gotUserNode {
-            throw API.apiError("Could not read a valid user record from this endpoint")
+            throw ApiError.noUserRecordFound
         }
     }
 
@@ -224,11 +224,11 @@ enum GraphQL {
         let Q = query.queryText
 
         guard let requestData = try? JSONSerialization.data(withJSONObject: ["query": Q]) else {
-            throw API.apiError("\(query.logPrefix)Could not serialise query")
+            throw ApiError.graphQLFailure("\(query.logPrefix)Could not serialise query")
         }
 
         guard let url = URL(string: urlString) else {
-            throw API.apiError("Invalid URL: \(urlString)")
+            throw ApiError.invalidUrl(urlString)
         }
 
         var request = URLRequest(url: url)
@@ -240,29 +240,25 @@ enum GraphQL {
         let start = Date()
         defer {
             multiGateKeeper.relaxedReturnTicket()
-            if monitoringLog {
-                DLog("\(query.logPrefix)Response time: \(-start.timeIntervalSinceNow) sec")
-            }
+            Logging.log("\(query.logPrefix)Response time: \(-start.timeIntervalSinceNow) sec")
         }
 
         Task { @MainActor in
             API.currentOperationName = query.name
         }
 
-        if monitoringLog {
-            DLog("\(query.logPrefix)Fetching: \(Q)")
-        }
+        Logging.log("\(query.logPrefix)Fetching: \(Q)")
 
         guard let json = try await HTTP.getJsonData(for: request, attempts: attempts, logPrefix: query.logPrefix, retryOnInvalidJson: true).json as? JSON else {
-            throw API.apiError("\(query.logPrefix)Retuned data is not JSON")
+            throw ApiError.graphQLFailure("\(query.logPrefix)Retuned data is not JSON")
         }
 
         return json
     }
 
     private static func run(_ query: Query, for urlString: String, authToken: String, expectedNodeCost: Int?, attempts: Int = 5, newStats: @escaping (ApiStats) -> Void) async throws {
-        if let expectedNodeCost, monitoringLog {
-            DLog("\(query.logPrefix)Queued - Expected Count: \(expectedNodeCost)")
+        if let expectedNodeCost {
+            Logging.log("\(query.logPrefix)Queued - Expected Count: \(expectedNodeCost)")
         }
 
         var currentAttempt = attempts
@@ -273,20 +269,20 @@ enum GraphQL {
             let apiStats = ApiStats.fromV4(json: json["data"] as? JSON)
             if let expectedNodeCost {
                 if let apiStats {
-                    DLog("\(query.logPrefix)Received page (Cost: \(apiStats.cost), Remaining: \(apiStats.remaining)/\(apiStats.limit) - Expected Count: \(expectedNodeCost) - Returned Count: \(apiStats.nodeCount))")
+                    Logging.log("\(query.logPrefix)Received page (Cost: \(apiStats.cost), Remaining: \(apiStats.remaining)/\(apiStats.limit) - Expected Count: \(expectedNodeCost) - Returned Count: \(apiStats.nodeCount))")
                     if expectedNodeCost != apiStats.nodeCount {
-                        DLog("Warning: Mismatched expected and received node count!")
+                        Logging.log("Warning: Mismatched expected and received node count!")
                     }
                     newStats(apiStats)
                 } else {
-                    DLog("\(query.logPrefix)Received page (No stats) - Expected Count: \(expectedNodeCost)")
+                    Logging.log("\(query.logPrefix)Received page (No stats) - Expected Count: \(expectedNodeCost)")
                 }
             } else {
                 if let apiStats {
-                    DLog("\(query.logPrefix)Received page (Cost: \(apiStats.cost), Remaining: \(apiStats.remaining)/\(apiStats.limit) - Returned Count: \(apiStats.nodeCount))")
+                    Logging.log("\(query.logPrefix)Received page (Cost: \(apiStats.cost), Remaining: \(apiStats.remaining)/\(apiStats.limit) - Returned Count: \(apiStats.nodeCount))")
                     newStats(apiStats)
                 } else {
-                    DLog("\(query.logPrefix)Received page (No stats)")
+                    Logging.log("\(query.logPrefix)Received page (No stats)")
                 }
             }
 
@@ -301,12 +297,12 @@ enum GraphQL {
 
             if let errorMessage {
                 if currentAttempt > 0 {
-                    DLog("Retrying on GitHub error (attempts left: \(currentAttempt)): \(errorMessage)")
+                    Logging.log("Retrying on GitHub error (attempts left: \(currentAttempt)): \(errorMessage)")
                     try? await Task.sleep(nanoseconds: 5 * NSEC_PER_SEC)
                     currentAttempt -= 1
                     continue
                 }
-                throw API.apiError("\(query.logPrefix)\(errorMessage)")
+                throw ApiError.graphQLFailure("\(query.logPrefix)Server error: \(errorMessage)")
             }
 
             do {
@@ -317,7 +313,7 @@ enum GraphQL {
                 break
 
             } catch {
-                throw API.apiError("\(query.logPrefix)Error while parsing GraphQL response: \(error.localizedDescription) - in: \(json)")
+                throw ApiError.graphQLFailure("\(query.logPrefix)Error while parsing GraphQL response: \(error.localizedDescription) - in: \(json)")
             }
         }
     }

@@ -74,21 +74,6 @@ let itemDateFormatter: DateFormatter = {
     return f
 }()
 
-#if DEBUG
-    import os.log
-#endif
-
-var monitoringLog = false
-
-func DLog(_ message: @escaping @autoclosure () -> String) {
-    if monitoringLog {
-        NotificationCenter.default.post(name: .LogMessagePosted, object: message)
-    }
-    #if DEBUG
-        os_log("%{public}@", message())
-    #endif
-}
-
 let numberFormatter: NumberFormatter = {
     let n = NumberFormatter()
     n.numberStyle = .decimal
@@ -97,6 +82,10 @@ let numberFormatter: NumberFormatter = {
 
 @MainActor
 func bootUp() {
+    if CommandLine.arguments.contains("-useSystemLog") {
+        Logging.setupConsoleLogging()
+    }
+
     Settings.checkMigration()
     DataManager.checkMigration()
     API.setup()

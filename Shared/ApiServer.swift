@@ -65,7 +65,7 @@ final class ApiServer: NSManagedObject {
 
     @MainActor
     static func resetSyncOfEverything() {
-        DLog("RESETTING SYNC STATE OF ALL ITEMS")
+        Logging.log("RESETTING SYNC STATE OF ALL ITEMS")
         for r in Repo.allItems(in: DataManager.main, prefetchRelationships: ["pullRequests", "issues"]) {
             r.resetSyncState()
             for p in r.pullRequests {
@@ -81,7 +81,7 @@ final class ApiServer: NSManagedObject {
     func deleteEverything() {
         guard let moc = managedObjectContext else { return }
 
-        DLog("Wiping all data for API server \(label ?? "<no API server name>")")
+        Logging.log("Wiping all data for API server \(label ?? "<no API server name>")")
 
         let categories: [Set<NSManagedObject>] = [pullRequests, issues, labels, teams, comments, statuses, reviews, reactions]
         categories.forEach { set in
@@ -153,7 +153,7 @@ final class ApiServer: NSManagedObject {
     }
 
     func rollBackAllUpdates(in moc: NSManagedObjectContext) {
-        DLog("Rolling back changes for failed sync on API server '\(label.orEmpty)'")
+        Logging.log("Rolling back changes for failed sync on API server '\(label.orEmpty)'")
         for set in [repos, pullRequests, comments, statuses, labels, issues, teams, reviews, reactions] as [Set<DataItem>] {
             var i = set.makeIterator()
             while let dataItem = i.next() {
@@ -181,14 +181,14 @@ final class ApiServer: NSManagedObject {
         try await withThrowingTaskGroup(of: Void.self) { group in
             if let graphQLPath {
                 group.addTask { @MainActor in
-                    DLog("Checking GraphQL interface on \(graphQLPath)")
+                    Logging.log("Checking GraphQL interface on \(graphQLPath)")
                     try await GraphQL.testApi(to: self)
                 }
             }
 
             if let apiPath {
                 group.addTask { @MainActor in
-                    DLog("Checking REST interface on \(apiPath)")
+                    Logging.log("Checking REST interface on \(apiPath)")
                     try await RestAccess.testApi(to: self)
                 }
             }

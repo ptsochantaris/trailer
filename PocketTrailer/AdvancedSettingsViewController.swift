@@ -331,16 +331,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
         Setting(section: .Sort,
                 title: "Bunch by repository",
                 description: Settings.groupByRepoHelp,
-                valueDisplayed: { Settings.groupByRepo ? "✓" : " " }),
-
-        Setting(section: .Misc,
-                title: "Log activity to console",
-                description: Settings.logActivityToConsoleHelp,
-                valueDisplayed: { Settings.logActivityToConsole ? "✓" : " " }),
-        Setting(section: .Misc,
-                title: "Log API calls to console",
-                description: Settings.dumpAPIResponsesInConsoleHelp,
-                valueDisplayed: { Settings.dumpAPIResponsesInConsole ? "✓" : " " })
+                valueDisplayed: { Settings.groupByRepo ? "✓" : " " })
     ]
 
     private var settingsChangedTimer: PopTimer!
@@ -541,7 +532,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
             originalIndex += 1
         }
 
-        if section == SettingsSection.Refresh {
+        if section == .Refresh {
             var values = [String]()
             var count = 0
             var previousIndex: Int?
@@ -567,7 +558,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
             let v = PickerViewController.Info(title: setting.title, values: values, selectedIndex: previousIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
             performSegue(withIdentifier: "showPicker", sender: v)
 
-        } else if section == SettingsSection.Display {
+        } else if section == .Display {
             switch originalIndex {
             case 0:
                 let wasOff = !Settings.showLabels
@@ -620,7 +611,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
             default: break
             }
 
-        } else if section == SettingsSection.Filtering {
+        } else if section == .Filtering {
             switch originalIndex {
             case 0:
                 Settings.includeTitlesInFilter = !Settings.includeTitlesInFilter
@@ -648,7 +639,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
             }
             settingsChangedTimer.push()
 
-        } else if section == SettingsSection.AppleWatch {
+        } else if section == .AppleWatch {
             switch originalIndex {
             case 0:
                 Settings.preferIssuesInWatch = !Settings.preferIssuesInWatch
@@ -658,7 +649,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
             default: break
             }
 
-        } else if section == SettingsSection.Comments {
+        } else if section == .Comments {
             switch originalIndex {
             case 0:
                 Settings.showCommentsEverywhere = !Settings.showCommentsEverywhere
@@ -683,7 +674,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
             default: break
             }
 
-        } else if section == SettingsSection.Reviews {
+        } else if section == .Reviews {
             switch originalIndex {
             case 0:
                 let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
@@ -741,7 +732,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
                 Settings.notifyOnAllReviewAcceptances = false
             }
 
-        } else if section == SettingsSection.Reactions {
+        } else if section == .Reactions {
             switch originalIndex {
             case 0:
                 Settings.notifyOnItemReactions = !Settings.notifyOnItemReactions
@@ -763,7 +754,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
             default: break
             }
 
-        } else if section == SettingsSection.Watchlist {
+        } else if section == .Watchlist {
             var previousIndex: Int?
             switch originalIndex {
             case 0:
@@ -775,7 +766,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
             let v = PickerViewController.Info(title: setting.title, values: RepoDisplayPolicy.labels, selectedIndex: previousIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
             performSegue(withIdentifier: "showPicker", sender: v)
 
-        } else if section == SettingsSection.Stauses {
+        } else if section == .Stauses {
             switch originalIndex {
             case 0:
                 Settings.showStatusItems = !Settings.showStatusItems
@@ -823,7 +814,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
                 break
             }
 
-        } else if section == SettingsSection.History {
+        } else if section == .History {
             switch originalIndex {
             case 0:
                 let v = PickerViewController.Info(title: setting.title, values: HandlingPolicy.labels, selectedIndex: Settings.mergeHandlingPolicy, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
@@ -840,7 +831,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
             default: break
             }
 
-        } else if section == SettingsSection.Confirm {
+        } else if section == .Confirm {
             switch originalIndex {
             case 0:
                 Settings.dontAskBeforeWipingMerged = !Settings.dontAskBeforeWipingMerged
@@ -848,7 +839,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
                 Settings.dontAskBeforeWipingClosed = !Settings.dontAskBeforeWipingClosed
             default: break
             }
-        } else if section == SettingsSection.Sort {
+        } else if section == .Sort {
             switch originalIndex {
             case 0:
                 Settings.sortDescending = !Settings.sortDescending
@@ -860,21 +851,6 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
             case 2:
                 Settings.groupByRepo = !Settings.groupByRepo
                 settingsChangedTimer.push()
-            default: break
-            }
-
-        } else if section == SettingsSection.Misc {
-            switch originalIndex {
-            case 0:
-                Settings.logActivityToConsole = !Settings.logActivityToConsole
-                if Settings.logActivityToConsole {
-                    showMessage("Warning", "Logging is a feature meant to aid error reporting, having it constantly enabled will cause this app to be less responsive and use more battery")
-                }
-            case 1:
-                Settings.dumpAPIResponsesInConsole = !Settings.dumpAPIResponsesInConsole
-                if Settings.dumpAPIResponsesInConsole {
-                    showMessage("Warning", "Logging is a feature meant to aid error reporting, having it constantly enabled will cause this app to be less responsive and use more battery")
-                }
             default: break
             }
         }

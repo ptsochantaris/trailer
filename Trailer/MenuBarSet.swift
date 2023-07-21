@@ -131,7 +131,7 @@ final class MenuBarSet {
             let f = ListableItem.requestForItems(of: type, withFilter: menu.filter.stringValue, sectionIndex: -1, criterion: viewCriterion, excludeSnoozed: excludeSnoozed)
             let countString = somethingFailed ? "X" : (Settings.hideMenubarCounts ? "" : String(try! DataManager.main.count(for: f)))
 
-            DLog("Updating \(viewCriterion?.label ?? "general") \(type) menu, \(countString) total items")
+            Logging.log("Updating \(viewCriterion?.label ?? "general") \(type) menu, \(countString) total items")
 
             let siv = StatusItemView()
             siv.textAttributes = attributes

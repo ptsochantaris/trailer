@@ -16,6 +16,38 @@ extension String {
     }
 }
 
+enum ApiError: Error {
+    case errorCode(Int)
+    case nonHttpResponse
+    case cancelled
+    case invalidUrl(String)
+    case imageFetchFailed
+    case invalidImageData
+    case noUserRecordFound
+    case graphQLFailure(String)
+    
+    var description: String {
+        switch self {
+        case let .errorCode(code):
+            return "HTTP Code \(code) received"
+        case .nonHttpResponse:
+            return "Network response was not a HTTP response"
+        case .cancelled:
+            return "Operation cancelled"
+        case let .invalidUrl(url):
+            return "Invalid URL: \(url)"
+        case .imageFetchFailed:
+            return "Image fetch failed"
+        case .invalidImageData:
+            return "Invalid image data"
+        case .noUserRecordFound:
+            return "Could not read a valid user record from this endpoint"
+        case let .graphQLFailure(text):
+            return "GraphQL issue: \(text)"
+        }
+    }
+}
+
 @MainActor
 enum API {
     static var currentNetworkStatus = NetworkStatus.NotReachable
@@ -27,7 +59,7 @@ enum API {
         GraphQL.setup()
 
         let n = reachability.status
-        DLog("Network is \(n.name)")
+        Logging.log("Network is \(n.name)")
         currentNetworkStatus = n
 
         NotificationCenter.default.addObserver(forName: ReachabilityChangedNotification, object: nil, queue: .main) { _ in
@@ -44,18 +76,18 @@ enum API {
         let newStatus = reachability.status
         if newStatus != currentNetworkStatus {
             currentNetworkStatus = newStatus
-            DLog("Network changed to \(newStatus.name)")
+            Logging.log("Network changed to \(newStatus.name)")
         }
     }
 
     static var hasNetworkConnection: Bool {
-        DLog("Actively verifying reported network availability state…")
+        Logging.log("Actively verifying reported network availability state…")
         let previousNetworkStatus = currentNetworkStatus
         checkNetworkAvailability()
         if previousNetworkStatus != currentNetworkStatus {
-            DLog("Network state seems to have changed without having been notified, noted")
+            Logging.log("Network state seems to have changed without having been notified, noted")
         } else {
-            DLog("No change to network state")
+            Logging.log("No change to network state")
         }
         return currentNetworkStatus != .NotReachable
     }
@@ -64,7 +96,7 @@ enum API {
 
     static var currentOperationName = lastSuccessfulSyncAt {
         didSet {
-            DLog("Status update: \(currentOperationName)")
+            Logging.log("Status update: \(currentOperationName)")
             NotificationCenter.default.post(name: .SyncProgressUpdate, object: nil)
         }
     }
@@ -88,12 +120,12 @@ enum API {
                 return
             }
             if isRefreshing {
-                DLog("Starting refresh")
+                Logging.log("Starting refresh")
                 DataManager.postMigrationTasks()
                 NotificationQueue.clear()
                 NotificationCenter.default.post(name: .RefreshStarting, object: nil)
             } else {
-                DLog("Refresh done")
+                Logging.log("Refresh done")
                 if ApiServer.shouldReportRefreshFailure(in: DataManager.main) {
                     currentOperationName = "Last update failed"
                     NotificationCenter.default.post(name: .RefreshEnded, object: false)
@@ -157,13 +189,13 @@ enum API {
 
         let repos = Repo.syncableRepos(in: syncMoc)
 
-        DLog("Will sync items from: \(repos.compactMap(\.fullName).joined(separator: ", "))")
+        Logging.log("Will sync items from: \(repos.compactMap(\.fullName).joined(separator: ", "))")
 
         if Settings.useV4API {
             do {
                 try await v4Sync(repos, to: syncMoc)
             } catch {
-                DLog("Sync aborted due to error: \(error.localizedDescription)")
+                Logging.log("Sync aborted due to error: \(error.localizedDescription)")
             }
 
         } else {
@@ -188,15 +220,15 @@ enum API {
 
         if syncMoc.hasChanges {
             do {
-                DLog("Committing synced data")
+                Logging.log("Committing synced data")
                 try syncMoc.save()
-                DLog("Synced data committed")
+                Logging.log("Synced data committed")
                 await DataManager.sendNotificationsIndexAndSave()
             } catch {
-                DLog("Committing sync failed: \(error.localizedDescription)")
+                Logging.log("Committing sync failed: \(error.localizedDescription)")
             }
         } else {
-            DLog("No changes, skipping commit")
+            Logging.log("No changes, skipping commit")
         }
 
         isRefreshing = false
@@ -219,7 +251,7 @@ enum API {
             return false
         }
         switch result {
-        case .cancelled, .success:
+        case .cancelled, .ignored, .success:
             break
         case .deleted, .failed, .notFound:
             server.lastSyncSucceeded = false
@@ -268,21 +300,21 @@ enum API {
         }
 
         if needToCheck {
-            DLog("Some API servers don't have user details yet, will bring user credentials down for them")
+            Logging.log("Some API servers don't have user details yet, will bring user credentials down for them")
             await syncUserDetails(in: moc)
         }
     }
 
     private static func getRateLimit(from server: ApiServer) async -> ApiStats? {
         do {
-            let (code, _) = try await RestAccess.start(call: "/rate_limit", on: server, triggeredByUser: true)
+            let (_, code) = try await RestAccess.start(call: "/rate_limit", on: server, triggeredByUser: true)
             switch code {
             case .notFound:
                 // is GE account
                 return ApiStats.noLimits
-            case .cancelled, .deleted, .failed:
-                break
-            case let .success(headers):
+            case .cancelled, .deleted, .failed, .ignored:
+                return nil
+            case let .success(headers, _):
                 return ApiStats.fromV3(headers: headers)
             }
         } catch {}
@@ -331,7 +363,7 @@ enum API {
                     r.postSyncAction = PostSyncAction.doNothing.rawValue
                 }
             }
-        case .cancelled:
+        case .cancelled, .ignored:
             break
         case .deleted, .failed, .notFound:
             server.lastSyncSucceeded = false
@@ -340,14 +372,9 @@ enum API {
 
     static func fetchRepo(fullName: String, from server: ApiServer, moc: NSManagedObjectContext) async throws {
         let path = "\(server.apiPath ?? "")/repos/\(fullName)"
-        do {
-            let (data, _, _) = try await RestAccess.getData(in: path, from: server)
-            if let repoData = data as? JSON {
-                await Repo.syncRepos(from: [repoData], server: server, addNewRepos: true, manuallyAdded: true, moc: moc)
-            }
-        } catch {
-            let resultCode = (error as NSError).code
-            throw apiError("Operation failed with code \(resultCode)")
+        let (data, _, _) = try await RestAccess.getData(in: path, from: server)
+        if let repoData = data as? JSON {
+            await Repo.syncRepos(from: [repoData], server: server, addNewRepos: true, manuallyAdded: true, moc: moc)
         }
     }
 
@@ -364,14 +391,14 @@ enum API {
             switch result {
             case .success:
                 return userList
-            case .cancelled:
-                throw apiError("Operation cancelled")
+            case .cancelled, .ignored:
+                throw ApiError.cancelled
             case .notFound:
-                throw apiError("Operation failed with code 404")
+                throw ApiError.errorCode(404)
             case .deleted:
-                throw apiError("Operation failed with code 410")
+                throw ApiError.errorCode(410)
             case let .failed(code):
-                throw apiError("Operation failed with code \(code)")
+                throw ApiError.errorCode(code)
             }
         }
 
@@ -387,14 +414,14 @@ enum API {
             switch result {
             case .success:
                 return orgList
-            case .cancelled:
-                throw apiError("Operation cancelled")
+            case .cancelled, .ignored:
+                throw ApiError.cancelled
             case .notFound:
-                throw apiError("Operation failed with code 404")
+                throw ApiError.errorCode(404)
             case .deleted:
-                throw apiError("Operation failed with code 410")
+                throw ApiError.errorCode(410)
             case let .failed(code):
-                throw apiError("Operation failed with code \(code)")
+                throw ApiError.errorCode(code)
             }
         }
 
@@ -423,9 +450,5 @@ enum API {
                 apiServer.lastSyncSucceeded = false
             }
         }
-    }
-
-    nonisolated static func apiError(_ message: String) -> Error {
-        NSError(domain: "API Error", code: -1, userInfo: [NSLocalizedDescriptionKey: message])
     }
 }

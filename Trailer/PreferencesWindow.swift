@@ -1222,7 +1222,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         s.beginSheetModal(for: self) { response in
             if response == .OK, let url = s.url {
                 _ = Settings.writeToURL(url)
-                DLog("Exported settings to \(url.absoluteString)")
+                Logging.log("Exported settings to \(url.absoluteString)")
             }
         }
     }

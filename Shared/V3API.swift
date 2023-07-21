@@ -4,7 +4,7 @@ import Foundation
 extension API {
     private static func handleRepoSync(for repo: Repo, result: DataResult) {
         switch result {
-        case .cancelled, .success:
+        case .cancelled, .ignored, .success:
             break // all good
         case .notFound:
             repo.inaccessible = true
@@ -74,7 +74,7 @@ extension API {
                         guard let data, !data.isEmpty else { return true }
 
                         if isFirstEventSync {
-                            DLog("First event check for this repo. Let's ensure all items are marked as updated")
+                            Logging.log("First event check for this repo. Let's ensure all items are marked as updated")
                             for i in r.pullRequests { i.setToUpdatedIfIdle() }
                             for i in r.issues { i.setToUpdatedIfIdle() }
                             r.lastScannedIssueEventId = data.first!["id"] as? Int ?? 0
@@ -90,7 +90,7 @@ extension API {
                                     }
                                     if eventId == lastLocalEvent {
                                         foundLastEvent = true
-                                        DLog("Parsed all repo issue events up to the one we already have")
+                                        Logging.log("Parsed all repo issue events up to the one we already have")
                                         break // we're done
                                     }
                                     if event["event"] as? String != nil {
@@ -108,7 +108,8 @@ extension API {
                         }
                     }
                     switch result {
-                    case .cancelled, .success: break
+                    case .cancelled, .ignored, .success:
+                        break
                     case .deleted, .failed, .notFound:
                         apiServer.lastSyncSucceeded = false
                     }
@@ -247,7 +248,7 @@ extension API {
                     switch result {
                     case .cancelled:
                         break
-                    case .success:
+                    case .ignored, .success:
                         c.pendingReactionScan = false
                     case .deleted, .failed, .notFound:
                         c.apiServer.lastSyncSucceeded = false
@@ -281,7 +282,7 @@ extension API {
                         return false
                     }
                     switch result {
-                    case .cancelled, .success:
+                    case .cancelled, .ignored, .success:
                         break
                     case .deleted, .failed, .notFound:
                         apiServer.lastSyncSucceeded = false
@@ -314,7 +315,7 @@ extension API {
                                 return false
                             }
                             switch result {
-                            case .cancelled, .success:
+                            case .cancelled, .ignored, .success:
                                 break
                             case .deleted, .failed, .notFound:
                                 apiServer.lastSyncSucceeded = false
@@ -355,7 +356,7 @@ extension API {
                             return false
                         }
                         switch result {
-                        case .cancelled, .success:
+                        case .cancelled, .ignored, .success:
                             break
                         case .deleted, .failed, .notFound:
                             apiServer.lastSyncSucceeded = false
@@ -384,7 +385,7 @@ extension API {
                         return false
                     }
                     switch result {
-                    case .cancelled, .success:
+                    case .cancelled, .ignored, .success:
                         break
                     case .deleted, .failed, .notFound:
                         apiServer.lastSyncSucceeded = false
@@ -395,7 +396,7 @@ extension API {
     }
 
     private static func investigatePrClosure(for pullRequest: PullRequest) async {
-        DLog("Checking closed PR to see if it was merged: \(pullRequest.title.orEmpty)")
+        Logging.log("Checking closed PR to see if it was merged: \(pullRequest.title.orEmpty)")
 
         let repoFullName = pullRequest.repo.fullName.orEmpty
         let path = "/repos/\(repoFullName)/pulls/\(pullRequest.number)"
@@ -418,7 +419,7 @@ extension API {
             case .deleted, .notFound:
                 pullRequest.stateChanged = ListableItem.StateChange.closed.rawValue
                 pullRequest.postSyncAction = PostSyncAction.isUpdated.rawValue // let handleClosing() decide
-            case .cancelled, .failed:
+            case .cancelled, .failed, .ignored:
                 pullRequest.postSyncAction = PostSyncAction.doNothing.rawValue // keep since we don't know what's going on here
                 pullRequest.apiServer.lastSyncSucceeded = false
             }
@@ -501,7 +502,7 @@ extension API {
                         return false
                     }
                     switch result {
-                    case .cancelled, .deleted, .notFound, .success:
+                    case .cancelled, .deleted, .ignored, .notFound, .success:
                         break
                     case .failed:
                         apiServer.lastSyncSucceeded = false
@@ -533,7 +534,7 @@ extension API {
                         return false
                     }
                     switch result {
-                    case .cancelled, .deleted, .notFound, .success:
+                    case .cancelled, .deleted, .ignored, .notFound, .success:
                         break
                     case .failed:
                         apiServer.lastSyncSucceeded = false
@@ -566,7 +567,7 @@ extension API {
                             return false
                         }
                         switch result {
-                        case .cancelled:
+                        case .cancelled, .ignored:
                             break
                         case .deleted, .notFound, .success:
                             p.lastStatusScan = now

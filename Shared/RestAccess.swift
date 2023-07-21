@@ -10,7 +10,7 @@ enum RestAccess {
     static func getPagedData(at path: String, from server: ApiServer, startingFrom page: Int = 1, perPage: @MainActor @escaping ([JSON]?, Bool) async -> Bool) async -> DataResult {
         if path.isEmpty {
             // handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
-            return .success(headers: [:])
+            return .success(headers: [:], data: Data())
         }
 
         do {
@@ -27,11 +27,10 @@ enum RestAccess {
     }
 
     static func testApi(to apiServer: ApiServer) async throws {
-        let (_, data) = try await start(call: "/user", on: apiServer, triggeredByUser: true, attempts: 1)
+        let (data, _) = try await start(call: "/user", on: apiServer, triggeredByUser: true, attempts: 1)
         if let d = data as? JSON, let userName = d["login"] as? String, let userId = d["id"] as? Int {
             if userName.isEmpty || userId <= 0 {
-                let localError = API.apiError("Could not read a valid user record from this endpoint")
-                throw localError
+                throw ApiError.noUserRecordFound
             }
         }
     }
@@ -46,9 +45,9 @@ enum RestAccess {
             }
         }
 
-        let (result, data) = try await start(call: path, on: server, triggeredByUser: false)
+        let (data, result) = try await start(call: path, on: server, triggeredByUser: false)
         var lastPage = true
-        if case let .success(allHeaders) = result {
+        if case let .success(allHeaders, _) = result {
             if let serverMoc = server.managedObjectContext {
                 #if os(iOS)
                     Task {
@@ -75,25 +74,25 @@ enum RestAccess {
     static func getRawData(at path: String, from server: ApiServer) async throws -> (Any?, DataResult) {
         if path.isEmpty {
             // handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
-            return (nil, .success(headers: [:]))
+            return (nil, .success(headers: [:], data: Data()))
         }
 
         let (data, _, result) = try await getData(in: "\(path)?per_page=100", from: server)
         return (data, result)
     }
 
-    static func start(call path: String, on server: ApiServer, triggeredByUser: Bool, attempts: Int = 5) async throws -> (DataResult, Any?) {
+    static func start(call path: String, on server: ApiServer, triggeredByUser: Bool, attempts: Int = 5) async throws -> (Any?, DataResult) {
         let apiServerLabel: String
         if server.lastSyncSucceeded || triggeredByUser {
             apiServerLabel = server.label.orEmpty
         } else {
-            throw API.apiError("Sync has failed, skipping this call")
+            throw ApiError.cancelled
         }
 
         let expandedPath = path.hasPrefix("/") ? server.apiPath.orEmpty.appending(pathComponent: path) : path
 
         guard let url = URL(string: expandedPath) else {
-            throw API.apiError("Invalid URL: \(expandedPath)")
+            throw ApiError.invalidUrl(expandedPath)
         }
         var request = URLRequest(url: url)
         var acceptTypes = [String]()
@@ -111,13 +110,13 @@ enum RestAccess {
         }
 
         do {
-            let (parsedData, result) = try await HTTP.getJsonData(for: request, attempts: attempts)
-            DLog("(\(apiServerLabel) GET \(expandedPath) - RESULT: \(result.logValue)")
-            return (result, parsedData)
+            let output = try await HTTP.getJsonData(for: request, attempts: attempts)
+            Logging.log("(\(apiServerLabel) GET \(expandedPath) - RESULT: \(output.result.logValue)")
+            return output
 
         } catch {
             let error = error as NSError
-            DLog("(\(apiServerLabel) GET \(expandedPath) - FAILED: (code \(error.code) \(error.localizedDescription)")
+            Logging.log("(\(apiServerLabel) GET \(expandedPath) - FAILED: (code \(error.code) \(error.localizedDescription)")
             throw error
         }
     }

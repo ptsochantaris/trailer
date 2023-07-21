@@ -6,7 +6,7 @@ import UserNotifications
 enum NotificationManager {
     static func handleLocalNotification(notification: UNNotificationContent, action: String) {
         if !notification.userInfo.isEmpty {
-            DLog("Received local notification: \(notification.userInfo)")
+            Logging.log("Received local notification: \(notification.userInfo)")
             popupManager.masterController.localNotificationSelected(userInfo: notification.userInfo, action: action)
         }
     }
@@ -35,9 +35,9 @@ enum NotificationManager {
         n.setNotificationCategories([itemCategory, repoCategory])
         n.requestAuthorization(options: .provisional) { success, error in
             if success {
-                DLog("Successfully registered for local notifications")
+                Logging.log("Successfully registered for local notifications")
             } else {
-                DLog("Registering for notifications failed: \((error?.localizedDescription).orEmpty)")
+                Logging.log("Registering for notifications failed: \((error?.localizedDescription).orEmpty)")
             }
         }
         n.delegate = delegate

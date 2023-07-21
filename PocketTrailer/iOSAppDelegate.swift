@@ -13,7 +13,7 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
         bootUp()
 
         if DataManager.main.persistentStoreCoordinator == nil {
-            DLog("Database was corrupted on startup, removing DB files and resetting")
+            Logging.log("Database was corrupted on startup, removing DB files and resetting")
             DataManager.removeDatabaseFiles()
             abort()
         }
@@ -118,7 +118,7 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
             let howLongAgo = Date().timeIntervalSince(l).rounded()
             let howLongUntilNextSync = Settings.backgroundRefreshPeriod - howLongAgo
             if howLongUntilNextSync > 0 {
-                DLog("No need to refresh yet, will refresh in \(howLongUntilNextSync) sec")
+                Logging.log("No need to refresh yet, will refresh in \(howLongUntilNextSync) sec")
                 return
             }
         }
@@ -151,9 +151,9 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
 
     private func wrapBackgroundProcessing(success: Bool) {
         if success {
-            DLog("Background fetch completed")
+            Logging.log("Background fetch completed")
         } else {
-            DLog("Background fetch FAILED")
+            Logging.log("Background fetch FAILED")
         }
         scheduleRefreshTask()
         backgroundProcessing?.setTaskCompleted(success: success)
@@ -253,9 +253,9 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
 
         do {
             try BGTaskScheduler.shared.submit(request)
-            DLog("Scheduled next refresh after \(request.earliestBeginDate!)")
+            Logging.log("Scheduled next refresh after \(request.earliestBeginDate!)")
         } catch {
-            DLog("Could not schedule app refresh: \(error)")
+            Logging.log("Could not schedule app refresh: \(error)")
         }
     }
 }

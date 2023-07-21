@@ -4,7 +4,7 @@ import TrailerJson
 typealias JSON = [String: Any]
 
 enum DataResult {
-    case success(headers: [AnyHashable: Any]), notFound, deleted, failed(code: Int), cancelled
+    case success(headers: [AnyHashable: Any], data: Data), notFound, deleted, failed(code: Int), cancelled, ignored
 
     var logValue: String {
         switch self {
@@ -12,6 +12,7 @@ enum DataResult {
         case .deleted: return "Deleted"
         case .notFound: return "Not Found"
         case .cancelled: return "Cancelled"
+        case .ignored: return "Ignored"
         case let .failed(code): return "Error Code \(code)"
         }
     }
@@ -49,25 +50,31 @@ enum HTTP {
         defer {
             gateKeeper.relaxedReturnTicket()
         }
-        let (result, data) = try await getData(for: request, attempts: attempts, logPrefix: logPrefix)
-        if case .success = result, monitoringLog, let dataString = String(data: data, encoding: .utf8) {
-            DLog("API data from \(request.url?.absoluteString ?? "<nil>"): \(dataString)")
+
+        let result = try await getData(for: request, attempts: attempts, logPrefix: logPrefix)
+        guard case let .success(_, data) = result else {
+            return (nil, result)
         }
+
+        if Logging.monitoringLog, let dataString = String(data: data, encoding: .utf8) {
+            Logging.log("API data from \(request.url?.absoluteString ?? "<nil>"): \(dataString)")
+        }
+
         do {
             let json = try await Task.detached { try data.withUnsafeBytes { try TrailerJson.parse(bytes: $0) } }.value
             return (json, result)
         } catch {
             if retryOnInvalidJson, attempts > 1 {
-                DLog("Retrying on invalid JSON result (attempts left: \(attempts)): \(error)")
+                Logging.log("Retrying on invalid JSON result (attempts left: \(attempts)): \(error)")
                 try? await Task.sleep(nanoseconds: 5 * NSEC_PER_SEC)
                 return try await getJsonData(for: request, attempts: attempts - 1, retryOnInvalidJson: true)
             }
-            DLog("JSON error: \(error)")
+            Logging.log("JSON error: \(error)")
             throw error
         }
     }
 
-    static func getData(for request: URLRequest, attempts: Int, logPrefix: String? = nil) async throws -> (result: DataResult, data: Data) {
+    static func getData(for request: URLRequest, attempts: Int, logPrefix: String? = nil) async throws -> DataResult {
         #if os(iOS)
             Task { @MainActor in
                 BackgroundTask.registerForBackground()
@@ -84,39 +91,36 @@ enum HTTP {
             do {
                 let response = try await urlSession.data(for: request)
                 guard let httpResponse = response.1 as? HTTPURLResponse else {
-                    throw API.apiError("Network response was not a HTTP response")
+                    throw ApiError.nonHttpResponse
                 }
 
                 let code = httpResponse.statusCode
 
                 switch code {
-                case 304:
-                    throw API.apiError("Unexpected 304 received")
                 case 404:
-                    return (result: .notFound, data: Data())
+                    return .notFound
                 case 410:
-                    return (result: .deleted, data: Data())
+                    return .deleted
                 case 403, 502, 503:
                     // in case of throttle or ongoing GH deployment
-                    throw API.apiError("HTTP Code \(code) received")
+                    throw ApiError.errorCode(code)
                 case 400...:
-                    return (result: .failed(code: code), data: Data())
+                    return .failed(code: code)
                 default:
-                    return (.success(headers: httpResponse.allHeaderFields), response.0)
+                    return .success(headers: httpResponse.allHeaderFields, data: response.0)
                 }
             } catch {
                 if (error as NSError).code == -999 {
-                    return (.cancelled, Data())
+                    return .cancelled
                 }
 
+                let url = request.url?.absoluteString ?? "<nil>"
                 attempt -= 1
                 if attempt > 0 {
-                    let url = request.url?.absoluteString ?? "<nil>"
-                    DLog("\(logPrefix.orEmpty)Will pause and retry call to \(url) - \(error.localizedDescription)")
-                    try? await Task.sleep(nanoseconds: 5 * NSEC_PER_SEC)
+                    Logging.log("\(logPrefix.orEmpty)Will retry call to \(url) in 10 seconds - \(error.localizedDescription)")
+                    try? await Task.sleep(nanoseconds: 10 * NSEC_PER_SEC)
                 } else {
-                    let url = request.url?.absoluteString ?? "<nil>"
-                    DLog("\(logPrefix.orEmpty)Failed call to \(url) - \(error.localizedDescription)")
+                    Logging.log("\(logPrefix.orEmpty)Failed call to \(url) - \(error.localizedDescription)")
                     throw error
                 }
             }
@@ -129,14 +133,19 @@ enum HTTP {
         let absolutePath = "\(path)\(connector)s=128"
 
         guard let url = URL(string: absolutePath) else {
-            throw API.apiError("Invalid URL: \(absolutePath)")
+            throw ApiError.invalidUrl(absolutePath)
         }
 
         let req = URLRequest(url: url)
-        let response = try await HTTP.getData(for: req, attempts: 1)
-        guard let i = IMAGE_CLASS(data: response.data) else {
-            throw API.apiError("Invalid image data")
+
+        guard case let .success(_, data) = try await HTTP.getData(for: req, attempts: 1) else {
+            throw ApiError.imageFetchFailed
         }
+
+        guard let i = IMAGE_CLASS(data: data) else {
+            throw ApiError.invalidImageData
+        }
+
         return i
     }
 }

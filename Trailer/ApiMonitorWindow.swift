@@ -1,8 +1,5 @@
 import Cocoa
-
-extension Notification.Name {
-    static let LogMessagePosted = Notification.Name("LogMessagePosted")
-}
+import Combine
 
 extension NSAttributedString: @unchecked Sendable {}
 
@@ -18,25 +15,31 @@ final class ApiMonitorWindow: NSWindow, NSWindowDelegate {
     override func awakeFromNib() {
         super.awakeFromNib()
         delegate = self
-
-        let nc = NotificationCenter.default
-        nc.addObserver(self, selector: #selector(newMessage(_:)), name: .LogMessagePosted, object: nil)
-
-        monitoringLog = true
-
         textStorage = textView.textStorage
+
+        let logDateFormatter = DateFormatter()
+        logDateFormatter.dateFormat = "yyyyMMdd HH:mm:ss:SSS"
+
+        Logging.monitorObservation = Logging.logPublisher
+            .sink { [weak self] message in
+                guard let self else { return }
+
+                let date = logDateFormatter.string(from: Date())
+                let logString = NSAttributedString(string: ">>> \(date) - \(message())\n\n",
+                                                   attributes: [.foregroundColor: NSColor.textColor])
+                Task { @MainActor in
+                    self.textStorage.append(logString)
+                    if self.autoScroll {
+                        self.textView.scrollToEndOfDocument(nil)
+                    }
+                }
+            }
     }
 
     func windowWillClose(_: Notification) {
-        monitoringLog = false
+        Logging.monitorObservation = nil
         prefs?.closedApiMonitorWindow()
     }
-
-    private let dateFormatter: DateFormatter = {
-        let d = DateFormatter()
-        d.dateFormat = "yyyyMMdd HH:mm:ss:SSS"
-        return d
-    }()
 
     @IBAction private func autoScrollSelected(_ sender: NSButton) {
         autoScroll = sender.integerValue != 0
@@ -49,29 +52,8 @@ final class ApiMonitorWindow: NSWindow, NSWindowDelegate {
             NSPasteboard.general.setString(log, forType: .string)
         }
     }
-    
-    @IBAction private func clearSelected(_ sender: NSButton) {
+
+    @IBAction private func clearSelected(_: NSButton) {
         textStorage.mutableString.deleteCharacters(in: NSRange(location: 0, length: textStorage.length))
-    }
-    
-    @objc private func newMessage(_ notification: Notification) {
-        guard let message = notification.object as? (() -> String) else {
-            return
-        }
-
-        let now = Date()
-
-        Task.detached(priority: .utility) {
-            let date = self.dateFormatter.string(from: now)
-            let logString = NSAttributedString(string: ">>> \(date) - \(message())\n\n", attributes: [
-                .foregroundColor: NSColor.textColor
-            ])
-            Task { @MainActor in
-                self.textStorage.append(logString)
-                if self.autoScroll {
-                    self.textView.scrollToEndOfDocument(nil)
-                }
-            }
-        }
     }
 }

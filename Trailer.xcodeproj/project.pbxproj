@@ -149,6 +149,8 @@
 		16C3048E1CF4ECEF0017D79F /* SectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C3048D1CF4ECEF0017D79F /* SectionHeaderView.swift */; };
 		16C4ACF71EB553E20022C33B /* requestsChangesIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 16C4ACF51EB553E20022C33B /* requestsChangesIcon.png */; };
 		16C4ACF81EB553E20022C33B /* approvesChangesIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 16C4ACF61EB553E20022C33B /* approvesChangesIcon.png */; };
+		16C6B9432A6AE04F00CBA836 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C6B9422A6AE04F00CBA836 /* Logging.swift */; };
+		16C6B9442A6AE04F00CBA836 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C6B9422A6AE04F00CBA836 /* Logging.swift */; };
 		16C90F021B13BC180095E8D5 /* RepoSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C90F011B13BC180095E8D5 /* RepoSettingsViewController.swift */; };
 		16C9A2761A44D12600EE54EC /* AboutTrailerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C9A2751A44D12600EE54EC /* AboutTrailerViewController.swift */; };
 		16C9A27A1A44DD0200EE54EC /* CommentBlacklistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C9A2791A44DD0200EE54EC /* CommentBlacklistViewController.swift */; };
@@ -421,6 +423,7 @@
 		16C3048D1CF4ECEF0017D79F /* SectionHeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SectionHeaderView.swift; sourceTree = "<group>"; };
 		16C4ACF51EB553E20022C33B /* requestsChangesIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = requestsChangesIcon.png; sourceTree = "<group>"; };
 		16C4ACF61EB553E20022C33B /* approvesChangesIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = approvesChangesIcon.png; sourceTree = "<group>"; };
+		16C6B9422A6AE04F00CBA836 /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
 		16C90F011B13BC180095E8D5 /* RepoSettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = RepoSettingsViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16C9A2751A44D12600EE54EC /* AboutTrailerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutTrailerViewController.swift; sourceTree = "<group>"; };
 		16C9A2791A44DD0200EE54EC /* CommentBlacklistViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentBlacklistViewController.swift; sourceTree = "<group>"; };
@@ -808,6 +811,7 @@
 				1664CBC91B7796840006BDE7 /* Enums.swift */,
 				16F0BAD523A53EB4002EC348 /* Colors.swift */,
 				16D2B874251FA54E00D86C89 /* Enums+Settings.swift */,
+				16C6B9422A6AE04F00CBA836 /* Logging.swift */,
 			);
 			name = Globals;
 			sourceTree = "<group>";
@@ -1270,6 +1274,7 @@
 				165C49101BA63B45006BBCF5 /* AdvancedSettingsCell.swift in Sources */,
 				1657230523AAA2AC00F597EF /* V3API.swift in Sources */,
 				169205641E34DA9F00FB9547 /* CustomReposViewController.swift in Sources */,
+				16C6B9442A6AE04F00CBA836 /* Logging.swift in Sources */,
 				164840FC1AD196D6009E6383 /* SettingsManager.swift in Sources */,
 				1657230923AAA3B000F597EF /* RestAccess.swift in Sources */,
 				1633C1931ABCEC4A0086C692 /* Issue.swift in Sources */,
@@ -1380,6 +1385,7 @@
 				16901A451D659E9500141595 /* NotificationQueue.swift in Sources */,
 				162002D01A2A3E2100FF95F3 /* Application.swift in Sources */,
 				16B3B3171A34E8E2000BE6CC /* ApiServer.swift in Sources */,
+				16C6B9432A6AE04F00CBA836 /* Logging.swift in Sources */,
 				161C959E1A3A36020019A577 /* MenuWindow.swift in Sources */,
 				16A69EDA1AC83020008231F9 /* ListableItem.swift in Sources */,
 				16CBE1C51A2DFBA500485053 /* Settings.swift in Sources */,

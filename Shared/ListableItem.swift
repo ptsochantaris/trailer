@@ -1073,7 +1073,7 @@ class ListableItem: DataItem, Listable {
             }
         }
 
-        // DLog("%@", andPredicates)
+        // Logging.log("%@", andPredicates)
 
         let f = NSFetchRequest<T>(entityName: itemType.typeName)
         f.fetchBatchSize = 50
@@ -1138,7 +1138,7 @@ class ListableItem: DataItem, Listable {
                         let r = n.request.identifier
                         let u = n.request.content.userInfo
                         if let notificationUri = u[LISTABLE_URI_KEY] as? String, notificationUri == uri {
-                            DLog("Removing related notification: \(r)")
+                            Logging.log("Removing related notification: \(r)")
                             nc.removeDeliveredNotifications(withIdentifiers: [r])
                         }
                     }
@@ -1245,18 +1245,18 @@ class ListableItem: DataItem, Listable {
     }
 
     final func handleClosing() {
-        DLog("Detected closed item: \(title.orEmpty), handling policy is \(Settings.closeHandlingPolicy), coming from section \(sectionIndex)")
+        Logging.log("Detected closed item: \(title.orEmpty), handling policy is \(Settings.closeHandlingPolicy), coming from section \(sectionIndex)")
 
         if !isVisibleOnMenu {
-            DLog("Closed item was hidden, won't announce")
+            Logging.log("Closed item was hidden, won't announce")
             managedObjectContext?.delete(self)
 
         } else if shouldKeep(accordingTo: Settings.closeHandlingPolicy) {
-            DLog("Will keep closed item")
+            Logging.log("Will keep closed item")
             keep(as: .closed, notification: self is Issue ? .issueClosed : .prClosed)
 
         } else {
-            DLog("Will not keep closed item")
+            Logging.log("Will not keep closed item")
             managedObjectContext?.delete(self)
         }
     }

@@ -55,21 +55,21 @@ final actor ImageCache {
                 let path = cacheDirectory.appending(pathComponent: f)
                 if path.hasSuffix(".etag") {
                     try fileManager.removeItem(atPath: path)
-                    DLog("Removed old cached data: \(path)")
+                    Logging.log("Removed old cached data: \(path)")
 
                 } else if path.hasSuffix(".bin") {
                     let attributes = try fileManager.attributesOfItem(atPath: path)
                     if let date = attributes[.creationDate] as? Date {
                         if now.timeIntervalSince(date) > (3600 * 24 * 30) {
                             try fileManager.removeItem(atPath: path)
-                            DLog("Removed old cached data: \(path)")
+                            Logging.log("Removed old cached data: \(path)")
                         }
                     } else {
-                        DLog("Removed cached data with no modification date: \(path)")
+                        Logging.log("Removed cached data with no modification date: \(path)")
                     }
                 }
             } catch {
-                DLog("File error when removing old cached data: \(error.localizedDescription)")
+                Logging.log("File error when removing old cached data: \(error.localizedDescription)")
             }
         }
     }

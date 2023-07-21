@@ -131,7 +131,7 @@ enum Settings {
 
         #if os(macOS)
             if Settings.lastRunVersion != "", sharedDefaults.object(forKey: "launchAtLogin") == nil {
-                DLog("Migrated to the new startup mechanism, activating it by default")
+                Logging.log("Migrated to the new startup mechanism, activating it by default")
                 isAppLoginItem = true
             }
         #endif
@@ -157,14 +157,14 @@ enum Settings {
         if let v = value {
             let vString = String(describing: v)
             if let p = previousValue, String(describing: p) == vString {
-                DLog("Setting \(key) to identical value (\(vString), skipping")
+                Logging.log("Setting \(key) to identical value (\(vString), skipping")
                 return
             } else {
                 sharedDefaults.set(v, forKey: key)
             }
         } else {
             if previousValue == nil {
-                DLog("Setting \(key) to identical value (nil), skipping")
+                Logging.log("Setting \(key) to identical value (nil), skipping")
                 return
             } else {
                 sharedDefaults.removeObject(forKey: key)
@@ -172,9 +172,9 @@ enum Settings {
         }
 
         if let v = value {
-            DLog("Setting \(key) to \(String(describing: v))")
+            Logging.log("Setting \(key) to \(String(describing: v))")
         } else {
-            DLog("Clearing option \(key)")
+            Logging.log("Clearing option \(key)")
         }
 
         Task { @MainActor in
@@ -230,18 +230,18 @@ enum Settings {
         settings["DB_CONFIG_OBJECTS"] = ApiServer.archivedApiServers
         settings["DB_SNOOZE_OBJECTS"] = SnoozePreset.archivedPresets
         if !settings.write(to: url, atomically: true) {
-            DLog("Warning, exporting settings failed")
+            Logging.log("Warning, exporting settings failed")
             return false
         }
         NotificationCenter.default.post(name: .SettingsExported, object: nil)
-        DLog("Written settings to \(url.absoluteString)")
+        Logging.log("Written settings to \(url.absoluteString)")
         return true
     }
 
     @MainActor
     static func readFromURL(_ url: URL) async -> Bool {
         if let settings = NSDictionary(contentsOf: url) {
-            DLog("Reading settings from \(url.absoluteString)")
+            Logging.log("Reading settings from \(url.absoluteString)")
             resetAllSettings()
             for k in allFields {
                 if let v = settings[k] {
@@ -953,7 +953,7 @@ enum Settings {
         if new != filterLookup[key] {
             filterLookup[key] = new
             if let data = try? JSONEncoder().encode(filterLookup) {
-                DLog("Persisting filters for menus")
+                Logging.log("Persisting filters for menus")
                 sharedDefaults.setValue(data, forKey: "PERSISTED_TAB_FILTERS")
             }
         }

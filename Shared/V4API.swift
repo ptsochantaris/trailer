@@ -5,12 +5,12 @@ extension API {
     static func canUseV4API(for moc: NSManagedObjectContext) -> String? {
         let servers = ApiServer.allApiServers(in: moc)
         if servers.contains(where: { $0.goodToGo && $0.graphQLPath.isEmpty }) {
-            DLog("Warning: Some servers have a blank v4 API path")
+            Logging.log("Warning: Some servers have a blank v4 API path")
             return Settings.v4DAPIessage
         }
 
         if Repo.nullNodeIdItems(in: moc) > 0 {
-            DLog("Warning: Some repos still have a null node ID")
+            Logging.log("Warning: Some repos still have a null node ID")
             return Settings.v4DBMessage
         }
 

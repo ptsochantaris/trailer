@@ -31,7 +31,7 @@ extension GraphQL {
             ingest = Task.detached { [weak self] in
                 guard let self else { return }
                 for await chunk in queue {
-                    DLog("Processing GQL nodes: \(chunk.report)")
+                    Logging.log("Processing GQL nodes: \(chunk.report)")
                     await process(chunk: chunk)
                     if !chunk.moreComing {
                         queue.finish()

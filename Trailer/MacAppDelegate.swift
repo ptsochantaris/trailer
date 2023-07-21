@@ -133,11 +133,11 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 
     @objc private func systemWillSleep() {
         systemSleeping = true
-        DLog("System is going to sleep")
+        Logging.log("System is going to sleep")
     }
 
     @objc private func systemDidWake() {
-        DLog("System woke up")
+        Logging.log("System woke up")
         systemSleeping = false
         Task {
             try? await Task.sleep(nanoseconds: 2 * NSEC_PER_SEC)
@@ -593,7 +593,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         let url = URL(fileURLWithPath: filename)
         let ext = url.pathExtension
         if ext == "trailerSettings" {
-            DLog("Will open \(url.absoluteString)")
+            Logging.log("Will open \(url.absoluteString)")
             Task {
                 await tryLoadSettings(from: url, skipConfirm: Settings.dontConfirmSettingsImport)
             }
@@ -682,7 +682,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
             let howLongAgo = Date().timeIntervalSince(l).rounded()
             let howLongUntilNextSync = Settings.refreshPeriod - howLongAgo
             if howLongUntilNextSync > 0 {
-                DLog("No need to refresh yet, will refresh in \(howLongUntilNextSync) sec")
+                Logging.log("No need to refresh yet, will refresh in \(howLongUntilNextSync) sec")
                 setupRefreshTask(in: howLongUntilNextSync)
                 return
             }
@@ -808,23 +808,23 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
     @MainActor
     func startRefresh() async {
         if API.isRefreshing {
-            DLog("Won't start refresh because refresh is already ongoing")
+            Logging.log("Won't start refresh because refresh is already ongoing")
             return
         }
 
         if systemSleeping {
-            DLog("Won't start refresh because the system is in power-nap / sleep")
+            Logging.log("Won't start refresh because the system is in power-nap / sleep")
             return
         }
 
         let hasConnection = API.hasNetworkConnection
         if !hasConnection {
-            DLog("Won't start refresh because internet connectivity is down")
+            Logging.log("Won't start refresh because internet connectivity is down")
             return
         }
 
         if !ApiServer.someServersHaveAuthTokens(in: DataManager.main) {
-            DLog("Won't start refresh because there are no configured API servers")
+            Logging.log("Won't start refresh because there are no configured API servers")
             return
         }
 
@@ -893,7 +893,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
             }
 
             if let w = incomingEvent.window as? MenuWindow {
-                // DLog("Keycode: %@", incomingEvent.keyCode)
+                // Logging.log("Keycode: %@", incomingEvent.keyCode)
 
                 switch incomingEvent.keyCode {
                 case 123, 124:
@@ -1272,14 +1272,14 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 
 extension MacAppDelegate: SPUUpdaterDelegate {
     func updaterDidNotFindUpdate(_: SPUUpdater) {
-        DLog("No app updates available")
+        Logging.log("No app updates available")
     }
 
     func updaterDidNotFindUpdate(_: SPUUpdater, error: Error) {
-        DLog("Could not look for update: \(error.localizedDescription)")
+        Logging.log("Could not look for update: \(error.localizedDescription)")
     }
 
     func updater(_: SPUUpdater, didFindValidUpdate _: SUAppcastItem) {
-        DLog("Found update")
+        Logging.log("Found update")
     }
 }
