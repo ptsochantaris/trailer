@@ -19,6 +19,6 @@ Released under the terms of the MIT license, see the [LICENSE](LICENSE.txt) file
 
 ## Copyright
 
-Copyright (c) 2014-2022 Paul Tsochantaris
+Copyright (c) 2014-2023 Paul Tsochantaris
 
 Parts copyright (c) 2013-2014 HouseTrip Ltd.
