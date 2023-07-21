@@ -87,6 +87,7 @@ enum HTTP {
         #endif
 
         var attempt = attempts
+        var retryDelay: UInt64 = 5
         while true {
             do {
                 let response = try await urlSession.data(for: request)
@@ -117,8 +118,9 @@ enum HTTP {
                 let url = request.url?.absoluteString ?? "<nil>"
                 attempt -= 1
                 if attempt > 0 {
-                    Logging.log("\(logPrefix.orEmpty)Will retry call to \(url) in 10 seconds - \(error.localizedDescription)")
-                    try? await Task.sleep(nanoseconds: 10 * NSEC_PER_SEC)
+                    Logging.log("\(logPrefix.orEmpty)Will retry call to \(url) in \(retryDelay) seconds - \(error.localizedDescription)")
+                    try? await Task.sleep(nanoseconds: retryDelay * NSEC_PER_SEC)
+                    retryDelay += 2
                 } else {
                     Logging.log("\(logPrefix.orEmpty)Failed call to \(url) - \(error.localizedDescription)")
                     throw error
