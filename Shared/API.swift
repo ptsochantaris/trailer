@@ -25,7 +25,7 @@ enum ApiError: Error {
     case invalidImageData
     case noUserRecordFound
     case graphQLFailure(String)
-    
+
     var description: String {
         switch self {
         case let .errorCode(code):
