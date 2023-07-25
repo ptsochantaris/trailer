@@ -511,13 +511,14 @@ enum GraphQL {
                 }
             }
 
-            let queries = Query.batching("\(serverName): \(name)", groupName: "nodes", idList: ids, maxCost: maxCost, perNode: nodeBlock, fields: fields)
-
             do {
+                let queries = Query.batching("\(serverName): \(name)", groupName: "nodes", idList: ids, maxCost: maxCost, perNode: nodeBlock, fields: fields)
                 try await server.run(queries: queries)
                 processor.add(chunk: .init(nodes: nodes, server: server, parentType: parentType, moreComing: false))
                 await processor.waitForCompletion()
             } catch {
+                processor.add(chunk: .init(nodes: [:], server: server, parentType: nil, moreComing: false))
+                await processor.waitForCompletion()
                 server.lastSyncSucceeded = false
                 throw error
             }
