@@ -115,8 +115,6 @@
 		16A0FA7423AECFAE0023B565 /* BackgroundTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A0FA7323AECFAE0023B565 /* BackgroundTask.swift */; };
 		16A1E44129F2FBB6007684D0 /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 16A1E44029F2FBB6007684D0 /* AsyncAlgorithms */; };
 		16A1E44329F2FBCA007684D0 /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 16A1E44229F2FBCA007684D0 /* AsyncAlgorithms */; };
-		16A1E44529F31B9D007684D0 /* GraphQLProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A1E44429F31B9D007684D0 /* GraphQLProcessor.swift */; };
-		16A1E44629F31B9D007684D0 /* GraphQLProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A1E44429F31B9D007684D0 /* GraphQLProcessor.swift */; };
 		16A41E9E22A71C7A00D1D352 /* TextFieldCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A41E9D22A71C7A00D1D352 /* TextFieldCell.swift */; };
 		16A69EDA1AC83020008231F9 /* ListableItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A69ED91AC83020008231F9 /* ListableItem.swift */; };
 		16A69EDB1AC83020008231F9 /* ListableItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A69ED91AC83020008231F9 /* ListableItem.swift */; };
@@ -381,7 +379,6 @@
 		169FB2351A3DBD7D00E00771 /* SectionHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SectionHeader.swift; sourceTree = "<group>"; };
 		16A0B0361A48AC7900B3452D /* MacAppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = MacAppDelegate.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16A0FA7323AECFAE0023B565 /* BackgroundTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundTask.swift; sourceTree = "<group>"; };
-		16A1E44429F31B9D007684D0 /* GraphQLProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraphQLProcessor.swift; sourceTree = "<group>"; };
 		16A41E9D22A71C7A00D1D352 /* TextFieldCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldCell.swift; sourceTree = "<group>"; };
 		16A69ED91AC83020008231F9 /* ListableItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = ListableItem.swift; path = ../Shared/ListableItem.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16AE7CED1C92304300CB304B /* Trailer 24.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 24.xcdatamodel"; sourceTree = "<group>"; };
@@ -526,7 +523,6 @@
 			children = (
 				1657230023AAA23500F597EF /* V4API.swift */,
 				160CA02B23A65152003FA0D8 /* GraphQL.swift */,
-				16A1E44429F31B9D007684D0 /* GraphQLProcessor.swift */,
 			);
 			name = V4API;
 			sourceTree = "<group>";
@@ -1278,7 +1274,6 @@
 				164840FC1AD196D6009E6383 /* SettingsManager.swift in Sources */,
 				1657230923AAA3B000F597EF /* RestAccess.swift in Sources */,
 				1633C1931ABCEC4A0086C692 /* Issue.swift in Sources */,
-				16A1E44629F31B9D007684D0 /* GraphQLProcessor.swift in Sources */,
 				16F413701BA5850A006B0195 /* RepoCell.swift in Sources */,
 				168839C71DEF8C3B002D9448 /* ImportExport.swift in Sources */,
 				1606F1BD1A471CDC0088368E /* RespositoriesViewController.swift in Sources */,
@@ -1358,7 +1353,6 @@
 				169B92961CC52C05002774A8 /* SnoozePreset.swift in Sources */,
 				160FB1401AE3F78E00EB5C8E /* PreferencesWindow.swift in Sources */,
 				16A0B0371A48AC7900B3452D /* MacAppDelegate.swift in Sources */,
-				16A1E44529F31B9D007684D0 /* GraphQLProcessor.swift in Sources */,
 				16393A9B283E99E000DDD546 /* StatusItemView.swift in Sources */,
 				161B851C1AB8E12C00AD4C5D /* Team.swift in Sources */,
 				16B3B31D1A34E8E2000BE6CC /* PRLabel.swift in Sources */,
