@@ -7,6 +7,26 @@
 		<language>en</language>
 
         <item>
+            <title>Version 1.8.4</title>
+            <sparkle:minimumSystemVersion>11.0.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[<font face="sans-serif" size="3"><ul>
+                <li>The log options in the Misc section in preferences are now replaced by a logging window that lists all operations performed by Trailer, as well as API requests and responses, with an option to copy the log to the clipboard.</li>
+                <li>Improved v4 API GitHub failures handling and retries.</li>
+                <li>An updated v4 API preferences panel, with specific presets (and a safe default)</li>
+                <li>Tidbits: Updated to Sparkle 2.x, Cleaned up ancient prefs migration code, minor querying cleanups/performance optimisations, returned to system-provided networking as NIO was having issues, and fix for crash bug in GraphQL parsing.</li>
+                </ul>
+                </font>]]></description>
+            <pubDate>Tue, 26 Jul 2023 20:00:00 +0000</pubDate>
+            <enclosure
+            url="https://github.com/ptsochantaris/trailer/releases/download/1.8.4/Trailer-184.zip"
+            sparkle:version="1671"
+            sparkle:shortVersionString="1.8.4"
+            sparkle:dsaSignature="MC0CFQCpfGAu7eAz6TzBAQx1TRXXLzpOmwIUQ82rWCbMOQXs2gzE8McbncEpeLU="
+            sparkle:edSignature="foo0vYY92K+siomG6W+qN6MLz/jDw54kcLr/GKjsdaWq7fkQT2sY/C2dRdrWO62tqVa2EBQs8iLPkPqzHevICQ==" length="4755707"
+            type="application/octet-stream"/>
+        </item>
+        
+        <item>
             <title>Version 1.8.3</title>
             <sparkle:minimumSystemVersion>11.0.0</sparkle:minimumSystemVersion>
             <description><![CDATA[<font face="sans-serif" size="3"><ul>
