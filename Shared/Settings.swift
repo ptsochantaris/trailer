@@ -150,38 +150,32 @@ enum Settings {
             }
         }
     #endif
+    
+    fileprivate static subscript(key: String) -> Any? {
+        get {
+            sharedDefaults.object(forKey: key)
+        }
+        set {
+            let previousValue = sharedDefaults.object(forKey: key)
 
-    private static func set(_ key: String, _ value: Any?) {
-        let previousValue = sharedDefaults.object(forKey: key)
-
-        if let v = value {
-            let vString = String(describing: v)
-            if let p = previousValue, String(describing: p) == vString {
-                Logging.log("Setting \(key) to identical value (\(vString), skipping")
-                return
+            if let newValue {
+                if let previousValue, String(describing: previousValue) == String(describing: newValue) {
+                    return
+                }
+                sharedDefaults.set(newValue, forKey: key)
             } else {
-                sharedDefaults.set(v, forKey: key)
-            }
-        } else {
-            if previousValue == nil {
-                Logging.log("Setting \(key) to identical value (nil), skipping")
-                return
-            } else {
+                if previousValue == nil {
+                    return
+                }
                 sharedDefaults.removeObject(forKey: key)
             }
-        }
 
-        if let v = value {
-            Logging.log("Setting \(key) to \(String(describing: v))")
-        } else {
-            Logging.log("Clearing option \(key)")
-        }
-
-        Task { @MainActor in
-            possibleExport(key)
+            Task { @MainActor in
+                possibleExport(key)
+            }
         }
     }
-
+    
     private static let saveTimer = PopTimer(timeInterval: 2) {
         if let e = Settings.lastExportUrl {
             Task { @MainActor in
@@ -191,7 +185,7 @@ enum Settings {
     }
 
     static func possibleExport(_ key: String?) {
-        #if os(OSX)
+        #if os(macOS)
             if !Settings.autoRepeatSettingsExport {
                 return
             }
@@ -207,11 +201,7 @@ enum Settings {
             }
         #endif
     }
-
-    private static func get(_ key: String) -> Any? {
-        sharedDefaults.object(forKey: key)
-    }
-
+    
     ///////////////////////////////// IMPORT / EXPORT
 
     @discardableResult
@@ -263,154 +253,104 @@ enum Settings {
 
     ///////////////////////////////// NUMBERS
 
+    @UserDefault(key: "PR_V4_SYNC_PROFILE", defaultValue: -10)
+    static var syncProfile: Int
     static let syncProfileHelp = "Preferred balance between query size and safety when using v4 API."
-    static var syncProfile: Int {
-        get { get("PR_V4_SYNC_PROFILE") as? Int ?? -10 }
-        set { set("PR_V4_SYNC_PROFILE", newValue) }
-    }
 
+    @UserDefault(key: "V4_THREAD_SYNC", defaultValue: false)
+    static var threadedSync: Bool
     static let threadedSyncHelp = "Try two parallel queries to the server when using v4 API. Can greatly speed up incremental syncs but in some corner cases cause throttling by GitHub."
-    static var threadedSync: Bool {
-        get { get("V4_THREAD_SYNC") as? Bool ?? false }
-        set { set("V4_THREAD_SYNC", newValue) }
-    }
 
+    @UserDefault(key: "AUTO_SNOOZE_DAYS", defaultValue: 0)
+    static var autoSnoozeDuration: Int
     static let autoSnoozeDurationHelp = "How many days before an item is automatically snoozed. An item is auto-snoozed forever but will wake up on any comment, mention, or status update."
-    static var autoSnoozeDuration: Int {
-        get { get("AUTO_SNOOZE_DAYS") as? Int ?? 0 }
-        set { set("AUTO_SNOOZE_DAYS", newValue) }
-    }
 
+    @UserDefault(key: "SORT_METHOD_KEY", defaultValue: 0)
+    static var sortMethod: Int
     static let sortMethodHelp = "The criterion to use when sorting items."
-    static var sortMethod: Int {
-        get { get("SORT_METHOD_KEY") as? Int ?? 0 }
-        set { set("SORT_METHOD_KEY", newValue) }
-    }
 
-    static var statusFilteringMode: Int {
-        get { get("STATUS_FILTERING_METHOD_KEY") as? Int ?? 0 }
-        set { set("STATUS_FILTERING_METHOD_KEY", newValue) }
-    }
+    @UserDefault(key: "STATUS_FILTERING_METHOD_KEY", defaultValue: 0)
+    static var statusFilteringMode: Int
 
-    static var lastPreferencesTabSelected: Int {
-        get { get("LAST_PREFS_TAB_SELECTED") as? Int ?? 0 }
-        set { set("LAST_PREFS_TAB_SELECTED", newValue) }
-    }
+    @UserDefault(key: "LAST_PREFS_TAB_SELECTED", defaultValue: 0)
+    static var lastPreferencesTabSelected: Int
 
-    static var lastPreferencesTabSelectedOSX: Int {
-        get { get("LAST_PREFS_TAB_SELECTED_OSX") as? Int ?? 0 }
-        set { set("LAST_PREFS_TAB_SELECTED_OSX", newValue) }
-    }
+    @UserDefault(key: "LAST_PREFS_TAB_SELECTED_OSX", defaultValue: 0)
+    static var lastPreferencesTabSelectedOSX: Int
 
+    @UserDefault(key: "CLOSE_HANDLING_POLICY_2", defaultValue: HandlingPolicy.keepMine.rawValue)
+    static var closeHandlingPolicy: Int
     static let closeHandlingPolicyHelp = "How to handle an item when it is believed to be closed (or has disappeared)."
-    static var closeHandlingPolicy: Int {
-        get { get("CLOSE_HANDLING_POLICY_2") as? Int ?? HandlingPolicy.keepMine.rawValue }
-        set { set("CLOSE_HANDLING_POLICY_2", newValue) }
-    }
 
+    @UserDefault(key: "MERGE_HANDLING_POLICY_2", defaultValue: HandlingPolicy.keepMine.rawValue)
+    static var mergeHandlingPolicy: Int
     static let mergeHandlingPolicyHelp = "How to handle an item when it is detected as merged."
-    static var mergeHandlingPolicy: Int {
-        get { get("MERGE_HANDLING_POLICY_2") as? Int ?? HandlingPolicy.keepMine.rawValue }
-        set { set("MERGE_HANDLING_POLICY_2", newValue) }
-    }
 
     static let statusItemRefreshBatchSizeHelp = "Because querying statuses can be bandwidth and time intensive, Trailer will scan for updates on items that haven't been scanned for the longest time, at every refresh, up to a maximum of this number of items. Higher values mean longer sync times and more API usage."
     static var statusItemRefreshBatchSize: Int {
-        get { if let n = get("STATUS_ITEM_REFRESH_BATCH") as? Int { return n > 0 ? n : 100 } else { return 100 } }
-        set { set("STATUS_ITEM_REFRESH_BATCH", newValue) }
+        get { if let n = self["STATUS_ITEM_REFRESH_BATCH"] as? Int { return n > 0 ? n : 100 } else { return 100 } }
+        set { self["STATUS_ITEM_REFRESH_BATCH"] = newValue }
     }
 
-    static var checkForUpdatesInterval: Int {
-        get { get("UPDATE_CHECK_INTERVAL_KEY") as? Int ?? 8 }
-        set { set("UPDATE_CHECK_INTERVAL_KEY", newValue) }
-    }
+    @UserDefault(key: "UPDATE_CHECK_INTERVAL_KEY", defaultValue: 8)
+    static var checkForUpdatesInterval: Int
 
+    @UserDefault(key: "ASSIGNED_REVIEW_HANDLING_POLICY", defaultValue: 0)
+    static var assignedReviewHandlingPolicy: Int
     static let assignedReviewHandlingPolicyHelp = "If an item is assigned for you to review, Trailer can move it to a specific section or leave it as-is."
-    static var assignedReviewHandlingPolicy: Int {
-        get { get("ASSIGNED_REVIEW_HANDLING_POLICY") as? Int ?? 0 }
-        set { set("ASSIGNED_REVIEW_HANDLING_POLICY", newValue) }
-    }
 
+    @UserDefault(key: "ASSIGNED_PR_HANDLING_POLICY", defaultValue: 1)
+    static var assignedPrHandlingPolicy: Int
     static let assignedPrHandlingPolicyHelp = "If an item is assigned to you, Trailer can move it to a specific section or leave it as-is."
-    static var assignedPrHandlingPolicy: Int {
-        get { get("ASSIGNED_PR_HANDLING_POLICY") as? Int ?? 1 }
-        set { set("ASSIGNED_PR_HANDLING_POLICY", newValue) }
-    }
 
+    @UserDefault(key: "NEW_PR_DISPLAY_POLICY_INDEX", defaultValue: RepoDisplayPolicy.hide.intValue)
+    static var displayPolicyForNewPrs: Int
     static let displayPolicyForNewPrsHelp = "When a new repository is detected in your watchlist, this display policy will be applied by default to pull requests that come from it. You can further customize the display policy for any individual repository from the 'Repositories' tab."
-    static var displayPolicyForNewPrs: Int {
-        get { get("NEW_PR_DISPLAY_POLICY_INDEX") as? Int ?? RepoDisplayPolicy.hide.intValue }
-        set { set("NEW_PR_DISPLAY_POLICY_INDEX", newValue) }
-    }
 
+    @UserDefault(key: "NEW_ISSUE_DISPLAY_POLICY_INDEX", defaultValue: RepoDisplayPolicy.hide.intValue)
+    static var displayPolicyForNewIssues: Int
     static let displayPolicyForNewIssuesHelp = "When a new repository is detected in your watchlist, this display policy will be applied by default to issues that come from it. You can further customize the display policy for any individual repository from the 'Repositories' tab."
-    static var displayPolicyForNewIssues: Int {
-        get { get("NEW_ISSUE_DISPLAY_POLICY_INDEX") as? Int ?? RepoDisplayPolicy.hide.intValue }
-        set { set("NEW_ISSUE_DISPLAY_POLICY_INDEX", newValue) }
-    }
 
+    @UserDefault(key: "NEW_MENTION_MOVE_POLICY", defaultValue: Section.mentioned.intValue)
+    static var newMentionMovePolicy: Int
     static let newMentionMovePolicyHelp = "If your username is mentioned in an item's description or a comment posted inside it, move the item to the specified section."
-    static var newMentionMovePolicy: Int {
-        get { get("NEW_MENTION_MOVE_POLICY") as? Int ?? Section.mentioned.intValue }
-        set { set("NEW_MENTION_MOVE_POLICY", newValue) }
-    }
 
+    @UserDefault(key: "TEAM_MENTION_MOVE_POLICY", defaultValue: Section.mentioned.intValue)
+    static var teamMentionMovePolicy: Int
     static let teamMentionMovePolicyHelp = "If the name of one of the teams you belong to is mentioned in an item's description or a comment posted inside it, move the item to the specified section."
-    static var teamMentionMovePolicy: Int {
-        get { get("TEAM_MENTION_MOVE_POLICY") as? Int ?? Section.mentioned.intValue }
-        set { set("TEAM_MENTION_MOVE_POLICY", newValue) }
-    }
 
+    @UserDefault(key: "NEW_ITEM_IN_OWNED_REPO_MOVE_POLICY", defaultValue: Section.none.intValue)
+    static var newItemInOwnedRepoMovePolicy: Int
     static let newItemInOwnedRepoMovePolicyHelp = "Automatically move an item to the specified section if it has been created in a repo which you own, even if there is no direct mention of you."
-    static var newItemInOwnedRepoMovePolicy: Int {
-        get { get("NEW_ITEM_IN_OWNED_REPO_MOVE_POLICY") as? Int ?? Section.none.intValue }
-        set { set("NEW_ITEM_IN_OWNED_REPO_MOVE_POLICY", newValue) }
-    }
 
     /////////////////////////// STRINGS
 
-    static var defaultAppForOpeningItems: String {
-        get { get("DEFAULT_APP_FOR_OPENING_ITEMS") as? String ?? "" }
-        set { set("DEFAULT_APP_FOR_OPENING_ITEMS", newValue) }
-    }
+    @UserDefault(key: "DEFAULT_APP_FOR_OPENING_ITEMS", defaultValue: "")
+    static var defaultAppForOpeningItems: String
 
-    static var defaultAppForOpeningWeb: String {
-        get { get("DEFAULT_APP_FOR_OPENING_WEB") as? String ?? "" }
-        set { set("DEFAULT_APP_FOR_OPENING_WEB", newValue) }
-    }
+    @UserDefault(key: "DEFAULT_APP_FOR_OPENING_WEB", defaultValue: "")
+    static var defaultAppForOpeningWeb: String
 
+    @UserDefault(key: "STATUS_FILTERING_TERMS_KEY", defaultValue: [])
+    static var statusFilteringTerms: [String]
     static let statusFilteringTermsHelp = "You can specify specific terms which can then be matched against status items, in order to hide or show them."
-    static var statusFilteringTerms: [String] {
-        get { get("STATUS_FILTERING_TERMS_KEY") as? [String] ?? [] }
-        set { set("STATUS_FILTERING_TERMS_KEY", newValue) }
-    }
 
-    static var commentAuthorBlacklist: [String] {
-        get { get("COMMENT_AUTHOR_BLACKLIST") as? [String] ?? [] }
-        set { set("COMMENT_AUTHOR_BLACKLIST", newValue) }
-    }
+    @UserDefault(key: "COMMENT_AUTHOR_BLACKLIST", defaultValue: [])
+    static var commentAuthorBlacklist: [String]
 
+    @UserDefault(key: "ITEM_AUTHOR_BLACKLIST", defaultValue: [])
+    static var itemAuthorBlacklist: [String]
     static let itemAuthorBlacklistHelp = "Items from the specified usernames will be hidden."
-    static var itemAuthorBlacklist: [String] {
-        get { get("ITEM_AUTHOR_BLACKLIST") as? [String] ?? [] }
-        set { set("ITEM_AUTHOR_BLACKLIST", newValue) }
-    }
 
+    @UserDefault(key: "LABEL_BLACKLIST", defaultValue: [])
+    static var labelBlacklist: [String]
     static let labelBlacklistHelp = "Items containing the specified labels will be hidden."
-    static var labelBlacklist: [String] {
-        get { get("LABEL_BLACKLIST") as? [String] ?? [] }
-        set { set("LABEL_BLACKLIST", newValue) }
-    }
 
-    static var hotkeyLetter: String {
-        get { get("HOTKEY_LETTER") as? String ?? "T" }
-        set { set("HOTKEY_LETTER", newValue) }
-    }
+    @UserDefault(key: "HOTKEY_LETTER", defaultValue: "T")
+    static var hotkeyLetter: String
 
-    static var lastRunVersion: String {
-        get { (get("LAST_RUN_VERSION_KEY") as? String).orEmpty }
-        set { set("LAST_RUN_VERSION_KEY", newValue) }
-    }
+    @UserDefault(key: "LAST_RUN_VERSION_KEY", defaultValue: "")
+    static var lastRunVersion: String
 
     /////////////////////////// FLOATS
 
@@ -425,513 +365,352 @@ enum Settings {
     #else
         static let refreshPeriodHelp = "How often to refresh items when the app is active and in the foreground."
         static var refreshPeriod: TimeInterval {
-            get { if let n = get("REFRESH_PERIOD_KEY") as? TimeInterval { return n < 60 ? 120 : n } else { return 120 } }
-            set { set("REFRESH_PERIOD_KEY", newValue) }
+            get { if let n = self["REFRESH_PERIOD_KEY"] as? TimeInterval { return n < 60 ? 120 : n } else { return 120 } }
+            set { self["REFRESH_PERIOD_KEY"] = newValue }
         }
     #endif
 
     static let newRepoCheckPeriodHelp = "How long before reloading your team list and watched repositories from a server. Since this doesn't change often, it's good to keep this as high as possible in order to keep bandwidth use as low as possible during refreshes. Set this to a lower value if you often update your watched repositories or teams."
     static var newRepoCheckPeriod: Float {
-        get { if let n = get("NEW_REPO_CHECK_PERIOD") as? Float { return max(n, 2) } else { return 2 } }
-        set { set("NEW_REPO_CHECK_PERIOD", newValue) }
+        get { if let n = self["NEW_REPO_CHECK_PERIOD"] as? Float { return max(n, 2) } else { return 2 } }
+        set { self["NEW_REPO_CHECK_PERIOD"] = newValue }
     }
 
     /////////////////////////// DATES
 
-    static var lastSuccessfulRefresh: Date? {
-        get { get("LAST_SUCCESSFUL_REFRESH") as? Date }
-        set { set("LAST_SUCCESSFUL_REFRESH", newValue) }
-    }
+    @OptionalUserDefault(key: "LAST_SUCCESSFUL_REFRESH")
+    static var lastSuccessfulRefresh: Date?
 
-    static var lastExportDate: Date? {
-        get { get("LAST_EXPORT_TIME") as? Date }
-        set { set("LAST_EXPORT_TIME", newValue) }
-    }
+    @OptionalUserDefault(key: "LAST_EXPORT_TIME")
+    static var lastExportDate: Date?
 
     /////////////////////////// URLs
 
     static var lastExportUrl: URL? {
         get {
-            if let s = get("LAST_EXPORT_URL") as? String {
+            if let s = self["LAST_EXPORT_URL"] as? String {
                 return URL(string: s)
             } else {
                 return nil
             }
         }
-        set { set("LAST_EXPORT_URL", newValue?.absoluteString) }
+        set { self["LAST_EXPORT_URL"] = newValue?.absoluteString }
     }
 
     /////////////////////////// SWITCHES
 
+    @UserDefault(key: "HIDE_ARCHIVED_REPOS", defaultValue: false)
+    static var hideArchivedRepos: Bool
     static let hideArchivedReposHelp = "Automatically hide repositories which have been marked as archived"
-    static var hideArchivedRepos: Bool {
-        get { get("HIDE_ARCHIVED_REPOS") as? Bool ?? false }
-        set { set("HIDE_ARCHIVED_REPOS", newValue) }
-    }
 
+    @UserDefault(key: "HIDE_MENUBAR_COUNTS", defaultValue: false)
+    static var hideMenubarCounts: Bool
     static let hideMenubarCountsHelp = "Hide the counts of items in each status item in the menubar"
-    static var hideMenubarCounts: Bool {
-        get { get("HIDE_MENUBAR_COUNTS") as? Bool ?? false }
-        set { set("HIDE_MENUBAR_COUNTS", newValue) }
-    }
 
+    @UserDefault(key: "HIDE_SNOOZED_ITEMS", defaultValue: false)
+    static var hideSnoozedItems: Bool
     static let hideSnoozedItemsHelp = "Hide the snoozed items section"
-    static var hideSnoozedItems: Bool {
-        get { get("HIDE_SNOOZED_ITEMS") as? Bool ?? false }
-        set { set("HIDE_SNOOZED_ITEMS", newValue) }
-    }
 
+    @UserDefault(key: "HIDE_UNCOMMENTED_PRS_KEY", defaultValue: false)
+    static var hideUncommentedItems: Bool
     static let hideUncommentedItemsHelp = "Only show items which have red number badges."
-    static var hideUncommentedItems: Bool {
-        get { get("HIDE_UNCOMMENTED_PRS_KEY") as? Bool ?? false }
-        set { set("HIDE_UNCOMMENTED_PRS_KEY", newValue) }
-    }
 
+    @UserDefault(key: "SHOW_COMMENTS_EVERYWHERE_KEY", defaultValue: false)
+    static var showCommentsEverywhere: Bool
     static let showCommentsEverywhereHelp = "Badge and send notificatons for items in the 'all' sections as well as your own and participated ones."
-    static var showCommentsEverywhere: Bool {
-        get { get("SHOW_COMMENTS_EVERYWHERE_KEY") as? Bool ?? false }
-        set { set("SHOW_COMMENTS_EVERYWHERE_KEY", newValue) }
-    }
 
+    @UserDefault(key: "SORT_ORDER_KEY", defaultValue: false)
+    static var sortDescending: Bool
     static let sortDescendingHelp = "The direction to sort items based on the criterion below. Toggling this option will change the set of options available in the option below to better reflect what that will do."
-    static var sortDescending: Bool {
-        get { get("SORT_ORDER_KEY") as? Bool ?? false }
-        set { set("SORT_ORDER_KEY", newValue) }
-    }
 
+    @UserDefault(key: "SHOW_UPDATED_KEY", defaultValue: false)
+    static var showCreatedInsteadOfUpdated: Bool
     static let showCreatedInsteadOfUpdatedHelp = "Trailer will usually display the time of the most recent activity in an item, such as comments. This setting replaces that with the orignal creation time of the item. Together with the sorting options, this is useful for helping prioritise items based on how old, or new, they are."
-    static var showCreatedInsteadOfUpdated: Bool {
-        get { get("SHOW_UPDATED_KEY") as? Bool ?? false }
-        set { set("SHOW_UPDATED_KEY", newValue) }
-    }
 
+    @UserDefault(key: "DONT_KEEP_MY_PRS_KEY", defaultValue: false)
+    static var dontKeepPrsMergedByMe: Bool
     static let dontKeepPrsMergedByMeHelp = "If a PR is detected as merged by you, remove it immediately from the list of merged items"
-    static var dontKeepPrsMergedByMe: Bool {
-        get { get("DONT_KEEP_MY_PRS_KEY") as? Bool ?? false }
-        set { set("DONT_KEEP_MY_PRS_KEY", newValue) }
-    }
 
+    @UserDefault(key: "HIDE_AVATARS_KEY", defaultValue: false)
+    static var hideAvatars: Bool
     static let hideAvatarsHelp = "Hide the image of the author's avatar on the left of listed items"
-    static var hideAvatars: Bool {
-        get { get("HIDE_AVATARS_KEY") as? Bool ?? false }
-        set { set("HIDE_AVATARS_KEY", newValue) }
-    }
 
+    @UserDefault(key: "HIDE_NOTIFICATION_AVATARS_KEY", defaultValue: false)
+    static var hideAvatarsInNotifications: Bool
     static let hideAvatarsInNotificationsHelp = "Hide the image of the author's avatar in the notifications that Trailer posts"
-    static var hideAvatarsInNotifications: Bool {
-        get { get("HIDE_NOTIFICATION_AVATARS_KEY") as? Bool ?? false }
-        set { set("HIDE_NOTIFICATION_AVATARS_KEY", newValue) }
-    }
 
+    @UserDefault(key: "DONT_ASK_BEFORE_WIPING_MERGED", defaultValue: false)
+    static var dontAskBeforeWipingMerged: Bool
     static let dontAskBeforeWipingMergedHelp = "Don't ask for confirmation when you select 'Remove all merged items'. Please note there is no confirmation when selecting this from the Apple Watch, irrespective of this setting."
-    static var dontAskBeforeWipingMerged: Bool {
-        get { get("DONT_ASK_BEFORE_WIPING_MERGED") as? Bool ?? false }
-        set { set("DONT_ASK_BEFORE_WIPING_MERGED", newValue) }
-    }
 
+    @UserDefault(key: "DONT_ASK_BEFORE_WIPING_CLOSED", defaultValue: false)
+    static var dontAskBeforeWipingClosed: Bool
     static let dontAskBeforeWipingClosedHelp = "Don't ask for confirmation when you select 'Remove all closed items'. Please note there is no confirmation when selecting this from the Apple Watch, irrespective of this setting."
-    static var dontAskBeforeWipingClosed: Bool {
-        get { get("DONT_ASK_BEFORE_WIPING_CLOSED") as? Bool ?? false }
-        set { set("DONT_ASK_BEFORE_WIPING_CLOSED", newValue) }
-    }
 
+    @UserDefault(key: "GROUP_BY_REPO", defaultValue: false)
+    static var groupByRepo: Bool
     static let groupByRepoHelp = "Sort and gather items from the same repository next to each other, before applying the criterion specified above."
-    static var groupByRepo: Bool {
-        get { get("GROUP_BY_REPO") as? Bool ?? false }
-        set { set("GROUP_BY_REPO", newValue) }
-    }
 
+    @UserDefault(key: "SHOW_LABELS", defaultValue: false)
+    static var showLabels: Bool
     static let showLabelsHelp = "Show labels associated with items, usually a good idea"
-    static var showLabels: Bool {
-        get { get("SHOW_LABELS") as? Bool ?? false }
-        set { set("SHOW_LABELS", newValue) }
-    }
 
+    @UserDefault(key: "SHOW_STATUS_ITEMS", defaultValue: false)
+    static var showStatusItems: Bool
     static let showStatusItemsHelp = "Show status items, such as CI results or messages from code review services, that are attached to items on the server."
-    static var showStatusItems: Bool {
-        get { get("SHOW_STATUS_ITEMS") as? Bool ?? false }
-        set { set("SHOW_STATUS_ITEMS", newValue) }
-    }
 
+    @UserDefault(key: "MAKE_STATUS_ITEMS_SELECTABLE", defaultValue: false)
+    static var makeStatusItemsSelectable: Bool
     static let makeStatusItemsSelectableHelp = "Normally you have to Cmd-click on status items to visit their relayed links, this option makes them always selectable, but it makes it easier to accidentally end up opening a status item page instead of an item's page."
-    static var makeStatusItemsSelectable: Bool {
-        get { get("MAKE_STATUS_ITEMS_SELECTABLE") as? Bool ?? false }
-        set { set("MAKE_STATUS_ITEMS_SELECTABLE", newValue) }
-    }
 
+    @UserDefault(key: "OPEN_PR_AT_FIRST_UNREAD_COMMENT_KEY", defaultValue: false)
+    static var openPrAtFirstUnreadComment: Bool
     static let openPrAtFirstUnreadCommentHelp = "When opening the web view for an item, skip directly down to the first comment that has not been read, rather than starting from the top of the item's web page."
-    static var openPrAtFirstUnreadComment: Bool {
-        get { get("OPEN_PR_AT_FIRST_UNREAD_COMMENT_KEY") as? Bool ?? false }
-        set { set("OPEN_PR_AT_FIRST_UNREAD_COMMENT_KEY", newValue) }
-    }
 
-    static var hotkeyEnable: Bool {
-        get { get("HOTKEY_ENABLE") as? Bool ?? false }
-        set { set("HOTKEY_ENABLE", newValue) }
-    }
+    @UserDefault(key: "HOTKEY_ENABLE", defaultValue: false)
+    static var hotkeyEnable: Bool
 
-    static var hotkeyControlModifier: Bool {
-        get { get("HOTKEY_CONTROL_MODIFIER") as? Bool ?? false }
-        set { set("HOTKEY_CONTROL_MODIFIER", newValue) }
-    }
+    @UserDefault(key: "HOTKEY_CONTROL_MODIFIER", defaultValue: false)
+    static var hotkeyControlModifier: Bool
 
+    @UserDefault(key: "DISABLE_ALL_COMMENT_NOTIFICATIONS", defaultValue: false)
+    static var disableAllCommentNotifications: Bool
     static let disableAllCommentNotificationsHelp = "Do not get notified about any comments at all."
-    static var disableAllCommentNotifications: Bool {
-        get { get("DISABLE_ALL_COMMENT_NOTIFICATIONS") as? Bool ?? false }
-        set { set("DISABLE_ALL_COMMENT_NOTIFICATIONS", newValue) }
-    }
 
+    @UserDefault(key: "NOTIFY_ON_STATUS_UPDATES", defaultValue: false)
+    static var notifyOnStatusUpdates: Bool
     static let notifyOnStatusUpdatesHelp = "Post notifications when status items change. Useful for tracking the CI build state of your own items, for instance."
-    static var notifyOnStatusUpdates: Bool {
-        get { get("NOTIFY_ON_STATUS_UPDATES") as? Bool ?? false }
-        set { set("NOTIFY_ON_STATUS_UPDATES", newValue) }
-    }
 
+    @UserDefault(key: "NOTIFY_ON_STATUS_UPDATES_ALL", defaultValue: false)
+    static var notifyOnStatusUpdatesForAllPrs: Bool
     static let notifyOnStatusUpdatesForAllPrsHelp = "Notificaitons for status items are sent only for your own and particiapted items by default. Select this to receive status update notifications for the items in the 'all' section too."
-    static var notifyOnStatusUpdatesForAllPrs: Bool {
-        get { get("NOTIFY_ON_STATUS_UPDATES_ALL") as? Bool ?? false }
-        set { set("NOTIFY_ON_STATUS_UPDATES_ALL", newValue) }
-    }
 
+    @UserDefault(key: "SHOW_ISSUES_IN_WATCH_GLANCE", defaultValue: false)
+    static var preferIssuesInWatch: Bool
     static let preferIssuesInWatchHelp = "If there is only enough space to display one count or set of statistics on the Apple Watch, prefer the ones for issues rather than the ones for PRs."
-    static var preferIssuesInWatch: Bool {
-        get { get("SHOW_ISSUES_IN_WATCH_GLANCE") as? Bool ?? false }
-        set { set("SHOW_ISSUES_IN_WATCH_GLANCE", newValue) }
-    }
 
+    @UserDefault(key: "HIDE_DESCRIPTION_IN_WATCH_DETAIL_VIEW", defaultValue: false)
+    static var hideDescriptionInWatchDetail: Bool
     static let hideDescriptionInWatchDetailHelp = "When showing the full detail view of items on the Apple Watch, skip showing the description of the item, instead showing only status and comments for it."
-    static var hideDescriptionInWatchDetail: Bool {
-        get { get("HIDE_DESCRIPTION_IN_WATCH_DETAIL_VIEW") as? Bool ?? false }
-        set { set("HIDE_DESCRIPTION_IN_WATCH_DETAIL_VIEW", newValue) }
-    }
 
-    static var autoRepeatSettingsExport: Bool {
-        get { get("AUTO_REPEAT_SETTINGS_EXPORT") as? Bool ?? false }
-        set { set("AUTO_REPEAT_SETTINGS_EXPORT", newValue) }
-    }
+    @UserDefault(key: "AUTO_REPEAT_SETTINGS_EXPORT", defaultValue: false)
+    static var autoRepeatSettingsExport: Bool
 
-    static var dontConfirmSettingsImport: Bool {
-        get { get("DONT_CONFIRM_SETTINGS_IMPORT") as? Bool ?? false }
-        set { set("DONT_CONFIRM_SETTINGS_IMPORT", newValue) }
-    }
+    @UserDefault(key: "DONT_CONFIRM_SETTINGS_IMPORT", defaultValue: false)
+    static var dontConfirmSettingsImport: Bool
 
     static let removeNotificationsWhenItemIsRemovedHelp = "When an item is removed, whether through user action or automatically due to settings, also remove any notifications in the Notification Center that are related to this item."
-    static var removeNotificationsWhenItemIsRemoved: Bool {
-        get { get("REMOVE_RELATED_NOTIFICATIONS_ON_ITEM_REMOVE") as? Bool ?? true }
-        set { set("REMOVE_RELATED_NOTIFICATIONS_ON_ITEM_REMOVE", newValue) }
-    }
+    @UserDefault(key: "REMOVE_RELATED_NOTIFICATIONS_ON_ITEM_REMOVE", defaultValue: true)
+    static var removeNotificationsWhenItemIsRemoved: Bool
 
+    @UserDefault(key: "INCLUDE_SERVERS_IN_FILTER", defaultValue: false)
+    static var includeServersInFilter: Bool
     static let includeServersInFilterHelp = "Check the name of the server an item came from when selecting it for inclusion in filtered results. You can also prefix a search with 'server:' to specifically search for this."
-    static var includeServersInFilter: Bool {
-        get { get("INCLUDE_SERVERS_IN_FILTER") as? Bool ?? false }
-        set { set("INCLUDE_SERVERS_IN_FILTER", newValue) }
-    }
 
+    @UserDefault(key: "HIDE_PRS_THAT_ARENT_PASSING", defaultValue: false)
+    static var hidePrsThatArentPassing: Bool
     static let hidePrsThatArentPassingHelp = "Hide PR items which have status items, but are not all green. Useful for hiding PRs which are not ready to review or those who have not passed certain checks yet."
-    static var hidePrsThatArentPassing: Bool {
-        get { get("HIDE_PRS_THAT_ARENT_PASSING") as? Bool ?? false }
-        set { set("HIDE_PRS_THAT_ARENT_PASSING", newValue) }
-    }
 
+    @UserDefault(key: "HIDE_PRS_THAT_ARENT_PASSING_ONLY_IN_ALL", defaultValue: false)
+    static var hidePrsThatDontPassOnlyInAll: Bool
     static let hidePrsThatDontPassOnlyInAllHelp = "Normally hiding red PRs will happen on every section. Selecting this will limit that filter to the 'All' section only, so red PRs which are yours or you have participated in will still show up."
-    static var hidePrsThatDontPassOnlyInAll: Bool {
-        get { get("HIDE_PRS_THAT_ARENT_PASSING_ONLY_IN_ALL") as? Bool ?? false }
-        set { set("HIDE_PRS_THAT_ARENT_PASSING_ONLY_IN_ALL", newValue) }
-    }
 
-    static let snoozeWakeOnCommentHelp = "Wake up snoozing items if a new comment is made"
-    static let snoozeWakeOnMentionHelp = "Wake up snoozing items in you are mentioned in a new comment"
-    static let snoozeWakeOnStatusUpdateHelp = "Wake up snoozing items if there is a status or CI update"
-
+    @UserDefault(key: "DISPLAY_MILESTONES", defaultValue: false)
+    static var showMilestones: Bool
     static let showMilestonesHelp = "Include milestone information, if any, on current items."
-    static var showMilestones: Bool {
-        get { get("DISPLAY_MILESTONES") as? Bool ?? false }
-        set { set("DISPLAY_MILESTONES", newValue) }
-    }
 
+    @UserDefault(key: "SHOW_RELATIVE_DATES", defaultValue: false)
+    static var showRelativeDates: Bool
     static let showRelativeDatesHelp = "Show relative dates to now, e.g. '6d, 4h ago' instead of '12 May 2017, 11:00"
-    static var showRelativeDates: Bool {
-        get { get("SHOW_RELATIVE_DATES") as? Bool ?? false }
-        set { set("SHOW_RELATIVE_DATES", newValue) }
-    }
 
+    @UserDefault(key: "NOTIFY_ON_REVIEW_CHANGE_REQUESTS", defaultValue: false)
+    static var notifyOnReviewChangeRequests: Bool
     static let notifyOnReviewChangeRequestsHelp = "Issue a notification when someone creates a review in a PR that requires changes."
-    static var notifyOnReviewChangeRequests: Bool {
-        get { get("NOTIFY_ON_REVIEW_CHANGE_REQUESTS") as? Bool ?? false }
-        set { set("NOTIFY_ON_REVIEW_CHANGE_REQUESTS", newValue) }
-    }
 
+    @UserDefault(key: "NOTIFY_ON_REVIEW_ACCEPTANCES", defaultValue: false)
+    static var notifyOnReviewAcceptances: Bool
     static let notifyOnReviewAcceptancesHelp = "Issue a notification when someone accepts the changes related to a review in a PR that required changes."
-    static var notifyOnReviewAcceptances: Bool {
-        get { get("NOTIFY_ON_REVIEW_ACCEPTANCES") as? Bool ?? false }
-        set { set("NOTIFY_ON_REVIEW_ACCEPTANCES", newValue) }
-    }
 
+    @UserDefault(key: "NOTIFY_ON_REVIEW_DISMISSALS", defaultValue: false)
+    static var notifyOnReviewDismissals: Bool
     static let notifyOnReviewDismissalsHelp = "Issue a notification when someone dismissed a review in a PR that required changes."
-    static var notifyOnReviewDismissals: Bool {
-        get { get("NOTIFY_ON_REVIEW_DISMISSALS") as? Bool ?? false }
-        set { set("NOTIFY_ON_REVIEW_DISMISSALS", newValue) }
-    }
 
+    @UserDefault(key: "NOTIFY_ON_ALL_REVIEW_CHANGE_REQUESTS", defaultValue: false)
+    static var notifyOnAllReviewChangeRequests: Bool
     static let notifyOnAllReviewChangeRequestsHelp = "Do this for all items, not just those created by me."
-    static var notifyOnAllReviewChangeRequests: Bool {
-        get { get("NOTIFY_ON_ALL_REVIEW_CHANGE_REQUESTS") as? Bool ?? false }
-        set { set("NOTIFY_ON_ALL_REVIEW_CHANGE_REQUESTS", newValue) }
-    }
 
+    @UserDefault(key: "NOTIFY_ON_ALL_REVIEW_ACCEPTANCES", defaultValue: false)
+    static var notifyOnAllReviewAcceptances: Bool
     static let notifyOnAllReviewAcceptancesHelp = "Do this for all items, not just those created by me."
-    static var notifyOnAllReviewAcceptances: Bool {
-        get { get("NOTIFY_ON_ALL_REVIEW_ACCEPTANCES") as? Bool ?? false }
-        set { set("NOTIFY_ON_ALL_REVIEW_ACCEPTANCES", newValue) }
-    }
 
+    @UserDefault(key: "NOTIFY_ON_ALL_REVIEW_DISMISSALS", defaultValue: false)
+    static var notifyOnAllReviewDismissals: Bool
     static let notifyOnAllReviewDismissalsHelp = "Do this for all items, not just those created by me."
-    static var notifyOnAllReviewDismissals: Bool {
-        get { get("NOTIFY_ON_ALL_REVIEW_DISMISSALS") as? Bool ?? false }
-        set { set("NOTIFY_ON_ALL_REVIEW_DISMISSALS", newValue) }
-    }
 
+    @UserDefault(key: "NOTIFY_ON_REVIEW_ASSIGNMENTS", defaultValue: false)
+    static var notifyOnReviewAssignments: Bool
     static let notifyOnReviewAssignmentsHelp = "Issue a notification when someone assigns me a PR to review."
-    static var notifyOnReviewAssignments: Bool {
-        get { get("NOTIFY_ON_REVIEW_ASSIGNMENTS") as? Bool ?? false }
-        set { set("NOTIFY_ON_REVIEW_ASSIGNMENTS", newValue) }
-    }
 
+    @UserDefault(key: "SHOW_STATUSES_EVERYWHERE", defaultValue: false)
+    static var showStatusesOnAllItems: Bool
     static let showStatusesOnAllItemsHelp = "Show statuses in the 'all' section too."
-    static var showStatusesOnAllItems: Bool {
-        get { get("SHOW_STATUSES_EVERYWHERE") as? Bool ?? false }
-        set { set("SHOW_STATUSES_EVERYWHERE", newValue) }
-    }
 
+    @UserDefault(key: "UPDATE_CHECK_AUTO_KEY", defaultValue: true)
+    static var checkForUpdatesAutomatically: Bool
     static let checkForUpdatesAutomaticallyHelp = "Check for updates to Trailer automatically. It is generally a very good idea to keep this selected, unless you are using an external package manager to manage the updates."
-    static var checkForUpdatesAutomatically: Bool {
-        get { get("UPDATE_CHECK_AUTO_KEY") as? Bool ?? true }
-        set { set("UPDATE_CHECK_AUTO_KEY", newValue) }
-    }
 
+    @UserDefault(key: "SHOW_REPOS_IN_NAME", defaultValue: true)
+    static var showReposInName: Bool
     static let showReposInNameHelp = "Show the name of the repository each item comes from."
-    static var showReposInName: Bool {
-        get { get("SHOW_REPOS_IN_NAME") as? Bool ?? true }
-        set { set("SHOW_REPOS_IN_NAME", newValue) }
-    }
 
+    @UserDefault(key: "INCLUDE_TITLES_IN_FILTER", defaultValue: true)
+    static var includeTitlesInFilter: Bool
     static let includeTitlesInFilterHelp = "Check item titles when selecting items for inclusion in filtered results. You can also prefix a search with 'title:' to specifically search for this."
-    static var includeTitlesInFilter: Bool {
-        get { get("INCLUDE_TITLES_IN_FILTER") as? Bool ?? true }
-        set { set("INCLUDE_TITLES_IN_FILTER", newValue) }
-    }
 
+    @UserDefault(key: "MARK_PRS_AS_UNREAD_ON_NEW_COMMITS", defaultValue: false)
+    static var markPrsAsUnreadOnNewCommits: Bool
     static let markPrsAsUnreadOnNewCommitsHelp = "Mark a PR with an exclamation mark even if they it may not have unread comments, in case there have been new commits from other users."
-    static var markPrsAsUnreadOnNewCommits: Bool {
-        get { get("MARK_PRS_AS_UNREAD_ON_NEW_COMMITS") as? Bool ?? false }
-        set { set("MARK_PRS_AS_UNREAD_ON_NEW_COMMITS", newValue) }
-    }
 
+    @UserDefault(key: "INCLUDE_MILESTONES_IN_FILTER", defaultValue: false)
+    static var includeMilestonesInFilter: Bool
     static let includeMilestonesInFilterHelp = "Check item milestone names for inclusion in filtered results. You can also prefix a search with 'milestone:' to specifically search for this."
-    static var includeMilestonesInFilter: Bool {
-        get { get("INCLUDE_MILESTONES_IN_FILTER") as? Bool ?? false }
-        set { set("INCLUDE_MILESTONES_IN_FILTER", newValue) }
-    }
 
+    @UserDefault(key: "INCLUDE_ASSIGNEE_NAMES_IN_FILTER", defaultValue: false)
+    static var includeAssigneeNamesInFilter: Bool
     static let includeAssigneeInFilterHelp = "Check item assignee names for inclusion in filtered results. You can also prefix a search with 'assignee:' to specifically search for this."
-    static var includeAssigneeNamesInFilter: Bool {
-        get { get("INCLUDE_ASSIGNEE_NAMES_IN_FILTER") as? Bool ?? false }
-        set { set("INCLUDE_ASSIGNEE_NAMES_IN_FILTER", newValue) }
-    }
 
+    @UserDefault(key: "INCLUDE_NUMBERS_IN_FILTER", defaultValue: false)
+    static var includeNumbersInFilter: Bool
     static let includeNumbersInFilterHelp = "Check the PR/Issue number of the item when selecting it for inclusion in filtered results. You can also prefix a search with 'number:' to specifically search for this."
-    static var includeNumbersInFilter: Bool {
-        get { get("INCLUDE_NUMBERS_IN_FILTER") as? Bool ?? false }
-        set { set("INCLUDE_NUMBERS_IN_FILTER", newValue) }
-    }
 
+    @UserDefault(key: "INCLUDE_REPOS_IN_FILTER", defaultValue: true)
+    static var includeReposInFilter: Bool
     static let includeReposInFilterHelp = "Check repository names when selecting items for inclusion in filtered results. You can also prefix a search with 'repo:' to specifically search for this."
-    static var includeReposInFilter: Bool {
-        get { get("INCLUDE_REPOS_IN_FILTER") as? Bool ?? true }
-        set { set("INCLUDE_REPOS_IN_FILTER", newValue) }
-    }
 
+    @UserDefault(key: "INCLUDE_LABELS_IN_FILTER", defaultValue: true)
+    static var includeLabelsInFilter: Bool
     static let includeLabelsInFilterHelp = "Check labels of items when selecting items for inclusion in filtered results. You can also prefix a search with 'label:' to specifically search for this."
-    static var includeLabelsInFilter: Bool {
-        get { get("INCLUDE_LABELS_IN_FILTER") as? Bool ?? true }
-        set { set("INCLUDE_LABELS_IN_FILTER", newValue) }
-    }
 
+    @UserDefault(key: "AUTO_ADD_NEW_REPOS", defaultValue: true)
+    static var automaticallyAddNewReposFromWatchlist: Bool
     static let automaticallyAddNewReposFromWatchlistHelp = "Automatically add to Trailer any repos are added to your remote watchlist"
-    static var automaticallyAddNewReposFromWatchlist: Bool {
-        get { get("AUTO_ADD_NEW_REPOS") as? Bool ?? true }
-        set { set("AUTO_ADD_NEW_REPOS", newValue) }
-    }
 
+    @UserDefault(key: "AUTO_REMOVE_DELETED_REPOS", defaultValue: true)
+    static var automaticallyRemoveDeletedReposFromWatchlist: Bool
     static let automaticallyRemoveDeletedReposFromWatchlistHelp = "Automatically remove from Trailer any (previously automatically added) repos if they are no longer on your remote watchlist"
-    static var automaticallyRemoveDeletedReposFromWatchlist: Bool {
-        get { get("AUTO_REMOVE_DELETED_REPOS") as? Bool ?? true }
-        set { set("AUTO_REMOVE_DELETED_REPOS", newValue) }
-    }
 
+    @UserDefault(key: "INCLUDE_USERS_IN_FILTER", defaultValue: true)
+    static var includeUsersInFilter: Bool
     static let includeUsersInFilterHelp = "Check the name of the author of an item when selecting it for inclusion in filtered results. You can also prefix a search with 'user:' to specifically search for this."
-    static var includeUsersInFilter: Bool {
-        get { get("INCLUDE_USERS_IN_FILTER") as? Bool ?? true }
-        set { set("INCLUDE_USERS_IN_FILTER", newValue) }
-    }
 
+    @UserDefault(key: "INCLUDE_STATUSES_IN_FILTER", defaultValue: true)
+    static var includeStatusesInFilter: Bool
     static let includeStatusesInFilterHelp = "Check status lines of items when selecting items for inclusion in filtered results. You can also prefix a search with 'status:' to specifically search for this."
-    static var includeStatusesInFilter: Bool {
-        get { get("INCLUDE_STATUSES_IN_FILTER") as? Bool ?? true }
-        set { set("INCLUDE_STATUSES_IN_FILTER", newValue) }
-    }
 
+    @UserDefault(key: "SHOW_STATUSES_GRAY", defaultValue: true)
+    static var showStatusesGray: Bool
     static let showStatusesGrayHelp = "Include neutral statuses in an item's status list"
-    static var showStatusesGray: Bool {
-        get { get("SHOW_STATUSES_GRAY") as? Bool ?? true }
-        set { set("SHOW_STATUSES_GRAY", newValue) }
-    }
 
+    @UserDefault(key: "SHOW_STATUSES_GREEN", defaultValue: true)
+    static var showStatusesGreen: Bool
     static let showStatusesGreenHelp = "Include green statuses in an item's status list"
-    static var showStatusesGreen: Bool {
-        get { get("SHOW_STATUSES_GREEN") as? Bool ?? true }
-        set { set("SHOW_STATUSES_GREEN", newValue) }
-    }
 
+    @UserDefault(key: "SHOW_STATUSES_YELLOW", defaultValue: true)
+    static var showStatusesYellow: Bool
     static let showStatusesYellowHelp = "Include yellow statuses in an item's status list"
-    static var showStatusesYellow: Bool {
-        get { get("SHOW_STATUSES_YELLOW") as? Bool ?? true }
-        set { set("SHOW_STATUSES_YELLOW", newValue) }
-    }
 
+    @UserDefault(key: "SHOW_STATUSES_RED", defaultValue: true)
+    static var showStatusesRed: Bool
     static let showStatusesRedHelp = "Include red statuses in an item's status list"
-    static var showStatusesRed: Bool {
-        get { get("SHOW_STATUSES_RED") as? Bool ?? true }
-        set { set("SHOW_STATUSES_RED", newValue) }
-    }
 
-    static var hotkeyCommandModifier: Bool {
-        get { get("HOTKEY_COMMAND_MODIFIER") as? Bool ?? true }
-        set { set("HOTKEY_COMMAND_MODIFIER", newValue) }
-    }
+    @UserDefault(key: "HOTKEY_COMMAND_MODIFIER", defaultValue: true)
+    static var hotkeyCommandModifier: Bool
 
-    static var hotkeyOptionModifier: Bool {
-        get { get("HOTKEY_OPTION_MODIFIER") as? Bool ?? true }
-        set { set("HOTKEY_OPTION_MODIFIER", newValue) }
-    }
+    @UserDefault(key: "HOTKEY_OPTION_MODIFIER", defaultValue: true)
+    static var hotkeyOptionModifier: Bool
 
-    static var hotkeyShiftModifier: Bool {
-        get { get("HOTKEY_SHIFT_MODIFIER") as? Bool ?? true }
-        set { set("HOTKEY_SHIFT_MODIFIER", newValue) }
-    }
+    @UserDefault(key: "HOTKEY_SHIFT_MODIFIER", defaultValue: true)
+    static var hotkeyShiftModifier: Bool
 
+    @UserDefault(key: "GRAY_OUT_WHEN_REFRESHING", defaultValue: true)
+    static var grayOutWhenRefreshing: Bool
     static let grayOutWhenRefreshingHelp = "Gray out the menubar icon when refreshing data from the configured servers. You may want to turn this off if you find that distracting or use a menu bar management tool that automatically highlights menubar items which get updated"
-    static var grayOutWhenRefreshing: Bool {
-        get { get("GRAY_OUT_WHEN_REFRESHING") as? Bool ?? true }
-        set { set("GRAY_OUT_WHEN_REFRESHING", newValue) }
-    }
 
+    @UserDefault(key: "API_SERVERS_IN_SEPARATE_MENUS", defaultValue: false)
+    static var showSeparateApiServersInMenu: Bool
     static let showSeparateApiServersInMenuHelp = "Show each API server as a separate item on the menu bar"
-    static var showSeparateApiServersInMenu: Bool {
-        get { get("API_SERVERS_IN_SEPARATE_MENUS") as? Bool ?? false }
-        set { set("API_SERVERS_IN_SEPARATE_MENUS", newValue) }
-    }
 
+    @UserDefault(key: "QUERY_AUTHORED_PRS", defaultValue: false)
+    static var queryAuthoredPRs: Bool
     static let queryAuthoredPRsHelp = "Query all authored PRs for the current user, irrespective of repository visibility or if the repository is in the watchlist."
-    static var queryAuthoredPRs: Bool {
-        get { get("QUERY_AUTHORED_PRS") as? Bool ?? false }
-        set { set("QUERY_AUTHORED_PRS", newValue) }
-    }
 
+    @UserDefault(key: "QUERY_AUTHORED_ISSUES", defaultValue: false)
+    static var queryAuthoredIssues: Bool
     static let queryAuthoredIssuesHelp = "Query all authored issues for the current user, irrespective of repository visibility or if the repository is in the watchlist."
-    static var queryAuthoredIssues: Bool {
-        get { get("QUERY_AUTHORED_ISSUES") as? Bool ?? false }
-        set { set("QUERY_AUTHORED_ISSUES", newValue) }
-    }
 
+    @UserDefault(key: "ASSUME_READ_ITEM_IF_USER_HAS_NEWER_COMMENTS", defaultValue: false)
+    static var assumeReadItemIfUserHasNewerComments: Bool
     static let assumeReadItemIfUserHasNewerCommentsHelp = "Mark any comments posted by others before your own as read. Warning: Only turn this on if you are sure you can catch any comments that others may add while you are adding yours! (This is a very useful setting for *secondary* Trailer displays)"
-    static var assumeReadItemIfUserHasNewerComments: Bool {
-        get { get("ASSUME_READ_ITEM_IF_USER_HAS_NEWER_COMMENTS") as? Bool ?? false }
-        set { set("ASSUME_READ_ITEM_IF_USER_HAS_NEWER_COMMENTS", newValue) }
-    }
 
+    @UserDefault(key: "DISPLAY_REVIEW_CHANGE_REQUESTS", defaultValue: false)
+    static var displayReviewsOnItems: Bool
     static let displayReviewsOnItemsHelp = "List requested, approving, and blocking reviews in the list of Pull Requests."
-    static var displayReviewsOnItems: Bool {
-        get { get("DISPLAY_REVIEW_CHANGE_REQUESTS") as? Bool ?? false }
-        set { set("DISPLAY_REVIEW_CHANGE_REQUESTS", newValue) }
-    }
 
+    @UserDefault(key: "REACTION_SCANNING_BATCH", defaultValue: 100)
+    static var reactionScanningBatchSize: Int
     static let reactionScanningBatchSizeHelp = "Because querying reactions can be bandwidth and time intensive, Trailer will scan for updates on items that haven't been scanned for the longest time, at every refresh, up to a maximum of this number of items. Higher values mean longer sync times and more API usage."
-    static var reactionScanningBatchSize: Int {
-        get { get("REACTION_SCANNING_BATCH") as? Int ?? 100 }
-        set { set("REACTION_SCANNING_BATCH", newValue) }
-    }
 
+    @UserDefault(key: "NOTIFY_ON_ITEM_REACTIONS", defaultValue: false)
+    static var notifyOnItemReactions: Bool
     static let notifyOnItemReactionsHelp = "Count reactions to PRs and issues as comments. Increase the total count. Notify and badge an item as unread depending on the comment section settings."
-    static var notifyOnItemReactions: Bool {
-        get { get("NOTIFY_ON_ITEM_REACTIONS") as? Bool ?? false }
-        set { set("NOTIFY_ON_ITEM_REACTIONS", newValue) }
-    }
 
+    @UserDefault(key: "NOTIFY_ON_COMMENT_REACTIONS", defaultValue: false)
+    static var notifyOnCommentReactions: Bool
     static let notifyOnCommentReactionsHelp = "Count reactions to comments themselves as comments. Increase the total count of the item that contains the comment being reacted to. Notify and badge it as unread depending on the comment section settings."
-    static var notifyOnCommentReactions: Bool {
-        get { get("NOTIFY_ON_COMMENT_REACTIONS") as? Bool ?? false }
-        set { set("NOTIFY_ON_COMMENT_REACTIONS", newValue) }
-    }
 
+    @UserDefault(key: "DISPLAY_NUMBERS_FOR_ITEMS", defaultValue: false)
+    static var displayNumbersForItems: Bool
     static let displayNumbersForItemsHelp = "Prefix titles of items with the number of the referenced PR or issue."
-    static var displayNumbersForItems: Bool {
-        get { get("DISPLAY_NUMBERS_FOR_ITEMS") as? Bool ?? false }
-        set { set("DISPLAY_NUMBERS_FOR_ITEMS", newValue) }
-    }
 
+    @UserDefault(key: "DRAFT_HANDLING_POLICY", defaultValue: 0)
+    static var draftHandlingPolicy: Int
     static let draftHandlingPolicyHelp = "How to deal with a PR if it is marked as a draft."
-    static var draftHandlingPolicy: Int {
-        get { get("DRAFT_HANDLING_POLICY") as? Int ?? 0 }
-        set { set("DRAFT_HANDLING_POLICY", newValue) }
-    }
 
+    @UserDefault(key: "COUNT_VISIBLE_SNOOZED_ITEMS", defaultValue: true)
+    static var countVisibleSnoozedItems: Bool
     static let countVisibleSnoozedItemsHelp = "Include visible snoozed items in menubar count."
-    static var countVisibleSnoozedItems: Bool {
-        get { get("COUNT_VISIBLE_SNOOZED_ITEMS") as? Bool ?? true }
-        set { set("COUNT_VISIBLE_SNOOZED_ITEMS", newValue) }
-    }
 
+    @UserDefault(key: "SHOW_BASE_AND_HEAD_BRANCHES", defaultValue: false)
+    static var showBaseAndHeadBranches: Bool
     static let showBaseAndHeadBranchesHelp = "Display the source and destination branches for PRs."
-    static var showBaseAndHeadBranches: Bool {
-        get { get("SHOW_BASE_AND_HEAD_BRANCHES") as? Bool ?? false }
-        set { set("SHOW_BASE_AND_HEAD_BRANCHES", newValue) }
-    }
 
+    @UserDefault(key: "MARK_UNMERGEABLE_ITEMS", defaultValue: false)
+    static var markUnmergeablePrs: Bool
     static let markUnmergeablePrsHelp = "Indicate PRs which cannot be merged. This option only works for items synced via the new v4 API."
-    static var markUnmergeablePrs: Bool {
-        get { get("MARK_UNMERGEABLE_ITEMS") as? Bool ?? false }
-        set { set("MARK_UNMERGEABLE_ITEMS", newValue) }
-    }
 
+    @UserDefault(key: "SHOW_PR_LINES", defaultValue: false)
+    static var showPrLines: Bool
     static let showPrLinesHelp = "Sync and show the number of lines added and/or removed on PRs. This option only works for items synced via the new v4 API."
-    static var showPrLines: Bool {
-        get { get("SHOW_PR_LINES") as? Bool ?? false }
-        set { set("SHOW_PR_LINES", newValue) }
-    }
 
+    @UserDefault(key: "SCAN_CLOSED_AND_MERGED", defaultValue: false)
+    static var scanClosedAndMergedItems: Bool
     static let scanClosedAndMergedItemsHelp = "Also highlight unread comments on closed and merged items. This option only works for items synced via the new v4 API."
-    static var scanClosedAndMergedItems: Bool {
-        get { get("SCAN_CLOSED_AND_MERGED") as? Bool ?? false }
-        set { set("SCAN_CLOSED_AND_MERGED", newValue) }
-    }
 
+    @UserDefault(key: "REQUESTED_TEAM_REVIEWS", defaultValue: false)
+    static var showRequestedTeamReviews: Bool
     static let showRequestedTeamReviewsHelp = "Display the name(s) of teams which have been assigned as reviewers on PRs"
-    static var showRequestedTeamReviews: Bool {
-        get { get("REQUESTED_TEAM_REVIEWS") as? Bool ?? false }
-        set { set("REQUESTED_TEAM_REVIEWS", newValue) }
-    }
+        
+    @UserDefault(key: "USE_V4_API", defaultValue: false)
+    static var useV4API: Bool
+    static let useV4APIHelp = "In cases where the new v4 API is available, such as the public GitHub server, using it can result in significant efficiency and speed improvements when syncing."
 
     static let v4title = "Can't be turned on yet"
     static let v4DBMessage = "Your repo list seems to contain entries which have not yet been migrated in order to be able to use the new API.\n\nYou will have to perform a sync before being able to turn this setting on."
     static let v4DAPIessage = "One of your servers doesn't have a v4 API path defined. Please configure this before turning on v4 API support."
-    static let useV4APIHelp = "In cases where the new v4 API is available, such as the public GitHub server, using it can result in significant efficiency and speed improvements when syncing."
-    static var useV4API: Bool {
-        get { get("USE_V4_API") as? Bool ?? false }
-        set { set("USE_V4_API", newValue) }
-    }
-
     static let reloadAllDataHelp = "Choosing this option will remove all synced data and reload everything from scratch. This can take a while and use up a large amount of API quota, so only use it if things seem broken."
+    static let snoozeWakeOnCommentHelp = "Wake up snoozing items if a new comment is made"
+    static let snoozeWakeOnMentionHelp = "Wake up snoozing items in you are mentioned in a new comment"
+    static let snoozeWakeOnStatusUpdateHelp = "Wake up snoozing items if there is a status or CI update"
 
     //////////////////////// Filters
 
@@ -955,6 +734,67 @@ enum Settings {
             if let data = try? JSONEncoder().encode(filterLookup) {
                 Logging.log("Persisting filters for menus")
                 sharedDefaults.setValue(data, forKey: "PERSISTED_TAB_FILTERS")
+            }
+        }
+    }
+    
+    @propertyWrapper
+    struct UserDefault<Value> {
+        let key: String
+        let defaultValue: Value
+
+        init(key: String, defaultValue: Value) {
+            self.key = key
+            self.defaultValue = defaultValue
+        }
+
+        var wrappedValue: Value {
+            get {
+                Settings[key] as? Value ?? defaultValue
+            }
+            set {
+                Settings[key] = newValue
+            }
+        }
+    }
+
+    @propertyWrapper
+    struct OptionalUserDefault<Value> {
+        let key: String
+
+        init(key: String) {
+            self.key = key
+        }
+
+        var wrappedValue: Value? {
+            get {
+                Settings[key] as? Value
+            }
+            set {
+                Settings[key] = newValue
+            }
+        }
+    }
+
+    @propertyWrapper
+    struct EnumUserDefault<Value: RawRepresentable> {
+        let key: String
+        let defaultValue: Value
+
+        init(key: String, defaultValue: Value) {
+            self.key = key
+            self.defaultValue = defaultValue
+        }
+
+        var wrappedValue: Value {
+            get {
+                if let o = Settings[key] as? Value.RawValue, let v = Value(rawValue: o) {
+                    return v
+                }
+                return defaultValue
+            }
+            set {
+                Settings[key] = newValue.rawValue
             }
         }
     }

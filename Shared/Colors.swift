@@ -2,7 +2,7 @@
     import UIKit
     typealias COLOR_CLASS = UIColor
 
-#elseif os(OSX)
+#elseif os(macOS)
     import Cocoa
     typealias COLOR_CLASS = NSColor
 
@@ -24,7 +24,7 @@ extension COLOR_CLASS {
     static var appLabel: COLOR_CLASS {
         #if os(iOS)
             return .label
-        #elseif os(OSX)
+        #elseif os(macOS)
             return .labelColor
         #endif
     }
@@ -32,7 +32,7 @@ extension COLOR_CLASS {
     static var appSecondaryLabel: COLOR_CLASS {
         #if os(iOS)
             return .secondaryLabel
-        #elseif os(OSX)
+        #elseif os(macOS)
             return .secondaryLabelColor
         #endif
     }
@@ -40,7 +40,7 @@ extension COLOR_CLASS {
     static var appTertiaryLabel: COLOR_CLASS {
         #if os(iOS)
             return .tertiaryLabel
-        #elseif os(OSX)
+        #elseif os(macOS)
             return .tertiaryLabelColor
         #endif
     }

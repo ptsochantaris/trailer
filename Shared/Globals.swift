@@ -19,7 +19,7 @@
 
     let compactTraits = UITraitCollection(horizontalSizeClass: .compact)
 
-#elseif os(OSX)
+#elseif os(macOS)
 
     @MainActor weak var app: MacAppDelegate!
 
@@ -337,7 +337,7 @@ let versionString: String = {
     return "Version \(currentAppVersion) (\(buildNumber))"
 }()
 
-#if os(OSX)
+#if os(macOS)
 
     @MainActor
     func openItem(_ url: URL) {

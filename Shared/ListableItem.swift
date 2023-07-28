@@ -857,7 +857,7 @@ class ListableItem: DataItem, Listable {
         let p = NSMutableParagraphStyle()
         p.lineBreakMode = .byWordWrapping
         p.alignment = .center
-        #if os(OSX)
+        #if os(macOS)
             return NSAttributedString(string: message, attributes: [
                 NSAttributedString.Key.foregroundColor: color,
                 NSAttributedString.Key.paragraphStyle: p
@@ -1123,7 +1123,7 @@ class ListableItem: DataItem, Listable {
     }
 
     static func removeRelatedNotifications(uri: String) {
-        #if os(OSX)
+        #if os(macOS)
             let nc = NSUserNotificationCenter.default
             for n in nc.deliveredNotifications {
                 if let u = n.userInfo, let notificationUri = u[LISTABLE_URI_KEY] as? String, notificationUri == uri {

@@ -44,7 +44,7 @@ enum DataManager {
     }
 
     private static func performVersionChangedTasks() {
-        #if os(OSX)
+        #if os(macOS)
             let nc = NSUserNotificationCenter.default
 
             // Unstick macOS notifications with custom actions but without an identifier, causes macOS to keep them forever
@@ -52,45 +52,9 @@ enum DataManager {
                 nc.removeAllDeliveredNotifications()
                 break
             }
-
-            // Migrate delivered notifications from old keys
-            for notification in nc.deliveredNotifications {
-                if let userInfo = notification.userInfo, let u = (userInfo["pullRequestIdKey"] as? String) ?? (userInfo["issueIdKey"] as? String) ?? (userInfo["statusIdKey"] as? String) {
-                    notification.userInfo![LISTABLE_URI_KEY] = u
-                    notification.userInfo!["pullRequestIdKey"] = nil
-                    notification.userInfo!["issueIdKey"] = nil
-                    notification.userInfo!["statusIdKey"] = nil
-                    nc.deliver(notification)
-                }
-            }
         #endif
 
-        let d = UserDefaults.standard
-        if let legacyAuthToken = d.object(forKey: "GITHUB_AUTH_TOKEN") as? String {
-            var legacyApiHost = (d.object(forKey: "API_BACKEND_SERVER") as? String).orEmpty
-            if legacyApiHost.isEmpty { legacyApiHost = "api.github.com" }
-
-            let legacyApiPath = (d.object(forKey: "API_SERVER_PATH") as? String).orEmpty
-
-            var legacyWebHost = (d.object(forKey: "API_FRONTEND_SERVER") as? String).orEmpty
-            if legacyWebHost.isEmpty { legacyWebHost = "github.com" }
-
-            let actualApiPath = "\(legacyApiHost)/\(legacyApiPath)".replacingOccurrences(of: "//", with: "/")
-
-            let newApiServer = ApiServer.addDefaultGithub(in: main)
-            newApiServer.apiPath = "https://\(actualApiPath)"
-            newApiServer.webPath = "https://\(legacyWebHost)"
-            newApiServer.authToken = legacyAuthToken
-            newApiServer.lastSyncSucceeded = true
-
-            d.removeObject(forKey: "API_BACKEND_SERVER")
-            d.removeObject(forKey: "API_SERVER_PATH")
-            d.removeObject(forKey: "API_FRONTEND_SERVER")
-            d.removeObject(forKey: "GITHUB_AUTH_TOKEN")
-        } else {
-            ApiServer.ensureAtLeastGithub(in: main)
-        }
-
+        ApiServer.ensureAtLeastGithub(in: main)
         Logging.log("Resetting sync state of everything")
         ApiServer.resetSyncOfEverything()
 
