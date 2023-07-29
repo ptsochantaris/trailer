@@ -45,9 +45,8 @@ enum DataManager {
 
     private static func performVersionChangedTasks() {
         #if os(macOS)
-            let nc = NSUserNotificationCenter.default
-
             // Unstick macOS notifications with custom actions but without an identifier, causes macOS to keep them forever
+            let nc = NSUserNotificationCenter.default
             for notification in nc.deliveredNotifications where notification.additionalActions != nil && notification.identifier == nil {
                 nc.removeAllDeliveredNotifications()
                 break
@@ -55,48 +54,7 @@ enum DataManager {
         #endif
 
         ApiServer.ensureAtLeastGithub(in: main)
-        Logging.log("Resetting sync state of everything")
         ApiServer.resetSyncOfEverything()
-
-        Logging.log("Marking all unspecified (nil) announced flags as announced")
-        for i in PullRequest.allItems(in: main) where i.value(forKey: "announced") == nil {
-            i.announced = true
-        }
-        for i in Issue.allItems(in: main) where i.value(forKey: "announced") == nil {
-            i.announced = true
-        }
-
-        Logging.log("Migrating display policies")
-        for r in Repo.allItems(in: main) {
-            if let markedAsHidden = (r.value(forKey: "hidden") as AnyObject?)?.boolValue, markedAsHidden == true {
-                r.displayPolicyForPrs = RepoDisplayPolicy.hide.rawValue
-                r.displayPolicyForIssues = RepoDisplayPolicy.hide.rawValue
-            } else {
-                if let prDisplayPolicy = postMigrationRepoPrPolicy, r.value(forKey: "displayPolicyForPrs") == nil {
-                    r.displayPolicyForPrs = prDisplayPolicy.rawValue
-                }
-                if let issueDisplayPolicy = postMigrationRepoIssuePolicy, r.value(forKey: "displayPolicyForIssues") == nil {
-                    r.displayPolicyForIssues = issueDisplayPolicy.rawValue
-                }
-            }
-        }
-
-        Logging.log("Migrating snooze presets")
-        for s in SnoozePreset.allSnoozePresets(in: main) {
-            if let m = postMigrationSnoozeWakeOnComment {
-                s.wakeOnComment = m
-            }
-            if let m = postMigrationSnoozeWakeOnMention {
-                s.wakeOnMention = m
-            }
-            if let m = postMigrationSnoozeWakeOnStatusUpdate {
-                s.wakeOnStatusChange = m
-            }
-        }
-
-        for s in PRStatus.allItems(in: DataManager.main) where s.context == nil {
-            s.resetSyncState()
-        }
     }
 
     private static func processNotificationsForItems(of type: (some ListableItem).Type, newNotification: NotificationType, reopenedNotification: NotificationType, assignmentNotification: NotificationType) async {
@@ -454,8 +412,8 @@ enum DataManager {
     }
 
     static func id(for uriPath: String?) -> NSManagedObjectID? {
-        if let up = uriPath, let u = URL(string: up), let p = persistentStoreCoordinator {
-            return p.managedObjectID(forURIRepresentation: u)
+        if let uriPath, let url = URL(string: uriPath), let persistentStoreCoordinator {
+            return persistentStoreCoordinator.managedObjectID(forURIRepresentation: url)
         }
         return nil
     }

@@ -9,7 +9,6 @@ final class PullRequest: ListableItem {
     @NSManaged var lastStatusNotified: String?
     @NSManaged var mergeCommitSha: String?
     @NSManaged var hasNewCommits: Bool
-    @NSManaged var assignedForReview: Bool
     @NSManaged var reviewers: String
     @NSManaged var teamReviewers: String
     @NSManaged var mergedByNodeId: String?
@@ -19,6 +18,7 @@ final class PullRequest: ListableItem {
     @NSManaged var headRefName: String?
     @NSManaged var headLabel: String?
     @NSManaged var baseLabel: String?
+    @NSManaged var assignedReviewStatus: Int
 
     @NSManaged var statuses: Set<PRStatus>
     @NSManaged var reviews: Set<Review>
@@ -132,26 +132,66 @@ final class PullRequest: ListableItem {
         reviews.contains { $0.isMine }
     }
 
-    func checkAndStoreReviewAssignments(_ reviewerNames: Set<String>, _ reviewerTeams: Set<String>) {
-        var assigned = reviewerNames.contains(apiServer.userName.orEmpty)
-        let assignedToTeam: Bool
-        if assigned {
-            assignedToTeam = false
-        } else {
-            let myTeamNames = apiServer.teams.compactMap(\.slug)
-            assigned = myTeamNames.contains { reviewerTeams.contains($0) }
-            assignedToTeam = assigned
-        }
-        if assigned, !assignedForReview, Settings.notifyOnReviewAssignments {
-            if assignedToTeam {
-                NotificationQueue.add(type: .assignedToTeamForReview, for: self)
-            } else {
-                NotificationQueue.add(type: .assignedForReview, for: self)
+    var preferredSectionBasedOnReviewAssignment: Section? {
+        switch AssignmentStatus(rawValue: assignedReviewStatus) {
+        case nil, .none?, .others:
+            break
+
+        case .me:
+            if Settings.assignedDirectReviewHandlingPolicy > Section.none.rawValue {
+                return Section(rawValue: Settings.assignedDirectReviewHandlingPolicy)!
+            }
+
+        case .myTeam:
+            if Settings.assignedTeamReviewHandlingPolicy > Section.none.rawValue {
+                return Section(rawValue: Settings.assignedTeamReviewHandlingPolicy)!
             }
         }
-        assignedForReview = assigned
+
+        return nil
+    }
+
+    private func setAssignedReviewStatus(to status: AssignmentStatus) {
+        if assignedReviewStatus == status.rawValue {
+            return
+        }
+
+        assignedReviewStatus = status.rawValue
+
+        switch status {
+        case .none, .others:
+            break
+        case .me:
+            if Settings.notifyOnReviewAssignments {
+                NotificationQueue.add(type: .assignedForReview, for: self)
+            }
+        case .myTeam:
+            if Settings.notifyOnReviewAssignments {
+                NotificationQueue.add(type: .assignedToTeamForReview, for: self)
+            }
+        }
+    }
+
+    func checkAndStoreReviewAssignments(_ reviewerNames: Set<String>, _ reviewerTeams: Set<String>) {
         reviewers = reviewerNames.joined(separator: ",")
         teamReviewers = reviewerTeams.joined(separator: ",")
+
+        if reviewerNames.isEmpty {
+            setAssignedReviewStatus(to: .none)
+            return
+        }
+
+        if reviewerNames.contains(apiServer.userName.orEmpty) {
+            setAssignedReviewStatus(to: .me)
+            return
+        }
+
+        let myTeamNames = apiServer.teams.compactMap(\.slug)
+        if myTeamNames.contains(where: { reviewerTeams.contains($0) }) {
+            setAssignedReviewStatus(to: .myTeam)
+        } else {
+            setAssignedReviewStatus(to: .others)
+        }
     }
 
     @MainActor
@@ -329,7 +369,7 @@ final class PullRequest: ListableItem {
     }
 
     var shouldAnnounceStatus: Bool {
-        canBadge && (Settings.notifyOnStatusUpdatesForAllPrs || createdByMe || assignedToParticipated || assignedToMySection)
+        canBadge && (Settings.notifyOnStatusUpdatesForAllPrs || createdByMe || shouldGo(to: .participated) || shouldGo(to: .mine) || shouldGo(to: .mentioned))
     }
 
     func linesAttributedString(labelFont: FONT_CLASS) -> NSAttributedString? {

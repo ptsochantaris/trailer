@@ -23,7 +23,7 @@ enum Settings {
             "REMOVE_RELATED_NOTIFICATIONS_ON_ITEM_REMOVE", "HIDE_SNOOZED_ITEMS", "INCLUDE_MILESTONES_IN_FILTER", "INCLUDE_ASSIGNEE_NAMES_IN_FILTER", "API_SERVERS_IN_SEPARATE_MENUS", "ASSUME_READ_ITEM_IF_USER_HAS_NEWER_COMMENTS",
             "AUTO_SNOOZE_DAYS", "HIDE_MENUBAR_COUNTS", "AUTO_ADD_NEW_REPOS", "AUTO_REMOVE_DELETED_REPOS", "MARK_PRS_AS_UNREAD_ON_NEW_COMMITS", "SHOW_LABELS", "DISPLAY_REVIEW_CHANGE_REQUESTS", "SHOW_RELATIVE_DATES", "QUERY_AUTHORED_PRS", "QUERY_AUTHORED_ISSUES",
             "DISPLAY_MILESTONES", "DEFAULT_APP_FOR_OPENING_WEB", "DEFAULT_APP_FOR_OPENING_ITEMS", "HIDE_ARCHIVED_REPOS", "DRAFT_HANDLING_POLICY", "MARK_UNMERGEABLE_ITEMS", "SHOW_PR_LINES", "SCAN_CLOSED_AND_MERGED", "USE_V4_API", "REQUESTED_TEAM_REVIEWS",
-            "SHOW_STATUSES_GREEN", "SHOW_STATUSES_GRAY", "SHOW_STATUSES_YELLOW", "SHOW_STATUSES_RED", "SHOW_BASE_AND_HEAD_BRANCHES", "PERSISTED_TAB_FILTERS", "PR_V4_SYNC_PAGE", "ISSUE_V4_SYNC_PAGE", "V4_THREAD_SYNC"
+            "SHOW_STATUSES_GREEN", "SHOW_STATUSES_GRAY", "SHOW_STATUSES_YELLOW", "SHOW_STATUSES_RED", "SHOW_BASE_AND_HEAD_BRANCHES", "PERSISTED_TAB_FILTERS", "PR_V4_SYNC_PAGE", "ISSUE_V4_SYNC_PAGE", "V4_THREAD_SYNC", "ASSIGNED_PR_TEAM_HANDLING_POLICY"
         ]
     }
 
@@ -50,7 +50,7 @@ enum Settings {
         }
 
         if let moveAssignedPrs = sharedDefaults.object(forKey: "MOVE_ASSIGNED_PRS_TO_MY_SECTION") as? Bool {
-            sharedDefaults.set(moveAssignedPrs ? AssignmentPolicy.moveToMine.rawValue : AssignmentPolicy.doNothing.rawValue, forKey: "ASSIGNED_PR_HANDLING_POLICY")
+            sharedDefaults.set(moveAssignedPrs ? Placement.moveToMine.assignmentPolicyRawValue : Placement.doNothing.assignmentPolicyRawValue, forKey: "ASSIGNED_PR_HANDLING_POLICY")
             sharedDefaults.removeObject(forKey: "MOVE_ASSIGNED_PRS_TO_MY_SECTION")
         }
 
@@ -115,6 +115,14 @@ enum Settings {
             sharedDefaults.removeObject(forKey: "HIDE_ALL_SECTION")
         }
 
+        if sharedDefaults.object(forKey: "ASSIGNED_REVIEW_TEAM_HANDLING_POLICY") == nil {
+            assignedTeamReviewHandlingPolicy = assignedDirectReviewHandlingPolicy
+        }
+
+        if sharedDefaults.object(forKey: "ASSIGNED_PR_TEAM_HANDLING_POLICY") == nil {
+            assignedItemTeamHandlingPolicy = assignedItemDirectHandlingPolicy
+        }
+
         if sharedDefaults.object(forKey: "HIDE_NOTIFICATION_AVATARS_KEY") == nil {
             let existingHidingSetting = sharedDefaults.bool(forKey: "HIDE_AVATARS_KEY")
             sharedDefaults.setValue(existingHidingSetting, forKey: "HIDE_NOTIFICATION_AVATARS_KEY")
@@ -150,7 +158,7 @@ enum Settings {
             }
         }
     #endif
-    
+
     fileprivate static subscript(key: String) -> Any? {
         get {
             sharedDefaults.object(forKey: key)
@@ -175,7 +183,7 @@ enum Settings {
             }
         }
     }
-    
+
     private static let saveTimer = PopTimer(timeInterval: 2) {
         if let e = Settings.lastExportUrl {
             Task { @MainActor in
@@ -201,7 +209,7 @@ enum Settings {
             }
         #endif
     }
-    
+
     ///////////////////////////////// IMPORT / EXPORT
 
     @discardableResult
@@ -296,12 +304,20 @@ enum Settings {
     static var checkForUpdatesInterval: Int
 
     @UserDefault(key: "ASSIGNED_REVIEW_HANDLING_POLICY", defaultValue: 0)
-    static var assignedReviewHandlingPolicy: Int
-    static let assignedReviewHandlingPolicyHelp = "If an item is assigned for you to review, Trailer can move it to a specific section or leave it as-is."
+    static var assignedDirectReviewHandlingPolicy: Int
+    static let assignedDirectReviewHandlingPolicyHelp = "If an item is assigned for you to review, Trailer can move it to a specific section or leave it as-is."
+
+    @UserDefault(key: "ASSIGNED_REVIEW_TEAM_HANDLING_POLICY", defaultValue: 0)
+    static var assignedTeamReviewHandlingPolicy: Int
+    static let assignedTeamReviewHandlingPolicyHelp = "If an item is assigned for your team to review, Trailer can move it to a specific section or leave it as-is."
 
     @UserDefault(key: "ASSIGNED_PR_HANDLING_POLICY", defaultValue: 1)
-    static var assignedPrHandlingPolicy: Int
-    static let assignedPrHandlingPolicyHelp = "If an item is assigned to you, Trailer can move it to a specific section or leave it as-is."
+    static var assignedItemDirectHandlingPolicy: Int
+    static let assignedItemDirectHandlingPolicyHelp = "If an item is assigned to you, Trailer can move it to a specific section or leave it as-is."
+
+    @UserDefault(key: "ASSIGNED_PR_TEAM_HANDLING_POLICY", defaultValue: 1)
+    static var assignedItemTeamHandlingPolicy: Int
+    static let assignedItemTeamHandlingPolicyHelp = "If an item is assigned to your team(s), Trailer can move it to a specific section or leave it as-is."
 
     @UserDefault(key: "NEW_PR_DISPLAY_POLICY_INDEX", defaultValue: RepoDisplayPolicy.hide.intValue)
     static var displayPolicyForNewPrs: Int
@@ -357,10 +373,8 @@ enum Settings {
     #if os(iOS)
         static let backgroundRefreshPeriodHelp = "The minimum amount of time to wait before requesting an update when the app is in the background. Even though this is quite efficient, it's still a good idea to keep this to a high value in order to keep battery and bandwidth use low. The default of half an hour is generally a good number. Please note that iOS may ignore this value and perform background refreshes at longer intervals depending on battery level and other reasons."
         static var backgroundRefreshPeriod: TimeInterval {
-            get { if let n = get("IOS_BACKGROUND_REFRESH_PERIOD_KEY") as? TimeInterval { return n > 0 ? n : 1800 } else { return 1800 } }
-            set {
-                set("IOS_BACKGROUND_REFRESH_PERIOD_KEY", newValue)
-            }
+            get { if let n = self["IOS_BACKGROUND_REFRESH_PERIOD_KEY"] as? TimeInterval { return n > 0 ? n : 1800 } else { return 1800 } }
+            set { self["IOS_BACKGROUND_REFRESH_PERIOD_KEY"] = newValue }
         }
     #else
         static let refreshPeriodHelp = "How often to refresh items when the app is active and in the foreground."
@@ -699,7 +713,7 @@ enum Settings {
     @UserDefault(key: "REQUESTED_TEAM_REVIEWS", defaultValue: false)
     static var showRequestedTeamReviews: Bool
     static let showRequestedTeamReviewsHelp = "Display the name(s) of teams which have been assigned as reviewers on PRs"
-        
+
     @UserDefault(key: "USE_V4_API", defaultValue: false)
     static var useV4API: Bool
     static let useV4APIHelp = "In cases where the new v4 API is available, such as the public GitHub server, using it can result in significant efficiency and speed improvements when syncing."
@@ -737,7 +751,7 @@ enum Settings {
             }
         }
     }
-    
+
     @propertyWrapper
     struct UserDefault<Value> {
         let key: String

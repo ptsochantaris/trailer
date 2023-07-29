@@ -14,9 +14,6 @@ enum Section: Int {
     static let apiTitles = ["", "mine", "participated", "mentioned", "merged", "closed", "other", "snoozed"]
     var apiName: String { Section.apiTitles[Int(rawValue)] }
 
-    static let movePolicyNames = ["Don't Move", "Mine", "Participated", "Mentioned"]
-    var movePolicyName: String { Section.movePolicyNames[Int(rawValue)] }
-
     var intValue: Int { Int(rawValue) }
 
     static let nonZeroPredicate = NSPredicate(format: "sectionIndex > 0")

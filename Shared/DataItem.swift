@@ -142,6 +142,10 @@ class DataItem: NSManagedObject, Querying {
 
     class var typeName: String { abort() }
 
+    override func value(forUndefinedKey _: String) -> Any? {
+        nil
+    }
+
     func resetSyncState() {
         updatedAt = updatedAt?.addingTimeInterval(-1) ?? .distantPast
         apiServer.resetSyncState()

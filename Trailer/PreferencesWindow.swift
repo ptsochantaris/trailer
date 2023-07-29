@@ -98,7 +98,8 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
 
     // Display
     @IBOutlet private var grayOutWhenRefreshing: NSButton!
-    @IBOutlet private var assignedPrHandlingPolicy: NSPopUpButton!
+    @IBOutlet private var assignedItemDirectHandlingPolicy: NSPopUpButton!
+    @IBOutlet private var assignedItemTeamHandlingPolicy: NSPopUpButton!
     @IBOutlet private var refreshItemsLabel: NSTextField!
     @IBOutlet private var showCreationDates: NSButton!
     @IBOutlet private var hideAvatars: NSButton!
@@ -178,7 +179,8 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     @IBOutlet private var allNewIssuesSetting: NSPopUpButton!
 
     // Reviews
-    @IBOutlet private var assignedReviewHandlingPolicy: NSPopUpButton!
+    @IBOutlet private var assignedDirectReviewHandlingPolicy: NSPopUpButton!
+    @IBOutlet private var assignedTeamReviewHandlingPolicy: NSPopUpButton!
     @IBOutlet private var notifyOnChangeRequests: NSButton!
     @IBOutlet private var notifyOnAcceptances: NSButton!
     @IBOutlet private var notifyOnReviewDismissals: NSButton!
@@ -375,9 +377,18 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         showOptionalReviewAssignmentWarning(previousSync: previousShouldSync)
     }
 
-    @IBAction private func assignedReviewHandlingPolicySelected(_ sender: NSPopUpButton) {
+    @IBAction private func assignedDirectReviewHandlingPolicySelected(_ sender: NSPopUpButton) {
         let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
-        Settings.assignedReviewHandlingPolicy = sender.index(of: sender.selectedItem!)
+        let index = sender.index(of: sender.selectedItem!)
+        Settings.assignedDirectReviewHandlingPolicy = Placement(menuIndex: index).assignmentPolicyRawValue
+        deferredUpdateTimer.push()
+        showOptionalReviewAssignmentWarning(previousSync: previousShouldSync)
+    }
+
+    @IBAction private func assignedTeamReviewHandlingPolicySelected(_ sender: NSPopUpButton) {
+        let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
+        let index = sender.index(of: sender.selectedItem!)
+        Settings.assignedTeamReviewHandlingPolicy = Placement(menuIndex: index).assignmentPolicyRawValue
         deferredUpdateTimer.push()
         showOptionalReviewAssignmentWarning(previousSync: previousShouldSync)
     }
@@ -451,7 +462,8 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         sortModeSelect.toolTip = Settings.sortMethodHelp
         sortingOrder.toolTip = Settings.sortDescendingHelp
         groupByRepo.toolTip = Settings.groupByRepoHelp
-        assignedPrHandlingPolicy.toolTip = Settings.assignedPrHandlingPolicyHelp
+        assignedItemDirectHandlingPolicy.toolTip = Settings.assignedItemDirectHandlingPolicyHelp
+        assignedItemTeamHandlingPolicy.toolTip = Settings.assignedItemTeamHandlingPolicyHelp
         draftHandlingPolicy.toolTip = Settings.draftHandlingPolicyHelp
         includeTitlesInFiltering.toolTip = Settings.includeTitlesInFilterHelp
         includeMilestonesInFiltering.toolTip = Settings.includeMilestonesInFilterHelp
@@ -506,7 +518,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         notifyOnReviewDismissals.toolTip = Settings.notifyOnReviewDismissalsHelp
         notifyOnAllReviewDismissals.toolTip = Settings.notifyOnAllReviewDismissalsHelp
         notifyOnReviewAssignments.toolTip = Settings.notifyOnReviewAssignmentsHelp
-        assignedReviewHandlingPolicy.toolTip = Settings.assignedReviewHandlingPolicyHelp
+        assignedDirectReviewHandlingPolicy.toolTip = Settings.assignedDirectReviewHandlingPolicyHelp
         supportReviews.toolTip = Settings.displayReviewsOnItemsHelp
         showRequestedTeamReviews.toolTip = Settings.showRequestedTeamReviewsHelp
         notifyOnItemReactions.toolTip = Settings.notifyOnItemReactionsHelp
@@ -602,7 +614,6 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         sortingOrder.integerValue = Settings.sortDescending ? 1 : 0
         showCreationDates.integerValue = Settings.showCreatedInsteadOfUpdated ? 1 : 0
         groupByRepo.integerValue = Settings.groupByRepo ? 1 : 0
-        assignedPrHandlingPolicy.selectItem(at: Settings.assignedPrHandlingPolicy)
         draftHandlingPolicy.selectItem(at: Settings.draftHandlingPolicy)
         showStatusItems.integerValue = Settings.showStatusItems ? 1 : 0
         makeStatusItemsSelectable.integerValue = Settings.makeStatusItemsSelectable ? 1 : 0
@@ -627,6 +638,9 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         showStatusesRed.integerValue = Settings.showStatusesRed ? 1 : 0
         showStatusesNeutral.integerValue = Settings.showStatusesGray ? 1 : 0
 
+        assignedItemDirectHandlingPolicy.selectItem(at: Placement(fromAssignmentPolicyRawValue: Settings.assignedItemDirectHandlingPolicy)?.menuIndex ?? 0)
+        assignedItemTeamHandlingPolicy.selectItem(at: Placement(fromAssignmentPolicyRawValue: Settings.assignedItemTeamHandlingPolicy)?.menuIndex ?? 0)
+
         defaultOpenApp.stringValue = Settings.defaultAppForOpeningItems
         defaultOpenLinks.stringValue = Settings.defaultAppForOpeningWeb
 
@@ -649,7 +663,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         hotkeyOptionModifier.integerValue = Settings.hotkeyOptionModifier ? 1 : 0
         hotkeyShiftModifier.integerValue = Settings.hotkeyShiftModifier ? 1 : 0
 
-        assignedReviewHandlingPolicy.select(assignedReviewHandlingPolicy.item(at: Settings.assignedReviewHandlingPolicy))
+        assignedDirectReviewHandlingPolicy.select(assignedDirectReviewHandlingPolicy.item(at: Settings.assignedDirectReviewHandlingPolicy))
 
         enableHotkeySegments()
 
@@ -1112,8 +1126,13 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         deferredUpdateTimer.push()
     }
 
-    @IBAction private func assignedPrHandlingPolicySelected(_ sender: NSPopUpButton) {
-        Settings.assignedPrHandlingPolicy = sender.indexOfSelectedItem
+    @IBAction private func assignedItemDirectHandlingPolicySelected(_ sender: NSPopUpButton) {
+        Settings.assignedItemDirectHandlingPolicy = Placement(menuIndex: sender.indexOfSelectedItem).assignmentPolicyRawValue
+        deferredUpdateTimer.push()
+    }
+
+    @IBAction private func assignedItemTeamHandlingPolicySelected(_ sender: NSPopUpButton) {
+        Settings.assignedItemTeamHandlingPolicy = Placement(menuIndex: sender.indexOfSelectedItem).assignmentPolicyRawValue
         deferredUpdateTimer.push()
     }
 

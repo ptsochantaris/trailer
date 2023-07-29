@@ -62,7 +62,7 @@ class ListableItem: DataItem, Listable {
         case none, reopened, merged, closed
     }
 
-    @NSManaged var assignedToMe: Bool
+    @NSManaged var assignedStatus: Int
     @NSManaged var assigneeName: String? // note: This now could be a list of names, delimited with a ","
     @NSManaged var body: String?
     @NSManaged var condition: Int
@@ -184,36 +184,64 @@ class ListableItem: DataItem, Listable {
     }
 
     final func processAssignmentStatus(from info: JSON?, idField: String) {
-        let myIdOnThisRepo = repo.apiServer.userNodeId
-        var assigneeNames = [String]()
-
-        func checkAndStoreAssigneeName(from assignee: JSON) -> Bool {
-            if let name = assignee["login"] as? String, let assigneeId = assignee[idField] as? String {
-                let shouldBeAssignedToMe = assigneeId == myIdOnThisRepo
-                assigneeNames.append(name)
-                return shouldBeAssignedToMe
-            } else {
-                return false
-            }
-        }
-
-        var foundAssignmentToMe = false
-
-        if let assignees = info?["assignees"] as? [JSON], !assignees.isEmpty {
-            for assignee in assignees where checkAndStoreAssigneeName(from: assignee) {
-                foundAssignmentToMe = true
-            }
+        let assigneeJson: [JSON]?
+        if let assignees = info?["assignees"] as? [JSON] {
+            assigneeJson = assignees
         } else if let assignee = info?["assignee"] as? JSON {
-            foundAssignmentToMe = checkAndStoreAssigneeName(from: assignee)
+            assigneeJson = [assignee]
+        } else {
+            assigneeJson = nil
         }
 
-        isNewAssignment = foundAssignmentToMe && !assignedToMe && !createdByMe
-        assignedToMe = foundAssignmentToMe
+        var directAssignmentToMe = false
+        var teamAssignmentToMe = false
+        var directAssigneeNames = [String]()
+        var teamAssigneeNames = [String]()
 
-        if assigneeNames.isEmpty {
-            assigneeName = nil
+        if let assigneeJson {
+            let myIdOnThisRepo = repo.apiServer.userNodeId
+            let myTeamNames = apiServer.teams.compactMap(\.slug)
+
+            for assignee in assigneeJson {
+                if let name = assignee["login"] as? String, let assigneeId = assignee[idField] as? String {
+                    if !directAssignmentToMe, assigneeId == myIdOnThisRepo {
+                        directAssignmentToMe = true
+                    }
+                    directAssigneeNames.append(name)
+                } else if let name = assignee["slug"] as? String {
+                    if !teamAssignmentToMe, myTeamNames.contains(name) {
+                        teamAssignmentToMe = true
+                    }
+                    teamAssigneeNames.append(name)
+                }
+            }
+        }
+
+        let allSigneeNames = teamAssigneeNames + directAssigneeNames
+        assigneeName = allSigneeNames.isEmpty ? nil : allSigneeNames.joined(separator: ",")
+
+        if createdByMe {
+            isNewAssignment = false
         } else {
-            assigneeName = assigneeNames.joined(separator: ",")
+            let previousStatus = assignedStatus
+
+            let wasAssignedToMe = previousStatus == AssignmentStatus.me.rawValue
+            let wasAssignedToMyTeam = previousStatus == AssignmentStatus.myTeam.rawValue
+            let wasAssigned = wasAssignedToMe || wasAssignedToMyTeam
+
+            let isNewDirectAssignment = directAssignmentToMe && !wasAssignedToMe
+            let isNewTeamAssignment = teamAssignmentToMe && !wasAssignedToMyTeam
+            let isAssigned = isNewDirectAssignment || isNewTeamAssignment
+
+            isNewAssignment = isAssigned && !wasAssigned
+        }
+
+        if directAssignmentToMe {
+            assignedStatus = AssignmentStatus.me.rawValue
+        } else if teamAssignmentToMe {
+            assignedStatus = AssignmentStatus.myTeam.rawValue
+        } else {
+            assignedStatus = AssignmentStatus.none.rawValue
         }
     }
 
@@ -329,12 +357,29 @@ class ListableItem: DataItem, Listable {
         isSnoozing || muted
     }
 
-    final var assignedToMySection: Bool {
-        assignedToMe && Settings.assignedPrHandlingPolicy == AssignmentPolicy.moveToMine.rawValue
-    }
+    final func shouldGo(to section: Section) -> Bool {
+        let policy: Int
+        switch AssignmentStatus(rawValue: assignedStatus) {
+        case nil, .none?, .others:
+            return false
 
-    final var assignedToParticipated: Bool {
-        assignedToMe && Settings.assignedPrHandlingPolicy == AssignmentPolicy.moveToParticipated.rawValue
+        case .me:
+            policy = Settings.assignedItemDirectHandlingPolicy
+
+        case .myTeam:
+            policy = Settings.assignedItemTeamHandlingPolicy
+        }
+
+        switch section {
+        case .all, .closed, .merged, .none, .snoozed:
+            return false
+        case .mentioned:
+            return policy == Placement.moveToMentioned.assignmentPolicyRawValue
+        case .participated:
+            return policy == Placement.moveToParticipated.assignmentPolicyRawValue
+        case .mine:
+            return policy == Placement.moveToMine.assignmentPolicyRawValue
+        }
     }
 
     final var createdByMe: Bool {
@@ -451,34 +496,46 @@ class ListableItem: DataItem, Listable {
     private func preferredSection(takingItemConditionIntoAccount: Bool) -> Section {
         if Settings.draftHandlingPolicy == DraftHandlingPolicy.hide.rawValue && draft {
             return .none
-
-        } else if takingItemConditionIntoAccount && condition == ItemCondition.merged.rawValue {
-            return .merged
-
-        } else if takingItemConditionIntoAccount && condition == ItemCondition.closed.rawValue {
-            return .closed
-
-        } else if createdByMe || assignedToMySection {
-            return .mine
-
-        } else if assignedToParticipated || commentedByMe || reviewedByMe {
-            return .participated
-
-        } else if let p = self as? PullRequest, Settings.assignedReviewHandlingPolicy > Section.none.rawValue, p.assignedForReview {
-            return Section(rawValue: Settings.assignedReviewHandlingPolicy)!
-
-        } else if Settings.newMentionMovePolicy > Section.none.rawValue, contains(terms: ["@\(apiServer.userName.orEmpty)"]) {
-            return Section(rawValue: Settings.newMentionMovePolicy)!
-
-        } else if Settings.teamMentionMovePolicy > Section.none.rawValue, contains(terms: apiServer.teams.compactMap(\.calculatedReferral)) {
-            return Section(rawValue: Settings.teamMentionMovePolicy)!
-
-        } else if Settings.newItemInOwnedRepoMovePolicy > Section.none.rawValue, repo.isMine {
-            return Section(rawValue: Settings.newItemInOwnedRepoMovePolicy)!
-
-        } else {
-            return .all
         }
+
+        if takingItemConditionIntoAccount {
+            if condition == ItemCondition.merged.rawValue {
+                return .merged
+            }
+            if condition == ItemCondition.closed.rawValue {
+                return .closed
+            }
+        }
+
+        if createdByMe || shouldGo(to: .mine) {
+            return .mine
+        }
+
+        if shouldGo(to: .participated) || commentedByMe || reviewedByMe {
+            return .participated
+        }
+
+        if shouldGo(to: .mentioned) {
+            return .mentioned
+        }
+
+        if let p = self as? PullRequest, let section = p.preferredSectionBasedOnReviewAssignment {
+            return section
+        }
+
+        if Settings.newMentionMovePolicy > Section.none.rawValue, contains(terms: ["@\(apiServer.userName.orEmpty)"]) {
+            return Section(rawValue: Settings.newMentionMovePolicy)!
+        }
+
+        if Settings.teamMentionMovePolicy > Section.none.rawValue, contains(terms: apiServer.teams.compactMap(\.calculatedReferral)) {
+            return Section(rawValue: Settings.teamMentionMovePolicy)!
+        }
+
+        if Settings.newItemInOwnedRepoMovePolicy > Section.none.rawValue, repo.isMine {
+            return Section(rawValue: Settings.newItemInOwnedRepoMovePolicy)!
+        }
+
+        return .all
     }
 
     private func canBadge(in targetSection: Section) -> Bool {

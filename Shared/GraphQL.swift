@@ -848,7 +848,7 @@ enum GraphQL {
             }
         }
     }
-    
+
     private static func scanNodes(_ nodes: [String: Lista<Node>], from server: ApiServer, parentType: (some DataItem).Type?) async {
         guard nodes.count > 0, let moc = server.managedObjectContext else { return }
         await DataManager.runInChild(of: moc) { child in
@@ -880,7 +880,7 @@ enum GraphQL {
             if let nodeList = nodes["PullRequestReviewComment"] {
                 PRComment.sync(from: nodeList, on: server, moc: child, parentCache: parentCache)
             }
-            if let nodeList = nodes["Reaction"], let parentType = parentType {
+            if let nodeList = nodes["Reaction"], let parentType {
                 Reaction.sync(from: nodeList, for: parentType, on: server, moc: child, parentCache: parentCache)
             }
             if let nodeList = nodes["ReviewRequest"] {

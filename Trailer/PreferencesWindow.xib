@@ -57,7 +57,7 @@
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" heightSizable="YES"/>
                                             <clipView key="contentView" id="0eh-Pe-UwN">
                                                 <rect key="frame" x="1" y="1" width="238" height="333"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="20" headerView="GLY-La-oaP" id="wPh-gi-N9t">
                                                         <rect key="frame" x="0.0" y="0.0" width="238" height="316"/>
@@ -361,7 +361,7 @@ Token</string>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <clipView key="contentView" id="hCD-zR-3bF">
                                                 <rect key="frame" x="1" y="1" width="869" height="318"/>
-                                                <autoresizingMask key="autoresizingMask"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" rowHeight="20" headerView="qia-ub-v1J" id="6pK-a1-URw">
                                                         <rect key="frame" x="0.0" y="0.0" width="869" height="301"/>
@@ -587,10 +587,10 @@ Token</string>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <subviews>
                                                 <box fixedFrame="YES" borderType="line" title="Sorting" translatesAutoresizingMaskIntoConstraints="NO" id="fNC-DY-p8H">
-                                                    <rect key="frame" x="503" y="290" width="344" height="112"/>
+                                                    <rect key="frame" x="439" y="290" width="408" height="112"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                                     <view key="contentView" id="Feb-GG-39G">
-                                                        <rect key="frame" x="4" y="5" width="336" height="92"/>
+                                                        <rect key="frame" x="4" y="5" width="400" height="92"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="afo-70-80J">
@@ -605,7 +605,7 @@ Token</string>
                                                                 </connections>
                                                             </button>
                                                             <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TqD-G8-E24">
-                                                                <rect key="frame" x="173" y="16" width="155" height="25"/>
+                                                                <rect key="frame" x="193" y="16" width="155" height="25"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="check" title="Bunch by repository" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="AYd-ds-ReS">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -616,7 +616,7 @@ Token</string>
                                                                 </connections>
                                                             </button>
                                                             <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bWX-fP-uhd">
-                                                                <rect key="frame" x="17" y="47" width="306" height="26"/>
+                                                                <rect key="frame" x="17" y="47" width="367" height="26"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="PQf-4J-ChU">
                                                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -836,14 +836,14 @@ Token</string>
                                                     </customSpacing>
                                                 </stackView>
                                                 <box autoresizesSubviews="NO" fixedFrame="YES" borderType="line" title="If an item is a draft…" translatesAutoresizingMaskIntoConstraints="NO" id="IV7-Ff-s3B">
-                                                    <rect key="frame" x="502" y="202" width="345" height="84"/>
+                                                    <rect key="frame" x="439" y="217" width="408" height="69"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                                     <view key="contentView" id="Fun-OY-4yH">
-                                                        <rect key="frame" x="4" y="5" width="337" height="64"/>
+                                                        <rect key="frame" x="4" y="5" width="400" height="49"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Cpe-1u-UbD">
-                                                                <rect key="frame" x="17" y="19" width="306" height="26"/>
+                                                                <rect key="frame" x="17" y="10" width="367" height="26"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <popUpButtonCell key="cell" type="push" title="Do Nothing" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="k6A-y3-mud" id="pj8-Vh-2mr">
                                                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -863,43 +863,81 @@ Token</string>
                                                         </subviews>
                                                     </view>
                                                 </box>
-                                                <box autoresizesSubviews="NO" fixedFrame="YES" borderType="line" title="When something from &quot;all items&quot; is assigned to me…" translatesAutoresizingMaskIntoConstraints="NO" id="96h-4X-0sU">
-                                                    <rect key="frame" x="503" y="125" width="345" height="73"/>
+                                                <box autoresizesSubviews="NO" fixedFrame="YES" borderType="line" title="When something from &quot;all items&quot; is assigned…" translatesAutoresizingMaskIntoConstraints="NO" id="96h-4X-0sU">
+                                                    <rect key="frame" x="439" y="129" width="409" height="79"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                                     <view key="contentView" id="evv-lI-oOm">
-                                                        <rect key="frame" x="4" y="5" width="337" height="53"/>
+                                                        <rect key="frame" x="4" y="5" width="401" height="59"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lB5-eS-YSK">
-                                                                <rect key="frame" x="17" y="8" width="306" height="26"/>
+                                                                <rect key="frame" x="17" y="10" width="182" height="26"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <popUpButtonCell key="cell" type="push" title="Do nothing" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="9TM-I1-9UP" id="rPe-gD-wp2">
+                                                                <popUpButtonCell key="cell" type="push" title="Move to &quot;Mine&quot;" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="RE2-yr-udn" id="rPe-gD-wp2">
                                                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="menu"/>
                                                                     <menu key="menu" id="cHj-CQ-Gut">
                                                                         <items>
-                                                                            <menuItem title="Move to &quot;My&quot; section" id="RE2-yr-udn"/>
-                                                                            <menuItem title="Move to &quot;Participated&quot; section" id="RS4-Xg-Tc4"/>
+                                                                            <menuItem title="Move to &quot;Mine&quot;" id="RE2-yr-udn"/>
+                                                                            <menuItem title="Move to &quot;Participated&quot;" id="RS4-Xg-Tc4"/>
+                                                                            <menuItem title="Move to &quot;Mentioned&quot;" id="xhZ-Jo-3il"/>
                                                                             <menuItem title="Do nothing" state="on" id="9TM-I1-9UP"/>
                                                                         </items>
                                                                     </menu>
                                                                 </popUpButtonCell>
                                                                 <connections>
-                                                                    <action selector="assignedPrHandlingPolicySelected:" target="vQH-WF-vh2" id="lmg-Bg-Cqp"/>
+                                                                    <action selector="assignedItemDirectHandlingPolicySelected:" target="vQH-WF-vh2" id="lmg-Bg-Cqp"/>
                                                                 </connections>
                                                             </popUpButton>
+                                                            <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jRo-wO-w7i">
+                                                                <rect key="frame" x="203" y="10" width="182" height="26"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <popUpButtonCell key="cell" type="push" title="Move to &quot;Mine&quot;" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="tmd-td-78D" id="hlN-qs-rr6">
+                                                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                                    <font key="font" metaFont="menu"/>
+                                                                    <menu key="menu" id="FHd-cv-AfA">
+                                                                        <items>
+                                                                            <menuItem title="Move to &quot;Mine&quot;" id="tmd-td-78D"/>
+                                                                            <menuItem title="Move to &quot;Participated&quot;" id="ogA-b4-Bpk"/>
+                                                                            <menuItem title="Move to &quot;Mentioned&quot;" id="OxJ-Eb-cTL"/>
+                                                                            <menuItem title="Do nothing" state="on" id="PS7-T7-dF6"/>
+                                                                        </items>
+                                                                    </menu>
+                                                                </popUpButtonCell>
+                                                                <connections>
+                                                                    <action selector="assignedItemTeamHandlingPolicySelected:" target="vQH-WF-vh2" id="ao7-Vt-VqE"/>
+                                                                </connections>
+                                                            </popUpButton>
+                                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="e46-Mc-W3w">
+                                                                <rect key="frame" x="23" y="38" width="43" height="14"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <textFieldCell key="cell" lineBreakMode="clipping" title="…to me" id="fUT-l9-kM6">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                            </textField>
+                                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tNd-cj-lxh">
+                                                                <rect key="frame" x="210" y="38" width="86" height="14"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <textFieldCell key="cell" lineBreakMode="clipping" title="…to my team(s)" id="Xdd-w6-pza">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                            </textField>
                                                         </subviews>
                                                     </view>
                                                 </box>
                                                 <box autoresizesSubviews="NO" fixedFrame="YES" borderType="line" title="Refreshing" translatesAutoresizingMaskIntoConstraints="NO" id="zpr-xa-Rug">
-                                                    <rect key="frame" x="502" y="16" width="346" height="104"/>
+                                                    <rect key="frame" x="439" y="16" width="409" height="104"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                                     <view key="contentView" id="LeE-vI-Qal">
-                                                        <rect key="frame" x="4" y="5" width="338" height="84"/>
+                                                        <rect key="frame" x="4" y="5" width="401" height="84"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="INA-l0-fZh">
-                                                                <rect key="frame" x="304" y="13" width="19" height="27"/>
+                                                                <rect key="frame" x="365" y="13" width="19" height="27"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <stepperCell key="cell" continuous="YES" alignment="left" increment="10" minValue="60" maxValue="3600" doubleValue="60" id="EvF-c3-Alv"/>
                                                                 <connections>
@@ -907,7 +945,7 @@ Token</string>
                                                                 </connections>
                                                             </stepper>
                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Zu0-k7-csJ">
-                                                                <rect key="frame" x="41" y="18" width="263" height="17"/>
+                                                                <rect key="frame" x="102" y="18" width="263" height="17"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Refresh items every 3600 seconds" id="tcS-Fj-NKu">
                                                                     <font key="font" metaFont="system"/>
@@ -916,7 +954,7 @@ Token</string>
                                                                 </textFieldCell>
                                                             </textField>
                                                             <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ueT-Kq-j9E">
-                                                                <rect key="frame" x="41" y="49" width="281" height="18"/>
+                                                                <rect key="frame" x="102" y="49" width="281" height="18"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="check" title="Gray menubar count when refreshing" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="4bJ-dN-Uhp">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1458,43 +1496,14 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box fixedFrame="YES" boxType="custom" borderType="none" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="49Q-X3-TvK">
-                                            <rect key="frame" x="183" y="51" width="550" height="328"/>
+                                            <rect key="frame" x="183" y="17" width="550" height="362"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <view key="contentView" id="Hr7-ca-s5X">
-                                                <rect key="frame" x="0.0" y="0.0" width="550" height="328"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="550" height="362"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <box fixedFrame="YES" borderType="none" title="When a PR is assigned to me or my team for review…" translatesAutoresizingMaskIntoConstraints="NO" id="zDt-bc-lCe">
-                                                        <rect key="frame" x="119" y="203" width="315" height="46"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <view key="contentView" id="eGN-JN-FT6">
-                                                            <rect key="frame" x="0.0" y="0.0" width="315" height="34"/>
-                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                            <subviews>
-                                                                <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="c3C-Sm-aRL">
-                                                                    <rect key="frame" x="-2" y="9" width="320" height="26"/>
-                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                    <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="UcN-MJ-hZX">
-                                                                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                                        <font key="font" metaFont="menu"/>
-                                                                        <menu key="menu" id="heA-t8-Vcv">
-                                                                            <items>
-                                                                                <menuItem title="Don't Move It" id="PTs-X4-uhH"/>
-                                                                                <menuItem title="Move To Mine" id="biD-wT-mtd"/>
-                                                                                <menuItem title="Move To Participated" id="pqU-ga-jXW"/>
-                                                                                <menuItem title="Move To Mentioned" id="BcL-s2-WDj"/>
-                                                                            </items>
-                                                                        </menu>
-                                                                    </popUpButtonCell>
-                                                                    <connections>
-                                                                        <action selector="assignedReviewHandlingPolicySelected:" target="vQH-WF-vh2" id="0Yk-6R-FJC"/>
-                                                                    </connections>
-                                                                </popUpButton>
-                                                            </subviews>
-                                                        </view>
-                                                    </box>
                                                     <box fixedFrame="YES" title="Notify me when…" translatesAutoresizingMaskIntoConstraints="NO" id="C58-hf-r5t">
-                                                        <rect key="frame" x="39" y="36" width="475" height="154"/>
+                                                        <rect key="frame" x="39" y="40" width="475" height="154"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="FlM-UP-339">
                                                             <rect key="frame" x="4" y="5" width="467" height="134"/>
@@ -1581,7 +1590,7 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                         </view>
                                                     </box>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="PC0-Di-dZ3">
-                                                        <rect key="frame" x="-2" y="15" width="554" height="17"/>
+                                                        <rect key="frame" x="-2" y="19" width="554" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="To disable usage of the Reviews API, uncheck all options here &amp; set the drop-down option to &quot;Don't Move It&quot;" id="bis-lC-jvI">
                                                             <font key="font" metaFont="label" size="9"/>
@@ -1590,7 +1599,7 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                         </textFieldCell>
                                                     </textField>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7m1-w3-6Le">
-                                                        <rect key="frame" x="131" y="300" width="272" height="18"/>
+                                                        <rect key="frame" x="131" y="334" width="272" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Display review info for PRs" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="NJt-Z2-5f6">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1601,7 +1610,7 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                         </connections>
                                                     </button>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rDE-A8-36S">
-                                                        <rect key="frame" x="131" y="270" width="288" height="18"/>
+                                                        <rect key="frame" x="131" y="304" width="288" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Display teams asked to review PRs" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Ybv-mB-zei">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1611,6 +1620,72 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                             <action selector="showRequestedTeamReviewsSelected:" target="vQH-WF-vh2" id="xZF-kO-kyn"/>
                                                         </connections>
                                                     </button>
+                                                    <box autoresizesSubviews="NO" fixedFrame="YES" borderType="line" title="When a PR is assigned for review…" translatesAutoresizingMaskIntoConstraints="NO" id="ORE-Hy-cR5">
+                                                        <rect key="frame" x="39" y="203" width="475" height="79"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                                        <view key="contentView" id="PrF-Mb-6Nc">
+                                                            <rect key="frame" x="4" y="5" width="467" height="59"/>
+                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                            <subviews>
+                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="auq-Ob-ShO">
+                                                                    <rect key="frame" x="28" y="38" width="43" height="14"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <textFieldCell key="cell" lineBreakMode="clipping" title="…to me" id="xLY-v2-HSg">
+                                                                        <font key="font" metaFont="smallSystem"/>
+                                                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                    </textFieldCell>
+                                                                </textField>
+                                                                <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="SYZ-oe-uNN">
+                                                                    <rect key="frame" x="17" y="6" width="216" height="26"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <popUpButtonCell key="cell" type="push" title="Don't Move It" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="kee-oR-sjv">
+                                                                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                                        <font key="font" metaFont="menu"/>
+                                                                        <menu key="menu" id="X5S-Xw-DMR">
+                                                                            <items>
+                                                                                <menuItem title="Don't Move It" state="on" id="hy9-vB-o8b"/>
+                                                                                <menuItem title="Move To Mine" id="YaC-Ie-duu"/>
+                                                                                <menuItem title="Move To Participated" id="lZk-mr-9lw"/>
+                                                                                <menuItem title="Move To Mentioned" id="ETl-hk-Dd3"/>
+                                                                            </items>
+                                                                        </menu>
+                                                                    </popUpButtonCell>
+                                                                    <connections>
+                                                                        <action selector="assignedDirectReviewHandlingPolicySelected:" target="vQH-WF-vh2" id="g7q-JM-SdO"/>
+                                                                    </connections>
+                                                                </popUpButton>
+                                                                <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xRB-DD-kQe">
+                                                                    <rect key="frame" x="235" y="6" width="216" height="26"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <popUpButtonCell key="cell" type="push" title="Don't Move It" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="g7W-b9-SEt">
+                                                                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                                        <font key="font" metaFont="menu"/>
+                                                                        <menu key="menu" id="5yX-cH-Iyh">
+                                                                            <items>
+                                                                                <menuItem title="Don't Move It" state="on" id="XJL-V2-xmP"/>
+                                                                                <menuItem title="Move To Mine" id="ncc-zw-x99"/>
+                                                                                <menuItem title="Move To Participated" id="nao-d1-2qZ"/>
+                                                                                <menuItem title="Move To Mentioned" id="3PN-ks-JFk"/>
+                                                                            </items>
+                                                                        </menu>
+                                                                    </popUpButtonCell>
+                                                                    <connections>
+                                                                        <action selector="assignedTeamReviewHandlingPolicySelected:" target="vQH-WF-vh2" id="0Dg-X0-1yX"/>
+                                                                    </connections>
+                                                                </popUpButton>
+                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0r9-PA-AkD">
+                                                                    <rect key="frame" x="241" y="38" width="77" height="14"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <textFieldCell key="cell" lineBreakMode="clipping" title="…to my teams" id="1uA-QF-eFE">
+                                                                        <font key="font" metaFont="smallSystem"/>
+                                                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                    </textFieldCell>
+                                                                </textField>
+                                                            </subviews>
+                                                        </view>
+                                                    </box>
                                                 </subviews>
                                             </view>
                                         </box>
@@ -2643,8 +2718,10 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="apiServerSelectedBox" destination="Zjr-Bg-vY8" id="n7z-EM-8EF"/>
                 <outlet property="apiServerTestButton" destination="Tu3-cb-beM" id="tmV-b8-rij"/>
                 <outlet property="apiServerWebPath" destination="CT9-ev-oP0" id="Cr5-z4-MfR"/>
-                <outlet property="assignedPrHandlingPolicy" destination="lB5-eS-YSK" id="CV3-XC-bVk"/>
-                <outlet property="assignedReviewHandlingPolicy" destination="c3C-Sm-aRL" id="PQH-8r-kPy"/>
+                <outlet property="assignedDirectReviewHandlingPolicy" destination="SYZ-oe-uNN" id="U3e-nJ-xYw"/>
+                <outlet property="assignedItemDirectHandlingPolicy" destination="lB5-eS-YSK" id="CV3-XC-bVk"/>
+                <outlet property="assignedItemTeamHandlingPolicy" destination="jRo-wO-w7i" id="Y99-FK-vgn"/>
+                <outlet property="assignedTeamReviewHandlingPolicy" destination="xRB-DD-kQe" id="1h7-Y3-6DP"/>
                 <outlet property="assumeCommentsBeforeMineAreRead" destination="gWR-4e-ufK" id="uF3-ZN-vmp"/>
                 <outlet property="autoSnoozeLabel" destination="4MH-0X-KEO" id="bAY-Ka-oDM"/>
                 <outlet property="autoSnoozeSelector" destination="hgg-d7-xNz" id="4mr-e9-oiH"/>

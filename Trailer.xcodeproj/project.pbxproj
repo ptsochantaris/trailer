@@ -364,6 +364,7 @@
 		168BC6C817EC2DF000BC4584 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		168C6ECC18B2104100E41D85 /* LICENSE.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 		168C6ECD18B2104100E41D85 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
+		168E6F102A74C4970002C6F3 /* Trailer 43.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 43.xcdatamodel"; sourceTree = "<group>"; };
 		168FD00D1A2A7AD1005929CB /* MessageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageView.swift; sourceTree = "<group>"; };
 		16901A441D659E9500141595 /* NotificationQueue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NotificationQueue.swift; path = Shared/NotificationQueue.swift; sourceTree = "<group>"; };
 		169205631E34DA9F00FB9547 /* CustomReposViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomReposViewController.swift; sourceTree = "<group>"; };
@@ -521,8 +522,8 @@
 		160CA02923A65142003FA0D8 /* V4API */ = {
 			isa = PBXGroup;
 			children = (
-				1657230023AAA23500F597EF /* V4API.swift */,
 				160CA02B23A65152003FA0D8 /* GraphQL.swift */,
+				1657230023AAA23500F597EF /* V4API.swift */,
 			);
 			name = V4API;
 			sourceTree = "<group>";
@@ -590,17 +591,17 @@
 		1628A6F518789F85005EDA69 /* Logic */ = {
 			isa = PBXGroup;
 			children = (
-				1657230623AAA3A100F597EF /* V3API */,
-				160CA02923A65142003FA0D8 /* V4API */,
-				16CBE1C41A2DFBA500485053 /* Settings.swift */,
 				16275DF41CF8944100EEBF48 /* API.swift */,
-				16BF6735283A2AE20028EC13 /* HTTP.swift */,
+				16B8179A29B29F1B009A49EB /* Gate.swift */,
 				162A29D81A4085FD008F41A9 /* GroupingCriterion.swift */,
-				1668CFE71D5E16B70021CDC5 /* Reachability.swift */,
+				16BF6735283A2AE20028EC13 /* HTTP.swift */,
+				16E7C20D2A69934900F72BFE /* ImageCache.swift */,
 				16901A441D659E9500141595 /* NotificationQueue.swift */,
 				160E19E11D672BD1006C1A59 /* PopTimer.swift */,
-				16B8179A29B29F1B009A49EB /* Gate.swift */,
-				16E7C20D2A69934900F72BFE /* ImageCache.swift */,
+				1668CFE71D5E16B70021CDC5 /* Reachability.swift */,
+				16CBE1C41A2DFBA500485053 /* Settings.swift */,
+				1657230623AAA3A100F597EF /* V3API */,
+				160CA02923A65142003FA0D8 /* V4API */,
 			);
 			name = Logic;
 			sourceTree = "<group>";
@@ -803,10 +804,10 @@
 		16B3B35C1A34F859000BE6CC /* Globals */ = {
 			isa = PBXGroup;
 			children = (
-				164785A91A2CE7BD00297764 /* Globals.swift */,
-				1664CBC91B7796840006BDE7 /* Enums.swift */,
 				16F0BAD523A53EB4002EC348 /* Colors.swift */,
+				1664CBC91B7796840006BDE7 /* Enums.swift */,
 				16D2B874251FA54E00D86C89 /* Enums+Settings.swift */,
+				164785A91A2CE7BD00297764 /* Globals.swift */,
 				16C6B9422A6AE04F00CBA836 /* Logging.swift */,
 			);
 			name = Globals;
@@ -1598,7 +1599,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1671;
+				CURRENT_PROJECT_VERSION = 1674;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -1662,7 +1663,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1671;
+				CURRENT_PROJECT_VERSION = 1674;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEPLOYMENT_POSTPROCESSING = YES;
@@ -2073,6 +2074,7 @@
 		16B3B33B1A34E990000BE6CC /* Trailer.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				168E6F102A74C4970002C6F3 /* Trailer 43.xcdatamodel */,
 				167165D028550D600064CEBC /* Trailer 42.xcdatamodel */,
 				16F0BAD923A644C9002EC348 /* Trailer 41.xcdatamodel */,
 				16D97065235B243500871F81 /* Trailer 40.xcdatamodel */,
@@ -2116,7 +2118,7 @@
 				16B3B34D1A34E990000BE6CC /* Trailer 9.xcdatamodel */,
 				16B3B34E1A34E990000BE6CC /* Trailer.xcdatamodel */,
 			);
-			currentVersion = 167165D028550D600064CEBC /* Trailer 42.xcdatamodel */;
+			currentVersion = 168E6F102A74C4970002C6F3 /* Trailer 43.xcdatamodel */;
 			name = Trailer.xcdatamodeld;
 			path = ../Shared/Trailer.xcdatamodeld;
 			sourceTree = "<group>";

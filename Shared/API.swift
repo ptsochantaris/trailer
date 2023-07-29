@@ -147,7 +147,11 @@ enum API {
     }
 
     nonisolated static var shouldSyncReviewAssignments: Bool {
-        Settings.displayReviewsOnItems || Settings.showRequestedTeamReviews || Settings.notifyOnReviewAssignments || (Settings.assignedReviewHandlingPolicy != Section.none.rawValue)
+        Settings.displayReviewsOnItems
+            || Settings.showRequestedTeamReviews
+            || Settings.notifyOnReviewAssignments
+            || (Settings.assignedDirectReviewHandlingPolicy != Section.none.rawValue)
+            || (Settings.assignedTeamReviewHandlingPolicy != Section.none.rawValue)
     }
 
     ////////////////////////////////////// API interface

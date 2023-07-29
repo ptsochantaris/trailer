@@ -65,7 +65,7 @@ final class ApiServer: NSManagedObject {
 
     @MainActor
     static func resetSyncOfEverything() {
-        Logging.log("RESETTING SYNC STATE OF ALL ITEMS")
+        Logging.log("Resetting sync state of all items")
         for r in Repo.allItems(in: DataManager.main, prefetchRelationships: ["pullRequests", "issues"]) {
             r.resetSyncState()
             for p in r.pullRequests {
