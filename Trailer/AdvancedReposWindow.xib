@@ -16,15 +16,15 @@
         <window title="Advanced Repository Settings" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="QvC-M9-y7g" userLabel="Window" customClass="AdvancedReposWindow" customModule="Trailer" customModuleProvider="target">
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="196" y="240" width="638" height="494"/>
+            <rect key="contentRect" x="196" y="240" width="638" height="407"/>
             <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1415"/>
             <view key="contentView" wantsLayer="YES" id="EiT-Mj-1SZ">
-                <rect key="frame" x="0.0" y="0.0" width="638" height="494"/>
+                <rect key="frame" x="0.0" y="0.0" width="638" height="407"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <box fixedFrame="YES" title="Watchlists and teams" translatesAutoresizingMaskIntoConstraints="NO" id="5Cb-9o-n6I">
-                        <rect key="frame" x="17" y="308" width="604" height="171"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <rect key="frame" x="17" y="221" width="604" height="171"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <view key="contentView" id="VxC-k3-DWi">
                             <rect key="frame" x="4" y="5" width="596" height="151"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -98,8 +98,8 @@
                         </view>
                     </box>
                     <box fixedFrame="YES" title="Items created by me in any repository" translatesAutoresizingMaskIntoConstraints="NO" id="z3Y-If-0az">
-                        <rect key="frame" x="17" y="201" width="604" height="103"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <rect key="frame" x="17" y="16" width="604" height="103"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <view key="contentView" id="Ksb-TL-CLL">
                             <rect key="frame" x="4" y="5" width="596" height="83"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -129,112 +129,55 @@
                             </subviews>
                         </view>
                     </box>
-                    <box fixedFrame="YES" title="Add a custom repository" translatesAutoresizingMaskIntoConstraints="NO" id="R0A-lE-VTt">
-                        <rect key="frame" x="17" y="96" width="604" height="101"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                        <view key="contentView" id="zZ4-Xe-BBh">
-                            <rect key="frame" x="4" y="5" width="596" height="81"/>
+                    <box autoresizesSubviews="NO" fixedFrame="YES" borderType="line" title="Visibility of a new repository that is automatically added" translatesAutoresizingMaskIntoConstraints="NO" id="Vsl-Kv-tUb">
+                        <rect key="frame" x="17" y="128" width="604" height="84"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <view key="contentView" id="yrr-Td-29o">
+                            <rect key="frame" x="4" y="5" width="596" height="64"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Vvh-bj-1RH">
-                                    <rect key="frame" x="320" y="43" width="34" height="17"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="/" id="tPb-hC-IgX">
+                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="omI-3c-tFK">
+                                    <rect key="frame" x="21" y="23" width="109" height="17"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Pull Requests:" id="ZBm-K4-Bse">
                                         <font key="font" metaFont="system"/>
                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Erw-bZ-KSm">
-                                    <rect key="frame" x="151" y="43" width="34" height="17"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="/" id="Pu3-18-CCU">
+                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="SeA-ch-Oa8">
+                                    <rect key="frame" x="324" y="23" width="71" height="17"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Issues:" id="Umu-aY-DIt">
                                         <font key="font" metaFont="system"/>
                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Yzx-Ii-QaS">
-                                    <rect key="frame" x="346" y="38" width="146" height="22"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="repo name" drawsBackground="YES" id="ZRp-Dg-Lan">
-                                        <font key="font" metaFont="system"/>
-                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    </textFieldCell>
-                                </textField>
-                                <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sDw-ab-qeW">
-                                    <rect key="frame" x="177" y="38" width="146" height="22"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="org or owner" drawsBackground="YES" id="Te1-gJ-pPh">
-                                        <font key="font" metaFont="system"/>
-                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    </textFieldCell>
-                                </textField>
-                                <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2yd-xG-C2i">
-                                    <rect key="frame" x="18" y="36" width="139" height="26"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                    <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="fp7-RG-tJa">
+                                <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="p65-tr-RPq">
+                                    <rect key="frame" x="133" y="17" width="180" height="26"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                    <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="Gjo-bs-5If">
                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="menu"/>
-                                        <menu key="menu" id="jeu-29-d8Q"/>
+                                        <menu key="menu" title="State" showsStateColumn="NO" id="rvE-fI-yHY"/>
                                     </popUpButtonCell>
-                                </popUpButton>
-                                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Q1h-uY-gOT">
-                                    <rect key="frame" x="498" y="32" width="65" height="32"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                    <buttonCell key="cell" type="push" title="Add" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="9qw-Qv-ckX">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
                                     <connections>
-                                        <action selector="addSelected:" target="QvC-M9-y7g" id="xzW-5w-7xs"/>
+                                        <action selector="allNewPrsPolicySelected:" target="QvC-M9-y7g" id="Juf-er-MaV"/>
                                     </connections>
-                                </button>
-                                <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="FkL-l2-tI4">
-                                    <rect key="frame" x="565" y="42" width="16" height="16"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
-                                </progressIndicator>
-                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eTz-ld-cu0">
-                                    <rect key="frame" x="164" y="19" width="391" height="14"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Enter a star (*) as a repo name to add all repositories from this org/owner." id="f2i-oz-ksw">
-                                        <font key="font" metaFont="message" size="11"/>
-                                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
-                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                    </textFieldCell>
-                                </textField>
-                            </subviews>
-                        </view>
-                    </box>
-                    <box fixedFrame="YES" title="Remove a custom repository" translatesAutoresizingMaskIntoConstraints="NO" id="DQp-0p-Ktc">
-                        <rect key="frame" x="17" y="16" width="604" height="76"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                        <view key="contentView" id="e2D-86-0O2">
-                            <rect key="frame" x="4" y="5" width="596" height="56"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                            <subviews>
-                                <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YIa-Bi-a4f">
-                                    <rect key="frame" x="18" y="13" width="480" height="26"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                    <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="zet-Z6-Fkr">
+                                </popUpButton>
+                                <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="liW-aT-8ke">
+                                    <rect key="frame" x="398" y="17" width="180" height="26"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                    <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="VRi-AL-psy">
                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="menu"/>
-                                        <menu key="menu" id="lsq-GS-HWb"/>
+                                        <menu key="menu" title="State" showsStateColumn="NO" id="Rhw-sZ-3xj"/>
                                     </popUpButtonCell>
-                                </popUpButton>
-                                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="U5Q-mA-E8g">
-                                    <rect key="frame" x="497" y="9" width="89" height="32"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                    <buttonCell key="cell" type="push" title="Remove" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="iep-X5-cgF">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
                                     <connections>
-                                        <action selector="removeSelected:" target="QvC-M9-y7g" id="mHE-mo-jxo"/>
+                                        <action selector="allNewIssuesPolicySelected:" target="QvC-M9-y7g" id="FJw-ej-RQw"/>
                                     </connections>
-                                </button>
+                                </popUpButton>
                             </subviews>
                         </view>
                     </box>
@@ -242,23 +185,18 @@
             </view>
             <connections>
                 <outlet property="activityDisplay" destination="X9I-OD-5UZ" id="mve-DE-g2b"/>
-                <outlet property="addButton" destination="Q1h-uY-gOT" id="ylP-jt-9vA"/>
+                <outlet property="allNewIssuesSetting" destination="liW-aT-8ke" id="5wC-0G-0Ou"/>
+                <outlet property="allNewPrsSetting" destination="p65-tr-RPq" id="ZRW-Yd-9FS"/>
                 <outlet property="autoAddRepos" destination="KtQ-HN-5dD" id="Ath-at-Ecb"/>
                 <outlet property="autoRemoveRepos" destination="jfq-yy-XJ6" id="jsc-zx-d8e"/>
                 <outlet property="hideArchivedRepos" destination="Fxz-mG-rT8" id="3Qe-bq-71M"/>
-                <outlet property="newRepoName" destination="Yzx-Ii-QaS" id="6bs-lq-wt6"/>
-                <outlet property="newRepoOwner" destination="sDw-ab-qeW" id="fIU-yP-LDG"/>
-                <outlet property="newRepoSpinner" destination="FkL-l2-tI4" id="T1R-IF-w8L"/>
                 <outlet property="refreshButton" destination="WSa-Vr-bmX" id="GvZ-8R-Vy5"/>
                 <outlet property="refreshReposLabel" destination="BAK-gw-nC7" id="dEX-uv-5n9"/>
-                <outlet property="removeButton" destination="U5Q-mA-E8g" id="OHh-Kf-TqA"/>
-                <outlet property="removeRepoList" destination="zet-Z6-Fkr" id="h9Y-fM-K1L"/>
                 <outlet property="repoCheckStepper" destination="5ZD-lq-6Qf" id="VqU-i5-E1y"/>
-                <outlet property="serverPicker" destination="2yd-xG-C2i" id="Tgu-Qe-cSk"/>
                 <outlet property="syncAuthoredIssues" destination="KKy-mh-Psl" id="KWy-nY-0Xd"/>
                 <outlet property="syncAuthoredPrs" destination="ao9-HE-VzB" id="kBK-yp-OJ2"/>
             </connections>
-            <point key="canvasLocation" x="218" y="273"/>
+            <point key="canvasLocation" x="218" y="229.5"/>
         </window>
     </objects>
 </document>

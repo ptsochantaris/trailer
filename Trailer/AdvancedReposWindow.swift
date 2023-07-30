@@ -13,12 +13,23 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
     @IBOutlet private var syncAuthoredPrs: NSButton!
     @IBOutlet private var syncAuthoredIssues: NSButton!
 
+    @IBOutlet private var allNewPrsSetting: NSPopUpButton!
+    @IBOutlet private var allNewIssuesSetting: NSPopUpButton!
+
     weak var prefs: PreferencesWindow?
 
     @MainActor
     override func awakeFromNib() {
         super.awakeFromNib()
         delegate = self
+        
+        allNewPrsSetting.addItems(withTitles: RepoDisplayPolicy.labels)
+        allNewPrsSetting.toolTip = "The visibility settings you would like to apply by default for Pull Requests if a new repository is added in your watchlist."
+        allNewPrsSetting.selectItem(at: Settings.displayPolicyForNewPrs)
+
+        allNewIssuesSetting.addItems(withTitles: RepoDisplayPolicy.labels)
+        allNewIssuesSetting.toolTip = "The visibility settings you would like to apply by default for Pull Requests if a new repository is added in your watchlist."
+        allNewIssuesSetting.selectItem(at: Settings.displayPolicyForNewIssues)
 
         refreshButton.toolTip = "Reload all watchlists now. Normally Trailer does this by itself every few hours. You can control how often from the 'Display' tab."
         refreshReposLabel.toolTip = Settings.newRepoCheckPeriodHelp
@@ -36,19 +47,14 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
         newRepoCheckChanged(nil)
 
         updateActivity()
+    }
 
-        let allServers = ApiServer.allApiServers(in: DataManager.main)
-        if allServers.count > 1 {
-            let m = NSMenuItem()
-            m.title = "Select a server…"
-            serverPicker.menu?.addItem(m)
-        }
-        for s in allServers {
-            let m = NSMenuItem()
-            m.representedObject = s
-            m.title = s.label ?? "(no label)"
-            serverPicker.menu?.addItem(m)
-        }
+    @IBAction private func allNewPrsPolicySelected(_ sender: NSPopUpButton) {
+        Settings.displayPolicyForNewPrs = sender.indexOfSelectedItem
+    }
+
+    @IBAction private func allNewIssuesPolicySelected(_ sender: NSPopUpButton) {
+        Settings.displayPolicyForNewIssues = sender.indexOfSelectedItem
     }
 
     func windowWillClose(_: Notification) {
@@ -64,32 +70,6 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
         } else {
             refreshButton.isEnabled = ApiServer.someServersHaveAuthTokens(in: DataManager.main)
             activityDisplay.stopAnimation(nil)
-            updateRemovableRepos()
-        }
-        addButton.isEnabled = !refreshing
-        removeButton.isEnabled = !refreshing
-    }
-
-    private func updateRemovableRepos() {
-        removeRepoList.removeAllItems()
-        let manuallyAddedRepos = Repo.allItems(in: DataManager.main).filter(\.manuallyAdded)
-        if manuallyAddedRepos.isEmpty {
-            let m = NSMenuItem()
-            m.title = "You have not added any custom repositories"
-            removeRepoList.menu?.addItem(m)
-            removeRepoList.isEnabled = false
-        } else if manuallyAddedRepos.count > 1 {
-            let m = NSMenuItem()
-            m.title = "Select a custom repository to remove…"
-            removeRepoList.menu?.addItem(m)
-            removeRepoList.isEnabled = true
-        }
-        for r in manuallyAddedRepos {
-            let m = NSMenuItem()
-            m.representedObject = r
-            m.title = r.fullName ?? "(no label)"
-            removeRepoList.menu?.addItem(m)
-            removeRepoList.isEnabled = true
         }
     }
 
@@ -106,7 +86,6 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
         Settings.hideArchivedRepos = sender.integerValue == 1
         if Settings.hideArchivedRepos, Repo.hideArchivedRepos(in: DataManager.main) {
             prefs?.reloadRepositories()
-            updateRemovableRepos()
             Task {
                 await app.updateAllMenus()
                 await DataManager.saveDB()
@@ -154,96 +133,6 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
                 await prepareReposForSync()
             }
             await DataManager.saveDB()
-        }
-    }
-
-    @IBOutlet private var serverPicker: NSPopUpButton!
-    @IBOutlet private var newRepoOwner: NSTextField!
-    @IBOutlet private var newRepoName: NSTextField!
-    @IBOutlet private var newRepoSpinner: NSProgressIndicator!
-    @IBOutlet private var addButton: NSButton!
-
-    @IBAction private func addSelected(_: NSButton) {
-        let name = newRepoName.stringValue.trim
-        let owner = newRepoOwner.stringValue.trim
-        guard
-            !name.isEmpty,
-            !owner.isEmpty,
-            let server = serverPicker.selectedItem?.representedObject as? ApiServer
-        else {
-            let alert = NSAlert()
-            alert.messageText = "Missing Information"
-            alert.informativeText = "Please select a server, provide an owner/org name, and the name of the repo (or a star for all repos). Usually this info is part of the repository's URL, like https://github.com/owner_or_org/repo_name"
-            alert.addButton(withTitle: "OK")
-            alert.beginSheetModal(for: self)
-            return
-        }
-
-        newRepoSpinner.startAnimation(nil)
-        addButton.isEnabled = false
-        defer {
-            self.newRepoSpinner.stopAnimation(nil)
-            self.addButton.isEnabled = true
-        }
-
-        Task {
-            if name == "*" {
-                let alert = NSAlert()
-                do {
-                    try await API.fetchAllRepos(owner: owner, from: server, moc: DataManager.main)
-                    preferencesDirty = true
-                    let addedCount = Repo.newItems(in: DataManager.main).count
-                    alert.messageText = "\(addedCount) repositories added for '\(owner)'"
-                    if Settings.displayPolicyForNewPrs == Int(RepoDisplayPolicy.hide.rawValue), Settings.displayPolicyForNewIssues == Int(RepoDisplayPolicy.hide.rawValue) {
-                        alert.informativeText = "WARNING: While \(addedCount) repositories have been added successfully to your list, your default settings specify that they should be hidden. You probably want to change their visibility from the repositories list."
-                    } else {
-                        alert.informativeText = "The new repositories have been added to your local list. Trailer will refresh after you close preferences to fetch any items from them."
-                    }
-                    await DataManager.saveDB()
-                    prefs?.reloadRepositories()
-                    updateRemovableRepos()
-                    await app.updateAllMenus()
-                } catch {
-                    alert.messageText = "Fetching Repository Information Failed"
-                    alert.informativeText = error.localizedDescription
-                }
-                _ = alert.addButton(withTitle: "OK")
-                _ = await alert.beginSheetModal(for: self)
-            } else {
-                let alert = NSAlert()
-                do {
-                    try await API.fetchRepo(named: name, owner: owner, from: server, moc: DataManager.main)
-                    preferencesDirty = true
-                    alert.messageText = "Repository added"
-                    if Settings.displayPolicyForNewPrs == Int(RepoDisplayPolicy.hide.rawValue), Settings.displayPolicyForNewIssues == Int(RepoDisplayPolicy.hide.rawValue) {
-                        alert.informativeText = "WARNING: While the repository has been added successfully to your list, your default settings specify that it should be hidden. You probably want to change its visibility from the repositories list."
-                    } else {
-                        alert.informativeText = "The new repository has been added to your local list. Trailer will refresh after you close preferences to fetch any items from it."
-                    }
-                    await DataManager.saveDB()
-                    prefs?.reloadRepositories()
-                    updateRemovableRepos()
-                    await app.updateAllMenus()
-                } catch {
-                    alert.messageText = "Fetching Repository Information Failed"
-                    alert.informativeText = error.localizedDescription
-                }
-                _ = alert.addButton(withTitle: "OK")
-                _ = await alert.beginSheetModal(for: self)
-            }
-        }
-    }
-
-    @IBOutlet private var removeRepoList: NSPopUpButtonCell!
-    @IBOutlet private var removeButton: NSButton!
-    @IBAction private func removeSelected(_: NSButton) {
-        guard let repo = removeRepoList.selectedItem?.representedObject as? Repo else { return }
-        DataManager.main.delete(repo)
-        Task {
-            await DataManager.saveDB()
-            prefs?.reloadRepositories()
-            updateRemovableRepos()
-            await app.updateAllMenus()
         }
     }
 }

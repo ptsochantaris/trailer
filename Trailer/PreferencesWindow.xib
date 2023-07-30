@@ -357,20 +357,20 @@ Token</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <scrollView fixedFrame="YES" autohidesScrollers="YES" horizontalLineScroll="28" horizontalPageScroll="10" verticalLineScroll="28" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dPG-Wd-B7N">
-                                            <rect key="frame" x="22" y="103" width="871" height="320"/>
+                                            <rect key="frame" x="22" y="146" width="871" height="277"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <clipView key="contentView" id="hCD-zR-3bF">
-                                                <rect key="frame" x="1" y="1" width="869" height="318"/>
-                                                <autoresizingMask key="autoresizingMask"/>
+                                                <rect key="frame" x="1" y="1" width="869" height="275"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" rowHeight="20" headerView="qia-ub-v1J" id="6pK-a1-URw">
-                                                        <rect key="frame" x="0.0" y="0.0" width="869" height="301"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="869" height="258"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <size key="intercellSpacing" width="8" height="8"/>
                                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                         <tableColumns>
-                                                            <tableColumn identifier="repos" editable="NO" width="389" minWidth="100" maxWidth="10000" id="nW5-Ng-D0l">
+                                                            <tableColumn identifier="repos" editable="NO" width="489" minWidth="100" maxWidth="10000" id="nW5-Ng-D0l">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Watched Repository">
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.33333298560000002" alpha="1" colorSpace="calibratedWhite"/>
@@ -383,7 +383,7 @@ Token</string>
                                                                 <sortDescriptor key="sortDescriptorPrototype" selector="localizedCaseInsensitiveCompare:" sortKey="fullName"/>
                                                                 <tableColumnResizingMask key="resizingMask" resizeWithTable="YES"/>
                                                             </tableColumn>
-                                                            <tableColumn identifier="group" width="48" minWidth="10" maxWidth="1000" id="8j5-1c-L78" userLabel="Group">
+                                                            <tableColumn identifier="group" width="41" minWidth="10" maxWidth="1000" id="8j5-1c-L78" userLabel="Group">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Group">
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
@@ -395,7 +395,7 @@ Token</string>
                                                                 </textFieldCell>
                                                                 <sortDescriptor key="sortDescriptorPrototype" selector="localizedCaseInsensitiveCompare:" sortKey="groupLabel" ascending="NO"/>
                                                             </tableColumn>
-                                                            <tableColumn identifier="hide" width="136" minWidth="10" maxWidth="1000" id="pRg-vg-7bD" userLabel="Hide">
+                                                            <tableColumn identifier="hide" width="116" minWidth="10" maxWidth="1000" id="pRg-vg-7bD" userLabel="Hide">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Author Based Hiding">
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
@@ -407,7 +407,7 @@ Token</string>
                                                                 </popUpButtonCell>
                                                                 <sortDescriptor key="sortDescriptorPrototype" selector="compare:" sortKey="itemHidingPolicy" ascending="NO"/>
                                                             </tableColumn>
-                                                            <tableColumn identifier="prs" editable="NO" width="110" minWidth="40" maxWidth="1000" id="FAL-Ui-K4b" userLabel="Pull Requests">
+                                                            <tableColumn identifier="prs" editable="NO" width="79" minWidth="40" maxWidth="1000" id="FAL-Ui-K4b" userLabel="Pull Requests">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Pull Requests">
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.33333298560000002" alpha="1" colorSpace="calibratedWhite"/>
@@ -419,7 +419,7 @@ Token</string>
                                                                 </popUpButtonCell>
                                                                 <sortDescriptor key="sortDescriptorPrototype" selector="compare:" sortKey="displayPolicyForPrs" ascending="NO"/>
                                                             </tableColumn>
-                                                            <tableColumn identifier="issues" editable="NO" width="102" minWidth="40" maxWidth="1000" id="P1T-D7-Rnp" userLabel="Issues">
+                                                            <tableColumn identifier="issues" editable="NO" width="42" minWidth="40" maxWidth="1000" id="P1T-D7-Rnp" userLabel="Issues">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Issues">
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.33333298560000002" alpha="1" colorSpace="calibratedWhite"/>
@@ -431,16 +431,16 @@ Token</string>
                                                                 </popUpButtonCell>
                                                                 <sortDescriptor key="sortDescriptorPrototype" selector="compare:" sortKey="displayPolicyForIssues" ascending="NO"/>
                                                             </tableColumn>
-                                                            <tableColumn identifier="fork" editable="NO" width="32" minWidth="10" maxWidth="3.4028234663852886e+38" id="RB5-FQ-ycS" userLabel="Forked">
-                                                                <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Fork">
+                                                            <tableColumn identifier="remove" editable="NO" width="50" minWidth="10" maxWidth="3.4028234663852886e+38" id="RB5-FQ-ycS">
+                                                                <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Remove">
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 </tableHeaderCell>
-                                                                <buttonCell key="dataCell" type="check" bezelStyle="regularSquare" imagePosition="left" enabled="NO" inset="2" id="Scw-Kn-nOP">
-                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="system"/>
+                                                                <buttonCell key="dataCell" type="inline" bezelStyle="inline" image="xmark.app.fill" catalog="system" imagePosition="only" alignment="center" borderStyle="border" inset="2" id="Scw-Kn-nOP">
+                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                    <font key="font" metaFont="smallSystemBold"/>
                                                                 </buttonCell>
-                                                                <sortDescriptor key="sortDescriptorPrototype" selector="compare:" sortKey="fork"/>
+                                                                <sortDescriptor key="sortDescriptorPrototype" selector="compare:" sortKey="remove"/>
                                                             </tableColumn>
                                                         </tableColumns>
                                                         <connections>
@@ -463,60 +463,8 @@ Token</string>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </tableHeaderView>
                                         </scrollView>
-                                        <box autoresizesSubviews="NO" fixedFrame="YES" borderType="line" title="For new repositories:" translatesAutoresizingMaskIntoConstraints="NO" id="Tbd-Dj-P6C">
-                                            <rect key="frame" x="19" y="5" width="471" height="60"/>
-                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
-                                            <view key="contentView" id="NJP-dt-zeu">
-                                                <rect key="frame" x="4" y="5" width="463" height="40"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                <subviews>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BQ4-pw-I0b">
-                                                        <rect key="frame" x="3" y="12" width="109" height="17"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Pull Requests:" id="EiN-MI-aPn">
-                                                            <font key="font" metaFont="system"/>
-                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LVp-LL-LY1">
-                                                        <rect key="frame" x="241" y="13" width="71" height="17"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Issues:" id="AR6-vN-PIV">
-                                                            <font key="font" metaFont="system"/>
-                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
-                                                    <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mod-Tl-ijj">
-                                                        <rect key="frame" x="113" y="7" width="131" height="26"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                                        <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="L9t-Id-6Gk">
-                                                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="menu"/>
-                                                            <menu key="menu" title="State" showsStateColumn="NO" id="Byb-5J-qh0"/>
-                                                        </popUpButtonCell>
-                                                        <connections>
-                                                            <action selector="allNewPrsPolicySelected:" target="vQH-WF-vh2" id="67U-VE-xr9"/>
-                                                        </connections>
-                                                    </popUpButton>
-                                                    <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZgQ-VU-aMD">
-                                                        <rect key="frame" x="313" y="7" width="131" height="26"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                                        <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="z9W-lk-3Nx">
-                                                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="menu"/>
-                                                            <menu key="menu" title="State" showsStateColumn="NO" id="Ig1-wC-hlr"/>
-                                                        </popUpButtonCell>
-                                                        <connections>
-                                                            <action selector="allNewIssuesPolicySelected:" target="vQH-WF-vh2" id="eTd-Bw-lqn"/>
-                                                        </connections>
-                                                    </popUpButton>
-                                                </subviews>
-                                            </view>
-                                        </box>
                                         <searchField wantsLayer="YES" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Qfh-lH-HFg">
-                                            <rect key="frame" x="22" y="73" width="441" height="22"/>
+                                            <rect key="frame" x="22" y="116" width="441" height="22"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                             <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" placeholderString="Filter…" usesSingleLineMode="YES" bezelStyle="round" id="dZ4-dF-dkV">
                                                 <font key="font" metaFont="cellTitle"/>
@@ -539,7 +487,7 @@ Token</string>
                                             </connections>
                                         </button>
                                         <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mZx-Vy-AUF">
-                                            <rect key="frame" x="621" y="70" width="136" height="26"/>
+                                            <rect key="frame" x="621" y="113" width="136" height="26"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                             <popUpButtonCell key="cell" type="bevel" bezelStyle="regularSquare" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ovF-8L-cM3">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -551,7 +499,7 @@ Token</string>
                                             </connections>
                                         </popUpButton>
                                         <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gC3-is-WyN">
-                                            <rect key="frame" x="759" y="70" width="137" height="26"/>
+                                            <rect key="frame" x="759" y="113" width="137" height="26"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                             <popUpButtonCell key="cell" type="bevel" bezelStyle="regularSquare" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="t23-3c-Lhx">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -563,7 +511,7 @@ Token</string>
                                             </connections>
                                         </popUpButton>
                                         <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8qH-xP-gTK">
-                                            <rect key="frame" x="468" y="70" width="151" height="26"/>
+                                            <rect key="frame" x="468" y="113" width="151" height="26"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                             <popUpButtonCell key="cell" type="bevel" bezelStyle="regularSquare" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="J36-7q-zgd">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -574,6 +522,85 @@ Token</string>
                                                 <action selector="allHidingPolicySelected:" target="vQH-WF-vh2" id="Ntp-YN-OWp"/>
                                             </connections>
                                         </popUpButton>
+                                        <box fixedFrame="YES" title="Add a new repository" translatesAutoresizingMaskIntoConstraints="NO" id="HvS-kg-N5l">
+                                            <rect key="frame" x="19" y="10" width="604" height="89"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <view key="contentView" id="2qv-l8-P6D">
+                                                <rect key="frame" x="4" y="5" width="596" height="69"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="JHp-n0-sWa">
+                                                        <rect key="frame" x="318" y="35" width="34" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="/" id="dTA-Gx-XGc">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="pqD-Hs-yNw">
+                                                        <rect key="frame" x="149" y="35" width="34" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="/" id="q9E-0u-7Rc">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3XD-zJ-ye4">
+                                                        <rect key="frame" x="346" y="33" width="146" height="22"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="repo name" drawsBackground="YES" id="fMa-dH-ocj">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Htz-Wx-ddG">
+                                                        <rect key="frame" x="177" y="33" width="146" height="22"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="org or owner" drawsBackground="YES" id="Z7L-0u-nyZ">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="giq-87-abZ">
+                                                        <rect key="frame" x="18" y="29" width="139" height="26"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                                        <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="oqs-Qf-pUX">
+                                                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="menu"/>
+                                                            <menu key="menu" id="WXI-dn-HWE"/>
+                                                        </popUpButtonCell>
+                                                    </popUpButton>
+                                                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GwQ-vI-Za6">
+                                                        <rect key="frame" x="495" y="27" width="65" height="32"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="push" title="Add" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="9Ai-Lo-IL6">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="addSelected:" target="vQH-WF-vh2" id="qzM-ah-0Fj"/>
+                                                        </connections>
+                                                    </button>
+                                                    <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="AJj-dX-r2W">
+                                                        <rect key="frame" x="561" y="36" width="16" height="16"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                                                    </progressIndicator>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="SWT-W0-vy2">
+                                                        <rect key="frame" x="164" y="12" width="391" height="14"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Enter a star (*) as a repo name to add all repositories from this org/owner" id="Q2D-ed-Tov">
+                                                            <font key="font" metaFont="message" size="11"/>
+                                                            <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                </subviews>
+                                            </view>
+                                        </box>
                                     </subviews>
                                 </view>
                             </tabViewItem>
@@ -2704,10 +2731,9 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
             </view>
             <contentBorderThickness minY="32"/>
             <connections>
+                <outlet property="addButton" destination="GwQ-vI-Za6" id="07s-sl-XtE"/>
                 <outlet property="allHidingSetting" destination="8qH-xP-gTK" id="0Hn-P8-5So"/>
                 <outlet property="allIssuesSetting" destination="gC3-is-WyN" id="z1A-Ml-Vr8"/>
-                <outlet property="allNewIssuesSetting" destination="ZgQ-VU-aMD" id="I7H-lJ-aUx"/>
-                <outlet property="allNewPrsSetting" destination="mod-Tl-ijj" id="uRk-Fa-jzb"/>
                 <outlet property="allPrsSetting" destination="mZx-Vy-AUF" id="mzx-Ce-S88"/>
                 <outlet property="apiServerApiPath" destination="9xz-I3-HQw" id="Qbx-W0-uWC"/>
                 <outlet property="apiServerAuthToken" destination="yUS-Pw-j0m" id="TGP-GL-t5j"/>
@@ -2775,6 +2801,9 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="markUnmergeablePrs" destination="qXS-9a-Cpn" id="jNO-Gr-PY1"/>
                 <outlet property="newItemInOwnedRepoMovePolicy" destination="tH9-aj-JJe" id="dWN-Fr-u7n"/>
                 <outlet property="newMentionMovePolicy" destination="dTC-mN-8dT" id="EPV-dK-9nd"/>
+                <outlet property="newRepoName" destination="3XD-zJ-ye4" id="F1N-ku-PFF"/>
+                <outlet property="newRepoOwner" destination="Htz-Wx-ddG" id="SQ9-uZ-Y9k"/>
+                <outlet property="newRepoSpinner" destination="AJj-dX-r2W" id="9VQ-h9-ay4"/>
                 <outlet property="notifyOnAcceptances" destination="cUX-93-pkY" id="14e-Db-SMA"/>
                 <outlet property="notifyOnAllAcceptances" destination="Cle-hT-Lca" id="0Zq-p3-Lm7"/>
                 <outlet property="notifyOnAllChangeRequests" destination="4hX-kx-RH5" id="v0F-Kh-u4w"/>
@@ -2802,6 +2831,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="repoFilter" destination="Qfh-lH-HFg" id="Ezf-Zw-jxe"/>
                 <outlet property="scanClosedAndMergedItems" destination="yWZ-ok-Fkz" id="pw9-Ka-yxd"/>
                 <outlet property="serverList" destination="wPh-gi-N9t" id="B6u-Jh-imO"/>
+                <outlet property="serverPicker" destination="giq-87-abZ" id="V8C-BS-6aC"/>
                 <outlet property="showAllComments" destination="UGp-d4-lNW" id="nt3-bL-T3b"/>
                 <outlet property="showBaseAndHeadBranches" destination="xW2-Xd-Qws" id="Zbc-nI-Wmo"/>
                 <outlet property="showCreationDates" destination="Efg-Id-lOP" id="cZu-0h-5hD"/>
@@ -2847,4 +2877,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
             <point key="canvasLocation" x="221" y="164"/>
         </window>
     </objects>
+    <resources>
+        <image name="xmark.app.fill" catalog="system" width="15" height="14"/>
+    </resources>
 </document>

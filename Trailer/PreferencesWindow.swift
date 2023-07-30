@@ -48,6 +48,11 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
 
     // Repositories
     @IBOutlet private var projectsTable: NSTableView!
+    @IBOutlet private var serverPicker: NSPopUpButton!
+    @IBOutlet private var newRepoOwner: NSTextField!
+    @IBOutlet private var newRepoName: NSTextField!
+    @IBOutlet private var newRepoSpinner: NSProgressIndicator!
+    @IBOutlet private var addButton: NSButton!
 
     // History
     @IBOutlet private var prMergedPolicy: NSPopUpButton!
@@ -175,8 +180,6 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     @IBOutlet private var allPrsSetting: NSPopUpButton!
     @IBOutlet private var allIssuesSetting: NSPopUpButton!
     @IBOutlet private var allHidingSetting: NSPopUpButton!
-    @IBOutlet private var allNewPrsSetting: NSPopUpButton!
-    @IBOutlet private var allNewIssuesSetting: NSPopUpButton!
 
     // Reviews
     @IBOutlet private var assignedDirectReviewHandlingPolicy: NSPopUpButton!
@@ -207,9 +210,6 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
 
         updateAllItemSettingButtons()
         fillSnoozingDropdowns()
-
-        allNewPrsSetting.addItems(withTitles: RepoDisplayPolicy.labels)
-        allNewIssuesSetting.addItems(withTitles: RepoDisplayPolicy.labels)
 
         addTooltips()
         reloadSettings()
@@ -243,8 +243,23 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
                 }
             }
         }
+        
+        let tableMenu = NSMenu()
+        tableMenu.addItem(withTitle: "Open Repo", action: #selector(openRepoSelected), keyEquivalent: "")
+        projectsTable.menu = tableMenu
     }
-
+    
+    @objc private func openRepoSelected() {
+        let row = projectsTable.clickedRow
+        guard row >= 0,
+              let urlString = repos[row].webUrl,
+              let url = URL(string: urlString)
+        else {
+            return
+        }
+        openLink(url)
+    }
+    
     private func updateReviewOptions() {
         if !Settings.notifyOnReviewChangeRequests {
             Settings.notifyOnAllReviewChangeRequests = false
@@ -449,8 +464,6 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         apiServerReportError.toolTip = "If this is checked, Trailer will display a red 'X' symbol on your menubar if sync fails with this server. It is usually a good idea to keep this on, but you may want to turn it off if a specific server isn't always reacahble, for instance."
         projectsTable.toolTip = "These are all your watched repositories.\n\nTrailer scans the watchlists of all the servers you have configured and adds the repositories to this combined watchlist.\n\nYou can visit and edit the watchlist of each server from the link provided on that server's entry on the 'Servers' tab.\n\nYou can keep clutter low by editing the visibility of items from each repository with the dropdown menus on the right."
         repoFilter.toolTip = "Quickly find a repository you are looking for by typing some text in there. Productivity tip: If you use the buttons on the right to set visibility of 'all' items, those settings will apply to only the visible filtered items."
-        allNewPrsSetting.toolTip = "The visibility settings you would like to apply by default for Pull Requests if a new repository is added in your watchlist."
-        allNewIssuesSetting.toolTip = "The visibility settings you would like to apply by default for Pull Requests if a new repository is added in your watchlist."
         launchAtStartup.toolTip = "Automatically launch Trailer when you log in."
         allPrsSetting.toolTip = "Set the PR visibility of all (or the currently selected/filtered) repositories"
         allIssuesSetting.toolTip = "Set the issue visibility of all (or the currently selected/filtered) repositories"
@@ -653,9 +666,6 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         supportReviews.integerValue = Settings.displayReviewsOnItems ? 1 : 0
         notifyOnReviewAssignments.integerValue = Settings.notifyOnReviewAssignments ? 1 : 0
 
-        allNewPrsSetting.selectItem(at: Settings.displayPolicyForNewPrs)
-        allNewIssuesSetting.selectItem(at: Settings.displayPolicyForNewIssues)
-
         newMentionMovePolicy.selectItem(at: Settings.newMentionMovePolicy)
         teamMentionMovePolicy.selectItem(at: Settings.teamMentionMovePolicy)
         newItemInOwnedRepoMovePolicy.selectItem(at: Settings.newItemInOwnedRepoMovePolicy)
@@ -689,6 +699,25 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         updateReviewOptions()
 
         updateActivity()
+        
+        updateRepoAdding()
+    }
+    
+    private func updateRepoAdding() {
+        serverPicker.menu?.removeAllItems()
+        
+        let allServers = ApiServer.allApiServers(in: DataManager.main)
+        if allServers.count > 1 {
+            let m = NSMenuItem()
+            m.title = "Select a server…"
+            serverPicker.menu?.addItem(m)
+        }
+        for s in allServers {
+            let m = NSMenuItem()
+            m.representedObject = s
+            m.title = s.label ?? "(no label)"
+            serverPicker.menu?.addItem(m)
+        }
     }
 
     func updateActivity() {
@@ -700,6 +729,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         allHidingSetting.isEnabled = isIdle
         v4ApiSwitch.isEnabled = isIdle
         reloadAllData.isEnabled = isIdle
+        addButton.isEnabled = isIdle
 
         if isIdle {
             projectsTable.alphaValue = 1
@@ -1011,14 +1041,6 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         deferredUpdateTimer.push()
     }
 
-    @IBAction private func allNewPrsPolicySelected(_ sender: NSPopUpButton) {
-        Settings.displayPolicyForNewPrs = sender.indexOfSelectedItem
-    }
-
-    @IBAction private func allNewIssuesPolicySelected(_ sender: NSPopUpButton) {
-        Settings.displayPolicyForNewIssues = sender.indexOfSelectedItem
-    }
-
     @IBAction private func hideUncommentedRequestsSelected(_ sender: NSButton) {
         Settings.hideUncommentedItems = (sender.integerValue == 1)
         deferredUpdateTimer.push()
@@ -1165,6 +1187,64 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         Settings.isAppLoginItem = sender.integerValue == 1
     }
 
+    @IBAction private func addSelected(_: NSButton) {
+        let name = newRepoName.stringValue.trim
+        let owner = newRepoOwner.stringValue.trim
+        guard
+            !name.isEmpty,
+            !owner.isEmpty,
+            let server = serverPicker.selectedItem?.representedObject as? ApiServer
+        else {
+            let alert = NSAlert()
+            alert.messageText = "Missing Information"
+            alert.informativeText = "Please select a server, provide an owner/org name, and the name of the repo (or a star for all repos). Usually this info is part of the repository's URL, like https://github.com/owner_or_org/repo_name"
+            alert.addButton(withTitle: "OK")
+            alert.beginSheetModal(for: self)
+            return
+        }
+        
+        newRepoSpinner.startAnimation(nil)
+        addButton.isEnabled = false
+        
+        Task {
+            defer {
+                newRepoSpinner.stopAnimation(nil)
+                addButton.isEnabled = true
+            }
+            
+            let alert = NSAlert()
+            do {
+                if name == "*" {
+                    try await API.fetchAllRepos(owner: owner, from: server, moc: DataManager.main)
+                    let addedCount = Repo.newItems(in: DataManager.main).count
+                    alert.messageText = "\(addedCount) repositories added for '\(owner)'"
+                    if Settings.displayPolicyForNewPrs == Int(RepoDisplayPolicy.hide.rawValue), Settings.displayPolicyForNewIssues == Int(RepoDisplayPolicy.hide.rawValue) {
+                        alert.informativeText = "WARNING: While \(addedCount) repositories have been added successfully to your list, your default settings specify that they should be hidden. You probably want to change their visibility from the repositories list."
+                    } else {
+                        alert.informativeText = "The new repositories have been added to your local list. Trailer will refresh after you close preferences to fetch any items from them."
+                    }
+                } else {
+                    try await API.fetchRepo(named: name, owner: owner, from: server, moc: DataManager.main)
+                    alert.messageText = "Repository added"
+                    if Settings.displayPolicyForNewPrs == Int(RepoDisplayPolicy.hide.rawValue), Settings.displayPolicyForNewIssues == Int(RepoDisplayPolicy.hide.rawValue) {
+                        alert.informativeText = "WARNING: While the repository has been added successfully to your list, your default settings specify that it should be hidden. You probably want to change its visibility from the repositories list."
+                    } else {
+                        alert.informativeText = "The new repository has been added to your local list. Trailer will refresh after you close preferences to fetch any items from it."
+                    }
+                }
+                preferencesDirty = true
+                await DataManager.saveDB()
+                reloadRepositories()
+                await app.updateAllMenus()
+            } catch {
+                alert.messageText = "Fetching Repository Information Failed"
+                alert.informativeText = error.localizedDescription
+            }
+            _ = alert.addButton(withTitle: "OK")
+            _ = await alert.beginSheetModal(for: self)
+        }
+    }
+    
     func refreshRepos() {
         API.isRefreshing = true
         Task { @MainActor in
@@ -1609,9 +1689,11 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
                     menuCell.selectItem(at: Int(selectedIndex))
                 }
             } else if let forkButton = cell as? NSButtonCell {
-                if tid == "fork" {
+                if tid == "remove" {
                     let r = repos[row]
-                    forkButton.integerValue = r.fork ? 1 : 0
+                    let show = r.manuallyAdded
+                    forkButton.isEnabled = show
+                    forkButton.image = show ? NSImage(systemSymbolName: "xmark.app.fill", accessibilityDescription: "Remove") : nil
                 }
             }
         } else if tv == serverList {
@@ -1684,12 +1766,26 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
                     r.displayPolicyForIssues = index
                 } else if tableColumn?.identifier.rawValue == "hide" {
                     r.itemHidingPolicy = index
+                } else if tableColumn?.identifier.rawValue == "remove" {
+                    remove(repo: r)
                 }
                 if index != RepoDisplayPolicy.hide.rawValue {
                     r.resetSyncState()
                 }
                 updateDisplayIssuesSetting()
             }
+        }
+    }
+    
+    private func remove(repo: Repo) {
+        guard repo.manuallyAdded else {
+            return
+        }
+        DataManager.main.delete(repo)
+        Task {
+            await DataManager.saveDB()
+            reloadRepositories()
+            await app.updateAllMenus()
         }
     }
 
