@@ -494,6 +494,10 @@ class ListableItem: DataItem, Listable {
         snoozingPreset = nil
         wasAwokenFromSnooze = explicityAwoke
     }
+    
+    var preferredSectionBasedOnReviewAssignment: Section? {
+        return nil
+    }
 
     private func preferredSection(takingItemConditionIntoAccount: Bool) -> Section {
         if Settings.draftHandlingPolicy == DraftHandlingPolicy.hide.rawValue && draft {
@@ -521,7 +525,7 @@ class ListableItem: DataItem, Listable {
             return .mentioned
         }
 
-        if let p = self as? PullRequest, let section = p.preferredSectionBasedOnReviewAssignment {
+        if let section = preferredSectionBasedOnReviewAssignment {
             return section
         }
 
@@ -551,10 +555,27 @@ class ListableItem: DataItem, Listable {
 
         return true
     }
+    
+    var shouldHideBecauseOfRepoPolicy: Bool {
+        return false
+    }
+    
+    var shouldWakeBecauseOfCommit: Bool {
+        return false
+    }
+    
+    func shouldBeCheckedForRedStatuses(in section: Section) -> [PRStatus]? {
+        return nil
+    }
 
     final func postProcess(context: PostProcessContext = PostProcessContext()) {
         if let s = snoozeUntil, s < Date() { // our snooze-by date is past
             disableSnoozing(explicityAwoke: true)
+        }
+        
+        if shouldWakeBecauseOfCommit { // we wake on comments and have a new commit alarm
+            wakeUp() // re-process as awake item
+            return
         }
 
         var targetSection = preferredSection(takingItemConditionIntoAccount: true)
@@ -569,31 +590,13 @@ class ListableItem: DataItem, Listable {
             }
         }
 
-        if targetSection != .none {
-            if createdByMe {
-                switch repo.itemHidingPolicy {
-                case RepoHidingPolicy.hideMyAuthoredPrs.rawValue where self is PullRequest,
-                    RepoHidingPolicy.hideMyAuthoredIssues.rawValue where self is Issue,
-                    RepoHidingPolicy.hideAllMyAuthoredItems.rawValue:
-                    
-                    targetSection = .none
-                default: break
-                }
-            } else {
-                switch repo.itemHidingPolicy {
-                case RepoHidingPolicy.hideOthersPrs.rawValue where self is PullRequest,
-                    RepoHidingPolicy.hideOthersIssues.rawValue where self is Issue,
-                    RepoHidingPolicy.hideAllOthersItems.rawValue:
-                    
-                    targetSection = .none
-                default: break
-                }
-            }
+        if targetSection != .none, shouldHideBecauseOfRepoPolicy {
+            targetSection = .none
         }
 
         if targetSection != .none,
-           let p = self as? PullRequest, p.shouldBeCheckedForRedStatuses(in: targetSection),
-           p.displayedStatuses.contains(where: { $0.state != "success" }) {
+           let displayed = shouldBeCheckedForRedStatuses(in: targetSection),
+           displayed.contains(where: { $0.state != "success" }) {
             targetSection = .none
         }
 
@@ -642,11 +645,6 @@ class ListableItem: DataItem, Listable {
             targetSection = .none
         }
 
-        if snoozeUntil != nil, let p = self as? PullRequest, shouldWakeOnComment, p.hasNewCommits { // we wake on comments and have a new commit alarm
-            wakeUp() // re-process as awake item
-            return
-        }
-
         if targetSection != .none {
             totalComments = countComments(context: context)
                 + (context.notifyOnItemReactions ? countReactions(context: context) : 0)
@@ -657,15 +655,8 @@ class ListableItem: DataItem, Listable {
         sectionIndex = targetSection.rawValue
     }
 
-    private func countReviews(context: PostProcessContext) -> Int {
-        guard let self = self as? PullRequest, context.shouldSyncReviews || context.shouldSyncReviewAssignments else {
-            return 0
-        }
-        var count = 0
-        for r in self.reviews where r.shouldContributeToCount(since: .distantPast, context: context) {
-            count += 1
-        }
-        return count
+    func countReviews(context: PostProcessContext) -> Int {
+        return 0
     }
 
     private func countComments(context: PostProcessContext) -> Int {
@@ -1383,15 +1374,11 @@ class ListableItem: DataItem, Listable {
     }
 
     var contextMenuTitle: String {
-        if self is PullRequest {
-            return muted ? "PR #\(number) (muted)" : "PR #\(number)"
-        } else {
-            return muted ? "Issue #\(number) (muted)" : "Issue #\(number)"
-        }
+        muted ? "Issue #\(number) (muted)" : "Issue #\(number)"
     }
 
     var contextMenuSubtitle: String? {
-        (self as? PullRequest)?.headRefName
+        nil
     }
 
     @MainActor

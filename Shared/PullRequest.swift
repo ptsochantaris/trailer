@@ -132,7 +132,7 @@ final class PullRequest: ListableItem {
         reviews.contains { $0.isMine }
     }
 
-    var preferredSectionBasedOnReviewAssignment: Section? {
+    override var preferredSectionBasedOnReviewAssignment: Section? {
         switch AssignmentStatus(rawValue: assignedReviewStatus) {
         case nil, .none?, .others:
             break
@@ -160,6 +160,30 @@ final class PullRequest: ListableItem {
             return false
         }
         return !context.excludedCommentAuthors.contains(userLogin.comparableForm)
+    }
+    
+    override var shouldHideBecauseOfRepoPolicy: Bool {
+        if createdByMe {
+            switch repo.itemHidingPolicy {
+            case RepoHidingPolicy.hideMyAuthoredPrs.rawValue,
+                RepoHidingPolicy.hideAllMyAuthoredItems.rawValue:
+                return true
+            default:
+                return false
+            }
+        } else {
+            switch repo.itemHidingPolicy {
+            case RepoHidingPolicy.hideOthersPrs.rawValue,
+                RepoHidingPolicy.hideAllOthersItems.rawValue:
+                return true
+            default:
+                return false
+            }
+        }
+    }
+    
+    override var shouldWakeBecauseOfCommit: Bool {
+        snoozeUntil != nil && shouldWakeOnComment && hasNewCommits
     }
 
     private func setAssignedReviewStatus(to status: AssignmentStatus) {
@@ -286,16 +310,39 @@ final class PullRequest: ListableItem {
     override class var includeInUnreadPredicate: NSPredicate {
         Settings.markPrsAsUnreadOnNewCommits ? _unreadOrNewCommitsPredicate : super.includeInUnreadPredicate
     }
+    
+    override var contextMenuTitle: String {
+        muted ? "PR #\(number) (muted)" : "PR #\(number)"
+    }
+    
+    override var contextMenuSubtitle: String? {
+        headRefName
+    }
 
-    func shouldBeCheckedForRedStatuses(in section: Section) -> Bool {
+    override func shouldBeCheckedForRedStatuses(in section: Section) -> [PRStatus]? {
         if Settings.hidePrsThatArentPassing {
             if Settings.hidePrsThatDontPassOnlyInAll {
-                return section == .all
+                if section == .all {
+                    return displayedStatuses
+                }
             } else {
-                return section == .mine || section == .participated || section == .all
+                if section == .mine || section == .participated || section == .all {
+                    return displayedStatuses
+                }
             }
         }
-        return false
+        return nil
+    }
+    
+    override func countReviews(context: PostProcessContext) -> Int {
+        guard context.shouldSyncReviews || context.shouldSyncReviewAssignments else {
+            return 0
+        }
+        var count = 0
+        for r in reviews where r.shouldContributeToCount(since: .distantPast, context: context) {
+            count += 1
+        }
+        return count
     }
 
     static func statusCheckBatch(in moc: NSManagedObjectContext) -> [PullRequest] {
