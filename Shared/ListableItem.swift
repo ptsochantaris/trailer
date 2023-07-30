@@ -494,9 +494,9 @@ class ListableItem: DataItem, Listable {
         snoozingPreset = nil
         wasAwokenFromSnooze = explicityAwoke
     }
-    
+
     var preferredSectionBasedOnReviewAssignment: Section? {
-        return nil
+        nil
     }
 
     private func preferredSection(takingItemConditionIntoAccount: Bool) -> Section {
@@ -555,24 +555,24 @@ class ListableItem: DataItem, Listable {
 
         return true
     }
-    
+
     var shouldHideBecauseOfRepoPolicy: Bool {
-        return false
+        false
     }
-    
+
     var shouldWakeBecauseOfCommit: Bool {
-        return false
+        false
     }
-    
-    func shouldBeCheckedForRedStatuses(in section: Section) -> [PRStatus]? {
-        return nil
+
+    func shouldBeCheckedForRedStatuses(in _: Section) -> [PRStatus]? {
+        nil
     }
 
     final func postProcess(context: PostProcessContext = PostProcessContext()) {
         if let s = snoozeUntil, s < Date() { // our snooze-by date is past
             disableSnoozing(explicityAwoke: true)
         }
-        
+
         if shouldWakeBecauseOfCommit { // we wake on comments and have a new commit alarm
             wakeUp() // re-process as awake item
             return
@@ -655,8 +655,8 @@ class ListableItem: DataItem, Listable {
         sectionIndex = targetSection.rawValue
     }
 
-    func countReviews(context: PostProcessContext) -> Int {
-        return 0
+    func countReviews(context _: PostProcessContext) -> Int {
+        0
     }
 
     private func countComments(context: PostProcessContext) -> Int {

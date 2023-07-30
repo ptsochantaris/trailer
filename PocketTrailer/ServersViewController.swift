@@ -122,6 +122,9 @@ final class ServersViewController: UITableViewController {
                 self?.performSegue(withIdentifier: "apiOptions", sender: nil)
             }
         })
+        a.addAction(UIAlertAction(title: "Log Monitor…", style: .default) { [weak self] _ in
+            self?.performSegue(withIdentifier: "liveLog", sender: nil)
+        })
         a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         present(a, animated: true)
         a.popoverPresentationController?.barButtonItem = sender

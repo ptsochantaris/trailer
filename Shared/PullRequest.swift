@@ -161,27 +161,27 @@ final class PullRequest: ListableItem {
         }
         return !context.excludedCommentAuthors.contains(userLogin.comparableForm)
     }
-    
+
     override var shouldHideBecauseOfRepoPolicy: Bool {
         if createdByMe {
             switch repo.itemHidingPolicy {
-            case RepoHidingPolicy.hideMyAuthoredPrs.rawValue,
-                RepoHidingPolicy.hideAllMyAuthoredItems.rawValue:
+            case RepoHidingPolicy.hideAllMyAuthoredItems.rawValue,
+                 RepoHidingPolicy.hideMyAuthoredPrs.rawValue:
                 return true
             default:
                 return false
             }
         } else {
             switch repo.itemHidingPolicy {
-            case RepoHidingPolicy.hideOthersPrs.rawValue,
-                RepoHidingPolicy.hideAllOthersItems.rawValue:
+            case RepoHidingPolicy.hideAllOthersItems.rawValue,
+                 RepoHidingPolicy.hideOthersPrs.rawValue:
                 return true
             default:
                 return false
             }
         }
     }
-    
+
     override var shouldWakeBecauseOfCommit: Bool {
         snoozeUntil != nil && shouldWakeOnComment && hasNewCommits
     }
@@ -310,11 +310,11 @@ final class PullRequest: ListableItem {
     override class var includeInUnreadPredicate: NSPredicate {
         Settings.markPrsAsUnreadOnNewCommits ? _unreadOrNewCommitsPredicate : super.includeInUnreadPredicate
     }
-    
+
     override var contextMenuTitle: String {
         muted ? "PR #\(number) (muted)" : "PR #\(number)"
     }
-    
+
     override var contextMenuSubtitle: String? {
         headRefName
     }
@@ -333,7 +333,7 @@ final class PullRequest: ListableItem {
         }
         return nil
     }
-    
+
     override func countReviews(context: PostProcessContext) -> Int {
         guard context.shouldSyncReviews || context.shouldSyncReviewAssignments else {
             return 0

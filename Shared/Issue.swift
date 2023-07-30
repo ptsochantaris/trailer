@@ -103,20 +103,20 @@ final class Issue: ListableItem {
         add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc, includeAllGroups: includeAllGroups)
         return try! moc.fetch(f)
     }
-    
+
     override var shouldHideBecauseOfRepoPolicy: Bool {
         if createdByMe {
             switch repo.itemHidingPolicy {
-            case RepoHidingPolicy.hideMyAuthoredIssues.rawValue,
-                RepoHidingPolicy.hideAllMyAuthoredItems.rawValue:
+            case RepoHidingPolicy.hideAllMyAuthoredItems.rawValue,
+                 RepoHidingPolicy.hideMyAuthoredIssues.rawValue:
                 return true
             default:
                 return false
             }
         } else {
             switch repo.itemHidingPolicy {
-            case RepoHidingPolicy.hideOthersIssues.rawValue,
-                RepoHidingPolicy.hideAllOthersItems.rawValue:
+            case RepoHidingPolicy.hideAllOthersItems.rawValue,
+                 RepoHidingPolicy.hideOthersIssues.rawValue:
                 return true
             default:
                 return false
