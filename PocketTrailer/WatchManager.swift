@@ -257,7 +257,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
                 "user": comment.userName.orEmpty,
                 "date": comment.createdAt ?? .distantPast,
                 "text": comment.body.orEmpty,
-                "mine": comment.isMine
+                "mine": comment.createdByMe
             ])
         }
         return comments
