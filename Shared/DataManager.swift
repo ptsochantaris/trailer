@@ -384,12 +384,12 @@ enum DataManager {
 
     static func postProcessAllItems(in context: NSManagedObjectContext, postProcessContext: PostProcessContext = PostProcessContext()) async {
         let start = Date()
-        let increment = 500
+        let increment = 200
 
         await withTaskGroup(of: Void.self) { group in
             let prCount = PullRequest.countItems(in: context)
             for i in stride(from: 0, to: prCount, by: increment) {
-                group.addTask {
+                group.addTask(priority: .high) {
                     await runInChild(of: context) { child in
                         for p in PullRequest.allItems(offset: i, count: increment, in: child, prefetchRelationships: ["comments", "reactions", "reviews"]) {
                             p.postProcess(context: postProcessContext)
@@ -400,7 +400,7 @@ enum DataManager {
 
             let issueCount = Issue.countItems(in: context)
             for i in stride(from: 0, to: issueCount, by: increment) {
-                group.addTask {
+                group.addTask(priority: .high) {
                     await runInChild(of: context) { child in
                         for i in Issue.allItems(offset: i, count: increment, in: child, prefetchRelationships: ["comments", "reactions"]) {
                             i.postProcess(context: postProcessContext)
@@ -409,6 +409,7 @@ enum DataManager {
                 }
             }
         }
+
         Logging.log("Postprocess done - \(-start.timeIntervalSinceNow) sec")
     }
 

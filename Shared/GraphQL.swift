@@ -489,9 +489,19 @@ enum GraphQL {
             return
         }
 
-        let itemsByServer = Dictionary(grouping: items) { $0.apiServer }
-        for (server, items) in itemsByServer {
-            let ids = items.compactMap(\.nodeId)
+        var itemIdsByServer = [ApiServer: Lista<String>]()
+        for item in items {
+            guard let nodeId = item.nodeId else {
+                continue
+            }
+            let server = item.apiServer
+            if let existing = itemIdsByServer[server] {
+                existing.append(nodeId)
+            } else {
+                itemIdsByServer[server] = Lista(value: nodeId)
+            }
+        }
+        for (server, ids) in itemIdsByServer {
             var nodes = [String: Lista<Node>]()
             let serverName = server.label ?? "<no label>"
             let nodeBlock: Query.PerNodeBlock = { node in
@@ -649,20 +659,19 @@ enum GraphQL {
     }
 
     private static func checkAuthoredPrClosures(nodes: [String: Lista<Node>], in server: ApiServer) async {
-        let prsToCheck = Lista<PullRequest>()
+        let prIdsToCheck = Lista<String>()
         let fetchedPrIds = Set(nodes["PullRequest"]?.map(\.id) ?? [])
         for repo in server.repos.filter({ $0.displayPolicyForPrs == RepoDisplayPolicy.authoredOnly.rawValue }) {
-            for pr in repo.pullRequests where !fetchedPrIds.contains(pr.nodeId ?? "") {
-                prsToCheck.append(pr)
-            }
+            let ids = repo.pullRequests.compactMap(\.nodeId).filter { !fetchedPrIds.contains($0) }
+            prIdsToCheck.append(from: ids)
         }
 
-        if prsToCheck.count == 0 {
+        if prIdsToCheck.count == 0 {
             return
         }
 
         let prGroup = Group("pullRequests") { prFragment(includeRepo: true) }
-        let group = BatchGroup(name: "nodes", templateGroup: prGroup, idList: prsToCheck.compactMap(\.nodeId))
+        let group = BatchGroup(name: "nodes", templateGroup: prGroup, idList: prIdsToCheck)
         let nodes = Lista<Node>()
         let query = Query(name: "Closed Authored PRs", rootElement: group, allowsEmptyResponse: true) { node in
             node.forcedUpdate = true
@@ -765,12 +774,12 @@ enum GraphQL {
             }
 
             if idsForReposInThisServerWantingLatestPrs.count > 0 {
-                let q = Query.batching("\(serverLabel): Updated PRs", groupName: "nodes", idList: Array(idsForReposInThisServerWantingLatestPrs), maxCost: Profile.current.itemIncrementalBatchCost, perNode: perNodeBlock) { latestPrsFragment }
+                let q = Query.batching("\(serverLabel): Updated PRs", groupName: "nodes", idList: idsForReposInThisServerWantingLatestPrs, maxCost: Profile.current.itemIncrementalBatchCost, perNode: perNodeBlock) { latestPrsFragment }
                 queriesForServer.append(contentsOf: q)
             }
 
             if idsForReposInThisServerWantingAllOpenPrs.count > 0 {
-                let q = Query.batching("\(serverLabel): Open PRs", groupName: "nodes", idList: Array(idsForReposInThisServerWantingAllOpenPrs), maxCost: Profile.current.itemInitialBatchCost, perNode: perNodeBlock) { allOpenPrsFragment }
+                let q = Query.batching("\(serverLabel): Open PRs", groupName: "nodes", idList: idsForReposInThisServerWantingAllOpenPrs, maxCost: Profile.current.itemInitialBatchCost, perNode: perNodeBlock) { allOpenPrsFragment }
                 queriesForServer.append(contentsOf: q)
             }
 
@@ -834,12 +843,12 @@ enum GraphQL {
             }
 
             if idsForReposInThisServerWantingLatestIssues.count > 0 {
-                let q = Query.batching("\(serverLabel): Updated Issues", groupName: "nodes", idList: Array(idsForReposInThisServerWantingLatestIssues), maxCost: Profile.current.itemIncrementalBatchCost, perNode: perNodeBlock) { latestIssuesFragment }
+                let q = Query.batching("\(serverLabel): Updated Issues", groupName: "nodes", idList: idsForReposInThisServerWantingLatestIssues, maxCost: Profile.current.itemIncrementalBatchCost, perNode: perNodeBlock) { latestIssuesFragment }
                 queriesForServer.append(contentsOf: q)
             }
 
             if idsForReposInThisServerWantingAllOpenIssues.count > 0 {
-                let q = Query.batching("\(serverLabel): Open Issues", groupName: "nodes", idList: Array(idsForReposInThisServerWantingAllOpenIssues), maxCost: Profile.current.itemInitialBatchCost, perNode: perNodeBlock) { allOpenIssuesFragment }
+                let q = Query.batching("\(serverLabel): Open Issues", groupName: "nodes", idList: idsForReposInThisServerWantingAllOpenIssues, maxCost: Profile.current.itemInitialBatchCost, perNode: perNodeBlock) { allOpenIssuesFragment }
                 queriesForServer.append(contentsOf: q)
             }
 
