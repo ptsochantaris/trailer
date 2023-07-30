@@ -90,10 +90,10 @@ enum DataManager {
         }
     }
 
-    private static func processCommentAndReviewNotifications() async {
+    private static func processCommentAndReviewNotifications(postProcessContext: PostProcessContext) async {
         await runInChild(of: main) { child in
             for c in PRComment.newItems(in: child) {
-                c.processNotifications()
+                c.processNotifications(postProcessContext: postProcessContext)
                 c.postSyncAction = PostSyncAction.doNothing.rawValue
             }
 
@@ -104,11 +104,11 @@ enum DataManager {
         }
     }
 
-    private static func processStatusNotifications() async {
+    private static func processStatusNotifications(postProcessContext: PostProcessContext) async {
         await runInChild(of: main) { child in
             let latestStatuses = PRStatus.newItems(in: child)
             var coveredPrs = Set<NSManagedObjectID>()
-            if Settings.notifyOnStatusUpdates {
+            if postProcessContext.notifyOnStatusUpdates {
                 for pr in latestStatuses.map(\.pullRequest) where pr.shouldAnnounceStatus && !coveredPrs.contains(pr.objectID) {
                     coveredPrs.insert(pr.objectID)
                     if let s = pr.displayedStatuses.first {
@@ -152,15 +152,17 @@ enum DataManager {
     static func sendNotificationsIndexAndSave() async {
         await saveDB() // get IDs
 
-        await postProcessAllItems(in: main)
+        let postProcessContext = PostProcessContext()
+
+        await postProcessAllItems(in: main, postProcessContext: postProcessContext)
 
         await processNotificationsForItems(of: PullRequest.self, newNotification: .newPr, reopenedNotification: .prReopened, assignmentNotification: .newPrAssigned)
 
         await processNotificationsForItems(of: Issue.self, newNotification: .newIssue, reopenedNotification: .issueReopened, assignmentNotification: .newIssueAssigned)
 
-        await processCommentAndReviewNotifications()
+        await processCommentAndReviewNotifications(postProcessContext: postProcessContext)
 
-        await processStatusNotifications()
+        await processStatusNotifications(postProcessContext: postProcessContext)
 
         await runInChild(of: main) { child in
             let nothing = PostSyncAction.doNothing.rawValue
@@ -380,10 +382,9 @@ enum DataManager {
         }
     }
 
-    static func postProcessAllItems(in context: NSManagedObjectContext) async {
+    static func postProcessAllItems(in context: NSManagedObjectContext, postProcessContext: PostProcessContext = PostProcessContext()) async {
         let start = Date()
         let increment = 500
-        let postProcessContext = PostProcessContext()
 
         await withTaskGroup(of: Void.self) { group in
             let prCount = PullRequest.countItems(in: context)

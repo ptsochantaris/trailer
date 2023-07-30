@@ -57,7 +57,7 @@
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" heightSizable="YES"/>
                                             <clipView key="contentView" id="0eh-Pe-UwN">
                                                 <rect key="frame" x="1" y="1" width="238" height="333"/>
-                                                <autoresizingMask key="autoresizingMask"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="20" headerView="GLY-La-oaP" id="wPh-gi-N9t">
                                                         <rect key="frame" x="0.0" y="0.0" width="238" height="316"/>
@@ -361,7 +361,7 @@ Token</string>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <clipView key="contentView" id="hCD-zR-3bF">
                                                 <rect key="frame" x="1" y="1" width="869" height="318"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" rowHeight="20" headerView="qia-ub-v1J" id="6pK-a1-URw">
                                                         <rect key="frame" x="0.0" y="0.0" width="869" height="301"/>
@@ -873,15 +873,15 @@ Token</string>
                                                             <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lB5-eS-YSK">
                                                                 <rect key="frame" x="17" y="10" width="182" height="26"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <popUpButtonCell key="cell" type="push" title="Move to &quot;Mine&quot;" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="RE2-yr-udn" id="rPe-gD-wp2">
+                                                                <popUpButtonCell key="cell" type="push" title="Move to &quot;Mine&quot;" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="RE2-yr-udn" id="rPe-gD-wp2">
                                                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="menu"/>
                                                                     <menu key="menu" id="cHj-CQ-Gut">
                                                                         <items>
-                                                                            <menuItem title="Move to &quot;Mine&quot;" id="RE2-yr-udn"/>
+                                                                            <menuItem title="Move to &quot;Mine&quot;" state="on" id="RE2-yr-udn"/>
                                                                             <menuItem title="Move to &quot;Participated&quot;" id="RS4-Xg-Tc4"/>
                                                                             <menuItem title="Move to &quot;Mentioned&quot;" id="xhZ-Jo-3il"/>
-                                                                            <menuItem title="Do nothing" state="on" id="9TM-I1-9UP"/>
+                                                                            <menuItem title="Do nothing" id="9TM-I1-9UP"/>
                                                                         </items>
                                                                     </menu>
                                                                 </popUpButtonCell>
@@ -892,15 +892,15 @@ Token</string>
                                                             <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jRo-wO-w7i">
                                                                 <rect key="frame" x="203" y="10" width="182" height="26"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <popUpButtonCell key="cell" type="push" title="Move to &quot;Mine&quot;" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="tmd-td-78D" id="hlN-qs-rr6">
+                                                                <popUpButtonCell key="cell" type="push" title="Move to &quot;Mine&quot;" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="tmd-td-78D" id="hlN-qs-rr6">
                                                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="menu"/>
                                                                     <menu key="menu" id="FHd-cv-AfA">
                                                                         <items>
-                                                                            <menuItem title="Move to &quot;Mine&quot;" id="tmd-td-78D"/>
+                                                                            <menuItem title="Move to &quot;Mine&quot;" state="on" id="tmd-td-78D"/>
                                                                             <menuItem title="Move to &quot;Participated&quot;" id="ogA-b4-Bpk"/>
                                                                             <menuItem title="Move to &quot;Mentioned&quot;" id="OxJ-Eb-cTL"/>
-                                                                            <menuItem title="Do nothing" state="on" id="PS7-T7-dF6"/>
+                                                                            <menuItem title="Do nothing" id="PS7-T7-dF6"/>
                                                                         </items>
                                                                     </menu>
                                                                 </popUpButtonCell>
@@ -1462,7 +1462,7 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                             <action selector="showAllCommentsSelected:" target="vQH-WF-vh2" id="Hsq-qd-D3i"/>
                                                         </connections>
                                                     </button>
-                                                    <box fixedFrame="YES" borderType="line" title="Do not present notifications for comments from these usernames:" translatesAutoresizingMaskIntoConstraints="NO" id="BtZ-XP-Seo">
+                                                    <box fixedFrame="YES" borderType="line" title="Ignore comments from these usernames:" translatesAutoresizingMaskIntoConstraints="NO" id="BtZ-XP-Seo">
                                                         <rect key="frame" x="8" y="53" width="655" height="111"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="3Av-Xm-Bwe">
@@ -1639,12 +1639,12 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                                 <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="SYZ-oe-uNN">
                                                                     <rect key="frame" x="17" y="6" width="216" height="26"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                    <popUpButtonCell key="cell" type="push" title="Don't Move It" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="kee-oR-sjv">
+                                                                    <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="kee-oR-sjv">
                                                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                                         <font key="font" metaFont="menu"/>
                                                                         <menu key="menu" id="X5S-Xw-DMR">
                                                                             <items>
-                                                                                <menuItem title="Don't Move It" state="on" id="hy9-vB-o8b"/>
+                                                                                <menuItem title="Don't Move It" id="hy9-vB-o8b"/>
                                                                                 <menuItem title="Move To Mine" id="YaC-Ie-duu"/>
                                                                                 <menuItem title="Move To Participated" id="lZk-mr-9lw"/>
                                                                                 <menuItem title="Move To Mentioned" id="ETl-hk-Dd3"/>
@@ -1658,12 +1658,12 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                                 <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xRB-DD-kQe">
                                                                     <rect key="frame" x="235" y="6" width="216" height="26"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                    <popUpButtonCell key="cell" type="push" title="Don't Move It" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="g7W-b9-SEt">
+                                                                    <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="g7W-b9-SEt">
                                                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                                         <font key="font" metaFont="menu"/>
                                                                         <menu key="menu" id="5yX-cH-Iyh">
                                                                             <items>
-                                                                                <menuItem title="Don't Move It" state="on" id="XJL-V2-xmP"/>
+                                                                                <menuItem title="Don't Move It" id="XJL-V2-xmP"/>
                                                                                 <menuItem title="Move To Mine" id="ncc-zw-x99"/>
                                                                                 <menuItem title="Move To Participated" id="nao-d1-2qZ"/>
                                                                                 <menuItem title="Move To Mentioned" id="3PN-ks-JFk"/>

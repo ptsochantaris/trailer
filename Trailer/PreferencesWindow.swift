@@ -229,8 +229,11 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         deferredUpdateTimer = PopTimer(timeInterval: 1) { [weak self] in
             Task { @MainActor [weak self] in
                 await DataManager.postProcessAllItems(in: DataManager.main)
-                if let s = self, s.serversDirty {
-                    s.serversDirty = false
+                guard let self else {
+                    return
+                }
+                if self.serversDirty {
+                    self.serversDirty = false
                     await DataManager.saveDB()
                     Settings.possibleExport(nil)
                     app.setupWindows()

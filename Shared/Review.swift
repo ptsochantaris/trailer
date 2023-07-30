@@ -103,6 +103,17 @@ final class Review: DataItem {
         }
     }
 
+    func shouldContributeToCount(since: Date, context: PostProcessContext) -> Bool {
+        guard !isMine,
+              let username,
+              let createdAt,
+              createdAt > since
+        else {
+            return false
+        }
+        return !context.excludedCommentAuthors.contains(username.comparableForm)
+    }
+
     func processNotifications() {
         guard !isMine, pullRequest.canBadge, let newState = State(rawValue: state ?? "") else {
             return

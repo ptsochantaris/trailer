@@ -14,12 +14,14 @@ import TrailerQL
 struct PostProcessContext {
     let excludedLabels = Set(Settings.labelBlacklist.map(\.comparableForm))
     let excludedAuthors = Set(Settings.itemAuthorBlacklist.map(\.comparableForm))
+    let excludedCommentAuthors = Set(Settings.commentAuthorBlacklist.map(\.comparableForm))
     let assumeReadItemIfUserHasNewerComments = Settings.assumeReadItemIfUserHasNewerComments
     let hideUncommentedItems = Settings.hideUncommentedItems
     let shouldSyncReviews = API.shouldSyncReviews
     let shouldSyncReviewAssignments = API.shouldSyncReviewAssignments
     let notifyOnItemReactions = Settings.notifyOnItemReactions
     let notifyOnCommentReactions = Settings.notifyOnCommentReactions
+    let notifyOnStatusUpdates = Settings.notifyOnStatusUpdates
 }
 
 protocol Listable: Querying {
@@ -43,7 +45,7 @@ extension Listable {
 
         for item in items {
             for comment in item.comments {
-                comment.pendingReactionScan = comment.isMine
+                comment.pendingReactionScan = comment.createdByMe
             }
             for reaction in item.reactions {
                 reaction.postSyncAction = PostSyncAction.delete.rawValue
@@ -399,7 +401,7 @@ class ListableItem: DataItem, Listable {
     }
 
     private final var commentedByMe: Bool {
-        comments.contains { $0.isMine }
+        comments.contains { $0.createdByMe }
     }
 
     var reviewedByMe: Bool {
@@ -568,18 +570,24 @@ class ListableItem: DataItem, Listable {
         }
 
         if targetSection != .none {
-            let isMine = createdByMe
-
-            switch repo.itemHidingPolicy {
-            case RepoHidingPolicy.hideMyAuthoredPrs.rawValue where isMine && self is PullRequest,
-                 RepoHidingPolicy.hideMyAuthoredIssues.rawValue where isMine && self is Issue,
-                 RepoHidingPolicy.hideAllMyAuthoredItems.rawValue where isMine,
-                 RepoHidingPolicy.hideOthersPrs.rawValue where !isMine && self is PullRequest,
-                 RepoHidingPolicy.hideOthersIssues.rawValue where !isMine && self is Issue,
-                 RepoHidingPolicy.hideAllOthersItems.rawValue where !isMine:
-
-                targetSection = .none
-            default: break
+            if createdByMe {
+                switch repo.itemHidingPolicy {
+                case RepoHidingPolicy.hideMyAuthoredPrs.rawValue where self is PullRequest,
+                    RepoHidingPolicy.hideMyAuthoredIssues.rawValue where self is Issue,
+                    RepoHidingPolicy.hideAllMyAuthoredItems.rawValue:
+                    
+                    targetSection = .none
+                default: break
+                }
+            } else {
+                switch repo.itemHidingPolicy {
+                case RepoHidingPolicy.hideOthersPrs.rawValue where self is PullRequest,
+                    RepoHidingPolicy.hideOthersIssues.rawValue where self is Issue,
+                    RepoHidingPolicy.hideAllOthersItems.rawValue:
+                    
+                    targetSection = .none
+                default: break
+                }
             }
         }
 
@@ -640,52 +648,74 @@ class ListableItem: DataItem, Listable {
         }
 
         if targetSection != .none {
-            let reviewCount: Int
-            if let p = self as? PullRequest, context.shouldSyncReviews || context.shouldSyncReviewAssignments {
-                reviewCount = p.reviews.count
-            } else {
-                reviewCount = 0
-            }
-
-            totalComments = comments.count
-                + (context.notifyOnItemReactions ? reactions.count : 0)
-                + (context.notifyOnCommentReactions ? countCommentReactions : 0)
-                + reviewCount
+            totalComments = countComments(context: context)
+                + (context.notifyOnItemReactions ? countReactions(context: context) : 0)
+                + (context.notifyOnCommentReactions ? countCommentReactions(context: context) : 0)
+                + countReviews(context: context)
         }
 
         sectionIndex = targetSection.rawValue
     }
 
-    private var countCommentReactions: Int {
+    private func countReviews(context: PostProcessContext) -> Int {
+        guard let self = self as? PullRequest, context.shouldSyncReviews || context.shouldSyncReviewAssignments else {
+            return 0
+        }
         var count = 0
-        for c in comments {
-            count += c.reactions.count
+        for r in self.reviews where r.shouldContributeToCount(since: .distantPast, context: context) {
+            count += 1
+        }
+        return count
+    }
+
+    private func countComments(context: PostProcessContext) -> Int {
+        var count = 0
+        for c in comments where c.shouldContributeToCount(since: .distantPast, context: context) {
+            count += 1
+        }
+        return count
+    }
+
+    private func countReactions(context: PostProcessContext) -> Int {
+        var count = 0
+        for r in reactions where r.shouldContributeToCount(since: .distantPast, context: context) {
+            count += 1
+        }
+        return count
+    }
+
+    private func countCommentReactions(context: PostProcessContext) -> Int {
+        var count = 0
+        for c in comments where c.shouldContributeToCount(since: .distantPast, context: context) {
+            for r in c.reactions where r.shouldContributeToCount(since: .distantPast, context: context) {
+                count += 1
+            }
         }
         return count
     }
 
     private final func myComments(since: Date) -> [PRComment] {
-        comments.filter { $0.isMine && ($0.createdAt ?? .distantPast) > since }
+        comments.filter { $0.createdByMe && ($0.createdAt ?? .distantPast) > since }
     }
 
     private final func othersComments(since: Date) -> [PRComment] {
-        comments.filter { !$0.isMine && ($0.createdAt ?? .distantPast) > since }
+        comments.filter { !$0.createdByMe && ($0.createdAt ?? .distantPast) > since }
     }
 
-    private final func countOthersComments(since: Date, context: PostProcessContext) -> Int {
+    private final func countOthersComments(since startDate: Date, context: PostProcessContext) -> Int {
         var count = 0
         for c in comments {
-            if !c.isMine, (c.createdAt ?? .distantPast) > since {
+            if c.shouldContributeToCount(since: startDate, context: context) {
                 count += 1
             }
             if context.notifyOnCommentReactions {
-                for r in c.reactions where !r.isMine && (r.createdAt ?? .distantPast) > since {
+                for r in c.reactions where r.shouldContributeToCount(since: startDate, context: context) {
                     count += 1
                 }
             }
         }
         if context.notifyOnItemReactions {
-            for r in reactions where !r.isMine && (r.createdAt ?? .distantPast) > since {
+            for r in reactions where r.shouldContributeToCount(since: startDate, context: context) {
                 count += 1
             }
         }

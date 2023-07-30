@@ -73,6 +73,17 @@ final class Reaction: DataItem {
         }
     }
 
+    func shouldContributeToCount(since: Date, context: PostProcessContext) -> Bool {
+        guard !isMine,
+              let userName,
+              let createdAt,
+              createdAt > since
+        else {
+            return false
+        }
+        return !context.excludedCommentAuthors.contains(userName.comparableForm)
+    }
+
     @MainActor
     func checkNotifications() {
         if postSyncAction == PostSyncAction.isNew.rawValue, !isMine {

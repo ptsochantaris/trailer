@@ -151,6 +151,17 @@ final class PullRequest: ListableItem {
         return nil
     }
 
+    func shouldContributeToCount(since: Date, context: PostProcessContext) -> Bool {
+        guard !createdByMe,
+              let userLogin,
+              let createdAt,
+              createdAt > since
+        else {
+            return false
+        }
+        return !context.excludedCommentAuthors.contains(userLogin.comparableForm)
+    }
+
     private func setAssignedReviewStatus(to status: AssignmentStatus) {
         if assignedReviewStatus == status.rawValue {
             return

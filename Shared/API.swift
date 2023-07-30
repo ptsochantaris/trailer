@@ -121,11 +121,13 @@ enum API {
             }
             if isRefreshing {
                 Logging.log("Starting refresh")
+                GraphQL.callCount = 0
                 DataManager.postMigrationTasks()
                 NotificationQueue.clear()
                 NotificationCenter.default.post(name: .RefreshStarting, object: nil)
             } else {
                 Logging.log("Refresh done")
+                GraphQL.callCount = 0
                 if ApiServer.shouldReportRefreshFailure(in: DataManager.main) {
                     currentOperationName = "Last update failed"
                     NotificationCenter.default.post(name: .RefreshEnded, object: false)

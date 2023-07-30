@@ -218,6 +218,8 @@ enum GraphQL {
 
     private static let multiGateKeeper = Gate(tickets: 2)
 
+    static var callCount = 0
+
     private static func fetchData(from urlString: String, for query: Query, authToken: String, attempts: Int) async throws -> JSON {
         let Q = query.queryText
 
@@ -242,7 +244,8 @@ enum GraphQL {
         }
 
         Task { @MainActor in
-            API.currentOperationName = query.name
+            callCount += 1
+            API.currentOperationName = query.name + " (call \(callCount))"
         }
 
         Logging.log("\(query.logPrefix)Fetching: \(Q)")

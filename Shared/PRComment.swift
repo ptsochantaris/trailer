@@ -79,32 +79,46 @@ final class PRComment: DataItem {
         }
     }
 
-    func processNotifications() {
-        guard let parent, parent.canBadge else {
+    func shouldContributeToCount(since: Date, context: PostProcessContext) -> Bool {
+        guard !createdByMe,
+              let userName,
+              let createdAt,
+              createdAt > since
+        else {
+            return false
+        }
+        return !context.excludedCommentAuthors.contains(userName.comparableForm)
+    }
+
+    func processNotifications(postProcessContext: PostProcessContext) {
+        guard !createdByMe, let parent, parent.canBadge else {
             return
         }
+
+        if let userName, postProcessContext.excludedCommentAuthors.contains(userName.comparableForm) {
+            Logging.log("Ignoring comment from user '\(userName)' as their name is on the blacklist")
+            return
+        }
+
         if contains(terms: ["@\(apiServer.userName!)"]) {
             if parent.isSnoozing, parent.shouldWakeOnMention {
                 Logging.log("Waking up snoozed item ID \(parent.nodeId ?? "<no ID>") because of mention")
                 parent.wakeUp()
             }
             NotificationQueue.add(type: .newMention, for: self)
-        } else if !isMine {
-            if parent.isSnoozing, parent.shouldWakeOnComment {
-                Logging.log("Waking up snoozed item ID \(parent.nodeId ?? "<no ID>") because of posted comment")
-                parent.wakeUp()
-            }
-            guard !Settings.disableAllCommentNotifications, let authorName = userName else {
-                return
-            }
-            let blocked = Settings.commentAuthorBlacklist.contains { authorName.compare($0, options: [.caseInsensitive, .diacriticInsensitive]) == .orderedSame }
-            if blocked {
-                Logging.log("Blocked notification for user '\(authorName)' as their name is on the blacklist")
-            } else {
-                Logging.log("User '\(authorName)' not on blacklist, can post notification")
-                NotificationQueue.add(type: .newComment, for: self)
-            }
+            return
         }
+
+        if parent.isSnoozing, parent.shouldWakeOnComment {
+            Logging.log("Waking up snoozed item ID \(parent.nodeId ?? "<no ID>") because of posted comment")
+            parent.wakeUp()
+        }
+
+        if Settings.disableAllCommentNotifications {
+            return
+        }
+
+        NotificationQueue.add(type: .newComment, for: self)
     }
 
     private func fill(from info: JSON) {
@@ -147,7 +161,7 @@ final class PRComment: DataItem {
         pullRequest ?? issue
     }
 
-    var isMine: Bool {
+    var createdByMe: Bool {
         userNodeId == apiServer.userNodeId
     }
 
