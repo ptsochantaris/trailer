@@ -556,7 +556,7 @@ class ListableItem: DataItem, Listable {
         return true
     }
 
-    var shouldHideBecauseOfRepoPolicy: Bool {
+    var shouldHideBecauseOfRepoHidingPolicy: Bool {
         false
     }
 
@@ -566,6 +566,23 @@ class ListableItem: DataItem, Listable {
 
     func shouldBeCheckedForRedStatuses(in _: Section) -> [PRStatus]? {
         nil
+    }
+
+    var repoDisplayPolicy: Int {
+        repo.displayPolicyForIssues
+    }
+
+    private func shouldHideBecauseOfRepoDisplayPolicy(targetSection: Section) -> Bool {
+        switch repoDisplayPolicy {
+        case RepoDisplayPolicy.hide.rawValue:
+            return true
+        case RepoDisplayPolicy.mine.rawValue:
+            return targetSection == .all || targetSection == .participated || targetSection == .mentioned
+        case RepoDisplayPolicy.mineAndPaticipated.rawValue:
+            return targetSection == .all
+        default:
+            return false
+        }
     }
 
     final func postProcess(context: PostProcessContext = PostProcessContext()) {
@@ -580,17 +597,7 @@ class ListableItem: DataItem, Listable {
 
         var targetSection = preferredSection(takingItemConditionIntoAccount: true)
 
-        if targetSection != .none {
-            switch self is Issue ? repo.displayPolicyForIssues : repo.displayPolicyForPrs {
-            case RepoDisplayPolicy.hide.rawValue,
-                 RepoDisplayPolicy.mine.rawValue where targetSection == .all || targetSection == .participated || targetSection == .mentioned,
-                 RepoDisplayPolicy.mineAndPaticipated.rawValue where targetSection == .all:
-                targetSection = .none
-            default: break
-            }
-        }
-
-        if targetSection != .none, shouldHideBecauseOfRepoPolicy {
+        if targetSection != .none, shouldHideBecauseOfRepoDisplayPolicy(targetSection: targetSection) || shouldHideBecauseOfRepoHidingPolicy || shouldHideDueToMyReview {
             targetSection = .none
         }
 
@@ -1198,6 +1205,10 @@ class ListableItem: DataItem, Listable {
         if newValue {
             ListableItem.removeRelatedNotifications(uri: objectID.uriRepresentation().absoluteString)
         }
+    }
+
+    var shouldHideDueToMyReview: Bool {
+        false
     }
 
     static func removeRelatedNotifications(uri: String) {

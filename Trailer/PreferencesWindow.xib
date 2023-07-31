@@ -370,7 +370,7 @@ Token</string>
                                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                         <tableColumns>
-                                                            <tableColumn identifier="repos" editable="NO" width="489" minWidth="100" maxWidth="10000" id="nW5-Ng-D0l">
+                                                            <tableColumn identifier="repos" editable="NO" width="514" minWidth="100" maxWidth="10000" id="nW5-Ng-D0l">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Watched Repository">
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.33333298560000002" alpha="1" colorSpace="calibratedWhite"/>
@@ -1523,21 +1523,21 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box fixedFrame="YES" boxType="custom" borderType="none" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="49Q-X3-TvK">
-                                            <rect key="frame" x="183" y="17" width="550" height="362"/>
+                                            <rect key="frame" x="75" y="64" width="749" height="301"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <view key="contentView" id="Hr7-ca-s5X">
-                                                <rect key="frame" x="0.0" y="0.0" width="550" height="362"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="749" height="301"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <box fixedFrame="YES" title="Notify me when…" translatesAutoresizingMaskIntoConstraints="NO" id="C58-hf-r5t">
-                                                        <rect key="frame" x="39" y="40" width="475" height="154"/>
+                                                        <rect key="frame" x="17" y="17" width="459" height="154"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="FlM-UP-339">
-                                                            <rect key="frame" x="4" y="5" width="467" height="134"/>
+                                                            <rect key="frame" x="4" y="5" width="451" height="134"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="W7P-8B-zzm">
-                                                                    <rect key="frame" x="18" y="103" width="349" height="18"/>
+                                                                    <rect key="frame" x="18" y="103" width="335" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="Someone requests changes to a PR I created…" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="p1O-O4-Ugb">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1548,7 +1548,7 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                                     </connections>
                                                                 </button>
                                                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cUX-93-pkY">
-                                                                    <rect key="frame" x="18" y="73" width="349" height="18"/>
+                                                                    <rect key="frame" x="18" y="73" width="335" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="Someone accepts changes on a PR I created…" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="pNh-wM-EPz">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1559,7 +1559,7 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                                     </connections>
                                                                 </button>
                                                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8kt-mf-c4i">
-                                                                    <rect key="frame" x="18" y="43" width="349" height="18"/>
+                                                                    <rect key="frame" x="18" y="43" width="335" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="Someone dismisses a review on a PR I created…" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="edL-Bg-Zov">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1570,7 +1570,7 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                                     </connections>
                                                                 </button>
                                                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="z39-OC-9iv">
-                                                                    <rect key="frame" x="18" y="13" width="349" height="18"/>
+                                                                    <rect key="frame" x="18" y="13" width="335" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="Someone assigns me a PR to review" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="THH-72-g8l">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1581,7 +1581,7 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                                     </connections>
                                                                 </button>
                                                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4hX-kx-RH5">
-                                                                    <rect key="frame" x="371" y="103" width="84" height="18"/>
+                                                                    <rect key="frame" x="352" y="103" width="84" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="…or All" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="Rbb-Fj-bP3">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1592,7 +1592,7 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                                     </connections>
                                                                 </button>
                                                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Cle-hT-Lca">
-                                                                    <rect key="frame" x="371" y="73" width="84" height="18"/>
+                                                                    <rect key="frame" x="352" y="73" width="84" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="…or All" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="5eI-7r-swf">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1603,7 +1603,7 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                                     </connections>
                                                                 </button>
                                                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jjg-cq-Lfe">
-                                                                    <rect key="frame" x="371" y="43" width="84" height="18"/>
+                                                                    <rect key="frame" x="352" y="43" width="84" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="…or All" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="26G-BO-CIp">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1616,17 +1616,8 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                             </subviews>
                                                         </view>
                                                     </box>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="PC0-Di-dZ3">
-                                                        <rect key="frame" x="-2" y="19" width="554" height="17"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="To disable usage of the Reviews API, uncheck all options here &amp; set the drop-down option to &quot;Don't Move It&quot;" id="bis-lC-jvI">
-                                                            <font key="font" metaFont="label" size="9"/>
-                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7m1-w3-6Le">
-                                                        <rect key="frame" x="131" y="334" width="272" height="18"/>
+                                                        <rect key="frame" x="29" y="264" width="272" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Display review info for PRs" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="NJt-Z2-5f6">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1637,7 +1628,7 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                         </connections>
                                                     </button>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rDE-A8-36S">
-                                                        <rect key="frame" x="131" y="304" width="288" height="18"/>
+                                                        <rect key="frame" x="29" y="234" width="288" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Display teams asked to review PRs" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Ybv-mB-zei">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1648,14 +1639,14 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                         </connections>
                                                     </button>
                                                     <box autoresizesSubviews="NO" fixedFrame="YES" borderType="line" title="When a PR is assigned for review…" translatesAutoresizingMaskIntoConstraints="NO" id="ORE-Hy-cR5">
-                                                        <rect key="frame" x="39" y="203" width="475" height="79"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                                        <rect key="frame" x="478" y="17" width="255" height="154"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="PrF-Mb-6Nc">
-                                                            <rect key="frame" x="4" y="5" width="467" height="59"/>
+                                                            <rect key="frame" x="4" y="5" width="247" height="134"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="auq-Ob-ShO">
-                                                                    <rect key="frame" x="28" y="38" width="43" height="14"/>
+                                                                    <rect key="frame" x="28" y="103" width="43" height="14"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" lineBreakMode="clipping" title="…to me" id="xLY-v2-HSg">
                                                                         <font key="font" metaFont="smallSystem"/>
@@ -1664,7 +1655,7 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                                     </textFieldCell>
                                                                 </textField>
                                                                 <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="SYZ-oe-uNN">
-                                                                    <rect key="frame" x="17" y="6" width="216" height="26"/>
+                                                                    <rect key="frame" x="17" y="71" width="216" height="26"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="kee-oR-sjv">
                                                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1683,7 +1674,7 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                                     </connections>
                                                                 </popUpButton>
                                                                 <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xRB-DD-kQe">
-                                                                    <rect key="frame" x="235" y="6" width="216" height="26"/>
+                                                                    <rect key="frame" x="17" y="19" width="216" height="26"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="g7W-b9-SEt">
                                                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1702,7 +1693,7 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                                     </connections>
                                                                 </popUpButton>
                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0r9-PA-AkD">
-                                                                    <rect key="frame" x="241" y="38" width="77" height="14"/>
+                                                                    <rect key="frame" x="23" y="51" width="77" height="14"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" lineBreakMode="clipping" title="…to my teams" id="1uA-QF-eFE">
                                                                         <font key="font" metaFont="smallSystem"/>
@@ -1713,6 +1704,47 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                             </subviews>
                                                         </view>
                                                     </box>
+                                                    <box autoresizesSubviews="NO" fixedFrame="YES" borderType="line" title="Hide PRs based on my review" translatesAutoresizingMaskIntoConstraints="NO" id="IY7-gT-RAm">
+                                                        <rect key="frame" x="477" y="178" width="256" height="103"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <view key="contentView" id="iGc-I2-SZi">
+                                                            <rect key="frame" x="4" y="5" width="248" height="83"/>
+                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                            <subviews>
+                                                                <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="U88-pc-Jz8">
+                                                                    <rect key="frame" x="18" y="49" width="210" height="18"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <buttonCell key="cell" type="check" title="PRs I approved" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="zfj-Ya-0W9">
+                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                        <font key="font" metaFont="system"/>
+                                                                    </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="autohidePrsIApprovedSelected:" target="vQH-WF-vh2" id="sgu-Eg-11V"/>
+                                                                    </connections>
+                                                                </button>
+                                                                <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ei9-bM-vil">
+                                                                    <rect key="frame" x="18" y="17" width="210" height="18"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <buttonCell key="cell" type="check" title="PRs I requested changes in" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="58w-iX-8yf">
+                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                        <font key="font" metaFont="system"/>
+                                                                    </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="autohidePrsIRejectedSelected:" target="vQH-WF-vh2" id="LZY-0p-1LI"/>
+                                                                    </connections>
+                                                                </button>
+                                                            </subviews>
+                                                        </view>
+                                                    </box>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="PC0-Di-dZ3">
+                                                        <rect key="frame" x="29" y="178" width="260" height="41"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="To disable usage of the Reviews API, uncheck all options here &amp; set the drop-down options to &quot;Don't Move It&quot;" id="bis-lC-jvI">
+                                                            <font key="font" metaFont="label" size="9"/>
+                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
                                                 </subviews>
                                             </view>
                                         </box>
@@ -2749,6 +2781,8 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="assignedItemTeamHandlingPolicy" destination="jRo-wO-w7i" id="Y99-FK-vgn"/>
                 <outlet property="assignedTeamReviewHandlingPolicy" destination="xRB-DD-kQe" id="1h7-Y3-6DP"/>
                 <outlet property="assumeCommentsBeforeMineAreRead" destination="gWR-4e-ufK" id="uF3-ZN-vmp"/>
+                <outlet property="autoHidePrsIApproved" destination="U88-pc-Jz8" id="HU8-gt-z9y"/>
+                <outlet property="autoHidePrsIRejected" destination="Ei9-bM-vil" id="g4U-y3-lu4"/>
                 <outlet property="autoSnoozeLabel" destination="4MH-0X-KEO" id="bAY-Ka-oDM"/>
                 <outlet property="autoSnoozeSelector" destination="hgg-d7-xNz" id="4mr-e9-oiH"/>
                 <outlet property="checkForUpdatesAutomatically" destination="vcg-xx-N3A" id="G9B-Yw-7hB"/>

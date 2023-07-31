@@ -714,6 +714,14 @@ enum Settings {
     static var showRequestedTeamReviews: Bool
     static let showRequestedTeamReviewsHelp = "Display the name(s) of teams which have been assigned as reviewers on PRs"
 
+    @UserDefault(key: "REVIEWS_AUTOHIDE_MY_APPROVED", defaultValue: false)
+    static var autoHidePrsIApproved: Bool
+    static let autoHidePrsIApprovedHelp = "Automatically hide PRs which I have reviewed and approved. The PR will re-appear if a review is requested again."
+
+    @UserDefault(key: "REVIEWS_AUTOHIDE_MY_REJECTED", defaultValue: false)
+    static var autoHidePrsIRejected: Bool
+    static let autoHidePrsIRejectedHelp = "Automatically hide PRs which I have reviewed and requested changed for. The PR will re-appear if a review is requested again."
+
     @UserDefault(key: "USE_V4_API", defaultValue: false)
     static var useV4API: Bool
     static let useV4APIHelp = "In cases where the new v4 API is available, such as the public GitHub server, using it can result in significant efficiency and speed improvements when syncing."

@@ -149,7 +149,11 @@ final class Review: DataItem {
     }
 
     var affectsBottomLine: Bool {
-        let s = state
-        return s == State.CHANGES_REQUESTED.rawValue || s == State.APPROVED.rawValue || s == State.DISMISSED.rawValue
+        switch state {
+        case State.APPROVED.rawValue, State.CHANGES_REQUESTED.rawValue, State.DISMISSED.rawValue:
+            return true
+        default:
+            return false
+        }
     }
 }

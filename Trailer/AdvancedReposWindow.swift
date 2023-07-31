@@ -22,7 +22,7 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
     override func awakeFromNib() {
         super.awakeFromNib()
         delegate = self
-        
+
         allNewPrsSetting.addItems(withTitles: RepoDisplayPolicy.labels)
         allNewPrsSetting.toolTip = "The visibility settings you would like to apply by default for Pull Requests if a new repository is added in your watchlist."
         allNewPrsSetting.selectItem(at: Settings.displayPolicyForNewPrs)

@@ -162,7 +162,7 @@ final class PullRequest: ListableItem {
         return !context.excludedCommentAuthors.contains(userLogin.comparableForm)
     }
 
-    override var shouldHideBecauseOfRepoPolicy: Bool {
+    override var shouldHideBecauseOfRepoHidingPolicy: Bool {
         if createdByMe {
             switch repo.itemHidingPolicy {
             case RepoHidingPolicy.hideAllMyAuthoredItems.rawValue,
@@ -454,6 +454,37 @@ final class PullRequest: ListableItem {
             res.append(NSAttributedString(string: "-\(removedString)", attributes: attributes))
         }
         return res
+    }
+
+    override var repoDisplayPolicy: Int {
+        repo.displayPolicyForPrs
+    }
+
+    override var shouldHideDueToMyReview: Bool {
+        let hideIfApproved = Settings.autoHidePrsIApproved
+        let hideIfRejected = Settings.autoHidePrsIRejected
+
+        guard hideIfApproved || hideIfRejected,
+              let myName = apiServer.userName,
+              !reviewers.contains(myName)
+        else {
+            return false
+        }
+
+        let latestReview = reviews.filter { $0.affectsBottomLine && $0.username == myName }.sorted { $0.createdBefore($1) }.last
+        guard let latestReview else {
+            return false
+        }
+
+        if hideIfApproved, latestReview.state == Review.State.APPROVED.rawValue {
+            return true
+        }
+
+        if hideIfRejected, latestReview.state == Review.State.CHANGES_REQUESTED.rawValue {
+            return true
+        }
+
+        return false
     }
 
     func reviewsAttributedString(labelFont: FONT_CLASS) -> NSAttributedString? {

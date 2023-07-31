@@ -145,7 +145,7 @@ enum API {
     }
 
     nonisolated static var shouldSyncReviews: Bool {
-        Settings.displayReviewsOnItems || Settings.notifyOnReviewDismissals || Settings.notifyOnReviewAcceptances || Settings.notifyOnReviewChangeRequests
+        Settings.displayReviewsOnItems || Settings.notifyOnReviewDismissals || Settings.notifyOnReviewAcceptances || Settings.notifyOnReviewChangeRequests || Settings.autoHidePrsIApproved || Settings.autoHidePrsIRejected
     }
 
     nonisolated static var shouldSyncReviewAssignments: Bool {

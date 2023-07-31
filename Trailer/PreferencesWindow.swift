@@ -193,6 +193,8 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     @IBOutlet private var notifyOnAllReviewDismissals: NSButton!
     @IBOutlet private var supportReviews: NSButton!
     @IBOutlet private var showRequestedTeamReviews: NSButton!
+    @IBOutlet private var autoHidePrsIApproved: NSButton!
+    @IBOutlet private var autoHidePrsIRejected: NSButton!
 
     // Reactions
     @IBOutlet private var notifyOnItemReactions: NSButton!
@@ -243,12 +245,12 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
                 }
             }
         }
-        
+
         let tableMenu = NSMenu()
         tableMenu.addItem(withTitle: "Open Repo", action: #selector(openRepoSelected), keyEquivalent: "")
         projectsTable.menu = tableMenu
     }
-    
+
     @objc private func openRepoSelected() {
         let row = projectsTable.clickedRow
         guard row >= 0,
@@ -259,7 +261,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         }
         openLink(url)
     }
-    
+
     private func updateReviewOptions() {
         if !Settings.notifyOnReviewChangeRequests {
             Settings.notifyOnAllReviewChangeRequests = false
@@ -554,6 +556,8 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         showStatusesYellow.toolTip = Settings.showStatusesYellowHelp
         showStatusesRed.toolTip = Settings.showStatusesRedHelp
         showStatusesNeutral.toolTip = Settings.showStatusesGrayHelp
+        autoHidePrsIApproved.toolTip = Settings.autoHidePrsIApprovedHelp
+        autoHidePrsIRejected.toolTip = Settings.autoHidePrsIRejectedHelp
     }
 
     private func updateAllItemSettingButtons() {
@@ -654,6 +658,9 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         showStatusesRed.integerValue = Settings.showStatusesRed ? 1 : 0
         showStatusesNeutral.integerValue = Settings.showStatusesGray ? 1 : 0
 
+        autoHidePrsIApproved.integerValue = Settings.autoHidePrsIApproved ? 1 : 0
+        autoHidePrsIRejected.integerValue = Settings.autoHidePrsIRejected ? 1 : 0
+
         assignedItemDirectHandlingPolicy.selectItem(at: Placement(fromAssignmentPolicyRawValue: Settings.assignedItemDirectHandlingPolicy)?.menuIndex ?? 0)
         assignedItemTeamHandlingPolicy.selectItem(at: Placement(fromAssignmentPolicyRawValue: Settings.assignedItemTeamHandlingPolicy)?.menuIndex ?? 0)
 
@@ -699,13 +706,13 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         updateReviewOptions()
 
         updateActivity()
-        
+
         updateRepoAdding()
     }
-    
+
     private func updateRepoAdding() {
         serverPicker.menu?.removeAllItems()
-        
+
         let allServers = ApiServer.allApiServers(in: DataManager.main)
         if allServers.count > 1 {
             let m = NSMenuItem()
@@ -895,6 +902,16 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
 
     @IBAction private func includeAssigneeNamesInFilteringSelected(_ sender: NSButton) {
         Settings.includeAssigneeNamesInFilter = (sender.integerValue == 1)
+        deferredUpdateTimer.push()
+    }
+
+    @IBAction private func autohidePrsIApprovedSelected(_ sender: NSButton) {
+        Settings.autoHidePrsIApproved = (sender.integerValue == 1)
+        deferredUpdateTimer.push()
+    }
+
+    @IBAction private func autohidePrsIRejectedSelected(_ sender: NSButton) {
+        Settings.autoHidePrsIRejected = (sender.integerValue == 1)
         deferredUpdateTimer.push()
     }
 
@@ -1202,16 +1219,16 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
             alert.beginSheetModal(for: self)
             return
         }
-        
+
         newRepoSpinner.startAnimation(nil)
         addButton.isEnabled = false
-        
+
         Task {
             defer {
                 newRepoSpinner.stopAnimation(nil)
                 addButton.isEnabled = true
             }
-            
+
             let alert = NSAlert()
             do {
                 if name == "*" {
@@ -1244,7 +1261,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
             _ = await alert.beginSheetModal(for: self)
         }
     }
-    
+
     func refreshRepos() {
         API.isRefreshing = true
         Task { @MainActor in
@@ -1774,7 +1791,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
             }
         }
     }
-    
+
     private func remove(repo: Repo) {
         guard repo.manuallyAdded else {
             return

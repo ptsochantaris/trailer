@@ -104,7 +104,7 @@ final class Issue: ListableItem {
         return try! moc.fetch(f)
     }
 
-    override var shouldHideBecauseOfRepoPolicy: Bool {
+    override var shouldHideBecauseOfRepoHidingPolicy: Bool {
         if createdByMe {
             switch repo.itemHidingPolicy {
             case RepoHidingPolicy.hideAllMyAuthoredItems.rawValue,
