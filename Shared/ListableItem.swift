@@ -831,78 +831,71 @@ class ListableItem: DataItem, Listable {
         }
         return _title
     }
+    
+    var baseLabelText: String? { nil }
+    
+    var headLabelText: String? { nil }
 
     func subtitle(with font: FONT_CLASS, lightColor: COLOR_CLASS, darkColor: COLOR_CLASS, separator: String) -> NSMutableAttributedString {
-        let _subtitle = NSMutableAttributedString()
-
-        let lightSubtitle = [NSAttributedString.Key.foregroundColor: lightColor,
-                             NSAttributedString.Key.font: font]
-
-        let separatorString = NSAttributedString(string: separator, attributes: lightSubtitle)
-
-        var darkSubtitle = lightSubtitle
-        darkSubtitle[NSAttributedString.Key.foregroundColor] = darkColor
-
-        if Settings.showBaseAndHeadBranches, let p = self as? PullRequest, let b = p.baseLabel, let h = p.headLabel {
-            let splitB = b.components(separatedBy: ":")
-            let splitH = h.components(separatedBy: ":")
-            let repoB, repoH, branchB, branchH: String?
-            if splitB.count == 2 && splitH.count == 2 {
-                repoB = splitB.first ?? repo.fullName
-                if splitB.first == splitH.first { // same repo
-                    repoH = nil
-                } else {
-                    repoH = splitH.first
-                }
+        var components = [String]()
+        if Settings.showBaseAndHeadBranches, let baseLabelText, let headLabelText {
+            let splitB = baseLabelText.components(separatedBy: ":")
+            let splitH = headLabelText.components(separatedBy: ":")
+            
+            let repoH: String?
+            if splitB.count == 2 && splitH.count == 2, splitB.first == splitH.first { // same repo
+                repoH = nil
             } else {
                 repoH = splitH.first
-                repoB = splitB.first
             }
-            branchB = splitB.last
-            branchH = splitH.last
-
-            if let repoB {
-                _subtitle.append(NSAttributedString(string: repoB, attributes: darkSubtitle))
-                if branchB != nil {
-                    _subtitle.append(NSAttributedString(string: ":", attributes: lightSubtitle))
-                }
+            
+            if let baseName = splitB.first ?? repo.fullName {
+                components.append(baseName)
             }
-            if let branchB {
-                _subtitle.append(NSAttributedString(string: branchB, attributes: lightSubtitle))
+            
+            if let branchB = splitB.last {
+                components.append(":")
+                components.append(branchB)
             }
-
+            
+            let branchH = splitH.last
+            
             if repoH != nil || branchH != nil {
-                _subtitle.append(NSAttributedString(string: " ← ", attributes: lightSubtitle))
+                components.append(" ← ")
             }
-
+            
             if let repoH {
-                _subtitle.append(NSAttributedString(string: repoH, attributes: lightSubtitle))
+                components.append(repoH)
                 if branchH != nil {
-                    _subtitle.append(NSAttributedString(string: ":", attributes: lightSubtitle))
+                    components.append(":")
                 }
             }
+            
             if let branchH {
-                _subtitle.append(NSAttributedString(string: branchH, attributes: lightSubtitle))
+                components.append(branchH)
             }
-            _subtitle.append(separatorString)
-
-        } else if Settings.showReposInName, let n = repo.fullName {
-            _subtitle.append(NSAttributedString(string: n, attributes: darkSubtitle))
-            _subtitle.append(separatorString)
+            
+        } else if Settings.showReposInName, let repoFullName = repo.fullName {
+            components.append(repoFullName)
         }
-
+        
+        var lightComponents = [separator]
+        
         if Settings.showMilestones, let m = milestone, !m.isEmpty {
-            _subtitle.append(NSAttributedString(string: m, attributes: darkSubtitle))
-            _subtitle.append(separatorString)
+            lightComponents.append(m)
+            lightComponents.append(separator)
         }
-
-        if let l = userLogin {
-            _subtitle.append(NSAttributedString(string: "@\(l)", attributes: lightSubtitle))
-            _subtitle.append(separatorString)
+        
+        if let userLogin {
+            lightComponents.append("@")
+            lightComponents.append(userLogin)
+            lightComponents.append(separator)
         }
-
-        _subtitle.append(NSAttributedString(string: displayDate, attributes: lightSubtitle))
-
+        
+        lightComponents.append(displayDate)
+        
+        let _subtitle = NSMutableAttributedString(string: components.joined(), attributes: [.foregroundColor: darkColor, .font: font])
+        _subtitle.append(NSAttributedString(string: lightComponents.joined(), attributes: [.foregroundColor: lightColor, .font: font]))
         return _subtitle
     }
 
