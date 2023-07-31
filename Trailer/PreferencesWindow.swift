@@ -1690,10 +1690,8 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
                 }
             } else if let forkButton = cell as? NSButtonCell {
                 if tid == "remove" {
-                    let r = repos[row]
-                    let show = r.manuallyAdded
-                    forkButton.isEnabled = show
-                    forkButton.image = show ? NSImage(systemSymbolName: "xmark.app.fill", accessibilityDescription: "Remove") : nil
+                    let repo = repos[row]
+                    forkButton.image = repo.manuallyAdded ? NSImage(systemSymbolName: "xmark.square.fill", accessibilityDescription: "Remove") : nil
                 }
             }
         } else if tv == serverList {

@@ -431,12 +431,12 @@ Token</string>
                                                                 </popUpButtonCell>
                                                                 <sortDescriptor key="sortDescriptorPrototype" selector="compare:" sortKey="displayPolicyForIssues" ascending="NO"/>
                                                             </tableColumn>
-                                                            <tableColumn identifier="remove" editable="NO" width="50" minWidth="10" maxWidth="3.4028234663852886e+38" id="RB5-FQ-ycS">
-                                                                <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Remove">
+                                                            <tableColumn identifier="remove" editable="NO" width="25" minWidth="10" maxWidth="3.4028234663852886e+38" id="RB5-FQ-ycS">
+                                                                <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 </tableHeaderCell>
-                                                                <buttonCell key="dataCell" type="inline" bezelStyle="inline" image="xmark.app.fill" catalog="system" imagePosition="only" alignment="center" borderStyle="border" inset="2" id="Scw-Kn-nOP">
+                                                                <buttonCell key="dataCell" type="inline" bezelStyle="inline" imagePosition="only" alignment="center" inset="2" id="Scw-Kn-nOP">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="smallSystemBold"/>
                                                                 </buttonCell>
@@ -2877,7 +2877,4 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
             <point key="canvasLocation" x="221" y="164"/>
         </window>
     </objects>
-    <resources>
-        <image name="xmark.app.fill" catalog="system" width="15" height="14"/>
-    </resources>
 </document>
