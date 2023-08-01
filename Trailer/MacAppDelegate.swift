@@ -1176,6 +1176,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 
     private var preferencesWindowController: NSWindowController?
     private var preferencesWindow: PreferencesWindow?
+    @discardableResult
     func showPreferencesWindow(andSelect selectTab: Int?) -> PreferencesWindow? {
         if preferencesWindowController == nil {
             preferencesWindowController = NSWindowController(windowNibName: NSNib.Name("PreferencesWindow"))
