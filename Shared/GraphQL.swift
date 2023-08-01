@@ -216,6 +216,7 @@ enum GraphQL {
         }
     }
 
+    private static let singleGateKeeper = Gate(tickets: 1)
     private static let multiGateKeeper = Gate(tickets: 2)
 
     static var callCount = 0
@@ -223,23 +224,30 @@ enum GraphQL {
     private static func fetchData(from urlString: String, for query: Query, authToken: String, attempts: Int) async throws -> JSON {
         let Q = query.queryText
 
-        guard let requestData = try? JSONSerialization.data(withJSONObject: ["query": Q]) else {
-            throw ApiError.graphQLFailure("\(query.logPrefix)Could not serialise query")
-        }
-
         guard let url = URL(string: urlString) else {
             throw ApiError.invalidUrl(urlString)
+        }
+
+        guard let requestData = try? JSONSerialization.data(withJSONObject: ["query": Q]) else {
+            throw ApiError.graphQLFailure("\(query.logPrefix)Could not serialise query")
         }
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.httpBody = requestData
         request.setValue("bearer \(authToken)", forHTTPHeaderField: "Authorization")
+        if Settings.V4IdMigrationStatus == .done {
+            request.setValue("1", forHTTPHeaderField: "X-Github-Next-Global-ID")
+        }
 
-        await multiGateKeeper.takeTicket()
+        let gate = Settings.threadedSync ? multiGateKeeper : singleGateKeeper
+
+        await gate.takeTicket()
+
         let start = Date()
+
         defer {
-            multiGateKeeper.relaxedReturnTicket()
+            gate.relaxedReturnTicket()
             Logging.log("\(query.logPrefix)Response time: \(-start.timeIntervalSinceNow) sec")
         }
 
@@ -267,7 +275,18 @@ enum GraphQL {
         while true {
             let json = try await fetchData(from: urlString, for: query, authToken: authToken, attempts: attempts)
 
-            let apiStats = ApiStats.fromV4(json: json["data"] as? JSON)
+            var migratedIds = [String: String]()
+            if let extensions = json["extensions"] as? JSON, let warnings = extensions["warnings"] as? [JSON] {
+                let deprecations = warnings.compactMap { $0["data"] as? JSON }
+                for deprecation in deprecations {
+                    if let oldId = deprecation["legacy_global_id"] as? String, let newId = deprecation["next_global_id"] as? String, oldId != newId {
+                        migratedIds[oldId] = newId
+                    }
+                }
+            }
+
+            let apiStats = ApiStats.fromV4(json: json["data"] as? JSON, migratedIds: migratedIds.isEmpty ? nil : migratedIds)
+
             if let expectedNodeCost {
                 if let apiStats {
                     Logging.log("\(query.logPrefix)Received page (Cost: \(apiStats.cost), Remaining: \(apiStats.remaining)/\(apiStats.limit) - Expected Count: \(expectedNodeCost) - Returned Count: \(apiStats.nodeCount))")
@@ -907,6 +926,48 @@ enum GraphQL {
             if let nodeList = nodes["CheckRun"] {
                 PRStatus.sync(from: nodeList, on: server, moc: child, parentCache: parentCache)
             }
+        }
+    }
+
+    @MainActor
+    static func migrateV4Ids(for type: DataItem.Type, in server: ApiServer) async throws {
+        guard let graphQLPath = server.graphQLPath, let authToken = server.authToken, let moc = server.managedObjectContext else {
+            return
+        }
+
+        let serverName = server.label.orEmpty
+
+        let typeName = type.typeName
+        Logging.log("Migrating V4 \(typeName) DSs in `\(serverName)`")
+
+        let ids = type.allIds(in: server, moc: moc)
+        Logging.log("\(ids.count) IDs to process")
+        if ids.isEmpty {
+            return
+        }
+
+        do {
+            let queries = Query.batching("\(serverName): ID Migration", groupName: "nodes", idList: ids, maxCost: 1000, perNode: nil) {
+                Field.id
+            }
+
+            try await GraphQL.runQueries(queries: queries, on: graphQLPath, token: authToken) { newStats in
+                moc.perform {
+                    server.updateApiStats(newStats)
+                    if let idMigrations = newStats.migratedIds {
+                        for (k, v) in idMigrations where k != v {
+                            // Logging.log("Migrating \(typeName) ID \(k) to \(v)")
+                            if let item = type.item(id: k, in: moc) {
+                                item.nodeId = v
+                            }
+                        }
+                    }
+                }
+            }
+
+        } catch {
+            server.lastSyncSucceeded = false
+            throw error
         }
     }
 }

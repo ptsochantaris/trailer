@@ -163,12 +163,33 @@ enum API {
         syncMoc.undoManager = nil
         syncMoc.parent = DataManager.main
 
-        if Settings.useV4API && canUseV4API(for: syncMoc) != nil {
+        let useV4 = Settings.useV4API
+        if useV4 && canUseV4API(for: syncMoc) != nil {
             return
         }
 
         isRefreshing = true
         currentOperationCount += 1
+
+        defer {
+            isRefreshing = false
+            currentOperationCount -= 1
+        }
+
+        if useV4 {
+            if Settings.V4IdMigrationStatus == .pending {
+                currentOperationName = "Migrating IDs…"
+                do {
+                    let goodToGoServers = ApiServer.allApiServers(in: syncMoc).filter(\.goodToGo)
+                    try await migrateV4Ids(in: goodToGoServers)
+                } catch {
+                    Logging.log("ID Migration failed: \(error.localizedDescription)")
+                    return
+                }
+            }
+            Settings.V4IdMigrationStatus = .done
+        }
+
         currentOperationName = "Fetching…"
 
         let lastCheck = lastRepoCheck
@@ -236,9 +257,6 @@ enum API {
         } else {
             Logging.log("No changes, skipping commit")
         }
-
-        isRefreshing = false
-        currentOperationCount -= 1
     }
 
     static var lastSuccessfulSyncAt: String {
@@ -264,7 +282,7 @@ enum API {
         }
     }
 
-    // moc must have been created in an @APIActor task
+    @MainActor
     static func fetchRepositories(to moc: NSManagedObjectContext) async {
         ApiServer.resetSyncSuccess(in: moc)
 

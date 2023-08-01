@@ -26,7 +26,7 @@ final class PullRequest: ListableItem {
     override class var typeName: String { "PullRequest" }
 
     override var baseLabelText: String? { baseLabel }
-    
+
     override var headLabelText: String? { headLabel }
 
     override var webUrl: String? {

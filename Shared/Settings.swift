@@ -5,6 +5,10 @@
     import ServiceManagement
 #endif
 
+enum MigrationStatus: Int {
+    case pending, notNeeded, done
+}
+
 enum Settings {
     private static let sharedDefaults = UserDefaults(suiteName: "group.Trailer")!
 
@@ -133,7 +137,8 @@ enum Settings {
             repo.updatedAt = .distantPast
         }
 
-        for server in ApiServer.allApiServers(in: DataManager.main) where server.isGitHub && server.graphQLPath.isEmpty {
+        let allServers = ApiServer.allApiServers(in: DataManager.main)
+        for server in allServers where server.isGitHub && server.graphQLPath.isEmpty {
             server.graphQLPath = "https://api.github.com/graphql"
         }
 
@@ -412,6 +417,9 @@ enum Settings {
     }
 
     /////////////////////////// SWITCHES
+
+    @EnumUserDefault(key: "NEW_ID_MIGRATION_STATE", defaultValue: .pending)
+    static var V4IdMigrationStatus: MigrationStatus
 
     @UserDefault(key: "HIDE_ARCHIVED_REPOS", defaultValue: false)
     static var hideArchivedRepos: Bool

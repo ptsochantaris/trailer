@@ -6,6 +6,7 @@ typealias FetchCache = NSCache<NSString, NSManagedObject>
 
 protocol Querying: NSManagedObject {
     static var typeName: String { get }
+    var nodeId: String? { get set }
 }
 
 extension Querying {
@@ -129,6 +130,20 @@ extension Querying {
         f.predicate = NSPredicate(format: "nodeId == nil")
         return try! moc.count(for: f)
     }
+
+    static func item(id: String, in moc: NSManagedObjectContext) -> Self? {
+        let f = NSFetchRequest<Self>(entityName: typeName)
+        f.fetchLimit = 1
+        f.includesSubentities = false
+        f.propertiesToFetch = ["nodeId"]
+        f.predicate = NSPredicate(format: "nodeId == %@", id)
+        do {
+            return try moc.fetch(f).first
+        } catch {
+            Logging.log("Fetch error: \(error.localizedDescription)")
+            return nil
+        }
+    }
 }
 
 class DataItem: NSManagedObject, Querying {
@@ -172,15 +187,10 @@ class DataItem: NSManagedObject, Querying {
                                      postProcessCallback: @escaping (T, JSON, Bool, NSManagedObjectContext) -> Void) async {
         guard let infos = data, !infos.isEmpty else { return }
 
-        var legacyIdsToNodeIds = [Int: String]()
-
         var nodeIdsToInfo = [String: JSON]()
         for info in infos {
             let nodeId = info["node_id"] as! String
             nodeIdsToInfo[nodeId] = info
-            if let legacyId = info["id"] as? Int {
-                legacyIdsToNodeIds[legacyId] = nodeId
-            }
         }
 
         if nodeIdsToInfo.isEmpty { return }
@@ -191,24 +201,6 @@ class DataItem: NSManagedObject, Querying {
             f.relationshipKeyPathsForPrefetching = prefetchRelationships
             f.returnsObjectsAsFaults = false
             f.includesSubentities = false
-
-            let legacyServerIds = Array(legacyIdsToNodeIds.keys)
-            if !legacyServerIds.isEmpty {
-                f.predicate = NSPredicate(format: "nodeId == nil and serverId in %@ and apiServer == %@", legacyServerIds, serverId)
-                for item in try! child.fetch(f) {
-                    if let legacyId = item.value(forKey: "serverId") as? Int {
-                        if let nodeId = legacyIdsToNodeIds[legacyId] {
-                            item.nodeId = nodeId
-                            item.setValue(nil, forKey: "serverId")
-                            Logging.log("Migrated \(entityName) from legacy ID \(legacyId) to node ID \(nodeId)")
-                        } else {
-                            Logging.log("Warning: Migration failed for \(entityName) with legacy ID \(legacyId), could not find node ID")
-                        }
-                    } else {
-                        Logging.log("Warning: Migration failed for \(entityName) - could not read legacy ID!")
-                    }
-                }
-            }
 
             var nodeIdsOfItems = Set(nodeIdsToInfo.map { k, _ in k })
             f.predicate = NSPredicate(format: "nodeId in %@ and apiServer == %@", nodeIdsOfItems, serverId)
@@ -372,6 +364,16 @@ class DataItem: NSManagedObject, Querying {
                 postSyncAction = PostSyncAction.doNothing.rawValue
             }
         }
+    }
+
+    static func allIds(in server: ApiServer, moc: NSManagedObjectContext) -> [String] {
+        let entityName = typeName
+        let f = NSFetchRequest<Self>(entityName: entityName)
+        f.returnsObjectsAsFaults = false
+        f.includesSubentities = false
+        f.predicate = NSPredicate(format: "apiServer == %@", server)
+        let existingItems = try! moc.fetch(f)
+        return existingItems.compactMap { $0.value(forKey: "nodeId") as? String }
     }
 
     static func syncItems<T: DataItem>(of _: T.Type, from nodes: Lista<Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache, perItemCallback: (T, Node) -> Void) {

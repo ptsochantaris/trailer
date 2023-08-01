@@ -402,6 +402,7 @@ let apiDateFormatter: DateFormatter = {
 struct ApiStats {
     let nodeCount, cost, remaining, limit: Int
     let resetAt: Date?
+    let migratedIds: [String: String]?
 
     static func fromV3(headers: [AnyHashable: Any]) -> ApiStats {
         let date: Date?
@@ -412,21 +413,22 @@ struct ApiStats {
         }
         let remaining = Int(headers["x-ratelimit-remaining"] as? String ?? "") ?? 10000
         let limit = Int(headers["x-ratelimit-limit"] as? String ?? "") ?? 10000
-        return ApiStats(nodeCount: 0, cost: 1, remaining: remaining, limit: limit, resetAt: date)
+        return ApiStats(nodeCount: 0, cost: 1, remaining: remaining, limit: limit, resetAt: date, migratedIds: nil)
     }
 
-    static func fromV4(json: JSON?) -> ApiStats? {
+    static func fromV4(json: JSON?, migratedIds: [String: String]?) -> ApiStats? {
         guard let info = json?["rateLimit"] as? JSON else { return nil }
         let date = apiDateFormatter.date(from: info["resetAt"] as? String ?? "")
         return ApiStats(nodeCount: info["nodeCount"] as? Int ?? 0,
                         cost: info["cost"] as? Int ?? 0,
                         remaining: info["remaining"] as? Int ?? 10000,
                         limit: info["limit"] as? Int ?? 10000,
-                        resetAt: date)
+                        resetAt: date,
+                        migratedIds: migratedIds)
     }
 
     static var noLimits: ApiStats {
-        ApiStats(nodeCount: 0, cost: 0, remaining: 10000, limit: 10000, resetAt: nil)
+        ApiStats(nodeCount: 0, cost: 0, remaining: 10000, limit: 10000, resetAt: nil, migratedIds: nil)
     }
 
     var areValid: Bool {
