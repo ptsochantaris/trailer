@@ -1176,7 +1176,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 
     private var preferencesWindowController: NSWindowController?
     private var preferencesWindow: PreferencesWindow?
-    func showPreferencesWindow(andSelect selectTab: Int?) {
+    func showPreferencesWindow(andSelect selectTab: Int?) -> PreferencesWindow? {
         if preferencesWindowController == nil {
             preferencesWindowController = NSWindowController(windowNibName: NSNib.Name("PreferencesWindow"))
         }
@@ -1185,10 +1185,12 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
             w.center()
             w.makeKeyAndOrderFront(self)
             preferencesWindow = w
-            if let s = selectTab {
-                w.tabs.selectTabViewItem(at: s)
+            if let selectTab {
+                w.tabs.selectTabViewItem(at: selectTab)
             }
+            return w
         }
+        return nil
     }
 
     func closedPreferencesWindow() {

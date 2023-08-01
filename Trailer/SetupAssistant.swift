@@ -80,19 +80,23 @@ final class SetupAssistant: NSWindow, NSWindowDelegate, NSControlTextEditingDele
 
     private func checkRefreshDone() async {
         while API.isRefreshing {
-            try? await Task.sleep(nanoseconds: 1 * NSEC_PER_SEC)
+            try? await Task.sleep(nanoseconds: 200 * NSEC_PER_MSEC)
         }
 
         if newServer.lastSyncSucceeded {
             close()
 
-            app.showPreferencesWindow(andSelect: 1)
+            guard let prefs = app.showPreferencesWindow(andSelect: 1) else {
+                return
+            }
 
             let alert = NSAlert()
             alert.messageText = "Setup complete!"
             alert.informativeText = "This tab contains your watchlist, with view settings for each repository. Be sure to enable only the repos you need, in order to keep API usage low. Trailer will load data from the active repositories once you close the preferences window.\n\nYou can tweak options & behaviour from the other tabs.\n\nTrailer has read-only access to your GitHub data, so feel free to experiment, you can't damage your data or settings on GitHub."
             alert.addButton(withTitle: "OK")
-            alert.runModal()
+            alert.beginSheetModal(for: prefs) { _ in
+                // Nothing
+            }
 
         } else {
             let alert = NSAlert()
