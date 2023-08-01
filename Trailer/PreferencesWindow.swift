@@ -1263,6 +1263,9 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     }
 
     func refreshRepos() {
+        if !ApiServer.someServersHaveAuthTokens(in: DataManager.main) || API.isRefreshing {
+            return
+        }
         API.isRefreshing = true
         Task { @MainActor in
             await API.fetchRepositories(to: DataManager.main)
@@ -1286,6 +1289,8 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
             }
             DataItem.nukeDeletedItems(in: DataManager.main)
             API.isRefreshing = false
+            
+            reloadRepositories()
         }
     }
 
@@ -1630,10 +1635,8 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     func tabView(_ tabView: NSTabView, willSelect tabViewItem: NSTabViewItem?) {
         if let item = tabViewItem {
             let newIndex = tabView.indexOfTabViewItem(item)
-            if newIndex == 1 {
-                if lastRepoCheck == .distantPast, DataManager.appIsConfigured {
-                    refreshRepos()
-                }
+            if newIndex == 1, lastRepoCheck == .distantPast {
+                refreshRepos()
             }
             Settings.lastPreferencesTabSelectedOSX = newIndex
         }
