@@ -3,12 +3,14 @@ import Cocoa
 final class ApiOptionsWindow: NSWindow, NSWindowDelegate {
     weak var prefs: PreferencesWindow?
 
-    @IBOutlet var highRadio: NSButton!
-    @IBOutlet var moderateRadio: NSButton!
-    @IBOutlet var lightRadio: NSButton!
-    @IBOutlet var safeRadio: NSButton!
-
+    @IBOutlet private var highRadio: NSButton!
+    @IBOutlet private var moderateRadio: NSButton!
+    @IBOutlet private var lightRadio: NSButton!
+    @IBOutlet private var safeRadio: NSButton!
     @IBOutlet private var threadCheckbox: NSButton!
+
+    @IBOutlet private var migrationIndicator: NSTextField!
+    @IBOutlet private var migrationbutton: NSButton!
 
     @MainActor
     override func awakeFromNib() {
@@ -44,6 +46,8 @@ final class ApiOptionsWindow: NSWindow, NSWindowDelegate {
         moderateRadio.integerValue = profile == .moderate ? 1 : 0
         lightRadio.integerValue = profile == .cautious ? 1 : 0
         safeRadio.integerValue = profile == .light ? 1 : 0
+
+        updateMigrationStatus()
     }
 
     @IBAction private func threadingToggled(_ sender: NSButton) {
@@ -54,6 +58,32 @@ final class ApiOptionsWindow: NSWindow, NSWindowDelegate {
         Settings.syncProfile = GraphQL.Profile.cautious.rawValue
         Settings.threadedSync = false
         updateUI()
+    }
+
+    private func updateMigrationStatus() {
+        switch Settings.V4IdMigrationPhase {
+        case .done:
+            migrationIndicator.stringValue = "Status: Completed"
+            migrationbutton.isEnabled = true
+        case .failedAnnounced, .failedPending:
+            migrationIndicator.stringValue = "Status: Failed"
+            migrationbutton.isEnabled = true
+        case .inProgress:
+            migrationIndicator.stringValue = "Running…"
+            migrationbutton.isEnabled = false
+        case .pending:
+            migrationIndicator.stringValue = "Not performed yet"
+            migrationbutton.isEnabled = true
+        }
+    }
+
+    @IBAction private func migrationSelected(_: NSButton) {
+        Settings.V4IdMigrationPhase = .inProgress
+        updateMigrationStatus()
+        Task {
+            await API.attemptV4Migration()
+            updateMigrationStatus()
+        }
     }
 
     func windowWillClose(_: Notification) {

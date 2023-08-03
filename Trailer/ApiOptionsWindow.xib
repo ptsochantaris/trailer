@@ -16,43 +16,21 @@
         <window title="API Options" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="QvC-M9-y7g" customClass="ApiOptionsWindow" customModule="Trailer" customModuleProvider="target">
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="196" y="240" width="484" height="261"/>
+            <rect key="contentRect" x="196" y="240" width="484" height="362"/>
             <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1415"/>
             <view key="contentView" wantsLayer="YES" id="EiT-Mj-1SZ">
-                <rect key="frame" x="0.0" y="0.0" width="484" height="261"/>
+                <rect key="frame" x="0.0" y="0.0" width="484" height="362"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <box fixedFrame="YES" title="Options for V4 API sync queries" translatesAutoresizingMaskIntoConstraints="NO" id="Klt-fG-YQk">
-                        <rect key="frame" x="17" y="27" width="450" height="214"/>
+                        <rect key="frame" x="17" y="142" width="450" height="201"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <view key="contentView" id="NBP-Z5-dKm">
-                            <rect key="frame" x="4" y="5" width="442" height="194"/>
+                            <rect key="frame" x="4" y="5" width="442" height="181"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xJD-Ku-8bF">
-                                    <rect key="frame" x="18" y="24" width="219" height="18"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                    <buttonCell key="cell" type="check" title="Query in parallel where possible" bezelStyle="regularSquare" imagePosition="left" alignment="center" state="on" inset="2" id="hF8-9K-iyj">
-                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="threadingToggled:" target="QvC-M9-y7g" id="Yf9-aG-DGD"/>
-                                    </connections>
-                                </button>
-                                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2ph-sL-wLJ">
-                                    <rect key="frame" x="291" y="13" width="138" height="32"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                                    <buttonCell key="cell" type="push" title="Reset to Defaults" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="tqM-o2-LFN">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="resetSelected:" target="QvC-M9-y7g" id="VAY-p2-c4s"/>
-                                    </connections>
-                                </button>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QkA-AA-SM8">
-                                    <rect key="frame" x="17" y="78" width="101" height="58"/>
+                                    <rect key="frame" x="18" y="80" width="101" height="58"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" alignment="center" title="More but smaller queries; higher API cost" id="8w3-Ko-45N">
                                         <font key="font" metaFont="smallSystem"/>
@@ -61,7 +39,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3ga-QH-ynL">
-                                    <rect key="frame" x="230" y="66" width="92" height="70"/>
+                                    <rect key="frame" x="229" y="68" width="92" height="70"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" alignment="center" title="Fewer queries, but may cause timeouts if syncing a lot of repositories" id="wli-sx-M1H">
                                         <font key="font" metaFont="smallSystem"/>
@@ -70,7 +48,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="axL-U5-dhK">
-                                    <rect key="frame" x="137" y="143" width="70" height="18"/>
+                                    <rect key="frame" x="136" y="145" width="70" height="18"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="radio" title="Default" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="JBo-dE-tQS">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -81,7 +59,7 @@
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="c5R-SF-6HS">
-                                    <rect key="frame" x="40" y="143" width="53" height="18"/>
+                                    <rect key="frame" x="40" y="145" width="53" height="18"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="radio" title="Safe" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="gb9-LZ-wJs">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -92,7 +70,7 @@
                                     </connections>
                                 </button>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="pYG-rB-gzo">
-                                    <rect key="frame" x="121" y="78" width="102" height="58"/>
+                                    <rect key="frame" x="120" y="80" width="102" height="58"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" alignment="center" title="A conservative balance between query sizes and API cost" id="ZZR-L0-vFZ">
                                         <font key="font" metaFont="smallSystem"/>
@@ -101,7 +79,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2d5-nc-h0T">
-                                    <rect key="frame" x="235" y="143" width="85" height="18"/>
+                                    <rect key="frame" x="233" y="145" width="85" height="18"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="radio" title="Moderate" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="fnD-dg-Iom">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -112,7 +90,7 @@
                                     </connections>
                                 </button>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HZG-nQ-Ou6">
-                                    <rect key="frame" x="326" y="78" width="101" height="58"/>
+                                    <rect key="frame" x="324" y="80" width="101" height="58"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" alignment="center" title="Fewer but larger queries; lower API cost, but risks API timeouts." id="yHX-C4-puR">
                                         <font key="font" metaFont="smallSystem"/>
@@ -121,7 +99,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3rI-JF-7om">
-                                    <rect key="frame" x="349" y="143" width="55" height="18"/>
+                                    <rect key="frame" x="349" y="145" width="55" height="18"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="radio" title="High" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="Uqc-z7-rYR">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -131,6 +109,68 @@
                                         <action selector="radioButtonSelected:" target="QvC-M9-y7g" id="Awn-3Z-f6J"/>
                                     </connections>
                                 </button>
+                                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xJD-Ku-8bF">
+                                    <rect key="frame" x="21" y="22" width="219" height="18"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <buttonCell key="cell" type="check" title="Query in parallel where possible" bezelStyle="regularSquare" imagePosition="left" alignment="center" state="on" inset="2" id="hF8-9K-iyj">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="threadingToggled:" target="QvC-M9-y7g" id="Yf9-aG-DGD"/>
+                                    </connections>
+                                </button>
+                                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2ph-sL-wLJ">
+                                    <rect key="frame" x="291" y="12" width="138" height="32"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                    <buttonCell key="cell" type="push" title="Reset to Defaults" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="tqM-o2-LFN">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="resetSelected:" target="QvC-M9-y7g" id="VAY-p2-c4s"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                        </view>
+                    </box>
+                    <box fixedFrame="YES" title="ID Migration (requires v4 API)" translatesAutoresizingMaskIntoConstraints="NO" id="Aae-IM-g12">
+                        <rect key="frame" x="17" y="17" width="450" height="121"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                        <view key="contentView" id="lIq-xr-BzB">
+                            <rect key="frame" x="4" y="5" width="442" height="101"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="s6d-nG-K7I">
+                                    <rect key="frame" x="9" y="39" width="415" height="49"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <textFieldCell key="cell" alignment="left" id="Ct9-U1-yGf">
+                                        <font key="font" metaFont="smallSystem"/>
+                                        <string key="title">GitHub servers have updated their item IDs and require clients to migrate those over. Trailer will try migrating automatically, but if needed you can run it manually from here as well.</string>
+                                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    </textFieldCell>
+                                </textField>
+                                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4G2-ZW-c40">
+                                    <rect key="frame" x="310" y="10" width="119" height="32"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                    <buttonCell key="cell" type="push" title="Run Migration" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Z8W-Jb-Yw4">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="migrationSelected:" target="QvC-M9-y7g" id="1gU-3O-JVv"/>
+                                    </connections>
+                                </button>
+                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dyN-3P-NRf">
+                                    <rect key="frame" x="9" y="18" width="302" height="16"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Status" id="SHE-aF-EJR">
+                                        <font key="font" metaFont="smallSystem"/>
+                                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    </textFieldCell>
+                                </textField>
                             </subviews>
                         </view>
                     </box>
@@ -139,11 +179,13 @@
             <connections>
                 <outlet property="highRadio" destination="3rI-JF-7om" id="xsB-sE-MDC"/>
                 <outlet property="lightRadio" destination="axL-U5-dhK" id="7ij-y4-VYR"/>
+                <outlet property="migrationIndicator" destination="dyN-3P-NRf" id="JUG-Zv-RMW"/>
+                <outlet property="migrationbutton" destination="4G2-ZW-c40" id="V0B-Ih-Qom"/>
                 <outlet property="moderateRadio" destination="2d5-nc-h0T" id="V8h-Si-AC2"/>
                 <outlet property="safeRadio" destination="c5R-SF-6HS" id="jtQ-k0-ZXD"/>
                 <outlet property="threadCheckbox" destination="xJD-Ku-8bF" id="X5L-So-frP"/>
             </connections>
-            <point key="canvasLocation" x="-3" y="139.5"/>
+            <point key="canvasLocation" x="-3" y="190"/>
         </window>
     </objects>
 </document>

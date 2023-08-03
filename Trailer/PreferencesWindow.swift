@@ -1289,7 +1289,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
             }
             DataItem.nukeDeletedItems(in: DataManager.main)
             API.isRefreshing = false
-            
+
             reloadRepositories()
         }
     }

@@ -185,6 +185,11 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
 
         Task {
             await API.performSync()
+
+            if Settings.V4IdMigrationPhase == .failedPending {
+                showMessage("ID migration failed", "Trailer tried to automatically migrate your IDs during the most recent sync but it failed for some reason. Since GitHub servers require using a new set of IDs soon please visit Trailer Preferences -> Servers -> V4 API Settings and select the option to try migrating IDs again soon.")
+                Settings.V4IdMigrationPhase = .failedAnnounced
+            }
         }
 
         return .started

@@ -10,10 +10,39 @@ final class ApiSettingsViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet private var threadToggle: UISwitch!
     @IBOutlet private var threadInfo: UILabel!
 
+    @IBOutlet private var migrationButton: UIButton!
+    @IBOutlet private var migrationIndicator: UILabel!
+
     override func viewDidLoad() {
         super.viewDidLoad()
         threadInfo.text = Settings.threadedSyncHelp
         updateUI()
+    }
+
+    private func updateMigrationStatus() {
+        switch Settings.V4IdMigrationPhase {
+        case .done:
+            migrationIndicator.text = "Status: Completed"
+            migrationButton.isEnabled = true
+        case .failedAnnounced, .failedPending:
+            migrationIndicator.text = "Status: Failed"
+            migrationButton.isEnabled = true
+        case .inProgress:
+            migrationIndicator.text = "Running…"
+            migrationButton.isEnabled = false
+        case .pending:
+            migrationIndicator.text = "Not performed yet"
+            migrationButton.isEnabled = true
+        }
+    }
+
+    @IBAction private func migrationSelected(_: UIButton) {
+        Settings.V4IdMigrationPhase = .inProgress
+        updateMigrationStatus()
+        Task {
+            await API.attemptV4Migration()
+            updateMigrationStatus()
+        }
     }
 
     @IBAction private func toggleSelected(_ sender: UISwitch) {
@@ -42,6 +71,7 @@ final class ApiSettingsViewController: UIViewController, UITextFieldDelegate {
         defaultToggle.isOn = profile == .cautious
         lightToggle.isOn = profile == .light
         threadToggle.isOn = Settings.threadedSync
+        updateMigrationStatus()
     }
 
     override func viewWillDisappear(_ animated: Bool) {

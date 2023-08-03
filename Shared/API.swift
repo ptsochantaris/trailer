@@ -158,14 +158,74 @@ enum API {
 
     ////////////////////////////////////// API interface
 
+    @MainActor
+    static func attemptV4Migration() async {
+        while isRefreshing {
+            try? await Task.sleep(nanoseconds: 1 * NSEC_PER_SEC)
+        }
+
+        isRefreshing = true
+        defer {
+            isRefreshing = false
+        }
+
+        let childMoc = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
+        childMoc.undoManager = nil
+        childMoc.parent = DataManager.main
+
+        currentOperationName = "Migrating IDs…"
+        Logging.log("Staring v4 API ID migration")
+
+        do {
+            let types = [Team.self,
+                         Reaction.self,
+                         PRLabel.self,
+                         PRComment.self,
+                         Review.self,
+                         PRStatus.self,
+                         PullRequest.self,
+                         Issue.self,
+                         Repo.self]
+
+            let goodToGoServers = ApiServer.allApiServers(in: childMoc).filter(\.goodToGo)
+            try await withThrowingTaskGroup(of: Void.self) { group in
+                for server in goodToGoServers {
+                    for type in types {
+                        group.addTask {
+                            try await GraphQL.migrateV4Ids(for: type, in: server)
+                        }
+                    }
+                }
+                try await group.waitForAll()
+            }
+
+            if childMoc.hasChanges {
+                try childMoc.save()
+                await DataManager.saveDB()
+            }
+            Logging.log("v4 sync ID migration complete")
+            Settings.V4IdMigrationPhase = .done
+
+        } catch {
+            Settings.V4IdMigrationPhase = .failedPending
+            Logging.log("ID Migration failed: \(error.localizedDescription)")
+        }
+    }
+
     static func performSync() async {
         let syncMoc = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
         syncMoc.undoManager = nil
         syncMoc.parent = DataManager.main
 
         let useV4 = Settings.useV4API
-        if useV4 && canUseV4API(for: syncMoc) != nil {
-            return
+
+        if useV4 {
+            if canUseV4API(for: syncMoc) != nil {
+                return
+            }
+            if Settings.V4IdMigrationPhase == .pending {
+                await attemptV4Migration()
+            }
         }
 
         isRefreshing = true
@@ -174,19 +234,6 @@ enum API {
         defer {
             isRefreshing = false
             currentOperationCount -= 1
-        }
-
-        if useV4, Settings.V4IdMigrationPhase.needed {
-            do {
-                Settings.V4IdMigrationPhase = .inProgress
-                currentOperationName = "Migrating IDs…"
-                let goodToGoServers = ApiServer.allApiServers(in: syncMoc).filter(\.goodToGo)
-                try await migrateV4Ids(in: goodToGoServers)
-            } catch {
-                Settings.V4IdMigrationPhase = .pending
-                Logging.log("ID Migration failed: \(error.localizedDescription)")
-                return
-            }
         }
 
         currentOperationName = "Fetching…"
@@ -217,7 +264,7 @@ enum API {
 
         Logging.log("Will sync items from: \(repos.compactMap(\.fullName).joined(separator: ", "))")
 
-        if Settings.useV4API {
+        if useV4 {
             do {
                 try await v4Sync(repos, to: syncMoc)
             } catch {
@@ -250,10 +297,6 @@ enum API {
                 try syncMoc.save()
                 Logging.log("Synced data committed")
                 await DataManager.sendNotificationsIndexAndSave()
-                
-                if Settings.V4IdMigrationPhase.needed {
-                    Settings.V4IdMigrationPhase = .done
-                }
             } catch {
                 Logging.log("Committing sync failed: \(error.localizedDescription)")
             }

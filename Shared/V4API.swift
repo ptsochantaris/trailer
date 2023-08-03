@@ -39,33 +39,6 @@ extension API {
         }
     }
 
-    @MainActor
-    static func migrateV4Ids(in goodToGoServers: [ApiServer]) async throws {
-        Logging.log("v4 synced items require ID migration, will perform that now before sync")
-
-        let types = [Team.self,
-                     Reaction.self,
-                     PRLabel.self,
-                     PRComment.self,
-                     Review.self,
-                     PRStatus.self,
-                     PullRequest.self,
-                     Issue.self,
-                     Repo.self]
-
-        await withThrowingTaskGroup(of: Void.self) { group in
-            for server in goodToGoServers {
-                for type in types {
-                    group.addTask {
-                        try await GraphQL.migrateV4Ids(for: type, in: server)
-                    }
-                }
-            }
-        }
-
-        Logging.log("v4 sync ID migration complete")
-    }
-
     static func v4Sync(_ repos: [Repo], to moc: NSManagedObjectContext) async throws {
         let servers = ApiServer.allApiServers(in: moc).filter(\.goodToGo)
 

@@ -830,6 +830,16 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 
         Task {
             await API.performSync()
+
+            if Settings.V4IdMigrationPhase == .failedPending {
+                let alert = NSAlert()
+                alert.messageText = "ID migration failed"
+                alert.informativeText = "Trailer tried to automatically migrate your IDs during the most recent sync but it failed for some reason. Since GitHub servers require using a new set of IDs soon please visit Trailer Preferences -> Servers -> V4 API Settings and select the option to try migrating IDs again soon."
+                _ = alert.addButton(withTitle: "OK")
+                _ = alert.runModal()
+
+                Settings.V4IdMigrationPhase = .failedAnnounced
+            }
         }
     }
 
