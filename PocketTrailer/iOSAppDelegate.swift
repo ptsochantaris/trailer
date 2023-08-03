@@ -163,6 +163,7 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
     private var backgroundTask = UIBackgroundTaskIdentifier.invalid
 
     @discardableResult
+    @MainActor
     func startRefresh() async -> RefreshStartResult {
         let refreshing = API.isRefreshing
         if refreshing {
@@ -182,7 +183,7 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
             return .noConfiguredServers
         }
 
-        Task { @MainActor in
+        Task {
             await API.performSync()
         }
 

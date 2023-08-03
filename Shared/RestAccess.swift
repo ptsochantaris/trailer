@@ -108,7 +108,7 @@ enum RestAccess {
         if let a = server.authToken {
             request.setValue("token \(a)", forHTTPHeaderField: "Authorization")
         }
-        if Settings.V4IdMigrationStatus == .done {
+        if Settings.V4IdMigrationPhase.wantsNewIds {
             request.setValue("1", forHTTPHeaderField: "X-Github-Next-Global-ID")
         }
 

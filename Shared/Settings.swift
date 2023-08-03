@@ -6,7 +6,25 @@
 #endif
 
 enum MigrationStatus: Int {
-    case pending, notNeeded, done
+    case pending, inProgress, done
+    
+    var needed: Bool {
+        switch self {
+        case .pending, .inProgress:
+            return true
+        case .done:
+            return false
+        }
+    }
+    
+    var wantsNewIds: Bool {
+        switch self {
+        case .done, .inProgress:
+            return true
+        case .pending:
+            return false
+        }
+    }
 }
 
 enum Settings {
@@ -418,8 +436,8 @@ enum Settings {
 
     /////////////////////////// SWITCHES
 
-    @EnumUserDefault(key: "NEW_ID_MIGRATION_STATE", defaultValue: .pending)
-    static var V4IdMigrationStatus: MigrationStatus
+    @EnumUserDefault(key: "NEW_ID_MIGRATION_PHASE", defaultValue: .pending)
+    static var V4IdMigrationPhase: MigrationStatus
 
     @UserDefault(key: "HIDE_ARCHIVED_REPOS", defaultValue: false)
     static var hideArchivedRepos: Bool

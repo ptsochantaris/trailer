@@ -236,7 +236,7 @@ enum GraphQL {
         request.httpMethod = "POST"
         request.httpBody = requestData
         request.setValue("bearer \(authToken)", forHTTPHeaderField: "Authorization")
-        if Settings.V4IdMigrationStatus == .done {
+        if Settings.V4IdMigrationPhase.wantsNewIds {
             request.setValue("1", forHTTPHeaderField: "X-Github-Next-Global-ID")
         }
 
@@ -947,7 +947,7 @@ enum GraphQL {
         }
 
         do {
-            let queries = Query.batching("\(serverName): ID Migration", groupName: "nodes", idList: ids, maxCost: 1000, perNode: nil) {
+            let queries = Query.batching("\(serverName): \(typeName) ID Migration", groupName: "nodes", idList: ids, maxCost: 1000, perNode: nil) {
                 Field.id
             }
 

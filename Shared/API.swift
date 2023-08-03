@@ -176,18 +176,17 @@ enum API {
             currentOperationCount -= 1
         }
 
-        if useV4 {
-            if Settings.V4IdMigrationStatus == .pending {
+        if useV4, Settings.V4IdMigrationPhase.needed {
+            do {
+                Settings.V4IdMigrationPhase = .inProgress
                 currentOperationName = "Migrating IDs…"
-                do {
-                    let goodToGoServers = ApiServer.allApiServers(in: syncMoc).filter(\.goodToGo)
-                    try await migrateV4Ids(in: goodToGoServers)
-                } catch {
-                    Logging.log("ID Migration failed: \(error.localizedDescription)")
-                    return
-                }
+                let goodToGoServers = ApiServer.allApiServers(in: syncMoc).filter(\.goodToGo)
+                try await migrateV4Ids(in: goodToGoServers)
+            } catch {
+                Settings.V4IdMigrationPhase = .pending
+                Logging.log("ID Migration failed: \(error.localizedDescription)")
+                return
             }
-            Settings.V4IdMigrationStatus = .done
         }
 
         currentOperationName = "Fetching…"
@@ -251,6 +250,10 @@ enum API {
                 try syncMoc.save()
                 Logging.log("Synced data committed")
                 await DataManager.sendNotificationsIndexAndSave()
+                
+                if Settings.V4IdMigrationPhase.needed {
+                    Settings.V4IdMigrationPhase = .done
+                }
             } catch {
                 Logging.log("Committing sync failed: \(error.localizedDescription)")
             }
