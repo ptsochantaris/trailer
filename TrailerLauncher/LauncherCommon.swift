@@ -25,6 +25,6 @@ enum LauncherCommon {
     static func launchMainApp() {
         if isMainAppRunning { return }
         let path = "/" + Bundle.main.bundlePath.split(separator: "/").dropLast(3).joined(separator: "/") + "/MacOS/Trailer"
-        NSWorkspace.shared.launchApplication(path)
+        NSWorkspace.shared.open(URL(fileURLWithPath: path), configuration: NSWorkspace.OpenConfiguration())
     }
 }

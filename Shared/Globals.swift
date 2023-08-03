@@ -461,15 +461,25 @@ let versionString: String = {
         if path.isEmpty {
             NSWorkspace.shared.open(url)
         } else {
-            let appURL = URL(fileURLWithPath: path)
-            do {
-                try NSWorkspace.shared.open([url], withApplicationAt: appURL, options: [], configuration: [:])
-            } catch {
-                let a = NSAlert()
-                a.alertStyle = .warning
-                a.messageText = "Could not open this URL using '\(path)'"
-                a.informativeText = error.localizedDescription
-                a.runModal()
+            Task { @MainActor in
+                let appURL = URL(fileURLWithPath: path)
+                do {
+                    try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+                        NSWorkspace.shared.open([url], withApplicationAt: appURL, configuration: NSWorkspace.OpenConfiguration()) { _, error in
+                            if let error {
+                                continuation.resume(throwing: error)
+                            } else {
+                                continuation.resume()
+                            }
+                        }
+                    }
+                } catch {
+                    let a = NSAlert()
+                    a.alertStyle = .warning
+                    a.messageText = "Could not open this URL using '\(path)'"
+                    a.informativeText = error.localizedDescription
+                    a.runModal()
+                }
             }
         }
     }
