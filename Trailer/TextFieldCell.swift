@@ -64,4 +64,8 @@ final class TextFieldCell: NSTextFieldCell {
     override func fieldEditor(for _: NSView) -> NSTextView? {
         tfctv
     }
+    
+    override func drawingRect(forBounds rect: NSRect) -> NSRect {
+        rect.offsetBy(dx: 0, dy: 3)
+    }
 }

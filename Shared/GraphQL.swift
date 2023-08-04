@@ -247,7 +247,7 @@ enum GraphQL {
         let start = Date()
 
         defer {
-            gate.relaxedReturnTicket()
+            gate.returnTicket()
             Logging.log("\(query.logPrefix)Response time: \(-start.timeIntervalSinceNow) sec")
         }
 

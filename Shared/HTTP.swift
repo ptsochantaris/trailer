@@ -48,7 +48,7 @@ enum HTTP {
     static func getJsonData(for request: URLRequest, attempts: Int, logPrefix: String? = nil, retryOnInvalidJson: Bool = false) async throws -> (json: Any?, result: DataResult) {
         await gateKeeper.takeTicket()
         defer {
-            gateKeeper.relaxedReturnTicket()
+            gateKeeper.returnTicket()
         }
 
         let result = try await getData(for: request, attempts: attempts, logPrefix: logPrefix)
