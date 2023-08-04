@@ -7,6 +7,32 @@
 		<language>en</language>
 
         <item>
+            <title>Version 1.8.5</title>
+            <sparkle:minimumSystemVersion>11.0.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[<font face="sans-serif" size="3"><ul>
+                <li>If you’re using V4 API, this build will perform a migration of IDs once after installation to the new identifiers that GitHub is requiring. This may mean the first sync after upgrade will take slightly longer.</li>
+                <li>Display: Item counts will now take author/comment blocklist into account.</li>
+                <li>Display: Base/head display fixes.</li>
+                <li>Display: V4 API syncs now display the number of calls made in the status display.</li>
+                <li>Settings: New setting added to autohide PRs that have been approved or rejected by the current user.</li>
+                <li>Settings: Separate options for assignments to allow different sections for items assigned to the user compared to items assigned to one of the current user’s teams.</li>
+                <li>Settings: Repository list now makes it easier to add and remove custom entries.</li>
+                <li>Performance: Item post processing is slightly faster.</li>
+                <li>Tidying: Removed older migration code from very old versions.</li>
+                <li>Fix: Initial launch refreshes watchlist repos correctly once again.</li>
+                </ul>
+                </font>]]></description>
+            <pubDate>Fri, 04 Aug 2023 20:00:00 +0000</pubDate>
+            <enclosure
+            url="https://github.com/ptsochantaris/trailer/releases/download/1.8.5/Trailer-185.zip"
+            sparkle:version="1688"
+            sparkle:shortVersionString="1.8.5"
+            sparkle:dsaSignature="MC0CFQCipaFhtPFug1LFeJkBmwdg5hqFPwIUESGtHlTYy2VDP0uw+z/3kr6m2do="
+            sparkle:edSignature="pazuDefuOCjtIwqhalk1b8vYhGmfxOI7NNzGXeecxOSa1w4dV2WScX/HKeUhSAJMTQFJraGyZdgo7AciBszrDg==" length="4808203"
+            type="application/octet-stream"/>
+        </item>
+
+        <item>
             <title>Version 1.8.4</title>
             <sparkle:minimumSystemVersion>11.0.0</sparkle:minimumSystemVersion>
             <description><![CDATA[<font face="sans-serif" size="3"><ul>
