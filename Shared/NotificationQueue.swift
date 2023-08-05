@@ -21,14 +21,16 @@ enum NotificationQueue {
 
     @MainActor
     static func commit() {
-        let moc = DataManager.main
-        while let (type, itemId) = queue.pop() {
-            if let storedItem = try? moc.existingObject(with: itemId) as? DataItem, storedItem.apiServer.lastSyncSucceeded {
-                #if os(iOS)
-                    NotificationManager.postNotification(type: type, for: storedItem)
-                #else
-                    app.postNotification(type: type, for: storedItem)
-                #endif
+        let queueCopy = Array(queue)
+        queue.removeAll()
+        Task {
+            let moc = DataManager.main
+            for (type, itemId) in queueCopy {
+                if let storedItem = try? moc.existingObject(with: itemId) as? DataItem,
+                   storedItem.apiServer.lastSyncSucceeded {
+                    await NotificationManager.shared.postNotification(type: type, for: storedItem)
+                    await Task.yield()
+                }
             }
         }
     }

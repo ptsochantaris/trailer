@@ -46,6 +46,9 @@ let LISTABLE_URI_KEY = "listableUriKey"
 let COMMENT_ID_KEY = "commentIdKey"
 let NOTIFICATION_URL_KEY = "urlKey"
 
+extension NSAttributedString: @unchecked Sendable {}
+extension IMAGE_CLASS: @unchecked Sendable {}
+
 ////////////////////////// Utilities
 
 #if os(iOS)

@@ -732,42 +732,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         tabs.removeFromSuperview()
     }
 
-    func localNotificationSelected(userInfo: [AnyHashable: Any], action: String) {
-        var urlToOpen = userInfo[NOTIFICATION_URL_KEY] as? String
-        var relatedItem: ListableItem?
-
-        if let commentId = DataManager.id(for: userInfo[COMMENT_ID_KEY] as? String), let c = try? DataManager.main.existingObject(with: commentId) as? PRComment {
-            relatedItem = c.parent
-            if urlToOpen == nil {
-                urlToOpen = c.webUrl
-            }
-        } else if let uri = userInfo[LISTABLE_URI_KEY] as? String, let itemId = DataManager.id(for: uri) {
-            relatedItem = try? DataManager.main.existingObject(with: itemId) as? ListableItem
-        }
-
-        if let item = relatedItem {
-            switch action {
-            case "mute":
-                item.setMute(to: true)
-
-            case "read":
-                item.catchUpWithComments()
-
-            default:
-                if let sc = navigationItem.searchController, sc.isActive {
-                    sc.searchBar.text = nil
-                    sc.isActive = false
-                }
-                Task { @MainActor in
-                    try? await Task.sleep(nanoseconds: 100 * NSEC_PER_MSEC)
-                    selectTab(for: item, overrideUrl: urlToOpen, andOpen: true)
-                }
-            }
-        } else {
-            showMessage("Item not found", "Could not locate the item related to this notification")
-        }
-    }
-
     private func selectTab(for item: ListableItem, overrideUrl: String?, andOpen: Bool) {
         var tabItem: UITabBarItem?
         for d in tabBarSets {
@@ -794,6 +758,17 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
            let comment = try? DataManager.main.existingObject(with: itemId) as? PRComment,
            let item = comment.parent {
             selectTab(for: item, overrideUrl: nil, andOpen: true)
+        }
+    }
+
+    func notificationSelected(for item: ListableItem, urlToOpen: String?) {
+        if let sc = navigationItem.searchController, sc.isActive {
+            sc.searchBar.text = nil
+            sc.isActive = false
+        }
+        Task {
+            try? await Task.sleep(nanoseconds: 100 * NSEC_PER_MSEC)
+            selectTab(for: item, overrideUrl: urlToOpen, andOpen: true)
         }
     }
 

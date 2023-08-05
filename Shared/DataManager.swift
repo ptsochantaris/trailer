@@ -44,15 +44,6 @@ enum DataManager {
     }
 
     private static func performVersionChangedTasks() {
-        #if os(macOS)
-            // Unstick macOS notifications with custom actions but without an identifier, causes macOS to keep them forever
-            let nc = NSUserNotificationCenter.default
-            for notification in nc.deliveredNotifications where notification.additionalActions != nil && notification.identifier == nil {
-                nc.removeAllDeliveredNotifications()
-                break
-            }
-        #endif
-
         ApiServer.ensureAtLeastGithub(in: main)
         ApiServer.resetSyncOfEverything()
     }

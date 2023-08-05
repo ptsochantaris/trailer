@@ -1,97 +1,152 @@
 import CoreSpotlight
-import UIKit
+import Lista
 import UserNotifications
 
 @MainActor
-enum NotificationManager {
-    static func handleLocalNotification(notification: UNNotificationContent, action: String) {
-        if !notification.userInfo.isEmpty {
-            Logging.log("Received local notification: \(notification.userInfo)")
-            popupManager.masterController.localNotificationSelected(userInfo: notification.userInfo, action: action)
+final class NotificationManager: NSObject {
+    static let shared = NotificationManager()
+
+    #if os(iOS)
+        func handleUserActivity(activity: NSUserActivity) -> Bool {
+            if let info = activity.userInfo {
+                if activity.activityType == CSSearchableItemActionType, let uid = info[CSSearchableItemActivityIdentifier] as? String {
+                    popupManager.masterController.highightItemWithUriPath(uriPath: uid)
+                    return true
+
+                } else if activity.activityType == CSQueryContinuationActionType, let searchString = info[CSSearchQueryString] as? String {
+                    popupManager.masterController.focusFilter(terms: searchString)
+                    return true
+                }
+            }
+            return false
         }
-    }
+    #endif
 
-    static func handleUserActivity(activity: NSUserActivity) -> Bool {
-        if let info = activity.userInfo {
-            if activity.activityType == CSSearchableItemActionType, let uid = info[CSSearchableItemActivityIdentifier] as? String {
-                popupManager.masterController.highightItemWithUriPath(uriPath: uid)
-                return true
+    func handleLocalNotification(notification: UNNotificationContent, action: String) async {
+        let userInfo = notification.userInfo
+        if userInfo.isEmpty {
+            return
+        }
 
-            } else if activity.activityType == CSQueryContinuationActionType, let searchString = info[CSSearchQueryString] as? String {
-                popupManager.masterController.focusFilter(terms: searchString)
-                return true
+        var relatedItem: ListableItem?
+        var relatedComment: PRComment?
+
+        if let commentId = DataManager.id(for: userInfo[COMMENT_ID_KEY] as? String), let c = try? DataManager.main.existingObject(with: commentId) as? PRComment {
+            relatedItem = c.parent
+            relatedComment = c
+        } else if let uri = userInfo[LISTABLE_URI_KEY] as? String, let itemId = DataManager.id(for: uri) {
+            relatedItem = try? DataManager.main.existingObject(with: itemId) as? ListableItem
+        }
+
+        guard let relatedItem else {
+            Logging.log("Could not locate the item related to this notification")
+            return
+        }
+
+        switch action {
+        case "mute":
+            relatedItem.setMute(to: true)
+        case "read":
+            relatedItem.catchUpWithComments()
+        default:
+            relatedItem.catchUpWithComments()
+
+            if let urlToOpen = userInfo[NOTIFICATION_URL_KEY] as? String ?? relatedComment?.webUrl ?? relatedItem.webUrl,
+               let u = URL(string: urlToOpen) {
+                #if os(macOS)
+                    openItem(u)
+                #else
+                    popupManager.masterController.notificationSelected(for: relatedItem, urlToOpen: urlToOpen)
+                #endif
             }
         }
-        return false
+
+        Task {
+            await DataManager.saveDB()
+            #if os(macOS)
+                app.updateRelatedMenus(for: relatedItem)
+            #endif
+        }
     }
 
-    static func setup(delegate: UNUserNotificationCenterDelegate) {
-        let readAction = UNNotificationAction(identifier: "read", title: "Mark as read", options: [])
-        let muteAction = UNNotificationAction(identifier: "mute", title: "Mute this item", options: [.destructive])
-        let itemCategory = UNNotificationCategory(identifier: "mutable", actions: [readAction, muteAction], intentIdentifiers: [], options: [])
-        let repoCategory = UNNotificationCategory(identifier: "repo", actions: [], intentIdentifiers: [], options: [])
-
+    func setup() {
         let n = UNUserNotificationCenter.current()
-        n.setNotificationCategories([itemCategory, repoCategory])
-        n.requestAuthorization(options: .provisional) { success, error in
-            if success {
-                Logging.log("Successfully registered for local notifications")
-            } else {
-                Logging.log("Registering for notifications failed: \((error?.localizedDescription).orEmpty)")
+        n.delegate = self
+
+        n.setNotificationCategories([
+            UNNotificationCategory(identifier: "mutable", actions: [
+                UNNotificationAction(identifier: "read", title: "Mark as read", options: []),
+                UNNotificationAction(identifier: "mute", title: "Mute this item", options: [.destructive])
+            ], intentIdentifiers: []),
+
+            UNNotificationCategory(identifier: "repo", actions: [], intentIdentifiers: [])
+        ])
+
+        Task {
+            do {
+                if try await n.requestAuthorization(options: .provisional) {
+                    Logging.log("Successfully registered for local notifications")
+                } else {
+                    Logging.log("Denied permission for notifications")
+                }
+            } catch {
+                Logging.log("Registering for local notifications failed: \(error.localizedDescription)")
             }
         }
-        n.delegate = delegate
     }
 
-    static func postNotification(type: NotificationType, for item: DataItem) {
+    func postNotification(type: NotificationType, for item: DataItem) async {
         let notification = UNMutableNotificationContent()
 
         switch type {
         case .newMention:
-            guard let c = item as? PRComment, let parent = c.parent, !parent.shouldSkipNotifications else { return }
-            notification.title = "@\(c.userName.orEmpty) mentioned you:"
+            guard let c = item as? PRComment,
+                  let parent = c.parent,
+                  !parent.shouldSkipNotifications
+            else { return }
+            notification.title = "@\(c.userName.orEmpty) Mentioned You"
             notification.subtitle = c.notificationSubtitle
-            if let b = c.body { notification.body = b }
+            notification.body = c.body.orEmpty
             notification.categoryIdentifier = "mutable"
 
         case .newComment:
             guard let c = item as? PRComment, let parent = c.parent, !parent.shouldSkipNotifications else { return }
-            notification.title = "@\(c.userName.orEmpty) commented:"
+            notification.title = "@\(c.userName.orEmpty) Commented"
             notification.subtitle = c.notificationSubtitle
-            if let b = c.body { notification.body = b }
+            notification.body = c.body.orEmpty
             notification.categoryIdentifier = "mutable"
 
         case .newPr:
             guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
             notification.title = "New PR"
-            if let r = p.repo.fullName { notification.subtitle = r }
-            if let b = p.title { notification.body = b }
+            notification.subtitle = p.repo.fullName.orEmpty
+            notification.body = p.title.orEmpty
             notification.categoryIdentifier = "mutable"
 
         case .prReopened:
             guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
             notification.title = "Re-Opened PR"
-            if let r = p.repo.fullName { notification.subtitle = r }
-            if let b = p.title { notification.body = b }
+            notification.subtitle = p.repo.fullName.orEmpty
+            notification.body = p.title.orEmpty
             notification.categoryIdentifier = "mutable"
 
         case .prMerged:
             guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
             notification.title = "PR Merged!"
-            if let r = p.repo.fullName { notification.subtitle = r }
-            if let b = p.title { notification.body = b }
+            notification.subtitle = p.repo.fullName.orEmpty
+            notification.body = p.title.orEmpty
             notification.categoryIdentifier = "mutable"
 
         case .prClosed:
             guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
             notification.title = "PR Closed"
-            if let r = p.repo.fullName { notification.subtitle = r }
-            if let b = p.title { notification.body = b }
+            notification.subtitle = p.repo.fullName.orEmpty
+            notification.body = p.title.orEmpty
             notification.categoryIdentifier = "mutable"
 
         case .newRepoSubscribed:
             guard let r = item as? Repo else { return }
-            notification.title = "New Repository Subscribed"
+            notification.title = "New Repo Subscribed"
             notification.body = r.fullName.orEmpty
             notification.categoryIdentifier = "repo"
 
@@ -104,43 +159,43 @@ enum NotificationManager {
         case .newPrAssigned:
             guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
             notification.title = "PR Assigned"
-            if let r = p.repo.fullName { notification.subtitle = r }
-            if let b = p.title { notification.body = b }
+            notification.subtitle = p.repo.fullName.orEmpty
+            notification.body = p.title.orEmpty
             notification.categoryIdentifier = "mutable"
 
         case .newStatus:
             guard let s = item as? PRStatus, !s.pullRequest.shouldSkipNotifications else { return }
             notification.title = "PR Status Update"
-            if let d = s.descriptionText { notification.subtitle = d }
-            if let t = s.pullRequest.title { notification.body = t }
+            notification.subtitle = s.descriptionText.orEmpty
+            notification.body = s.pullRequest.title.orEmpty
             notification.categoryIdentifier = "mutable"
 
         case .newIssue:
             guard let i = item as? Issue, !i.shouldSkipNotifications else { return }
             notification.title = "New Issue"
-            if let n = i.repo.fullName { notification.subtitle = n }
-            if let t = i.title { notification.body = t }
+            notification.subtitle = i.repo.fullName.orEmpty
+            notification.body = i.title.orEmpty
             notification.categoryIdentifier = "mutable"
 
         case .issueReopened:
             guard let i = item as? Issue, !i.shouldSkipNotifications else { return }
             notification.title = "Re-Opened Issue"
-            if let n = i.repo.fullName { notification.subtitle = n }
-            if let t = i.title { notification.body = t }
+            notification.subtitle = i.repo.fullName.orEmpty
+            notification.body = i.title.orEmpty
             notification.categoryIdentifier = "mutable"
 
         case .issueClosed:
             guard let i = item as? Issue, !i.shouldSkipNotifications else { return }
             notification.title = "Issue Closed"
-            if let n = i.repo.fullName { notification.subtitle = n }
-            if let t = i.title { notification.body = t }
+            notification.subtitle = i.repo.fullName.orEmpty
+            notification.body = i.title.orEmpty
             notification.categoryIdentifier = "mutable"
 
         case .newIssueAssigned:
             guard let i = item as? Issue, !i.shouldSkipNotifications else { return }
             notification.title = "Issue Assigned"
-            if let n = i.repo.fullName { notification.subtitle = n }
-            if let t = i.title { notification.body = t }
+            notification.subtitle = i.repo.fullName.orEmpty
+            notification.body = i.title.orEmpty
             notification.categoryIdentifier = "mutable"
 
         case .changesApproved:
@@ -148,8 +203,8 @@ enum NotificationManager {
             let p = r.pullRequest
             if p.shouldSkipNotifications { return }
             notification.title = "@\(r.username.orEmpty) Approved Changes"
-            if let t = p.title { notification.subtitle = t }
-            if let b = r.body { notification.body = b }
+            notification.subtitle = p.title.orEmpty
+            notification.body = r.body.orEmpty
             notification.categoryIdentifier = "mutable"
 
             let path = Bundle.main.path(forResource: "approvesChangesIcon", ofType: "png")!
@@ -162,8 +217,8 @@ enum NotificationManager {
             let p = r.pullRequest
             if p.shouldSkipNotifications { return }
             notification.title = "@\(r.username.orEmpty) Requests Changes"
-            if let t = p.title { notification.subtitle = t }
-            if let b = r.body { notification.body = b }
+            notification.subtitle = p.title.orEmpty
+            notification.body = r.body.orEmpty
             notification.categoryIdentifier = "mutable"
 
             let path = Bundle.main.path(forResource: "requestsChangesIcon", ofType: "png")!
@@ -176,22 +231,22 @@ enum NotificationManager {
             let p = r.pullRequest
             if p.shouldSkipNotifications { return }
             notification.title = "@\(r.username.orEmpty) Dismissed A Review"
-            if let t = p.title { notification.subtitle = t }
-            if let b = r.body { notification.body = b }
+            notification.subtitle = p.title.orEmpty
+            notification.body = r.body.orEmpty
             notification.categoryIdentifier = "mutable"
 
         case .assignedForReview:
             guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
             notification.title = "PR Review Requested"
-            if let n = p.repo.fullName { notification.subtitle = n }
-            if let t = p.title { notification.body = t }
+            notification.subtitle = p.repo.fullName.orEmpty
+            notification.body = p.title.orEmpty
             notification.categoryIdentifier = "mutable"
 
         case .assignedToTeamForReview:
             guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
             notification.title = "PR Review Request to Team"
-            if let n = p.repo.fullName { notification.subtitle = n }
-            if let t = p.title { notification.body = t }
+            notification.subtitle = p.repo.fullName.orEmpty
+            notification.body = p.title.orEmpty
             notification.categoryIdentifier = "mutable"
 
         case .newReaction:
@@ -213,19 +268,59 @@ enum NotificationManager {
         }
 
         notification.userInfo = DataManager.info(for: item)
-        let url = (item as? PRComment)?.avatarUrl ?? (item as? ListableItem)?.userAvatarUrl
+
+        let attachmentUrl = Settings.hideAvatarsInNotifications ? nil :
+            (item as? PRComment)?.avatarUrl ??
+            (item as? ListableItem)?.userAvatarUrl
 
         Task {
-            if !Settings.hideAvatarsInNotifications, let url {
-                if let entry = try? await HTTP.avatar(from: url),
-                   let storedUrl = await ImageCache.shared.store(entry, from: url),
-                   let attachment = try? UNNotificationAttachment(identifier: storedUrl.path, url: storedUrl, options: nil) {
-                    notification.attachments = [attachment]
-                }
+            if let attachmentUrl,
+               let entry = try? await HTTP.avatar(from: attachmentUrl),
+               let storedUrl = await ImageCache.shared.store(entry, from: attachmentUrl),
+               let attachment = try? UNNotificationAttachment(identifier: storedUrl.path, url: storedUrl, options: nil) {
+                notification.attachments = [attachment]
             }
-            let identifier = [notification.title, notification.subtitle, notification.body].joined(separator: " - ")
-            let request = UNNotificationRequest(identifier: identifier, content: notification, trigger: nil)
+
+            let request = UNNotificationRequest(identifier: UUID().uuidString,
+                                                content: notification,
+                                                trigger: nil)
             try? await UNUserNotificationCenter.current().add(request)
         }
+    }
+
+    private let removalQueue = Lista<String>()
+    private lazy var removalTimer = PopTimer(timeInterval: 0.5) { [weak self] in
+        guard let self else { return }
+        let idSet = Set(removalQueue)
+        removalQueue.removeAll()
+        Task {
+            let nc = UNUserNotificationCenter.current()
+            let idsToRemove = await nc.deliveredNotifications().map(\.request).compactMap { request -> String? in
+                guard let uri = request.content.userInfo[LISTABLE_URI_KEY] as? String, idSet.contains(uri) else {
+                    return nil
+                }
+                return request.identifier
+            }
+            if idsToRemove.isEmpty {
+                return
+            }
+            Logging.log("Removing related notifications: \(idsToRemove)")
+            nc.removeDeliveredNotifications(withIdentifiers: idsToRemove)
+        }
+    }
+
+    func removeRelatedNotifications(for uri: String) {
+        removalQueue.append(uri)
+        removalTimer.push()
+    }
+}
+
+extension NotificationManager: UNUserNotificationCenterDelegate {
+    func userNotificationCenter(_: UNUserNotificationCenter, willPresent _: UNNotification) async -> UNNotificationPresentationOptions {
+        [.badge, .banner, .list, .sound]
+    }
+
+    func userNotificationCenter(_: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
+        await NotificationManager.shared.handleLocalNotification(notification: response.notification.request.content, action: response.actionIdentifier)
     }
 }

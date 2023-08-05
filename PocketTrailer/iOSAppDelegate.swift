@@ -3,7 +3,7 @@ import UIKit
 import UserNotifications
 
 @UIApplicationMain
-final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
+final class iOSAppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     private var backgroundProcessing: BGProcessingTask?
@@ -19,15 +19,6 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
         }
 
         return true
-    }
-
-    func userNotificationCenter(_: UNUserNotificationCenter, willPresent _: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        completionHandler([.badge, .banner, .list, .sound])
-    }
-
-    func userNotificationCenter(_: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        NotificationManager.handleLocalNotification(notification: response.notification.request.content, action: response.actionIdentifier)
-        completionHandler()
     }
 
     func applicationDidEnterBackground(_: UIApplication) {
@@ -61,7 +52,7 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
             }
         }
 
-        NotificationManager.setup(delegate: self)
+        NotificationManager.shared.setup()
 
         let n = NotificationCenter.default
         n.addObserver(self, selector: #selector(refreshStarting), name: .RefreshStarting, object: nil)
@@ -106,7 +97,7 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
     }
 
     func application(_: UIApplication, continue userActivity: NSUserActivity, restorationHandler _: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
-        NotificationManager.handleUserActivity(activity: userActivity)
+        NotificationManager.shared.handleUserActivity(activity: userActivity)
     }
 
     deinit {
@@ -240,8 +231,6 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificati
             DataManager.main.delete(p)
         }
     }
-
-    // e -l objc -- (void)[[BGTaskScheduler sharedScheduler] _simulateLaunchForTaskWithIdentifier:@"com.housetrip.mobile.trailer.ios.PocketTrailer.refresh"]
 
     private func scheduleRefreshTask() {
         BGTaskScheduler.shared.cancelAllTaskRequests()

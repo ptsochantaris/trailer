@@ -3,11 +3,9 @@ import CoreSpotlight
 import Lista
 import TrailerQL
 
-#if os(iOS)
-    import MobileCoreServices
+#if canImport(UIKit)
     import UIKit
-    import UserNotifications
-#else
+#elseif canImport(Cocoa)
     import Cocoa
 #endif
 
@@ -260,15 +258,15 @@ class ListableItem: DataItem, Listable {
 
     override final func prepareForDeletion() {
         let uri = objectID.uriRepresentation().absoluteString
-        Task { @MainActor in
-            hideFromNotifications(uri: uri)
-        }
+        ListableItem.hideFromNotifications(uri: uri)
         super.prepareForDeletion()
     }
 
-    private final func hideFromNotifications(uri: String) {
-        if Settings.removeNotificationsWhenItemIsRemoved {
-            ListableItem.removeRelatedNotifications(uri: uri)
+    private static func hideFromNotifications(uri: String) {
+        Task {
+            if Settings.removeNotificationsWhenItemIsRemoved {
+                await NotificationManager.shared.removeRelatedNotifications(for: uri)
+            }
         }
     }
 
@@ -1175,58 +1173,18 @@ class ListableItem: DataItem, Listable {
 
     private static let isUnmergeablePredicate = NSPredicate(format: "isMergeable == false")
 
-    @MainActor
-    static func relatedItems(from notificationUserInfo: JSON) -> (PRComment?, ListableItem)? {
-        var item: ListableItem?
-        var comment: PRComment?
-        if let cid = notificationUserInfo[COMMENT_ID_KEY] as? String, let itemId = DataManager.id(for: cid), let c = try? DataManager.main.existingObject(with: itemId) as? PRComment {
-            comment = c
-            item = c.parent
-        } else if let pid = notificationUserInfo[LISTABLE_URI_KEY] as? String, let itemId = DataManager.id(for: pid) {
-            item = try? DataManager.main.existingObject(with: itemId) as? ListableItem
-        }
-        if let i = item {
-            return (comment, i)
-        } else {
-            return nil
-        }
-    }
-
     final func setMute(to newValue: Bool) {
         muted = newValue
         postProcess()
         if newValue {
-            ListableItem.removeRelatedNotifications(uri: objectID.uriRepresentation().absoluteString)
+            Task {
+                await NotificationManager.shared.removeRelatedNotifications(for: objectID.uriRepresentation().absoluteString)
+            }
         }
     }
 
     var shouldHideDueToMyReview: Bool {
         false
-    }
-
-    static func removeRelatedNotifications(uri: String) {
-        #if os(macOS)
-            let nc = NSUserNotificationCenter.default
-            for n in nc.deliveredNotifications {
-                if let u = n.userInfo, let notificationUri = u[LISTABLE_URI_KEY] as? String, notificationUri == uri {
-                    nc.removeDeliveredNotification(n)
-                }
-            }
-        #elseif os(iOS)
-            let nc = UNUserNotificationCenter.current()
-            nc.getDeliveredNotifications { notifications in
-                Task { @MainActor in
-                    for n in notifications {
-                        let r = n.request.identifier
-                        let u = n.request.content.userInfo
-                        if let notificationUri = u[LISTABLE_URI_KEY] as? String, notificationUri == uri {
-                            Logging.log("Removing related notification: \(r)")
-                            nc.removeDeliveredNotifications(withIdentifiers: [r])
-                        }
-                    }
-                }
-            }
-        #endif
     }
 
     var searchKeywords: [String] {
@@ -1249,7 +1207,7 @@ class ListableItem: DataItem, Listable {
             let item = await indexForSpotlight(uri: uri)
             return .needsIndexing(item)
         } else {
-            hideFromNotifications(uri: uri)
+            ListableItem.hideFromNotifications(uri: uri)
             return .needsRemoval(uri)
         }
     }

@@ -1,8 +1,6 @@
 import Cocoa
 import Combine
 
-extension NSAttributedString: @unchecked Sendable {}
-
 final class ApiMonitorWindow: NSWindow, NSWindowDelegate {
     @IBOutlet private var textView: NSTextView!
     @IBOutlet private var scrollView: NSScrollView!

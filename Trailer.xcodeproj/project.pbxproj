@@ -56,6 +56,9 @@
 		164840FE1AD19837009E6383 /* PopupManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164840FD1AD19837009E6383 /* PopupManager.swift */; };
 		164841001AD198A6009E6383 /* WatchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164840FF1AD198A6009E6383 /* WatchManager.swift */; };
 		164841021AD19933009E6383 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164841011AD19933009E6383 /* NotificationManager.swift */; };
+		164E4C092A7EABCE00BFE065 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164841011AD19933009E6383 /* NotificationManager.swift */; };
+		164E4C0B2A7EB15A00BFE065 /* approvesChangesIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 16C4ACF61EB553E20022C33B /* approvesChangesIcon.png */; };
+		164E4C0C2A7EB15A00BFE065 /* requestsChangesIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 16C4ACF51EB553E20022C33B /* requestsChangesIcon.png */; };
 		16519EB41ACF0E91002171D0 /* Trailer.icns in Resources */ = {isa = PBXBuildFile; fileRef = 16519EB31ACF0E91002171D0 /* Trailer.icns */; };
 		16522D791AB03AE500B1C3FB /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 16522D781AB03AE500B1C3FB /* Images.xcassets */; };
 		16522D851AB03AE500B1C3FB /* Interface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 16522D831AB03AE500B1C3FB /* Interface.storyboard */; };
@@ -421,8 +424,8 @@
 		16C2378420E923780045A548 /* Trailer 38.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 38.xcdatamodel"; sourceTree = "<group>"; };
 		16C3048B1CF4EC590017D79F /* SectionHeaderView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SectionHeaderView.xib; sourceTree = "<group>"; };
 		16C3048D1CF4ECEF0017D79F /* SectionHeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SectionHeaderView.swift; sourceTree = "<group>"; };
-		16C4ACF51EB553E20022C33B /* requestsChangesIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = requestsChangesIcon.png; sourceTree = "<group>"; };
-		16C4ACF61EB553E20022C33B /* approvesChangesIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = approvesChangesIcon.png; sourceTree = "<group>"; };
+		16C4ACF51EB553E20022C33B /* requestsChangesIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = requestsChangesIcon.png; path = PocketTrailer/requestsChangesIcon.png; sourceTree = "<group>"; };
+		16C4ACF61EB553E20022C33B /* approvesChangesIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = approvesChangesIcon.png; path = PocketTrailer/approvesChangesIcon.png; sourceTree = "<group>"; };
 		16C6B9422A6AE04F00CBA836 /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
 		16C90F011B13BC180095E8D5 /* RepoSettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = RepoSettingsViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16C9A2751A44D12600EE54EC /* AboutTrailerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutTrailerViewController.swift; sourceTree = "<group>"; };
@@ -579,6 +582,7 @@
 		1628A6F218789EA3005EDA69 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				164E4C0A2A7EB14C00BFE065 /* Images */,
 				168C6ECC18B2104100E41D85 /* LICENSE.txt */,
 				16F51FA019DE8C78007B0BB1 /* PRIVACY */,
 				168C6ECD18B2104100E41D85 /* README.md */,
@@ -649,8 +653,6 @@
 				16954D3824333B8E0008AD4F /* Quickstart.storyboard */,
 				16954D3524333B0B0008AD4F /* Settings.storyboard */,
 				16154E2E19C43E8E00E49139 /* Launch.storyboard */,
-				16C4ACF51EB553E20022C33B /* requestsChangesIcon.png */,
-				16C4ACF61EB553E20022C33B /* approvesChangesIcon.png */,
 				1628A6D518789E73005EDA69 /* Images.xcassets */,
 			);
 			name = Resources;
@@ -665,6 +667,15 @@
 				16522D801AB03AE500B1C3FB /* WatchKit App */,
 			);
 			name = "Pocket Trailer";
+			sourceTree = "<group>";
+		};
+		164E4C0A2A7EB14C00BFE065 /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				16C4ACF51EB553E20022C33B /* requestsChangesIcon.png */,
+				16C4ACF61EB553E20022C33B /* approvesChangesIcon.png */,
+			);
+			name = Images;
 			sourceTree = "<group>";
 		};
 		16522D711AB03AE500B1C3FB /* WatchKit Extension */ = {
@@ -1071,7 +1082,7 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastSwiftMigration = 0700;
 				LastSwiftUpdateCheck = 1340;
-				LastUpgradeCheck = 1430;
+				LastUpgradeCheck = 1500;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
 					1628A6B018789E73005EDA69 = {
@@ -1177,11 +1188,13 @@
 				1655FD5C2A69CA0D0087F439 /* ApiMonitorWindow.xib in Resources */,
 				160FB1421AE3F7C700EB5C8E /* PreferencesWindow.xib in Resources */,
 				164840C31ACFEFA9009E6383 /* MenuWindow.xib in Resources */,
+				164E4C0B2A7EB15A00BFE065 /* approvesChangesIcon.png in Resources */,
 				16DB793E1E326CD90076A36D /* AdvancedReposWindow.xib in Resources */,
 				168BC6C917EC2DF000BC4584 /* Images.xcassets in Resources */,
 				1686DEB72A5DD12000AED26E /* ApiOptionsWindow.xib in Resources */,
 				16519EB41ACF0E91002171D0 /* Trailer.icns in Resources */,
 				168BC6C417EC2DF000BC4584 /* MainMenu.xib in Resources */,
+				164E4C0C2A7EB15A00BFE065 /* requestsChangesIcon.png in Resources */,
 				16DEA937235C6F00004589B3 /* TrailerLauncher.app in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1400,6 +1413,7 @@
 				167B10571E6A86A300B0E1AE /* Review.swift in Sources */,
 				16B3B34F1A34E990000BE6CC /* Trailer.xcdatamodeld in Sources */,
 				1633C1921ABCEC4A0086C692 /* Issue.swift in Sources */,
+				164E4C092A7EABCE00BFE065 /* NotificationManager.swift in Sources */,
 				1694008C1E7AAE32002C5DAD /* Reaction.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
