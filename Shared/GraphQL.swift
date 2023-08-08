@@ -1,6 +1,7 @@
 import Foundation
 import Lista
 import TrailerQL
+import Semalot
 
 extension Node {
     var creationSkipped: Bool {
@@ -216,8 +217,8 @@ enum GraphQL {
         }
     }
 
-    private static let singleGateKeeper = Gate(tickets: 1)
-    private static let multiGateKeeper = Gate(tickets: 2)
+    private static let singleGateKeeper = Semalot(tickets: 1)
+    private static let multiGateKeeper = Semalot(tickets: 2)
 
     static var callCount = 0
 

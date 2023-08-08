@@ -91,6 +91,7 @@
 		167B10581E6A86A300B0E1AE /* Review.swift in Sources */ = {isa = PBXBuildFile; fileRef = 167B10561E6A86A300B0E1AE /* Review.swift */; };
 		167E80F42517EC1700ED9A67 /* CoreSpotlight.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 167E80F32517EC1700ED9A67 /* CoreSpotlight.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		167F7BF623B38D4D00A01529 /* UpdatedRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 167F7BF523B38D4D00A01529 /* UpdatedRow.swift */; };
+		16813B212A83041F0069C87B /* Semalot in Frameworks */ = {isa = PBXBuildFile; productRef = 16813B202A83041F0069C87B /* Semalot */; };
 		16813CBF1BA16D660020F8EB /* CommonController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16813CBE1BA16D660020F8EB /* CommonController.swift */; };
 		1686DEB72A5DD12000AED26E /* ApiOptionsWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1686DEB62A5DD12000AED26E /* ApiOptionsWindow.xib */; };
 		1686DEB92A5DD12C00AED26E /* ApiOptionsWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1686DEB82A5DD12C00AED26E /* ApiOptionsWindow.swift */; };
@@ -140,8 +141,6 @@
 		16B3B3501A34E990000BE6CC /* Trailer.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B33B1A34E990000BE6CC /* Trailer.xcdatamodeld */; };
 		16B6B7C11BA3B94C006A509F /* ComplicationDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B6B7C01BA3B94C006A509F /* ComplicationDataSource.swift */; };
 		16B74E481A3B4AC800410EF6 /* PrTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B74E471A3B4AC800410EF6 /* PrTable.swift */; };
-		16B8179C29B29F1B009A49EB /* Gate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B8179A29B29F1B009A49EB /* Gate.swift */; };
-		16B8179D29B29F1B009A49EB /* Gate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B8179A29B29F1B009A49EB /* Gate.swift */; };
 		16B94072182D136700F32061 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 16B94070182D136700F32061 /* dsa_pub.pem */; };
 		16BF6736283A2AE20028EC13 /* HTTP.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16BF6735283A2AE20028EC13 /* HTTP.swift */; };
 		16BF6737283A2AE20028EC13 /* HTTP.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16BF6735283A2AE20028EC13 /* HTTP.swift */; };
@@ -416,7 +415,6 @@
 		16B415611E3D054500741E6F /* Trailer 33.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 33.xcdatamodel"; sourceTree = "<group>"; };
 		16B6B7C01BA3B94C006A509F /* ComplicationDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ComplicationDataSource.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16B74E471A3B4AC800410EF6 /* PrTable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PrTable.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		16B8179A29B29F1B009A49EB /* Gate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Gate.swift; path = Shared/Gate.swift; sourceTree = "<group>"; };
 		16B94070182D136700F32061 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
 		16BF6735283A2AE20028EC13 /* HTTP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HTTP.swift; path = Shared/HTTP.swift; sourceTree = "<group>"; };
 		16C2378420E923780045A548 /* Trailer 38.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 38.xcdatamodel"; sourceTree = "<group>"; };
@@ -493,6 +491,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				16813B212A83041F0069C87B /* Semalot in Frameworks */,
 				16E19E452A61551E0079118C /* Sparkle in Frameworks */,
 				16DE55BB2A5A397700166337 /* Lista in Frameworks */,
 				168924532A58BC2A0094F0D1 /* TrailerJson in Frameworks */,
@@ -594,7 +593,6 @@
 			isa = PBXGroup;
 			children = (
 				16275DF41CF8944100EEBF48 /* API.swift */,
-				16B8179A29B29F1B009A49EB /* Gate.swift */,
 				162A29D81A4085FD008F41A9 /* GroupingCriterion.swift */,
 				16BF6735283A2AE20028EC13 /* HTTP.swift */,
 				16E7C20D2A69934900F72BFE /* ImageCache.swift */,
@@ -1028,6 +1026,7 @@
 				165880C92A59C2AF0012A2B7 /* TrailerQL */,
 				16DE55BA2A5A397700166337 /* Lista */,
 				16E19E442A61551E0079118C /* Sparkle */,
+				16813B202A83041F0069C87B /* Semalot */,
 			);
 			productName = Trailer;
 			productReference = 168BC6AA17EC2DF000BC4584 /* Trailer.app */;
@@ -1127,6 +1126,7 @@
 				165880C82A59C2AF0012A2B7 /* XCRemoteSwiftPackageReference "trailer-ql" */,
 				16DE55B92A5A397700166337 /* XCRemoteSwiftPackageReference "lista" */,
 				16E19E432A61551E0079118C /* XCRemoteSwiftPackageReference "Sparkle" */,
+				16813B1F2A83041F0069C87B /* XCRemoteSwiftPackageReference "semalot" */,
 			);
 			productRefGroup = 168BC6AB17EC2DF000BC4584 /* Products */;
 			projectDirPath = "";
@@ -1266,7 +1266,6 @@
 				161B851D1AB8E12C00AD4C5D /* Team.swift in Sources */,
 				162484562A76CE9F00C69515 /* LogMonitor.swift in Sources */,
 				16C3048E1CF4ECEF0017D79F /* SectionHeaderView.swift in Sources */,
-				16B8179D29B29F1B009A49EB /* Gate.swift in Sources */,
 				160E19E31D672BD1006C1A59 /* PopTimer.swift in Sources */,
 				16EE6AD01A9A711C000A8483 /* CountLabel.swift in Sources */,
 				166ADEC61CCAFF77001BA61F /* SnoozingViewController.swift in Sources */,
@@ -1381,7 +1380,6 @@
 				1664CBCA1B7796840006BDE7 /* Enums.swift in Sources */,
 				162002DB1A2A545C00FF95F3 /* CenterTextFieldCell.swift in Sources */,
 				16B74E481A3B4AC800410EF6 /* PrTable.swift in Sources */,
-				16B8179C29B29F1B009A49EB /* Gate.swift in Sources */,
 				1686DEB92A5DD12C00AED26E /* ApiOptionsWindow.swift in Sources */,
 				16F0BAD623A53EB4002EC348 /* Colors.swift in Sources */,
 				1657230423AAA2AC00F597EF /* V3API.swift in Sources */,
@@ -1999,6 +1997,14 @@
 				kind = branch;
 			};
 		};
+		16813B1F2A83041F0069C87B /* XCRemoteSwiftPackageReference "semalot" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ptsochantaris/semalot";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		168924512A58BC2A0094F0D1 /* XCRemoteSwiftPackageReference "trailer-json" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ptsochantaris/trailer-json";
@@ -2035,6 +2041,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 165880C82A59C2AF0012A2B7 /* XCRemoteSwiftPackageReference "trailer-ql" */;
 			productName = TrailerQL;
+		};
+		16813B202A83041F0069C87B /* Semalot */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 16813B1F2A83041F0069C87B /* XCRemoteSwiftPackageReference "semalot" */;
+			productName = Semalot;
 		};
 		168924522A58BC2A0094F0D1 /* TrailerJson */ = {
 			isa = XCSwiftPackageProductDependency;

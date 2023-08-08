@@ -1,5 +1,6 @@
 import Foundation
 import TrailerJson
+import Semalot
 
 typealias JSON = [String: Any]
 
@@ -19,7 +20,7 @@ enum DataResult {
 }
 
 enum HTTP {
-    private static let gateKeeper = Gate(tickets: 8)
+    private static let gateKeeper = Semalot(tickets: 8)
 
     private static let urlSession: URLSession = {
         #if DEBUG
