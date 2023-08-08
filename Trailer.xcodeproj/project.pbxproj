@@ -117,8 +117,6 @@
 		169FB2361A3DBD7D00E00771 /* SectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169FB2351A3DBD7D00E00771 /* SectionHeader.swift */; };
 		16A0B0371A48AC7900B3452D /* MacAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A0B0361A48AC7900B3452D /* MacAppDelegate.swift */; };
 		16A0FA7423AECFAE0023B565 /* BackgroundTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A0FA7323AECFAE0023B565 /* BackgroundTask.swift */; };
-		16A1E44129F2FBB6007684D0 /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 16A1E44029F2FBB6007684D0 /* AsyncAlgorithms */; };
-		16A1E44329F2FBCA007684D0 /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 16A1E44229F2FBCA007684D0 /* AsyncAlgorithms */; };
 		16A41E9E22A71C7A00D1D352 /* TextFieldCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A41E9D22A71C7A00D1D352 /* TextFieldCell.swift */; };
 		16A69EDA1AC83020008231F9 /* ListableItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A69ED91AC83020008231F9 /* ListableItem.swift */; };
 		16A69EDB1AC83020008231F9 /* ListableItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A69ED91AC83020008231F9 /* ListableItem.swift */; };
@@ -480,7 +478,6 @@
 				16DE55BD2A5A398D00166337 /* Lista in Frameworks */,
 				165880CC2A59C2BC0012A2B7 /* TrailerQL in Frameworks */,
 				168924552A58BC7A0094F0D1 /* TrailerJson in Frameworks */,
-				16A1E44329F2FBCA007684D0 /* AsyncAlgorithms in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -501,7 +498,6 @@
 				168924532A58BC2A0094F0D1 /* TrailerJson in Frameworks */,
 				167E80F42517EC1700ED9A67 /* CoreSpotlight.framework in Frameworks */,
 				165880CA2A59C2AF0012A2B7 /* TrailerQL in Frameworks */,
-				16A1E44129F2FBB6007684D0 /* AsyncAlgorithms in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -985,7 +981,6 @@
 			);
 			name = PocketTrailer;
 			packageProductDependencies = (
-				16A1E44229F2FBCA007684D0 /* AsyncAlgorithms */,
 				168924542A58BC7A0094F0D1 /* TrailerJson */,
 				165880CB2A59C2BC0012A2B7 /* TrailerQL */,
 				16DE55BC2A5A398D00166337 /* Lista */,
@@ -1029,7 +1024,6 @@
 			);
 			name = Trailer;
 			packageProductDependencies = (
-				16A1E44029F2FBB6007684D0 /* AsyncAlgorithms */,
 				168924522A58BC2A0094F0D1 /* TrailerJson */,
 				165880C92A59C2AF0012A2B7 /* TrailerQL */,
 				16DE55BA2A5A397700166337 /* Lista */,
@@ -1129,7 +1123,6 @@
 			);
 			mainGroup = 168BC6A117EC2DF000BC4584;
 			packageReferences = (
-				16A1E43F29F2FBB6007684D0 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
 				168924512A58BC2A0094F0D1 /* XCRemoteSwiftPackageReference "trailer-json" */,
 				165880C82A59C2AF0012A2B7 /* XCRemoteSwiftPackageReference "trailer-ql" */,
 				16DE55B92A5A397700166337 /* XCRemoteSwiftPackageReference "lista" */,
@@ -2014,14 +2007,6 @@
 				kind = branch;
 			};
 		};
-		16A1E43F29F2FBB6007684D0 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/apple/swift-async-algorithms";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.1.0;
-			};
-		};
 		16DE55B92A5A397700166337 /* XCRemoteSwiftPackageReference "lista" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ptsochantaris/lista";
@@ -2060,16 +2045,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 168924512A58BC2A0094F0D1 /* XCRemoteSwiftPackageReference "trailer-json" */;
 			productName = TrailerJson;
-		};
-		16A1E44029F2FBB6007684D0 /* AsyncAlgorithms */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 16A1E43F29F2FBB6007684D0 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
-			productName = AsyncAlgorithms;
-		};
-		16A1E44229F2FBCA007684D0 /* AsyncAlgorithms */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 16A1E43F29F2FBB6007684D0 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
-			productName = AsyncAlgorithms;
 		};
 		16DE55BA2A5A397700166337 /* Lista */ = {
 			isa = XCSwiftPackageProductDependency;
