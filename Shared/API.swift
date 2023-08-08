@@ -339,6 +339,7 @@ enum API {
         }
 
         let goodToGoServers = ApiServer.allApiServers(in: moc).filter(\.goodToGo)
+
         await withTaskGroup(of: Void.self) { group in
             for apiServer in goodToGoServers {
                 group.addTask { @MainActor in
@@ -361,12 +362,8 @@ enum API {
     }
 
     private static func ensureApiServersHaveUserIds(in moc: NSManagedObjectContext) async {
-        var needToCheck = false
-        for apiServer in ApiServer.allApiServers(in: moc) {
-            if apiServer.userNodeId == nil || (apiServer.userName?.isEmpty ?? true) {
-                needToCheck = true
-                break
-            }
+        let needToCheck = ApiServer.allApiServers(in: moc).contains {
+            $0.userNodeId == nil || $0.userName.orEmpty.isEmpty
         }
 
         if needToCheck {
@@ -392,8 +389,7 @@ enum API {
     }
 
     static func updateLimitsFromServer() async {
-        let configuredServers = ApiServer.allApiServers(in: DataManager.main).filter(\.goodToGo)
-        for apiServer in configuredServers {
+        for apiServer in ApiServer.allApiServers(in: DataManager.main).filter(\.goodToGo) {
             if let l = await getRateLimit(from: apiServer) {
                 apiServer.updateApiStats(l)
             }
@@ -405,8 +401,7 @@ enum API {
             return
         }
 
-        let repos = server.repos.filter(\.manuallyAdded)
-        for repo in repos {
+        for repo in server.repos.filter(\.manuallyAdded) {
             do {
                 try await fetchRepo(fullName: repo.fullName ?? "", from: server, moc: moc)
             } catch {
@@ -501,13 +496,8 @@ enum API {
         await Repo.syncRepos(from: userList + orgList, server: server, addNewRepos: true, manuallyAdded: true, moc: moc)
     }
 
-    static func fetchRepo(named: String, owner: String, from server: ApiServer, moc: NSManagedObjectContext) async throws {
-        try await fetchRepo(fullName: "\(owner)/\(named)", from: server, moc: moc)
-    }
-
     private static func syncUserDetails(in moc: NSManagedObjectContext) async {
-        let configuredServers = ApiServer.allApiServers(in: moc).filter(\.goodToGo)
-        for apiServer in configuredServers {
+        for apiServer in ApiServer.allApiServers(in: moc).filter(\.goodToGo) {
             do {
                 let (data, _, _) = try await RestAccess.getData(in: "/user", from: apiServer)
                 if let d = data as? JSON {

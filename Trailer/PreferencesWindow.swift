@@ -1241,7 +1241,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
                         alert.informativeText = "The new repositories have been added to your local list. Trailer will refresh after you close preferences to fetch any items from them."
                     }
                 } else {
-                    try await API.fetchRepo(named: name, owner: owner, from: server, moc: DataManager.main)
+                    try await API.fetchRepo(fullName: "\(owner)/\(name)", from: server, moc: DataManager.main)
                     alert.messageText = "Repository added"
                     if Settings.displayPolicyForNewPrs == Int(RepoDisplayPolicy.hide.rawValue), Settings.displayPolicyForNewIssues == Int(RepoDisplayPolicy.hide.rawValue) {
                         alert.informativeText = "WARNING: While the repository has been added successfully to your list, your default settings specify that it should be hidden. You probably want to change its visibility from the repositories list."

@@ -13,7 +13,7 @@ public final actor Gate {
             headroom -= 1
             return
         }
-        
+
         await withCheckedContinuation { continuation in
             queue.append {
                 continuation.resume()
