@@ -14,7 +14,7 @@ For maintained binaries and/or more info:
 Note: Trailer lists all your [watched repositories](http://github.com/watching). To reduce notification noise (and speed up your sync) visit the Preferences and change the display settings of each repository. To change the settings for all visible repositories use "Set all PRs…" and "Set all issues…". Use a filter first if you only want modify a subset.
 
 ## Packages
-Parts of trailer are being split off into their own Swift Packages to make them more reusable and self-contained.
+Parts of Trailer are being split off into their own Swift Packages to make them more reusable and self-contained.
 - [Trailer-QL](https://github.com/ptsochantaris/trailer-ql)
 - [Trailer-Json](https://github.com/ptsochantaris/trailer-json)
 - [Lista](https://github.com/ptsochantaris/lista)
