@@ -7,6 +7,24 @@
 		<language>en</language>
 
         <item>
+            <title>Version 1.8.6</title>
+            <sparkle:minimumSystemVersion>11.0.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[<font face="sans-serif" size="3"><ul>
+                <li>Possibly eliminates a potential v4 API locking issue</li>
+                <li>Corrects an issue where the option of team review assignments would reset after being set on macOS</li>
+                </ul>
+                </font>]]></description>
+            <pubDate>Fri, 10 Aug 2023 18:00:00 +0000</pubDate>
+            <enclosure
+            url="https://github.com/ptsochantaris/trailer/releases/download/1.8.6/Trailer-186.zip"
+            sparkle:version="1691"
+            sparkle:shortVersionString="1.8.6"
+            sparkle:dsaSignature="MC4CFQDGHIisLgTzJ4GTNfKO4WwgFevuMAIVAJYnMj8IhvURS/iBU4tDo7l4kZli"
+            sparkle:edSignature="oAyyvXDaKKP2L7Cbo9wgNuZOdsf+Q2LDi2BQpEMr7GkboZ3Lb91Xx4EL36P2YRE8xPfRdlQfC7gP1qc5FtjPBA==" length="3920974"
+            type="application/octet-stream"/>
+        </item>
+
+        <item>
             <title>Version 1.8.5</title>
             <sparkle:minimumSystemVersion>11.0.0</sparkle:minimumSystemVersion>
             <description><![CDATA[<font face="sans-serif" size="3"><ul>
