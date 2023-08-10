@@ -398,19 +398,15 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     }
 
     @IBAction private func assignedDirectReviewHandlingPolicySelected(_ sender: NSPopUpButton) {
-        let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
         let index = sender.index(of: sender.selectedItem!)
         Settings.assignedDirectReviewHandlingPolicy = Placement(menuIndex: index).assignmentPolicyRawValue
         deferredUpdateTimer.push()
-        showOptionalReviewAssignmentWarning(previousSync: previousShouldSync)
     }
 
     @IBAction private func assignedTeamReviewHandlingPolicySelected(_ sender: NSPopUpButton) {
-        let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
         let index = sender.index(of: sender.selectedItem!)
         Settings.assignedTeamReviewHandlingPolicy = Placement(menuIndex: index).assignmentPolicyRawValue
         deferredUpdateTimer.push()
-        showOptionalReviewAssignmentWarning(previousSync: previousShouldSync)
     }
 
     @IBAction private func draftHandlingPolicy(_ sender: NSPopUpButton) {
@@ -537,6 +533,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         notifyOnAllReviewDismissals.toolTip = Settings.notifyOnAllReviewDismissalsHelp
         notifyOnReviewAssignments.toolTip = Settings.notifyOnReviewAssignmentsHelp
         assignedDirectReviewHandlingPolicy.toolTip = Settings.assignedDirectReviewHandlingPolicyHelp
+        assignedTeamReviewHandlingPolicy.toolTip = Settings.assignedTeamReviewHandlingPolicyHelp
         supportReviews.toolTip = Settings.displayReviewsOnItemsHelp
         showRequestedTeamReviews.toolTip = Settings.showRequestedTeamReviewsHelp
         notifyOnItemReactions.toolTip = Settings.notifyOnItemReactionsHelp
@@ -683,7 +680,11 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         hotkeyOptionModifier.integerValue = Settings.hotkeyOptionModifier ? 1 : 0
         hotkeyShiftModifier.integerValue = Settings.hotkeyShiftModifier ? 1 : 0
 
-        assignedDirectReviewHandlingPolicy.select(assignedDirectReviewHandlingPolicy.item(at: Settings.assignedDirectReviewHandlingPolicy))
+        let assignedDirectMenuIndex = Placement(fromAssignmentPolicyRawValue: Settings.assignedDirectReviewHandlingPolicy)?.menuIndex ?? 0
+        assignedDirectReviewHandlingPolicy.select(assignedDirectReviewHandlingPolicy.item(at: assignedDirectMenuIndex))
+
+        let assignedTeamMenuIndex = Placement(fromAssignmentPolicyRawValue: Settings.assignedTeamReviewHandlingPolicy)?.menuIndex ?? 0
+        assignedTeamReviewHandlingPolicy.select(assignedTeamReviewHandlingPolicy.item(at: assignedTeamMenuIndex))
 
         enableHotkeySegments()
 

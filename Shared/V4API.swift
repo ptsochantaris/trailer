@@ -61,11 +61,13 @@ extension API {
                 if !servers.isEmpty {
                     group.addTask { @MainActor in
                         await GraphQL.fetchAllAuthoredPrs(from: servers)
+                        Logging.log("Fetching authored PRs phase complete")
                     }
                 }
                 if !repos.isEmpty {
                     group.addTask { @MainActor in
                         await GraphQL.fetchAllSubscribedPrs(from: repos)
+                        Logging.log("Fetching subscribed PRs phase complete")
                     }
                 }
             }
@@ -76,6 +78,7 @@ extension API {
                     group.addTask { @MainActor in
                         let prs = PullRequest.statusCheckBatch(in: moc)
                         try await GraphQL.update(for: prs, steps: [.statuses])
+                        Logging.log("Status fetch phase complete")
                     }
                 } else {
                     for p in PullRequest.allItems(in: moc) {
@@ -89,15 +92,18 @@ extension API {
                     group.addTask { @MainActor in
                         let rp = PullRequest.reactionCheckBatch(in: moc)
                         try await GraphQL.update(for: rp, steps: [.reactions])
+                        Logging.log("PR reactions fetch phase complete")
                     }
                 }
                 try await group.waitForAll()
             }
 
             try await GraphQL.update(for: newOrUpdatedPrs, steps: steps)
+            Logging.log("PR extras fetch phase complete")
 
             let reviews = Review.newOrUpdatedItems(in: moc, fromSuccessfulSyncOnly: true)
             try await GraphQL.updateComments(for: reviews)
+            Logging.log("Review comment fetch phase complete")
         }
 
         let issueTask = Task {
@@ -105,21 +111,25 @@ extension API {
                 if !servers.isEmpty {
                     group.addTask { @MainActor in
                         await GraphQL.fetchAllAuthoredIssues(from: servers)
+                        Logging.log("Fetching authored issues phase complete")
                     }
                 }
                 if !repos.isEmpty {
                     group.addTask { @MainActor in
                         await GraphQL.fetchAllSubscribedIssues(from: repos)
+                        Logging.log("Fetching subscribed issues phase complete")
                     }
                 }
             }
 
             let newOrUpdatedIssues = Issue.newOrUpdatedItems(in: moc, fromSuccessfulSyncOnly: true)
             try await GraphQL.update(for: newOrUpdatedIssues, steps: steps)
+            Logging.log("Issue extras fetch phase complete")
 
             if Settings.notifyOnItemReactions {
                 let ri = Issue.reactionCheckBatch(in: moc)
                 try await GraphQL.update(for: ri, steps: [.reactions])
+                Logging.log("Issue reaction fetch phase complete")
             }
         }
 
@@ -135,6 +145,9 @@ extension API {
                 }
             }
             try await GraphQL.updateReactions(for: comments)
+            Logging.log("Comment reaction fetch phase complete")
         }
+        
+        Logging.log("V4 API phase complete")
     }
 }

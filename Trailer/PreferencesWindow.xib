@@ -139,7 +139,7 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Tu3-cb-beM">
-                                                        <rect key="frame" x="14" y="7" width="66" height="32"/>
+                                                        <rect key="frame" x="13" y="7" width="66" height="32"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                         <buttonCell key="cell" type="push" title="Test" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="QdL-bA-0NX">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -258,7 +258,7 @@ Token</string>
                                                         </connections>
                                                     </textField>
                                                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="q1S-M3-nh6">
-                                                        <rect key="frame" x="237" y="52" width="130" height="17"/>
+                                                        <rect key="frame" x="236" y="52" width="130" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                         <buttonCell key="cell" type="inline" title="Existing Tokens" bezelStyle="inline" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="OhE-A7-jdY">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1523,7 +1523,7 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box fixedFrame="YES" boxType="custom" borderType="none" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="49Q-X3-TvK">
-                                            <rect key="frame" x="75" y="64" width="749" height="301"/>
+                                            <rect key="frame" x="74" y="64" width="749" height="301"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <view key="contentView" id="Hr7-ca-s5X">
                                                 <rect key="frame" x="0.0" y="0.0" width="749" height="301"/>
