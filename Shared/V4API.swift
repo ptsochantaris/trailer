@@ -147,7 +147,7 @@ extension API {
             try await GraphQL.updateReactions(for: comments)
             Logging.log("Comment reaction fetch phase complete")
         }
-        
+
         Logging.log("V4 API phase complete")
     }
 }

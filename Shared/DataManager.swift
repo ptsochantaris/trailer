@@ -36,16 +36,12 @@ enum DataManager {
 
         if Settings.lastRunVersion != versionString {
             Logging.log("VERSION UPDATE MAINTENANCE NEEDED")
-            performVersionChangedTasks()
+            ApiServer.ensureAtLeastGithub(in: main)
+            ApiServer.resetSyncOfEverything()
             Settings.lastRunVersion = versionString
             migrated = true
         }
         ApiServer.ensureAtLeastGithub(in: main)
-    }
-
-    private static func performVersionChangedTasks() {
-        ApiServer.ensureAtLeastGithub(in: main)
-        ApiServer.resetSyncOfEverything()
     }
 
     private static func processNotificationsForItems(of type: (some ListableItem).Type, newNotification: NotificationType, reopenedNotification: NotificationType, assignmentNotification: NotificationType) async {

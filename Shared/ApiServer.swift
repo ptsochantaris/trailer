@@ -5,7 +5,6 @@ import TrailerQL
 final class ApiServer: NSManagedObject {
     @NSManaged var apiPath: String?
     @NSManaged var graphQLPath: String?
-    @NSManaged var authToken: String?
     @NSManaged var label: String?
     @NSManaged var lastSyncSucceeded: Bool
     @NSManaged var reportRefreshFailures: Bool
@@ -29,6 +28,58 @@ final class ApiServer: NSManagedObject {
 
     static var lastReportedOverLimit = Set<NSManagedObjectID>()
     static var lastReportedNearLimit = Set<NSManagedObjectID>()
+
+    override class func value(forUndefinedKey _: String) -> Any? {
+        nil
+    }
+
+    private var _cachedAuthToken: String??
+    var authToken: String? {
+        get {
+            if let _cachedAuthToken {
+                return _cachedAuthToken
+            }
+
+            if objectID.isTemporaryID {
+                _cachedAuthToken = .some(nil)
+                return nil
+            }
+
+            let serverKey = objectID.uriRepresentation().absoluteString
+
+            if let existing = try! Keychain.read(account: serverKey) {
+                let result = String(bytes: existing, encoding: .utf8)
+                _cachedAuthToken = .some(result)
+                return result
+            }
+
+            if let legacy = value(forKey: "authToken") as? String, let legacyData = legacy.data(using: .utf8) {
+                Logging.log("Migrating server ID for \(label.orEmpty) to keychain...")
+                try! Keychain.write(data: legacyData, account: serverKey)
+                setValue(nil, forKey: "authToken")
+                _cachedAuthToken = .some(legacy)
+                return legacy
+            }
+
+            _cachedAuthToken = .some(nil)
+            return nil
+        }
+        set {
+            assert(!objectID.isTemporaryID)
+            _cachedAuthToken = .some(newValue)
+            let oid = objectID
+            Task.detached {
+                let serverKey = oid.uriRepresentation().absoluteString
+                let newData = newValue?.data(using: .utf8)
+                try! Keychain.write(data: newData, account: serverKey)
+            }
+        }
+    }
+
+    override func prepareForDeletion() {
+        authToken = nil // clear from keychain
+        super.prepareForDeletion()
+    }
 
     var shouldReportOverTheApiLimit: Bool {
         if requestsRemaining == 0 {

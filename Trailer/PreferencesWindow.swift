@@ -1315,10 +1315,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     }
 
     @IBAction private func apiServerReportErrorSelected(_ sender: NSButton) {
-        if let apiServer = selectedServer {
-            apiServer.reportRefreshFailures = (sender.integerValue != 0)
-            storeApiFormToSelectedServer()
-        }
+        storeApiFormToSelectedServer()
     }
 
     @objc private func updateImportExportSettings() {
@@ -1413,24 +1410,6 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         }
     }
 
-    @IBAction private func viewExistingTokensSelected(_: NSButton) {
-        if apiServerWebPath.stringValue.isEmpty {
-            reportNeedFrontEnd()
-        } else {
-            let address = "\(apiServerWebPath.stringValue)/settings/tokens"
-            openLink(URL(string: address)!)
-        }
-    }
-
-    @IBAction private func viewWatchlistSelected(_: NSButton) {
-        if apiServerWebPath.stringValue.isEmpty {
-            reportNeedFrontEnd()
-        } else {
-            let address = "\(apiServerWebPath.stringValue)/watching"
-            openLink(URL(string: address)!)
-        }
-    }
-
     @IBAction private func prMergePolicySelected(_ sender: NSPopUpButton) {
         Settings.mergeHandlingPolicy = sender.indexOfSelectedItem
         updateHistoryOptions()
@@ -1482,39 +1461,38 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     }
 
     @IBAction private func apiRestoreDefaultsSelected(_: NSButton) {
-        if let apiServer = selectedServer {
-            apiServer.resetToGithub()
+        if let selectedServer {
+            selectedServer.resetToGithub()
             fillServerApiFormFromSelectedServer()
             storeApiFormToSelectedServer()
         }
     }
 
     private func fillServerApiFormFromSelectedServer() {
-        if let apiServer = selectedServer {
-            apiServerName.stringValue = apiServer.label.orEmpty
-            apiServerWebPath.stringValue = apiServer.webPath.orEmpty
-            apiServerApiPath.stringValue = apiServer.apiPath.orEmpty
-            apiServerGraphQLPath.stringValue = apiServer.graphQLPath.orEmpty
-            apiServerAuthToken.stringValue = apiServer.authToken.orEmpty
-            apiServerSelectedBox.title = apiServer.label ?? "New Server"
-            apiServerTestButton.isEnabled = !apiServer.authToken.isEmpty
-            apiServerDeleteButton.isEnabled = (ApiServer.countApiServers(in: DataManager.main) > 1)
-            apiServerReportError.integerValue = apiServer.reportRefreshFailures ? 1 : 0
-        }
+        guard let selectedServer else { return }
+        apiServerName.stringValue = selectedServer.label.orEmpty
+        apiServerWebPath.stringValue = selectedServer.webPath.orEmpty
+        apiServerApiPath.stringValue = selectedServer.apiPath.orEmpty
+        apiServerGraphQLPath.stringValue = selectedServer.graphQLPath.orEmpty
+        apiServerAuthToken.stringValue = selectedServer.authToken.orEmpty
+        apiServerSelectedBox.title = selectedServer.label ?? "New Server"
+        apiServerTestButton.isEnabled = !selectedServer.authToken.isEmpty
+        apiServerDeleteButton.isEnabled = (ApiServer.countApiServers(in: DataManager.main) > 1)
+        apiServerReportError.integerValue = selectedServer.reportRefreshFailures ? 1 : 0
     }
 
     private func storeApiFormToSelectedServer() {
-        if let apiServer = selectedServer {
-            apiServer.label = apiServerName.stringValue.trim
-            apiServer.apiPath = apiServerApiPath.stringValue.trim
-            apiServer.graphQLPath = apiServerGraphQLPath.stringValue.trim
-            apiServer.webPath = apiServerWebPath.stringValue.trim
-            apiServer.authToken = apiServerAuthToken.stringValue.trim
-            apiServerTestButton.isEnabled = !apiServer.authToken.isEmpty
-            serverList.reloadData()
-            serversDirty = true
-            deferredUpdateTimer.push()
-        }
+        guard let selectedServer else { return }
+        selectedServer.label = apiServerName.stringValue.trim
+        selectedServer.apiPath = apiServerApiPath.stringValue.trim
+        selectedServer.graphQLPath = apiServerGraphQLPath.stringValue.trim
+        selectedServer.webPath = apiServerWebPath.stringValue.trim
+        selectedServer.authToken = apiServerAuthToken.stringValue.trim
+        selectedServer.reportRefreshFailures = apiServerReportError.integerValue != 0
+        apiServerTestButton.isEnabled = !selectedServer.authToken.isEmpty
+        serverList.reloadData()
+        serversDirty = true
+        deferredUpdateTimer.push()
     }
 
     @IBAction private func addNewApiServerSelected(_: NSButton) {
@@ -1565,38 +1543,15 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         } else if obj === defaultOpenApp {
             Settings.defaultAppForOpeningItems = defaultOpenApp.stringValue.trim
 
-        } else if obj === apiServerName {
-            if let apiServer = selectedServer {
-                apiServer.label = apiServerName.stringValue
-                storeApiFormToSelectedServer()
-            }
+        } else if obj === apiServerName || obj === apiServerWebPath {
+            storeApiFormToSelectedServer()
 
-        } else if obj === apiServerApiPath {
-            if let apiServer = selectedServer {
-                apiServer.apiPath = apiServerApiPath.stringValue
-                storeApiFormToSelectedServer()
+        } else if obj === apiServerApiPath || obj === apiServerGraphQLPath || obj === apiServerAuthToken {
+            storeApiFormToSelectedServer()
+            if selectedServer != nil {
                 reset()
             }
 
-        } else if obj === apiServerGraphQLPath {
-            if let apiServer = selectedServer {
-                apiServer.graphQLPath = apiServerGraphQLPath.stringValue
-                storeApiFormToSelectedServer()
-                reset()
-            }
-
-        } else if obj === apiServerWebPath {
-            if let apiServer = selectedServer {
-                apiServer.webPath = apiServerWebPath.stringValue
-                storeApiFormToSelectedServer()
-            }
-
-        } else if obj === apiServerAuthToken {
-            if let apiServer = selectedServer {
-                apiServer.authToken = apiServerAuthToken.stringValue
-                storeApiFormToSelectedServer()
-                reset()
-            }
         } else if obj === repoFilter {
             reloadRepositories()
             updateAllItemSettingButtons()

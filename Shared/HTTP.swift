@@ -1,6 +1,6 @@
 import Foundation
-import TrailerJson
 import Semalot
+import TrailerJson
 
 typealias JSON = [String: Any]
 

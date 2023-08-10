@@ -1,7 +1,7 @@
 import Foundation
 import Lista
-import TrailerQL
 import Semalot
+import TrailerQL
 
 extension Node {
     var creationSkipped: Bool {
