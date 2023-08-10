@@ -10,7 +10,12 @@ enum Keychain {
     private static let service = "com.housetrip.Trailer"
 
     private static func baseQuery(account: String) -> [CFString: Any] {
-        [kSecAttrService: service, kSecAttrAccount: account, kSecClass: kSecClassGenericPassword]
+        [kSecUseDataProtectionKeychain: kCFBooleanTrue!,
+                       kSecAttrService: service,
+                       kSecAttrAccount: account,
+                             kSecClass: kSecClassGenericPassword,
+                    kSecAttrAccessible: kSecAttrAccessibleAfterFirstUnlock,
+                   kSecAttrAccessGroup: "X727JSJUGJ.\(service)"]
     }
 
     static func write(data: Data?, account: String) throws {

@@ -1314,7 +1314,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         }
     }
 
-    @IBAction private func apiServerReportErrorSelected(_ sender: NSButton) {
+    @IBAction private func apiServerReportErrorSelected(_: NSButton) {
         storeApiFormToSelectedServer()
     }
 
