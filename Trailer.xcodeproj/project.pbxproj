@@ -40,6 +40,7 @@
 		1628A6D618789E73005EDA69 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1628A6D518789E73005EDA69 /* Images.xcassets */; };
 		162A29D91A4085FD008F41A9 /* GroupingCriterion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162A29D81A4085FD008F41A9 /* GroupingCriterion.swift */; };
 		162A29DA1A4085FD008F41A9 /* GroupingCriterion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162A29D81A4085FD008F41A9 /* GroupingCriterion.swift */; };
+		162BCE702A856418000A3F81 /* Semalot in Frameworks */ = {isa = PBXBuildFile; productRef = 162BCE6F2A856418000A3F81 /* Semalot */; };
 		1633C1921ABCEC4A0086C692 /* Issue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1633C1911ABCEC4A0086C692 /* Issue.swift */; };
 		1633C1931ABCEC4A0086C692 /* Issue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1633C1911ABCEC4A0086C692 /* Issue.swift */; };
 		16358F3B1CF138190055F849 /* DataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16358F3A1CF138190055F849 /* DataSource.swift */; };
@@ -473,6 +474,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				162BCE702A856418000A3F81 /* Semalot in Frameworks */,
 				16DE55BD2A5A398D00166337 /* Lista in Frameworks */,
 				165880CC2A59C2BC0012A2B7 /* TrailerQL in Frameworks */,
 				168924552A58BC7A0094F0D1 /* TrailerJson in Frameworks */,
@@ -982,6 +984,7 @@
 				168924542A58BC7A0094F0D1 /* TrailerJson */,
 				165880CB2A59C2BC0012A2B7 /* TrailerQL */,
 				16DE55BC2A5A398D00166337 /* Lista */,
+				162BCE6F2A856418000A3F81 /* Semalot */,
 			);
 			productName = PocketTrailer;
 			productReference = 1628A6B118789E73005EDA69 /* PocketTrailer.app */;
@@ -2032,6 +2035,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		162BCE6F2A856418000A3F81 /* Semalot */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 16813B1F2A83041F0069C87B /* XCRemoteSwiftPackageReference "semalot" */;
+			productName = Semalot;
+		};
 		165880C92A59C2AF0012A2B7 /* TrailerQL */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 165880C82A59C2AF0012A2B7 /* XCRemoteSwiftPackageReference "trailer-ql" */;
