@@ -7,15 +7,13 @@ enum Keychain {
         case failure(OSStatus)
     }
 
-    private static let service = "com.housetrip.Trailer"
-
     private static func baseQuery(account: String) -> [CFString: Any] {
         [kSecUseDataProtectionKeychain: kCFBooleanTrue!,
-                       kSecAttrService: service,
+                       kSecAttrService: "com.housetrip.Trailer",
                        kSecAttrAccount: account,
                              kSecClass: kSecClassGenericPassword,
                     kSecAttrAccessible: kSecAttrAccessibleAfterFirstUnlock,
-                   kSecAttrAccessGroup: "X727JSJUGJ.\(service)"]
+                   kSecAttrAccessGroup: "X727JSJUGJ.com.housetrip.Trailer"]
     }
 
     static func write(data: Data?, account: String) throws {
