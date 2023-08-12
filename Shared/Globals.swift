@@ -39,6 +39,8 @@
 
 #endif
 
+let keychain = Keychain(service: "com.housetrip.Trailer", teamId: "X727JSJUGJ")
+
 @MainActor var preferencesDirty = false
 @MainActor var lastRepoCheck = Date.distantPast
 let autoSnoozeSentinelDate = Date.distantFuture.addingTimeInterval(-1)
