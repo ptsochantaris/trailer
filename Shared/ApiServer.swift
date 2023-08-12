@@ -69,8 +69,7 @@ final class ApiServer: NSManagedObject {
             let oid = objectID
             Task.detached {
                 let serverKey = oid.uriRepresentation().absoluteString
-                let newData = newValue?.data(using: .utf8)
-                keyVine[serverKey] = newData
+                keyVine[serverKey] = newValue
             }
         }
     }
