@@ -47,15 +47,14 @@ final class ApiServer: NSManagedObject {
 
             let serverKey = objectID.uriRepresentation().absoluteString
 
-            if let existing = keychain[serverKey] {
-                let result = String(bytes: existing, encoding: .utf8)
+            if let result: String = keyVine[serverKey] {
                 _cachedAuthToken = .some(result)
                 return result
             }
 
             if let legacy = value(forKey: "authToken") as? String, let legacyData = legacy.data(using: .utf8) {
                 Logging.log("Migrating server ID for \(label.orEmpty) to keychain...")
-                keychain[serverKey] = legacyData
+                keyVine[serverKey] = legacyData
                 setValue(nil, forKey: "authToken")
                 _cachedAuthToken = .some(legacy)
                 return legacy
@@ -71,7 +70,7 @@ final class ApiServer: NSManagedObject {
             Task.detached {
                 let serverKey = oid.uriRepresentation().absoluteString
                 let newData = newValue?.data(using: .utf8)
-                keychain[serverKey] = newData
+                keyVine[serverKey] = newData
             }
         }
     }

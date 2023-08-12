@@ -19,6 +19,7 @@ Parts of Trailer are being split off into their own Swift Packages to make them 
 - [Trailer-Json](https://github.com/ptsochantaris/trailer-json)
 - [Lista](https://github.com/ptsochantaris/lista)
 - [Semalot](https://github.com/ptsochantaris/semalot)
+- [KeyVine](https://github.com/ptsochantaris/key-vine)
 
 ## License
 

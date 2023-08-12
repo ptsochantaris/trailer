@@ -39,7 +39,8 @@
 
 #endif
 
-let keychain = Keychain(service: "com.housetrip.Trailer", teamId: "X727JSJUGJ")
+import KeyVine
+let keyVine = KeyVine(appIdentifier: "com.housetrip.Trailer", teamId: "X727JSJUGJ")
 
 @MainActor var preferencesDirty = false
 @MainActor var lastRepoCheck = Date.distantPast
