@@ -40,7 +40,7 @@
 #endif
 
 import KeyVine
-let keyVine = KeyVine(appIdentifier: "com.housetrip.Trailer", teamId: "X727JSJUGJ")
+var keyVine = KeyVine(appIdentifier: "com.housetrip.Trailer", teamId: "X727JSJUGJ")
 
 @MainActor var preferencesDirty = false
 @MainActor var lastRepoCheck = Date.distantPast
