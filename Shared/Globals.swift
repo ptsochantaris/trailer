@@ -198,115 +198,137 @@ enum KeepPolicy: Int {
 }
 
 enum Placement {
-    case moveToMine, moveToParticipated, moveToMentioned, doNothing
+    case mine, participated, mentioned, nothing
 
     var name: String {
         switch self {
-        case .doNothing:
+        case .nothing:
             return "Do Nothing"
-        case .moveToMine:
+        case .mine:
             return "Move to \"Mine\""
-        case .moveToMentioned:
+        case .mentioned:
             return "Move to \"Mentioned\""
-        case .moveToParticipated:
+        case .participated:
             return "Move to \"Participated\""
         }
     }
 
-    static let labels = [Placement.moveToMine.name, Placement.moveToParticipated.name, Placement.moveToMentioned.name, Placement.doNothing.name]
+    static let labels = [Placement.mine.name, Placement.participated.name, Placement.mentioned.name, Placement.nothing.name]
 
     var preferredSection: Section? {
         switch self {
-        case .doNothing:
+        case .nothing:
             return nil
-        case .moveToMine:
+        case .mine:
             return .mine
-        case .moveToParticipated:
+        case .participated:
             return .participated
-        case .moveToMentioned:
+        case .mentioned:
             return .mentioned
         }
     }
 
-    var assignmentPolicyRawValue: Int {
+    var assignmentPolicySettingsValue: Int {
         switch self {
-        case .doNothing:
+        case .nothing:
             return 2
-        case .moveToMine:
+        case .mine:
             return 0
-        case .moveToParticipated:
+        case .participated:
             return 1
-        case .moveToMentioned:
+        case .mentioned:
             return 3
         }
     }
 
-    init?(fromAssignmentPolicyRawValue: Int) {
-        switch fromAssignmentPolicyRawValue {
+    var assignmentPolictMenuIndex: Int {
+        switch self {
+        case .nothing:
+            return 3
+        case .mine:
+            return 0
+        case .participated:
+            return 1
+        case .mentioned:
+            return 2
+        }
+    }
+
+    init(assignmentPolicyMenuIndex: Int) {
+        switch assignmentPolicyMenuIndex {
+        case Placement.mine.assignmentPolictMenuIndex:
+            self = .mine
+        case Placement.participated.assignmentPolictMenuIndex:
+            self = .participated
+        case Placement.mentioned.assignmentPolictMenuIndex:
+            self = .mentioned
+        default:
+            self = .nothing
+        }
+    }
+
+    init?(fromAssignmentPolicySettingsValue: Int) {
+        switch fromAssignmentPolicySettingsValue {
         case 2:
-            self = .doNothing
+            self = .nothing
         case 0:
-            self = .moveToMine
+            self = .mine
         case 1:
-            self = .moveToParticipated
+            self = .participated
         case 3:
-            self = .moveToMentioned
+            self = .mentioned
         default:
             return nil
         }
     }
 
-    var movePolicyRawValue: Int {
+    var movePolicySettingsValue: Int {
         switch self {
-        case .doNothing:
+        case .nothing:
             return 0
-        case .moveToMine:
+        case .mine:
             return 1
-        case .moveToParticipated:
+        case .participated:
             return 2
-        case .moveToMentioned:
+        case .mentioned:
             return 3
         }
     }
 
-    init?(fromMovePolicyRawValue: Int) {
-        switch fromMovePolicyRawValue {
+    var movePolicyMenuIndex: Int {
+        switch self {
+        case .nothing:
+            return 0
+        case .mine:
+            return 1
+        case .participated:
+            return 2
+        case .mentioned:
+            return 3
+        }
+    }
+
+    init(fromMovePolicyMenuIndex: Int) {
+        switch fromMovePolicyMenuIndex {
+        case 1: self = .mine
+        case 2: self = .participated
+        case 3: self = .mentioned
+        default: self = .nothing
+        }
+    }
+
+    init?(fromMovePolicySettingsValue: Int) {
+        switch fromMovePolicySettingsValue {
         case 0:
-            self = .doNothing
+            self = .nothing
         case 1:
-            self = .moveToMine
+            self = .mine
         case 2:
-            self = .moveToParticipated
+            self = .participated
         case 3:
-            self = .moveToMentioned
+            self = .mentioned
         default:
             return nil
-        }
-    }
-
-    init(menuIndex: Int) {
-        switch menuIndex {
-        case Placement.moveToMine.menuIndex:
-            self = .moveToMine
-        case Placement.moveToParticipated.menuIndex:
-            self = .moveToParticipated
-        case Placement.moveToMentioned.menuIndex:
-            self = .moveToMentioned
-        default:
-            self = .doNothing
-        }
-    }
-
-    var menuIndex: Int {
-        switch self {
-        case .doNothing:
-            return 3
-        case .moveToMine:
-            return 0
-        case .moveToParticipated:
-            return 1
-        case .moveToMentioned:
-            return 2
         }
     }
 }
@@ -367,9 +389,18 @@ enum RepoDisplayPolicy: Int, CaseIterable {
     var intValue: Int { Int(rawValue) }
 }
 
-enum DraftHandlingPolicy: Int {
+enum DraftHandlingPolicy: Int, CaseIterable {
     case nothing, display, hide
-    static let labels = ["Do Nothing", "Display in Title", "Hide"]
+
+    static let allCases: [DraftHandlingPolicy] = [.nothing, .display, .hide]
+
+    var label: String {
+        switch self {
+        case .nothing: return "Do Nothing"
+        case .display: return "Display in Title"
+        case .hide: return "Hide"
+        }
+    }
 }
 
 enum AssignmentStatus: Int {

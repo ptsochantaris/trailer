@@ -356,7 +356,7 @@ class ListableItem: DataItem, Listable {
     }
 
     final func shouldGo(to section: Section) -> Bool {
-        let policy: Int
+        let policy: Placement
         switch AssignmentStatus(rawValue: assignedStatus) {
         case nil, .none?, .others:
             return false
@@ -372,11 +372,11 @@ class ListableItem: DataItem, Listable {
         case .all, .closed, .merged, .none, .snoozed:
             return false
         case .mentioned:
-            return policy == Placement.moveToMentioned.assignmentPolicyRawValue
+            return policy == .mentioned
         case .participated:
-            return policy == Placement.moveToParticipated.assignmentPolicyRawValue
+            return policy == .participated
         case .mine:
-            return policy == Placement.moveToMine.assignmentPolicyRawValue
+            return policy == .mine
         }
     }
 
@@ -494,7 +494,7 @@ class ListableItem: DataItem, Listable {
     }
 
     private func preferredSection(takingItemConditionIntoAccount: Bool) -> Section {
-        if Settings.draftHandlingPolicy == DraftHandlingPolicy.hide.rawValue && draft {
+        if Settings.draftHandlingPolicy == .hide && draft {
             return .none
         }
 
@@ -523,20 +523,17 @@ class ListableItem: DataItem, Listable {
             return section
         }
 
-        if let policy = Placement(fromMovePolicyRawValue: Settings.newMentionMovePolicy),
-           let section = policy.preferredSection,
+        if let section = Settings.newMentionMovePolicy.preferredSection,
            contains(terms: ["@\(apiServer.userName.orEmpty)"]) {
             return section
         }
 
-        if let policy = Placement(fromMovePolicyRawValue: Settings.teamMentionMovePolicy),
-           let section = policy.preferredSection,
+        if let section = Settings.teamMentionMovePolicy.preferredSection,
            contains(terms: apiServer.teams.compactMap(\.calculatedReferral)) {
             return section
         }
 
-        if let policy = Placement(fromMovePolicyRawValue: Settings.newItemInOwnedRepoMovePolicy),
-           let section = policy.preferredSection,
+        if let section = Settings.newItemInOwnedRepoMovePolicy.preferredSection,
            repo.isMine {
             return section
         }
@@ -745,7 +742,7 @@ class ListableItem: DataItem, Listable {
         if let t = title {
             components.append(t)
         }
-        if draft, Settings.draftHandlingPolicy == DraftHandlingPolicy.display.rawValue {
+        if draft, Settings.draftHandlingPolicy == .display {
             components.append("draft")
         }
         components.append("\(labels.count) labels:")
@@ -822,7 +819,7 @@ class ListableItem: DataItem, Listable {
             }
         }
 
-        if draft, Settings.draftHandlingPolicy == DraftHandlingPolicy.display.rawValue {
+        if draft, Settings.draftHandlingPolicy == .display {
             _title.append(NSAttributedString(string: " ", attributes: titleAttributes))
 
             let font = FONT_CLASS.boldSystemFont(ofSize: labelFont.pointSize - 3)

@@ -399,18 +399,18 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
 
     @IBAction private func assignedDirectReviewHandlingPolicySelected(_ sender: NSPopUpButton) {
         let index = sender.index(of: sender.selectedItem!)
-        Settings.assignedDirectReviewHandlingPolicy = Placement(menuIndex: index).assignmentPolicyRawValue
+        Settings.assignedDirectReviewHandlingPolicy = Placement(assignmentPolicyMenuIndex: index)
         deferredUpdateTimer.push()
     }
 
     @IBAction private func assignedTeamReviewHandlingPolicySelected(_ sender: NSPopUpButton) {
         let index = sender.index(of: sender.selectedItem!)
-        Settings.assignedTeamReviewHandlingPolicy = Placement(menuIndex: index).assignmentPolicyRawValue
+        Settings.assignedTeamReviewHandlingPolicy = Placement(assignmentPolicyMenuIndex: index)
         deferredUpdateTimer.push()
     }
 
     @IBAction private func draftHandlingPolicy(_ sender: NSPopUpButton) {
-        Settings.draftHandlingPolicy = sender.index(of: sender.selectedItem!)
+        Settings.draftHandlingPolicy = DraftHandlingPolicy(rawValue: sender.index(of: sender.selectedItem!)) ?? .nothing
         deferredUpdateTimer.push()
     }
 
@@ -631,7 +631,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         sortingOrder.integerValue = Settings.sortDescending ? 1 : 0
         showCreationDates.integerValue = Settings.showCreatedInsteadOfUpdated ? 1 : 0
         groupByRepo.integerValue = Settings.groupByRepo ? 1 : 0
-        draftHandlingPolicy.selectItem(at: Settings.draftHandlingPolicy)
+        draftHandlingPolicy.selectItem(at: Settings.draftHandlingPolicy.rawValue)
         showStatusItems.integerValue = Settings.showStatusItems ? 1 : 0
         makeStatusItemsSelectable.integerValue = Settings.makeStatusItemsSelectable ? 1 : 0
         openPrAtFirstUnreadComment.integerValue = Settings.openPrAtFirstUnreadComment ? 1 : 0
@@ -658,8 +658,8 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         autoHidePrsIApproved.integerValue = Settings.autoHidePrsIApproved ? 1 : 0
         autoHidePrsIRejected.integerValue = Settings.autoHidePrsIRejected ? 1 : 0
 
-        assignedItemDirectHandlingPolicy.selectItem(at: Placement(fromAssignmentPolicyRawValue: Settings.assignedItemDirectHandlingPolicy)?.menuIndex ?? 0)
-        assignedItemTeamHandlingPolicy.selectItem(at: Placement(fromAssignmentPolicyRawValue: Settings.assignedItemTeamHandlingPolicy)?.menuIndex ?? 0)
+        assignedItemDirectHandlingPolicy.selectItem(at: Settings.assignedItemDirectHandlingPolicy.assignmentPolictMenuIndex)
+        assignedItemTeamHandlingPolicy.selectItem(at: Settings.assignedItemTeamHandlingPolicy.assignmentPolictMenuIndex)
 
         defaultOpenApp.stringValue = Settings.defaultAppForOpeningItems
         defaultOpenLinks.stringValue = Settings.defaultAppForOpeningWeb
@@ -670,9 +670,9 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         supportReviews.integerValue = Settings.displayReviewsOnItems ? 1 : 0
         notifyOnReviewAssignments.integerValue = Settings.notifyOnReviewAssignments ? 1 : 0
 
-        newMentionMovePolicy.selectItem(at: Settings.newMentionMovePolicy)
-        teamMentionMovePolicy.selectItem(at: Settings.teamMentionMovePolicy)
-        newItemInOwnedRepoMovePolicy.selectItem(at: Settings.newItemInOwnedRepoMovePolicy)
+        newMentionMovePolicy.selectItem(at: Settings.newMentionMovePolicy.movePolicyMenuIndex)
+        teamMentionMovePolicy.selectItem(at: Settings.teamMentionMovePolicy.movePolicyMenuIndex)
+        newItemInOwnedRepoMovePolicy.selectItem(at: Settings.newItemInOwnedRepoMovePolicy.movePolicyMenuIndex)
 
         hotkeyEnable.integerValue = Settings.hotkeyEnable ? 1 : 0
         hotkeyControlModifier.integerValue = Settings.hotkeyControlModifier ? 1 : 0
@@ -680,10 +680,10 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         hotkeyOptionModifier.integerValue = Settings.hotkeyOptionModifier ? 1 : 0
         hotkeyShiftModifier.integerValue = Settings.hotkeyShiftModifier ? 1 : 0
 
-        let assignedDirectMenuIndex = Placement(fromAssignmentPolicyRawValue: Settings.assignedDirectReviewHandlingPolicy)?.menuIndex ?? 0
+        let assignedDirectMenuIndex = Settings.assignedDirectReviewHandlingPolicy.assignmentPolictMenuIndex
         assignedDirectReviewHandlingPolicy.select(assignedDirectReviewHandlingPolicy.item(at: assignedDirectMenuIndex))
 
-        let assignedTeamMenuIndex = Placement(fromAssignmentPolicyRawValue: Settings.assignedTeamReviewHandlingPolicy)?.menuIndex ?? 0
+        let assignedTeamMenuIndex = Settings.assignedTeamReviewHandlingPolicy.assignmentPolictMenuIndex
         assignedTeamReviewHandlingPolicy.select(assignedTeamReviewHandlingPolicy.item(at: assignedTeamMenuIndex))
 
         enableHotkeySegments()
@@ -800,17 +800,17 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     }
 
     @IBAction private func newMentionMovePolicySelected(_ sender: NSPopUpButton) {
-        Settings.newMentionMovePolicy = Placement(menuIndex: sender.indexOfSelectedItem).movePolicyRawValue
+        Settings.newMentionMovePolicy = Placement(fromMovePolicyMenuIndex: sender.indexOfSelectedItem)
         deferredUpdateTimer.push()
     }
 
     @IBAction private func teamMentionMovePolicySelected(_ sender: NSPopUpButton) {
-        Settings.teamMentionMovePolicy = sender.indexOfSelectedItem
+        Settings.teamMentionMovePolicy = Placement(fromMovePolicyMenuIndex: sender.indexOfSelectedItem)
         deferredUpdateTimer.push()
     }
 
     @IBAction private func newItemInOwnedRepoMovePolicySelected(_ sender: NSPopUpButton) {
-        Settings.newItemInOwnedRepoMovePolicy = sender.indexOfSelectedItem
+        Settings.newItemInOwnedRepoMovePolicy = Placement(fromMovePolicyMenuIndex: sender.indexOfSelectedItem)
         deferredUpdateTimer.push()
     }
 
@@ -1174,12 +1174,12 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     }
 
     @IBAction private func assignedItemDirectHandlingPolicySelected(_ sender: NSPopUpButton) {
-        Settings.assignedItemDirectHandlingPolicy = Placement(menuIndex: sender.indexOfSelectedItem).assignmentPolicyRawValue
+        Settings.assignedItemDirectHandlingPolicy = Placement(assignmentPolicyMenuIndex: sender.indexOfSelectedItem)
         deferredUpdateTimer.push()
     }
 
     @IBAction private func assignedItemTeamHandlingPolicySelected(_ sender: NSPopUpButton) {
-        Settings.assignedItemTeamHandlingPolicy = Placement(menuIndex: sender.indexOfSelectedItem).assignmentPolicyRawValue
+        Settings.assignedItemTeamHandlingPolicy = Placement(assignmentPolicyMenuIndex: sender.indexOfSelectedItem)
         deferredUpdateTimer.push()
     }
 
@@ -1425,19 +1425,19 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
 
     private func updateStatusTermPreferenceControls() {
         let mode = Settings.statusFilteringMode
-        statusTermMenu.selectItem(at: mode)
-        if mode != 0 {
-            statusTermsField.isEnabled = true
-            statusTermsField.alphaValue = 1.0
-        } else {
+        statusTermMenu.selectItem(at: mode.rawValue)
+        if mode == .all {
             statusTermsField.isEnabled = false
             statusTermsField.alphaValue = 0.5
+        } else {
+            statusTermsField.isEnabled = true
+            statusTermsField.alphaValue = 1.0
         }
         statusTermsField.objectValue = Settings.statusFilteringTerms
     }
 
     @IBAction private func statusFilterMenuChanged(_ sender: NSPopUpButton) {
-        Settings.statusFilteringMode = sender.indexOfSelectedItem
+        Settings.statusFilteringMode = StatusFilter(rawValue: sender.indexOfSelectedItem) ?? Settings.statusFilteringMode
         Settings.statusFilteringTerms = statusTermsField.objectValue as! [String]
         updateStatusTermPreferenceControls()
         deferredUpdateTimer.push()

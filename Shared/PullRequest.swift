@@ -142,16 +142,14 @@ final class PullRequest: ListableItem {
             break
 
         case .me:
-            if Settings.assignedDirectReviewHandlingPolicy != Placement.doNothing.assignmentPolicyRawValue,
-               let placement = Placement(fromAssignmentPolicyRawValue: Settings.assignedDirectReviewHandlingPolicy),
-               let section = placement.preferredSection {
+            if Settings.assignedDirectReviewHandlingPolicy != .nothing,
+               let section = Settings.assignedDirectReviewHandlingPolicy.preferredSection {
                 return section
             }
 
         case .myTeam:
-            if Settings.assignedTeamReviewHandlingPolicy != Placement.doNothing.assignmentPolicyRawValue,
-               let placement = Placement(fromAssignmentPolicyRawValue: Settings.assignedTeamReviewHandlingPolicy),
-               let section = placement.preferredSection {
+            if Settings.assignedTeamReviewHandlingPolicy != .nothing,
+               let section = Settings.assignedTeamReviewHandlingPolicy.preferredSection {
                 return section
             }
         }
@@ -406,10 +404,10 @@ final class PullRequest: ListableItem {
         var statusList = Array(contexts.values)
 
         let mode = Settings.statusFilteringMode
-        if mode != StatusFilter.all.rawValue {
+        if mode != .all {
             let terms = Settings.statusFilteringTerms
             if !terms.isEmpty {
-                let inclusive = mode == StatusFilter.include.rawValue
+                let inclusive = mode == .include
                 // contains(a) or contains(b) or contains(c)  -vs-  not(contains(a) or contains(b) or contains(c))
 
                 statusList = statusList.filter {

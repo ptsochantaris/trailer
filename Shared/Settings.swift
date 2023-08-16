@@ -72,7 +72,7 @@ enum Settings {
         }
 
         if let moveAssignedPrs = sharedDefaults.object(forKey: "MOVE_ASSIGNED_PRS_TO_MY_SECTION") as? Bool {
-            sharedDefaults.set(moveAssignedPrs ? Placement.moveToMine.assignmentPolicyRawValue : Placement.doNothing.assignmentPolicyRawValue, forKey: "ASSIGNED_PR_HANDLING_POLICY")
+            sharedDefaults.set(moveAssignedPrs ? Placement.mine.assignmentPolicySettingsValue : Placement.nothing.assignmentPolicySettingsValue, forKey: "ASSIGNED_PR_HANDLING_POLICY")
             sharedDefaults.removeObject(forKey: "MOVE_ASSIGNED_PRS_TO_MY_SECTION")
         }
 
@@ -87,17 +87,17 @@ enum Settings {
         }
 
         if let mentionedUserMoveLegacy = sharedDefaults.object(forKey: "AUTO_PARTICIPATE_IN_MENTIONS_KEY") as? Bool {
-            sharedDefaults.set(mentionedUserMoveLegacy ? Placement.moveToMentioned.movePolicyRawValue : Placement.doNothing.movePolicyRawValue, forKey: "NEW_MENTION_MOVE_POLICY")
+            sharedDefaults.set(mentionedUserMoveLegacy ? Placement.mentioned.movePolicySettingsValue : Placement.nothing.movePolicySettingsValue, forKey: "NEW_MENTION_MOVE_POLICY")
             sharedDefaults.removeObject(forKey: "AUTO_PARTICIPATE_IN_MENTIONS_KEY")
         }
 
         if let mentionedTeamMoveLegacy = sharedDefaults.object(forKey: "AUTO_PARTICIPATE_ON_TEAM_MENTIONS") as? Bool {
-            sharedDefaults.set(mentionedTeamMoveLegacy ? Placement.moveToMentioned.movePolicyRawValue : Placement.doNothing.movePolicyRawValue, forKey: "TEAM_MENTION_MOVE_POLICY")
+            sharedDefaults.set(mentionedTeamMoveLegacy ? Placement.mentioned.movePolicySettingsValue : Placement.nothing.movePolicySettingsValue, forKey: "TEAM_MENTION_MOVE_POLICY")
             sharedDefaults.removeObject(forKey: "AUTO_PARTICIPATE_ON_TEAM_MENTIONS")
         }
 
         if let mentionedRepoMoveLegacy = sharedDefaults.object(forKey: "MOVE_NEW_ITEMS_IN_OWN_REPOS_TO_MENTIONED") as? Bool {
-            sharedDefaults.set(mentionedRepoMoveLegacy ? Placement.moveToMentioned.movePolicyRawValue : Placement.doNothing.movePolicyRawValue, forKey: "NEW_ITEM_IN_OWNED_REPO_MOVE_POLICY")
+            sharedDefaults.set(mentionedRepoMoveLegacy ? Placement.mentioned.movePolicySettingsValue : Placement.nothing.movePolicySettingsValue, forKey: "NEW_ITEM_IN_OWNED_REPO_MOVE_POLICY")
             sharedDefaults.removeObject(forKey: "MOVE_NEW_ITEMS_IN_OWN_REPOS_TO_MENTIONED")
         }
 
@@ -300,8 +300,8 @@ enum Settings {
     static var sortMethod: SortingMethod
     static let sortMethodHelp = "The criterion to use when sorting items."
 
-    @UserDefault(key: "STATUS_FILTERING_METHOD_KEY", defaultValue: 0)
-    static var statusFilteringMode: Int
+    @EnumUserDefault(key: "STATUS_FILTERING_METHOD_KEY", defaultValue: .all)
+    static var statusFilteringMode: StatusFilter
 
     @UserDefault(key: "LAST_PREFS_TAB_SELECTED", defaultValue: 0)
     static var lastPreferencesTabSelected: Int
@@ -326,40 +326,40 @@ enum Settings {
     @UserDefault(key: "UPDATE_CHECK_INTERVAL_KEY", defaultValue: 8)
     static var checkForUpdatesInterval: Int
 
-    @UserDefault(key: "ASSIGNED_REVIEW_HANDLING_POLICY", defaultValue: 0)
-    static var assignedDirectReviewHandlingPolicy: Int
+    @AssignmentPlacementUserDefault(key: "ASSIGNED_REVIEW_HANDLING_POLICY", defaultValue: .nothing)
+    static var assignedDirectReviewHandlingPolicy: Placement
     static let assignedDirectReviewHandlingPolicyHelp = "If an item is assigned for you to review, Trailer can move it to a specific section or leave it as-is."
 
-    @UserDefault(key: "ASSIGNED_REVIEW_TEAM_HANDLING_POLICY", defaultValue: 0)
-    static var assignedTeamReviewHandlingPolicy: Int
+    @AssignmentPlacementUserDefault(key: "ASSIGNED_REVIEW_TEAM_HANDLING_POLICY", defaultValue: .nothing)
+    static var assignedTeamReviewHandlingPolicy: Placement
     static let assignedTeamReviewHandlingPolicyHelp = "If an item is assigned for your team to review, Trailer can move it to a specific section or leave it as-is."
 
-    @UserDefault(key: "ASSIGNED_PR_HANDLING_POLICY", defaultValue: 1)
-    static var assignedItemDirectHandlingPolicy: Int
+    @AssignmentPlacementUserDefault(key: "ASSIGNED_PR_HANDLING_POLICY", defaultValue: .mine)
+    static var assignedItemDirectHandlingPolicy: Placement
     static let assignedItemDirectHandlingPolicyHelp = "If an item is assigned to you, Trailer can move it to a specific section or leave it as-is."
 
-    @UserDefault(key: "ASSIGNED_PR_TEAM_HANDLING_POLICY", defaultValue: 1)
-    static var assignedItemTeamHandlingPolicy: Int
+    @AssignmentPlacementUserDefault(key: "ASSIGNED_PR_TEAM_HANDLING_POLICY", defaultValue: .mine)
+    static var assignedItemTeamHandlingPolicy: Placement
     static let assignedItemTeamHandlingPolicyHelp = "If an item is assigned to your team(s), Trailer can move it to a specific section or leave it as-is."
 
-    @EnumUserDefault(key: "NEW_PR_DISPLAY_POLICY_INDEX", defaultValue: RepoDisplayPolicy.hide)
+    @EnumUserDefault(key: "NEW_PR_DISPLAY_POLICY_INDEX", defaultValue: .hide)
     static var displayPolicyForNewPrs: RepoDisplayPolicy
     static let displayPolicyForNewPrsHelp = "When a new repository is detected in your watchlist, this display policy will be applied by default to pull requests that come from it. You can further customize the display policy for any individual repository from the 'Repositories' tab."
 
-    @EnumUserDefault(key: "NEW_ISSUE_DISPLAY_POLICY_INDEX", defaultValue: RepoDisplayPolicy.hide)
+    @EnumUserDefault(key: "NEW_ISSUE_DISPLAY_POLICY_INDEX", defaultValue: .hide)
     static var displayPolicyForNewIssues: RepoDisplayPolicy
     static let displayPolicyForNewIssuesHelp = "When a new repository is detected in your watchlist, this display policy will be applied by default to issues that come from it. You can further customize the display policy for any individual repository from the 'Repositories' tab."
 
-    @UserDefault(key: "NEW_MENTION_MOVE_POLICY", defaultValue: Placement.moveToMentioned.movePolicyRawValue)
-    static var newMentionMovePolicy: Int
+    @MovePlacementUserDefault(key: "NEW_MENTION_MOVE_POLICY", defaultValue: .mentioned)
+    static var newMentionMovePolicy: Placement
     static let newMentionMovePolicyHelp = "If your username is mentioned in an item's description or a comment posted inside it, move the item to the specified section."
 
-    @UserDefault(key: "TEAM_MENTION_MOVE_POLICY", defaultValue: Placement.moveToMentioned.movePolicyRawValue)
-    static var teamMentionMovePolicy: Int
+    @MovePlacementUserDefault(key: "TEAM_MENTION_MOVE_POLICY", defaultValue: .mentioned)
+    static var teamMentionMovePolicy: Placement
     static let teamMentionMovePolicyHelp = "If the name of one of the teams you belong to is mentioned in an item's description or a comment posted inside it, move the item to the specified section."
 
-    @UserDefault(key: "NEW_ITEM_IN_OWNED_REPO_MOVE_POLICY", defaultValue: Placement.doNothing.movePolicyRawValue)
-    static var newItemInOwnedRepoMovePolicy: Int
+    @MovePlacementUserDefault(key: "NEW_ITEM_IN_OWNED_REPO_MOVE_POLICY", defaultValue: .nothing)
+    static var newItemInOwnedRepoMovePolicy: Placement
     static let newItemInOwnedRepoMovePolicyHelp = "Automatically move an item to the specified section if it has been created in a repo which you own, even if there is no direct mention of you."
 
     /////////////////////////// STRINGS
@@ -712,8 +712,8 @@ enum Settings {
     static var displayNumbersForItems: Bool
     static let displayNumbersForItemsHelp = "Prefix titles of items with the number of the referenced PR or issue."
 
-    @UserDefault(key: "DRAFT_HANDLING_POLICY", defaultValue: 0)
-    static var draftHandlingPolicy: Int
+    @EnumUserDefault(key: "DRAFT_HANDLING_POLICY", defaultValue: .nothing)
+    static var draftHandlingPolicy: DraftHandlingPolicy
     static let draftHandlingPolicyHelp = "How to deal with a PR if it is marked as a draft."
 
     @UserDefault(key: "COUNT_VISIBLE_SNOOZED_ITEMS", defaultValue: true)
@@ -843,6 +843,52 @@ enum Settings {
             }
             set {
                 Settings[key] = newValue.rawValue
+            }
+        }
+    }
+
+    @propertyWrapper
+    struct MovePlacementUserDefault {
+        let key: String
+        let defaultValue: Placement
+
+        init(key: String, defaultValue: Placement) {
+            self.key = key
+            self.defaultValue = defaultValue
+        }
+
+        var wrappedValue: Placement {
+            get {
+                if let o = Settings[key] as? Int, let v = Placement(fromMovePolicySettingsValue: o) {
+                    return v
+                }
+                return defaultValue
+            }
+            set {
+                Settings[key] = newValue.movePolicySettingsValue
+            }
+        }
+    }
+
+    @propertyWrapper
+    struct AssignmentPlacementUserDefault {
+        let key: String
+        let defaultValue: Placement
+
+        init(key: String, defaultValue: Placement) {
+            self.key = key
+            self.defaultValue = defaultValue
+        }
+
+        var wrappedValue: Placement {
+            get {
+                if let o = Settings[key] as? Int, let v = Placement(fromAssignmentPolicySettingsValue: o) {
+                    return v
+                }
+                return defaultValue
+            }
+            set {
+                Settings[key] = newValue.assignmentPolicySettingsValue
             }
         }
     }

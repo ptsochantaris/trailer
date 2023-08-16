@@ -152,8 +152,8 @@ enum API {
         Settings.displayReviewsOnItems
             || Settings.showRequestedTeamReviews
             || Settings.notifyOnReviewAssignments
-            || (Settings.assignedDirectReviewHandlingPolicy != Placement.doNothing.assignmentPolicyRawValue)
-            || (Settings.assignedTeamReviewHandlingPolicy != Placement.doNothing.assignmentPolicyRawValue)
+            || (Settings.assignedDirectReviewHandlingPolicy != .nothing)
+            || (Settings.assignedTeamReviewHandlingPolicy != .nothing)
     }
 
     ////////////////////////////////////// API interface
