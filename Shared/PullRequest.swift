@@ -142,13 +142,17 @@ final class PullRequest: ListableItem {
             break
 
         case .me:
-            if Settings.assignedDirectReviewHandlingPolicy > Section.none.rawValue {
-                return Section(rawValue: Settings.assignedDirectReviewHandlingPolicy)!
+            if Settings.assignedDirectReviewHandlingPolicy != Placement.doNothing.assignmentPolicyRawValue,
+               let placement = Placement(fromAssignmentPolicyRawValue: Settings.assignedDirectReviewHandlingPolicy),
+               let section = placement.preferredSection {
+                return section
             }
 
         case .myTeam:
-            if Settings.assignedTeamReviewHandlingPolicy > Section.none.rawValue {
-                return Section(rawValue: Settings.assignedTeamReviewHandlingPolicy)!
+            if Settings.assignedTeamReviewHandlingPolicy != Placement.doNothing.assignmentPolicyRawValue,
+               let placement = Placement(fromAssignmentPolicyRawValue: Settings.assignedTeamReviewHandlingPolicy),
+               let section = placement.preferredSection {
+                return section
             }
         }
 
@@ -427,7 +431,7 @@ final class PullRequest: ListableItem {
     }
 
     @objc var sectionName: String {
-        Section.prMenuTitles[Int(sectionIndex)]
+        Section(sectionIndex: sectionIndex).prMenuName
     }
 
     var shouldAnnounceStatus: Bool {

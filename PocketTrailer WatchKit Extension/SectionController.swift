@@ -36,7 +36,7 @@ final class SectionController: CommonController {
 
     override func table(_: WKInterfaceTable, didSelectRowAt rowIndex: Int) {
         let r = rowControllers[rowIndex] as! SectionRow
-        let section = r.section?.rawValue ?? -1
+        let section = r.section?.sectionIndex ?? -1
         let list = [
             SECTION_KEY: section,
             TYPE_KEY: r.type!,
@@ -56,11 +56,6 @@ final class SectionController: CommonController {
             startRefreshButton.setHidden(false)
             updatedLabel.setHidden(false)
         }
-    }
-
-    private func sectionFrom(apiName: String) -> Section {
-        let index = Section.apiTitles.firstIndex(of: apiName)!
-        return Section(rawValue: index)!
     }
 
     func resetUI() {
@@ -83,20 +78,20 @@ final class SectionController: CommonController {
                 pt.label = label
                 rowControllers.append(pt)
                 var totalUnread = 0
-                for itemSection in Section.apiTitles {
+                for itemSection in Section.allCases {
                     switch itemSection {
-                    case Section.none.apiName:
+                    case Section.none:
                         continue
-                    case Section.closed.apiName:
+                    case Section.closed:
                         showClearClosed = true
-                    case Section.merged.apiName:
+                    case Section.merged:
                         showClearMerged = true
                     default: break
                     }
 
                     if let section = items[itemSection] as? [AnyHashable: Any], let count = section["total"] as? Int, let unread = section["unread"] as? Int, count > 0 {
                         let s = SectionRow()
-                        s.section = sectionFrom(apiName: itemSection)
+                        s.section = itemSection
                         s.totalCount = count
                         s.unreadCount = unread
                         s.type = itemType

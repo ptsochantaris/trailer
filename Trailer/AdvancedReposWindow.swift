@@ -25,11 +25,11 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
 
         allNewPrsSetting.addItems(withTitles: RepoDisplayPolicy.labels)
         allNewPrsSetting.toolTip = "The visibility settings you would like to apply by default for Pull Requests if a new repository is added in your watchlist."
-        allNewPrsSetting.selectItem(at: Settings.displayPolicyForNewPrs)
+        allNewPrsSetting.selectItem(at: Settings.displayPolicyForNewPrs.rawValue)
 
         allNewIssuesSetting.addItems(withTitles: RepoDisplayPolicy.labels)
         allNewIssuesSetting.toolTip = "The visibility settings you would like to apply by default for Pull Requests if a new repository is added in your watchlist."
-        allNewIssuesSetting.selectItem(at: Settings.displayPolicyForNewIssues)
+        allNewIssuesSetting.selectItem(at: Settings.displayPolicyForNewIssues.rawValue)
 
         refreshButton.toolTip = "Reload all watchlists now. Normally Trailer does this by itself every few hours. You can control how often from the 'Display' tab."
         refreshReposLabel.toolTip = Settings.newRepoCheckPeriodHelp
@@ -50,11 +50,11 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
     }
 
     @IBAction private func allNewPrsPolicySelected(_ sender: NSPopUpButton) {
-        Settings.displayPolicyForNewPrs = sender.indexOfSelectedItem
+        Settings.displayPolicyForNewPrs = RepoDisplayPolicy(rawValue: sender.indexOfSelectedItem) ?? Settings.displayPolicyForNewPrs
     }
 
     @IBAction private func allNewIssuesPolicySelected(_ sender: NSPopUpButton) {
-        Settings.displayPolicyForNewIssues = sender.indexOfSelectedItem
+        Settings.displayPolicyForNewIssues = RepoDisplayPolicy(rawValue: sender.indexOfSelectedItem) ?? Settings.displayPolicyForNewIssues
     }
 
     func windowWillClose(_: Notification) {

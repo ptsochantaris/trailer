@@ -53,7 +53,7 @@ extension Listable {
     }
 
     var section: Section {
-        Section(rawValue: sectionIndex) ?? .none
+        Section(sectionIndex: sectionIndex)
     }
 }
 
@@ -333,22 +333,20 @@ class ListableItem: DataItem, Listable {
         postProcess()
     }
 
-    final func shouldKeep(accordingTo policy: Int) -> Bool { // issue: item has already been moved at this point
-        let policy = HandlingPolicy(rawValue: policy)
-
+    final func shouldKeep(accordingTo policy: KeepPolicy) -> Bool { // issue: item has already been moved at this point
         switch policy {
-        case .keepAll:
+        case .everything:
             return true
 
-        case .keepMineAndParticipated:
+        case .mineAndParticipated:
             let preConditionSection = preferredSection(takingItemConditionIntoAccount: false)
             return preConditionSection == .mine || preConditionSection == .participated
 
-        case .keepMine:
+        case .mine:
             let preConditionSection = preferredSection(takingItemConditionIntoAccount: false)
             return preConditionSection == .mine
 
-        case .keepNone, .none:
+        case .nothing:
             return false
         }
     }
@@ -407,7 +405,7 @@ class ListableItem: DataItem, Listable {
     }
 
     final var isVisibleOnMenu: Bool {
-        sectionIndex != Section.none.rawValue
+        sectionIndex != Section.none.sectionIndex
     }
 
     final func wakeUp() {
@@ -420,14 +418,12 @@ class ListableItem: DataItem, Listable {
     }
 
     final var canBadge: Bool {
-        if let section = Section(rawValue: sectionIndex) {
-            return canBadge(in: section)
-        }
-        return false
+        let section = Section(sectionIndex: sectionIndex)
+        return canBadge(in: section)
     }
 
     final func keep(as newCondition: ItemCondition, notification: NotificationType) {
-        if sectionIndex == Section.all.rawValue, !Section.all.shouldBadgeComments {
+        if sectionIndex == Section.all.sectionIndex, !Section.all.shouldBadgeComments {
             catchUpCommentDate()
         }
         postSyncAction = PostSyncAction.doNothing.rawValue
@@ -527,16 +523,22 @@ class ListableItem: DataItem, Listable {
             return section
         }
 
-        if Settings.newMentionMovePolicy > Section.none.rawValue, contains(terms: ["@\(apiServer.userName.orEmpty)"]) {
-            return Section(rawValue: Settings.newMentionMovePolicy)!
+        if let policy = Placement(fromMovePolicyRawValue: Settings.newMentionMovePolicy),
+           let section = policy.preferredSection,
+           contains(terms: ["@\(apiServer.userName.orEmpty)"]) {
+            return section
         }
 
-        if Settings.teamMentionMovePolicy > Section.none.rawValue, contains(terms: apiServer.teams.compactMap(\.calculatedReferral)) {
-            return Section(rawValue: Settings.teamMentionMovePolicy)!
+        if let policy = Placement(fromMovePolicyRawValue: Settings.teamMentionMovePolicy),
+           let section = policy.preferredSection,
+           contains(terms: apiServer.teams.compactMap(\.calculatedReferral)) {
+            return section
         }
 
-        if Settings.newItemInOwnedRepoMovePolicy > Section.none.rawValue, repo.isMine {
-            return Section(rawValue: Settings.newItemInOwnedRepoMovePolicy)!
+        if let policy = Placement(fromMovePolicyRawValue: Settings.newItemInOwnedRepoMovePolicy),
+           let section = policy.preferredSection,
+           repo.isMine {
+            return section
         }
 
         return .all
@@ -657,7 +659,7 @@ class ListableItem: DataItem, Listable {
                 + countReviews(context: context)
         }
 
-        sectionIndex = targetSection.rawValue
+        sectionIndex = targetSection.sectionIndex
     }
 
     func countReviews(context _: PostProcessContext) -> Int {
@@ -1066,7 +1068,8 @@ class ListableItem: DataItem, Listable {
         if sectionIndex < 0 {
             andPredicates.append(Section.nonZeroPredicate)
 
-        } else if let s = Section(rawValue: sectionIndex) {
+        } else {
+            let s = Section(sectionIndex: sectionIndex)
             andPredicates.append(s.matchingPredicate)
         }
 
@@ -1141,12 +1144,11 @@ class ListableItem: DataItem, Listable {
             sortDescriptors.append(NSSortDescriptor(key: "repo.fullName", ascending: true, selector: #selector(NSString.localizedCaseInsensitiveCompare)))
         }
 
-        if let fieldName = SortingMethod(rawValue: Settings.sortMethod)?.field {
-            if fieldName == "title" {
-                sortDescriptors.append(NSSortDescriptor(key: fieldName, ascending: !Settings.sortDescending, selector: #selector(NSString.localizedCaseInsensitiveCompare)))
-            } else {
-                sortDescriptors.append(NSSortDescriptor(key: fieldName, ascending: !Settings.sortDescending))
-            }
+        let fieldName = Settings.sortMethod.field
+        if fieldName == "title" {
+            sortDescriptors.append(NSSortDescriptor(key: fieldName, ascending: !Settings.sortDescending, selector: #selector(NSString.localizedCaseInsensitiveCompare)))
+        } else {
+            sortDescriptors.append(NSSortDescriptor(key: fieldName, ascending: !Settings.sortDescending))
         }
 
         // Logging.log("%@", andPredicates)
@@ -1348,7 +1350,7 @@ class ListableItem: DataItem, Listable {
         var actions: [MenuAction] = [.copy, .openRepo]
 
         if !isSnoozing {
-            let section = Section(rawValue: sectionIndex) ?? .none
+            let section = Section(sectionIndex: sectionIndex)
             if section.shouldBadgeComments {
                 if hasUnreadCommentsOrAlert {
                     actions.append(.markRead)
@@ -1364,7 +1366,7 @@ class ListableItem: DataItem, Listable {
             }
         }
 
-        if sectionIndex == Section.merged.rawValue || sectionIndex == Section.closed.rawValue {
+        if sectionIndex == Section.merged.sectionIndex || sectionIndex == Section.closed.sectionIndex {
             actions.append(.remove)
         }
 

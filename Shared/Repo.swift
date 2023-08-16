@@ -51,8 +51,8 @@ final class Repo: DataItem {
                 repo.archived = json["isArchived"] as? Bool ?? false
                 repo.ownerNodeId = (json["owner"] as? JSON)?["id"] as? String
                 if node.created {
-                    repo.displayPolicyForPrs = Settings.displayPolicyForNewPrs
-                    repo.displayPolicyForIssues = Settings.displayPolicyForNewIssues
+                    repo.displayPolicyForPrs = Settings.displayPolicyForNewPrs.rawValue
+                    repo.displayPolicyForIssues = Settings.displayPolicyForNewIssues.rawValue
                 }
             }
 
@@ -95,8 +95,8 @@ final class Repo: DataItem {
                 item.ownerNodeId = (info["owner"] as? JSON)?["node_id"] as? String
                 item.manuallyAdded = manuallyAdded
                 if item.postSyncAction == PostSyncAction.isNew.rawValue {
-                    item.displayPolicyForPrs = Settings.displayPolicyForNewPrs
-                    item.displayPolicyForIssues = Settings.displayPolicyForNewIssues
+                    item.displayPolicyForPrs = Settings.displayPolicyForNewPrs.rawValue
+                    item.displayPolicyForIssues = Settings.displayPolicyForNewIssues.rawValue
                 }
             }
         }

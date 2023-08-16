@@ -1504,7 +1504,7 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box fixedFrame="YES" boxType="custom" borderType="none" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="49Q-X3-TvK">
-                                            <rect key="frame" x="74" y="64" width="749" height="301"/>
+                                            <rect key="frame" x="73" y="64" width="749" height="301"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <view key="contentView" id="Hr7-ca-s5X">
                                                 <rect key="frame" x="0.0" y="0.0" width="749" height="301"/>

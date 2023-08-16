@@ -266,7 +266,7 @@ final class TrailerCell: NSTableCellView {
 
     @objc private func removeSelected() {
         if let item = associatedDataItem {
-            item.sectionIndex = Section.none.rawValue
+            item.sectionIndex = Section.none.sectionIndex
             app.updateRelatedMenus(for: item) // saveAndRequestMenuUpdate won't work in this case
             DataManager.main.delete(item)
             Task {

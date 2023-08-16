@@ -1,10 +1,18 @@
 import Foundation
 import SystemConfiguration
 
-enum NetworkStatus: Int {
-    case NotReachable, ReachableViaWiFi, ReachableViaWWAN
-    static let descriptions = ["Down", "Local", "Cellular"]
-    var name: String { NetworkStatus.descriptions[rawValue] }
+enum NetworkStatus {
+    case notReachable, reachableViaWiFi, reachableViaWWAN
+    var name: String {
+        switch self {
+        case .notReachable:
+            return "Down"
+        case .reachableViaWiFi:
+            return "Local"
+        case .reachableViaWWAN:
+            return "Cellular"
+        }
+    }
 }
 
 let ReachabilityChangedNotification = Notification.Name("ReachabilityChangedNotification")
@@ -47,18 +55,18 @@ final class Reachability {
 
     var status: NetworkStatus {
         var flags = SCNetworkReachabilityFlags()
-        var returnValue: NetworkStatus = .NotReachable
+        var returnValue: NetworkStatus = .notReachable
 
         if SCNetworkReachabilityGetFlags(reachability, &flags) {
             if flags.contains(.reachable) {
-                if !flags.contains(.connectionRequired) { returnValue = .ReachableViaWiFi }
+                if !flags.contains(.connectionRequired) { returnValue = .reachableViaWiFi }
 
                 if flags.contains(.connectionOnDemand) || flags.contains(.connectionOnTraffic) {
-                    if !flags.contains(.interventionRequired) { returnValue = .ReachableViaWiFi }
+                    if !flags.contains(.interventionRequired) { returnValue = .reachableViaWiFi }
                 }
 
                 #if os(iOS)
-                    if flags.contains(.isWWAN) { returnValue = .ReachableViaWWAN }
+                    if flags.contains(.isWWAN) { returnValue = .reachableViaWWAN }
                 #endif
             }
         }

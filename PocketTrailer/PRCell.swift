@@ -73,8 +73,7 @@ final class PRCell: UITableViewCell {
 
     @objc private func networkStateChanged() {
         Task {
-            let reachable = API.currentNetworkStatus != .NotReachable
-            if let f = failedToLoadImage, reachable {
+            if let f = failedToLoadImage, API.currentNetworkStatus != .notReachable {
                 loadImageAtPath(imagePath: f)
             }
         }

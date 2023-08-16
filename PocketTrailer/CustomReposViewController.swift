@@ -112,7 +112,7 @@ final class CustomReposViewController: UIViewController, UITableViewDelegate, UI
                     try await API.fetchAllRepos(owner: ownerName, from: server, moc: DataManager.main)
 
                     let addedCount = Repo.newItems(in: DataManager.main).count
-                    if Settings.displayPolicyForNewPrs == Int(RepoDisplayPolicy.hide.rawValue), Settings.displayPolicyForNewIssues == Int(RepoDisplayPolicy.hide.rawValue) {
+                    if Settings.displayPolicyForNewPrs == .hide, Settings.displayPolicyForNewIssues == .hide {
                         showMessage("Repositories added", "WARNING: While \(addedCount) repositories have been added successfully to your list, your default settings specify that they should be hidden. You probably want to change their visibility in the main repositories list.")
                     } else {
                         showMessage("Repositories added", "\(addedCount) new repositories have been added to your local list. Trailer will refresh after you close preferences to fetch any items from them.")
@@ -133,7 +133,7 @@ final class CustomReposViewController: UIViewController, UITableViewDelegate, UI
                 do {
                     try await API.fetchRepo(fullName: "\(ownerName)/\(repoName)", from: server, moc: DataManager.main)
 
-                    if Settings.displayPolicyForNewPrs == Int(RepoDisplayPolicy.hide.rawValue), Settings.displayPolicyForNewIssues == Int(RepoDisplayPolicy.hide.rawValue) {
+                    if Settings.displayPolicyForNewPrs == .hide, Settings.displayPolicyForNewIssues == .hide {
                         showMessage("Repository added", "WARNING: While the repository has been added successfully to your list, your default settings specify that it should be hidden. You probably want to change its visibility in the main repositories list.")
                     } else {
                         showMessage("Repository added", "The new repository has been added to your local list. Trailer will refresh after you close preferences to fetch any items from it.")

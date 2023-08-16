@@ -50,7 +50,7 @@ enum ApiError: Error {
 
 @MainActor
 enum API {
-    static var currentNetworkStatus = NetworkStatus.NotReachable
+    static var currentNetworkStatus = NetworkStatus.notReachable
 
     private static let reachability = Reachability()
 
@@ -65,7 +65,7 @@ enum API {
         NotificationCenter.default.addObserver(forName: ReachabilityChangedNotification, object: nil, queue: .main) { _ in
             Task { @MainActor in
                 checkNetworkAvailability()
-                if currentNetworkStatus != .NotReachable {
+                if currentNetworkStatus != .notReachable {
                     await app.startRefreshIfItIsDue()
                 }
             }
@@ -89,7 +89,7 @@ enum API {
         } else {
             Logging.log("No change to network state")
         }
-        return currentNetworkStatus != .NotReachable
+        return currentNetworkStatus != .notReachable
     }
 
     /////////////////////////////////////////////////////// Utilities
@@ -152,8 +152,8 @@ enum API {
         Settings.displayReviewsOnItems
             || Settings.showRequestedTeamReviews
             || Settings.notifyOnReviewAssignments
-            || (Settings.assignedDirectReviewHandlingPolicy != Section.none.rawValue)
-            || (Settings.assignedTeamReviewHandlingPolicy != Section.none.rawValue)
+            || (Settings.assignedDirectReviewHandlingPolicy != Placement.doNothing.assignmentPolicyRawValue)
+            || (Settings.assignedTeamReviewHandlingPolicy != Placement.doNothing.assignmentPolicyRawValue)
     }
 
     ////////////////////////////////////// API interface

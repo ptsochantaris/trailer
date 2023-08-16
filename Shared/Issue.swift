@@ -91,7 +91,7 @@ final class Issue: ListableItem {
     }
 
     @objc var sectionName: String {
-        Section.issueMenuTitles[Int(sectionIndex)]
+        Section(sectionIndex: sectionIndex).issuesMenuName
     }
 
     @MainActor

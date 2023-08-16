@@ -183,11 +183,11 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
         Setting(section: .Watchlist,
                 title: "PR visibility for new repos",
                 description: Settings.displayPolicyForNewPrsHelp,
-                valueDisplayed: { RepoDisplayPolicy(rawValue: Settings.displayPolicyForNewPrs)?.name }),
+                valueDisplayed: { Settings.displayPolicyForNewPrs.name }),
         Setting(section: .Watchlist,
                 title: "Issue visibility for new repos",
                 description: Settings.displayPolicyForNewIssuesHelp,
-                valueDisplayed: { RepoDisplayPolicy(rawValue: Settings.displayPolicyForNewIssues)?.name }),
+                valueDisplayed: { Settings.displayPolicyForNewIssues.name }),
 
         Setting(section: .Reviews,
                 title: "Show reviews for PRs",
@@ -295,11 +295,11 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
         Setting(section: .History,
                 title: "When something is merged",
                 description: Settings.mergeHandlingPolicyHelp,
-                valueDisplayed: { HandlingPolicy(rawValue: Settings.mergeHandlingPolicy)?.name }),
+                valueDisplayed: { Settings.mergeHandlingPolicy.name }),
         Setting(section: .History,
                 title: "When something is closed",
                 description: Settings.closeHandlingPolicyHelp,
-                valueDisplayed: { HandlingPolicy(rawValue: Settings.closeHandlingPolicy)?.name }),
+                valueDisplayed: { Settings.closeHandlingPolicy.name }),
         Setting(section: .History,
                 title: "Don't keep PRs merged by me",
                 description: Settings.dontKeepPrsMergedByMeHelp,
@@ -330,11 +330,8 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
                 title: "Criterion",
                 description: Settings.sortMethodHelp,
                 valueDisplayed: {
-                    if let m = SortingMethod(rawValue: Settings.sortMethod) {
-                        return Settings.sortDescending ? m.reverseTitle : m.normalTitle
-                    } else {
-                        return nil
-                    }
+                    let m = Settings.sortMethod
+                    return Settings.sortDescending ? m.reverseTitle : m.normalTitle
                 }),
         Setting(section: .Sort,
                 title: "Bunch by repository",
@@ -773,9 +770,9 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
             var previousIndex: Int?
             switch originalIndex {
             case 0:
-                previousIndex = Settings.displayPolicyForNewPrs
+                previousIndex = Settings.displayPolicyForNewPrs.rawValue
             case 1:
-                previousIndex = Settings.displayPolicyForNewIssues
+                previousIndex = Settings.displayPolicyForNewIssues.rawValue
             default: break
             }
             let v = PickerViewController.Info(title: setting.title, values: RepoDisplayPolicy.labels, selectedIndex: previousIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
@@ -832,10 +829,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
         } else if section == .History {
             switch originalIndex {
             case 0:
-                let v = PickerViewController.Info(title: setting.title, values: HandlingPolicy.labels, selectedIndex: Settings.mergeHandlingPolicy, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                let v = PickerViewController.Info(title: setting.title, values: KeepPolicy.labels, selectedIndex: Settings.mergeHandlingPolicy.rawValue, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
                 performSegue(withIdentifier: "showPicker", sender: v)
             case 1:
-                let v = PickerViewController.Info(title: setting.title, values: HandlingPolicy.labels, selectedIndex: Settings.closeHandlingPolicy, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                let v = PickerViewController.Info(title: setting.title, values: KeepPolicy.labels, selectedIndex: Settings.closeHandlingPolicy.rawValue, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
                 performSegue(withIdentifier: "showPicker", sender: v)
             case 2:
                 Settings.dontKeepPrsMergedByMe = !Settings.dontKeepPrsMergedByMe
@@ -860,8 +857,8 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
                 Settings.sortDescending = !Settings.sortDescending
                 settingsChangedTimer.push()
             case 1:
-                let valuesToPush = Settings.sortDescending ? SortingMethod.reverseTitles : SortingMethod.normalTitles
-                let v = PickerViewController.Info(title: setting.title, values: valuesToPush, selectedIndex: Settings.sortMethod, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                let valuesToPush = Settings.sortDescending ? SortingMethod.allCases.map(\.reverseTitle) : SortingMethod.allCases.map(\.normalTitle)
+                let v = PickerViewController.Info(title: setting.title, values: valuesToPush, selectedIndex: Settings.sortMethod.rawValue, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
                 performSegue(withIdentifier: "showPicker", sender: v)
             case 2:
                 Settings.groupByRepo = !Settings.groupByRepo
@@ -929,21 +926,21 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
             }
 
         } else if sip.section == SettingsSection.Sort.rawValue {
-            Settings.sortMethod = didSelectIndexPath.row
+            Settings.sortMethod = SortingMethod(rawValue: didSelectIndexPath.row) ?? Settings.sortMethod
             settingsChangedTimer.push()
 
         } else if sip.section == SettingsSection.Watchlist.rawValue {
             if sip.row == 0 {
-                Settings.displayPolicyForNewPrs = didSelectIndexPath.row
+                Settings.displayPolicyForNewPrs = RepoDisplayPolicy(rawValue: didSelectIndexPath.row) ?? Settings.displayPolicyForNewPrs
             } else if sip.row == 1 {
-                Settings.displayPolicyForNewIssues = didSelectIndexPath.row
+                Settings.displayPolicyForNewIssues = RepoDisplayPolicy(rawValue: didSelectIndexPath.row) ?? Settings.displayPolicyForNewIssues
             }
 
         } else if sip.section == SettingsSection.History.rawValue {
             if sip.row == 0 {
-                Settings.mergeHandlingPolicy = didSelectIndexPath.row
+                Settings.mergeHandlingPolicy = KeepPolicy(rawValue: didSelectIndexPath.row) ?? Settings.mergeHandlingPolicy
             } else if sip.row == 1 {
-                Settings.closeHandlingPolicy = didSelectIndexPath.row
+                Settings.closeHandlingPolicy = KeepPolicy(rawValue: didSelectIndexPath.row) ?? Settings.closeHandlingPolicy
             }
 
         } else if sip.section == SettingsSection.Stauses.rawValue {

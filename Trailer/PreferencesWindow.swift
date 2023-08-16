@@ -596,10 +596,10 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         itemFilteringBlacklist.objectValue = Settings.itemAuthorBlacklist
 
         setupSortMethodMenu()
-        sortModeSelect.selectItem(at: Settings.sortMethod)
+        sortModeSelect.selectItem(at: Settings.sortMethod.rawValue)
 
-        prMergedPolicy.selectItem(at: Settings.mergeHandlingPolicy)
-        prClosedPolicy.selectItem(at: Settings.closeHandlingPolicy)
+        prMergedPolicy.selectItem(at: Settings.mergeHandlingPolicy.rawValue)
+        prClosedPolicy.selectItem(at: Settings.closeHandlingPolicy.rawValue)
 
         launchAtStartup.integerValue = Settings.isAppLoginItem ? 1 : 0
         dontConfirmRemoveAllClosed.integerValue = Settings.dontAskBeforeWipingClosed ? 1 : 0
@@ -800,7 +800,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     }
 
     @IBAction private func newMentionMovePolicySelected(_ sender: NSPopUpButton) {
-        Settings.newMentionMovePolicy = sender.indexOfSelectedItem
+        Settings.newMentionMovePolicy = Placement(menuIndex: sender.indexOfSelectedItem).movePolicyRawValue
         deferredUpdateTimer.push()
     }
 
@@ -944,7 +944,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     }
 
     private func updateHistoryOptions() {
-        dontKeepPrsMergedByMe.isEnabled = Settings.mergeHandlingPolicy != HandlingPolicy.keepNone.rawValue
+        dontKeepPrsMergedByMe.isEnabled = Settings.mergeHandlingPolicy != .nothing
     }
 
     @IBAction private func highlightItemsWithNewCommitsSelected(_ sender: NSButton) {
@@ -1080,7 +1080,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     }
 
     @IBAction private func sortMethodChanged(_: NSMenuItem) {
-        Settings.sortMethod = sortModeSelect.indexOfSelectedItem
+        Settings.sortMethod = SortingMethod(rawValue: sortModeSelect.indexOfSelectedItem) ?? Settings.sortMethod
         deferredUpdateTimer.push()
     }
 
@@ -1096,11 +1096,15 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
 
     private func setupSortMethodMenu() {
         let m = NSMenu(title: "Sorting")
-        for t in Settings.sortDescending ? SortingMethod.reverseTitles : SortingMethod.normalTitles {
+        let titles = Settings.sortDescending
+            ? SortingMethod.allCases.map(\.reverseTitle)
+            : SortingMethod.allCases.map(\.normalTitle)
+
+        for t in titles {
             m.addItem(withTitle: t, action: #selector(sortMethodChanged), keyEquivalent: "")
         }
         sortModeSelect.menu = m
-        sortModeSelect.selectItem(at: Settings.sortMethod)
+        sortModeSelect.selectItem(at: Settings.sortMethod.rawValue)
     }
 
     private func updateStatusItemsOptions() {
@@ -1236,7 +1240,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
                     try await API.fetchAllRepos(owner: owner, from: server, moc: DataManager.main)
                     let addedCount = Repo.newItems(in: DataManager.main).count
                     alert.messageText = "\(addedCount) repositories added for '\(owner)'"
-                    if Settings.displayPolicyForNewPrs == Int(RepoDisplayPolicy.hide.rawValue), Settings.displayPolicyForNewIssues == Int(RepoDisplayPolicy.hide.rawValue) {
+                    if Settings.displayPolicyForNewPrs == .hide, Settings.displayPolicyForNewIssues == .hide {
                         alert.informativeText = "WARNING: While \(addedCount) repositories have been added successfully to your list, your default settings specify that they should be hidden. You probably want to change their visibility from the repositories list."
                     } else {
                         alert.informativeText = "The new repositories have been added to your local list. Trailer will refresh after you close preferences to fetch any items from them."
@@ -1244,7 +1248,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
                 } else {
                     try await API.fetchRepo(fullName: "\(owner)/\(name)", from: server, moc: DataManager.main)
                     alert.messageText = "Repository added"
-                    if Settings.displayPolicyForNewPrs == Int(RepoDisplayPolicy.hide.rawValue), Settings.displayPolicyForNewIssues == Int(RepoDisplayPolicy.hide.rawValue) {
+                    if Settings.displayPolicyForNewPrs == .hide, Settings.displayPolicyForNewIssues == .hide {
                         alert.informativeText = "WARNING: While the repository has been added successfully to your list, your default settings specify that it should be hidden. You probably want to change its visibility from the repositories list."
                     } else {
                         alert.informativeText = "The new repository has been added to your local list. Trailer will refresh after you close preferences to fetch any items from it."
@@ -1411,12 +1415,12 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     }
 
     @IBAction private func prMergePolicySelected(_ sender: NSPopUpButton) {
-        Settings.mergeHandlingPolicy = sender.indexOfSelectedItem
+        Settings.mergeHandlingPolicy = KeepPolicy(rawValue: sender.indexOfSelectedItem) ?? Settings.mergeHandlingPolicy // default
         updateHistoryOptions()
     }
 
     @IBAction private func prClosePolicySelected(_ sender: NSPopUpButton) {
-        Settings.closeHandlingPolicy = sender.indexOfSelectedItem
+        Settings.closeHandlingPolicy = KeepPolicy(rawValue: sender.indexOfSelectedItem) ?? Settings.closeHandlingPolicy
     }
 
     private func updateStatusTermPreferenceControls() {

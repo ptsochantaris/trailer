@@ -151,21 +151,31 @@ enum PostSyncAction: Int {
     }
 }
 
-enum NotificationType: Int {
+enum NotificationType {
     case newComment, newPr, prMerged, prReopened, newMention, prClosed, newRepoSubscribed, newRepoAnnouncement, newPrAssigned, newStatus, newIssue, issueClosed, newIssueAssigned, issueReopened, assignedForReview, changesRequested, changesApproved, changesDismissed, newReaction, assignedToTeamForReview
 }
 
-enum SortingMethod: Int {
+enum SortingMethod: Int, CaseIterable {
     case creationDate, recentActivity, title, linesAdded, linesRemoved
-    static let reverseTitles = ["Youngest first", "Most recently active", "Reverse alphabetically", "Most lines added", "Most lines removed"]
-    static let normalTitles = ["Oldest first", "Inactive for longest", "Alphabetically", "Least lines added", "Least lines removed"]
 
     var normalTitle: String {
-        SortingMethod.normalTitles[rawValue]
+        switch self {
+        case .creationDate: return "Oldest first"
+        case .recentActivity: return "Inactive for longest"
+        case .title: return "Alphabetically"
+        case .linesAdded: return "Least lines added"
+        case .linesRemoved: return "Least lines removed"
+        }
     }
 
     var reverseTitle: String {
-        SortingMethod.reverseTitles[rawValue]
+        switch self {
+        case .creationDate: return "Youngest first"
+        case .recentActivity: return "Most recently active"
+        case .title: return "Reverse alphabetically"
+        case .linesAdded: return "Most lines added"
+        case .linesRemoved: return "Most lines removed"
+        }
     }
 
     var field: String? {
@@ -179,11 +189,11 @@ enum SortingMethod: Int {
     }
 }
 
-enum HandlingPolicy: Int {
-    case keepMine, keepMineAndParticipated, keepAll, keepNone
+enum KeepPolicy: Int {
+    case mine, mineAndParticipated, everything, nothing
     static let labels = ["Keep Mine", "Keep Mine & Participated", "Keep All", "Don't Keep"]
     var name: String {
-        HandlingPolicy.labels[rawValue]
+        KeepPolicy.labels[rawValue]
     }
 }
 
@@ -204,6 +214,19 @@ enum Placement {
     }
 
     static let labels = [Placement.moveToMine.name, Placement.moveToParticipated.name, Placement.moveToMentioned.name, Placement.doNothing.name]
+
+    var preferredSection: Section? {
+        switch self {
+        case .doNothing:
+            return nil
+        case .moveToMine:
+            return .mine
+        case .moveToParticipated:
+            return .participated
+        case .moveToMentioned:
+            return .mentioned
+        }
+    }
 
     var assignmentPolicyRawValue: Int {
         switch self {
@@ -289,15 +312,9 @@ enum Placement {
 }
 
 enum RepoDisplayPolicy: Int, CaseIterable {
-    case hide = 0
-    case mine = 1
-    case mineAndPaticipated = 2
-    case all = 3
-    case authoredOnly = 4
+    case hide, mine, mineAndPaticipated, all, authoredOnly
 
-    static var labels: [String] {
-        allCases.map(\.name)
-    }
+    static var labels: [String] = allCases.map(\.name)
 
     var name: String {
         switch self {
@@ -380,7 +397,7 @@ enum RepoHidingPolicy: Int {
                          COLOR_CLASS(red: 0.5, green: 0.1, blue: 0.1, alpha: 1.0),
                          COLOR_CLASS(red: 0.5, green: 0.1, blue: 0.1, alpha: 1.0)]
     var name: String {
-        RepoHidingPolicy.labels[Int(rawValue)]
+        RepoHidingPolicy.labels[rawValue]
     }
 
     var bold: Bool {
@@ -393,7 +410,7 @@ enum RepoHidingPolicy: Int {
     }
 
     var color: COLOR_CLASS {
-        RepoHidingPolicy.colors[Int(rawValue)]
+        RepoHidingPolicy.colors[rawValue]
     }
 }
 

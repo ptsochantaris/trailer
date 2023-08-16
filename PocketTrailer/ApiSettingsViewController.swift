@@ -47,25 +47,25 @@ final class ApiSettingsViewController: UIViewController, UITextFieldDelegate {
 
     @IBAction private func toggleSelected(_ sender: UISwitch) {
         if sender === highToggle {
-            Settings.syncProfile = GraphQL.Profile.high.rawValue
+            Settings.syncProfile = GraphQL.Profile.high
         } else if sender === moderateToggle {
-            Settings.syncProfile = GraphQL.Profile.moderate.rawValue
+            Settings.syncProfile = GraphQL.Profile.moderate
         } else if sender === defaultToggle {
-            Settings.syncProfile = GraphQL.Profile.cautious.rawValue
+            Settings.syncProfile = GraphQL.Profile.cautious
         } else if sender === lightToggle {
-            Settings.syncProfile = GraphQL.Profile.light.rawValue
+            Settings.syncProfile = GraphQL.Profile.light
         }
         updateUI()
     }
 
     @IBAction private func defaultsSelected(_: UIBarButtonItem) {
-        Settings.syncProfile = GraphQL.Profile.cautious.rawValue
+        Settings.syncProfile = GraphQL.Profile.cautious
         Settings.threadedSync = false
         updateUI()
     }
 
     private func updateUI() {
-        let profile = GraphQL.Profile(settingsValue: Settings.syncProfile)
+        let profile = Settings.syncProfile
         highToggle.isOn = profile == .high
         moderateToggle.isOn = profile == .moderate
         defaultToggle.isOn = profile == .cautious
@@ -78,13 +78,13 @@ final class ApiSettingsViewController: UIViewController, UITextFieldDelegate {
         super.viewWillDisappear(animated)
 
         if highToggle.isOn {
-            Settings.syncProfile = GraphQL.Profile.high.rawValue
+            Settings.syncProfile = GraphQL.Profile.high
         } else if moderateToggle.isOn {
-            Settings.syncProfile = GraphQL.Profile.moderate.rawValue
+            Settings.syncProfile = GraphQL.Profile.moderate
         } else if defaultToggle.isOn {
-            Settings.syncProfile = GraphQL.Profile.cautious.rawValue
+            Settings.syncProfile = GraphQL.Profile.cautious
         } else if lightToggle.isOn {
-            Settings.syncProfile = GraphQL.Profile.light.rawValue
+            Settings.syncProfile = GraphQL.Profile.light
         }
         Settings.threadedSync = threadToggle.isOn
     }

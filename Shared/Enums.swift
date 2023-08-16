@@ -1,41 +1,124 @@
 import Foundation
 
-enum Section: Int {
+enum Section: CaseIterable {
     case none, mine, participated, mentioned, merged, closed, all, snoozed
-    static let prMenuTitles = ["", "Mine", "Participated", "Mentioned", "Recently Merged", "Recently Closed", "All Pull Requests", "Snoozed"]
-    var prMenuName: String { Section.prMenuTitles[Int(rawValue)] }
 
-    static let issueMenuTitles = ["", "Mine", "Participated", "Mentioned", "Recently Merged", "Recently Closed", "All Issues", "Snoozed"]
-    var issuesMenuName: String { Section.issueMenuTitles[Int(rawValue)] }
+    static let allCases: [Section] = [.none, .mine, .participated, .mentioned, .merged, .closed, .all, .snoozed]
 
-    static let watchMenuTitles = ["", "Mine", "Participated", "Mentioned", "Merged", "Closed", "Other", "Snoozed"]
-    var watchMenuName: String { Section.watchMenuTitles[Int(rawValue)] }
+    var prMenuName: String {
+        switch self {
+        case .none: return ""
+        case .mine: return "Mine"
+        case .participated: return "Participated"
+        case .mentioned: return "Mentioned"
+        case .merged: return "Recently Merged"
+        case .closed: return "Recently Closed"
+        case .all: return "All Pull Requests"
+        case .snoozed: return "Snoozed"
+        }
+    }
 
-    static let apiTitles = ["", "mine", "participated", "mentioned", "merged", "closed", "other", "snoozed"]
-    var apiName: String { Section.apiTitles[Int(rawValue)] }
+    var issuesMenuName: String {
+        switch self {
+        case .none: return ""
+        case .mine: return "Mine"
+        case .participated: return "Participated"
+        case .mentioned: return "Mentioned"
+        case .merged: return "Recently Merged"
+        case .closed: return "Recently Closed"
+        case .all: return "All Issues"
+        case .snoozed: return "Snoozed"
+        }
+    }
 
-    var intValue: Int { Int(rawValue) }
+    var watchMenuName: String {
+        switch self {
+        case .none: return ""
+        case .mine: return "Mine"
+        case .participated: return "Participated"
+        case .mentioned: return "Mentioned"
+        case .merged: return "Merged"
+        case .closed: return "Closed"
+        case .all: return "Other"
+        case .snoozed: return "Snoozed"
+        }
+    }
+
+    var apiName: String {
+        switch self {
+        case .none: return ""
+        case .mine: return "mine"
+        case .participated: return "participated"
+        case .mentioned: return "mentioned"
+        case .merged: return "merged"
+        case .closed: return "closed"
+        case .all: return "other"
+        case .snoozed: return "snoozed"
+        }
+    }
+
+    var sectionIndex: Int {
+        switch self {
+        case .none: return 0
+        case .mine: return 1
+        case .participated: return 2
+        case .mentioned: return 3
+        case .merged: return 4
+        case .closed: return 5
+        case .all: return 6
+        case .snoozed: return 7
+        }
+    }
+
+    init?(apiName: String) {
+        if let section = Self.allCases.first(where: { $0.apiName == apiName }) {
+            self = section
+        } else {
+            return nil
+        }
+    }
+
+    init(sectionIndex: Int) {
+        switch sectionIndex {
+        case 1:
+            self = .mine
+        case 2:
+            self = .participated
+        case 3:
+            self = .mentioned
+        case 4:
+            self = .merged
+        case 5:
+            self = .closed
+        case 6:
+            self = .all
+        case 7:
+            self = .snoozed
+        default:
+            self = .none
+        }
+    }
 
     static let nonZeroPredicate = NSPredicate(format: "sectionIndex > 0")
 
     private static var predicateMatchCache = NSCache<NSNumber, NSPredicate>()
     var matchingPredicate: NSPredicate {
-        let key = NSNumber(value: rawValue)
+        let key = NSNumber(value: sectionIndex)
         if let predicate = Section.predicateMatchCache.object(forKey: key) {
             return predicate
         }
-        let predicate = NSPredicate(format: "sectionIndex == %lld", rawValue)
+        let predicate = NSPredicate(format: "sectionIndex == %lld", sectionIndex)
         Section.predicateMatchCache.setObject(predicate, forKey: key)
         return predicate
     }
 
     private static var predicateExcludeCache = NSCache<NSNumber, NSPredicate>()
     var excludingPredicate: NSPredicate {
-        let key = NSNumber(value: rawValue)
+        let key = NSNumber(value: sectionIndex)
         if let predicate = Section.predicateExcludeCache.object(forKey: key) {
             return predicate
         }
-        let predicate = NSPredicate(format: "sectionIndex != %lld", rawValue)
+        let predicate = NSPredicate(format: "sectionIndex != %lld", sectionIndex)
         Section.predicateExcludeCache.setObject(predicate, forKey: key)
         return predicate
     }

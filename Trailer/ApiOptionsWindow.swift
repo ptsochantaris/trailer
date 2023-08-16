@@ -29,19 +29,19 @@ final class ApiOptionsWindow: NSWindow, NSWindowDelegate {
 
     @IBAction func radioButtonSelected(_ sender: NSButton) {
         if sender === lightRadio {
-            Settings.syncProfile = GraphQL.Profile.cautious.rawValue
+            Settings.syncProfile = GraphQL.Profile.cautious
         } else if sender === moderateRadio {
-            Settings.syncProfile = GraphQL.Profile.moderate.rawValue
+            Settings.syncProfile = GraphQL.Profile.moderate
         } else if sender === highRadio {
-            Settings.syncProfile = GraphQL.Profile.high.rawValue
+            Settings.syncProfile = GraphQL.Profile.high
         } else if sender === safeRadio {
-            Settings.syncProfile = GraphQL.Profile.light.rawValue
+            Settings.syncProfile = GraphQL.Profile.light
         }
     }
 
     private func updateUI() {
         threadCheckbox.integerValue = Settings.threadedSync ? 1 : 0
-        let profile = GraphQL.Profile(settingsValue: Settings.syncProfile)
+        let profile = Settings.syncProfile
         highRadio.integerValue = profile == .high ? 1 : 0
         moderateRadio.integerValue = profile == .moderate ? 1 : 0
         lightRadio.integerValue = profile == .cautious ? 1 : 0
@@ -55,7 +55,7 @@ final class ApiOptionsWindow: NSWindow, NSWindowDelegate {
     }
 
     @IBAction private func resetSelected(_: NSButton) {
-        Settings.syncProfile = GraphQL.Profile.cautious.rawValue
+        Settings.syncProfile = GraphQL.Profile.cautious
         Settings.threadedSync = false
         updateUI()
     }

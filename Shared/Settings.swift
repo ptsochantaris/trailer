@@ -87,17 +87,17 @@ enum Settings {
         }
 
         if let mentionedUserMoveLegacy = sharedDefaults.object(forKey: "AUTO_PARTICIPATE_IN_MENTIONS_KEY") as? Bool {
-            sharedDefaults.set(mentionedUserMoveLegacy ? Section.mentioned.intValue : Section.none.intValue, forKey: "NEW_MENTION_MOVE_POLICY")
+            sharedDefaults.set(mentionedUserMoveLegacy ? Placement.moveToMentioned.movePolicyRawValue : Placement.doNothing.movePolicyRawValue, forKey: "NEW_MENTION_MOVE_POLICY")
             sharedDefaults.removeObject(forKey: "AUTO_PARTICIPATE_IN_MENTIONS_KEY")
         }
 
         if let mentionedTeamMoveLegacy = sharedDefaults.object(forKey: "AUTO_PARTICIPATE_ON_TEAM_MENTIONS") as? Bool {
-            sharedDefaults.set(mentionedTeamMoveLegacy ? Section.mentioned.intValue : Section.none.intValue, forKey: "TEAM_MENTION_MOVE_POLICY")
+            sharedDefaults.set(mentionedTeamMoveLegacy ? Placement.moveToMentioned.movePolicyRawValue : Placement.doNothing.movePolicyRawValue, forKey: "TEAM_MENTION_MOVE_POLICY")
             sharedDefaults.removeObject(forKey: "AUTO_PARTICIPATE_ON_TEAM_MENTIONS")
         }
 
         if let mentionedRepoMoveLegacy = sharedDefaults.object(forKey: "MOVE_NEW_ITEMS_IN_OWN_REPOS_TO_MENTIONED") as? Bool {
-            sharedDefaults.set(mentionedRepoMoveLegacy ? Section.mentioned.intValue : Section.none.intValue, forKey: "NEW_ITEM_IN_OWNED_REPO_MOVE_POLICY")
+            sharedDefaults.set(mentionedRepoMoveLegacy ? Placement.moveToMentioned.movePolicyRawValue : Placement.doNothing.movePolicyRawValue, forKey: "NEW_ITEM_IN_OWNED_REPO_MOVE_POLICY")
             sharedDefaults.removeObject(forKey: "MOVE_NEW_ITEMS_IN_OWN_REPOS_TO_MENTIONED")
         }
 
@@ -284,8 +284,8 @@ enum Settings {
 
     ///////////////////////////////// NUMBERS
 
-    @UserDefault(key: "PR_V4_SYNC_PROFILE", defaultValue: -10)
-    static var syncProfile: Int
+    @EnumUserDefault(key: "PR_V4_SYNC_PROFILE", defaultValue: GraphQL.Profile.cautious)
+    static var syncProfile: GraphQL.Profile
     static let syncProfileHelp = "Preferred balance between query size and safety when using v4 API."
 
     @UserDefault(key: "V4_THREAD_SYNC", defaultValue: false)
@@ -296,8 +296,8 @@ enum Settings {
     static var autoSnoozeDuration: Int
     static let autoSnoozeDurationHelp = "How many days before an item is automatically snoozed. An item is auto-snoozed forever but will wake up on any comment, mention, or status update."
 
-    @UserDefault(key: "SORT_METHOD_KEY", defaultValue: 0)
-    static var sortMethod: Int
+    @EnumUserDefault(key: "SORT_METHOD_KEY", defaultValue: SortingMethod.creationDate)
+    static var sortMethod: SortingMethod
     static let sortMethodHelp = "The criterion to use when sorting items."
 
     @UserDefault(key: "STATUS_FILTERING_METHOD_KEY", defaultValue: 0)
@@ -309,12 +309,12 @@ enum Settings {
     @UserDefault(key: "LAST_PREFS_TAB_SELECTED_OSX", defaultValue: 0)
     static var lastPreferencesTabSelectedOSX: Int
 
-    @UserDefault(key: "CLOSE_HANDLING_POLICY_2", defaultValue: HandlingPolicy.keepMine.rawValue)
-    static var closeHandlingPolicy: Int
+    @EnumUserDefault(key: "CLOSE_HANDLING_POLICY_2", defaultValue: KeepPolicy.mine)
+    static var closeHandlingPolicy: KeepPolicy
     static let closeHandlingPolicyHelp = "How to handle an item when it is believed to be closed (or has disappeared)."
 
-    @UserDefault(key: "MERGE_HANDLING_POLICY_2", defaultValue: HandlingPolicy.keepMine.rawValue)
-    static var mergeHandlingPolicy: Int
+    @EnumUserDefault(key: "MERGE_HANDLING_POLICY_2", defaultValue: KeepPolicy.mine)
+    static var mergeHandlingPolicy: KeepPolicy
     static let mergeHandlingPolicyHelp = "How to handle an item when it is detected as merged."
 
     static let statusItemRefreshBatchSizeHelp = "Because querying statuses can be bandwidth and time intensive, Trailer will scan for updates on items that haven't been scanned for the longest time, at every refresh, up to a maximum of this number of items. Higher values mean longer sync times and more API usage."
@@ -342,23 +342,23 @@ enum Settings {
     static var assignedItemTeamHandlingPolicy: Int
     static let assignedItemTeamHandlingPolicyHelp = "If an item is assigned to your team(s), Trailer can move it to a specific section or leave it as-is."
 
-    @UserDefault(key: "NEW_PR_DISPLAY_POLICY_INDEX", defaultValue: RepoDisplayPolicy.hide.intValue)
-    static var displayPolicyForNewPrs: Int
+    @EnumUserDefault(key: "NEW_PR_DISPLAY_POLICY_INDEX", defaultValue: RepoDisplayPolicy.hide)
+    static var displayPolicyForNewPrs: RepoDisplayPolicy
     static let displayPolicyForNewPrsHelp = "When a new repository is detected in your watchlist, this display policy will be applied by default to pull requests that come from it. You can further customize the display policy for any individual repository from the 'Repositories' tab."
 
-    @UserDefault(key: "NEW_ISSUE_DISPLAY_POLICY_INDEX", defaultValue: RepoDisplayPolicy.hide.intValue)
-    static var displayPolicyForNewIssues: Int
+    @EnumUserDefault(key: "NEW_ISSUE_DISPLAY_POLICY_INDEX", defaultValue: RepoDisplayPolicy.hide)
+    static var displayPolicyForNewIssues: RepoDisplayPolicy
     static let displayPolicyForNewIssuesHelp = "When a new repository is detected in your watchlist, this display policy will be applied by default to issues that come from it. You can further customize the display policy for any individual repository from the 'Repositories' tab."
 
-    @UserDefault(key: "NEW_MENTION_MOVE_POLICY", defaultValue: Section.mentioned.intValue)
+    @UserDefault(key: "NEW_MENTION_MOVE_POLICY", defaultValue: Placement.moveToMentioned.movePolicyRawValue)
     static var newMentionMovePolicy: Int
     static let newMentionMovePolicyHelp = "If your username is mentioned in an item's description or a comment posted inside it, move the item to the specified section."
 
-    @UserDefault(key: "TEAM_MENTION_MOVE_POLICY", defaultValue: Section.mentioned.intValue)
+    @UserDefault(key: "TEAM_MENTION_MOVE_POLICY", defaultValue: Placement.moveToMentioned.movePolicyRawValue)
     static var teamMentionMovePolicy: Int
     static let teamMentionMovePolicyHelp = "If the name of one of the teams you belong to is mentioned in an item's description or a comment posted inside it, move the item to the specified section."
 
-    @UserDefault(key: "NEW_ITEM_IN_OWNED_REPO_MOVE_POLICY", defaultValue: Section.none.intValue)
+    @UserDefault(key: "NEW_ITEM_IN_OWNED_REPO_MOVE_POLICY", defaultValue: Placement.doNothing.movePolicyRawValue)
     static var newItemInOwnedRepoMovePolicy: Int
     static let newItemInOwnedRepoMovePolicyHelp = "Automatically move an item to the specified section if it has been created in a repo which you own, even if there is no direct mention of you."
 
