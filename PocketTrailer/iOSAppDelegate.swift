@@ -2,7 +2,7 @@ import BackgroundTasks
 import UIKit
 import UserNotifications
 
-@UIApplicationMain
+@main
 final class iOSAppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 

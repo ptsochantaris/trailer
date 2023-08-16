@@ -107,7 +107,7 @@ extension Querying {
     }
 
     static func nukeDeletedItems(in moc: NSManagedObjectContext) -> Int {
-        let discarded = Self.items(surviving: false, in: moc)
+        let discarded = items(surviving: false, in: moc)
         if !discarded.isEmpty {
             Logging.log("Nuking \(discarded.count) \(typeName) items marked for deletion")
             for i in discarded {

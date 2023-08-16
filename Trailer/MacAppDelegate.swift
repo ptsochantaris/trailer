@@ -6,7 +6,7 @@ enum Theme {
     case light, dark
 }
 
-@NSApplicationMain
+@main
 final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUserNotificationCenterDelegate, NSOpenSavePanelDelegate, NSControlTextEditingDelegate {
     // Globals
     var refreshTask: Task<Void, Never>?
