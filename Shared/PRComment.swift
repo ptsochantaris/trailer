@@ -72,9 +72,9 @@ final class PRComment: DataItem {
 
     private func fastForwardIfNeeded(parent item: ListableItem) {
         // Check if we're assigned to a newly created issue, in which case we want to "fast forward" its latest comment date to our own, if ours is newer
-        if let commentCreation = createdAt, item.postSyncAction == PostSyncAction.isNew.rawValue {
-            if let latestReadDate = item.latestReadCommentDate, latestReadDate < commentCreation {
-                item.latestReadCommentDate = commentCreation
+        if let createdAt, item.postSyncAction == PostSyncAction.isNew.rawValue {
+            if let latestReadDate = item.latestReadCommentDate, latestReadDate < createdAt {
+                item.latestReadCommentDate = createdAt
             }
         }
     }
@@ -166,10 +166,8 @@ final class PRComment: DataItem {
     }
 
     final func contains(terms: [String]) -> Bool {
-        if let b = body {
-            for t in terms where !t.isEmpty && b.localizedCaseInsensitiveContains(t) {
-                return true
-            }
+        if let body {
+            return terms.contains(where: { !$0.isEmpty && body.localizedCaseInsensitiveContains($0) })
         }
         return false
     }

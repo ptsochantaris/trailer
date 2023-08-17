@@ -121,8 +121,8 @@ final class TrailerCell: NSTableCellView {
     }
 
     @objc private func unPinSelected() {
-        if let i = associatedDataItem {
-            app.unPinSelected(for: i)
+        if let associatedDataItem {
+            app.unPinSelected(for: associatedDataItem)
         }
     }
 
@@ -145,8 +145,8 @@ final class TrailerCell: NSTableCellView {
         didSet {
             guard let table = app.visibleWindow?.table else { return }
 
-            if let item = associatedDataItem {
-                updateText(for: item)
+            if let associatedDataItem {
+                updateText(for: associatedDataItem)
             }
 
             if selected {
@@ -193,23 +193,23 @@ final class TrailerCell: NSTableCellView {
     }
 
     override func menu(for _: NSEvent) -> NSMenu? {
-        guard let item = associatedDataItem else {
+        guard let associatedDataItem else {
             return nil
         }
 
-        let title = item.contextMenuTitle
+        let title = associatedDataItem.contextMenuTitle
 
         let m = NSMenu(title: title)
         m.addItem(withTitle: title, action: #selector(copyNumberToClipboard), keyEquivalent: "")
 
-        if let subtitle = item.contextMenuSubtitle {
+        if let subtitle = associatedDataItem.contextMenuSubtitle {
             let c = m.addItem(withTitle: subtitle, action: #selector(copyBranchToClipboard), keyEquivalent: "c")
             c.keyEquivalentModifierMask = [.command, .option]
         }
 
         m.addItem(NSMenuItem.separator())
 
-        for a in item.contextActions {
+        for a in associatedDataItem.contextActions {
             switch a {
             case .copy:
                 let c = m.addItem(withTitle: a.title, action: #selector(copyToClipboard), keyEquivalent: "c")
@@ -265,10 +265,10 @@ final class TrailerCell: NSTableCellView {
     }
 
     @objc private func removeSelected() {
-        if let item = associatedDataItem {
-            item.sectionIndex = Section.none.sectionIndex
-            app.updateRelatedMenus(for: item) // saveAndRequestMenuUpdate won't work in this case
-            DataManager.main.delete(item)
+        if let associatedDataItem {
+            associatedDataItem.sectionIndex = Section.none.sectionIndex
+            app.updateRelatedMenus(for: associatedDataItem) // saveAndRequestMenuUpdate won't work in this case
+            DataManager.main.delete(associatedDataItem)
             Task {
                 await DataManager.saveDB()
             }
@@ -280,45 +280,45 @@ final class TrailerCell: NSTableCellView {
     }
 
     @objc private func snoozeSelected(_ sender: NSMenuItem) {
-        if let item = associatedDataItem, let oid = sender.representedObject as? NSManagedObjectID, let snoozeItem = try? DataManager.main.existingObject(with: oid) as? SnoozePreset {
-            item.snooze(using: snoozeItem)
-            saveAndRequestMenuUpdate(item)
+        if let associatedDataItem, let oid = sender.representedObject as? NSManagedObjectID, let snoozeItem = try? DataManager.main.existingObject(with: oid) as? SnoozePreset {
+            associatedDataItem.snooze(using: snoozeItem)
+            saveAndRequestMenuUpdate(associatedDataItem)
         }
     }
 
     @objc private func wakeUpSelected() {
-        if let item = associatedDataItem {
-            item.wakeUp()
-            saveAndRequestMenuUpdate(item)
+        if let associatedDataItem {
+            associatedDataItem.wakeUp()
+            saveAndRequestMenuUpdate(associatedDataItem)
         }
     }
 
     @objc private func markReadSelected() {
-        if let item = associatedDataItem {
-            item.catchUpWithComments()
-            saveAndRequestMenuUpdate(item)
+        if let associatedDataItem {
+            associatedDataItem.catchUpWithComments()
+            saveAndRequestMenuUpdate(associatedDataItem)
         }
     }
 
     @objc private func markUnreadSelected() {
-        if let item = associatedDataItem {
-            item.latestReadCommentDate = .distantPast
-            item.postProcess()
-            saveAndRequestMenuUpdate(item)
+        if let associatedDataItem {
+            associatedDataItem.latestReadCommentDate = .distantPast
+            associatedDataItem.postProcess()
+            saveAndRequestMenuUpdate(associatedDataItem)
         }
     }
 
     @objc private func muteSelected() {
-        if let item = associatedDataItem {
-            item.setMute(to: true)
-            saveAndRequestMenuUpdate(item)
+        if let associatedDataItem {
+            associatedDataItem.setMute(to: true)
+            saveAndRequestMenuUpdate(associatedDataItem)
         }
     }
 
     @objc private func unMuteSelected() {
-        if let item = associatedDataItem {
-            item.setMute(to: false)
-            saveAndRequestMenuUpdate(item)
+        if let associatedDataItem {
+            associatedDataItem.setMute(to: false)
+            saveAndRequestMenuUpdate(associatedDataItem)
         }
     }
 
@@ -334,8 +334,8 @@ final class TrailerCell: NSTableCellView {
     }
 
     override func updateTrackingAreas() {
-        if let t = trackingArea {
-            removeTrackingArea(t)
+        if let trackingArea {
+            removeTrackingArea(trackingArea)
         }
 
         let t = NSTrackingArea(rect: bounds, options: [NSTrackingArea.Options.mouseEnteredAndExited, NSTrackingArea.Options.activeInKeyWindow], owner: self, userInfo: nil)

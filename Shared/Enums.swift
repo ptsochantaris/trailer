@@ -122,14 +122,14 @@ enum Section: CaseIterable {
         Section.predicateExcludeCache.setObject(predicate, forKey: key)
         return predicate
     }
-    
+
     ///////////////////////////////////////////////////////////
-    
+
     static let placementLabels = [Section.mine.placementName,
-                           Section.participated.placementName,
-                           Section.mentioned.placementName,
-                           Section.none.placementName]
-    
+                                  Section.participated.placementName,
+                                  Section.mentioned.placementName,
+                                  Section.none.placementName]
+
     var placementName: String {
         switch self {
         case .mine:
@@ -145,7 +145,7 @@ enum Section: CaseIterable {
 
     var preferredSection: Section? {
         switch self {
-        case .mine, .participated, .mentioned:
+        case .mentioned, .mine, .participated:
             return self
         default:
             return nil

@@ -45,8 +45,8 @@ private final class TextFieldCellTextView: NSTextView, NSTextViewDelegate {
 
     var originalText: String?
     override func cancelOperation(_: Any?) {
-        if let o = originalText {
-            string = o
+        if let originalText {
+            string = originalText
         }
         window?.makeFirstResponder(nextResponder)
     }

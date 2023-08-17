@@ -86,9 +86,9 @@ final class PRListController: CommonController {
                                      "onlyUnread": onlyUnread,
                                      "count": PAGE_SIZE]
 
-        if let c = command {
-            params["command"] = c
-            if c == "markItemsRead" {
+        if let command {
+            params["command"] = command
+            if command == "markItemsRead" {
                 var itemIds = [String]()
                 for i in 0 ..< table.numberOfRows {
                     let controller = table.rowController(at: i) as! PRRow

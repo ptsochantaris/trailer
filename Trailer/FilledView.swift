@@ -16,10 +16,10 @@ final class FilledView: NSView {
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
 
-        if let b = backgroundColor {
-            b.set()
-            if let c = cornerRadius {
-                NSBezierPath(roundedRect: dirtyRect, xRadius: c, yRadius: c).addClip()
+        if let backgroundColor {
+            backgroundColor.set()
+            if let cornerRadius {
+                NSBezierPath(roundedRect: dirtyRect, xRadius: cornerRadius, yRadius: cornerRadius).addClip()
             }
             dirtyRect.fill()
         }

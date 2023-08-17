@@ -53,8 +53,8 @@ final class PickerViewController: UITableViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         if !layoutDone {
-            if let p = previousValue {
-                tableView.scrollToRow(at: IndexPath(row: p, section: 0), at: .middle, animated: false)
+            if let previousValue {
+                tableView.scrollToRow(at: IndexPath(row: previousValue, section: 0), at: .middle, animated: false)
             }
             layoutDone = true
         }

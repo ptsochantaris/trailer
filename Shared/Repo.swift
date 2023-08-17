@@ -171,14 +171,14 @@ final class Repo: DataItem {
         f.includesSubentities = false
         f.fetchLimit = 1
         let p = NSPredicate(format: "displayPolicyForPrs > 0 or displayPolicyForIssues > 0")
-        if let c = criterion {
-            switch c {
+        if let criterion {
+            switch criterion {
             case let .group(g):
                 // special case will never need exclusion
                 let rp = NSPredicate(format: "groupLabel == %@", g)
                 f.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [rp, p])
             case .server:
-                let ep = c.addCriterion(to: p)
+                let ep = criterion.addCriterion(to: p)
                 if excludeGrouped {
                     f.predicate = excludeGroupedRepos(ep)
                 } else {
@@ -197,8 +197,8 @@ final class Repo: DataItem {
     @MainActor
     static func mayProvideIssuesForDisplay(fromServerWithId id: NSManagedObjectID? = nil) -> Bool {
         let all: [Repo]
-        if let serverId = id {
-            all = Repo.allItems(in: serverId, moc: DataManager.main)
+        if let id {
+            all = Repo.allItems(in: id, moc: DataManager.main)
         } else {
             all = Repo.allItems(in: DataManager.main)
         }
@@ -208,8 +208,8 @@ final class Repo: DataItem {
     @MainActor
     static func mayProvidePrsForDisplay(fromServerWithId id: NSManagedObjectID? = nil) -> Bool {
         let all: [Repo]
-        if let serverId = id {
-            all = Repo.allItems(in: serverId, moc: DataManager.main)
+        if let id {
+            all = Repo.allItems(in: id, moc: DataManager.main)
         } else {
             all = Repo.allItems(in: DataManager.main)
         }
@@ -246,8 +246,8 @@ final class Repo: DataItem {
         let f = NSFetchRequest<Repo>(entityName: "Repo")
         f.returnsObjectsAsFaults = false
         f.includesSubentities = false
-        if let filterText = filter, !filterText.isEmpty {
-            f.predicate = NSPredicate(format: "fullName contains [cd] %@", filterText)
+        if let filter, !filter.isEmpty {
+            f.predicate = NSPredicate(format: "fullName contains [cd] %@", filter)
         }
         return try! DataManager.main.fetch(f)
     }

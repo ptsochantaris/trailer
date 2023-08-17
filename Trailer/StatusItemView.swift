@@ -110,9 +110,9 @@ final class StatusItemView: NSView {
 
         let tintedIcon = tintedImage(from: icon, tint: foreground)
 
-        if let t = title {
+        if let title {
             let r = CGRect(x: 0, y: dirtyRect.height - 7, width: dirtyRect.width, height: 7)
-            t.draw(in: r, withAttributes: titleAttributes(foregorund: foreground))
+            title.draw(in: r, withAttributes: titleAttributes(foregorund: foreground))
 
             let iconWidth = tintedIcon.size.width - 6
             let countLabelWidth = countLabel.size(withAttributes: textAttributes).width

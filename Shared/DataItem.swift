@@ -185,10 +185,11 @@ class DataItem: NSManagedObject, Querying {
                                      createNewItems: Bool = true,
                                      moc: NSManagedObjectContext,
                                      postProcessCallback: @escaping (T, JSON, Bool, NSManagedObjectContext) -> Void) async {
-        guard let infos = data, !infos.isEmpty else { return }
+        guard let data, !data.isEmpty else { return }
 
         var nodeIdsToInfo = [String: JSON]()
-        for info in infos {
+        nodeIdsToInfo.reserveCapacity(data.count)
+        for info in data {
             let nodeId = info["node_id"] as! String
             nodeIdsToInfo[nodeId] = info
         }
@@ -269,8 +270,8 @@ class DataItem: NSManagedObject, Querying {
     @MainActor
     static func add(criterion: GroupingCriterion?, toFetchRequest: NSFetchRequest<some ListableItem>, originalPredicate: NSPredicate, in moc: NSManagedObjectContext, includeAllGroups: Bool = false) {
         var andPredicates = [NSPredicate]()
-        if let c = criterion {
-            andPredicates.append(c.addCriterion(to: originalPredicate))
+        if let criterion {
+            andPredicates.append(criterion.addCriterion(to: originalPredicate))
         } else {
             andPredicates.append(originalPredicate)
         }

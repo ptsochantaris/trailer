@@ -27,8 +27,8 @@ final class SectionController: CommonController {
     }
 
     override func requestData(command: String?) {
-        if let c = command {
-            send(request: ["command": c])
+        if let command {
+            send(request: ["command": command])
         } else {
             send(request: ["command": "overview", "list": "overview"])
         }

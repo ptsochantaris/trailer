@@ -10,8 +10,8 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
     @IBOutlet private var typeSelector: UISegmentedControl!
 
     @IBAction private func deleteSelected(_: UIBarButtonItem) {
-        if let s = snoozeItem {
-            let appliedCount = s.appliedToIssues.count + s.appliedToPullRequests.count
+        if let snoozeItem {
+            let appliedCount = snoozeItem.appliedToIssues.count + snoozeItem.appliedToPullRequests.count
             if appliedCount > 0 {
                 let a = UIAlertController(title: "Delete Snooze Preset",
                                           message: "You have \(appliedCount) items that have been snoozed using this preset. What would you like to do with them after deleting this preset?",
@@ -19,7 +19,7 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 
                 a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
                 a.addAction(UIAlertAction(title: "Wake Them Up", style: .destructive) { _ in
-                    s.wakeUpAllAssociatedItems()
+                    snoozeItem.wakeUpAllAssociatedItems()
                     self.deletePreset()
                 })
                 a.addAction(UIAlertAction(title: "Keep Them Snoozed", style: .destructive) { _ in
@@ -44,19 +44,19 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
     }
 
     private func deletePreset() {
-        if let s = snoozeItem {
-            DataManager.main.delete(s)
+        if let snoozeItem {
+            DataManager.main.delete(snoozeItem)
         }
         _ = navigationController?.popViewController(animated: true)
     }
 
     @IBAction private func upSelected(_: UIBarButtonItem) {
-        if let this = snoozeItem {
+        if let snoozeItem {
             let all = SnoozePreset.allSnoozePresets(in: DataManager.main)
-            if let index = all.firstIndex(of: this), index > 0 {
+            if let index = all.firstIndex(of: snoozeItem), index > 0 {
                 let other = all[index - 1]
                 other.sortOrder = index
-                this.sortOrder = index - 1
+                snoozeItem.sortOrder = index - 1
                 updateView()
             }
         }
@@ -70,12 +70,12 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
     }
 
     @IBAction private func downSelected(_: UIBarButtonItem) {
-        if let this = snoozeItem {
+        if let snoozeItem {
             let all = SnoozePreset.allSnoozePresets(in: DataManager.main)
-            if let index = all.firstIndex(of: this), index < all.count - 1 {
+            if let index = all.firstIndex(of: snoozeItem), index < all.count - 1 {
                 let other = all[index + 1]
                 other.sortOrder = index
-                this.sortOrder = index + 1
+                snoozeItem.sortOrder = index + 1
                 updateView()
             }
         }
@@ -144,20 +144,20 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.section == 0 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "SnoozePresetElementCell", for: indexPath)
-            if let s = snoozeItem {
+            if let snoozeItem {
                 switch indexPath.row {
                 case 0:
                     cell.textLabel?.text = dayLabel
-                    cell.detailTextLabel?.text = dayValues[Int(s.day)]
-                    cell.detailTextLabel?.textColor = detailColor(for: s.day)
+                    cell.detailTextLabel?.text = dayValues[Int(snoozeItem.day)]
+                    cell.detailTextLabel?.textColor = detailColor(for: snoozeItem.day)
                 case 1:
                     cell.textLabel?.text = hourLabel
-                    cell.detailTextLabel?.text = hourValues[Int(s.hour)]
-                    cell.detailTextLabel?.textColor = detailColor(for: s.hour)
+                    cell.detailTextLabel?.text = hourValues[Int(snoozeItem.hour)]
+                    cell.detailTextLabel?.textColor = detailColor(for: snoozeItem.hour)
                 default:
                     cell.textLabel?.text = minuteLabel
-                    cell.detailTextLabel?.text = minuteValues[Int(s.minute)]
-                    cell.detailTextLabel?.textColor = detailColor(for: s.minute)
+                    cell.detailTextLabel?.text = minuteValues[Int(snoozeItem.minute)]
+                    cell.detailTextLabel?.textColor = detailColor(for: snoozeItem.minute)
                 }
             }
             return cell
@@ -295,9 +295,9 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
     }
 
     @IBAction private func pickerDoneSelected(_: UIBarButtonItem) {
-        if let p = pickerMode {
+        if let pickerMode {
             let s = picker.selectedRow(inComponent: 0)
-            switch p {
+            switch pickerMode {
             case .Day:
                 snoozeItem?.day = s
             case .Hour:
@@ -331,8 +331,8 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
     }
 
     private var indexForPicker: Int {
-        if let p = pickerMode {
-            switch p {
+        if let pickerMode {
+            switch pickerMode {
             case .Day:
                 return Int(snoozeItem?.day ?? 0)
             case .Hour:

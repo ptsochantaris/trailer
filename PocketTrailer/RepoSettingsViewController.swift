@@ -166,8 +166,8 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         let newText = (groupField.text?.isEmpty ?? true) ? nil : groupField.text
-        if let r = repo, r.groupLabel != newText {
-            r.groupLabel = newText
+        if let repo, repo.groupLabel != newText {
+            repo.groupLabel = newText
             commit()
             Task { @MainActor in
                 popupManager.masterController.updateStatus(becauseOfChanges: true)

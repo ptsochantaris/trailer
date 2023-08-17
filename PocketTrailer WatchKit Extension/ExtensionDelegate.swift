@@ -56,8 +56,8 @@ import WatchKit
 
     private func potentialUpdate() {
         Task { @MainActor in
-            if let l = lastView, session.isReachable {
-                l.requestData(command: nil)
+            if let lastView, session.isReachable {
+                lastView.requestData(command: nil)
             }
         }
     }

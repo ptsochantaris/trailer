@@ -128,13 +128,13 @@ final class ApiServer: NSManagedObject {
     }
 
     func deleteEverything() {
-        guard let moc = managedObjectContext else { return }
+        guard let managedObjectContext else { return }
 
         Logging.log("Wiping all data for API server \(label ?? "<no API server name>")")
 
         let categories: [Set<NSManagedObject>] = [pullRequests, issues, labels, teams, comments, statuses, reviews, reactions]
-        categories.forEach { set in
-            set.forEach { moc.delete($0) }
+        categories.forEach { list in
+            list.forEach { managedObjectContext.delete($0) }
         }
     }
 
@@ -347,9 +347,9 @@ final class ApiServer: NSManagedObject {
     }
 
     func configureRepos(from archive: [String: [String: NSObject]]) {
-        guard let moc = managedObjectContext else { return }
+        guard let managedObjectContext else { return }
         for (_, repoData) in archive {
-            let r = NSEntityDescription.insertNewObject(forEntityName: "Repo", into: moc) as! Repo
+            let r = NSEntityDescription.insertNewObject(forEntityName: "Repo", into: managedObjectContext) as! Repo
             for (k, v) in repoData where r.entity.attributesByName.keys.contains(k) {
                 r.setValue(v, forKey: k)
             }

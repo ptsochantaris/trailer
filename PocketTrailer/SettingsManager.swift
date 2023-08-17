@@ -22,7 +22,7 @@ final class SettingsManager {
     }
 
     func loadSettingsFrom(url: URL, confirmFromView: UIViewController?) async -> Bool {
-        if let v = confirmFromView {
+        if let confirmFromView {
             var continuation: CheckedContinuation<Bool, Never>?
             let a = UIAlertController(title: "Import these settings?", message: "This will overwrite all your current settings, are you sure?", preferredStyle: .alert)
             a.addAction(UIAlertAction(title: "Yes", style: .destructive) { _ in
@@ -32,7 +32,7 @@ final class SettingsManager {
                 continuation?.resume(returning: false)
             })
             Task { @MainActor in
-                v.present(a, animated: true)
+                confirmFromView.present(a, animated: true)
             }
             let decision = await withCheckedContinuation { c in
                 continuation = c

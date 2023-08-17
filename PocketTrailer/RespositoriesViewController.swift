@@ -202,13 +202,13 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
     }
 
     private var fetchedResultsController: NSFetchedResultsController<Repo> {
-        if let f = _fetchedResultsController {
-            return f
+        if let _fetchedResultsController {
+            return _fetchedResultsController
         }
 
         let fetchRequest = NSFetchRequest<Repo>(entityName: "Repo")
-        if let text = searchText {
-            fetchRequest.predicate = NSPredicate(format: "fullName contains [cd] %@", text)
+        if let searchText {
+            fetchRequest.predicate = NSPredicate(format: "fullName contains [cd] %@", searchText)
             setAllPrsItem.title = "Options for visible repos"
         } else {
             setAllPrsItem.title = "Options for all repos"

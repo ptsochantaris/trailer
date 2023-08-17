@@ -146,7 +146,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         super.viewWillAppear(animated)
         updateStatus(becauseOfChanges: false, updateItems: true)
 
-        if let s = splitViewController, !s.isCollapsed {
+        if let splitViewController, !splitViewController.isCollapsed {
             return
         } else if let i = tableView.indexPathForSelectedRow {
             tableView.deselectRow(at: i, animated: true)
@@ -494,7 +494,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         tableView.selectRow(at: ip, animated: false, scrollPosition: .middle)
         if andOpen {
             Task { @MainActor in
-                if let u = overrideUrl, let url = URL(string: u) {
+                if let overrideUrl, let url = URL(string: overrideUrl) {
                     showDetail(url: url, objectId: item.objectID)
                 } else if let u = item.webUrl, let url = URL(string: u) {
                     showDetail(url: url, objectId: item.objectID)
@@ -560,12 +560,12 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
             try! c.performFetch()
             c.delegate = self
 
-        } else if let f = fetchedResultsController {
-            let fr = f.fetchRequest
+        } else if let fetchedResultsController {
+            let fr = fetchedResultsController.fetchRequest
             fr.relationshipKeyPathsForPrefetching = newFetchRequest.relationshipKeyPathsForPrefetching
             fr.sortDescriptors = newFetchRequest.sortDescriptors
             fr.predicate = newFetchRequest.predicate
-            try! f.performFetch()
+            try! fetchedResultsController.performFetch()
         }
     }
 
@@ -620,8 +620,8 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
         if let i = tabs.selectedItem?.image {
             viewingPrs = i == UIImage(named: "prsTab") // not proud of this :(
-        } else if let c = currentTabBarSet {
-            viewingPrs = c.tabItems.first?.image == UIImage(named: "prsTab") // or this :(
+        } else if let currentTabBarSet {
+            viewingPrs = currentTabBarSet.tabItems.first?.image == UIImage(named: "prsTab") // or this :(
         } else if Repo.anyVisibleRepos(in: DataManager.main, criterion: currentTabBarSet?.viewCriterion, excludeGrouped: true) {
             viewingPrs = Repo.mayProvidePrsForDisplay(fromServerWithId: currentTabBarSet?.viewCriterion?.apiServerId)
         } else {
@@ -641,11 +641,11 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
             }
         }
 
-        if let ts = tabScroll, let i = tabs.selectedItem, let ind = tabs.items?.firstIndex(of: i) {
+        if let tabScroll, let i = tabs.selectedItem, let ind = tabs.items?.firstIndex(of: i) {
             let w = tabs.bounds.size.width / CGFloat(tabs.items?.count ?? 1)
             let x = w * CGFloat(ind)
             let f = CGRect(x: x, y: 0, width: w, height: tabs.bounds.size.height)
-            ts.scrollRectToVisible(f, animated: animated && tabsAlreadyWereVisible)
+            tabScroll.scrollRectToVisible(f, animated: animated && tabsAlreadyWereVisible)
         }
         lastTabCount = tabs.items?.count ?? 0
 
@@ -1012,24 +1012,24 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
         switch type {
         case .insert:
-            if let n = newIndexPath {
-                tableView.insertRows(at: [n], with: .fade)
+            if let newIndexPath {
+                tableView.insertRows(at: [newIndexPath], with: .fade)
             }
         case .delete:
-            if let i = indexPath {
-                tableView.deleteRows(at: [i], with: .fade)
+            if let indexPath {
+                tableView.deleteRows(at: [indexPath], with: .fade)
             }
         case .update:
-            if let i = indexPath, let object = anObject as? ListableItem, let cell = tableView.cellForRow(at: i) {
+            if let indexPath, let object = anObject as? ListableItem, let cell = tableView.cellForRow(at: indexPath) {
                 configureCell(cell: cell, withObject: object)
             }
         case .move:
-            if let i = indexPath, let n = newIndexPath {
+            if let indexPath, let newIndexPath {
                 if sectionsChanged {
-                    tableView.deleteRows(at: [i], with: .fade)
-                    tableView.insertRows(at: [n], with: .fade)
+                    tableView.deleteRows(at: [indexPath], with: .fade)
+                    tableView.insertRows(at: [newIndexPath], with: .fade)
                 } else {
-                    tableView.moveRow(at: i, to: n)
+                    tableView.moveRow(at: indexPath, to: newIndexPath)
                 }
             }
         @unknown default:

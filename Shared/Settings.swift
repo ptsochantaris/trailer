@@ -222,8 +222,8 @@ enum Settings {
             }
 
             let keyIsGood: Bool
-            if let k = key {
-                keyIsGood = !["LAST_SUCCESSFUL_REFRESH", "LAST_EXPORT_URL", "LAST_EXPORT_TIME"].contains(k)
+            if let key {
+                keyIsGood = !["LAST_SUCCESSFUL_REFRESH", "LAST_EXPORT_URL", "LAST_EXPORT_TIME"].contains(key)
             } else {
                 keyIsGood = true
             }

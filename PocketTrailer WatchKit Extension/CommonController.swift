@@ -52,26 +52,28 @@ class CommonController: WKInterfaceController {
         loading += 1
 
         WCSession.default.sendMessage(request) { [weak self] response in
-            guard let S = self else { return }
+            guard let self else { return }
             if let errorIndicator = response["error"] as? Bool, errorIndicator == true {
-                Task { @MainActor in
-                    S.loading = 0
-                    S.showTemporaryError(response["status"] as! String)
+                Task { @MainActor [weak self] in
+                    guard let self else { return }
+                    loading = 0
+                    showTemporaryError(response["status"] as! String)
                 }
             } else {
-                Task { @MainActor in
-                    S.loading = 0
+                Task { @MainActor [weak self] in
+                    guard let self else { return }
+                    loading = 0
                 }
-                S.update(from: response)
+                update(from: response)
             }
         } errorHandler: { error in
             Task { @MainActor [weak self] in
-                guard let S = self else { return }
-                if S.loading == 5 {
-                    S.loadingFailed(with: error)
+                guard let self else { return }
+                if loading == 5 {
+                    loadingFailed(with: error)
                 } else {
                     try? await Task.sleep(nanoseconds: 300 * NSEC_PER_MSEC)
-                    S.attempt(request: request)
+                    attempt(request: request)
                 }
             }
         }

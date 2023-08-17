@@ -96,16 +96,16 @@ final class PRStatus: DataItem {
             text = "❌ "
         }
 
-        if let c = context, !c.isEmpty {
-            if c == nodeId, let createdAt {
+        if let context, !context.isEmpty {
+            if context == nodeId, let createdAt {
                 text += shortDateFormatter.string(from: createdAt)
             } else {
-                text += c
+                text += context
             }
         }
 
-        if let t = descriptionText, !t.isEmpty {
-            text += " - \(t)"
+        if let descriptionText, !descriptionText.isEmpty {
+            text += " - \(descriptionText)"
         }
 
         return text

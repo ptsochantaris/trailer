@@ -1593,8 +1593,8 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     ///////////// Tabs
 
     func tabView(_ tabView: NSTabView, willSelect tabViewItem: NSTabViewItem?) {
-        if let item = tabViewItem {
-            let newIndex = tabView.indexOfTabViewItem(item)
+        if let tabViewItem {
+            let newIndex = tabView.indexOfTabViewItem(tabViewItem)
             if newIndex == 1, lastRepoCheck == .distantPast {
                 refreshRepos()
             }
@@ -1770,10 +1770,10 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     /////////////////////////////// snoozing
 
     @IBAction private func snoozeWakeChanged(_: NSButton) {
-        if let preset = selectedSnoozePreset {
-            preset.wakeOnComment = snoozeWakeOnComment.integerValue == 1
-            preset.wakeOnMention = snoozeWakeOnMention.integerValue == 1
-            preset.wakeOnStatusChange = snoozeWakeOnStatusUpdate.integerValue == 1
+        if let selectedSnoozePreset {
+            selectedSnoozePreset.wakeOnComment = snoozeWakeOnComment.integerValue == 1
+            selectedSnoozePreset.wakeOnMention = snoozeWakeOnMention.integerValue == 1
+            selectedSnoozePreset.wakeOnStatusChange = snoozeWakeOnStatusUpdate.integerValue == 1
             snoozePresetsList.reloadData()
             deferredUpdateTimer.push()
         }
@@ -1861,16 +1861,16 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     }
 
     private func fillSnoozeFormFromSelectedPreset() {
-        if let s = selectedSnoozePreset {
-            if s.duration {
+        if let selectedSnoozePreset {
+            if selectedSnoozePreset.duration {
                 snoozeTypeDuration.integerValue = 1
                 snoozeTypeDateTime.integerValue = 0
                 snoozeDurationMinutes.isEnabled = true
                 snoozeDurationHours.isEnabled = true
                 snoozeDurationDays.isEnabled = true
-                snoozeDurationMinutes.selectItem(at: Int(s.minute))
-                snoozeDurationHours.selectItem(at: Int(s.hour))
-                snoozeDurationDays.selectItem(at: Int(s.day))
+                snoozeDurationMinutes.selectItem(at: Int(selectedSnoozePreset.minute))
+                snoozeDurationHours.selectItem(at: Int(selectedSnoozePreset.hour))
+                snoozeDurationDays.selectItem(at: Int(selectedSnoozePreset.day))
                 snoozeDateTimeMinute.isEnabled = false
                 snoozeDateTimeMinute.selectItem(at: 0)
                 snoozeDateTimeHour.isEnabled = false
@@ -1889,16 +1889,16 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
                 snoozeDateTimeMinute.isEnabled = true
                 snoozeDateTimeHour.isEnabled = true
                 snoozeDateTimeDay.isEnabled = true
-                snoozeDateTimeMinute.selectItem(at: Int(s.minute))
-                snoozeDateTimeHour.selectItem(at: Int(s.hour))
-                snoozeDateTimeDay.selectItem(at: Int(s.day))
+                snoozeDateTimeMinute.selectItem(at: Int(selectedSnoozePreset.minute))
+                snoozeDateTimeHour.selectItem(at: Int(selectedSnoozePreset.hour))
+                snoozeDateTimeDay.selectItem(at: Int(selectedSnoozePreset.day))
             }
             snoozeWakeOnComment.isEnabled = true
-            snoozeWakeOnComment.integerValue = s.wakeOnComment ? 1 : 0
+            snoozeWakeOnComment.integerValue = selectedSnoozePreset.wakeOnComment ? 1 : 0
             snoozeWakeOnMention.isEnabled = true
-            snoozeWakeOnMention.integerValue = s.wakeOnMention ? 1 : 0
+            snoozeWakeOnMention.integerValue = selectedSnoozePreset.wakeOnMention ? 1 : 0
             snoozeWakeOnStatusUpdate.isEnabled = true
-            snoozeWakeOnStatusUpdate.integerValue = s.wakeOnStatusChange ? 1 : 0
+            snoozeWakeOnStatusUpdate.integerValue = selectedSnoozePreset.wakeOnStatusChange ? 1 : 0
             snoozeWakeLabel.textColor = .controlTextColor
             snoozeTypeDuration.isEnabled = true
             snoozeTypeDateTime.isEnabled = true
@@ -1943,8 +1943,8 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     }
 
     @IBAction private func deleteSnoozePresetSelected(_: NSButton) {
-        if let selectedPreset = selectedSnoozePreset, let index = SnoozePreset.allSnoozePresets(in: DataManager.main).firstIndex(of: selectedPreset) {
-            let appliedCount = selectedPreset.appliedToIssues.count + selectedPreset.appliedToPullRequests.count
+        if let selectedSnoozePreset, let index = SnoozePreset.allSnoozePresets(in: DataManager.main).firstIndex(of: selectedSnoozePreset) {
+            let appliedCount = selectedSnoozePreset.appliedToIssues.count + selectedSnoozePreset.appliedToPullRequests.count
             if appliedCount > 0 {
                 let alert = NSAlert()
                 alert.messageText = "Warning"
@@ -1957,15 +1957,15 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
                     case .alertFirstButtonReturn:
                         break
                     case .alertSecondButtonReturn:
-                        selectedPreset.wakeUpAllAssociatedItems()
+                        selectedSnoozePreset.wakeUpAllAssociatedItems()
                         fallthrough
                     case .alertThirdButtonReturn:
-                        self.completeSnoozeDelete(for: selectedPreset, index)
+                        self.completeSnoozeDelete(for: selectedSnoozePreset, index)
                     default: break
                     }
                 }
             } else {
-                completeSnoozeDelete(for: selectedPreset, index)
+                completeSnoozeDelete(for: selectedSnoozePreset, index)
             }
         }
     }
@@ -1978,35 +1978,35 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     }
 
     @IBAction private func snoozeTypeChanged(_ sender: NSButton) {
-        if let s = selectedSnoozePreset {
-            s.duration = sender == snoozeTypeDuration
+        if let selectedSnoozePreset {
+            selectedSnoozePreset.duration = sender == snoozeTypeDuration
             fillSnoozeFormFromSelectedPreset()
             commitSnoozeSettings()
         }
     }
 
     @IBAction private func snoozeOptionsChanged(_: NSPopUpButton) {
-        if let s = selectedSnoozePreset {
-            if s.duration {
-                s.day = snoozeDurationDays.indexOfSelectedItem
-                s.hour = snoozeDurationHours.indexOfSelectedItem
-                s.minute = snoozeDurationMinutes.indexOfSelectedItem
+        if let selectedSnoozePreset {
+            if selectedSnoozePreset.duration {
+                selectedSnoozePreset.day = snoozeDurationDays.indexOfSelectedItem
+                selectedSnoozePreset.hour = snoozeDurationHours.indexOfSelectedItem
+                selectedSnoozePreset.minute = snoozeDurationMinutes.indexOfSelectedItem
             } else {
-                s.day = snoozeDateTimeDay.indexOfSelectedItem
-                s.hour = snoozeDateTimeHour.indexOfSelectedItem
-                s.minute = snoozeDateTimeMinute.indexOfSelectedItem
+                selectedSnoozePreset.day = snoozeDateTimeDay.indexOfSelectedItem
+                selectedSnoozePreset.hour = snoozeDateTimeHour.indexOfSelectedItem
+                selectedSnoozePreset.minute = snoozeDateTimeMinute.indexOfSelectedItem
             }
             commitSnoozeSettings()
         }
     }
 
     @IBAction private func snoozeUpSelected(_: NSButton) {
-        if let this = selectedSnoozePreset {
+        if let selectedSnoozePreset {
             let all = SnoozePreset.allSnoozePresets(in: DataManager.main)
-            if let index = all.firstIndex(of: this), index > 0 {
+            if let index = all.firstIndex(of: selectedSnoozePreset), index > 0 {
                 let other = all[index - 1]
                 other.sortOrder = index
-                this.sortOrder = index - 1
+                selectedSnoozePreset.sortOrder = index - 1
                 snoozePresetsList.selectRowIndexes(IndexSet(integer: index - 1), byExtendingSelection: false)
                 commitSnoozeSettings()
             }
@@ -2014,12 +2014,12 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     }
 
     @IBAction private func snoozeDownSelected(_: NSButton) {
-        if let this = selectedSnoozePreset {
+        if let selectedSnoozePreset {
             let all = SnoozePreset.allSnoozePresets(in: DataManager.main)
-            if let index = all.firstIndex(of: this), index < all.count - 1 {
+            if let index = all.firstIndex(of: selectedSnoozePreset), index < all.count - 1 {
                 let other = all[index + 1]
                 other.sortOrder = index
-                this.sortOrder = index + 1
+                selectedSnoozePreset.sortOrder = index + 1
                 snoozePresetsList.selectRowIndexes(IndexSet(integer: index + 1), byExtendingSelection: false)
                 commitSnoozeSettings()
             }

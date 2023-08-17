@@ -115,16 +115,16 @@ final class CommentBlacklistViewController: UITableViewController {
             let name = n.hasPrefix("@") ? String(n.dropFirst()) : n
 
             Task { @MainActor [weak self] in
-                guard let S = self else { return }
-                var blackList = S.getBlacklist()
+                guard let self else { return }
+                var blackList = getBlacklist()
                 if !name.isEmpty, !blackList.contains(name) {
                     blackList.append(name)
-                    S.storeBlacklist(blackList)
+                    storeBlacklist(blackList)
                     let ip = IndexPath(row: blackList.count - 1, section: 0)
                     if blackList.count == 1 { // first insert
-                        S.tableView.insertSections(IndexSet(integer: 0), with: .fade)
+                        tableView.insertSections(IndexSet(integer: 0), with: .fade)
                     } else {
-                        S.tableView.insertRows(at: [ip], with: .fade)
+                        tableView.insertRows(at: [ip], with: .fade)
                     }
                 }
             }

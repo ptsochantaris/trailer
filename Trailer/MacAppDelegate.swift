@@ -170,7 +170,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
             window.table.selectRowIndexes(IndexSet(integer: reSelectIndex), byExtendingSelection: false)
         }
 
-        if let u = urlToOpen, let url = URL(string: u) {
+        if let urlToOpen, let url = URL(string: urlToOpen) {
             openItem(url)
         }
     }
@@ -662,9 +662,9 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 
         keyDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] incomingEvent -> NSEvent? in
 
-            guard let S = self else { return incomingEvent }
+            guard let self else { return incomingEvent }
 
-            if S.checkForHotkey(in: incomingEvent) {
+            if checkForHotkey(in: incomingEvent) {
                 return nil
             }
 
@@ -678,7 +678,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                         return incomingEvent
                     }
 
-                    let statusItems = S.statusItemList
+                    let statusItems = statusItemList
                     if let s = w.statusItem, let ind = statusItems.firstIndex(of: s) {
                         var nextIndex = incomingEvent.keyCode == 123 ? ind + 1 : ind - 1
                         if nextIndex < 0 {
@@ -687,12 +687,12 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                             nextIndex = 0
                         }
                         let newStatusItem = statusItems[nextIndex]
-                        for s in S.menuBarSets {
+                        for s in menuBarSets {
                             if s.prMenu.statusItem === newStatusItem {
-                                S.show(menu: s.prMenu)
+                                show(menu: s.prMenu)
                                 break
                             } else if s.issuesMenu.statusItem === newStatusItem {
-                                S.show(menu: s.issuesMenu)
+                                show(menu: s.issuesMenu)
                                 break
                             }
                         }
@@ -712,7 +712,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                         i = 0
                         while w.dataSource.itemAtRow(i) == nil { i += 1 }
                     }
-                    S.scrollTo(index: i, inMenu: w)
+                    scrollTo(index: i, inMenu: w)
                     return nil
 
                 case 126:
@@ -727,7 +727,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                     } else {
                         i = w.table.numberOfRows - 1
                     }
-                    S.scrollTo(index: i, inMenu: w)
+                    scrollTo(index: i, inMenu: w)
                     return nil
 
                 case 36:
@@ -735,9 +735,9 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                     if let c = NSTextInputContext.current, c.client.hasMarkedText() {
                         return incomingEvent
                     }
-                    if let dataItem = S.focusedItem(blink: true) {
+                    if let dataItem = focusedItem(blink: true) {
                         let isAlternative = incomingEvent.modifierFlags.contains(.option)
-                        S.selected(dataItem, alternativeSelect: isAlternative, window: w)
+                        selected(dataItem, alternativeSelect: isAlternative, window: w)
                     }
                     return nil
 
@@ -751,7 +751,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                         return incomingEvent
                     }
 
-                    guard let selectedItem = S.focusedItem(blink: false) else { return incomingEvent }
+                    guard let selectedItem = focusedItem(blink: false) else { return incomingEvent }
 
                     switch incomingEvent.charactersIgnoringModifiers ?? "" {
                     case "m":
@@ -772,11 +772,11 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                         }
                         if let snoozeIndex = Int(incomingEvent.charactersIgnoringModifiers ?? "") {
                             if snoozeIndex > 0, !selectedItem.isSnoozing {
-                                if S.snooze(item: selectedItem, snoozeIndex: snoozeIndex - 1, window: w) {
+                                if snooze(item: selectedItem, snoozeIndex: snoozeIndex - 1, window: w) {
                                     return nil
                                 }
                             } else if snoozeIndex == 0, selectedItem.isSnoozing {
-                                S.wake(item: selectedItem, window: w)
+                                wake(item: selectedItem, window: w)
                                 return nil
                             }
                         }

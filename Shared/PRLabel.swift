@@ -42,11 +42,12 @@ final class PRLabel: DataItem {
     }
 
     private static func labels(from data: [JSON]?, fromParent: ListableItem, postProcessCallback: (PRLabel, JSON) -> Void) {
-        guard let infos = data, !infos.isEmpty else { return }
+        guard let data, !data.isEmpty else { return }
 
         var namesOfItems = [String]()
         var namesToInfo = [String: JSON]()
-        for info in infos {
+        namesToInfo.reserveCapacity(data.count)
+        for info in data {
             if let name = info["name"] as? String {
                 namesOfItems.append(name)
                 namesToInfo[name] = info

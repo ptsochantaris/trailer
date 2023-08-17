@@ -373,15 +373,10 @@ class ListableItem: DataItem, Listable {
     }
 
     private final func contains(terms: [String]) -> Bool {
-        if let b = body {
-            for t in terms where !t.isEmpty && b.localizedCaseInsensitiveContains(t) {
-                return true
-            }
-        }
-        for c in comments where c.contains(terms: terms) {
+        if let body, terms.contains(where: { !$0.isEmpty && body.localizedCaseInsensitiveContains($0) }) {
             return true
         }
-        return false
+        return comments.contains(where: { $0.contains(terms: terms) })
     }
 
     private final var commentedByMe: Bool {
@@ -571,7 +566,7 @@ class ListableItem: DataItem, Listable {
     }
 
     final func postProcess(context: PostProcessContext = PostProcessContext()) {
-        if let s = snoozeUntil, s < Date() { // our snooze-by date is past
+        if let snoozeUntil, snoozeUntil < Date() { // our snooze-by date is past
             disableSnoozing(explicityAwoke: true)
         }
 
@@ -717,7 +712,7 @@ class ListableItem: DataItem, Listable {
                     oldestComment = c
                 }
             }
-            if let c = oldestComment, let url = c.webUrl {
+            if let url = oldestComment?.webUrl {
                 return url
             }
         }
@@ -727,8 +722,8 @@ class ListableItem: DataItem, Listable {
 
     final var accessibleTitle: String {
         let components = Lista<String>()
-        if let t = title {
-            components.append(t)
+        if let title {
+            components.append(title)
         }
         if draft, Settings.draftHandlingPolicy == .display {
             components.append("draft")
@@ -781,7 +776,7 @@ class ListableItem: DataItem, Listable {
 
     final func title(with font: FONT_CLASS, labelFont: FONT_CLASS, titleColor: COLOR_CLASS, numberColor: COLOR_CLASS) -> NSMutableAttributedString {
         let _title = NSMutableAttributedString()
-        guard let t = title else {
+        guard let title else {
             return _title
         }
 
@@ -791,7 +786,7 @@ class ListableItem: DataItem, Listable {
         }
 
         let titleAttributes: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: titleColor]
-        _title.append(NSAttributedString(string: t, attributes: titleAttributes))
+        _title.append(NSAttributedString(string: title, attributes: titleAttributes))
 
         if let p = self as? PullRequest {
             if Settings.showPrLines, let l = p.linesAttributedString(labelFont: labelFont) {
@@ -891,8 +886,8 @@ class ListableItem: DataItem, Listable {
             components.append("Repository: \(repo.fullName.orEmpty)")
         }
 
-        if let l = userLogin {
-            components.append("Author: \(l)")
+        if let userLogin {
+            components.append("Author: \(userLogin)")
         }
 
         components.append(displayDate)
@@ -1202,8 +1197,8 @@ class ListableItem: DataItem, Listable {
     private final func indexForSpotlight(uri: String) async -> CSSearchableItem {
         let s = CSSearchableItemAttributeSet(itemContentType: "public.text")
 
-        if let i = userAvatarUrl, !Settings.hideAvatars {
-            s.thumbnailURL = try? await ImageCache.shared.store(HTTP.avatar(from: i), from: i)
+        if let userAvatarUrl, !Settings.hideAvatars {
+            s.thumbnailURL = try? await ImageCache.shared.store(HTTP.avatar(from: userAvatarUrl), from: userAvatarUrl)
         }
 
         let titleSuffix = labels.compactMap(\.name).reduce("") { $0 + " [\($1)]" }
@@ -1313,8 +1308,8 @@ class ListableItem: DataItem, Listable {
             case .unmute: return "Un-Mute"
             case .snooze: return "Snooze"
             case let .wake(date):
-                if let snooze = date, snooze != .distantFuture, snooze != autoSnoozeSentinelDate {
-                    return "Wake (auto: " + itemDateFormatter.string(from: snooze) + ")"
+                if let date, date != .distantFuture, date != autoSnoozeSentinelDate {
+                    return "Wake (auto: " + itemDateFormatter.string(from: date) + ")"
                 } else {
                     return "Wake"
                 }

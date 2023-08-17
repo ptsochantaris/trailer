@@ -17,11 +17,11 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
 
     var messageView: MessageView? {
         didSet {
-            if let p = oldValue {
-                p.removeFromSuperview()
+            if let oldValue {
+                oldValue.removeFromSuperview()
             }
-            if let m = messageView {
-                contentView?.addSubview(m)
+            if let messageView {
+                contentView?.addSubview(messageView)
             }
         }
     }

@@ -90,7 +90,7 @@ final class Reaction: DataItem {
             if let parentItem = (pullRequest ?? issue), Settings.notifyOnItemReactions, parentItem.canBadge {
                 NotificationQueue.add(type: .newReaction, for: self)
 
-            } else if let c = comment, let parentItem = (c.pullRequest ?? c.issue), Settings.notifyOnCommentReactions, parentItem.canBadge {
+            } else if let comment, let parentItem = (comment.pullRequest ?? comment.issue), Settings.notifyOnCommentReactions, parentItem.canBadge {
                 NotificationQueue.add(type: .newReaction, for: self)
             }
         }

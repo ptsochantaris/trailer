@@ -38,7 +38,7 @@ final class PrTable: NSTableView, NSPasteboardItemDataProvider {
 
     private var dragOrigin: NSEvent?
     override func mouseDragged(with theEvent: NSEvent) {
-        if let origin = dragOrigin {
+        if let dragOrigin {
             func fastDistance(_ a: CGFloat, _ b: CGFloat) -> CGFloat {
                 let dx = abs(a)
                 let dy = abs(b)
@@ -46,7 +46,7 @@ final class PrTable: NSTableView, NSPasteboardItemDataProvider {
             }
 
             let l = theEvent.locationInWindow
-            let o = origin.locationInWindow
+            let o = dragOrigin.locationInWindow
             if fastDistance(o.y - l.y, o.x - l.x) < 15 {
                 return
             }

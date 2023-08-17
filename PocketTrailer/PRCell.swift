@@ -73,8 +73,8 @@ final class PRCell: UITableViewCell {
 
     @objc private func networkStateChanged() {
         Task {
-            if let f = failedToLoadImage, API.currentNetworkStatus != .notReachable {
-                loadImageAtPath(imagePath: f)
+            if let failedToLoadImage, API.currentNetworkStatus != .notReachable {
+                loadImageAtPath(imagePath: failedToLoadImage)
             }
         }
     }
@@ -200,10 +200,10 @@ final class PRCell: UITableViewCell {
         waitingForImageInPath = imagePath
         _image.image = UIImage(named: "avatarPlaceHolder")
         failedToLoadImage = nil
-        if let path = imagePath {
+        if let imagePath {
             Task {
-                let image = try? await HTTP.avatar(from: path)
-                if waitingForImageInPath == path {
+                let image = try? await HTTP.avatar(from: imagePath)
+                if waitingForImageInPath == imagePath {
                     _image.image = image
                     failedToLoadImage = image == nil ? imagePath : nil
                     waitingForImageInPath = nil

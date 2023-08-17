@@ -14,8 +14,8 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
         var valueDisplayed: () -> String?
 
         func isRelevant(to searchText: String?, showingHelp: Bool) -> Bool {
-            if let s = searchText, !s.isEmpty {
-                return title.localizedCaseInsensitiveContains(s) || (showingHelp && description.localizedCaseInsensitiveContains(s))
+            if let searchText, !searchText.isEmpty {
+                return title.localizedCaseInsensitiveContains(searchText) || (showingHelp && description.localizedCaseInsensitiveContains(searchText))
             } else {
                 return true
             }

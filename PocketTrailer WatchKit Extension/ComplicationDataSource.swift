@@ -51,21 +51,21 @@ final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
     }
 
     private func count(_ count: Int?, unit: String?) -> String {
-        if let u = unit {
-            if let c = count {
-                if c == 0 {
-                    return "No \(u)s"
-                } else if c > 1 {
-                    return "\(c) \(u)s"
+        if let unit {
+            if let count {
+                if count == 0 {
+                    return "No \(unit)s"
+                } else if count > 1 {
+                    return "\(count) \(unit)s"
                 } else {
-                    return "1 \(u)"
+                    return "1 \(unit)"
                 }
             } else {
-                return "-- \(u)s"
+                return "-- \(unit)s"
             }
         } else {
-            if let c = count {
-                return "\(c)"
+            if let count {
+                return "\(count)"
             } else {
                 return "--"
             }

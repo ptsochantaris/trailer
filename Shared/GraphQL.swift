@@ -757,11 +757,9 @@ enum GraphQL {
         var prRepoIdToLatestExistingUpdate = [String: Date]()
 
         let hideValue = RepoDisplayPolicy.hide.rawValue
-        repos.forEach {
-            if let n = $0.nodeId {
-                if $0.displayPolicyForPrs != hideValue {
-                    prRepoIdToLatestExistingUpdate[n] = PullRequest.mostRecentItemUpdate(in: $0)
-                }
+        for repo in repos {
+            if let n = repo.nodeId, repo.displayPolicyForPrs != hideValue {
+                prRepoIdToLatestExistingUpdate[n] = PullRequest.mostRecentItemUpdate(in: repo)
             }
         }
 
@@ -826,11 +824,9 @@ enum GraphQL {
         var issueRepoIdToLatestExistingUpdate = [String: Date]()
 
         let hideValue = RepoDisplayPolicy.hide.rawValue
-        repos.forEach {
-            if let n = $0.nodeId {
-                if $0.displayPolicyForIssues != hideValue {
-                    issueRepoIdToLatestExistingUpdate[n] = Issue.mostRecentItemUpdate(in: $0)
-                }
+        for repo in repos {
+            if let n = repo.nodeId, repo.displayPolicyForIssues != hideValue {
+                issueRepoIdToLatestExistingUpdate[n] = Issue.mostRecentItemUpdate(in: repo)
             }
         }
 
