@@ -142,13 +142,13 @@ final class PullRequest: ListableItem {
             break
 
         case .me:
-            if Settings.assignedDirectReviewHandlingPolicy != .nothing,
+            if Settings.assignedDirectReviewHandlingPolicy != .none,
                let section = Settings.assignedDirectReviewHandlingPolicy.preferredSection {
                 return section
             }
 
         case .myTeam:
-            if Settings.assignedTeamReviewHandlingPolicy != .nothing,
+            if Settings.assignedTeamReviewHandlingPolicy != .none,
                let section = Settings.assignedTeamReviewHandlingPolicy.preferredSection {
                 return section
             }

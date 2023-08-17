@@ -47,11 +47,11 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
         Setting(section: .Display,
                 title: "Assigned items to me",
                 description: Settings.assignedItemDirectHandlingPolicyHelp,
-                valueDisplayed: { Settings.assignedItemDirectHandlingPolicy.name }),
+                valueDisplayed: { Settings.assignedItemDirectHandlingPolicy.placementName }),
         Setting(section: .Display,
                 title: "Assigned items to my team(s)",
                 description: Settings.assignedItemTeamHandlingPolicyHelp,
-                valueDisplayed: { Settings.assignedItemTeamHandlingPolicy.name }),
+                valueDisplayed: { Settings.assignedItemTeamHandlingPolicy.placementName }),
         Setting(section: .Display,
                 title: "Display repository names",
                 description: Settings.showReposInNameHelp,
@@ -154,15 +154,15 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
         Setting(section: .Comments,
                 title: "Move items mentioning me to…",
                 description: Settings.newMentionMovePolicyHelp,
-                valueDisplayed: { Settings.newMentionMovePolicy.name }),
+                valueDisplayed: { Settings.newMentionMovePolicy.placementName }),
         Setting(section: .Comments,
                 title: "Move items mentioning my teams to…",
                 description: Settings.teamMentionMovePolicyHelp,
-                valueDisplayed: { Settings.teamMentionMovePolicy.name }),
+                valueDisplayed: { Settings.teamMentionMovePolicy.placementName }),
         Setting(section: .Comments,
                 title: "Move items created in my repos to…",
                 description: Settings.newItemInOwnedRepoMovePolicyHelp,
-                valueDisplayed: { Settings.newItemInOwnedRepoMovePolicy.name }),
+                valueDisplayed: { Settings.newItemInOwnedRepoMovePolicy.placementName }),
         Setting(section: .Comments,
                 title: "Open items at first unread comment",
                 description: Settings.openPrAtFirstUnreadCommentHelp,
@@ -200,11 +200,11 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
         Setting(section: .Reviews,
                 title: "When a PR is assigned to me for review",
                 description: Settings.assignedDirectReviewHandlingPolicyHelp,
-                valueDisplayed: { Settings.assignedDirectReviewHandlingPolicy.name }),
+                valueDisplayed: { Settings.assignedDirectReviewHandlingPolicy.placementName }),
         Setting(section: .Reviews,
                 title: "When a PR is assigned to my team(s) for review",
                 description: Settings.assignedTeamReviewHandlingPolicyHelp,
-                valueDisplayed: { Settings.assignedTeamReviewHandlingPolicy.name }),
+                valueDisplayed: { Settings.assignedTeamReviewHandlingPolicy.placementName }),
         Setting(section: .Reviews,
                 title: "Notify on change requests",
                 description: Settings.notifyOnReviewChangeRequestsHelp,
@@ -581,10 +581,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
                 Settings.showRelativeDates = !Settings.showRelativeDates
                 settingsChangedTimer.push()
             case 3:
-                let v = PickerViewController.Info(title: setting.title, values: Placement.labels, selectedIndex: Settings.assignedItemDirectHandlingPolicy.assignmentPolictMenuIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                let v = PickerViewController.Info(title: setting.title, values: Section.placementLabels, selectedIndex: Settings.assignedItemDirectHandlingPolicy.assignmentPolictMenuIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
                 performSegue(withIdentifier: "showPicker", sender: v)
             case 4:
-                let v = PickerViewController.Info(title: setting.title, values: Placement.labels, selectedIndex: Settings.assignedItemTeamHandlingPolicy.assignmentPolictMenuIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                let v = PickerViewController.Info(title: setting.title, values: Section.placementLabels, selectedIndex: Settings.assignedItemTeamHandlingPolicy.assignmentPolictMenuIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
                 performSegue(withIdentifier: "showPicker", sender: v)
             case 5:
                 Settings.showReposInName = !Settings.showReposInName
@@ -669,7 +669,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
                 let previousIndex = originalIndex == 2 ? Settings.newMentionMovePolicy :
                     originalIndex == 3 ? Settings.teamMentionMovePolicy :
                     Settings.newItemInOwnedRepoMovePolicy
-                let v = PickerViewController.Info(title: setting.title, values: Placement.labels, selectedIndex: previousIndex.movePolicyMenuIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                let v = PickerViewController.Info(title: setting.title, values: Section.placementLabels, selectedIndex: previousIndex.movePolicyMenuIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
                 performSegue(withIdentifier: "showPicker", sender: v)
             case 5:
                 Settings.openPrAtFirstUnreadComment = !Settings.openPrAtFirstUnreadComment
@@ -695,11 +695,11 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
                 showOptionalReviewWarning(previousSync: previousShouldSync)
 
             case 2:
-                let v = PickerViewController.Info(title: setting.title, values: Placement.labels, selectedIndex: Settings.assignedDirectReviewHandlingPolicy.assignmentPolictMenuIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                let v = PickerViewController.Info(title: setting.title, values: Section.placementLabels, selectedIndex: Settings.assignedDirectReviewHandlingPolicy.assignmentPolictMenuIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
                 performSegue(withIdentifier: "showPicker", sender: v)
 
             case 3:
-                let v = PickerViewController.Info(title: setting.title, values: Placement.labels, selectedIndex: Settings.assignedTeamReviewHandlingPolicy.assignmentPolictMenuIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                let v = PickerViewController.Info(title: setting.title, values: Section.placementLabels, selectedIndex: Settings.assignedTeamReviewHandlingPolicy.assignmentPolictMenuIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
                 performSegue(withIdentifier: "showPicker", sender: v)
 
             case 4:
@@ -915,10 +915,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
         } else if sip.section == SettingsSection.Display.rawValue {
             if sip.row == 3 {
-                Settings.assignedItemDirectHandlingPolicy = Placement(assignmentPolicyMenuIndex: didSelectIndexPath.row)
+                Settings.assignedItemDirectHandlingPolicy = Section(assignmentPolicyMenuIndex: didSelectIndexPath.row)
                 settingsChangedTimer.push()
             } else if sip.row == 4 {
-                Settings.assignedItemTeamHandlingPolicy = Placement(assignmentPolicyMenuIndex: didSelectIndexPath.row)
+                Settings.assignedItemTeamHandlingPolicy = Section(assignmentPolicyMenuIndex: didSelectIndexPath.row)
                 settingsChangedTimer.push()
             } else if sip.row == 9 {
                 Settings.draftHandlingPolicy = DraftHandlingPolicy(rawValue: didSelectIndexPath.row) ?? .nothing
@@ -948,20 +948,20 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
         } else if sip.section == SettingsSection.Comments.rawValue {
             if sip.row == 2 {
-                Settings.newMentionMovePolicy = Placement(fromMovePolicyMenuIndex: didSelectIndexPath.row)
+                Settings.newMentionMovePolicy = Section(movePolicyMenuIndex: didSelectIndexPath.row)
             } else if sip.row == 3 {
-                Settings.teamMentionMovePolicy = Placement(fromMovePolicyMenuIndex: didSelectIndexPath.row)
+                Settings.teamMentionMovePolicy = Section(movePolicyMenuIndex: didSelectIndexPath.row)
             } else if sip.row == 4 {
-                Settings.newItemInOwnedRepoMovePolicy = Placement(fromMovePolicyMenuIndex: didSelectIndexPath.row)
+                Settings.newItemInOwnedRepoMovePolicy = Section(movePolicyMenuIndex: didSelectIndexPath.row)
             }
             settingsChangedTimer.push()
 
         } else if sip.section == SettingsSection.Reviews.rawValue {
             let previous = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
             if sip.row == 2 {
-                Settings.assignedDirectReviewHandlingPolicy = Placement(assignmentPolicyMenuIndex: didSelectIndexPath.row)
+                Settings.assignedDirectReviewHandlingPolicy = Section(assignmentPolicyMenuIndex: didSelectIndexPath.row)
             } else if sip.row == 3 {
-                Settings.assignedTeamReviewHandlingPolicy = Placement(assignmentPolicyMenuIndex: didSelectIndexPath.row)
+                Settings.assignedTeamReviewHandlingPolicy = Section(assignmentPolicyMenuIndex: didSelectIndexPath.row)
             }
             showOptionalReviewWarning(previousSync: previous)
 

@@ -399,13 +399,13 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
 
     @IBAction private func assignedDirectReviewHandlingPolicySelected(_ sender: NSPopUpButton) {
         let index = sender.index(of: sender.selectedItem!)
-        Settings.assignedDirectReviewHandlingPolicy = Placement(assignmentPolicyMenuIndex: index)
+        Settings.assignedDirectReviewHandlingPolicy = Section(assignmentPolicyMenuIndex: index)
         deferredUpdateTimer.push()
     }
 
     @IBAction private func assignedTeamReviewHandlingPolicySelected(_ sender: NSPopUpButton) {
         let index = sender.index(of: sender.selectedItem!)
-        Settings.assignedTeamReviewHandlingPolicy = Placement(assignmentPolicyMenuIndex: index)
+        Settings.assignedTeamReviewHandlingPolicy = Section(assignmentPolicyMenuIndex: index)
         deferredUpdateTimer.push()
     }
 
@@ -800,17 +800,17 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     }
 
     @IBAction private func newMentionMovePolicySelected(_ sender: NSPopUpButton) {
-        Settings.newMentionMovePolicy = Placement(fromMovePolicyMenuIndex: sender.indexOfSelectedItem)
+        Settings.newMentionMovePolicy = Section(movePolicyMenuIndex: sender.indexOfSelectedItem)
         deferredUpdateTimer.push()
     }
 
     @IBAction private func teamMentionMovePolicySelected(_ sender: NSPopUpButton) {
-        Settings.teamMentionMovePolicy = Placement(fromMovePolicyMenuIndex: sender.indexOfSelectedItem)
+        Settings.teamMentionMovePolicy = Section(movePolicyMenuIndex: sender.indexOfSelectedItem)
         deferredUpdateTimer.push()
     }
 
     @IBAction private func newItemInOwnedRepoMovePolicySelected(_ sender: NSPopUpButton) {
-        Settings.newItemInOwnedRepoMovePolicy = Placement(fromMovePolicyMenuIndex: sender.indexOfSelectedItem)
+        Settings.newItemInOwnedRepoMovePolicy = Section(movePolicyMenuIndex: sender.indexOfSelectedItem)
         deferredUpdateTimer.push()
     }
 
@@ -1174,12 +1174,12 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     }
 
     @IBAction private func assignedItemDirectHandlingPolicySelected(_ sender: NSPopUpButton) {
-        Settings.assignedItemDirectHandlingPolicy = Placement(assignmentPolicyMenuIndex: sender.indexOfSelectedItem)
+        Settings.assignedItemDirectHandlingPolicy = Section(assignmentPolicyMenuIndex: sender.indexOfSelectedItem)
         deferredUpdateTimer.push()
     }
 
     @IBAction private func assignedItemTeamHandlingPolicySelected(_ sender: NSPopUpButton) {
-        Settings.assignedItemTeamHandlingPolicy = Placement(assignmentPolicyMenuIndex: sender.indexOfSelectedItem)
+        Settings.assignedItemTeamHandlingPolicy = Section(assignmentPolicyMenuIndex: sender.indexOfSelectedItem)
         deferredUpdateTimer.push()
     }
 

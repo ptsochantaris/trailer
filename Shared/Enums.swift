@@ -122,6 +122,123 @@ enum Section: CaseIterable {
         Section.predicateExcludeCache.setObject(predicate, forKey: key)
         return predicate
     }
+    
+    ///////////////////////////////////////////////////////////
+    
+    static let placementLabels = [Section.mine.placementName,
+                           Section.participated.placementName,
+                           Section.mentioned.placementName,
+                           Section.none.placementName]
+    
+    var placementName: String {
+        switch self {
+        case .mine:
+            return "Move to \"Mine\""
+        case .mentioned:
+            return "Move to \"Mentioned\""
+        case .participated:
+            return "Move to \"Participated\""
+        default:
+            return "Do Nothing"
+        }
+    }
+
+    var preferredSection: Section? {
+        switch self {
+        case .mine, .participated, .mentioned:
+            return self
+        default:
+            return nil
+        }
+    }
+
+    var assignmentPolicySettingsValue: Int {
+        switch self {
+        case .mine:
+            return 0
+        case .participated:
+            return 1
+        case .mentioned:
+            return 3
+        default:
+            return 2
+        }
+    }
+
+    var assignmentPolictMenuIndex: Int {
+        switch self {
+        case .mine:
+            return 0
+        case .participated:
+            return 1
+        case .mentioned:
+            return 2
+        default:
+            return 3
+        }
+    }
+
+    init(assignmentPolicyMenuIndex: Int) {
+        switch assignmentPolicyMenuIndex {
+        case Section.mine.assignmentPolictMenuIndex:
+            self = .mine
+        case Section.participated.assignmentPolictMenuIndex:
+            self = .participated
+        case Section.mentioned.assignmentPolictMenuIndex:
+            self = .mentioned
+        default:
+            self = .none
+        }
+    }
+
+    init(assignmentPolicySettingsValue: Int) {
+        switch assignmentPolicySettingsValue {
+        case 2: self = .none
+        case 1: self = .participated
+        case 3: self = .mentioned
+        default: self = .mine
+        }
+    }
+
+    var movePolicySettingsValue: Int {
+        switch self {
+        case .mine: return 1
+        case .participated: return 2
+        case .mentioned: return 3
+        default: return 0
+        }
+    }
+
+    var movePolicyMenuIndex: Int {
+        switch self {
+        case .mine:
+            return 1
+        case .participated:
+            return 2
+        case .mentioned:
+            return 3
+        default:
+            return 0
+        }
+    }
+
+    init(movePolicyMenuIndex: Int) {
+        switch movePolicyMenuIndex {
+        case 1: self = .mine
+        case 2: self = .participated
+        case 3: self = .mentioned
+        default: self = .none
+        }
+    }
+
+    init(movePolicySettingsValue: Int) {
+        switch movePolicySettingsValue {
+        case 1: self = .mine
+        case 2: self = .participated
+        case 3: self = .mentioned
+        default: self = .none
+        }
+    }
 }
 
 extension String? {

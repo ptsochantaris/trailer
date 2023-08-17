@@ -356,27 +356,15 @@ class ListableItem: DataItem, Listable {
     }
 
     final func shouldGo(to section: Section) -> Bool {
-        let policy: Placement
         switch AssignmentStatus(rawValue: assignedStatus) {
         case nil, .none?, .others:
             return false
 
         case .me:
-            policy = Settings.assignedItemDirectHandlingPolicy
+            return section == Settings.assignedItemDirectHandlingPolicy
 
         case .myTeam:
-            policy = Settings.assignedItemTeamHandlingPolicy
-        }
-
-        switch section {
-        case .all, .closed, .merged, .none, .snoozed:
-            return false
-        case .mentioned:
-            return policy == .mentioned
-        case .participated:
-            return policy == .participated
-        case .mine:
-            return policy == .mine
+            return section == Settings.assignedItemTeamHandlingPolicy
         }
     }
 
