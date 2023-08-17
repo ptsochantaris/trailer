@@ -219,6 +219,8 @@ enum API {
 
         let useV4 = Settings.useV4API
 
+        await HTTP.gateKeeper.setBonusTickets(8)
+        
         if useV4 {
             if canUseV4API(for: syncMoc) != nil {
                 return

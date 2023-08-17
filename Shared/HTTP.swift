@@ -20,7 +20,7 @@ enum DataResult {
 }
 
 enum HTTP {
-    private static let gateKeeper = Semalot(tickets: 8)
+    static let gateKeeper = Semalot(tickets: 8)
 
     private static let urlSession: URLSession = {
         #if DEBUG
