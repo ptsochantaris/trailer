@@ -21,14 +21,6 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
 
-    func applicationDidEnterBackground(_: UIApplication) {
-        BackgroundTask.appBackgrounded()
-    }
-
-    func applicationWillEnterForeground(_: UIApplication) {
-        BackgroundTask.appForegrounded()
-    }
-
     func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         Task {
             await DataManager.postProcessAllItems(in: DataManager.main)

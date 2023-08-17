@@ -1,6 +1,7 @@
 import Foundation
 import Semalot
 import TrailerJson
+import Maintini
 
 typealias JSON = [String: Any]
 
@@ -76,16 +77,12 @@ enum HTTP {
     }
 
     static func getData(for request: URLRequest, attempts: Int, logPrefix: String? = nil) async throws -> DataResult {
-        #if os(iOS)
-            Task { @MainActor in
-                BackgroundTask.registerForBackground()
+        await Maintini.startMaintaining()
+        defer {
+            Task {
+                await Maintini.endMaintaining()
             }
-            defer {
-                Task { @MainActor in
-                    BackgroundTask.unregisterForBackground()
-                }
-            }
-        #endif
+        }
 
         var attempt = attempts
         var retryDelay: UInt64 = 5

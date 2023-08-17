@@ -2,6 +2,7 @@ import CoreData
 import CoreSpotlight
 import Lista
 import TrailerQL
+import Maintini
 
 extension NSManagedObjectContext {
     func buildChildContext() -> NSManagedObjectContext {
@@ -233,9 +234,7 @@ enum DataManager {
     }
 
     static func saveDB() async {
-        #if os(iOS)
-            BackgroundTask.registerForBackground()
-        #endif
+        Maintini.startMaintaining()
 
         guard main.hasChanges else {
             Logging.log("No DB changes")
@@ -246,14 +245,10 @@ enum DataManager {
         }
 
         if !migrated {
-            #if os(iOS)
-                BackgroundTask.registerForBackground()
-            #endif
+            Maintini.startMaintaining()
             Task {
                 await processSpotlight(updates: main.updatedObjects, deletions: main.deletedObjects)
-                #if os(iOS)
-                    BackgroundTask.unregisterForBackground()
-                #endif
+                Maintini.endMaintaining()
             }
         }
 
@@ -278,9 +273,7 @@ enum DataManager {
         } else {
             await processSpotlight(updates: newItems, deletions: [])
         }
-        #if os(iOS)
-            BackgroundTask.unregisterForBackground()
-        #endif
+        Maintini.endMaintaining()
     }
 
     private static func processSpotlight(updates: Set<NSManagedObject>, deletions: Set<NSManagedObject>) async {

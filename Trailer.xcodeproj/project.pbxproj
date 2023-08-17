@@ -48,6 +48,8 @@
 		16358F3B1CF138190055F849 /* DataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16358F3A1CF138190055F849 /* DataSource.swift */; };
 		16358F3D1CF206CE0055F849 /* MenuBarSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16358F3C1CF206CE0055F849 /* MenuBarSet.swift */; };
 		16393A9B283E99E000DDD546 /* StatusItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16393A9A283E99E000DDD546 /* StatusItemView.swift */; };
+		163A2CA22A8ED49D00226C2B /* Maintini in Frameworks */ = {isa = PBXBuildFile; productRef = 163A2CA12A8ED49D00226C2B /* Maintini */; };
+		163A2CA42A8ED5D400226C2B /* Maintini in Frameworks */ = {isa = PBXBuildFile; productRef = 163A2CA32A8ED5D400226C2B /* Maintini */; };
 		1644E8E5214E8E2F00EAE523 /* ClockKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1644E8E4214E8E2F00EAE523 /* ClockKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		164785AA1A2CE7BD00297764 /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785A91A2CE7BD00297764 /* Globals.swift */; };
 		164785AB1A2CE7BD00297764 /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785A91A2CE7BD00297764 /* Globals.swift */; };
@@ -120,7 +122,6 @@
 		169B92971CC52C05002774A8 /* SnoozePreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169B92951CC52C05002774A8 /* SnoozePreset.swift */; };
 		169FB2361A3DBD7D00E00771 /* SectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169FB2351A3DBD7D00E00771 /* SectionHeader.swift */; };
 		16A0B0371A48AC7900B3452D /* MacAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A0B0361A48AC7900B3452D /* MacAppDelegate.swift */; };
-		16A0FA7423AECFAE0023B565 /* BackgroundTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A0FA7323AECFAE0023B565 /* BackgroundTask.swift */; };
 		16A41E9E22A71C7A00D1D352 /* TextFieldCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A41E9D22A71C7A00D1D352 /* TextFieldCell.swift */; };
 		16A69EDA1AC83020008231F9 /* ListableItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A69ED91AC83020008231F9 /* ListableItem.swift */; };
 		16A69EDB1AC83020008231F9 /* ListableItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A69ED91AC83020008231F9 /* ListableItem.swift */; };
@@ -384,7 +385,6 @@
 		169B92951CC52C05002774A8 /* SnoozePreset.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = SnoozePreset.swift; path = ../Shared/SnoozePreset.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		169FB2351A3DBD7D00E00771 /* SectionHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SectionHeader.swift; sourceTree = "<group>"; };
 		16A0B0361A48AC7900B3452D /* MacAppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = MacAppDelegate.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		16A0FA7323AECFAE0023B565 /* BackgroundTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundTask.swift; sourceTree = "<group>"; };
 		16A41E9D22A71C7A00D1D352 /* TextFieldCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldCell.swift; sourceTree = "<group>"; };
 		16A69ED91AC83020008231F9 /* ListableItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = ListableItem.swift; path = ../Shared/ListableItem.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16AE7CED1C92304300CB304B /* Trailer 24.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 24.xcdatamodel"; sourceTree = "<group>"; };
@@ -479,6 +479,7 @@
 				162BCE702A856418000A3F81 /* Semalot in Frameworks */,
 				16DE55BD2A5A398D00166337 /* Lista in Frameworks */,
 				165880CC2A59C2BC0012A2B7 /* TrailerQL in Frameworks */,
+				163A2CA22A8ED49D00226C2B /* Maintini in Frameworks */,
 				161471D12A881EE1006A903B /* KeyVine in Frameworks */,
 				168924552A58BC7A0094F0D1 /* TrailerJson in Frameworks */,
 			);
@@ -497,6 +498,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				16813B212A83041F0069C87B /* Semalot in Frameworks */,
+				163A2CA42A8ED5D400226C2B /* Maintini in Frameworks */,
 				16E19E452A61551E0079118C /* Sparkle in Frameworks */,
 				16DE55BB2A5A397700166337 /* Lista in Frameworks */,
 				168924532A58BC2A0094F0D1 /* TrailerJson in Frameworks */,
@@ -553,7 +555,6 @@
 				16259BCD1A449400009C5745 /* OpenInSafariActivity.swift */,
 				160823F31A44982F006F91AD /* UINavigationControllerExtensions.swift */,
 				168839C61DEF8C3B002D9448 /* ImportExport.swift */,
-				16A0FA7323AECFAE0023B565 /* BackgroundTask.swift */,
 			);
 			name = Core;
 			sourceTree = "<group>";
@@ -990,6 +991,7 @@
 				16DE55BC2A5A398D00166337 /* Lista */,
 				162BCE6F2A856418000A3F81 /* Semalot */,
 				161471D02A881EE1006A903B /* KeyVine */,
+				163A2CA12A8ED49D00226C2B /* Maintini */,
 			);
 			productName = PocketTrailer;
 			productReference = 1628A6B118789E73005EDA69 /* PocketTrailer.app */;
@@ -1036,6 +1038,7 @@
 				16E19E442A61551E0079118C /* Sparkle */,
 				16813B202A83041F0069C87B /* Semalot */,
 				161471CE2A881ED3006A903B /* KeyVine */,
+				163A2CA32A8ED5D400226C2B /* Maintini */,
 			);
 			productName = Trailer;
 			productReference = 168BC6AA17EC2DF000BC4584 /* Trailer.app */;
@@ -1137,6 +1140,7 @@
 				16E19E432A61551E0079118C /* XCRemoteSwiftPackageReference "Sparkle" */,
 				16813B1F2A83041F0069C87B /* XCRemoteSwiftPackageReference "semalot" */,
 				161471CD2A881ED3006A903B /* XCRemoteSwiftPackageReference "key-vine" */,
+				163A2CA02A8ED49D00226C2B /* XCRemoteSwiftPackageReference "maintini" */,
 			);
 			productRefGroup = 168BC6AB17EC2DF000BC4584 /* Products */;
 			projectDirPath = "";
@@ -1314,7 +1318,6 @@
 				1615045E1A464656001CF50C /* PRCell.swift in Sources */,
 				16B3B1501F3670680060A394 /* compression.swift in Sources */,
 				164840C51AD04C3C009E6383 /* QuickStartViewController.swift in Sources */,
-				16A0FA7423AECFAE0023B565 /* BackgroundTask.swift in Sources */,
 				166A84BE1A457CA700A3B292 /* ServersViewController.swift in Sources */,
 				161504601A4651CB001CF50C /* MasterViewController.swift in Sources */,
 				16D2B876251FA54E00D86C89 /* Enums+Settings.swift in Sources */,
@@ -2007,6 +2010,14 @@
 				kind = branch;
 			};
 		};
+		163A2CA02A8ED49D00226C2B /* XCRemoteSwiftPackageReference "maintini" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ptsochantaris/maintini";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		165880C82A59C2AF0012A2B7 /* XCRemoteSwiftPackageReference "trailer-ql" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ptsochantaris/trailer-ql";
@@ -2064,6 +2075,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 16813B1F2A83041F0069C87B /* XCRemoteSwiftPackageReference "semalot" */;
 			productName = Semalot;
+		};
+		163A2CA12A8ED49D00226C2B /* Maintini */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 163A2CA02A8ED49D00226C2B /* XCRemoteSwiftPackageReference "maintini" */;
+			productName = Maintini;
+		};
+		163A2CA32A8ED5D400226C2B /* Maintini */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 163A2CA02A8ED49D00226C2B /* XCRemoteSwiftPackageReference "maintini" */;
+			productName = Maintini;
 		};
 		165880C92A59C2AF0012A2B7 /* TrailerQL */ = {
 			isa = XCSwiftPackageProductDependency;
