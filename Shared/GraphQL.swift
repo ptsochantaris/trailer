@@ -224,7 +224,7 @@ enum GraphQL {
     }
 
     private static let singleGateKeeper = Semalot(tickets: 1)
-    private static let multiGateKeeper = Semalot(tickets: 2)
+    static let multiGateKeeper = Semalot(tickets: 2)
 
     static var callCount = 0
 

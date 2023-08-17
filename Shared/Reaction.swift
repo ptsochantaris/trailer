@@ -97,7 +97,7 @@ final class Reaction: DataItem {
     }
 
     var isMine: Bool {
-        userNodeId == apiServer.userNodeId || userNodeId == apiServer.userNodeId
+        userNodeId == apiServer.userNodeId
     }
 
     static func changesDetected(in reactions: Set<Reaction>, from info: JSON) -> String? {

@@ -226,6 +226,10 @@ enum API {
             if Settings.V4IdMigrationPhase == .pending {
                 await attemptV4Migration()
             }
+            
+            if Settings.threadedSync {
+                await GraphQL.multiGateKeeper.setBonusTickets(2)
+            }
         }
 
         isRefreshing = true
