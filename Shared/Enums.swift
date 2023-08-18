@@ -1,13 +1,103 @@
 import Foundation
 
-enum Section: CaseIterable {
-    case none, mine, participated, mentioned, merged, closed, all, snoozed
+enum Section: CaseIterable, Equatable {
+    enum HidingCause {
+        case unknown, approvedByMe, rejectedByMe, hidingAllMyAuthoredItems,
+             hidingMyAuthoredIssues, hidingAllOthersItems, hidingOthersIssues, containsRedStatuses, hidingOthersPrs,
+             containsBlockedLabel, containsBlockedAuthor, wasUncommented, hidingDrafts, assignedDirectReview,
+             assignedTeamReview, hidingMyAuthoredPrs, repoDisplayShowMineAndParticipated, repoDisplayHideAllItems,
+             repoDisplayShowMineOnly
 
-    static let allCases: [Section] = [.none, .mine, .participated, .mentioned, .merged, .closed, .all, .snoozed]
+        var description: String {
+            switch self {
+            case .unknown: return "Unknown reason"
+
+            case .hidingAllMyAuthoredItems: return "Repo setting: Item authored by me"
+            case .hidingMyAuthoredIssues: return "IRepo setting: ssue authored by me"
+            case .hidingAllOthersItems: return "Repo setting: Item not authored by me"
+            case .hidingOthersIssues: return "Repo setting: Issue authored by others"
+            case .hidingOthersPrs: return "Repo setting: PR authored by others"
+
+            case .containsBlockedLabel: return "Blocked item: Label"
+            case .containsBlockedAuthor: return "Blocked item: Author"
+
+            case .wasUncommented: return "Comment setting: Does not have any comments"
+
+            case .hidingDrafts: return "Display setting: Is marked as being a draft"
+
+            case .assignedDirectReview: return "Review setting: Assigned direct review section"
+            case .assignedTeamReview: return "Review setting: Assigned team review section"
+            case .approvedByMe: return "Review setting: Approved by me"
+            case .rejectedByMe: return "Review setting: Rejected by me"
+            case .containsRedStatuses: return "Review setting: PR has a red status"
+
+            case .hidingMyAuthoredPrs: return "Repo setting: PR authored by me"
+            case .repoDisplayShowMineAndParticipated: return "Repo setting: Mine or participated section items hidden"
+            case .repoDisplayHideAllItems: return "Repo setting: All items hidden"
+            case .repoDisplayShowMineOnly: return "Repo setting: Mine section items hidden"
+            }
+        }
+    }
+
+    case hidden(cause: HidingCause), mine, participated, mentioned, merged, closed, all, snoozed
+
+    static let allCases: [Section] = [.hidden(cause: .unknown), .mine, .participated, .mentioned, .merged, .closed, .all, .snoozed]
+
+    static func == (lhs: Section, rhs: Section) -> Bool {
+        switch lhs {
+        case .hidden:
+            if case .hidden = rhs {
+                return true
+            }
+            return false
+        case .mine:
+            if case .mine = rhs {
+                return true
+            }
+            return false
+        case .participated:
+            if case .participated = rhs {
+                return true
+            }
+            return false
+        case .mentioned:
+            if case .mentioned = rhs {
+                return true
+            }
+            return false
+        case .merged:
+            if case .merged = rhs {
+                return true
+            }
+            return false
+        case .closed:
+            if case .closed = rhs {
+                return true
+            }
+            return false
+        case .all:
+            if case .all = rhs {
+                return true
+            }
+            return false
+        case .snoozed:
+            if case .snoozed = rhs {
+                return true
+            }
+            return false
+        }
+    }
+
+    var visible: Bool {
+        if case .hidden = self {
+            return false
+        }
+        return true
+    }
 
     var prMenuName: String {
         switch self {
-        case .none: return ""
+        case .hidden: return ""
         case .mine: return "Mine"
         case .participated: return "Participated"
         case .mentioned: return "Mentioned"
@@ -20,7 +110,7 @@ enum Section: CaseIterable {
 
     var issuesMenuName: String {
         switch self {
-        case .none: return ""
+        case .hidden: return ""
         case .mine: return "Mine"
         case .participated: return "Participated"
         case .mentioned: return "Mentioned"
@@ -33,7 +123,7 @@ enum Section: CaseIterable {
 
     var watchMenuName: String {
         switch self {
-        case .none: return ""
+        case .hidden: return ""
         case .mine: return "Mine"
         case .participated: return "Participated"
         case .mentioned: return "Mentioned"
@@ -46,7 +136,7 @@ enum Section: CaseIterable {
 
     var apiName: String {
         switch self {
-        case .none: return ""
+        case .hidden: return ""
         case .mine: return "mine"
         case .participated: return "participated"
         case .mentioned: return "mentioned"
@@ -59,7 +149,7 @@ enum Section: CaseIterable {
 
     var sectionIndex: Int {
         switch self {
-        case .none: return 0
+        case .hidden: return 0
         case .mine: return 1
         case .participated: return 2
         case .mentioned: return 3
@@ -95,7 +185,7 @@ enum Section: CaseIterable {
         case 7:
             self = .snoozed
         default:
-            self = .none
+            self = .hidden(cause: .unknown)
         }
     }
 
@@ -128,7 +218,7 @@ enum Section: CaseIterable {
     static let placementLabels = [Section.mine.placementName,
                                   Section.participated.placementName,
                                   Section.mentioned.placementName,
-                                  Section.none.placementName]
+                                  Section.hidden(cause: .unknown).placementName]
 
     var placementName: String {
         switch self {
@@ -187,13 +277,13 @@ enum Section: CaseIterable {
         case Section.mentioned.assignmentPolictMenuIndex:
             self = .mentioned
         default:
-            self = .none
+            self = .hidden(cause: .unknown)
         }
     }
 
     init(assignmentPolicySettingsValue: Int) {
         switch assignmentPolicySettingsValue {
-        case 2: self = .none
+        case 2: self = .hidden(cause: .unknown)
         case 1: self = .participated
         case 3: self = .mentioned
         default: self = .mine
@@ -227,7 +317,7 @@ enum Section: CaseIterable {
         case 1: self = .mine
         case 2: self = .participated
         case 3: self = .mentioned
-        default: self = .none
+        default: self = .hidden(cause: .unknown)
         }
     }
 
@@ -236,7 +326,7 @@ enum Section: CaseIterable {
         case 1: self = .mine
         case 2: self = .participated
         case 3: self = .mentioned
-        default: self = .none
+        default: self = .hidden(cause: .unknown)
         }
     }
 }

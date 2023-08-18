@@ -9,7 +9,7 @@ extension Section {
             return Settings.scanClosedAndMergedItems
         case .mentioned, .mine, .participated:
             return true
-        case .none, .snoozed:
+        case .hidden, .snoozed:
             return false
         }
     }
@@ -32,7 +32,7 @@ extension Section {
             return Settings.showStatusesOnAllItems
         case .mentioned, .mine, .participated:
             return true
-        case .none, .snoozed:
+        case .hidden, .snoozed:
             return false
         }
     }
@@ -47,7 +47,7 @@ extension Section {
             return Settings.showStatusesOnAllItems
         case .mentioned, .mine, .participated, .snoozed:
             return true
-        case .none:
+        case .hidden:
             return Settings.hidePrsThatArentPassing // if visibility depends on statuses, check for statuses on hidden PRs because they may change
         }
     }

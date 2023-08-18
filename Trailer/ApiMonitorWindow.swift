@@ -10,6 +10,18 @@ final class ApiMonitorWindow: NSWindow, NSWindowDelegate {
     private var autoScroll = true
     private var textStorage: NSMutableAttributedString!
 
+    static let logParagraphStyle = {
+        let p = NSMutableParagraphStyle()
+        p.headIndent = 27
+        return p
+    }()
+
+    static let logAttributes: [NSAttributedString.Key: Any] = [
+        .foregroundColor: NSColor.textColor,
+        .paragraphStyle: logParagraphStyle,
+        .font: NSFont.monospacedSystemFont(ofSize: NSFont.smallSystemFontSize, weight: .regular)
+    ]
+
     override func awakeFromNib() {
         super.awakeFromNib()
         delegate = self
@@ -23,8 +35,7 @@ final class ApiMonitorWindow: NSWindow, NSWindowDelegate {
                 guard let self else { return }
 
                 let date = logDateFormatter.string(from: Date())
-                let logString = NSAttributedString(string: ">>> \(date) - \(message())\n\n",
-                                                   attributes: [.foregroundColor: NSColor.textColor])
+                let logString = NSAttributedString(string: ">>> \(date) - \(message())\n\n", attributes: ApiMonitorWindow.logAttributes)
                 Task { @MainActor in
                     self.textStorage.append(logString)
                     if self.autoScroll {

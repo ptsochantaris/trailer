@@ -205,8 +205,8 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func markEverythingRead() {
-        PullRequest.markEverythingRead(in: .none, in: DataManager.main)
-        Issue.markEverythingRead(in: .none, in: DataManager.main)
+        PullRequest.markEverythingRead(in: .hidden, in: DataManager.main)
+        Issue.markEverythingRead(in: .hidden, in: DataManager.main)
     }
 
     func clearAllClosed() {

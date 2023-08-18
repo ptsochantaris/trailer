@@ -125,6 +125,8 @@
 		16A69EDB1AC83020008231F9 /* ListableItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A69ED91AC83020008231F9 /* ListableItem.swift */; };
 		16A7246A2A8FA73E005B32AB /* PopTimer in Frameworks */ = {isa = PBXBuildFile; productRef = 16A724692A8FA73E005B32AB /* PopTimer */; };
 		16A7246C2A8FA748005B32AB /* PopTimer in Frameworks */ = {isa = PBXBuildFile; productRef = 16A7246B2A8FA748005B32AB /* PopTimer */; };
+		16A7246E2A901815005B32AB /* HiddenItemWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A7246D2A901815005B32AB /* HiddenItemWindow.swift */; };
+		16A724702A901845005B32AB /* HiddenItemWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 16A7246F2A901845005B32AB /* HiddenItemWindow.xib */; };
 		16B3B1501F3670680060A394 /* compression.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B14E1F366F790060A394 /* compression.swift */; };
 		16B3B1511F36706A0060A394 /* compression.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B14E1F366F790060A394 /* compression.swift */; };
 		16B3B3171A34E8E2000BE6CC /* ApiServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3101A34E8E2000BE6CC /* ApiServer.swift */; };
@@ -386,6 +388,8 @@
 		16A0B0361A48AC7900B3452D /* MacAppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = MacAppDelegate.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16A41E9D22A71C7A00D1D352 /* TextFieldCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldCell.swift; sourceTree = "<group>"; };
 		16A69ED91AC83020008231F9 /* ListableItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = ListableItem.swift; path = ../Shared/ListableItem.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		16A7246D2A901815005B32AB /* HiddenItemWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HiddenItemWindow.swift; sourceTree = "<group>"; };
+		16A7246F2A901845005B32AB /* HiddenItemWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HiddenItemWindow.xib; sourceTree = "<group>"; };
 		16AE7CED1C92304300CB304B /* Trailer 24.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 24.xcdatamodel"; sourceTree = "<group>"; };
 		16B3B14E1F366F790060A394 /* compression.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = compression.swift; path = Shared/compression.swift; sourceTree = "<group>"; };
 		16B3B3101A34E8E2000BE6CC /* ApiServer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = ApiServer.swift; path = Shared/ApiServer.swift; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -642,6 +646,8 @@
 				16DB793D1E326CD90076A36D /* AdvancedReposWindow.xib */,
 				1686DEB62A5DD12000AED26E /* ApiOptionsWindow.xib */,
 				1686DEB82A5DD12C00AED26E /* ApiOptionsWindow.swift */,
+				16A7246F2A901845005B32AB /* HiddenItemWindow.xib */,
+				16A7246D2A901815005B32AB /* HiddenItemWindow.swift */,
 			);
 			name = Windows;
 			sourceTree = "<group>";
@@ -1188,6 +1194,7 @@
 				164840BF1ACFEA45009E6383 /* AboutWindow.xib in Resources */,
 				16B94072182D136700F32061 /* dsa_pub.pem in Resources */,
 				1655FD5C2A69CA0D0087F439 /* ApiMonitorWindow.xib in Resources */,
+				16A724702A901845005B32AB /* HiddenItemWindow.xib in Resources */,
 				160FB1421AE3F7C700EB5C8E /* PreferencesWindow.xib in Resources */,
 				164840C31ACFEFA9009E6383 /* MenuWindow.xib in Resources */,
 				164E4C0B2A7EB15A00BFE065 /* approvesChangesIcon.png in Resources */,
@@ -1412,6 +1419,7 @@
 				1633C1921ABCEC4A0086C692 /* Issue.swift in Sources */,
 				164E4C092A7EABCE00BFE065 /* NotificationManager.swift in Sources */,
 				1694008C1E7AAE32002C5DAD /* Reaction.swift in Sources */,
+				16A7246E2A901815005B32AB /* HiddenItemWindow.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -142,15 +142,15 @@ final class PullRequest: ListableItem {
             break
 
         case .me:
-            if Settings.assignedDirectReviewHandlingPolicy != .none,
+            if Settings.assignedDirectReviewHandlingPolicy.visible,
                let section = Settings.assignedDirectReviewHandlingPolicy.preferredSection {
-                return section
+                return section.visible ? section : .hidden(cause: .assignedDirectReview)
             }
 
         case .myTeam:
-            if Settings.assignedTeamReviewHandlingPolicy != .none,
+            if Settings.assignedTeamReviewHandlingPolicy.visible,
                let section = Settings.assignedTeamReviewHandlingPolicy.preferredSection {
-                return section
+                return section.visible ? section : .hidden(cause: .assignedTeamReview)
             }
         }
 
@@ -168,22 +168,24 @@ final class PullRequest: ListableItem {
         return !context.excludedCommentAuthors.contains(userLogin.comparableForm)
     }
 
-    override var shouldHideBecauseOfRepoHidingPolicy: Bool {
+    override var shouldHideBecauseOfRepoHidingPolicy: Section.HidingCause? {
         if createdByMe {
             switch repo.itemHidingPolicy {
-            case RepoHidingPolicy.hideAllMyAuthoredItems.rawValue,
-                 RepoHidingPolicy.hideMyAuthoredPrs.rawValue:
-                return true
+            case RepoHidingPolicy.hideAllMyAuthoredItems.rawValue:
+                return .hidingAllMyAuthoredItems
+            case RepoHidingPolicy.hideMyAuthoredPrs.rawValue:
+                return .hidingMyAuthoredPrs
             default:
-                return false
+                return nil
             }
         } else {
             switch repo.itemHidingPolicy {
-            case RepoHidingPolicy.hideAllOthersItems.rawValue,
-                 RepoHidingPolicy.hideOthersPrs.rawValue:
-                return true
+            case RepoHidingPolicy.hideAllOthersItems.rawValue:
+                return .hidingAllOthersItems
+            case RepoHidingPolicy.hideOthersPrs.rawValue:
+                return .hidingOthersPrs
             default:
-                return false
+                return nil
             }
         }
     }
@@ -267,7 +269,7 @@ final class PullRequest: ListableItem {
         let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
         f.returnsObjectsAsFaults = false
         f.includesSubentities = false
-        if section != .none {
+        if section.visible {
             f.predicate = section.matchingPredicate
         }
         for pr in try! moc.fetch(f) {
@@ -326,18 +328,23 @@ final class PullRequest: ListableItem {
     }
 
     override func shouldBeCheckedForRedStatuses(in section: Section) -> [PRStatus]? {
-        if Settings.hidePrsThatArentPassing {
-            if Settings.hidePrsThatDontPassOnlyInAll {
-                if section == .all {
-                    return displayedStatuses
-                }
-            } else {
-                if section == .mine || section == .participated || section == .all {
-                    return displayedStatuses
-                }
-            }
+        guard Settings.hidePrsThatArentPassing else {
+            return nil
         }
-        return nil
+
+        switch section {
+        case .all:
+            return displayedStatuses
+
+        case .mine, .participated:
+            if Settings.hidePrsThatDontPassOnlyInAll {
+                return nil
+            }
+            return displayedStatuses
+
+        case .closed, .hidden, .mentioned, .merged, .snoozed:
+            return nil
+        }
     }
 
     override func countReviews(context: PostProcessContext) -> Int {
@@ -466,7 +473,7 @@ final class PullRequest: ListableItem {
         repo.displayPolicyForPrs
     }
 
-    override var shouldHideDueToMyReview: Bool {
+    override var shouldHideDueToMyReview: Section.HidingCause? {
         let hideIfApproved = Settings.autoHidePrsIApproved
         let hideIfRejected = Settings.autoHidePrsIRejected
 
@@ -474,23 +481,23 @@ final class PullRequest: ListableItem {
               let myName = apiServer.userName,
               !reviewers.contains(myName)
         else {
-            return false
+            return nil
         }
 
         let latestReview = reviews.filter { $0.affectsBottomLine && $0.username == myName }.sorted { $0.createdBefore($1) }.last
         guard let latestReview else {
-            return false
+            return nil
         }
 
         if hideIfApproved, latestReview.state == Review.State.APPROVED.rawValue {
-            return true
+            return .approvedByMe
         }
 
         if hideIfRejected, latestReview.state == Review.State.CHANGES_REQUESTED.rawValue {
-            return true
+            return .rejectedByMe
         }
 
-        return false
+        return nil
     }
 
     func reviewsAttributedString(labelFont: FONT_CLASS) -> NSAttributedString? {

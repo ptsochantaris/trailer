@@ -2493,15 +2493,24 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                 <rect key="frame" x="0.0" y="0.0" width="724" height="399"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <box fixedFrame="YES" borderType="line" title="Live API Monitoring" translatesAutoresizingMaskIntoConstraints="NO" id="AS8-n7-ngi">
-                                                        <rect key="frame" x="17" y="278" width="321" height="105"/>
+                                                    <box fixedFrame="YES" borderType="line" title="Diagnostics" translatesAutoresizingMaskIntoConstraints="NO" id="AS8-n7-ngi">
+                                                        <rect key="frame" x="17" y="278" width="393" height="105"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="GhS-Tk-g7Z">
-                                                            <rect key="frame" x="4" y="5" width="313" height="85"/>
+                                                            <rect key="frame" x="4" y="5" width="385" height="85"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
+                                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" setsMaxLayoutWidthAtFirstLayout="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="q4A-tm-mqN">
+                                                                    <rect key="frame" x="127" y="44" width="258" height="28"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" alignment="left" title="Monitor activity to aid debugging; affects performance when active." id="4Rc-P7-ocr">
+                                                                        <font key="font" metaFont="message" size="11"/>
+                                                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                    </textFieldCell>
+                                                                </textField>
                                                                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="r5n-eI-XNp">
-                                                                    <rect key="frame" x="105" y="8" width="104" height="32"/>
+                                                                    <rect key="frame" x="8" y="41" width="115" height="32"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="push" title="Stream Log" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="b59-Ij-brH">
                                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2511,15 +2520,26 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                                         <action selector="apiMonitorSelected:" target="vQH-WF-vh2" id="kTn-wJ-3X4"/>
                                                                     </connections>
                                                                 </button>
-                                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" setsMaxLayoutWidthAtFirstLayout="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="q4A-tm-mqN">
-                                                                    <rect key="frame" x="18" y="40" width="277" height="33"/>
+                                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" setsMaxLayoutWidthAtFirstLayout="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jZF-T1-7Sw">
+                                                                    <rect key="frame" x="127" y="9" width="258" height="28"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                    <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" alignment="center" title="Stream app activity to help with debugging; affects performance when active." id="4Rc-P7-ocr">
+                                                                    <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" alignment="left" title="List items which are currently hidden and the reason." id="ab3-sI-VwP">
                                                                         <font key="font" metaFont="message" size="11"/>
                                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>
                                                                 </textField>
+                                                                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="zam-kO-n4v">
+                                                                    <rect key="frame" x="8" y="6" width="115" height="32"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <buttonCell key="cell" type="push" title="Hidden Items" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="nC8-ku-SD8">
+                                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                        <font key="font" metaFont="system"/>
+                                                                    </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="hiddenItemListSelected:" target="vQH-WF-vh2" id="NWC-e0-84f"/>
+                                                                    </connections>
+                                                                </button>
                                                             </subviews>
                                                         </view>
                                                     </box>
@@ -2576,16 +2596,16 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                         </view>
                                                     </box>
                                                     <box fixedFrame="YES" borderType="line" title="Updates" translatesAutoresizingMaskIntoConstraints="NO" id="XQf-tU-A4s">
-                                                        <rect key="frame" x="340" y="277" width="367" height="106"/>
+                                                        <rect key="frame" x="412" y="277" width="295" height="106"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="AHg-rp-Lzn">
-                                                            <rect key="frame" x="4" y="5" width="359" height="86"/>
+                                                            <rect key="frame" x="4" y="5" width="287" height="86"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vcg-xx-N3A">
-                                                                    <rect key="frame" x="28" y="50" width="315" height="18"/>
+                                                                    <rect key="frame" x="17" y="51" width="251" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                    <buttonCell key="cell" type="check" title="Check for new Trailer releases automatically" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="a4y-qa-v3Z">
+                                                                    <buttonCell key="cell" type="check" title="Check for updates automatically" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="a4y-qa-v3Z">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                         <font key="font" metaFont="system"/>
                                                                     </buttonCell>
@@ -2594,7 +2614,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                                     </connections>
                                                                 </button>
                                                                 <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="AT5-aS-AgQ">
-                                                                    <rect key="frame" x="309" y="19" width="19" height="27"/>
+                                                                    <rect key="frame" x="234" y="15" width="19" height="27"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <stepperCell key="cell" continuous="YES" alignment="left" minValue="1" maxValue="1024" doubleValue="1" id="Lkq-hS-bCt"/>
                                                                     <connections>
@@ -2602,7 +2622,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                                     </connections>
                                                                 </stepper>
                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hkX-Jd-o2h">
-                                                                    <rect key="frame" x="41" y="25" width="265" height="17"/>
+                                                                    <rect key="frame" x="120" y="21" width="111" height="17"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="…every X hours" id="WVl-6O-rdk">
                                                                         <font key="font" metaFont="system"/>
@@ -2611,7 +2631,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                                     </textFieldCell>
                                                                 </textField>
                                                                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="PiT-m5-30d">
-                                                                    <rect key="frame" x="37" y="15" width="109" height="32"/>
+                                                                    <rect key="frame" x="12" y="11" width="109" height="32"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="push" title="Check Now" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ME3-g3-Yt9">
                                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>

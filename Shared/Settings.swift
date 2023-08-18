@@ -73,7 +73,7 @@ enum Settings {
         }
 
         if let moveAssignedPrs = sharedDefaults.object(forKey: "MOVE_ASSIGNED_PRS_TO_MY_SECTION") as? Bool {
-            sharedDefaults.set(moveAssignedPrs ? Section.mine.assignmentPolicySettingsValue : Section.none.assignmentPolicySettingsValue, forKey: "ASSIGNED_PR_HANDLING_POLICY")
+            sharedDefaults.set(moveAssignedPrs ? Section.mine.assignmentPolicySettingsValue : Section.hidden(cause: .unknown).assignmentPolicySettingsValue, forKey: "ASSIGNED_PR_HANDLING_POLICY")
             sharedDefaults.removeObject(forKey: "MOVE_ASSIGNED_PRS_TO_MY_SECTION")
         }
 
@@ -88,17 +88,17 @@ enum Settings {
         }
 
         if let mentionedUserMoveLegacy = sharedDefaults.object(forKey: "AUTO_PARTICIPATE_IN_MENTIONS_KEY") as? Bool {
-            sharedDefaults.set(mentionedUserMoveLegacy ? Section.mentioned.movePolicySettingsValue : Section.none.movePolicySettingsValue, forKey: "NEW_MENTION_MOVE_POLICY")
+            sharedDefaults.set(mentionedUserMoveLegacy ? Section.mentioned.movePolicySettingsValue : Section.hidden(cause: .unknown).movePolicySettingsValue, forKey: "NEW_MENTION_MOVE_POLICY")
             sharedDefaults.removeObject(forKey: "AUTO_PARTICIPATE_IN_MENTIONS_KEY")
         }
 
         if let mentionedTeamMoveLegacy = sharedDefaults.object(forKey: "AUTO_PARTICIPATE_ON_TEAM_MENTIONS") as? Bool {
-            sharedDefaults.set(mentionedTeamMoveLegacy ? Section.mentioned.movePolicySettingsValue : Section.none.movePolicySettingsValue, forKey: "TEAM_MENTION_MOVE_POLICY")
+            sharedDefaults.set(mentionedTeamMoveLegacy ? Section.mentioned.movePolicySettingsValue : Section.hidden(cause: .unknown).movePolicySettingsValue, forKey: "TEAM_MENTION_MOVE_POLICY")
             sharedDefaults.removeObject(forKey: "AUTO_PARTICIPATE_ON_TEAM_MENTIONS")
         }
 
         if let mentionedRepoMoveLegacy = sharedDefaults.object(forKey: "MOVE_NEW_ITEMS_IN_OWN_REPOS_TO_MENTIONED") as? Bool {
-            sharedDefaults.set(mentionedRepoMoveLegacy ? Section.mentioned.movePolicySettingsValue : Section.none.movePolicySettingsValue, forKey: "NEW_ITEM_IN_OWNED_REPO_MOVE_POLICY")
+            sharedDefaults.set(mentionedRepoMoveLegacy ? Section.mentioned.movePolicySettingsValue : Section.hidden(cause: .unknown).movePolicySettingsValue, forKey: "NEW_ITEM_IN_OWNED_REPO_MOVE_POLICY")
             sharedDefaults.removeObject(forKey: "MOVE_NEW_ITEMS_IN_OWN_REPOS_TO_MENTIONED")
         }
 
@@ -325,11 +325,11 @@ enum Settings {
     @UserDefault(key: "UPDATE_CHECK_INTERVAL_KEY", defaultValue: 8)
     static var checkForUpdatesInterval: Int
 
-    @AssignmentPlacementUserDefault(key: "ASSIGNED_REVIEW_HANDLING_POLICY", defaultValue: .none)
+    @AssignmentPlacementUserDefault(key: "ASSIGNED_REVIEW_HANDLING_POLICY", defaultValue: .hidden(cause: .unknown))
     static var assignedDirectReviewHandlingPolicy: Section
     static let assignedDirectReviewHandlingPolicyHelp = "If an item is assigned for you to review, Trailer can move it to a specific section or leave it as-is."
 
-    @AssignmentPlacementUserDefault(key: "ASSIGNED_REVIEW_TEAM_HANDLING_POLICY", defaultValue: .none)
+    @AssignmentPlacementUserDefault(key: "ASSIGNED_REVIEW_TEAM_HANDLING_POLICY", defaultValue: .hidden(cause: .unknown))
     static var assignedTeamReviewHandlingPolicy: Section
     static let assignedTeamReviewHandlingPolicyHelp = "If an item is assigned for your team to review, Trailer can move it to a specific section or leave it as-is."
 
@@ -357,7 +357,7 @@ enum Settings {
     static var teamMentionMovePolicy: Section
     static let teamMentionMovePolicyHelp = "If the name of one of the teams you belong to is mentioned in an item's description or a comment posted inside it, move the item to the specified section."
 
-    @MovePlacementUserDefault(key: "NEW_ITEM_IN_OWNED_REPO_MOVE_POLICY", defaultValue: .none)
+    @MovePlacementUserDefault(key: "NEW_ITEM_IN_OWNED_REPO_MOVE_POLICY", defaultValue: .hidden(cause: .unknown))
     static var newItemInOwnedRepoMovePolicy: Section
     static let newItemInOwnedRepoMovePolicyHelp = "Automatically move an item to the specified section if it has been created in a repo which you own, even if there is no direct mention of you."
 

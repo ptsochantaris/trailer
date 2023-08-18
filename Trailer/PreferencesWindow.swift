@@ -2084,4 +2084,24 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         apiMonitorWindow = nil
         apiMonitorWindowController = nil
     }
+
+    private var hiddenItemMonitorWindowController: NSWindowController?
+    private var hiddenItemMonitorWindow: HiddenItemWindow?
+    @IBAction private func hiddenItemListSelected(_: NSButton) {
+        if hiddenItemMonitorWindowController == nil {
+            hiddenItemMonitorWindowController = NSWindowController(windowNibName: NSNib.Name("HiddenItemWindow"))
+        }
+        if let w = hiddenItemMonitorWindowController?.window as? HiddenItemWindow {
+            w.prefs = self
+            w.level = .floating
+            w.center()
+            w.makeKeyAndOrderFront(self)
+            hiddenItemMonitorWindow = w
+        }
+    }
+
+    func closedHiddenItemMonitorWindow() {
+        hiddenItemMonitorWindow = nil
+        hiddenItemMonitorWindowController = nil
+    }
 }

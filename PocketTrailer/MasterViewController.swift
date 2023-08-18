@@ -1,7 +1,7 @@
 import CoreData
+import PopTimer
 import UIKit
 import UserNotifications
-import PopTimer
 
 @MainActor
 final class TabBarSet {

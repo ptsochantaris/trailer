@@ -152,8 +152,8 @@ enum API {
         Settings.displayReviewsOnItems
             || Settings.showRequestedTeamReviews
             || Settings.notifyOnReviewAssignments
-            || (Settings.assignedDirectReviewHandlingPolicy != .none)
-            || (Settings.assignedTeamReviewHandlingPolicy != .none)
+            || (Settings.assignedDirectReviewHandlingPolicy.visible)
+            || (Settings.assignedTeamReviewHandlingPolicy.visible)
     }
 
     ////////////////////////////////////// API interface
@@ -220,7 +220,7 @@ enum API {
         let useV4 = Settings.useV4API
 
         await HTTP.gateKeeper.setBonusTickets(8)
-        
+
         if useV4 {
             if canUseV4API(for: syncMoc) != nil {
                 return
@@ -228,7 +228,7 @@ enum API {
             if Settings.V4IdMigrationPhase == .pending {
                 await attemptV4Migration()
             }
-            
+
             if Settings.threadedSync {
                 await GraphQL.multiGateKeeper.setBonusTickets(2)
             }

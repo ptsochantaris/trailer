@@ -292,13 +292,13 @@ class DataItem: NSManagedObject, Querying {
     private static var dateParserTemplate = "                   +0000".cString(using: .ascii)!
     static func parseGH8601(_ i: String?) -> Date? {
         guard let i, i.count > 18 else { return nil }
-        
+
         var timeData = tm()
         dateQueue.sync {
             memcpy(&dateParserTemplate, i, 19)
             strptime(dateParserTemplate, "%FT%T%z", &timeData)
         }
-        
+
         let t = mktime(&timeData)
         return Date(timeIntervalSince1970: TimeInterval(t))
     }

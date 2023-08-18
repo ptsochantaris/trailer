@@ -1,6 +1,6 @@
 import CoreData
-import UIKit
 import PopTimer
+import UIKit
 
 final class RespositoriesViewController: UITableViewController, UISearchResultsUpdating, NSFetchedResultsControllerDelegate {
     enum SortOption {

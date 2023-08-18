@@ -1,7 +1,7 @@
 import Foundation
+import Maintini
 import Semalot
 import TrailerJson
-import Maintini
 
 typealias JSON = [String: Any]
 

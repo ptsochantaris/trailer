@@ -1,5 +1,5 @@
-import UIKit
 import PopTimer
+import UIKit
 
 final class AdvancedSettingsViewController: UITableViewController, PickerViewControllerDelegate, UISearchResultsUpdating {
     private enum SettingsSection: Int {

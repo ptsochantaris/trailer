@@ -56,7 +56,7 @@ final class Issue: ListableItem {
         let f = NSFetchRequest<Issue>(entityName: "Issue")
         f.returnsObjectsAsFaults = false
         f.includesSubentities = false
-        if section != .none {
+        if section.visible {
             f.predicate = section.matchingPredicate
         }
         for pr in try! moc.fetch(f) {
@@ -104,22 +104,24 @@ final class Issue: ListableItem {
         return try! moc.fetch(f)
     }
 
-    override var shouldHideBecauseOfRepoHidingPolicy: Bool {
+    override var shouldHideBecauseOfRepoHidingPolicy: Section.HidingCause? {
         if createdByMe {
             switch repo.itemHidingPolicy {
-            case RepoHidingPolicy.hideAllMyAuthoredItems.rawValue,
-                 RepoHidingPolicy.hideMyAuthoredIssues.rawValue:
-                return true
+            case RepoHidingPolicy.hideAllMyAuthoredItems.rawValue:
+                return .hidingMyAuthoredIssues
+            case RepoHidingPolicy.hideMyAuthoredIssues.rawValue:
+                return .hidingMyAuthoredIssues
             default:
-                return false
+                return nil
             }
         } else {
             switch repo.itemHidingPolicy {
-            case RepoHidingPolicy.hideAllOthersItems.rawValue,
-                 RepoHidingPolicy.hideOthersIssues.rawValue:
-                return true
+            case RepoHidingPolicy.hideAllOthersItems.rawValue:
+                return .hidingAllOthersItems
+            case RepoHidingPolicy.hideOthersIssues.rawValue:
+                return .hidingOthersIssues
             default:
-                return false
+                return nil
             }
         }
     }

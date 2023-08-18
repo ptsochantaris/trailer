@@ -388,12 +388,13 @@ class ListableItem: DataItem, Listable {
     }
 
     final var isVisibleOnMenu: Bool {
-        sectionIndex != Section.none.sectionIndex
+        sectionIndex != Section.hidden(cause: .unknown).sectionIndex
     }
 
-    final func wakeUp() {
+    @discardableResult
+    final func wakeUp() -> Section {
         disableSnoozing(explicityAwoke: true)
-        postProcess()
+        return postProcess()
     }
 
     final var isSnoozing: Bool {
@@ -478,7 +479,7 @@ class ListableItem: DataItem, Listable {
 
     private func preferredSection(takingItemConditionIntoAccount: Bool) -> Section {
         if Settings.draftHandlingPolicy == .hide && draft {
-            return .none
+            return .hidden(cause: .hidingDrafts)
         }
 
         if takingItemConditionIntoAccount {
@@ -536,8 +537,8 @@ class ListableItem: DataItem, Listable {
         return true
     }
 
-    var shouldHideBecauseOfRepoHidingPolicy: Bool {
-        false
+    var shouldHideBecauseOfRepoHidingPolicy: Section.HidingCause? {
+        nil
     }
 
     var shouldWakeBecauseOfCommit: Bool {
@@ -552,61 +553,74 @@ class ListableItem: DataItem, Listable {
         repo.displayPolicyForIssues
     }
 
-    private func shouldHideBecauseOfRepoDisplayPolicy(targetSection: Section) -> Bool {
+    private func shouldHideBecauseOfRepoDisplayPolicy(targetSection: Section) -> Section.HidingCause? {
         switch repoDisplayPolicy {
         case RepoDisplayPolicy.hide.rawValue:
-            return true
+            return .repoDisplayHideAllItems
+
         case RepoDisplayPolicy.mine.rawValue:
-            return targetSection == .all || targetSection == .participated || targetSection == .mentioned
+            if targetSection == .all || targetSection == .participated || targetSection == .mentioned {
+                return .repoDisplayShowMineOnly
+            }
         case RepoDisplayPolicy.mineAndPaticipated.rawValue:
-            return targetSection == .all
+            if targetSection == .all {
+                return .repoDisplayShowMineAndParticipated
+            }
         default:
-            return false
+            break
         }
+
+        return nil
     }
 
-    final func postProcess(context: PostProcessContext = PostProcessContext()) {
+    @discardableResult
+    final func postProcess(context: PostProcessContext = PostProcessContext()) -> Section {
         if let snoozeUntil, snoozeUntil < Date() { // our snooze-by date is past
             disableSnoozing(explicityAwoke: true)
         }
 
         if shouldWakeBecauseOfCommit { // we wake on comments and have a new commit alarm
-            wakeUp() // re-process as awake item
-            return
+            return wakeUp() // re-process as awake item
         }
 
         var targetSection = preferredSection(takingItemConditionIntoAccount: true)
 
-        if targetSection != .none, shouldHideBecauseOfRepoDisplayPolicy(targetSection: targetSection) || shouldHideBecauseOfRepoHidingPolicy || shouldHideDueToMyReview {
-            targetSection = .none
+        if targetSection.visible {
+            if let cause = shouldHideBecauseOfRepoDisplayPolicy(targetSection: targetSection) {
+                targetSection = .hidden(cause: cause)
+            } else if let cause = shouldHideBecauseOfRepoHidingPolicy {
+                targetSection = .hidden(cause: cause)
+            } else if let cause = shouldHideDueToMyReview {
+                targetSection = .hidden(cause: cause)
+            }
         }
 
-        if targetSection != .none,
+        if targetSection.visible,
            let displayed = shouldBeCheckedForRedStatuses(in: targetSection),
            displayed.contains(where: { $0.state != "success" }) {
-            targetSection = .none
+            targetSection = .hidden(cause: .containsRedStatuses)
         }
 
-        if targetSection != .none {
+        if targetSection.visible {
             let excluded = context.excludedLabels
             if !excluded.isEmpty {
                 let mine = Set(labels.compactMap { $0.name?.comparableForm })
                 if !excluded.isDisjoint(with: mine) {
-                    targetSection = .none
+                    targetSection = .hidden(cause: .containsBlockedLabel)
                 }
             }
         }
 
-        if targetSection != .none {
+        if targetSection.visible {
             let excludeAuthors = context.excludedAuthors
             if !excludeAuthors.isEmpty, let login = userLogin?.comparableForm {
                 if excludeAuthors.contains(login) {
-                    targetSection = .none
+                    targetSection = .hidden(cause: .containsBlockedAuthor)
                 }
             }
         }
 
-        if targetSection != .none, shouldMoveToSnoozing {
+        if targetSection.visible, shouldMoveToSnoozing {
             targetSection = .snoozed
         }
 
@@ -628,11 +642,11 @@ class ListableItem: DataItem, Listable {
             unreadComments = 0
         }
 
-        if targetSection != .none, context.hideUncommentedItems, unreadComments == 0 {
-            targetSection = .none
+        if targetSection.visible, context.hideUncommentedItems, unreadComments == 0 {
+            targetSection = .hidden(cause: .wasUncommented)
         }
 
-        if targetSection != .none {
+        if targetSection.visible {
             totalComments = countComments(context: context)
                 + (context.notifyOnItemReactions ? countReactions(context: context) : 0)
                 + (context.notifyOnCommentReactions ? countCommentReactions(context: context) : 0)
@@ -640,6 +654,8 @@ class ListableItem: DataItem, Listable {
         }
 
         sectionIndex = targetSection.sectionIndex
+
+        return targetSection
     }
 
     func countReviews(context _: PostProcessContext) -> Int {
@@ -1165,8 +1181,8 @@ class ListableItem: DataItem, Listable {
         }
     }
 
-    var shouldHideDueToMyReview: Bool {
-        false
+    var shouldHideDueToMyReview: Section.HidingCause? {
+        nil
     }
 
     var searchKeywords: [String] {

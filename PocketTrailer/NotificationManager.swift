@@ -1,7 +1,7 @@
 import CoreSpotlight
 import Lista
-import UserNotifications
 import PopTimer
+import UserNotifications
 
 @MainActor
 final class NotificationManager: NSObject {
@@ -294,7 +294,7 @@ final class NotificationManager: NSObject {
         guard let self else { return }
         let idSet = Set(removalQueue)
         removalQueue.removeAll()
-        
+
         let nc = UNUserNotificationCenter.current()
         let idsToRemove = await nc.deliveredNotifications().map(\.request).compactMap { request -> String? in
             guard let uri = request.content.userInfo[LISTABLE_URI_KEY] as? String, idSet.contains(uri) else {

@@ -1,5 +1,5 @@
-import UIKit
 import PopTimer
+import UIKit
 
 final class PreferencesTabBarController: UITabBarController {
     override func viewDidDisappear(_ animated: Bool) {

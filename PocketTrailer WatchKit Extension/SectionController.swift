@@ -80,11 +80,11 @@ final class SectionController: CommonController {
                 var totalUnread = 0
                 for itemSection in Section.allCases {
                     switch itemSection {
-                    case Section.none:
+                    case .hidden:
                         continue
-                    case Section.closed:
+                    case .closed:
                         showClearClosed = true
-                    case Section.merged:
+                    case .merged:
                         showClearMerged = true
                     default: break
                     }

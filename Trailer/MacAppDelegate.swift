@@ -1,7 +1,7 @@
 import Cocoa
 import CoreSpotlight
-import Sparkle
 import PopTimer
+import Sparkle
 
 enum Theme {
     case light, dark
