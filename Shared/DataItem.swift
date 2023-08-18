@@ -288,19 +288,17 @@ class DataItem: NSManagedObject, Querying {
         }
     }
 
-    // Single-purpose derivation from the excellent SAMAdditions:
-    // https://github.com/soffes/SAMCategories/blob/master/SAMCategories/NSDate%2BSAMAdditions.m
-    private static let dateParserTemplate = "                   +0000".cString(using: .ascii)!
+    private static let dateQueue = DispatchQueue(label: "housetrip.com.dateFormatting")
+    private static var dateParserTemplate = "                   +0000".cString(using: .ascii)!
     static func parseGH8601(_ i: String?) -> Date? {
         guard let i, i.count > 18 else { return nil }
-
-        var buffer = [CChar](repeating: 0, count: 25)
-        memcpy(&buffer, dateParserTemplate, 24)
-        memcpy(&buffer, i, 19)
-
+        
         var timeData = tm()
-        strptime(buffer, "%FT%T%z", &timeData)
-
+        dateQueue.sync {
+            memcpy(&dateParserTemplate, i, 19)
+            strptime(dateParserTemplate, "%FT%T%z", &timeData)
+        }
+        
         let t = mktime(&timeData)
         return Date(timeIntervalSince1970: TimeInterval(t))
     }
