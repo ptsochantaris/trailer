@@ -13,8 +13,6 @@
 		160CA03223A65152003FA0D8 /* GraphQL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160CA02B23A65152003FA0D8 /* GraphQL.swift */; };
 		160CA03323A65152003FA0D8 /* GraphQL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160CA02B23A65152003FA0D8 /* GraphQL.swift */; };
 		160D312C1A9619CE006B74BC /* FilledView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160D312B1A9619CE006B74BC /* FilledView.swift */; };
-		160E19E21D672BD1006C1A59 /* PopTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160E19E11D672BD1006C1A59 /* PopTimer.swift */; };
-		160E19E31D672BD1006C1A59 /* PopTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160E19E11D672BD1006C1A59 /* PopTimer.swift */; };
 		160FB1401AE3F78E00EB5C8E /* PreferencesWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160FB13F1AE3F78E00EB5C8E /* PreferencesWindow.swift */; };
 		160FB1421AE3F7C700EB5C8E /* PreferencesWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 160FB1411AE3F7C700EB5C8E /* PreferencesWindow.xib */; };
 		16143E7B1AB435EC00BAC070 /* SectionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16143E7A1AB435EC00BAC070 /* SectionController.swift */; };
@@ -125,6 +123,8 @@
 		16A41E9E22A71C7A00D1D352 /* TextFieldCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A41E9D22A71C7A00D1D352 /* TextFieldCell.swift */; };
 		16A69EDA1AC83020008231F9 /* ListableItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A69ED91AC83020008231F9 /* ListableItem.swift */; };
 		16A69EDB1AC83020008231F9 /* ListableItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A69ED91AC83020008231F9 /* ListableItem.swift */; };
+		16A7246A2A8FA73E005B32AB /* PopTimer in Frameworks */ = {isa = PBXBuildFile; productRef = 16A724692A8FA73E005B32AB /* PopTimer */; };
+		16A7246C2A8FA748005B32AB /* PopTimer in Frameworks */ = {isa = PBXBuildFile; productRef = 16A7246B2A8FA748005B32AB /* PopTimer */; };
 		16B3B1501F3670680060A394 /* compression.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B14E1F366F790060A394 /* compression.swift */; };
 		16B3B1511F36706A0060A394 /* compression.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B14E1F366F790060A394 /* compression.swift */; };
 		16B3B3171A34E8E2000BE6CC /* ApiServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3101A34E8E2000BE6CC /* ApiServer.swift */; };
@@ -278,7 +278,6 @@
 		160823F31A44982F006F91AD /* UINavigationControllerExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UINavigationControllerExtensions.swift; sourceTree = "<group>"; };
 		160CA02B23A65152003FA0D8 /* GraphQL.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GraphQL.swift; path = Shared/GraphQL.swift; sourceTree = "<group>"; };
 		160D312B1A9619CE006B74BC /* FilledView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilledView.swift; sourceTree = "<group>"; };
-		160E19E11D672BD1006C1A59 /* PopTimer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PopTimer.swift; path = Shared/PopTimer.swift; sourceTree = "<group>"; };
 		160FB13F1AE3F78E00EB5C8E /* PreferencesWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PreferencesWindow.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		160FB1411AE3F7C700EB5C8E /* PreferencesWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PreferencesWindow.xib; sourceTree = "<group>"; };
 		16143E7A1AB435EC00BAC070 /* SectionController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SectionController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -477,6 +476,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				162BCE702A856418000A3F81 /* Semalot in Frameworks */,
+				16A7246C2A8FA748005B32AB /* PopTimer in Frameworks */,
 				16DE55BD2A5A398D00166337 /* Lista in Frameworks */,
 				165880CC2A59C2BC0012A2B7 /* TrailerQL in Frameworks */,
 				163A2CA22A8ED49D00226C2B /* Maintini in Frameworks */,
@@ -503,6 +503,7 @@
 				16DE55BB2A5A397700166337 /* Lista in Frameworks */,
 				168924532A58BC2A0094F0D1 /* TrailerJson in Frameworks */,
 				167E80F42517EC1700ED9A67 /* CoreSpotlight.framework in Frameworks */,
+				16A7246A2A8FA73E005B32AB /* PopTimer in Frameworks */,
 				165880CA2A59C2AF0012A2B7 /* TrailerQL in Frameworks */,
 				161471CF2A881ED3006A903B /* KeyVine in Frameworks */,
 			);
@@ -604,7 +605,6 @@
 				16BF6735283A2AE20028EC13 /* HTTP.swift */,
 				16E7C20D2A69934900F72BFE /* ImageCache.swift */,
 				16901A441D659E9500141595 /* NotificationQueue.swift */,
-				160E19E11D672BD1006C1A59 /* PopTimer.swift */,
 				1668CFE71D5E16B70021CDC5 /* Reachability.swift */,
 				16CBE1C41A2DFBA500485053 /* Settings.swift */,
 				1657230623AAA3A100F597EF /* V3API */,
@@ -992,6 +992,7 @@
 				162BCE6F2A856418000A3F81 /* Semalot */,
 				161471D02A881EE1006A903B /* KeyVine */,
 				163A2CA12A8ED49D00226C2B /* Maintini */,
+				16A7246B2A8FA748005B32AB /* PopTimer */,
 			);
 			productName = PocketTrailer;
 			productReference = 1628A6B118789E73005EDA69 /* PocketTrailer.app */;
@@ -1039,6 +1040,7 @@
 				16813B202A83041F0069C87B /* Semalot */,
 				161471CE2A881ED3006A903B /* KeyVine */,
 				163A2CA32A8ED5D400226C2B /* Maintini */,
+				16A724692A8FA73E005B32AB /* PopTimer */,
 			);
 			productName = Trailer;
 			productReference = 168BC6AA17EC2DF000BC4584 /* Trailer.app */;
@@ -1141,6 +1143,7 @@
 				16813B1F2A83041F0069C87B /* XCRemoteSwiftPackageReference "semalot" */,
 				161471CD2A881ED3006A903B /* XCRemoteSwiftPackageReference "key-vine" */,
 				163A2CA02A8ED49D00226C2B /* XCRemoteSwiftPackageReference "maintini" */,
+				16A724682A8FA73E005B32AB /* XCRemoteSwiftPackageReference "pop-timer" */,
 			);
 			productRefGroup = 168BC6AB17EC2DF000BC4584 /* Products */;
 			projectDirPath = "";
@@ -1280,7 +1283,6 @@
 				161B851D1AB8E12C00AD4C5D /* Team.swift in Sources */,
 				162484562A76CE9F00C69515 /* LogMonitor.swift in Sources */,
 				16C3048E1CF4ECEF0017D79F /* SectionHeaderView.swift in Sources */,
-				160E19E31D672BD1006C1A59 /* PopTimer.swift in Sources */,
 				16EE6AD01A9A711C000A8483 /* CountLabel.swift in Sources */,
 				166ADEC61CCAFF77001BA61F /* SnoozingViewController.swift in Sources */,
 				16B3B3181A34E8E2000BE6CC /* ApiServer.swift in Sources */,
@@ -1363,7 +1365,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				16B3B31F1A34E8E2000BE6CC /* PRStatus.swift in Sources */,
-				160E19E21D672BD1006C1A59 /* PopTimer.swift in Sources */,
 				164840C11ACFEA5A009E6383 /* AboutWindow.swift in Sources */,
 				16B3B3211A34E8E2000BE6CC /* PullRequest.swift in Sources */,
 				162002D61A2A49A300FF95F3 /* ViewAllowsVibrancy.swift in Sources */,
@@ -2042,6 +2043,14 @@
 				kind = branch;
 			};
 		};
+		16A724682A8FA73E005B32AB /* XCRemoteSwiftPackageReference "pop-timer" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ptsochantaris/pop-timer";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		16DE55B92A5A397700166337 /* XCRemoteSwiftPackageReference "lista" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ptsochantaris/lista";
@@ -2110,6 +2119,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 168924512A58BC2A0094F0D1 /* XCRemoteSwiftPackageReference "trailer-json" */;
 			productName = TrailerJson;
+		};
+		16A724692A8FA73E005B32AB /* PopTimer */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 16A724682A8FA73E005B32AB /* XCRemoteSwiftPackageReference "pop-timer" */;
+			productName = PopTimer;
+		};
+		16A7246B2A8FA748005B32AB /* PopTimer */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 16A724682A8FA73E005B32AB /* XCRemoteSwiftPackageReference "pop-timer" */;
+			productName = PopTimer;
 		};
 		16DE55BA2A5A397700166337 /* Lista */ = {
 			isa = XCSwiftPackageProductDependency;
