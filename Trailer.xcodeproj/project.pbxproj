@@ -744,7 +744,6 @@
 		168BC6A117EC2DF000BC4584 = {
 			isa = PBXGroup;
 			children = (
-				16B6DAD32A58E88000499C57 /* Packages */,
 				1628A6F218789EA3005EDA69 /* Shared */,
 				168BC6B317EC2DF000BC4584 /* Trailer */,
 				164DEAFA1AC0C8BB00AA6F73 /* Pocket Trailer */,
@@ -835,13 +834,6 @@
 				16B6B7C01BA3B94C006A509F /* ComplicationDataSource.swift */,
 			);
 			name = Core;
-			sourceTree = "<group>";
-		};
-		16B6DAD32A58E88000499C57 /* Packages */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Packages;
 			sourceTree = "<group>";
 		};
 		16B9552E17EC86D10005118F /* Data */ = {
