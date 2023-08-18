@@ -15,12 +15,13 @@ Note: Trailer lists all your [watched repositories](http://github.com/watching).
 
 ## Packages
 Parts of Trailer are being split off into their own Swift Packages to make them more reusable and self-contained.
-- [Trailer-QL](https://github.com/ptsochantaris/trailer-ql)
-- [Trailer-Json](https://github.com/ptsochantaris/trailer-json)
+- [TrailerQL](https://github.com/ptsochantaris/trailer-ql)
+- [TrailerJson](https://github.com/ptsochantaris/trailer-json)
 - [Lista](https://github.com/ptsochantaris/lista)
 - [Semalot](https://github.com/ptsochantaris/semalot)
 - [KeyVine](https://github.com/ptsochantaris/key-vine)
 - [Maintini](https://github.com/ptsochantaris/maintini)
+- [PopTimer](https://github.com/ptsochantaris/poptimer)
 
 ## License
 

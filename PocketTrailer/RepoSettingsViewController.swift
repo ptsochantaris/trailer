@@ -1,4 +1,5 @@
 import UIKit
+import PopTimer
 
 final class RepoSettingsViewController: UITableViewController, UITextFieldDelegate {
     var repo: Repo?
@@ -29,10 +30,8 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
             groupField.isHidden = true
         }
 
-        settingsChangedTimer = PopTimer(timeInterval: 1.0) {
-            Task {
-                await DataManager.postProcessAllItems(in: DataManager.main)
-            }
+        settingsChangedTimer = PopTimer(timeInterval: 1.0) { @MainActor in
+            await DataManager.postProcessAllItems(in: DataManager.main)
         }
 
         tableView.tableHeaderView = header

@@ -1,6 +1,7 @@
 import Cocoa
 import CoreSpotlight
 import Sparkle
+import PopTimer
 
 enum Theme {
     case light, dark
@@ -77,7 +78,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
             return
         }
 
-        mouseIgnoreTimer = PopTimer(timeInterval: 0.4) {
+        mouseIgnoreTimer = PopTimer(timeInterval: 0.4) { @MainActor in
             app.isManuallyScrolling = false
         }
 

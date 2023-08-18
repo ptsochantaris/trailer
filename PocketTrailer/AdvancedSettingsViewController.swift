@@ -1,4 +1,5 @@
 import UIKit
+import PopTimer
 
 final class AdvancedSettingsViewController: UITableViewController, PickerViewControllerDelegate, UISearchResultsUpdating {
     private enum SettingsSection: Int {
@@ -382,14 +383,12 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
         navigationItem.hidesSearchBarWhenScrolling = false
 
-        searchTimer = PopTimer(timeInterval: 0.2) { [weak self] in
+        searchTimer = PopTimer(timeInterval: 0.2) { @MainActor [weak self] in
             self?.reload(searchChanged: true)
         }
 
-        settingsChangedTimer = PopTimer(timeInterval: 1.0) {
-            Task {
-                await DataManager.postProcessAllItems(in: DataManager.main)
-            }
+        settingsChangedTimer = PopTimer(timeInterval: 1.0) { @MainActor in
+            await DataManager.postProcessAllItems(in: DataManager.main)
         }
 
         importExport = ImportExport(parent: self)

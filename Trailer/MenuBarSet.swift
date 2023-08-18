@@ -1,4 +1,5 @@
 import Cocoa
+import PopTimer
 
 // from: https://stackoverflow.com/questions/11949250/how-to-resize-nsimage/42915296#42915296
 extension NSImage {
@@ -50,20 +51,16 @@ final class MenuBarSet {
     }
 
     func setTimers() {
-        prFilterTimer = PopTimer(timeInterval: 0.2) { [weak self] in
-            Task { [weak self] in
-                guard let self else { return }
-                await updatePrMenu()
-                prMenu.scrollToTop()
-            }
+        prFilterTimer = PopTimer(timeInterval: 0.2) { @MainActor [weak self] in
+            guard let self else { return }
+            await updatePrMenu()
+            prMenu.scrollToTop()
         }
 
-        issuesFilterTimer = PopTimer(timeInterval: 0.2) { [weak self] in
-            Task { [weak self] in
-                guard let self else { return }
-                await updateIssuesMenu()
-                issuesMenu.scrollToTop()
-            }
+        issuesFilterTimer = PopTimer(timeInterval: 0.2) { @MainActor [weak self] in
+            guard let self else { return }
+            await updateIssuesMenu()
+            issuesMenu.scrollToTop()
         }
     }
 

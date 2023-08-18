@@ -1,6 +1,7 @@
 import CoreData
 import UIKit
 import UserNotifications
+import PopTimer
 
 @MainActor
 final class TabBarSet {
@@ -184,7 +185,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         searchController.searchBar.autocapitalizationType = .none
         navigationItem.searchController = searchController
 
-        searchTimer = PopTimer(timeInterval: 0.3) { [weak self] in
+        searchTimer = PopTimer(timeInterval: 0.3) { @MainActor [weak self] in
             self?.updateSearch()
         }
 

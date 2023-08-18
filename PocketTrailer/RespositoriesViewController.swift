@@ -1,5 +1,6 @@
 import CoreData
 import UIKit
+import PopTimer
 
 final class RespositoriesViewController: UITableViewController, UISearchResultsUpdating, NSFetchedResultsControllerDelegate {
     enum SortOption {
@@ -42,7 +43,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 
         navigationItem.hidesSearchBarWhenScrolling = false
 
-        searchTimer = PopTimer(timeInterval: 0.4) { [weak self] in
+        searchTimer = PopTimer(timeInterval: 0.4) { @MainActor [weak self] in
             self?.reloadData()
         }
     }

@@ -4,6 +4,7 @@
     import Foundation
     import ServiceManagement
 #endif
+import PopTimer
 
 enum MigrationStatus: Int {
     case pending, inProgress, done, failedPending, failedAnnounced
@@ -207,11 +208,9 @@ enum Settings {
         }
     }
 
-    private static let saveTimer = PopTimer(timeInterval: 2) {
+    private static let saveTimer = PopTimer(timeInterval: 2) { @MainActor in
         if let e = Settings.lastExportUrl {
-            Task { @MainActor in
-                Settings.writeToURL(e)
-            }
+            Settings.writeToURL(e)
         }
     }
 

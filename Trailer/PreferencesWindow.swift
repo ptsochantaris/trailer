@@ -1,5 +1,6 @@
 import Cocoa
 import Foundation
+import PopTimer
 
 final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, NSTableViewDataSource, NSTabViewDelegate, NSControlTextEditingDelegate {
     private var deferredUpdateTimer: PopTimer!
@@ -228,21 +229,19 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         let n = NotificationCenter.default
         n.addObserver(self, selector: #selector(updateImportExportSettings), name: .SettingsExported, object: nil)
 
-        deferredUpdateTimer = PopTimer(timeInterval: 1) { [weak self] in
-            Task { @MainActor [weak self] in
-                await DataManager.postProcessAllItems(in: DataManager.main)
-                guard let self else {
-                    return
-                }
-                if self.serversDirty {
-                    self.serversDirty = false
-                    await DataManager.saveDB()
-                    Settings.possibleExport(nil)
-                    app.setupWindows()
-                } else {
-                    await DataManager.saveDB()
-                    await app.updateAllMenus()
-                }
+        deferredUpdateTimer = PopTimer(timeInterval: 1) { @MainActor [weak self] in
+            await DataManager.postProcessAllItems(in: DataManager.main)
+            guard let self else {
+                return
+            }
+            if self.serversDirty {
+                self.serversDirty = false
+                await DataManager.saveDB()
+                Settings.possibleExport(nil)
+                app.setupWindows()
+            } else {
+                await DataManager.saveDB()
+                await app.updateAllMenus()
             }
         }
 

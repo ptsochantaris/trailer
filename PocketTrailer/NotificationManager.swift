@@ -1,6 +1,7 @@
 import CoreSpotlight
 import Lista
 import UserNotifications
+import PopTimer
 
 @MainActor
 final class NotificationManager: NSObject {
@@ -289,24 +290,23 @@ final class NotificationManager: NSObject {
     }
 
     private let removalQueue = Lista<String>()
-    private lazy var removalTimer = PopTimer(timeInterval: 0.5) { [weak self] in
+    private lazy var removalTimer = PopTimer(timeInterval: 0.5) { @MainActor [weak self] in
         guard let self else { return }
         let idSet = Set(removalQueue)
         removalQueue.removeAll()
-        Task {
-            let nc = UNUserNotificationCenter.current()
-            let idsToRemove = await nc.deliveredNotifications().map(\.request).compactMap { request -> String? in
-                guard let uri = request.content.userInfo[LISTABLE_URI_KEY] as? String, idSet.contains(uri) else {
-                    return nil
-                }
-                return request.identifier
+        
+        let nc = UNUserNotificationCenter.current()
+        let idsToRemove = await nc.deliveredNotifications().map(\.request).compactMap { request -> String? in
+            guard let uri = request.content.userInfo[LISTABLE_URI_KEY] as? String, idSet.contains(uri) else {
+                return nil
             }
-            if idsToRemove.isEmpty {
-                return
-            }
-            Logging.log("Removing related notifications: \(idsToRemove)")
-            nc.removeDeliveredNotifications(withIdentifiers: idsToRemove)
+            return request.identifier
         }
+        if idsToRemove.isEmpty {
+            return
+        }
+        Logging.log("Removing related notifications: \(idsToRemove)")
+        nc.removeDeliveredNotifications(withIdentifiers: idsToRemove)
     }
 
     func removeRelatedNotifications(for uri: String) {

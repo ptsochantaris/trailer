@@ -1,4 +1,5 @@
 import UIKit
+import PopTimer
 
 final class PreferencesTabBarController: UITabBarController {
     override func viewDidDisappear(_ animated: Bool) {
@@ -19,11 +20,9 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .automatic
-        settingsChangedTimer = PopTimer(timeInterval: 1.0) {
-            Task { @MainActor in
-                await DataManager.postProcessAllItems(in: DataManager.main)
-                await DataManager.saveDB()
-            }
+        settingsChangedTimer = PopTimer(timeInterval: 1.0) { @MainActor in
+            await DataManager.postProcessAllItems(in: DataManager.main)
+            await DataManager.saveDB()
         }
     }
 
