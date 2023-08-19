@@ -168,25 +168,7 @@ enum DataManager {
                 r.postSyncAction = nothing
             }
             
-            let mergeExpiration = TimeInterval(Settings.autoRemoveMergedItems)
-            if mergeExpiration > 0 {
-                let cutoff = Date(timeIntervalSinceNow: -24 * 3600 * mergeExpiration)
-                for untouched in PullRequest.untouchedMergedItems(in: child) {
-                    if let updatedAt = untouched.updatedAt, updatedAt < cutoff {
-                        untouched.postSyncAction = PostSyncAction.delete.rawValue
-                    }
-                }
-            }
-
-            let closeExpiration = TimeInterval(Settings.autoRemoveClosedItems)
-            if closeExpiration > 0 {
-                let cutoff = Date(timeIntervalSinceNow: -24 * 3600 * closeExpiration)
-                for untouched in PullRequest.untouchedClosedItems(in: child) {
-                    if let updatedAt = untouched.updatedAt, updatedAt < cutoff {
-                        untouched.postSyncAction = PostSyncAction.delete.rawValue
-                    }
-                }
-            }
+            removeUntouchedMergedOrClosedItems(in: child)
 
             for p in PullRequest.newOrUpdatedItems(in: child) {
                 p.postSyncAction = nothing
@@ -202,6 +184,36 @@ enum DataManager {
         NotificationQueue.commit()
 
         preferencesDirty = false
+    }
+    
+    private static func removeUntouchedMergedOrClosedItems(in child: NSManagedObjectContext) {
+        let mergeExpiration = TimeInterval(Settings.autoRemoveMergedItems)
+        if mergeExpiration > 0 {
+            let cutoff = Date(timeIntervalSinceNow: -24 * 3600 * mergeExpiration)
+            for untouched in PullRequest.untouchedMergedItems(in: child) {
+                if let updatedAt = untouched.updatedAt, updatedAt < cutoff {
+                    Logging.log("Deleting closed PR which hasn't been updated: \(untouched.nodeId.orEmpty)")
+                    child.delete(untouched)
+                }
+            }
+        }
+
+        let closeExpiration = TimeInterval(Settings.autoRemoveClosedItems)
+        if closeExpiration > 0 {
+            let cutoff = Date(timeIntervalSinceNow: -24 * 3600 * closeExpiration)
+            for untouched in PullRequest.untouchedClosedItems(in: child) {
+                if let updatedAt = untouched.updatedAt, updatedAt < cutoff {
+                    Logging.log("Deleting closed PR which hasn't been updated: \(untouched.nodeId.orEmpty)")
+                    child.delete(untouched)
+                }
+            }
+            for untouched in Issue.untouchedClosedItems(in: child) {
+                if let updatedAt = untouched.updatedAt, updatedAt < cutoff {
+                    Logging.log("Deleting closed issue which hasn't been updated: \(untouched.nodeId.orEmpty)")
+                    child.delete(untouched)
+                }
+            }
+        }
     }
 
     private static func updateIndexingFromScratch() async {
