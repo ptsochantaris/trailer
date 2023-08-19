@@ -21,6 +21,8 @@ struct PostProcessContext {
     let notifyOnCommentReactions = Settings.notifyOnCommentReactions
     let notifyOnStatusUpdates = Settings.notifyOnStatusUpdates
     let shouldHideDrafts = Settings.draftHandlingPolicy == .hide
+    let autoRemoveClosedItems = Settings.autoRemoveClosedItems
+    let autoRemoveMergedItems = Settings.autoRemoveMergedItems
 }
 
 protocol Listable: Querying {

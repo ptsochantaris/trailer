@@ -167,6 +167,26 @@ enum DataManager {
             for r in PRComment.newOrUpdatedItems(in: child) {
                 r.postSyncAction = nothing
             }
+            
+            let mergeExpiration = TimeInterval(Settings.autoRemoveMergedItems)
+            if mergeExpiration > 0 {
+                let cutoff = Date(timeIntervalSinceNow: -24 * 3600 * mergeExpiration)
+                for untouched in PullRequest.untouchedMergedItems(in: child) {
+                    if let updatedAt = untouched.updatedAt, updatedAt < cutoff {
+                        untouched.postSyncAction = PostSyncAction.delete.rawValue
+                    }
+                }
+            }
+
+            let closeExpiration = TimeInterval(Settings.autoRemoveClosedItems)
+            if closeExpiration > 0 {
+                let cutoff = Date(timeIntervalSinceNow: -24 * 3600 * closeExpiration)
+                for untouched in PullRequest.untouchedClosedItems(in: child) {
+                    if let updatedAt = untouched.updatedAt, updatedAt < cutoff {
+                        untouched.postSyncAction = PostSyncAction.delete.rawValue
+                    }
+                }
+            }
 
             for p in PullRequest.newOrUpdatedItems(in: child) {
                 p.postSyncAction = nothing

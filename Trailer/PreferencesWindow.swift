@@ -63,7 +63,11 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     @IBOutlet private var dontConfirmRemoveAllClosed: NSButton!
     @IBOutlet private var removeNotificationsWhenItemIsRemoved: NSButton!
     @IBOutlet private var scanClosedAndMergedItems: NSButton!
-
+    @IBOutlet private var autoRemoveMergedItems: NSStepper!
+    @IBOutlet private var autoRemoveClosedItems: NSStepper!
+    @IBOutlet private var autoRemoveMergedItemsLabel: NSTextField!
+    @IBOutlet private var autoRemoveClosedItemsLabel: NSTextField!
+    
     // Statuses
     @IBOutlet private var showStatusItems: NSButton!
     @IBOutlet private var makeStatusItemsSelectable: NSButton!
@@ -495,6 +499,12 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         dontKeepPrsMergedByMe.toolTip = Settings.dontKeepPrsMergedByMeHelp
         removeNotificationsWhenItemIsRemoved.toolTip = Settings.removeNotificationsWhenItemIsRemovedHelp
         scanClosedAndMergedItems.toolTip = Settings.scanClosedAndMergedItemsHelp
+        
+        autoRemoveMergedItems.toolTip = Settings.autoRemoveMergedItemsHelp
+        autoRemoveMergedItemsLabel.toolTip = Settings.autoRemoveMergedItemsHelp
+        autoRemoveClosedItems.toolTip = Settings.autoRemoveClosedItemsHelp
+        autoRemoveClosedItemsLabel.toolTip = Settings.autoRemoveClosedItemsHelp
+        
         dontConfirmRemoveAllClosed.toolTip = Settings.dontAskBeforeWipingClosedHelp
         dontConfirmRemoveAllMerged.toolTip = Settings.dontAskBeforeWipingMergedHelp
         showAllComments.toolTip = Settings.showCommentsEverywhereHelp
@@ -596,9 +606,6 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
 
         setupSortMethodMenu()
         sortModeSelect.selectItem(at: Settings.sortMethod.rawValue)
-
-        prMergedPolicy.selectItem(at: Settings.mergeHandlingPolicy.rawValue)
-        prClosedPolicy.selectItem(at: Settings.closeHandlingPolicy.rawValue)
 
         launchAtStartup.integerValue = Settings.isAppLoginItem ? 1 : 0
         dontConfirmRemoveAllClosed.integerValue = Settings.dontAskBeforeWipingClosed ? 1 : 0
@@ -943,7 +950,37 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     }
 
     private func updateHistoryOptions() {
-        dontKeepPrsMergedByMe.isEnabled = Settings.mergeHandlingPolicy != .nothing
+
+        let mergePolicy = Settings.mergeHandlingPolicy
+        prMergedPolicy.selectItem(at: mergePolicy.rawValue)
+        let mergePolicyIsActive = mergePolicy != .nothing
+        autoRemoveMergedItems.isEnabled = mergePolicyIsActive
+        autoRemoveMergedItemsLabel.alphaValue = mergePolicyIsActive ? 1 : 0.5
+        dontKeepPrsMergedByMe.isEnabled = mergePolicyIsActive
+
+        let autoRemoveMergedCount = Settings.autoRemoveMergedItems
+        if autoRemoveMergedCount == 0 {
+            autoRemoveMergedItemsLabel.stringValue = "Keep until manually removed"
+        } else if autoRemoveMergedCount == 1 {
+            autoRemoveMergedItemsLabel.stringValue = "Automatically remove after a day of inactivity"
+        } else {
+            autoRemoveMergedItemsLabel.stringValue = "Automatically remove after \(autoRemoveMergedCount) days of inactivity"
+        }
+
+        let closePolicy = Settings.closeHandlingPolicy
+        prClosedPolicy.selectItem(at: closePolicy.rawValue)
+        let closePolicyIsActive = closePolicy != .nothing
+        autoRemoveClosedItems.isEnabled = closePolicyIsActive
+        autoRemoveClosedItemsLabel.alphaValue = closePolicyIsActive ? 1 : 0.5
+
+        let autoRemoveClosedCount = Settings.autoRemoveClosedItems
+        if autoRemoveClosedCount == 0 {
+            autoRemoveClosedItemsLabel.stringValue = "Keep until manually removed"
+        } else if autoRemoveClosedCount == 1 {
+            autoRemoveClosedItemsLabel.stringValue = "Automatically remove after a day of inactivity"
+        } else {
+            autoRemoveClosedItemsLabel.stringValue = "Automatically remove after \(autoRemoveClosedCount) days of inactivity"
+        }
     }
 
     @IBAction private func highlightItemsWithNewCommitsSelected(_ sender: NSButton) {
@@ -1139,6 +1176,16 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         reactionIntervalStepper.isEnabled = enabled
         reactionIntervalLabel.isEnabled = enabled
         reactionIntervalLabel.textColor = enabled ? NSColor.labelColor : NSColor.disabledControlTextColor
+    }
+    
+    @IBAction private func autoRemoveMergedItemsChanged(_ sender: NSStepper) {
+        Settings.autoRemoveMergedItems = sender.integerValue
+        updateHistoryOptions()
+    }
+
+    @IBAction private func autoRemoveClosedItemsChanged(_ sender: NSStepper) {
+        Settings.autoRemoveClosedItems = sender.integerValue
+        updateHistoryOptions()
     }
 
     @IBAction private func reactionIntervalCountChanged(_ sender: NSStepper) {
@@ -1419,7 +1466,8 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     }
 
     @IBAction private func prClosePolicySelected(_ sender: NSPopUpButton) {
-        Settings.closeHandlingPolicy = KeepPolicy(rawValue: sender.indexOfSelectedItem) ?? Settings.closeHandlingPolicy
+        Settings.closeHandlingPolicy = KeepPolicy(rawValue: sender.indexOfSelectedItem) ?? Settings.closeHandlingPolicy // default
+        updateHistoryOptions()
     }
 
     private func updateStatusTermPreferenceControls() {

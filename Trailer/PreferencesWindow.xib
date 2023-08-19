@@ -1183,102 +1183,14 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" borderType="none" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="HAA-q5-qyx">
-                                            <rect key="frame" x="183" y="72" width="551" height="293"/>
+                                            <rect key="frame" x="65" y="57" width="768" height="296"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <view key="contentView" id="cS6-gP-AUp">
-                                                <rect key="frame" x="0.0" y="0.0" width="551" height="293"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="768" height="296"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <box autoresizesSubviews="NO" fixedFrame="YES" borderType="line" title="Don't confirm when asked to remove…" translatesAutoresizingMaskIntoConstraints="NO" id="KkY-YC-hC1">
-                                                        <rect key="frame" x="72" y="19" width="413" height="66"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <view key="contentView" id="uFz-cS-CJ4">
-                                                            <rect key="frame" x="4" y="5" width="405" height="46"/>
-                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                            <subviews>
-                                                                <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ptr-tf-eNM">
-                                                                    <rect key="frame" x="58" y="15" width="166" height="18"/>
-                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                    <buttonCell key="cell" type="check" title="All merged items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="XJl-yt-Rm9">
-                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                        <font key="font" metaFont="system"/>
-                                                                    </buttonCell>
-                                                                    <connections>
-                                                                        <action selector="dontConfirmRemoveAllMergedSelected:" target="vQH-WF-vh2" id="jV4-g4-vGg"/>
-                                                                    </connections>
-                                                                </button>
-                                                                <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="w0K-BS-Gti">
-                                                                    <rect key="frame" x="228" y="15" width="156" height="18"/>
-                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                    <buttonCell key="cell" type="check" title="All closed items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="oXu-x0-6b5">
-                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                        <font key="font" metaFont="system"/>
-                                                                    </buttonCell>
-                                                                    <connections>
-                                                                        <action selector="dontConfirmRemoveAllClosedSelected:" target="vQH-WF-vh2" id="yu2-rU-uBH"/>
-                                                                    </connections>
-                                                                </button>
-                                                            </subviews>
-                                                        </view>
-                                                    </box>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6Rs-G3-8sn">
-                                                        <rect key="frame" x="15" y="251" width="185" height="17"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="When something is merged:" id="oev-O5-Yz8">
-                                                            <font key="font" metaFont="system"/>
-                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
-                                                    <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DVS-bf-HmU">
-                                                        <rect key="frame" x="204" y="245" width="333" height="26"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <popUpButtonCell key="cell" type="push" title="Move any merged items to &quot;Merged&quot;" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="3S5-2j-Zli" id="d5e-nv-C7o">
-                                                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="menu"/>
-                                                            <menu key="menu" title="OtherViews" id="R4i-KU-iWz">
-                                                                <items>
-                                                                    <menuItem title="Move only my own items to &quot;Merged&quot;" id="cgN-3d-2Wt"/>
-                                                                    <menuItem title="Move my own &amp; participated items to &quot;Merged&quot;" id="Rch-KQ-Rk6"/>
-                                                                    <menuItem title="Move any merged items to &quot;Merged&quot;" state="on" id="3S5-2j-Zli"/>
-                                                                    <menuItem title="Discard all merged items" id="XdV-Lf-khp"/>
-                                                                </items>
-                                                            </menu>
-                                                        </popUpButtonCell>
-                                                        <connections>
-                                                            <action selector="prMergePolicySelected:" target="vQH-WF-vh2" id="TtC-wI-FBz"/>
-                                                        </connections>
-                                                    </popUpButton>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4ns-RA-qwP">
-                                                        <rect key="frame" x="15" y="215" width="185" height="17"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="When something is closed:" id="a60-VD-gfW">
-                                                            <font key="font" metaFont="system"/>
-                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
-                                                    <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MUp-kA-DZp">
-                                                        <rect key="frame" x="204" y="209" width="333" height="26"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <popUpButtonCell key="cell" type="push" title="Move any closed items to &quot;Closed&quot;" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="r2G-KA-S7R" id="exr-ek-OWA">
-                                                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="menu"/>
-                                                            <menu key="menu" title="OtherViews" id="OrW-A7-Xc2">
-                                                                <items>
-                                                                    <menuItem title="Move only my own items to &quot;Closed&quot;" id="cyB-qf-6Eu"/>
-                                                                    <menuItem title="Move my own &amp; participated items to &quot;Closed&quot;" id="8BB-As-Esu"/>
-                                                                    <menuItem title="Move any closed items to &quot;Closed&quot;" state="on" id="r2G-KA-S7R"/>
-                                                                    <menuItem title="Discard all closed items" id="9gv-FQ-txC"/>
-                                                                </items>
-                                                            </menu>
-                                                        </popUpButtonCell>
-                                                        <connections>
-                                                            <action selector="prClosePolicySelected:" target="vQH-WF-vh2" id="ga5-ah-Ijc"/>
-                                                        </connections>
-                                                    </popUpButton>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KUQ-Bv-dT9">
-                                                        <rect key="frame" x="77" y="111" width="396" height="18"/>
+                                                        <rect key="frame" x="199" y="21" width="396" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="When an item is removed, also remove all related notifications" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="phr-Sl-OrT">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1289,7 +1201,7 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                         </connections>
                                                     </button>
                                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yWZ-ok-Fkz">
-                                                        <rect key="frame" x="66" y="138" width="419" height="18"/>
+                                                        <rect key="frame" x="188" y="53" width="419" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Highlight new comments on closed or merged items (v4 API only)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="UuI-Fr-tpN">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1299,17 +1211,140 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                             <action selector="scanClosedAndMergedItemsSelected:" target="vQH-WF-vh2" id="RhD-bD-Usw"/>
                                                         </connections>
                                                     </button>
-                                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZiV-Lz-lSl">
-                                                        <rect key="frame" x="63" y="165" width="424" height="18"/>
+                                                    <box fixedFrame="YES" title="Closed Items" translatesAutoresizingMaskIntoConstraints="NO" id="2ys-T1-Mmv">
+                                                        <rect key="frame" x="388" y="118" width="363" height="178"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Discard any PRs that I merged myself, regardless of these settings" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="XHX-lg-c6B">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="dontKeepMyPrsSelected:" target="vQH-WF-vh2" id="Rdm-9D-K5g"/>
-                                                        </connections>
-                                                    </button>
+                                                        <view key="contentView" id="2gZ-Ac-ISc">
+                                                            <rect key="frame" x="4" y="5" width="355" height="158"/>
+                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                            <subviews>
+                                                                <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MUp-kA-DZp">
+                                                                    <rect key="frame" x="17" y="113" width="322" height="26"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <popUpButtonCell key="cell" type="push" title="Move any closed items to &quot;Closed&quot;" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="r2G-KA-S7R" id="exr-ek-OWA">
+                                                                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                                        <font key="font" metaFont="menu"/>
+                                                                        <menu key="menu" title="OtherViews" id="OrW-A7-Xc2">
+                                                                            <items>
+                                                                                <menuItem title="Move only my own items to &quot;Closed&quot;" id="cyB-qf-6Eu"/>
+                                                                                <menuItem title="Move my own &amp; participated items to &quot;Closed&quot;" id="8BB-As-Esu"/>
+                                                                                <menuItem title="Move any closed items to &quot;Closed&quot;" state="on" id="r2G-KA-S7R"/>
+                                                                                <menuItem title="Discard all closed items" id="9gv-FQ-txC"/>
+                                                                            </items>
+                                                                        </menu>
+                                                                    </popUpButtonCell>
+                                                                    <connections>
+                                                                        <action selector="prClosePolicySelected:" target="vQH-WF-vh2" id="ga5-ah-Ijc"/>
+                                                                    </connections>
+                                                                </popUpButton>
+                                                                <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="w0K-BS-Gti">
+                                                                    <rect key="frame" x="23" y="87" width="184" height="18"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <buttonCell key="cell" type="check" title="Don't confirm removal" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="oXu-x0-6b5">
+                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                        <font key="font" metaFont="system"/>
+                                                                    </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="dontConfirmRemoveAllClosedSelected:" target="vQH-WF-vh2" id="yu2-rU-uBH"/>
+                                                                    </connections>
+                                                                </button>
+                                                                <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="H5P-wC-rsZ">
+                                                                    <rect key="frame" x="314" y="16" width="19" height="27"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                                                    <stepperCell key="cell" continuous="YES" alignment="left" maxValue="99999" id="365-YI-svH"/>
+                                                                    <connections>
+                                                                        <action selector="autoRemoveClosedItemsChanged:" target="vQH-WF-vh2" id="YYk-h3-Ztb"/>
+                                                                    </connections>
+                                                                </stepper>
+                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="whB-08-cLM">
+                                                                    <rect key="frame" x="-2" y="21" width="314" height="17"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Automatically remove after X days of inactivity" id="71u-tZ-cln">
+                                                                        <font key="font" metaFont="system"/>
+                                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                    </textFieldCell>
+                                                                </textField>
+                                                            </subviews>
+                                                        </view>
+                                                    </box>
+                                                    <box fixedFrame="YES" title="Merged Items" translatesAutoresizingMaskIntoConstraints="NO" id="5AV-oS-ptq">
+                                                        <rect key="frame" x="17" y="118" width="369" height="178"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <view key="contentView" id="rx9-wd-0NK">
+                                                            <rect key="frame" x="4" y="5" width="361" height="158"/>
+                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                            <subviews>
+                                                                <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DVS-bf-HmU">
+                                                                    <rect key="frame" x="17" y="113" width="328" height="26"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <popUpButtonCell key="cell" type="push" title="Move any merged items to &quot;Merged&quot;" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="3S5-2j-Zli" id="d5e-nv-C7o">
+                                                                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                                        <font key="font" metaFont="menu"/>
+                                                                        <menu key="menu" title="OtherViews" id="R4i-KU-iWz">
+                                                                            <items>
+                                                                                <menuItem title="Move only my own items to &quot;Merged&quot;" id="cgN-3d-2Wt"/>
+                                                                                <menuItem title="Move my own &amp; participated items to &quot;Merged&quot;" id="Rch-KQ-Rk6"/>
+                                                                                <menuItem title="Move any merged items to &quot;Merged&quot;" state="on" id="3S5-2j-Zli"/>
+                                                                                <menuItem title="Discard all merged items" id="XdV-Lf-khp"/>
+                                                                            </items>
+                                                                        </menu>
+                                                                    </popUpButtonCell>
+                                                                    <connections>
+                                                                        <action selector="prMergePolicySelected:" target="vQH-WF-vh2" id="TtC-wI-FBz"/>
+                                                                    </connections>
+                                                                </popUpButton>
+                                                                <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZiV-Lz-lSl">
+                                                                    <rect key="frame" x="23" y="87" width="323" height="18"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <buttonCell key="cell" type="check" title="Discard PRs that I merged myself, regardless" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="XHX-lg-c6B">
+                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                        <font key="font" metaFont="system"/>
+                                                                    </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="dontKeepMyPrsSelected:" target="vQH-WF-vh2" id="Rdm-9D-K5g"/>
+                                                                    </connections>
+                                                                </button>
+                                                                <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Suf-tp-9zM">
+                                                                    <rect key="frame" x="320" y="14" width="19" height="27"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                                                    <stepperCell key="cell" continuous="YES" alignment="left" maxValue="99999" id="26w-do-khz"/>
+                                                                    <connections>
+                                                                        <action selector="autoRemoveMergedItemsChanged:" target="vQH-WF-vh2" id="1DU-35-Tvm"/>
+                                                                    </connections>
+                                                                </stepper>
+                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Q69-Ws-ySy">
+                                                                    <rect key="frame" x="-2" y="19" width="320" height="17"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Automatically remove after X days of inactivity" id="Rz6-Sn-QNi">
+                                                                        <font key="font" metaFont="system"/>
+                                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                    </textFieldCell>
+                                                                </textField>
+                                                                <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ptr-tf-eNM">
+                                                                    <rect key="frame" x="23" y="60" width="176" height="18"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <buttonCell key="cell" type="check" title="Don't confirm removal" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="XJl-yt-Rm9">
+                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                        <font key="font" metaFont="system"/>
+                                                                    </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="dontConfirmRemoveAllMergedSelected:" target="vQH-WF-vh2" id="jV4-g4-vGg"/>
+                                                                    </connections>
+                                                                </button>
+                                                            </subviews>
+                                                        </view>
+                                                    </box>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dA5-5p-8Sl">
+                                                        <rect key="frame" x="211" y="97" width="346" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="v4 API required to check for activity on merged or closed items" id="VRi-PR-txy">
+                                                            <font key="font" metaFont="miniSystem"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
                                                 </subviews>
                                             </view>
                                         </box>
@@ -1322,7 +1357,7 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" borderType="none" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="9l1-g0-3Pv">
-                                            <rect key="frame" x="124" y="46" width="673" height="330"/>
+                                            <rect key="frame" x="123" y="46" width="673" height="330"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <view key="contentView" id="j25-JP-OCJ">
                                                 <rect key="frame" x="0.0" y="0.0" width="673" height="330"/>
@@ -2493,7 +2528,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                 <rect key="frame" x="0.0" y="0.0" width="724" height="399"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <box fixedFrame="YES" borderType="line" title="Diagnostics" translatesAutoresizingMaskIntoConstraints="NO" id="AS8-n7-ngi">
+                                                    <box fixedFrame="YES" borderType="line" title="Debugging" translatesAutoresizingMaskIntoConstraints="NO" id="AS8-n7-ngi">
                                                         <rect key="frame" x="17" y="278" width="393" height="105"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="GhS-Tk-g7Z">
@@ -2503,7 +2538,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" setsMaxLayoutWidthAtFirstLayout="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="q4A-tm-mqN">
                                                                     <rect key="frame" x="127" y="44" width="258" height="28"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                    <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" alignment="left" title="Monitor activity to aid debugging; affects performance when active." id="4Rc-P7-ocr">
+                                                                    <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" alignment="left" title="Live monitor of API activity; affects performance when active." id="4Rc-P7-ocr">
                                                                         <font key="font" metaFont="message" size="11"/>
                                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -2523,7 +2558,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" setsMaxLayoutWidthAtFirstLayout="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jZF-T1-7Sw">
                                                                     <rect key="frame" x="127" y="9" width="258" height="28"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                    <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" alignment="left" title="List items which are currently hidden and the reason." id="ab3-sI-VwP">
+                                                                    <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" alignment="left" title="List items which are currently hidden and the rule that hid them." id="ab3-sI-VwP">
                                                                         <font key="font" metaFont="message" size="11"/>
                                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -2784,6 +2819,10 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="assumeCommentsBeforeMineAreRead" destination="gWR-4e-ufK" id="uF3-ZN-vmp"/>
                 <outlet property="autoHidePrsIApproved" destination="U88-pc-Jz8" id="HU8-gt-z9y"/>
                 <outlet property="autoHidePrsIRejected" destination="Ei9-bM-vil" id="g4U-y3-lu4"/>
+                <outlet property="autoRemoveClosedItems" destination="H5P-wC-rsZ" id="Mzw-8S-1ot"/>
+                <outlet property="autoRemoveClosedItemsLabel" destination="whB-08-cLM" id="TfV-jf-Tmb"/>
+                <outlet property="autoRemoveMergedItems" destination="Suf-tp-9zM" id="qxZ-Eo-FSA"/>
+                <outlet property="autoRemoveMergedItemsLabel" destination="Q69-Ws-ySy" id="41w-3b-OfT"/>
                 <outlet property="autoSnoozeLabel" destination="4MH-0X-KEO" id="bAY-Ka-oDM"/>
                 <outlet property="autoSnoozeSelector" destination="hgg-d7-xNz" id="4mr-e9-oiH"/>
                 <outlet property="checkForUpdatesAutomatically" destination="vcg-xx-N3A" id="G9B-Yw-7hB"/>

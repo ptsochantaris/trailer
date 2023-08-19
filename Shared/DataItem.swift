@@ -44,6 +44,30 @@ extension Querying {
         }
         return try! moc.fetch(f)
     }
+    
+    static func untouchedMergedItems(in moc: NSManagedObjectContext) -> [Self] {
+        let f = NSFetchRequest<Self>(entityName: typeName)
+        f.returnsObjectsAsFaults = false
+        f.includesSubentities = false
+        f.predicate = NSCompoundPredicate(type: .and, subpredicates: [
+            ItemCondition.merged.matchingPredicate,
+            NSPredicate(format: "apiServer.lastSyncSucceeded == YES"),
+            PostSyncAction.doNothing.matchingPredicate
+        ])
+        return try! moc.fetch(f)
+    }
+
+    static func untouchedClosedItems(in moc: NSManagedObjectContext) -> [Self] {
+        let f = NSFetchRequest<Self>(entityName: typeName)
+        f.returnsObjectsAsFaults = false
+        f.includesSubentities = false
+        f.predicate = NSCompoundPredicate(type: .and, subpredicates: [
+            ItemCondition.closed.matchingPredicate,
+            NSPredicate(format: "apiServer.lastSyncSucceeded == YES"),
+            PostSyncAction.doNothing.matchingPredicate
+        ])
+        return try! moc.fetch(f)
+    }
 
     static func newOrUpdatedItems(in moc: NSManagedObjectContext, fromSuccessfulSyncOnly: Bool = false) -> [Self] {
         let f = NSFetchRequest<Self>(entityName: typeName)
