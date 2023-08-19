@@ -9,7 +9,6 @@ final class HiddenItemWindow: NSWindow, NSWindowDelegate {
     weak var prefs: PreferencesWindow?
 
     private var textStorage: NSTextStorage!
-    private var hiddenCount = 0
 
     @MainActor
     private func writeText(_ message: String) {
@@ -30,6 +29,8 @@ final class HiddenItemWindow: NSWindow, NSWindowDelegate {
                 sender.isEnabled = true
             }
 
+            var hiddenCount = 0
+
             func report(postProcessContext: PostProcessContext, for item: ListableItem) {
                 let section = item.postProcess(context: postProcessContext)
                 switch section {
@@ -37,7 +38,7 @@ final class HiddenItemWindow: NSWindow, NSWindowDelegate {
                     let title = item.title ?? "<no title>"
                     let numberString = String(item.number)
                     Task { @MainActor in
-                        writeText("#\(numberString) \(title) - \(cause.description)\n\n")
+                        writeText("[\(item.repo.fullName.orEmpty) #\(numberString)]: \(title) -- \(cause.description)\n\n")
                         hiddenCount += 1
                     }
                 default:

@@ -20,6 +20,7 @@ struct PostProcessContext {
     let notifyOnItemReactions = Settings.notifyOnItemReactions
     let notifyOnCommentReactions = Settings.notifyOnCommentReactions
     let notifyOnStatusUpdates = Settings.notifyOnStatusUpdates
+    let shouldHideDrafts = Settings.draftHandlingPolicy == .hide
 }
 
 protocol Listable: Querying {
@@ -333,7 +334,7 @@ class ListableItem: DataItem, Listable {
         postProcess()
     }
 
-    final func shouldKeep(accordingTo policy: KeepPolicy) -> Bool { // issue: item has already been moved at this point
+    final func shouldKeep(accordingTo policy: KeepPolicy) -> Bool {
         switch policy {
         case .everything:
             return true
@@ -478,10 +479,6 @@ class ListableItem: DataItem, Listable {
     }
 
     private func preferredSection(takingItemConditionIntoAccount: Bool) -> Section {
-        if Settings.draftHandlingPolicy == .hide && draft {
-            return .hidden(cause: .hidingDrafts)
-        }
-
         if takingItemConditionIntoAccount {
             if condition == ItemCondition.merged.rawValue {
                 return .merged
@@ -489,6 +486,10 @@ class ListableItem: DataItem, Listable {
             if condition == ItemCondition.closed.rawValue {
                 return .closed
             }
+        }
+        
+        if shouldMoveToSnoozing {
+            return .snoozed
         }
 
         if createdByMe || shouldGo(to: .mine) {
@@ -556,20 +557,55 @@ class ListableItem: DataItem, Listable {
     private func shouldHideBecauseOfRepoDisplayPolicy(targetSection: Section) -> Section.HidingCause? {
         switch repoDisplayPolicy {
         case RepoDisplayPolicy.hide.rawValue:
-            return .repoDisplayHideAllItems
+            return .repoHideAllItems
 
         case RepoDisplayPolicy.mine.rawValue:
             if targetSection == .all || targetSection == .participated || targetSection == .mentioned {
-                return .repoDisplayShowMineOnly
+                return .repoShowMineOnly
             }
         case RepoDisplayPolicy.mineAndPaticipated.rawValue:
             if targetSection == .all {
-                return .repoDisplayShowMineAndParticipated
+                return .repoShowMineAndParticipated
             }
         default:
             break
         }
 
+        return nil
+    }
+    
+    private func shouldHideBecauseOfBlockedContent(context: PostProcessContext) -> Section.HidingCause? {
+        let excluded = context.excludedLabels
+        if !excluded.isEmpty {
+            let mine = Set(labels.compactMap { $0.name?.comparableForm })
+            if !excluded.isDisjoint(with: mine) {
+                return .containsBlockedLabel
+            }
+        }
+        
+        let excludeAuthors = context.excludedAuthors
+        if !excludeAuthors.isEmpty,
+           let login = userLogin?.comparableForm {
+            if excludeAuthors.contains(login) {
+                return .containsBlockedAuthor
+            }
+        }
+        
+        return nil
+    }
+    
+    private func shouldHideBecauseOfRedStatuses(in section: Section) -> Section.HidingCause? {
+        if let displayed = shouldBeCheckedForRedStatuses(in: section),
+            displayed.contains(where: { $0.state != "success" }) {
+            return .containsRedStatuses
+        }
+        return nil
+    }
+    
+    private func shouldHideBecauseOfDraftStatus(context: PostProcessContext) -> Section.HidingCause? {
+        if context.shouldHideDrafts, draft {
+            return .hidingDrafts
+        }
         return nil
     }
 
@@ -578,52 +614,29 @@ class ListableItem: DataItem, Listable {
         if let snoozeUntil, snoozeUntil < Date() { // our snooze-by date is past
             disableSnoozing(explicityAwoke: true)
         }
-
+        
         if shouldWakeBecauseOfCommit { // we wake on comments and have a new commit alarm
             return wakeUp() // re-process as awake item
         }
-
-        var targetSection = preferredSection(takingItemConditionIntoAccount: true)
-
-        if targetSection.visible {
-            if let cause = shouldHideBecauseOfRepoDisplayPolicy(targetSection: targetSection) {
-                targetSection = .hidden(cause: cause)
-            } else if let cause = shouldHideBecauseOfRepoHidingPolicy {
-                targetSection = .hidden(cause: cause)
-            } else if let cause = shouldHideDueToMyReview {
+        
+        var targetSection: Section
+        
+        if let cause = shouldHideBecauseOfDraftStatus(context: context)
+            ?? shouldHideBecauseOfRepoHidingPolicy
+            ?? shouldHideDueToMyReview
+            ?? shouldHideBecauseOfBlockedContent(context: context) {
+            targetSection = .hidden(cause: cause)
+        } else {
+            targetSection = preferredSection(takingItemConditionIntoAccount: true)
+            
+            if targetSection.visible, let cause
+                = shouldHideBecauseOfRepoDisplayPolicy(targetSection: targetSection)
+                ?? shouldHideBecauseOfRedStatuses(in: targetSection) {
+                
                 targetSection = .hidden(cause: cause)
             }
         }
-
-        if targetSection.visible,
-           let displayed = shouldBeCheckedForRedStatuses(in: targetSection),
-           displayed.contains(where: { $0.state != "success" }) {
-            targetSection = .hidden(cause: .containsRedStatuses)
-        }
-
-        if targetSection.visible {
-            let excluded = context.excludedLabels
-            if !excluded.isEmpty {
-                let mine = Set(labels.compactMap { $0.name?.comparableForm })
-                if !excluded.isDisjoint(with: mine) {
-                    targetSection = .hidden(cause: .containsBlockedLabel)
-                }
-            }
-        }
-
-        if targetSection.visible {
-            let excludeAuthors = context.excludedAuthors
-            if !excludeAuthors.isEmpty, let login = userLogin?.comparableForm {
-                if excludeAuthors.contains(login) {
-                    targetSection = .hidden(cause: .containsBlockedAuthor)
-                }
-            }
-        }
-
-        if targetSection.visible, shouldMoveToSnoozing {
-            targetSection = .snoozed
-        }
-
+        
         if canBadge(in: targetSection) {
             var latestDate = latestReadCommentDate ?? .distantPast
 
@@ -642,15 +655,15 @@ class ListableItem: DataItem, Listable {
             unreadComments = 0
         }
 
-        if targetSection.visible, context.hideUncommentedItems, unreadComments == 0 {
-            targetSection = .hidden(cause: .wasUncommented)
-        }
-
         if targetSection.visible {
-            totalComments = countComments(context: context)
+            if context.hideUncommentedItems, unreadComments == 0 {
+                targetSection = .hidden(cause: .wasUncommented)
+            } else {
+                totalComments = countComments(context: context)
                 + (context.notifyOnItemReactions ? countReactions(context: context) : 0)
                 + (context.notifyOnCommentReactions ? countCommentReactions(context: context) : 0)
                 + countReviews(context: context)
+            }
         }
 
         sectionIndex = targetSection.sectionIndex

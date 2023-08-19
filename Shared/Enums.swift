@@ -5,36 +5,35 @@ enum Section: CaseIterable, Equatable {
         case unknown, approvedByMe, rejectedByMe, hidingAllMyAuthoredItems,
              hidingMyAuthoredIssues, hidingAllOthersItems, hidingOthersIssues, containsRedStatuses, hidingOthersPrs,
              containsBlockedLabel, containsBlockedAuthor, wasUncommented, hidingDrafts, assignedDirectReview,
-             assignedTeamReview, hidingMyAuthoredPrs, repoDisplayShowMineAndParticipated, repoDisplayHideAllItems,
-             repoDisplayShowMineOnly
-
+             assignedTeamReview, hidingMyAuthoredPrs, repoShowMineAndParticipated, repoHideAllItems,
+             repoShowMineOnly
+        
         var description: String {
             switch self {
             case .unknown: return "Unknown reason"
-
+                
             case .hidingAllMyAuthoredItems: return "Repo setting: Item authored by me"
             case .hidingMyAuthoredIssues: return "IRepo setting: ssue authored by me"
             case .hidingAllOthersItems: return "Repo setting: Item not authored by me"
             case .hidingOthersIssues: return "Repo setting: Issue authored by others"
             case .hidingOthersPrs: return "Repo setting: PR authored by others"
-
+            case .hidingDrafts: return "Display setting: Is marked as being a draft"
+                
             case .containsBlockedLabel: return "Blocked item: Label"
             case .containsBlockedAuthor: return "Blocked item: Author"
-
+                
             case .wasUncommented: return "Comment setting: Does not have any comments"
-
-            case .hidingDrafts: return "Display setting: Is marked as being a draft"
-
-            case .assignedDirectReview: return "Review setting: Assigned direct review section"
-            case .assignedTeamReview: return "Review setting: Assigned team review section"
+                
+            case .assignedDirectReview: return "Review setting: Assigned section based on direct review"
+            case .assignedTeamReview: return "Review setting: Assigned section based on team review"
             case .approvedByMe: return "Review setting: Approved by me"
             case .rejectedByMe: return "Review setting: Rejected by me"
             case .containsRedStatuses: return "Review setting: PR has a red status"
-
+                
             case .hidingMyAuthoredPrs: return "Repo setting: PR authored by me"
-            case .repoDisplayShowMineAndParticipated: return "Repo setting: Mine or participated section items hidden"
-            case .repoDisplayHideAllItems: return "Repo setting: All items hidden"
-            case .repoDisplayShowMineOnly: return "Repo setting: Mine section items hidden"
+            case .repoShowMineAndParticipated: return "Repo setting: Only Mine and Participated sections allowed"
+            case .repoHideAllItems: return "Repo setting: All items hidden"
+            case .repoShowMineOnly: return "Repo setting: Mine section items hidden"
             }
         }
     }
