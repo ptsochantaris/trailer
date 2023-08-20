@@ -78,12 +78,12 @@ enum Settings {
         }
 
         if let mergeHandlingPolicyLegacy = Settings["MERGE_HANDLING_POLICY"] as? Int {
-            Settings["MERGE_HANDLING_POLICY_2"] = mergeHandlingPolicyLegacy + (mergeHandlingPolicyLegacy > 0 ? 1 : 0)
+            Settings["MERGE_HANDLING_POLICY_2"] = mergeHandlingPolicyLegacy + (mergeHandlingPolicyLegacy > 0).asInt
             Settings["MERGE_HANDLING_POLICY"] = nil
         }
 
         if let closeHandlingPolicyLegacy = Settings["CLOSE_HANDLING_POLICY"] as? Int {
-            Settings["CLOSE_HANDLING_POLICY_2"] = closeHandlingPolicyLegacy + (closeHandlingPolicyLegacy > 0 ? 1 : 0)
+            Settings["CLOSE_HANDLING_POLICY_2"] = closeHandlingPolicyLegacy + (closeHandlingPolicyLegacy > 0).asInt
             Settings["CLOSE_HANDLING_POLICY"] = nil
         }
 

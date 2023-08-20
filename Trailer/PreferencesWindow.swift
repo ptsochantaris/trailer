@@ -280,12 +280,12 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         notifyOnAllReviewDismissals.isEnabled = Settings.notifyOnReviewDismissals
         notifyOnAllAcceptances.isEnabled = Settings.notifyOnReviewAcceptances
 
-        notifyOnChangeRequests.integerValue = Settings.notifyOnReviewChangeRequests ? 1 : 0
-        notifyOnReviewDismissals.integerValue = Settings.notifyOnReviewDismissals ? 1 : 0
-        notifyOnAcceptances.integerValue = Settings.notifyOnReviewAcceptances ? 1 : 0
-        notifyOnAllChangeRequests.integerValue = Settings.notifyOnAllReviewChangeRequests ? 1 : 0
-        notifyOnAllReviewDismissals.integerValue = Settings.notifyOnAllReviewDismissals ? 1 : 0
-        notifyOnAllAcceptances.integerValue = Settings.notifyOnAllReviewAcceptances ? 1 : 0
+        notifyOnChangeRequests.integerValue = Settings.notifyOnReviewChangeRequests.asInt
+        notifyOnReviewDismissals.integerValue = Settings.notifyOnReviewDismissals.asInt
+        notifyOnAcceptances.integerValue = Settings.notifyOnReviewAcceptances.asInt
+        notifyOnAllChangeRequests.integerValue = Settings.notifyOnAllReviewChangeRequests.asInt
+        notifyOnAllReviewDismissals.integerValue = Settings.notifyOnAllReviewDismissals.asInt
+        notifyOnAllAcceptances.integerValue = Settings.notifyOnAllReviewAcceptances.asInt
     }
 
     private func showOptionalReviewWarning(previousSync: Bool) {
@@ -607,62 +607,62 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         setupSortMethodMenu()
         sortModeSelect.selectItem(at: Settings.sortMethod.rawValue)
 
-        launchAtStartup.integerValue = Settings.isAppLoginItem ? 1 : 0
-        dontConfirmRemoveAllClosed.integerValue = Settings.dontAskBeforeWipingClosed ? 1 : 0
-        displayRepositoryNames.integerValue = Settings.showReposInName ? 1 : 0
-        includeRepositoriesInFiltering.integerValue = Settings.includeReposInFilter ? 1 : 0
-        includeLabelsInFiltering.integerValue = Settings.includeLabelsInFilter ? 1 : 0
-        includeTitlesInFiltering.integerValue = Settings.includeTitlesInFilter ? 1 : 0
-        includeMilestonesInFiltering.integerValue = Settings.includeMilestonesInFilter ? 1 : 0
-        includeAssigneeNamesInFiltering.integerValue = Settings.includeAssigneeNamesInFilter ? 1 : 0
-        includeUsersInFiltering.integerValue = Settings.includeUsersInFilter ? 1 : 0
-        includeNumbersInFiltering.integerValue = Settings.includeNumbersInFilter ? 1 : 0
-        includeServersInFiltering.integerValue = Settings.includeServersInFilter ? 1 : 0
-        includeStatusesInFiltering.integerValue = Settings.includeStatusesInFilter ? 1 : 0
-        dontConfirmRemoveAllMerged.integerValue = Settings.dontAskBeforeWipingMerged ? 1 : 0
-        hideUncommentedPrs.integerValue = Settings.hideUncommentedItems ? 1 : 0
-        assumeCommentsBeforeMineAreRead.integerValue = Settings.assumeReadItemIfUserHasNewerComments ? 1 : 0
-        hideAvatars.integerValue = Settings.hideAvatars ? 1 : 0
-        hideAvatarsInNotifications.integerValue = Settings.hideAvatarsInNotifications ? 1 : 0
-        hideCountsOnMenubar.integerValue = Settings.hideMenubarCounts ? 1 : 0
-        showSeparateApiServersInMenu.integerValue = Settings.showSeparateApiServersInMenu ? 1 : 0
-        dontKeepPrsMergedByMe.integerValue = Settings.dontKeepPrsMergedByMe ? 1 : 0
-        removeNotificationsWhenItemIsRemoved.integerValue = Settings.removeNotificationsWhenItemIsRemoved ? 1 : 0
-        scanClosedAndMergedItems.integerValue = Settings.scanClosedAndMergedItems ? 1 : 0
-        grayOutWhenRefreshing.integerValue = Settings.grayOutWhenRefreshing ? 1 : 0
-        notifyOnStatusUpdates.integerValue = Settings.notifyOnStatusUpdates ? 1 : 0
-        notifyOnStatusUpdatesForAllPrs.integerValue = Settings.notifyOnStatusUpdatesForAllPrs ? 1 : 0
-        disableAllCommentNotifications.integerValue = Settings.disableAllCommentNotifications ? 1 : 0
-        showAllComments.integerValue = Settings.showCommentsEverywhere ? 1 : 0
-        sortingOrder.integerValue = Settings.sortDescending ? 1 : 0
-        showCreationDates.integerValue = Settings.showCreatedInsteadOfUpdated ? 1 : 0
-        groupByRepo.integerValue = Settings.groupByRepo ? 1 : 0
+        launchAtStartup.integerValue = Settings.isAppLoginItem.asInt
+        dontConfirmRemoveAllClosed.integerValue = Settings.dontAskBeforeWipingClosed.asInt
+        displayRepositoryNames.integerValue = Settings.showReposInName.asInt
+        includeRepositoriesInFiltering.integerValue = Settings.includeReposInFilter.asInt
+        includeLabelsInFiltering.integerValue = Settings.includeLabelsInFilter.asInt
+        includeTitlesInFiltering.integerValue = Settings.includeTitlesInFilter.asInt
+        includeMilestonesInFiltering.integerValue = Settings.includeMilestonesInFilter.asInt
+        includeAssigneeNamesInFiltering.integerValue = Settings.includeAssigneeNamesInFilter.asInt
+        includeUsersInFiltering.integerValue = Settings.includeUsersInFilter.asInt
+        includeNumbersInFiltering.integerValue = Settings.includeNumbersInFilter.asInt
+        includeServersInFiltering.integerValue = Settings.includeServersInFilter.asInt
+        includeStatusesInFiltering.integerValue = Settings.includeStatusesInFilter.asInt
+        dontConfirmRemoveAllMerged.integerValue = Settings.dontAskBeforeWipingMerged.asInt
+        hideUncommentedPrs.integerValue = Settings.hideUncommentedItems.asInt
+        assumeCommentsBeforeMineAreRead.integerValue = Settings.assumeReadItemIfUserHasNewerComments.asInt
+        hideAvatars.integerValue = Settings.hideAvatars.asInt
+        hideAvatarsInNotifications.integerValue = Settings.hideAvatarsInNotifications.asInt
+        hideCountsOnMenubar.integerValue = Settings.hideMenubarCounts.asInt
+        showSeparateApiServersInMenu.integerValue = Settings.showSeparateApiServersInMenu.asInt
+        dontKeepPrsMergedByMe.integerValue = Settings.dontKeepPrsMergedByMe.asInt
+        removeNotificationsWhenItemIsRemoved.integerValue = Settings.removeNotificationsWhenItemIsRemoved.asInt
+        scanClosedAndMergedItems.integerValue = Settings.scanClosedAndMergedItems.asInt
+        grayOutWhenRefreshing.integerValue = Settings.grayOutWhenRefreshing.asInt
+        notifyOnStatusUpdates.integerValue = Settings.notifyOnStatusUpdates.asInt
+        notifyOnStatusUpdatesForAllPrs.integerValue = Settings.notifyOnStatusUpdatesForAllPrs.asInt
+        disableAllCommentNotifications.integerValue = Settings.disableAllCommentNotifications.asInt
+        showAllComments.integerValue = Settings.showCommentsEverywhere.asInt
+        sortingOrder.integerValue = Settings.sortDescending.asInt
+        showCreationDates.integerValue = Settings.showCreatedInsteadOfUpdated.asInt
+        groupByRepo.integerValue = Settings.groupByRepo.asInt
         draftHandlingPolicy.selectItem(at: Settings.draftHandlingPolicy.rawValue)
-        showStatusItems.integerValue = Settings.showStatusItems ? 1 : 0
-        makeStatusItemsSelectable.integerValue = Settings.makeStatusItemsSelectable ? 1 : 0
-        openPrAtFirstUnreadComment.integerValue = Settings.openPrAtFirstUnreadComment ? 1 : 0
-        hidePrsThatDontPass.integerValue = Settings.hidePrsThatArentPassing ? 1 : 0
-        hidePrsThatDontPassOnlyInAll.integerValue = Settings.hidePrsThatDontPassOnlyInAll ? 1 : 0
-        showStatusesForAll.integerValue = Settings.showStatusesOnAllItems ? 1 : 0
-        highlightItemsWithNewCommits.integerValue = Settings.markPrsAsUnreadOnNewCommits ? 1 : 0
-        hideSnoozedItems.integerValue = Settings.hideSnoozedItems ? 1 : 0
-        countSnoozedItems.integerValue = Settings.countVisibleSnoozedItems ? 1 : 0
-        showLabels.integerValue = Settings.showLabels ? 1 : 0
-        showRelativeDates.integerValue = Settings.showRelativeDates ? 1 : 0
-        displayMilestones.integerValue = Settings.showMilestones ? 1 : 0
-        displayNumbersForItems.integerValue = Settings.displayNumbersForItems ? 1 : 0
-        v4ApiSwitch.integerValue = Settings.useV4API ? 1 : 0
-        markUnmergeablePrs.integerValue = Settings.markUnmergeablePrs ? 1 : 0
-        showPrLines.integerValue = Settings.showPrLines ? 1 : 0
-        showRequestedTeamReviews.integerValue = Settings.showRequestedTeamReviews ? 1 : 0
-        showBaseAndHeadBranches.integerValue = Settings.showBaseAndHeadBranches ? 1 : 0
-        showStatusesGreen.integerValue = Settings.showStatusesGreen ? 1 : 0
-        showStatusesYellow.integerValue = Settings.showStatusesYellow ? 1 : 0
-        showStatusesRed.integerValue = Settings.showStatusesRed ? 1 : 0
-        showStatusesNeutral.integerValue = Settings.showStatusesGray ? 1 : 0
+        showStatusItems.integerValue = Settings.showStatusItems.asInt
+        makeStatusItemsSelectable.integerValue = Settings.makeStatusItemsSelectable.asInt
+        openPrAtFirstUnreadComment.integerValue = Settings.openPrAtFirstUnreadComment.asInt
+        hidePrsThatDontPass.integerValue = Settings.hidePrsThatArentPassing.asInt
+        hidePrsThatDontPassOnlyInAll.integerValue = Settings.hidePrsThatDontPassOnlyInAll.asInt
+        showStatusesForAll.integerValue = Settings.showStatusesOnAllItems.asInt
+        highlightItemsWithNewCommits.integerValue = Settings.markPrsAsUnreadOnNewCommits.asInt
+        hideSnoozedItems.integerValue = Settings.hideSnoozedItems.asInt
+        countSnoozedItems.integerValue = Settings.countVisibleSnoozedItems.asInt
+        showLabels.integerValue = Settings.showLabels.asInt
+        showRelativeDates.integerValue = Settings.showRelativeDates.asInt
+        displayMilestones.integerValue = Settings.showMilestones.asInt
+        displayNumbersForItems.integerValue = Settings.displayNumbersForItems.asInt
+        v4ApiSwitch.integerValue = Settings.useV4API.asInt
+        markUnmergeablePrs.integerValue = Settings.markUnmergeablePrs.asInt
+        showPrLines.integerValue = Settings.showPrLines.asInt
+        showRequestedTeamReviews.integerValue = Settings.showRequestedTeamReviews.asInt
+        showBaseAndHeadBranches.integerValue = Settings.showBaseAndHeadBranches.asInt
+        showStatusesGreen.integerValue = Settings.showStatusesGreen.asInt
+        showStatusesYellow.integerValue = Settings.showStatusesYellow.asInt
+        showStatusesRed.integerValue = Settings.showStatusesRed.asInt
+        showStatusesNeutral.integerValue = Settings.showStatusesGray.asInt
 
-        autoHidePrsIApproved.integerValue = Settings.autoHidePrsIApproved ? 1 : 0
-        autoHidePrsIRejected.integerValue = Settings.autoHidePrsIRejected ? 1 : 0
+        autoHidePrsIApproved.integerValue = Settings.autoHidePrsIApproved.asInt
+        autoHidePrsIRejected.integerValue = Settings.autoHidePrsIRejected.asInt
         
         autoRemoveMergedItems.integerValue = Settings.autoRemoveMergedItems
         autoRemoveClosedItems.integerValue = Settings.autoRemoveClosedItems
@@ -673,21 +673,21 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         defaultOpenApp.stringValue = Settings.defaultAppForOpeningItems
         defaultOpenLinks.stringValue = Settings.defaultAppForOpeningWeb
 
-        notifyOnItemReactions.integerValue = Settings.notifyOnItemReactions ? 1 : 0
-        notifyOnCommentReactions.integerValue = Settings.notifyOnCommentReactions ? 1 : 0
+        notifyOnItemReactions.integerValue = Settings.notifyOnItemReactions.asInt
+        notifyOnCommentReactions.integerValue = Settings.notifyOnCommentReactions.asInt
 
-        supportReviews.integerValue = Settings.displayReviewsOnItems ? 1 : 0
-        notifyOnReviewAssignments.integerValue = Settings.notifyOnReviewAssignments ? 1 : 0
+        supportReviews.integerValue = Settings.displayReviewsOnItems.asInt
+        notifyOnReviewAssignments.integerValue = Settings.notifyOnReviewAssignments.asInt
 
         newMentionMovePolicy.selectItem(at: Settings.newMentionMovePolicy.movePolicyMenuIndex)
         teamMentionMovePolicy.selectItem(at: Settings.teamMentionMovePolicy.movePolicyMenuIndex)
         newItemInOwnedRepoMovePolicy.selectItem(at: Settings.newItemInOwnedRepoMovePolicy.movePolicyMenuIndex)
 
-        hotkeyEnable.integerValue = Settings.hotkeyEnable ? 1 : 0
-        hotkeyControlModifier.integerValue = Settings.hotkeyControlModifier ? 1 : 0
-        hotkeyCommandModifier.integerValue = Settings.hotkeyCommandModifier ? 1 : 0
-        hotkeyOptionModifier.integerValue = Settings.hotkeyOptionModifier ? 1 : 0
-        hotkeyShiftModifier.integerValue = Settings.hotkeyShiftModifier ? 1 : 0
+        hotkeyEnable.integerValue = Settings.hotkeyEnable.asInt
+        hotkeyControlModifier.integerValue = Settings.hotkeyControlModifier.asInt
+        hotkeyCommandModifier.integerValue = Settings.hotkeyCommandModifier.asInt
+        hotkeyOptionModifier.integerValue = Settings.hotkeyOptionModifier.asInt
+        hotkeyShiftModifier.integerValue = Settings.hotkeyShiftModifier.asInt
 
         let assignedDirectMenuIndex = Settings.assignedDirectReviewHandlingPolicy.assignmentPolictMenuIndex
         assignedDirectReviewHandlingPolicy.select(assignedDirectReviewHandlingPolicy.item(at: assignedDirectMenuIndex))
@@ -1245,7 +1245,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         checkForUpdatesSelector.isHidden = !setting
 
         checkForUpdatesSelector.integerValue = interval
-        checkForUpdatesAutomatically.integerValue = setting ? 1 : 0
+        checkForUpdatesAutomatically.integerValue = setting.asInt
         checkForUpdatesLabel.stringValue = interval < 2 ? "Check every hour" : "Check every \(interval) hours"
     }
 
@@ -1372,7 +1372,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     }
 
     @objc private func updateImportExportSettings() {
-        repeatLastExportAutomatically.integerValue = Settings.autoRepeatSettingsExport ? 1 : 0
+        repeatLastExportAutomatically.integerValue = Settings.autoRepeatSettingsExport.asInt
         if let lastExportDate = Settings.lastExportDate, let fileName = Settings.lastExportUrl?.absoluteString, let unescapedName = fileName.removingPercentEncoding {
             let time = itemDateFormatter.string(from: lastExportDate)
             lastExportReport.stringValue = "Last exported \(time) to \(unescapedName)"
@@ -1532,7 +1532,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         apiServerSelectedBox.title = selectedServer.label ?? "New Server"
         apiServerTestButton.isEnabled = !selectedServer.authToken.isEmpty
         apiServerDeleteButton.isEnabled = (ApiServer.countApiServers(in: DataManager.main) > 1)
-        apiServerReportError.integerValue = selectedServer.reportRefreshFailures ? 1 : 0
+        apiServerReportError.integerValue = selectedServer.reportRefreshFailures.asInt
     }
 
     private func storeApiFormToSelectedServer() {
@@ -1939,16 +1939,16 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
                 snoozeDateTimeMinute.isEnabled = true
                 snoozeDateTimeHour.isEnabled = true
                 snoozeDateTimeDay.isEnabled = true
-                snoozeDateTimeMinute.selectItem(at: Int(selectedSnoozePreset.minute))
-                snoozeDateTimeHour.selectItem(at: Int(selectedSnoozePreset.hour))
-                snoozeDateTimeDay.selectItem(at: Int(selectedSnoozePreset.day))
+                snoozeDateTimeMinute.selectItem(at: selectedSnoozePreset.minute)
+                snoozeDateTimeHour.selectItem(at: selectedSnoozePreset.hour)
+                snoozeDateTimeDay.selectItem(at: selectedSnoozePreset.day)
             }
             snoozeWakeOnComment.isEnabled = true
-            snoozeWakeOnComment.integerValue = selectedSnoozePreset.wakeOnComment ? 1 : 0
+            snoozeWakeOnComment.integerValue = selectedSnoozePreset.wakeOnComment.asInt
             snoozeWakeOnMention.isEnabled = true
-            snoozeWakeOnMention.integerValue = selectedSnoozePreset.wakeOnMention ? 1 : 0
+            snoozeWakeOnMention.integerValue = selectedSnoozePreset.wakeOnMention.asInt
             snoozeWakeOnStatusUpdate.isEnabled = true
-            snoozeWakeOnStatusUpdate.integerValue = selectedSnoozePreset.wakeOnStatusChange ? 1 : 0
+            snoozeWakeOnStatusUpdate.integerValue = selectedSnoozePreset.wakeOnStatusChange.asInt
             snoozeWakeLabel.textColor = .controlTextColor
             snoozeTypeDuration.isEnabled = true
             snoozeTypeDateTime.isEnabled = true

@@ -1,5 +1,11 @@
 import Foundation
 
+extension Bool {
+    var asInt: Int {
+        self ? 1 : 0
+    }
+}
+
 enum Section: CaseIterable, Equatable {
     enum HidingCause {
         case unknown, approvedByMe, rejectedByMe, hidingAllMyAuthoredItems,

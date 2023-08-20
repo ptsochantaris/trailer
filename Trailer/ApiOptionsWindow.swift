@@ -40,12 +40,12 @@ final class ApiOptionsWindow: NSWindow, NSWindowDelegate {
     }
 
     private func updateUI() {
-        threadCheckbox.integerValue = Settings.threadedSync ? 1 : 0
+        threadCheckbox.integerValue = Settings.threadedSync.asInt
         let profile = Settings.syncProfile
-        highRadio.integerValue = profile == .high ? 1 : 0
-        moderateRadio.integerValue = profile == .moderate ? 1 : 0
-        lightRadio.integerValue = profile == .cautious ? 1 : 0
-        safeRadio.integerValue = profile == .light ? 1 : 0
+        highRadio.integerValue = (profile == .high).asInt
+        moderateRadio.integerValue = (profile == .moderate).asInt
+        lightRadio.integerValue = (profile == .cautious).asInt
+        safeRadio.integerValue = (profile == .light).asInt
 
         updateMigrationStatus()
     }

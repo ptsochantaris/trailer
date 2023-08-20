@@ -38,11 +38,11 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
         syncAuthoredPrs.toolTip = Settings.queryAuthoredPRsHelp
         syncAuthoredIssues.toolTip = Settings.queryAuthoredIssuesHelp
 
-        autoAddRepos.integerValue = Settings.automaticallyAddNewReposFromWatchlist ? 1 : 0
-        autoRemoveRepos.integerValue = Settings.automaticallyRemoveDeletedReposFromWatchlist ? 1 : 0
-        hideArchivedRepos.integerValue = Settings.hideArchivedRepos ? 1 : 0
-        syncAuthoredPrs.integerValue = Settings.queryAuthoredPRs ? 1 : 0
-        syncAuthoredIssues.integerValue = Settings.queryAuthoredIssues ? 1 : 0
+        autoAddRepos.integerValue = Settings.automaticallyAddNewReposFromWatchlist.asInt
+        autoRemoveRepos.integerValue = Settings.automaticallyRemoveDeletedReposFromWatchlist.asInt
+        hideArchivedRepos.integerValue = Settings.hideArchivedRepos.asInt
+        syncAuthoredPrs.integerValue = Settings.queryAuthoredPRs.asInt
+        syncAuthoredIssues.integerValue = Settings.queryAuthoredIssues.asInt
 
         newRepoCheckChanged(nil)
 
