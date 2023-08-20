@@ -218,19 +218,12 @@ final class PullRequest: ListableItem {
     func checkAndStoreReviewAssignments(_ reviewerNames: Set<String>, _ reviewerTeams: Set<String>) {
         reviewers = reviewerNames.joined(separator: ",")
         teamReviewers = reviewerTeams.joined(separator: ",")
-
-        if reviewerNames.isEmpty {
-            setAssignedReviewStatus(to: .none)
-            return
-        }
-
+        
         if reviewerNames.contains(apiServer.userName.orEmpty) {
             setAssignedReviewStatus(to: .me)
-            return
-        }
-
-        let myTeamNames = apiServer.teams.compactMap(\.slug)
-        if myTeamNames.contains(where: { reviewerTeams.contains($0) }) {
+        } else if reviewerTeams.isEmpty {
+            setAssignedReviewStatus(to: .none)
+        } else if apiServer.teams.compactMap(\.slug).contains(where: { reviewerTeams.contains($0) }) {
             setAssignedReviewStatus(to: .myTeam)
         } else {
             setAssignedReviewStatus(to: .others)
