@@ -663,6 +663,9 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
 
         autoHidePrsIApproved.integerValue = Settings.autoHidePrsIApproved ? 1 : 0
         autoHidePrsIRejected.integerValue = Settings.autoHidePrsIRejected ? 1 : 0
+        
+        autoRemoveMergedItems.integerValue = Settings.autoRemoveMergedItems
+        autoRemoveClosedItems.integerValue = Settings.autoRemoveClosedItems
 
         assignedItemDirectHandlingPolicy.selectItem(at: Settings.assignedItemDirectHandlingPolicy.assignmentPolictMenuIndex)
         assignedItemTeamHandlingPolicy.selectItem(at: Settings.assignedItemTeamHandlingPolicy.assignmentPolictMenuIndex)
