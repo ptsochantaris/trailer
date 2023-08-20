@@ -44,11 +44,11 @@ extension API {
 
         var steps: SyncSteps = [.comments]
 
-        if shouldSyncReviewAssignments {
+        if Settings.cache.shouldSyncReviewAssignments {
             steps.insert(.reviewRequests)
         }
 
-        if shouldSyncReviews {
+        if Settings.cache.shouldSyncReviews {
             steps.insert(.reviews)
         } else {
             for r in Review.allItems(in: moc) {

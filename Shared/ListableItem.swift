@@ -9,49 +9,6 @@ import TrailerQL
     import Cocoa
 #endif
 
-struct SettingsCache {
-    let excludedLabels = Set(Settings.labelBlacklist.map(\.comparableForm))
-    let excludedAuthors = Set(Settings.itemAuthorBlacklist.map(\.comparableForm))
-    let excludedCommentAuthors = Set(Settings.commentAuthorBlacklist.map(\.comparableForm))
-    let assumeReadItemIfUserHasNewerComments = Settings.assumeReadItemIfUserHasNewerComments
-    let hideUncommentedItems = Settings.hideUncommentedItems
-    let shouldSyncReviews = API.shouldSyncReviews
-    let shouldSyncReviewAssignments = API.shouldSyncReviewAssignments
-    let notifyOnItemReactions = Settings.notifyOnItemReactions
-    let notifyOnCommentReactions = Settings.notifyOnCommentReactions
-    let notifyOnStatusUpdates = Settings.notifyOnStatusUpdates
-    let shouldHideDrafts = Settings.draftHandlingPolicy == .hide
-    let autoRemoveClosedItems = Settings.autoRemoveClosedItems
-    let autoRemoveMergedItems = Settings.autoRemoveMergedItems
-    let notifyOnStatusUpdatesForAllPrs = Settings.notifyOnStatusUpdatesForAllPrs
-    let hidePrsIfApproved = Settings.autoHidePrsIApproved
-    let hidePrsIfRejected = Settings.autoHidePrsIRejected
-    let preferredMovePolicySection = Settings.newMentionMovePolicy.preferredSection
-    let preferredTeamMentionPolicy = Settings.teamMentionMovePolicy.preferredSection
-    let newItemInOwnedRepoMovePolicy = Settings.newItemInOwnedRepoMovePolicy.preferredSection
-    let assignedItemDirectHandlingPolicy = Settings.assignedItemDirectHandlingPolicy
-    let assignedItemTeamHandlingPolicy = Settings.assignedItemTeamHandlingPolicy
-    let notifyOnAllReviewChangeRequests = Settings.notifyOnAllReviewChangeRequests
-    let notifyOnAllReviewAcceptances = Settings.notifyOnAllReviewAcceptances
-    let notifyOnAllReviewDismissals = Settings.notifyOnAllReviewDismissals
-    let notifyOnReviewChangeRequests = Settings.notifyOnReviewChangeRequests
-    let notifyOnReviewAcceptances = Settings.notifyOnReviewAcceptances
-    let notifyOnReviewDismissals = Settings.notifyOnReviewDismissals
-    let autoSnoozeDuration = TimeInterval(Settings.autoSnoozeDuration)
-    let hidePrsThatArentPassing = Settings.hidePrsThatArentPassing
-    let hidePrsThatDontPassOnlyInAll = Settings.hidePrsThatDontPassOnlyInAll
-    
-    let statusRed = Settings.showStatusesRed
-    let statusYellow = Settings.showStatusesYellow
-    let statusGreen = Settings.showStatusesGreen
-    let statusGray = Settings.showStatusesGray
-    let statusMode = Settings.statusFilteringMode
-    let statusTerms = Settings.statusFilteringTerms
-    
-    let makeStatusItemsSelectable = Settings.makeStatusItemsSelectable
-    let hideAvatars = Settings.hideAvatars
-}
-
 protocol Listable: Querying {
     var section: Section { get }
     var sectionIndex: Int { get }
@@ -294,7 +251,7 @@ class ListableItem: DataItem, Listable {
 
     private static func hideFromNotifications(uri: String) {
         Task {
-            if Settings.removeNotificationsWhenItemIsRemoved {
+            if Settings.cache.removeNotificationsWhenItemIsRemoved {
                 await NotificationManager.shared.removeRelatedNotifications(for: uri)
             }
         }
@@ -369,13 +326,11 @@ class ListableItem: DataItem, Listable {
             return true
 
         case .mineAndParticipated:
-            let context = SettingsCache()
-            let preConditionSection = preferredSection(takingItemConditionIntoAccount: false, context: context)
+            let preConditionSection = preferredSection(takingItemConditionIntoAccount: false)
             return preConditionSection == .mine || preConditionSection == .participated
 
         case .mine:
-            let context = SettingsCache()
-            let preConditionSection = preferredSection(takingItemConditionIntoAccount: false, context: context)
+            let preConditionSection = preferredSection(takingItemConditionIntoAccount: false)
             return preConditionSection == .mine
 
         case .nothing:
@@ -387,16 +342,16 @@ class ListableItem: DataItem, Listable {
         isSnoozing || muted
     }
 
-    final func shouldGo(to section: Section, context: SettingsCache) -> Bool {
+    final func shouldGo(to section: Section) -> Bool {
         switch AssignmentStatus(rawValue: assignedStatus) {
         case nil, .none?, .others:
             return false
 
         case .me:
-            return section == context.assignedItemDirectHandlingPolicy
+            return section == Settings.cache.assignedItemDirectHandlingPolicy
 
         case .myTeam:
-            return section == context.assignedItemTeamHandlingPolicy
+            return section == Settings.cache.assignedItemTeamHandlingPolicy
         }
     }
 
@@ -448,9 +403,9 @@ class ListableItem: DataItem, Listable {
         postProcess() // make sure it's in the right section and updated correctly for its new status
     }
 
-    private final func shouldMoveToSnoozing(context: SettingsCache) -> Bool {
+    private final func shouldMoveToSnoozing() -> Bool {
         if snoozeUntil == nil {
-            let d = context.autoSnoozeDuration
+            let d = Settings.cache.autoSnoozeDuration
             if d > 0, !wasAwokenFromSnooze, updatedAt != .distantPast, let snoozeByDate = updatedAt?.addingTimeInterval(86400.0 * d) {
                 if snoozeByDate < Date() {
                     snoozeUntil = autoSnoozeSentinelDate
@@ -504,7 +459,7 @@ class ListableItem: DataItem, Listable {
         nil
     }
 
-    private func preferredSection(takingItemConditionIntoAccount: Bool, context: SettingsCache) -> Section {
+    private func preferredSection(takingItemConditionIntoAccount: Bool) -> Section {
         if takingItemConditionIntoAccount {
             if condition == ItemCondition.merged.rawValue {
                 return .merged
@@ -514,25 +469,27 @@ class ListableItem: DataItem, Listable {
             }
         }
         
-        if shouldMoveToSnoozing(context: context) {
+        if shouldMoveToSnoozing() {
             return .snoozed
         }
 
-        if createdByMe || shouldGo(to: .mine, context: context) {
+        if createdByMe || shouldGo(to: .mine) {
             return .mine
         }
 
-        if shouldGo(to: .participated, context: context) || commentedByMe || reviewedByMe {
+        if shouldGo(to: .participated) || commentedByMe || reviewedByMe {
             return .participated
         }
 
-        if shouldGo(to: .mentioned, context: context) {
+        if shouldGo(to: .mentioned) {
             return .mentioned
         }
 
         if let section = preferredSectionBasedOnReviewAssignment {
             return section
         }
+        
+        let context = Settings.cache
         
         if let section = context.preferredMovePolicySection,
            contains(terms: ["@\(apiServer.userName.orEmpty)"]) {
@@ -552,7 +509,7 @@ class ListableItem: DataItem, Listable {
         return .all
     }
 
-    func canBadge(in targetSection: Section? = nil, context: SettingsCache) -> Bool {
+    func canBadge(in targetSection: Section? = nil) -> Bool {
         let targetSection = targetSection ?? Section(sectionIndex: sectionIndex)
         
         if !targetSection.shouldBadgeComments || muted || postSyncAction == PostSyncAction.isNew.rawValue {
@@ -560,7 +517,7 @@ class ListableItem: DataItem, Listable {
         }
 
         if targetSection == .closed || targetSection == .merged {
-            return preferredSection(takingItemConditionIntoAccount: false, context: context).shouldBadgeComments
+            return preferredSection(takingItemConditionIntoAccount: false).shouldBadgeComments
         }
 
         return true
@@ -598,7 +555,8 @@ class ListableItem: DataItem, Listable {
         return nil
     }
     
-    private func shouldHideBecauseOfBlockedContent(context: SettingsCache) -> Section.HidingCause? {
+    private func shouldHideBecauseOfBlockedContent() -> Section.HidingCause? {
+        let context = Settings.cache
         let excluded = context.excludedLabels
         if !excluded.isEmpty {
             let mine = Set(labels.compactMap { $0.name?.comparableForm })
@@ -618,19 +576,19 @@ class ListableItem: DataItem, Listable {
         return nil
     }
     
-    func shouldHideBecauseOfRedStatuses(in section: Section, context: SettingsCache) -> Section.HidingCause? {
+    func shouldHideBecauseOfRedStatuses(in section: Section) -> Section.HidingCause? {
         nil
     }
     
-    private func shouldHideBecauseOfDraftStatus(context: SettingsCache) -> Section.HidingCause? {
-        if context.shouldHideDrafts, draft {
+    private func shouldHideBecauseOfDraftStatus() -> Section.HidingCause? {
+        if Settings.cache.shouldHideDrafts, draft {
             return .hidingDrafts
         }
         return nil
     }
 
     @discardableResult
-    final func postProcess(context: SettingsCache = SettingsCache()) -> Section {
+    final func postProcess() -> Section {
         if let snoozeUntil, snoozeUntil < Date() { // our snooze-by date is past
             disableSnoozing(explicityAwoke: true)
         }
@@ -640,24 +598,26 @@ class ListableItem: DataItem, Listable {
         }
         
         var targetSection: Section
-        
-        if let cause = shouldHideBecauseOfDraftStatus(context: context)
+
+        if let cause = shouldHideBecauseOfDraftStatus()
             ?? shouldHideBecauseOfRepoHidingPolicy
-            ?? shouldHideDueToMyReview(context: context)
-            ?? shouldHideBecauseOfBlockedContent(context: context) {
+            ?? shouldHideDueToMyReview()
+            ?? shouldHideBecauseOfBlockedContent() {
             targetSection = .hidden(cause: cause)
         } else {
-            targetSection = preferredSection(takingItemConditionIntoAccount: true, context: context)
+            targetSection = preferredSection(takingItemConditionIntoAccount: true)
             
             if targetSection.visible, let cause
                 = shouldHideBecauseOfRepoDisplayPolicy(targetSection: targetSection)
-                ?? shouldHideBecauseOfRedStatuses(in: targetSection, context: context) {
+                ?? shouldHideBecauseOfRedStatuses(in: targetSection) {
                 
                 targetSection = .hidden(cause: cause)
             }
         }
         
-        if canBadge(in: targetSection, context: context) {
+        let context = Settings.cache
+        
+        if canBadge(in: targetSection) {
             var latestDate = latestReadCommentDate ?? .distantPast
 
             if context.assumeReadItemIfUserHasNewerComments {
@@ -668,7 +628,7 @@ class ListableItem: DataItem, Listable {
                 }
                 latestReadCommentDate = latestDate
             }
-            unreadComments = countOthersComments(since: latestDate, context: context)
+            unreadComments = countOthersComments(since: latestDate)
 
         } else {
             catchUpCommentDate()
@@ -679,10 +639,10 @@ class ListableItem: DataItem, Listable {
             if context.hideUncommentedItems, unreadComments == 0 {
                 targetSection = .hidden(cause: .wasUncommented)
             } else {
-                totalComments = countComments(context: context)
-                + (context.notifyOnItemReactions ? countReactions(context: context) : 0)
-                + (context.notifyOnCommentReactions ? countCommentReactions(context: context) : 0)
-                + countReviews(context: context)
+                totalComments = countComments()
+                + (context.notifyOnItemReactions ? countReactions() : 0)
+                + (context.notifyOnCommentReactions ? countCommentReactions() : 0)
+                + countReviews()
             }
         }
 
@@ -691,30 +651,30 @@ class ListableItem: DataItem, Listable {
         return targetSection
     }
 
-    func countReviews(context _: SettingsCache) -> Int {
+    func countReviews() -> Int {
         0
     }
 
-    private func countComments(context: SettingsCache) -> Int {
+    private func countComments() -> Int {
         var count = 0
-        for c in comments where c.shouldContributeToCount(since: .distantPast, context: context) {
+        for c in comments where c.shouldContributeToCount(since: .distantPast) {
             count += 1
         }
         return count
     }
 
-    private func countReactions(context: SettingsCache) -> Int {
+    private func countReactions() -> Int {
         var count = 0
-        for r in reactions where r.shouldContributeToCount(since: .distantPast, context: context) {
+        for r in reactions where r.shouldContributeToCount(since: .distantPast) {
             count += 1
         }
         return count
     }
 
-    private func countCommentReactions(context: SettingsCache) -> Int {
+    private func countCommentReactions() -> Int {
         var count = 0
-        for c in comments where c.shouldContributeToCount(since: .distantPast, context: context) {
-            for r in c.reactions where r.shouldContributeToCount(since: .distantPast, context: context) {
+        for c in comments where c.shouldContributeToCount(since: .distantPast) {
+            for r in c.reactions where r.shouldContributeToCount(since: .distantPast) {
                 count += 1
             }
         }
@@ -729,20 +689,21 @@ class ListableItem: DataItem, Listable {
         comments.filter { !$0.createdByMe && ($0.createdAt ?? .distantPast) > since }
     }
 
-    private final func countOthersComments(since startDate: Date, context: SettingsCache) -> Int {
+    private final func countOthersComments(since startDate: Date) -> Int {
         var count = 0
+        let context = Settings.cache
         for c in comments {
-            if c.shouldContributeToCount(since: startDate, context: context) {
+            if c.shouldContributeToCount(since: startDate) {
                 count += 1
             }
             if context.notifyOnCommentReactions {
-                for r in c.reactions where r.shouldContributeToCount(since: startDate, context: context) {
+                for r in c.reactions where r.shouldContributeToCount(since: startDate) {
                     count += 1
                 }
             }
         }
         if context.notifyOnItemReactions {
-            for r in reactions where r.shouldContributeToCount(since: startDate, context: context) {
+            for r in reactions where r.shouldContributeToCount(since: startDate) {
                 count += 1
             }
         }
@@ -774,7 +735,7 @@ class ListableItem: DataItem, Listable {
         if let title {
             components.append(title)
         }
-        if draft, Settings.draftHandlingPolicy == .display {
+        if draft, Settings.cache.draftHandlingPolicy == .display {
             components.append("draft")
         }
         components.append("\(labels.count) labels:")
@@ -793,7 +754,7 @@ class ListableItem: DataItem, Listable {
     }
 
     final func labelsAttributedString(labelFont: FONT_CLASS) -> NSAttributedString? {
-        if !Settings.showLabels {
+        if !Settings.cache.showLabels {
             return nil
         }
 
@@ -829,7 +790,8 @@ class ListableItem: DataItem, Listable {
             return _title
         }
 
-        if Settings.displayNumbersForItems {
+        let context = Settings.cache
+        if context.displayNumbersForItems {
             let numberAttributes: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: numberColor]
             _title.append(NSAttributedString(string: "#\(number) ", attributes: numberAttributes))
         }
@@ -838,11 +800,11 @@ class ListableItem: DataItem, Listable {
         _title.append(NSAttributedString(string: title, attributes: titleAttributes))
 
         if let p = self as? PullRequest {
-            if Settings.showPrLines, let l = p.linesAttributedString(labelFont: labelFont) {
+            if context.showPrLines, let l = p.linesAttributedString(labelFont: labelFont) {
                 _title.append(NSAttributedString(string: " ", attributes: titleAttributes))
                 _title.append(l)
             }
-            if Settings.markUnmergeablePrs, !p.isMergeable {
+            if context.markUnmergeablePrs, !p.isMergeable {
                 _title.append(NSAttributedString(string: " ", attributes: titleAttributes))
 
                 let font = FONT_CLASS.boldSystemFont(ofSize: labelFont.pointSize - 3)
@@ -851,7 +813,7 @@ class ListableItem: DataItem, Listable {
             }
         }
 
-        if draft, Settings.draftHandlingPolicy == .display {
+        if draft, context.draftHandlingPolicy == .display {
             _title.append(NSAttributedString(string: " ", attributes: titleAttributes))
 
             let font = FONT_CLASS.boldSystemFont(ofSize: labelFont.pointSize - 3)
@@ -866,8 +828,9 @@ class ListableItem: DataItem, Listable {
     var headLabelText: String? { nil }
 
     func subtitle(with font: FONT_CLASS, lightColor: COLOR_CLASS, darkColor: COLOR_CLASS, separator: String) -> NSMutableAttributedString {
+        let context = Settings.cache
         var components = [String]()
-        if Settings.showBaseAndHeadBranches, let baseLabelText, let headLabelText {
+        if context.showBaseAndHeadBranches, let baseLabelText, let headLabelText {
             let splitB = baseLabelText.components(separatedBy: ":")
             let splitH = headLabelText.components(separatedBy: ":")
 
@@ -904,13 +867,13 @@ class ListableItem: DataItem, Listable {
                 components.append(branchH)
             }
 
-        } else if Settings.showReposInName, let repoFullName = repo.fullName {
+        } else if context.showReposInName, let repoFullName = repo.fullName {
             components.append(repoFullName)
         }
 
         var lightComponents = [separator]
 
-        if Settings.showMilestones, let m = milestone, !m.isEmpty {
+        if context.showMilestones, let m = milestone, !m.isEmpty {
             lightComponents.append(m)
             lightComponents.append(separator)
         }
@@ -931,7 +894,7 @@ class ListableItem: DataItem, Listable {
     var accessibleSubtitle: String {
         var components = [String]()
 
-        if Settings.showReposInName {
+        if Settings.cache.showReposInName {
             components.append("Repository: \(repo.fullName.orEmpty)")
         }
 
@@ -945,14 +908,15 @@ class ListableItem: DataItem, Listable {
     }
 
     var displayDate: String {
-        if Settings.showRelativeDates {
-            if Settings.showCreatedInsteadOfUpdated {
+        let context = Settings.cache
+        if context.showRelativeDates {
+            if context.showCreatedInsteadOfUpdated {
                 return agoFormat(prefix: "created", since: createdAt)
             } else {
                 return agoFormat(prefix: "updated", since: updatedAt)
             }
         } else {
-            if Settings.showCreatedInsteadOfUpdated {
+            if context.showCreatedInsteadOfUpdated {
                 return "created " + itemDateFormatter.string(from: createdAt!)
             } else {
                 return "updated " + itemDateFormatter.string(from: updatedAt!)
@@ -1089,7 +1053,8 @@ class ListableItem: DataItem, Listable {
     @MainActor
     static func requestForItems<T: ListableItem>(of itemType: T.Type, withFilter: String?, sectionIndex: Int, criterion: GroupingCriterion? = nil, onlyUnread: Bool = false, excludeSnoozed: Bool = false) -> NSFetchRequest<T> {
         let andPredicates = Lista<NSPredicate>()
-
+        let context = Settings.cache
+        
         if onlyUnread {
             andPredicates.append(itemType.includeInUnreadPredicate)
         }
@@ -1102,7 +1067,7 @@ class ListableItem: DataItem, Listable {
             andPredicates.append(s.matchingPredicate)
         }
 
-        if excludeSnoozed || Settings.hideSnoozedItems {
+        if excludeSnoozed || context.hideSnoozedItems {
             andPredicates.append(Section.snoozed.excludingPredicate)
         }
 
@@ -1148,16 +1113,16 @@ class ListableItem: DataItem, Listable {
                     }
                 }
 
-                if Settings.includeTitlesInFilter { appendPredicate(format: filterTitlePredicate, numeric: false) }
-                if Settings.includeReposInFilter { appendPredicate(format: filterRepoPredicate, numeric: false) }
-                if Settings.includeServersInFilter { appendPredicate(format: filterServerPredicate, numeric: false) }
-                if Settings.includeUsersInFilter { appendPredicate(format: filterUserPredicate, numeric: false) }
-                if Settings.includeNumbersInFilter { appendPredicate(format: filterNumberPredicate, numeric: true) }
-                if Settings.includeMilestonesInFilter { appendPredicate(format: filterMilestonePredicate, numeric: false) }
-                if Settings.includeAssigneeNamesInFilter { appendPredicate(format: filterAssigneePredicate, numeric: false) }
-                if Settings.includeLabelsInFilter { appendPredicate(format: filterLabelPredicate, numeric: false) }
+                if context.includeTitlesInFilter { appendPredicate(format: filterTitlePredicate, numeric: false) }
+                if context.includeReposInFilter { appendPredicate(format: filterRepoPredicate, numeric: false) }
+                if context.includeServersInFilter { appendPredicate(format: filterServerPredicate, numeric: false) }
+                if context.includeUsersInFilter { appendPredicate(format: filterUserPredicate, numeric: false) }
+                if context.includeNumbersInFilter { appendPredicate(format: filterNumberPredicate, numeric: true) }
+                if context.includeMilestonesInFilter { appendPredicate(format: filterMilestonePredicate, numeric: false) }
+                if context.includeAssigneeNamesInFilter { appendPredicate(format: filterAssigneePredicate, numeric: false) }
+                if context.includeLabelsInFilter { appendPredicate(format: filterLabelPredicate, numeric: false) }
                 if itemType == PullRequest.self,
-                   Settings.includeStatusesInFilter { appendPredicate(format: filterStatusPredicate, numeric: false) }
+                   context.includeStatusesInFilter { appendPredicate(format: filterStatusPredicate, numeric: false) }
 
                 if negative {
                     andPredicates.append(NSCompoundPredicate(andPredicateWithSubpredicates: Array(predicates)))
@@ -1169,15 +1134,15 @@ class ListableItem: DataItem, Listable {
 
         let sortDescriptors = Lista<NSSortDescriptor>()
         sortDescriptors.append(NSSortDescriptor(key: "sectionIndex", ascending: true))
-        if Settings.groupByRepo {
+        if context.groupByRepo {
             sortDescriptors.append(NSSortDescriptor(key: "repo.fullName", ascending: true, selector: #selector(NSString.localizedCaseInsensitiveCompare)))
         }
 
-        let fieldName = Settings.sortMethod.field
+        let fieldName = context.sortField
         if fieldName == "title" {
-            sortDescriptors.append(NSSortDescriptor(key: fieldName, ascending: !Settings.sortDescending, selector: #selector(NSString.localizedCaseInsensitiveCompare)))
+            sortDescriptors.append(NSSortDescriptor(key: fieldName, ascending: !context.sortDescending, selector: #selector(NSString.localizedCaseInsensitiveCompare)))
         } else {
-            sortDescriptors.append(NSSortDescriptor(key: fieldName, ascending: !Settings.sortDescending))
+            sortDescriptors.append(NSSortDescriptor(key: fieldName, ascending: !context.sortDescending))
         }
 
         // Logging.log("%@", andPredicates)
@@ -1214,7 +1179,7 @@ class ListableItem: DataItem, Listable {
         }
     }
 
-    func shouldHideDueToMyReview(context: SettingsCache) -> Section.HidingCause? {
+    func shouldHideDueToMyReview() -> Section.HidingCause? {
         nil
     }
 
@@ -1246,7 +1211,7 @@ class ListableItem: DataItem, Listable {
     private final func indexForSpotlight(uri: String) async -> CSSearchableItem {
         let s = CSSearchableItemAttributeSet(itemContentType: "public.text")
 
-        if let userAvatarUrl, !Settings.hideAvatars {
+        if let userAvatarUrl, !Settings.cache.hideAvatars {
             s.thumbnailURL = try? await ImageCache.shared.store(HTTP.avatar(from: userAvatarUrl), from: userAvatarUrl)
         }
 

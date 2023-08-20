@@ -140,22 +140,6 @@ enum API {
         }
     }
 
-    nonisolated static var shouldSyncReactions: Bool {
-        Settings.notifyOnItemReactions || Settings.notifyOnCommentReactions
-    }
-
-    nonisolated static var shouldSyncReviews: Bool {
-        Settings.displayReviewsOnItems || Settings.notifyOnReviewDismissals || Settings.notifyOnReviewAcceptances || Settings.notifyOnReviewChangeRequests || Settings.autoHidePrsIApproved || Settings.autoHidePrsIRejected
-    }
-
-    nonisolated static var shouldSyncReviewAssignments: Bool {
-        Settings.displayReviewsOnItems
-            || Settings.showRequestedTeamReviews
-            || Settings.notifyOnReviewAssignments
-            || (Settings.assignedDirectReviewHandlingPolicy.visible)
-            || (Settings.assignedTeamReviewHandlingPolicy.visible)
-    }
-
     ////////////////////////////////////// API interface
 
     @MainActor

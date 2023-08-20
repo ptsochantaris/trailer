@@ -103,7 +103,7 @@ final class Review: DataItem {
         }
     }
 
-    func shouldContributeToCount(since: Date, context: SettingsCache) -> Bool {
+    func shouldContributeToCount(since: Date) -> Bool {
         guard !isMine,
               let username,
               let createdAt,
@@ -111,14 +111,15 @@ final class Review: DataItem {
         else {
             return false
         }
-        return !context.excludedCommentAuthors.contains(username.comparableForm)
+        return !Settings.cache.excludedCommentAuthors.contains(username.comparableForm)
     }
 
-    func processNotifications(context: SettingsCache) {
-        guard !isMine, pullRequest.canBadge(context: context), let newState = State(rawValue: state.orEmpty) else {
+    func processNotifications() {
+        guard !isMine, pullRequest.canBadge(), let newState = State(rawValue: state.orEmpty) else {
             return
         }
 
+        let context = Settings.cache
         switch newState {
         case .CHANGES_REQUESTED:
             if context.notifyOnAllReviewChangeRequests || (context.notifyOnReviewChangeRequests && pullRequest.createdByMe) {

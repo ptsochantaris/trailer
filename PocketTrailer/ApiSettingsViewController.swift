@@ -65,7 +65,7 @@ final class ApiSettingsViewController: UIViewController, UITextFieldDelegate {
     }
 
     private func updateUI() {
-        let profile = Settings.syncProfile
+        let profile = Settings.cache.syncProfile
         highToggle.isOn = profile == .high
         moderateToggle.isOn = profile == .moderate
         defaultToggle.isOn = profile == .cautious

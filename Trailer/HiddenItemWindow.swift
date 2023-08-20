@@ -31,8 +31,8 @@ final class HiddenItemWindow: NSWindow, NSWindowDelegate {
 
             var hiddenCount = 0
 
-            func report(postProcessContext: SettingsCache, for item: ListableItem) {
-                let section = item.postProcess(context: postProcessContext)
+            func report(for item: ListableItem) {
+                let section = item.postProcess()
                 switch section {
                 case let .hidden(cause):
                     let title = item.title ?? "<no title>"
@@ -52,14 +52,12 @@ final class HiddenItemWindow: NSWindow, NSWindowDelegate {
             await withCheckedContinuation { continuation in
                 let moc = DataManager.main.buildChildContext()
                 moc.perform {
-                    let postProcessContext = SettingsCache()
-
                     for p in PullRequest.allItems(in: moc, prefetchRelationships: ["comments", "reactions", "reviews"]) {
-                        report(postProcessContext: postProcessContext, for: p)
+                        report(for: p)
                     }
 
                     for i in Issue.allItems(in: moc, prefetchRelationships: ["comments", "reactions"]) {
-                        report(postProcessContext: postProcessContext, for: i)
+                        report(for: i)
                     }
 
                     continuation.resume()

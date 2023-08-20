@@ -197,7 +197,7 @@ enum GraphQL {
     }
 
     private static func commentGroup(for typeName: String) -> Group {
-        Group("comments", paging: Settings.syncProfile.largePageSize) {
+        Group("comments", paging: Settings.cache.syncProfile.largePageSize) {
             Fragment(on: typeName) {
                 Field.id
                 Field("body")
@@ -401,8 +401,8 @@ enum GraphQL {
             }
         }
 
-        try await process(name: steps.toString, items: items, parentType: T.self, maxCost: Settings.syncProfile.itemAccompanyingBatchCount) {
-            let profile = Settings.syncProfile
+        try await process(name: steps.toString, items: items, parentType: T.self, maxCost: Settings.cache.syncProfile.itemAccompanyingBatchCount) {
+            let profile = Settings.cache.syncProfile
             Fragment(on: typeName) {
                 Field.id
 
@@ -487,10 +487,10 @@ enum GraphQL {
     }
 
     static func updateReactions(for comments: [PRComment]) async throws {
-        try await process(name: "Comment Reactions", items: comments, maxCost: Settings.syncProfile.itemAccompanyingBatchCount) {
+        try await process(name: "Comment Reactions", items: comments, maxCost: Settings.cache.syncProfile.itemAccompanyingBatchCount) {
             Fragment(on: "IssueComment") {
                 Field.id
-                Group("reactions", paging: Settings.syncProfile.largePageSize) {
+                Group("reactions", paging: Settings.cache.syncProfile.largePageSize) {
                     Fragment(on: "Reaction") {
                         Field.id
                         Field("content")
@@ -503,7 +503,7 @@ enum GraphQL {
     }
 
     static func updateComments(for reviews: [Review]) async throws {
-        try await process(name: "Review Comments", items: reviews, maxCost: Settings.syncProfile.itemAccompanyingBatchCount) {
+        try await process(name: "Review Comments", items: reviews, maxCost: Settings.cache.syncProfile.itemAccompanyingBatchCount) {
             Fragment(on: "PullRequestReview") {
                 Field.id
                 commentGroup(for: "PullRequestReviewComment")
@@ -587,7 +587,7 @@ enum GraphQL {
             Field("url")
             Group("milestone") { milestoneFragment }
             authorGroup
-            let profile = Settings.syncProfile
+            let profile = Settings.cache.syncProfile
             Group("assignees", paging: profile.smallPageSize) { userFragment }
             Group("labels", paging: profile.smallPageSize) { labelFragment }
             Field("headRefOid")
@@ -618,8 +618,8 @@ enum GraphQL {
             Field("url")
             Group("milestone") { milestoneFragment }
             authorGroup
-            Group("assignees", paging: Settings.syncProfile.smallPageSize) { userFragment }
-            Group("labels", paging: Settings.syncProfile.smallPageSize) { labelFragment }
+            Group("assignees", paging: Settings.cache.syncProfile.smallPageSize) { userFragment }
+            Group("labels", paging: Settings.cache.syncProfile.smallPageSize) { labelFragment }
             if includeRepo {
                 Group("repository") { repositoryFragment }
             }
@@ -630,7 +630,7 @@ enum GraphQL {
         await withTaskGroup(of: Void.self) { group in
             for server in servers {
                 if Settings.queryAuthoredPRs {
-                    let g = Group("pullRequests", ("states", "[OPEN]"), paging: Settings.syncProfile.mediumPageSize) {
+                    let g = Group("pullRequests", ("states", "[OPEN]"), paging: Settings.cache.syncProfile.mediumPageSize) {
                         prFragment(includeRepo: true)
                     }
                     group.addTask { @MainActor in
@@ -725,28 +725,28 @@ enum GraphQL {
 
     private static var latestPrsFragment = Fragment(on: "Repository") {
         Field.id
-        Group("pullRequests", ("orderBy", "{direction: DESC, field: UPDATED_AT}"), paging: Settings.syncProfile.smallPageSize) {
+        Group("pullRequests", ("orderBy", "{direction: DESC, field: UPDATED_AT}"), paging: Settings.cache.syncProfile.smallPageSize) {
             prFragment(includeRepo: false)
         }
     }
 
     private static var latestIssuesFragment = Fragment(on: "Repository") {
         Field.id
-        Group("issues", ("orderBy", "{direction: DESC, field: UPDATED_AT}"), paging: Settings.syncProfile.smallPageSize) {
+        Group("issues", ("orderBy", "{direction: DESC, field: UPDATED_AT}"), paging: Settings.cache.syncProfile.smallPageSize) {
             issueFragment(includeRepo: false)
         }
     }
 
     private static var allOpenPrsFragment = Fragment(on: "Repository") {
         Field.id
-        Group("pullRequests", ("states", "[OPEN]"), paging: Settings.syncProfile.mediumPageSize) {
+        Group("pullRequests", ("states", "[OPEN]"), paging: Settings.cache.syncProfile.mediumPageSize) {
             prFragment(includeRepo: false)
         }
     }
 
     private static var allOpenIssuesFragment = Fragment(on: "Repository") {
         Field.id
-        Group("issues", ("states", "[OPEN]"), paging: Settings.syncProfile.largePageSize) {
+        Group("issues", ("states", "[OPEN]"), paging: Settings.cache.syncProfile.largePageSize) {
             issueFragment(includeRepo: false)
         }
     }
@@ -800,12 +800,12 @@ enum GraphQL {
             }
 
             if idsForReposInThisServerWantingLatestPrs.count > 0 {
-                let q = Query.batching("\(serverLabel): Updated PRs", groupName: "nodes", idList: idsForReposInThisServerWantingLatestPrs, maxCost: Settings.syncProfile.itemIncrementalBatchCost, perNode: perNodeBlock) { latestPrsFragment }
+                let q = Query.batching("\(serverLabel): Updated PRs", groupName: "nodes", idList: idsForReposInThisServerWantingLatestPrs, maxCost: Settings.cache.syncProfile.itemIncrementalBatchCost, perNode: perNodeBlock) { latestPrsFragment }
                 queriesForServer.append(contentsOf: q)
             }
 
             if idsForReposInThisServerWantingAllOpenPrs.count > 0 {
-                let q = Query.batching("\(serverLabel): Open PRs", groupName: "nodes", idList: idsForReposInThisServerWantingAllOpenPrs, maxCost: Settings.syncProfile.itemInitialBatchCost, perNode: perNodeBlock) { allOpenPrsFragment }
+                let q = Query.batching("\(serverLabel): Open PRs", groupName: "nodes", idList: idsForReposInThisServerWantingAllOpenPrs, maxCost: Settings.cache.syncProfile.itemInitialBatchCost, perNode: perNodeBlock) { allOpenPrsFragment }
                 queriesForServer.append(contentsOf: q)
             }
 
@@ -867,12 +867,12 @@ enum GraphQL {
             }
 
             if idsForReposInThisServerWantingLatestIssues.count > 0 {
-                let q = Query.batching("\(serverLabel): Updated Issues", groupName: "nodes", idList: idsForReposInThisServerWantingLatestIssues, maxCost: Settings.syncProfile.itemIncrementalBatchCost, perNode: perNodeBlock) { latestIssuesFragment }
+                let q = Query.batching("\(serverLabel): Updated Issues", groupName: "nodes", idList: idsForReposInThisServerWantingLatestIssues, maxCost: Settings.cache.syncProfile.itemIncrementalBatchCost, perNode: perNodeBlock) { latestIssuesFragment }
                 queriesForServer.append(contentsOf: q)
             }
 
             if idsForReposInThisServerWantingAllOpenIssues.count > 0 {
-                let q = Query.batching("\(serverLabel): Open Issues", groupName: "nodes", idList: idsForReposInThisServerWantingAllOpenIssues, maxCost: Settings.syncProfile.itemInitialBatchCost, perNode: perNodeBlock) { allOpenIssuesFragment }
+                let q = Query.batching("\(serverLabel): Open Issues", groupName: "nodes", idList: idsForReposInThisServerWantingAllOpenIssues, maxCost: Settings.cache.syncProfile.itemInitialBatchCost, perNode: perNodeBlock) { allOpenIssuesFragment }
                 queriesForServer.append(contentsOf: q)
             }
 

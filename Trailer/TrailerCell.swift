@@ -22,7 +22,7 @@ final class TrailerCell: NSTableCellView {
     private let subtitle = CenterTextField(frame: .zero)
     private var trackingArea: NSTrackingArea?
 
-    init(item: ListableItem, context: SettingsCache) {
+    init(item: ListableItem) {
         dataItemId = item.objectID
 
         super.init(frame: .zero)
@@ -34,6 +34,7 @@ final class TrailerCell: NSTableCellView {
         let showUnpin = item.condition != ItemCondition.open.rawValue
         if showUnpin { W -= REMOVE_BUTTON_WIDTH } else { W -= 4 }
 
+        let context = Settings.cache
         let showAvatar = !context.hideAvatars
         let shift: CGFloat = showAvatar ? AVATAR_SIZE + AVATAR_PADDING : -4
         W -= shift
@@ -51,7 +52,7 @@ final class TrailerCell: NSTableCellView {
         }
 
         if let pullRequest = item as? PullRequest, item.section.shouldListStatuses {
-            let statuses = pullRequest.displayedStatusLines(context: context).reversed()
+            let statuses = pullRequest.displayedStatusLines.reversed()
             if !statuses.isEmpty {
                 for status in statuses {
                     let statusLabel = LinkField(frame: .zero)

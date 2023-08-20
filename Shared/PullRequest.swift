@@ -157,7 +157,7 @@ final class PullRequest: ListableItem {
         return nil
     }
 
-    func shouldContributeToCount(since: Date, context: SettingsCache) -> Bool {
+    func shouldContributeToCount(since: Date) -> Bool {
         guard !createdByMe,
               let userLogin,
               let createdAt,
@@ -165,7 +165,7 @@ final class PullRequest: ListableItem {
         else {
             return false
         }
-        return !context.excludedCommentAuthors.contains(userLogin.comparableForm)
+        return !Settings.cache.excludedCommentAuthors.contains(userLogin.comparableForm)
     }
 
     override var shouldHideBecauseOfRepoHidingPolicy: Section.HidingCause? {
@@ -320,7 +320,8 @@ final class PullRequest: ListableItem {
         headRefName
     }
 
-    override func shouldHideBecauseOfRedStatuses(in section: Section, context: SettingsCache) -> Section.HidingCause? {
+    override func shouldHideBecauseOfRedStatuses(in section: Section) -> Section.HidingCause? {
+        let context = Settings.cache
         guard context.hidePrsThatArentPassing else {
             return nil
         }
@@ -338,7 +339,7 @@ final class PullRequest: ListableItem {
             return nil
         }
         
-        let allSuccesses = displayedStatusLines(context: context).allSatisfy { $0.state == "success" }
+        let allSuccesses = displayedStatusLines.allSatisfy { $0.state == "success" }
 
         guard allSuccesses else {
             return .containsNonGreenStatuses
@@ -347,12 +348,12 @@ final class PullRequest: ListableItem {
         return nil
     }
 
-    override func countReviews(context: SettingsCache) -> Int {
-        guard context.shouldSyncReviews || context.shouldSyncReviewAssignments else {
+    override func countReviews() -> Int {
+        guard Settings.cache.requiresReviewApis else {
             return 0
         }
         var count = 0
-        for r in reviews where r.shouldContributeToCount(since: .distantPast, context: context) {
+        for r in reviews where r.shouldContributeToCount(since: .distantPast) {
             count += 1
         }
         return count
@@ -378,25 +379,14 @@ final class PullRequest: ListableItem {
     }
 
     var displayedStatusLines: [PRStatus] {
-        let red = Settings.showStatusesRed
-        let yellow = Settings.showStatusesYellow
-        let green = Settings.showStatusesGreen
-        let gray = Settings.showStatusesGray
-        let mode = Settings.statusFilteringMode
-        let terms = Settings.statusFilteringTerms
-        return displayedStatuses(red: red, yellow: yellow, green: green, gray: gray, mode: mode, terms: terms)
-    }
-
-    func displayedStatusLines(context: SettingsCache) -> [PRStatus] {
-        displayedStatuses(red: context.statusRed,
-                          yellow: context.statusYellow,
-                          green: context.statusGreen,
-                          gray: context.statusGray,
-                          mode: context.statusMode,
-                          terms: context.statusTerms)
-    }
-    
-    private func displayedStatuses(red: Bool, yellow: Bool, green: Bool, gray: Bool, mode: StatusFilter, terms: [String]) -> [PRStatus] {
+        let context = Settings.cache
+        let red = context.statusRed
+        let yellow = context.statusYellow
+        let green = context.statusGreen
+        let gray = context.statusGray
+        let mode = context.statusMode
+        let terms = context.statusTerms
+        
         var contexts = [String: PRStatus]()
         let filteredStatuses: Set<PRStatus>
         if red, yellow, green, gray {
@@ -452,13 +442,13 @@ final class PullRequest: ListableItem {
         Section(sectionIndex: sectionIndex).prMenuName
     }
 
-    func shouldAnnounceStatus(context: SettingsCache) -> Bool {
-        canBadge(context: context)
-        && (context.notifyOnStatusUpdatesForAllPrs
+    func shouldAnnounceStatus() -> Bool {
+        canBadge()
+        && (Settings.cache.notifyOnStatusUpdatesForAllPrs
             || createdByMe
-            || shouldGo(to: .participated, context: context)
-            || shouldGo(to: .mine, context: context)
-            || shouldGo(to: .mentioned, context: context))
+            || shouldGo(to: .participated)
+            || shouldGo(to: .mine)
+            || shouldGo(to: .mentioned))
     }
 
     func linesAttributedString(labelFont: FONT_CLASS) -> NSAttributedString? {
@@ -491,7 +481,8 @@ final class PullRequest: ListableItem {
         repo.displayPolicyForPrs
     }
 
-    override func shouldHideDueToMyReview(context: SettingsCache) -> Section.HidingCause? {
+    override func shouldHideDueToMyReview() -> Section.HidingCause? {
+        let context = Settings.cache
         let hideIfApproved = context.hidePrsIfApproved
         let hideIfRejected = context.hidePrsIfRejected
 

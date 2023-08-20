@@ -29,6 +29,121 @@ enum MigrationStatus: Int {
 }
 
 enum Settings {
+    private static var _cache: Cache?
+    private static let cacheAccess = DispatchSemaphore(value: 1)
+    
+    static var cache: Cache {
+        cacheAccess.wait()
+        if let _cache {
+            cacheAccess.signal()
+            return _cache
+        }
+        let new = Cache()
+        _cache = new
+        cacheAccess.signal()
+        return new
+    }
+    
+    struct Cache {
+        let excludedLabels = Set(Settings.labelBlacklist.map(\.comparableForm))
+        let excludedAuthors = Set(Settings.itemAuthorBlacklist.map(\.comparableForm))
+        let excludedCommentAuthors = Set(Settings.commentAuthorBlacklist.map(\.comparableForm))
+        let assumeReadItemIfUserHasNewerComments = Settings.assumeReadItemIfUserHasNewerComments
+        let hideUncommentedItems = Settings.hideUncommentedItems
+        let notifyOnItemReactions = Settings.notifyOnItemReactions
+        let notifyOnCommentReactions = Settings.notifyOnCommentReactions
+        let notifyOnStatusUpdates = Settings.notifyOnStatusUpdates
+        let shouldHideDrafts = Settings.draftHandlingPolicy == .hide
+        let autoRemoveClosedItems = Settings.autoRemoveClosedItems
+        let autoRemoveMergedItems = Settings.autoRemoveMergedItems
+        let notifyOnStatusUpdatesForAllPrs = Settings.notifyOnStatusUpdatesForAllPrs
+        let hidePrsIfApproved = Settings.autoHidePrsIApproved
+        let hidePrsIfRejected = Settings.autoHidePrsIRejected
+        let preferredMovePolicySection = Settings.newMentionMovePolicy.preferredSection
+        let preferredTeamMentionPolicy = Settings.teamMentionMovePolicy.preferredSection
+        let newItemInOwnedRepoMovePolicy = Settings.newItemInOwnedRepoMovePolicy.preferredSection
+        let assignedItemDirectHandlingPolicy = Settings.assignedItemDirectHandlingPolicy
+        let assignedItemTeamHandlingPolicy = Settings.assignedItemTeamHandlingPolicy
+        let notifyOnAllReviewChangeRequests = Settings.notifyOnAllReviewChangeRequests
+        let notifyOnAllReviewAcceptances = Settings.notifyOnAllReviewAcceptances
+        let notifyOnAllReviewDismissals = Settings.notifyOnAllReviewDismissals
+        let notifyOnReviewChangeRequests = Settings.notifyOnReviewChangeRequests
+        let notifyOnReviewAcceptances = Settings.notifyOnReviewAcceptances
+        let notifyOnReviewDismissals = Settings.notifyOnReviewDismissals
+        let autoSnoozeDuration = TimeInterval(Settings.autoSnoozeDuration)
+        let hidePrsThatArentPassing = Settings.hidePrsThatArentPassing
+        let hidePrsThatDontPassOnlyInAll = Settings.hidePrsThatDontPassOnlyInAll
+        let notifyOnReviewAssignments = Settings.notifyOnReviewAssignments
+        
+        let showCommentsEverywhere = Settings.showCommentsEverywhere
+        let scanClosedAndMergedItems = Settings.scanClosedAndMergedItems
+        let showStatusesOnAllItems = Settings.showStatusesOnAllItems
+        let showStatusItems = Settings.showStatusItems
+        let syncProfile = Settings.syncProfile
+        let hideSnoozedItems = Settings.hideSnoozedItems
+        let displayNumbersForItems = Settings.displayNumbersForItems
+        let showPrLines = Settings.showPrLines
+        let markUnmergeablePrs = Settings.markUnmergeablePrs
+        let draftHandlingPolicy = Settings.draftHandlingPolicy
+        let showBaseAndHeadBranches = Settings.showBaseAndHeadBranches
+        let showReposInName = Settings.showReposInName
+        let showMilestones = Settings.showMilestones
+        let showRelativeDates = Settings.showRelativeDates
+        let showCreatedInsteadOfUpdated = Settings.showCreatedInsteadOfUpdated
+        
+        let statusRed = Settings.showStatusesRed
+        let statusYellow = Settings.showStatusesYellow
+        let statusGreen = Settings.showStatusesGreen
+        let statusGray = Settings.showStatusesGray
+        let statusMode = Settings.statusFilteringMode
+        let statusTerms = Settings.statusFilteringTerms
+        let markPrsAsUnreadOnNewCommits = Settings.markPrsAsUnreadOnNewCommits
+        let removeNotificationsWhenItemIsRemoved = Settings.removeNotificationsWhenItemIsRemoved
+        
+        let includeTitlesInFilter = Settings.includeTitlesInFilter
+        let includeReposInFilter = Settings.includeReposInFilter
+        let includeServersInFilter = Settings.includeServersInFilter
+        let includeUsersInFilter = Settings.includeUsersInFilter
+        let includeNumbersInFilter = Settings.includeNumbersInFilter
+        let includeMilestonesInFilter = Settings.includeMilestonesInFilter
+        let includeAssigneeNamesInFilter = Settings.includeAssigneeNamesInFilter
+        let includeLabelsInFilter = Settings.includeLabelsInFilter
+        let includeStatusesInFilter = Settings.includeStatusesInFilter
+        let sortDescending = Settings.sortDescending
+        let sortField = Settings.sortMethod.field
+        let groupByRepo = Settings.groupByRepo
+        
+        let makeStatusItemsSelectable = Settings.makeStatusItemsSelectable
+        let hideAvatars = Settings.hideAvatars
+        let showLabels = Settings.showLabels
+        
+        let requiresReviewApis: Bool
+        let shouldSyncReactions: Bool
+        let shouldSyncReviews: Bool
+        let shouldSyncReviewAssignments: Bool
+        
+        init() {
+            Logging.log("(Re)creating settings cache")
+
+            shouldSyncReactions = notifyOnItemReactions || notifyOnCommentReactions
+            
+            shouldSyncReviews = displayReviewsOnItems
+            || notifyOnReviewDismissals
+            || notifyOnReviewAcceptances
+            || notifyOnReviewChangeRequests
+            || autoHidePrsIApproved
+            || autoHidePrsIRejected
+            
+            shouldSyncReviewAssignments = displayReviewsOnItems
+            || showRequestedTeamReviews
+            || notifyOnReviewAssignments
+            || (assignedDirectReviewHandlingPolicy.visible)
+            || (assignedTeamReviewHandlingPolicy.visible)
+            
+            requiresReviewApis = shouldSyncReviews || shouldSyncReviewAssignments
+        }
+    }
+    
     private static let sharedDefaults = UserDefaults(suiteName: "group.Trailer")!
 
     private static var allFields: [String] {
@@ -180,6 +295,10 @@ enum Settings {
             } else {
                 sharedDefaults.removeObject(forKey: key)
             }
+            Logging.log("Invalidating settings cache")
+            cacheAccess.wait()
+            _cache = nil
+            cacheAccess.signal()
 
 #if os(macOS)
             Task { @MainActor in

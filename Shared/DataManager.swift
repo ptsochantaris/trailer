@@ -78,28 +78,28 @@ enum DataManager {
         }
     }
 
-    private static func processCommentAndReviewNotifications(postProcessContext: SettingsCache) async {
+    private static func processCommentAndReviewNotifications() async {
         await runInChild(of: main) { child in
             for c in PRComment.newItems(in: child) {
-                c.processNotifications(postProcessContext: postProcessContext)
+                c.processNotifications()
                 c.postSyncAction = PostSyncAction.doNothing.rawValue
             }
 
             for r in Review.newOrUpdatedItems(in: child) {
-                r.processNotifications(context: postProcessContext)
+                r.processNotifications()
                 r.postSyncAction = PostSyncAction.doNothing.rawValue
             }
         }
     }
 
-    private static func processStatusNotifications(postProcessContext: SettingsCache) async {
+    private static func processStatusNotifications() async {
         await runInChild(of: main) { child in
             let latestStatuses = PRStatus.newItems(in: child)
             var coveredPrs = Set<NSManagedObjectID>()
-            if postProcessContext.notifyOnStatusUpdates {
-                for pr in latestStatuses.map(\.pullRequest) where pr.shouldAnnounceStatus(context: postProcessContext) && !coveredPrs.contains(pr.objectID) {
+            if Settings.cache.notifyOnStatusUpdates {
+                for pr in latestStatuses.map(\.pullRequest) where pr.shouldAnnounceStatus() && !coveredPrs.contains(pr.objectID) {
                     coveredPrs.insert(pr.objectID)
-                    if let s = pr.displayedStatusLines(context: postProcessContext).first {
+                    if let s = pr.displayedStatusLines.first {
                         let displayText = s.descriptionText
                         if pr.lastStatusNotified != displayText, pr.postSyncAction != PostSyncAction.isNew.rawValue {
                             NotificationQueue.add(type: .newStatus, for: s)
@@ -140,23 +140,21 @@ enum DataManager {
     static func sendNotificationsIndexAndSave() async {
         await saveDB() // get IDs
 
-        let postProcessContext = SettingsCache()
-
-        await postProcessAllItems(in: main, postProcessContext: postProcessContext)
+        await postProcessAllItems(in: main)
 
         await processNotificationsForItems(of: PullRequest.self, newNotification: .newPr, reopenedNotification: .prReopened, assignmentNotification: .newPrAssigned)
 
         await processNotificationsForItems(of: Issue.self, newNotification: .newIssue, reopenedNotification: .issueReopened, assignmentNotification: .newIssueAssigned)
 
-        await processCommentAndReviewNotifications(postProcessContext: postProcessContext)
+        await processCommentAndReviewNotifications()
 
-        await processStatusNotifications(postProcessContext: postProcessContext)
+        await processStatusNotifications()
 
         await runInChild(of: main) { child in
             let nothing = PostSyncAction.doNothing.rawValue
 
             for r in Reaction.newOrUpdatedItems(in: child) {
-                r.checkNotifications(context: postProcessContext)
+                r.checkNotifications()
                 r.postSyncAction = nothing
             }
 
@@ -394,7 +392,7 @@ enum DataManager {
         }
     }
 
-    static func postProcessAllItems(in context: NSManagedObjectContext, postProcessContext: SettingsCache = SettingsCache()) async {
+    static func postProcessAllItems(in context: NSManagedObjectContext) async {
         let start = Date()
         let increment = 200
 
@@ -404,7 +402,7 @@ enum DataManager {
                 group.addTask(priority: .high) {
                     await runInChild(of: context) { child in
                         for p in PullRequest.allItems(offset: i, count: increment, in: child, prefetchRelationships: ["comments", "reactions", "reviews"]) {
-                            p.postProcess(context: postProcessContext)
+                            p.postProcess()
                         }
                     }
                 }
@@ -415,7 +413,7 @@ enum DataManager {
                 group.addTask(priority: .high) {
                     await runInChild(of: context) { child in
                         for i in Issue.allItems(offset: i, count: increment, in: child, prefetchRelationships: ["comments", "reactions"]) {
-                            i.postProcess(context: postProcessContext)
+                            i.postProcess()
                         }
                     }
                 }

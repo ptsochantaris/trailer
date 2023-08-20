@@ -50,7 +50,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
     private var currentTabBarSet: TabBarSet?
 
     private var searchTimer: PopTimer!
-    private var context: SettingsCache?
 
     private var pluralNameForItems: String {
         viewingPrs ? "pull requests" : "issues"
@@ -556,8 +555,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
     }
 
     private func updateQuery(newFetchRequest: NSFetchRequest<ListableItem>) {
-        context = nil
-
         if fetchedResultsController == nil || fetchedResultsController?.fetchRequest.entityName != newFetchRequest.entityName {
             let c = NSFetchedResultsController(fetchRequest: newFetchRequest, managedObjectContext: DataManager.main, sectionNameKeyPath: "sectionName", cacheName: nil)
             fetchedResultsController = c
@@ -782,7 +779,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        context = nil
         tableView.reloadData()
     }
 
@@ -797,7 +793,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
         if let o = fetchedResultsController?.object(at: indexPath) {
-            configureCell(cell: cell, withObject: o, context: usedContext)
+            configureCell(cell: cell, withObject: o)
         }
         return cell
     }
@@ -986,7 +982,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
     private var animatedUpdates = false
 
     func controllerWillChangeContent(_: NSFetchedResultsController<NSFetchRequestResult>) {
-        context = nil
         animatedUpdates = UIApplication.shared.applicationState != .background
         sectionsChanged = false
         if animatedUpdates {
@@ -1013,15 +1008,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         sectionsChanged = true
     }
     
-    private var usedContext: SettingsCache {
-        if let context {
-            return context
-        }
-        let used = SettingsCache()
-        context = used
-        return used
-    }
-
     func controller(_: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         guard animatedUpdates else { return }
 
@@ -1036,7 +1022,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
             }
         case .update:
             if let indexPath, let object = anObject as? ListableItem, let cell = tableView.cellForRow(at: indexPath) {
-                configureCell(cell: cell, withObject: object, context: usedContext)
+                configureCell(cell: cell, withObject: object)
             }
         case .move:
             if let indexPath, let newIndexPath {
@@ -1056,15 +1042,14 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         if animatedUpdates {
             tableView.endUpdates()
         } else {
-            context = nil
             tableView.reloadData()
         }
     }
 
-    private func configureCell(cell: UITableViewCell, withObject: ListableItem, context: SettingsCache) {
+    private func configureCell(cell: UITableViewCell, withObject: ListableItem) {
         guard let c = cell as? PRCell else { return }
         if let o = withObject as? PullRequest {
-            c.setPullRequest(pullRequest: o, context: context)
+            c.setPullRequest(pullRequest: o)
         } else if let o = withObject as? Issue {
             c.setIssue(issue: o)
         }
@@ -1145,7 +1130,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         await safeScrollToTop()
         updateQuery(newFetchRequest: itemFetchRequest)
         updateStatus(becauseOfChanges: becauseOfChanges)
-        context = nil
         tableView.reloadData()
     }
 

@@ -4,9 +4,9 @@ extension Section {
     var shouldBadgeComments: Bool {
         switch self {
         case .all:
-            return Settings.showCommentsEverywhere
+            return Settings.cache.showCommentsEverywhere
         case .closed, .merged:
-            return Settings.scanClosedAndMergedItems
+            return Settings.cache.scanClosedAndMergedItems
         case .mentioned, .mine, .participated:
             return true
         case .hidden, .snoozed:
@@ -16,7 +16,7 @@ extension Section {
 
     @MainActor
     var shouldListReactions: Bool {
-        if API.shouldSyncReactions {
+        if Settings.cache.shouldSyncReactions {
             return shouldBadgeComments
         }
         return false
@@ -24,12 +24,12 @@ extension Section {
 
     @MainActor
     var shouldListStatuses: Bool {
-        if !Settings.showStatusItems {
+        if !Settings.cache.showStatusItems {
             return false
         }
         switch self {
         case .all, .closed, .merged:
-            return Settings.showStatusesOnAllItems
+            return Settings.cache.showStatusesOnAllItems
         case .mentioned, .mine, .participated:
             return true
         case .hidden, .snoozed:
@@ -39,16 +39,16 @@ extension Section {
 
     @MainActor
     var shouldCheckStatuses: Bool {
-        if !Settings.showStatusItems {
+        if !Settings.cache.showStatusItems {
             return false
         }
         switch self {
         case .all, .closed, .merged:
-            return Settings.showStatusesOnAllItems
+            return Settings.cache.showStatusesOnAllItems
         case .mentioned, .mine, .participated, .snoozed:
             return true
         case .hidden:
-            return Settings.hidePrsThatArentPassing // if visibility depends on statuses, check for statuses on hidden PRs because they may change
+            return Settings.cache.hidePrsThatArentPassing // if visibility depends on statuses, check for statuses on hidden PRs because they may change
         }
     }
 }

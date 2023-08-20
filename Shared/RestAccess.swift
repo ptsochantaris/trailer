@@ -96,10 +96,11 @@ enum RestAccess {
         }
         var request = URLRequest(url: url)
         var acceptTypes = [String]()
-        if API.shouldSyncReactions {
+        let context = Settings.cache
+        if context.shouldSyncReactions {
             acceptTypes.append("application/vnd.github.squirrel-girl-preview")
         }
-        if API.shouldSyncReviews || API.shouldSyncReviewAssignments, !server.isGitHub {
+        if context.requiresReviewApis, !server.isGitHub {
             acceptTypes.append("application/vnd.github.black-cat-preview+json")
         }
         acceptTypes.append("application/vnd.github.shadow-cat-preview+json") // draft indicators

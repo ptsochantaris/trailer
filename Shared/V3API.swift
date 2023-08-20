@@ -173,14 +173,14 @@ extension API {
                 await detectAssignedPullRequests(for: newOrUpdatedPrs)
             }
 
-            if shouldSyncReviewAssignments {
+            if Settings.cache.shouldSyncReviewAssignments {
                 group.addTask { @MainActor in
                     await fetchReviewAssignmentsForCurrentPullRequests(for: newOrUpdatedPrs)
                 }
             }
 
             await withTaskGroup(of: Void.self) { commentGroup in
-                if shouldSyncReviews {
+                if Settings.cache.shouldSyncReviews {
                     commentGroup.addTask { @MainActor in
                         await fetchReviewsForForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
                         await fetchCommentsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)

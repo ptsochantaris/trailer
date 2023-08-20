@@ -512,7 +512,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
     }
 
     private func showOptionalReviewWarning(previousSync: Bool) {
-        if !previousSync, API.shouldSyncReviews || API.shouldSyncReviewAssignments {
+        if !previousSync, Settings.cache.requiresReviewApis {
             for p in PullRequest.allItems(in: DataManager.main) {
                 p.resetSyncState()
             }
@@ -684,12 +684,12 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
         } else if section == .Reviews {
             switch originalIndex {
             case 0:
-                let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
+                let previousShouldSync = Settings.cache.requiresReviewApis
                 Settings.displayReviewsOnItems = !Settings.displayReviewsOnItems
                 showOptionalReviewWarning(previousSync: previousShouldSync)
 
             case 1:
-                let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
+                let previousShouldSync = Settings.cache.requiresReviewApis
                 Settings.showRequestedTeamReviews = !Settings.showRequestedTeamReviews
                 showOptionalReviewWarning(previousSync: previousShouldSync)
 
@@ -702,7 +702,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
                 performSegue(withIdentifier: "showPicker", sender: v)
 
             case 4:
-                let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
+                let previousShouldSync = Settings.cache.requiresReviewApis
                 Settings.notifyOnReviewChangeRequests = !Settings.notifyOnReviewChangeRequests
                 showOptionalReviewWarning(previousSync: previousShouldSync)
 
@@ -710,7 +710,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
                 Settings.notifyOnAllReviewChangeRequests = !Settings.notifyOnAllReviewChangeRequests
 
             case 6:
-                let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
+                let previousShouldSync = Settings.cache.requiresReviewApis
                 Settings.notifyOnReviewAcceptances = !Settings.notifyOnReviewAcceptances
                 showOptionalReviewWarning(previousSync: previousShouldSync)
 
@@ -718,7 +718,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
                 Settings.notifyOnAllReviewAcceptances = !Settings.notifyOnAllReviewAcceptances
 
             case 8:
-                let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
+                let previousShouldSync = Settings.cache.requiresReviewApis
                 Settings.notifyOnReviewDismissals = !Settings.notifyOnReviewDismissals
                 showOptionalReviewWarning(previousSync: previousShouldSync)
 
@@ -726,7 +726,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
                 Settings.notifyOnAllReviewDismissals = !Settings.notifyOnAllReviewDismissals
 
             case 10:
-                let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
+                let previousShouldSync = Settings.cache.requiresReviewApis
                 Settings.notifyOnReviewAssignments = !Settings.notifyOnReviewAssignments
                 showOptionalReviewWarning(previousSync: previousShouldSync)
 
@@ -956,7 +956,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
             settingsChangedTimer.push()
 
         } else if sip.section == SettingsSection.Reviews.rawValue {
-            let previous = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
+            let previous = Settings.cache.requiresReviewApis
             if sip.row == 2 {
                 Settings.assignedDirectReviewHandlingPolicy = Section(assignmentPolicyMenuIndex: didSelectIndexPath.row)
             } else if sip.row == 3 {
@@ -965,7 +965,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
             showOptionalReviewWarning(previousSync: previous)
 
         } else if sip.section == SettingsSection.Reactions.rawValue {
-            let previous = API.shouldSyncReactions
+            let previous = Settings.cache.shouldSyncReactions
             Settings.reactionScanningBatchSize = didSelectIndexPath.row + 1
             showOptionalReviewWarning(previousSync: previous)
         }

@@ -85,7 +85,7 @@ final class PRCell: UITableViewCell {
 
     private weak var item: ListableItem?
 
-    func setPullRequest(pullRequest: PullRequest, context: SettingsCache) {
+    func setPullRequest(pullRequest: PullRequest) {
         item = pullRequest
 
         let separator = traitCollection.containsTraits(in: compactTraits) ? "\n" : "   "
@@ -114,7 +114,7 @@ final class PRCell: UITableViewCell {
         var statusText: NSMutableAttributedString?
         var totalStatuses = 0
         if pullRequest.section.shouldListStatuses {
-            let statusItems = pullRequest.displayedStatusLines(context: context)
+            let statusItems = pullRequest.displayedStatusLines
             var statusCount = statusItems.count
             totalStatuses = statusCount
             var lineAttributes = statusAttributes
@@ -177,7 +177,7 @@ final class PRCell: UITableViewCell {
         readCount.text = numberFormatter.string(for: _commentsTotal)
         readCount.isHidden = _commentsTotal == 0
 
-        if let p = item as? PullRequest, Settings.markPrsAsUnreadOnNewCommits, p.hasNewCommits {
+        if let p = item as? PullRequest, Settings.cache.markPrsAsUnreadOnNewCommits, p.hasNewCommits {
             unreadCount.isHidden = false
             unreadCount.text = _commentsNew == 0 ? "!" : numberFormatter.string(for: _commentsNew)
         } else {

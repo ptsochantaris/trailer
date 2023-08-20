@@ -291,7 +291,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     private func showOptionalReviewWarning(previousSync: Bool) {
         updateReviewOptions()
 
-        if !previousSync, API.shouldSyncReviews || API.shouldSyncReviewAssignments {
+        if !previousSync, Settings.cache.requiresReviewApis {
             for p in PullRequest.allItems(in: DataManager.main) {
                 p.resetSyncState()
             }
@@ -339,20 +339,20 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     }
 
     @IBAction private func supportReviewsSelected(_ sender: NSButton) {
-        let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
+        let previousShouldSync = Settings.cache.requiresReviewApis
         Settings.displayReviewsOnItems = sender.integerValue == 1
         showOptionalReviewWarning(previousSync: previousShouldSync)
     }
 
     @IBAction private func showRequestedTeamReviewsSelected(_ sender: NSButton) {
-        let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
+        let previousShouldSync = Settings.cache.requiresReviewApis
         Settings.showRequestedTeamReviews = sender.integerValue == 1
         showOptionalReviewWarning(previousSync: previousShouldSync)
         deferredUpdateTimer.push()
     }
 
     @IBAction private func notifyOnChangeRequestsSelected(_ sender: NSButton) {
-        let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
+        let previousShouldSync = Settings.cache.requiresReviewApis
         Settings.notifyOnReviewChangeRequests = sender.integerValue == 1
         showOptionalReviewWarning(previousSync: previousShouldSync)
     }
@@ -362,7 +362,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     }
 
     @IBAction private func notifyOnAcceptancesSelected(_ sender: NSButton) {
-        let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
+        let previousShouldSync = Settings.cache.requiresReviewApis
         Settings.notifyOnReviewAcceptances = sender.integerValue == 1
         showOptionalReviewWarning(previousSync: previousShouldSync)
     }
@@ -372,7 +372,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     }
 
     @IBAction private func notifyOnReviewDismissalsSelected(_ sender: NSButton) {
-        let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
+        let previousShouldSync = Settings.cache.requiresReviewApis
         Settings.notifyOnReviewDismissals = sender.integerValue == 1
         showOptionalReviewWarning(previousSync: previousShouldSync)
     }
@@ -382,7 +382,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     }
 
     private func showOptionalReviewAssignmentWarning(previousSync: Bool) {
-        if !previousSync, API.shouldSyncReviews || API.shouldSyncReviewAssignments {
+        if !previousSync, Settings.cache.requiresReviewApis {
             for p in PullRequest.allItems(in: DataManager.main) {
                 p.resetSyncState()
             }
@@ -395,7 +395,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     }
 
     @IBAction private func notifyOnReviewAssignmentsSelected(_ sender: NSButton) {
-        let previousShouldSync = (API.shouldSyncReviews || API.shouldSyncReviewAssignments)
+        let previousShouldSync = Settings.cache.requiresReviewApis
         Settings.notifyOnReviewAssignments = sender.integerValue == 1
         showOptionalReviewAssignmentWarning(previousSync: previousShouldSync)
     }
@@ -1175,7 +1175,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         let count = Settings.reactionScanningBatchSize
         reactionIntervalStepper.integerValue = count
         reactionIntervalLabel.stringValue = "Re-scan up to \(count) items on every refresh"
-        let enabled = API.shouldSyncReactions
+        let enabled = Settings.cache.shouldSyncReactions
         reactionIntervalStepper.isEnabled = enabled
         reactionIntervalLabel.isEnabled = enabled
         reactionIntervalLabel.textColor = enabled ? NSColor.labelColor : NSColor.disabledControlTextColor
