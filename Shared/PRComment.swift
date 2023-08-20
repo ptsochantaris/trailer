@@ -79,7 +79,7 @@ final class PRComment: DataItem {
         }
     }
 
-    func shouldContributeToCount(since: Date, context: PostProcessContext) -> Bool {
+    func shouldContributeToCount(since: Date, context: SettingsCache) -> Bool {
         guard !createdByMe,
               let userName,
               let createdAt,
@@ -90,8 +90,8 @@ final class PRComment: DataItem {
         return !context.excludedCommentAuthors.contains(userName.comparableForm)
     }
 
-    func processNotifications(postProcessContext: PostProcessContext) {
-        guard !createdByMe, let parent, parent.canBadge else {
+    func processNotifications(postProcessContext: SettingsCache) {
+        guard !createdByMe, let parent, parent.canBadge(context: postProcessContext) else {
             return
         }
 

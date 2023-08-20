@@ -103,7 +103,7 @@ final class Review: DataItem {
         }
     }
 
-    func shouldContributeToCount(since: Date, context: PostProcessContext) -> Bool {
+    func shouldContributeToCount(since: Date, context: SettingsCache) -> Bool {
         guard !isMine,
               let username,
               let createdAt,
@@ -114,22 +114,22 @@ final class Review: DataItem {
         return !context.excludedCommentAuthors.contains(username.comparableForm)
     }
 
-    func processNotifications() {
-        guard !isMine, pullRequest.canBadge, let newState = State(rawValue: state ?? "") else {
+    func processNotifications(context: SettingsCache) {
+        guard !isMine, pullRequest.canBadge(context: context), let newState = State(rawValue: state ?? "") else {
             return
         }
 
         switch newState {
         case .CHANGES_REQUESTED:
-            if Settings.notifyOnAllReviewChangeRequests || (Settings.notifyOnReviewChangeRequests && pullRequest.createdByMe) {
+            if context.notifyOnAllReviewChangeRequests || (context.notifyOnReviewChangeRequests && pullRequest.createdByMe) {
                 NotificationQueue.add(type: .changesRequested, for: self)
             }
         case .APPROVED:
-            if Settings.notifyOnAllReviewAcceptances || (Settings.notifyOnReviewAcceptances && pullRequest.createdByMe) {
+            if context.notifyOnAllReviewAcceptances || (context.notifyOnReviewAcceptances && pullRequest.createdByMe) {
                 NotificationQueue.add(type: .changesApproved, for: self)
             }
         case .DISMISSED:
-            if Settings.notifyOnAllReviewDismissals || (Settings.notifyOnReviewDismissals && pullRequest.createdByMe) {
+            if context.notifyOnAllReviewDismissals || (context.notifyOnReviewDismissals && pullRequest.createdByMe) {
                 NotificationQueue.add(type: .changesDismissed, for: self)
             }
         }

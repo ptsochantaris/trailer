@@ -85,7 +85,7 @@ final class PRCell: UITableViewCell {
 
     private weak var item: ListableItem?
 
-    func setPullRequest(pullRequest: PullRequest) {
+    func setPullRequest(pullRequest: PullRequest, context: PostProcessContext) {
         item = pullRequest
 
         let separator = traitCollection.containsTraits(in: compactTraits) ? "\n" : "   "
@@ -114,7 +114,7 @@ final class PRCell: UITableViewCell {
         var statusText: NSMutableAttributedString?
         var totalStatuses = 0
         if pullRequest.section.shouldListStatuses {
-            let statusItems = pullRequest.displayedStatuses
+            let statusItems = pullRequest.displayedStatusLines(context: context)
             var statusCount = statusItems.count
             totalStatuses = statusCount
             var lineAttributes = statusAttributes

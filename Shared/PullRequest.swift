@@ -157,7 +157,7 @@ final class PullRequest: ListableItem {
         return nil
     }
 
-    func shouldContributeToCount(since: Date, context: PostProcessContext) -> Bool {
+    func shouldContributeToCount(since: Date, context: SettingsCache) -> Bool {
         guard !createdByMe,
               let userLogin,
               let createdAt,
@@ -327,27 +327,34 @@ final class PullRequest: ListableItem {
         headRefName
     }
 
-    override func shouldBeCheckedForRedStatuses(in section: Section) -> [PRStatus]? {
-        guard Settings.hidePrsThatArentPassing else {
+    override func shouldHideBecauseOfRedStatuses(in section: Section, context: SettingsCache) -> Section.HidingCause? {
+        guard context.hidePrsThatArentPassing else {
             return nil
         }
 
         switch section {
         case .all:
-            return displayedStatuses
+            break
 
         case .mine, .participated:
-            if Settings.hidePrsThatDontPassOnlyInAll {
+            if context.hidePrsThatDontPassOnlyInAll {
                 return nil
             }
-            return displayedStatuses
 
         case .closed, .hidden, .mentioned, .merged, .snoozed:
             return nil
         }
+        
+        let allSuccesses = displayedStatusLines(context: context).allSatisfy { $0.state == "success" }
+
+        guard allSuccesses else {
+            return .containsNonGreenStatuses
+        }
+        
+        return nil
     }
 
-    override func countReviews(context: PostProcessContext) -> Int {
+    override func countReviews(context: SettingsCache) -> Int {
         guard context.shouldSyncReviews || context.shouldSyncReviewAssignments else {
             return 0
         }
@@ -377,12 +384,27 @@ final class PullRequest: ListableItem {
         return Array(prs)
     }
 
-    var displayedStatuses: [PRStatus] {
-        var contexts = [String: PRStatus]()
+    var displayedStatusLines: [PRStatus] {
         let red = Settings.showStatusesRed
         let yellow = Settings.showStatusesYellow
         let green = Settings.showStatusesGreen
         let gray = Settings.showStatusesGray
+        let mode = Settings.statusFilteringMode
+        let terms = Settings.statusFilteringTerms
+        return displayedStatuses(red: red, yellow: yellow, green: green, gray: gray, mode: mode, terms: terms)
+    }
+
+    func displayedStatusLines(context: SettingsCache) -> [PRStatus] {
+        displayedStatuses(red: context.statusRed,
+                          yellow: context.statusYellow,
+                          green: context.statusGreen,
+                          gray: context.statusGray,
+                          mode: context.statusMode,
+                          terms: context.statusTerms)
+    }
+    
+    private func displayedStatuses(red: Bool, yellow: Bool, green: Bool, gray: Bool, mode: StatusFilter, terms: [String]) -> [PRStatus] {
+        var contexts = [String: PRStatus]()
         let filteredStatuses: Set<PRStatus>
         if red, yellow, green, gray {
             filteredStatuses = statuses
@@ -410,9 +432,7 @@ final class PullRequest: ListableItem {
 
         var statusList = Array(contexts.values)
 
-        let mode = Settings.statusFilteringMode
         if mode != .all {
-            let terms = Settings.statusFilteringTerms
             if !terms.isEmpty {
                 let inclusive = mode == .include
                 // contains(a) or contains(b) or contains(c)  -vs-  not(contains(a) or contains(b) or contains(c))
@@ -439,8 +459,13 @@ final class PullRequest: ListableItem {
         Section(sectionIndex: sectionIndex).prMenuName
     }
 
-    var shouldAnnounceStatus: Bool {
-        canBadge && (Settings.notifyOnStatusUpdatesForAllPrs || createdByMe || shouldGo(to: .participated) || shouldGo(to: .mine) || shouldGo(to: .mentioned))
+    func shouldAnnounceStatus(context: SettingsCache) -> Bool {
+        canBadge(context: context)
+        && (context.notifyOnStatusUpdatesForAllPrs
+            || createdByMe
+            || shouldGo(to: .participated, context: context)
+            || shouldGo(to: .mine, context: context)
+            || shouldGo(to: .mentioned, context: context))
     }
 
     func linesAttributedString(labelFont: FONT_CLASS) -> NSAttributedString? {
@@ -473,9 +498,9 @@ final class PullRequest: ListableItem {
         repo.displayPolicyForPrs
     }
 
-    override var shouldHideDueToMyReview: Section.HidingCause? {
-        let hideIfApproved = Settings.autoHidePrsIApproved
-        let hideIfRejected = Settings.autoHidePrsIRejected
+    override func shouldHideDueToMyReview(context: SettingsCache) -> Section.HidingCause? {
+        let hideIfApproved = context.hidePrsIfApproved
+        let hideIfRejected = context.hidePrsIfRejected
 
         guard hideIfApproved || hideIfRejected,
               let myName = apiServer.userName,

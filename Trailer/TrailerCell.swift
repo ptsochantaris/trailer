@@ -22,7 +22,7 @@ final class TrailerCell: NSTableCellView {
     private let subtitle = CenterTextField(frame: .zero)
     private var trackingArea: NSTrackingArea?
 
-    init(item: ListableItem) {
+    init(item: ListableItem, context: SettingsCache) {
         dataItemId = item.objectID
 
         super.init(frame: .zero)
@@ -34,7 +34,7 @@ final class TrailerCell: NSTableCellView {
         let showUnpin = item.condition != ItemCondition.open.rawValue
         if showUnpin { W -= REMOVE_BUTTON_WIDTH } else { W -= 4 }
 
-        let showAvatar = !Settings.hideAvatars
+        let showAvatar = !context.hideAvatars
         let shift: CGFloat = showAvatar ? AVATAR_SIZE + AVATAR_PADDING : -4
         W -= shift
 
@@ -51,12 +51,12 @@ final class TrailerCell: NSTableCellView {
         }
 
         if let pullRequest = item as? PullRequest, item.section.shouldListStatuses {
-            let statuses = pullRequest.displayedStatuses.reversed()
+            let statuses = pullRequest.displayedStatusLines(context: context).reversed()
             if !statuses.isEmpty {
                 for status in statuses {
                     let statusLabel = LinkField(frame: .zero)
                     statusLabel.targetUrl = status.targetUrl
-                    statusLabel.needsCommand = !Settings.makeStatusItemsSelectable
+                    statusLabel.needsCommand = !context.makeStatusItemsSelectable
                     statusLabel.attributedStringValue = NSAttributedString(string: status.displayText, attributes: TrailerCell.statusAttributes)
                     statusLabel.textColor = status.colorForDisplay
                     statusLabel.alphaValue = faded ? DISABLED_FADE : 1.0

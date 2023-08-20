@@ -3,7 +3,7 @@ import Foundation
 enum Section: CaseIterable, Equatable {
     enum HidingCause {
         case unknown, approvedByMe, rejectedByMe, hidingAllMyAuthoredItems,
-             hidingMyAuthoredIssues, hidingAllOthersItems, hidingOthersIssues, containsRedStatuses, hidingOthersPrs,
+             hidingMyAuthoredIssues, hidingAllOthersItems, hidingOthersIssues, containsNonGreenStatuses, hidingOthersPrs,
              containsBlockedLabel, containsBlockedAuthor, wasUncommented, hidingDrafts, assignedDirectReview,
              assignedTeamReview, hidingMyAuthoredPrs, repoShowMineAndParticipated, repoHideAllItems,
              repoShowMineOnly
@@ -28,7 +28,7 @@ enum Section: CaseIterable, Equatable {
             case .assignedTeamReview: return "Review setting: Assigned section based on team review"
             case .approvedByMe: return "Review setting: Approved by me"
             case .rejectedByMe: return "Review setting: Rejected by me"
-            case .containsRedStatuses: return "Review setting: PR has a red status"
+            case .containsNonGreenStatuses: return "Review setting: PR statuses aren't all green"
                 
             case .hidingMyAuthoredPrs: return "Repo setting: PR authored by me"
             case .repoShowMineAndParticipated: return "Repo setting: Only Mine and Participated sections allowed"

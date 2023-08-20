@@ -9,7 +9,7 @@ import TrailerQL
     import Cocoa
 #endif
 
-struct PostProcessContext {
+struct SettingsCache {
     let excludedLabels = Set(Settings.labelBlacklist.map(\.comparableForm))
     let excludedAuthors = Set(Settings.itemAuthorBlacklist.map(\.comparableForm))
     let excludedCommentAuthors = Set(Settings.commentAuthorBlacklist.map(\.comparableForm))
@@ -23,6 +23,33 @@ struct PostProcessContext {
     let shouldHideDrafts = Settings.draftHandlingPolicy == .hide
     let autoRemoveClosedItems = Settings.autoRemoveClosedItems
     let autoRemoveMergedItems = Settings.autoRemoveMergedItems
+    let notifyOnStatusUpdatesForAllPrs = Settings.notifyOnStatusUpdatesForAllPrs
+    let hidePrsIfApproved = Settings.autoHidePrsIApproved
+    let hidePrsIfRejected = Settings.autoHidePrsIRejected
+    let preferredMovePolicySection = Settings.newMentionMovePolicy.preferredSection
+    let preferredTeamMentionPolicy = Settings.teamMentionMovePolicy.preferredSection
+    let newItemInOwnedRepoMovePolicy = Settings.newItemInOwnedRepoMovePolicy.preferredSection
+    let assignedItemDirectHandlingPolicy = Settings.assignedItemDirectHandlingPolicy
+    let assignedItemTeamHandlingPolicy = Settings.assignedItemTeamHandlingPolicy
+    let notifyOnAllReviewChangeRequests = Settings.notifyOnAllReviewChangeRequests
+    let notifyOnAllReviewAcceptances = Settings.notifyOnAllReviewAcceptances
+    let notifyOnAllReviewDismissals = Settings.notifyOnAllReviewDismissals
+    let notifyOnReviewChangeRequests = Settings.notifyOnReviewChangeRequests
+    let notifyOnReviewAcceptances = Settings.notifyOnReviewAcceptances
+    let notifyOnReviewDismissals = Settings.notifyOnReviewDismissals
+    let autoSnoozeDuration = TimeInterval(Settings.autoSnoozeDuration)
+    let hidePrsThatArentPassing = Settings.hidePrsThatArentPassing
+    let hidePrsThatDontPassOnlyInAll = Settings.hidePrsThatDontPassOnlyInAll
+    
+    let statusRed = Settings.showStatusesRed
+    let statusYellow = Settings.showStatusesYellow
+    let statusGreen = Settings.showStatusesGreen
+    let statusGray = Settings.showStatusesGray
+    let statusMode = Settings.statusFilteringMode
+    let statusTerms = Settings.statusFilteringTerms
+    
+    let makeStatusItemsSelectable = Settings.makeStatusItemsSelectable
+    let hideAvatars = Settings.hideAvatars
 }
 
 protocol Listable: Querying {
@@ -201,9 +228,9 @@ class ListableItem: DataItem, Listable {
         var directAssigneeNames = [String]()
         var teamAssigneeNames = [String]()
 
-        if let assigneeJson {
+        if let assigneeJson, !assigneeJson.isEmpty {
             let myIdOnThisRepo = repo.apiServer.userNodeId
-            let myTeamNames = apiServer.teams.compactMap(\.slug)
+            let myTeamNames = Set(apiServer.teams.compactMap(\.slug))
 
             for assignee in assigneeJson {
                 if let name = assignee["login"] as? String, let assigneeId = assignee[idField] as? String {
@@ -342,11 +369,13 @@ class ListableItem: DataItem, Listable {
             return true
 
         case .mineAndParticipated:
-            let preConditionSection = preferredSection(takingItemConditionIntoAccount: false)
+            let context = SettingsCache()
+            let preConditionSection = preferredSection(takingItemConditionIntoAccount: false, context: context)
             return preConditionSection == .mine || preConditionSection == .participated
 
         case .mine:
-            let preConditionSection = preferredSection(takingItemConditionIntoAccount: false)
+            let context = SettingsCache()
+            let preConditionSection = preferredSection(takingItemConditionIntoAccount: false, context: context)
             return preConditionSection == .mine
 
         case .nothing:
@@ -358,16 +387,16 @@ class ListableItem: DataItem, Listable {
         isSnoozing || muted
     }
 
-    final func shouldGo(to section: Section) -> Bool {
+    final func shouldGo(to section: Section, context: SettingsCache) -> Bool {
         switch AssignmentStatus(rawValue: assignedStatus) {
         case nil, .none?, .others:
             return false
 
         case .me:
-            return section == Settings.assignedItemDirectHandlingPolicy
+            return section == context.assignedItemDirectHandlingPolicy
 
         case .myTeam:
-            return section == Settings.assignedItemTeamHandlingPolicy
+            return section == context.assignedItemTeamHandlingPolicy
         }
     }
 
@@ -404,11 +433,6 @@ class ListableItem: DataItem, Listable {
         snoozeUntil != nil
     }
 
-    final var canBadge: Bool {
-        let section = Section(sectionIndex: sectionIndex)
-        return canBadge(in: section)
-    }
-
     final func keep(as newCondition: ItemCondition, notification: NotificationType) {
         if sectionIndex == Section.all.sectionIndex, !Section.all.shouldBadgeComments {
             catchUpCommentDate()
@@ -424,9 +448,9 @@ class ListableItem: DataItem, Listable {
         postProcess() // make sure it's in the right section and updated correctly for its new status
     }
 
-    private final var shouldMoveToSnoozing: Bool {
+    private final func shouldMoveToSnoozing(context: SettingsCache) -> Bool {
         if snoozeUntil == nil {
-            let d = TimeInterval(Settings.autoSnoozeDuration)
+            let d = context.autoSnoozeDuration
             if d > 0, !wasAwokenFromSnooze, updatedAt != .distantPast, let snoozeByDate = updatedAt?.addingTimeInterval(86400.0 * d) {
                 if snoozeByDate < Date() {
                     snoozeUntil = autoSnoozeSentinelDate
@@ -480,7 +504,7 @@ class ListableItem: DataItem, Listable {
         nil
     }
 
-    private func preferredSection(takingItemConditionIntoAccount: Bool) -> Section {
+    private func preferredSection(takingItemConditionIntoAccount: Bool, context: SettingsCache) -> Section {
         if takingItemConditionIntoAccount {
             if condition == ItemCondition.merged.rawValue {
                 return .merged
@@ -490,37 +514,37 @@ class ListableItem: DataItem, Listable {
             }
         }
         
-        if shouldMoveToSnoozing {
+        if shouldMoveToSnoozing(context: context) {
             return .snoozed
         }
 
-        if createdByMe || shouldGo(to: .mine) {
+        if createdByMe || shouldGo(to: .mine, context: context) {
             return .mine
         }
 
-        if shouldGo(to: .participated) || commentedByMe || reviewedByMe {
+        if shouldGo(to: .participated, context: context) || commentedByMe || reviewedByMe {
             return .participated
         }
 
-        if shouldGo(to: .mentioned) {
+        if shouldGo(to: .mentioned, context: context) {
             return .mentioned
         }
 
         if let section = preferredSectionBasedOnReviewAssignment {
             return section
         }
-
-        if let section = Settings.newMentionMovePolicy.preferredSection,
+        
+        if let section = context.preferredMovePolicySection,
            contains(terms: ["@\(apiServer.userName.orEmpty)"]) {
             return section
         }
 
-        if let section = Settings.teamMentionMovePolicy.preferredSection,
+        if let section = context.preferredTeamMentionPolicy,
            contains(terms: apiServer.teams.compactMap(\.calculatedReferral)) {
             return section
         }
 
-        if let section = Settings.newItemInOwnedRepoMovePolicy.preferredSection,
+        if let section = context.newItemInOwnedRepoMovePolicy,
            repo.isMine {
             return section
         }
@@ -528,13 +552,15 @@ class ListableItem: DataItem, Listable {
         return .all
     }
 
-    private func canBadge(in targetSection: Section) -> Bool {
+    func canBadge(in targetSection: Section? = nil, context: SettingsCache) -> Bool {
+        let targetSection = targetSection ?? Section(sectionIndex: sectionIndex)
+        
         if !targetSection.shouldBadgeComments || muted || postSyncAction == PostSyncAction.isNew.rawValue {
             return false
         }
 
         if targetSection == .closed || targetSection == .merged {
-            return preferredSection(takingItemConditionIntoAccount: false).shouldBadgeComments
+            return preferredSection(takingItemConditionIntoAccount: false, context: context).shouldBadgeComments
         }
 
         return true
@@ -546,10 +572,6 @@ class ListableItem: DataItem, Listable {
 
     var shouldWakeBecauseOfCommit: Bool {
         false
-    }
-
-    func shouldBeCheckedForRedStatuses(in _: Section) -> [PRStatus]? {
-        nil
     }
 
     var repoDisplayPolicy: Int {
@@ -576,7 +598,7 @@ class ListableItem: DataItem, Listable {
         return nil
     }
     
-    private func shouldHideBecauseOfBlockedContent(context: PostProcessContext) -> Section.HidingCause? {
+    private func shouldHideBecauseOfBlockedContent(context: SettingsCache) -> Section.HidingCause? {
         let excluded = context.excludedLabels
         if !excluded.isEmpty {
             let mine = Set(labels.compactMap { $0.name?.comparableForm })
@@ -596,15 +618,11 @@ class ListableItem: DataItem, Listable {
         return nil
     }
     
-    private func shouldHideBecauseOfRedStatuses(in section: Section) -> Section.HidingCause? {
-        if let displayed = shouldBeCheckedForRedStatuses(in: section),
-            displayed.contains(where: { $0.state != "success" }) {
-            return .containsRedStatuses
-        }
-        return nil
+    func shouldHideBecauseOfRedStatuses(in section: Section, context: SettingsCache) -> Section.HidingCause? {
+        nil
     }
     
-    private func shouldHideBecauseOfDraftStatus(context: PostProcessContext) -> Section.HidingCause? {
+    private func shouldHideBecauseOfDraftStatus(context: SettingsCache) -> Section.HidingCause? {
         if context.shouldHideDrafts, draft {
             return .hidingDrafts
         }
@@ -612,7 +630,7 @@ class ListableItem: DataItem, Listable {
     }
 
     @discardableResult
-    final func postProcess(context: PostProcessContext = PostProcessContext()) -> Section {
+    final func postProcess(context: SettingsCache = SettingsCache()) -> Section {
         if let snoozeUntil, snoozeUntil < Date() { // our snooze-by date is past
             disableSnoozing(explicityAwoke: true)
         }
@@ -625,21 +643,21 @@ class ListableItem: DataItem, Listable {
         
         if let cause = shouldHideBecauseOfDraftStatus(context: context)
             ?? shouldHideBecauseOfRepoHidingPolicy
-            ?? shouldHideDueToMyReview
+            ?? shouldHideDueToMyReview(context: context)
             ?? shouldHideBecauseOfBlockedContent(context: context) {
             targetSection = .hidden(cause: cause)
         } else {
-            targetSection = preferredSection(takingItemConditionIntoAccount: true)
+            targetSection = preferredSection(takingItemConditionIntoAccount: true, context: context)
             
             if targetSection.visible, let cause
                 = shouldHideBecauseOfRepoDisplayPolicy(targetSection: targetSection)
-                ?? shouldHideBecauseOfRedStatuses(in: targetSection) {
+                ?? shouldHideBecauseOfRedStatuses(in: targetSection, context: context) {
                 
                 targetSection = .hidden(cause: cause)
             }
         }
         
-        if canBadge(in: targetSection) {
+        if canBadge(in: targetSection, context: context) {
             var latestDate = latestReadCommentDate ?? .distantPast
 
             if context.assumeReadItemIfUserHasNewerComments {
@@ -673,11 +691,11 @@ class ListableItem: DataItem, Listable {
         return targetSection
     }
 
-    func countReviews(context _: PostProcessContext) -> Int {
+    func countReviews(context _: SettingsCache) -> Int {
         0
     }
 
-    private func countComments(context: PostProcessContext) -> Int {
+    private func countComments(context: SettingsCache) -> Int {
         var count = 0
         for c in comments where c.shouldContributeToCount(since: .distantPast, context: context) {
             count += 1
@@ -685,7 +703,7 @@ class ListableItem: DataItem, Listable {
         return count
     }
 
-    private func countReactions(context: PostProcessContext) -> Int {
+    private func countReactions(context: SettingsCache) -> Int {
         var count = 0
         for r in reactions where r.shouldContributeToCount(since: .distantPast, context: context) {
             count += 1
@@ -693,7 +711,7 @@ class ListableItem: DataItem, Listable {
         return count
     }
 
-    private func countCommentReactions(context: PostProcessContext) -> Int {
+    private func countCommentReactions(context: SettingsCache) -> Int {
         var count = 0
         for c in comments where c.shouldContributeToCount(since: .distantPast, context: context) {
             for r in c.reactions where r.shouldContributeToCount(since: .distantPast, context: context) {
@@ -711,7 +729,7 @@ class ListableItem: DataItem, Listable {
         comments.filter { !$0.createdByMe && ($0.createdAt ?? .distantPast) > since }
     }
 
-    private final func countOthersComments(since startDate: Date, context: PostProcessContext) -> Int {
+    private final func countOthersComments(since startDate: Date, context: SettingsCache) -> Int {
         var count = 0
         for c in comments {
             if c.shouldContributeToCount(since: startDate, context: context) {
@@ -1196,7 +1214,7 @@ class ListableItem: DataItem, Listable {
         }
     }
 
-    var shouldHideDueToMyReview: Section.HidingCause? {
+    func shouldHideDueToMyReview(context: SettingsCache) -> Section.HidingCause? {
         nil
     }
 

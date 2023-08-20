@@ -53,72 +53,71 @@ enum Settings {
 
     @MainActor
     static func checkMigration() {
-        if let snoozeWakeOnComment = sharedDefaults.object(forKey: "SNOOZE_WAKEUP_ON_COMMENT") as? Bool {
+        if let snoozeWakeOnComment = Settings["SNOOZE_WAKEUP_ON_COMMENT"] as? Bool {
             DataManager.postMigrationSnoozeWakeOnComment = snoozeWakeOnComment
-            sharedDefaults.removeObject(forKey: "SNOOZE_WAKEUP_ON_COMMENT")
+            Settings["SNOOZE_WAKEUP_ON_COMMENT"] = nil
         }
-        if let snoozeWakeOnMention = sharedDefaults.object(forKey: "SNOOZE_WAKEUP_ON_MENTION") as? Bool {
+        if let snoozeWakeOnMention = Settings["SNOOZE_WAKEUP_ON_MENTION"] as? Bool {
             DataManager.postMigrationSnoozeWakeOnMention = snoozeWakeOnMention
-            sharedDefaults.removeObject(forKey: "SNOOZE_WAKEUP_ON_MENTION")
+            Settings["SNOOZE_WAKEUP_ON_MENTION"] = nil
         }
-        if let snoozeWakeOnStatusUpdate = sharedDefaults.object(forKey: "SNOOZE_WAKEUP_ON_STATUS_UPDATE") as? Bool {
+        if let snoozeWakeOnStatusUpdate = Settings["SNOOZE_WAKEUP_ON_STATUS_UPDATE"] as? Bool {
             DataManager.postMigrationSnoozeWakeOnStatusUpdate = snoozeWakeOnStatusUpdate
-            sharedDefaults.removeObject(forKey: "SNOOZE_WAKEUP_ON_STATUS_UPDATE")
+            Settings["SNOOZE_WAKEUP_ON_STATUS_UPDATE"] = nil
         }
 
-        if
-            sharedDefaults.object(forKey: "SHOW_STATUSES_EVERYWHERE") as? Bool == nil,
-            let showStats = sharedDefaults.object(forKey: "SHOW_STATUS_ITEMS") as? Bool, showStats,
-            let notifyAll = sharedDefaults.object(forKey: "NOTIFY_ON_STATUS_UPDATES_ALL") as? Bool, notifyAll {
-            sharedDefaults.set(true, forKey: "SHOW_STATUSES_EVERYWHERE")
+        if Settings["SHOW_STATUSES_EVERYWHERE"] as? Bool == nil,
+           let showStats = Settings["SHOW_STATUS_ITEMS"] as? Bool, showStats,
+           let notifyAll = Settings["NOTIFY_ON_STATUS_UPDATES_ALL"] as? Bool, notifyAll {
+            Settings["SHOW_STATUSES_EVERYWHERE"] = true
         }
 
-        if let moveAssignedPrs = sharedDefaults.object(forKey: "MOVE_ASSIGNED_PRS_TO_MY_SECTION") as? Bool {
-            sharedDefaults.set(moveAssignedPrs ? Section.mine.assignmentPolicySettingsValue : Section.hidden(cause: .unknown).assignmentPolicySettingsValue, forKey: "ASSIGNED_PR_HANDLING_POLICY")
-            sharedDefaults.removeObject(forKey: "MOVE_ASSIGNED_PRS_TO_MY_SECTION")
+        if let moveAssignedPrs = Settings["MOVE_ASSIGNED_PRS_TO_MY_SECTION"] as? Bool {
+            Settings["ASSIGNED_PR_HANDLING_POLICY"] = moveAssignedPrs ? Section.mine.assignmentPolicySettingsValue : Section.hidden(cause: .unknown).assignmentPolicySettingsValue
+            Settings["MOVE_ASSIGNED_PRS_TO_MY_SECTION"] = nil
         }
 
-        if let mergeHandlingPolicyLegacy = sharedDefaults.object(forKey: "MERGE_HANDLING_POLICY") as? Int {
-            sharedDefaults.set(mergeHandlingPolicyLegacy + (mergeHandlingPolicyLegacy > 0 ? 1 : 0), forKey: "MERGE_HANDLING_POLICY_2")
-            sharedDefaults.removeObject(forKey: "MERGE_HANDLING_POLICY")
+        if let mergeHandlingPolicyLegacy = Settings["MERGE_HANDLING_POLICY"] as? Int {
+            Settings["MERGE_HANDLING_POLICY_2"] = mergeHandlingPolicyLegacy + (mergeHandlingPolicyLegacy > 0 ? 1 : 0)
+            Settings["MERGE_HANDLING_POLICY"] = nil
         }
 
-        if let closeHandlingPolicyLegacy = sharedDefaults.object(forKey: "CLOSE_HANDLING_POLICY") as? Int {
-            sharedDefaults.set(closeHandlingPolicyLegacy + (closeHandlingPolicyLegacy > 0 ? 1 : 0), forKey: "CLOSE_HANDLING_POLICY_2")
-            sharedDefaults.removeObject(forKey: "CLOSE_HANDLING_POLICY")
+        if let closeHandlingPolicyLegacy = Settings["CLOSE_HANDLING_POLICY"] as? Int {
+            Settings["CLOSE_HANDLING_POLICY_2"] = closeHandlingPolicyLegacy + (closeHandlingPolicyLegacy > 0 ? 1 : 0)
+            Settings["CLOSE_HANDLING_POLICY"] = nil
         }
 
-        if let mentionedUserMoveLegacy = sharedDefaults.object(forKey: "AUTO_PARTICIPATE_IN_MENTIONS_KEY") as? Bool {
-            sharedDefaults.set(mentionedUserMoveLegacy ? Section.mentioned.movePolicySettingsValue : Section.hidden(cause: .unknown).movePolicySettingsValue, forKey: "NEW_MENTION_MOVE_POLICY")
-            sharedDefaults.removeObject(forKey: "AUTO_PARTICIPATE_IN_MENTIONS_KEY")
+        if let mentionedUserMoveLegacy = Settings["AUTO_PARTICIPATE_IN_MENTIONS_KEY"] as? Bool {
+            Settings["NEW_MENTION_MOVE_POLICY"] = mentionedUserMoveLegacy ? Section.mentioned.movePolicySettingsValue : Section.hidden(cause: .unknown).movePolicySettingsValue
+            Settings["AUTO_PARTICIPATE_IN_MENTIONS_KEY"] = nil
         }
 
-        if let mentionedTeamMoveLegacy = sharedDefaults.object(forKey: "AUTO_PARTICIPATE_ON_TEAM_MENTIONS") as? Bool {
-            sharedDefaults.set(mentionedTeamMoveLegacy ? Section.mentioned.movePolicySettingsValue : Section.hidden(cause: .unknown).movePolicySettingsValue, forKey: "TEAM_MENTION_MOVE_POLICY")
-            sharedDefaults.removeObject(forKey: "AUTO_PARTICIPATE_ON_TEAM_MENTIONS")
+        if let mentionedTeamMoveLegacy = Settings["AUTO_PARTICIPATE_ON_TEAM_MENTIONS"] as? Bool {
+            Settings["TEAM_MENTION_MOVE_POLICY"] = mentionedTeamMoveLegacy ? Section.mentioned.movePolicySettingsValue : Section.hidden(cause: .unknown).movePolicySettingsValue
+            Settings["AUTO_PARTICIPATE_ON_TEAM_MENTIONS"] = nil
         }
 
-        if let mentionedRepoMoveLegacy = sharedDefaults.object(forKey: "MOVE_NEW_ITEMS_IN_OWN_REPOS_TO_MENTIONED") as? Bool {
-            sharedDefaults.set(mentionedRepoMoveLegacy ? Section.mentioned.movePolicySettingsValue : Section.hidden(cause: .unknown).movePolicySettingsValue, forKey: "NEW_ITEM_IN_OWNED_REPO_MOVE_POLICY")
-            sharedDefaults.removeObject(forKey: "MOVE_NEW_ITEMS_IN_OWN_REPOS_TO_MENTIONED")
+        if let mentionedRepoMoveLegacy = Settings["MOVE_NEW_ITEMS_IN_OWN_REPOS_TO_MENTIONED"] as? Bool {
+            Settings["NEW_ITEM_IN_OWNED_REPO_MOVE_POLICY"] = mentionedRepoMoveLegacy ? Section.mentioned.movePolicySettingsValue : Section.hidden(cause: .unknown).movePolicySettingsValue
+            Settings["MOVE_NEW_ITEMS_IN_OWN_REPOS_TO_MENTIONED"] = nil
         }
 
         DataManager.postMigrationRepoPrPolicy = .all
         DataManager.postMigrationRepoIssuePolicy = .hide
 
-        if let showIssues = sharedDefaults.object(forKey: "SHOW_ISSUES_MENU") as? Bool {
-            sharedDefaults.set(showIssues ? RepoDisplayPolicy.all.intValue : RepoDisplayPolicy.hide.intValue, forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX")
+        if let showIssues = Settings["SHOW_ISSUES_MENU"] as? Bool {
+            Settings["NEW_ISSUE_DISPLAY_POLICY_INDEX"] = showIssues ? RepoDisplayPolicy.all.intValue : RepoDisplayPolicy.hide.intValue
             DataManager.postMigrationRepoIssuePolicy = showIssues ? RepoDisplayPolicy.all : RepoDisplayPolicy.hide
-            sharedDefaults.removeObject(forKey: "SHOW_ISSUES_MENU")
+            Settings["SHOW_ISSUES_MENU"] = nil
         }
 
-        if let hideNewRepositories = sharedDefaults.object(forKey: "HIDE_NEW_REPOS_KEY") as? Bool {
-            sharedDefaults.set(hideNewRepositories ? RepoDisplayPolicy.hide.intValue : RepoDisplayPolicy.all.intValue, forKey: "NEW_PR_DISPLAY_POLICY_INDEX")
-            sharedDefaults.set(hideNewRepositories ? RepoDisplayPolicy.hide.intValue : RepoDisplayPolicy.all.intValue, forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX")
-            sharedDefaults.removeObject(forKey: "HIDE_NEW_REPOS_KEY")
+        if let hideNewRepositories = Settings["HIDE_NEW_REPOS_KEY"] as? Bool {
+            Settings["NEW_PR_DISPLAY_POLICY_INDEX"] = hideNewRepositories ? RepoDisplayPolicy.hide.intValue : RepoDisplayPolicy.all.intValue
+            Settings["NEW_ISSUE_DISPLAY_POLICY_INDEX"] = hideNewRepositories ? RepoDisplayPolicy.hide.intValue : RepoDisplayPolicy.all.intValue
+            Settings["HIDE_NEW_REPOS_KEY"] = nil
         }
 
-        if let hideAllSection = sharedDefaults.object(forKey: "HIDE_ALL_SECTION") as? Bool {
+        if let hideAllSection = Settings["HIDE_ALL_SECTION"] as? Bool {
             if hideAllSection {
                 if DataManager.postMigrationRepoPrPolicy == .all {
                     DataManager.postMigrationRepoPrPolicy = .mineAndPaticipated
@@ -127,29 +126,28 @@ enum Settings {
                     DataManager.postMigrationRepoIssuePolicy = .mineAndPaticipated
                 }
 
-                let newPrPolicy = sharedDefaults.object(forKey: "NEW_PR_DISPLAY_POLICY_INDEX") as? Int ?? RepoDisplayPolicy.all.rawValue
+                let newPrPolicy = Settings["NEW_PR_DISPLAY_POLICY_INDEX"] as? Int ?? RepoDisplayPolicy.all.rawValue
                 if newPrPolicy == RepoDisplayPolicy.all.rawValue {
-                    sharedDefaults.set(RepoDisplayPolicy.mineAndPaticipated.intValue, forKey: "NEW_PR_DISPLAY_POLICY_INDEX")
+                    Settings["NEW_PR_DISPLAY_POLICY_INDEX"] = RepoDisplayPolicy.mineAndPaticipated.intValue
                 }
-                let newIssuePolicy = sharedDefaults.object(forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX") as? Int ?? RepoDisplayPolicy.all.rawValue
+                let newIssuePolicy = Settings["NEW_ISSUE_DISPLAY_POLICY_INDEX"] as? Int ?? RepoDisplayPolicy.all.rawValue
                 if newIssuePolicy == RepoDisplayPolicy.all.rawValue {
-                    sharedDefaults.set(RepoDisplayPolicy.mineAndPaticipated.intValue, forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX")
+                    Settings["NEW_ISSUE_DISPLAY_POLICY_INDEX"] = RepoDisplayPolicy.mineAndPaticipated.intValue
                 }
             }
-            sharedDefaults.removeObject(forKey: "HIDE_ALL_SECTION")
+            Settings["HIDE_ALL_SECTION"] = nil
         }
 
-        if sharedDefaults.object(forKey: "ASSIGNED_REVIEW_TEAM_HANDLING_POLICY") == nil {
+        if Settings["ASSIGNED_REVIEW_TEAM_HANDLING_POLICY"] == nil {
             assignedTeamReviewHandlingPolicy = assignedDirectReviewHandlingPolicy
         }
 
-        if sharedDefaults.object(forKey: "ASSIGNED_PR_TEAM_HANDLING_POLICY") == nil {
+        if Settings["ASSIGNED_PR_TEAM_HANDLING_POLICY"] == nil {
             assignedItemTeamHandlingPolicy = assignedItemDirectHandlingPolicy
         }
 
-        if sharedDefaults.object(forKey: "HIDE_NOTIFICATION_AVATARS_KEY") == nil {
-            let existingHidingSetting = sharedDefaults.bool(forKey: "HIDE_AVATARS_KEY")
-            sharedDefaults.setValue(existingHidingSetting, forKey: "HIDE_NOTIFICATION_AVATARS_KEY")
+        if Settings["HIDE_NOTIFICATION_AVATARS_KEY"] == nil {
+            Settings["HIDE_NOTIFICATION_AVATARS_KEY"] = Settings["HIDE_AVATARS_KEY"] as? Bool ?? false
         }
 
         for repo in Repo.allItems(in: DataManager.main) where repo.value(forKey: "archived") == nil {
@@ -163,7 +161,7 @@ enum Settings {
         }
 
         #if os(macOS)
-            if Settings.lastRunVersion != "", sharedDefaults.object(forKey: "launchAtLogin") == nil {
+            if Settings.lastRunVersion != "", Settings["launchAtLogin"] == nil {
                 Logging.log("Migrated to the new startup mechanism, activating it by default")
                 isAppLoginItem = true
             }
@@ -172,40 +170,22 @@ enum Settings {
         sharedDefaults.synchronize()
     }
 
-    #if os(macOS)
-        static var isAppLoginItem: Bool {
-            get {
-                sharedDefaults.bool(forKey: "launchAtLogin")
-            }
-            set {
-                sharedDefaults.set(newValue, forKey: "launchAtLogin")
-                SMLoginItemSetEnabled(LauncherCommon.helperAppId as CFString, newValue)
-            }
-        }
-    #endif
-
-    fileprivate static subscript(key: String) -> Any? {
+    private static subscript(key: String) -> Any? {
         get {
             sharedDefaults.object(forKey: key)
         }
         set {
-            let previousValue = sharedDefaults.object(forKey: key)
-
             if let newValue {
-                if let previousValue, String(describing: previousValue) == String(describing: newValue) {
-                    return
-                }
                 sharedDefaults.set(newValue, forKey: key)
             } else {
-                if previousValue == nil {
-                    return
-                }
                 sharedDefaults.removeObject(forKey: key)
             }
 
+#if os(macOS)
             Task { @MainActor in
                 possibleExport(key)
             }
+#endif
         }
     }
 
@@ -215,23 +195,35 @@ enum Settings {
         }
     }
 
+    private static let goodKeys: Set<String> = ["LAST_SUCCESSFUL_REFRESH", "LAST_EXPORT_URL", "LAST_EXPORT_TIME"]
+    
+#if os(macOS)
+    static var isAppLoginItem: Bool {
+        get {
+            Settings["launchAtLogin"] as? Bool ?? false
+        }
+        set {
+            Settings["launchAtLogin"] = newValue
+            SMLoginItemSetEnabled(LauncherCommon.helperAppId as CFString, newValue)
+        }
+    }
+
     static func possibleExport(_ key: String?) {
-        #if os(macOS)
             if !Settings.autoRepeatSettingsExport {
                 return
             }
 
             let keyIsGood: Bool
             if let key {
-                keyIsGood = !["LAST_SUCCESSFUL_REFRESH", "LAST_EXPORT_URL", "LAST_EXPORT_TIME"].contains(key)
+                keyIsGood = !goodKeys.contains(key)
             } else {
                 keyIsGood = true
             }
             if keyIsGood, Settings.lastExportUrl != nil {
                 saveTimer.push()
             }
-        #endif
     }
+#endif
 
     ///////////////////////////////// IMPORT / EXPORT
 
@@ -243,8 +235,8 @@ enum Settings {
         Settings.lastExportUrl = url
         Settings.lastExportDate = Date()
         let settings = NSMutableDictionary()
-        for k in allFields {
-            if let v = sharedDefaults.object(forKey: k), k != "AUTO_REPEAT_SETTINGS_EXPORT" {
+        for k in allFields where k != "AUTO_REPEAT_SETTINGS_EXPORT" {
+            if let v = Settings[k] {
                 settings[k] = v
             }
         }
@@ -266,7 +258,7 @@ enum Settings {
             resetAllSettings()
             for k in allFields {
                 if let v = settings[k] {
-                    sharedDefaults.set(v, forKey: k)
+                    Settings[k] = v
                 }
             }
             let result1 = await ApiServer.configure(from: settings["DB_CONFIG_OBJECTS"] as! [String: [String: NSObject]])

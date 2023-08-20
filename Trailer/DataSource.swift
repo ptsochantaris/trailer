@@ -12,6 +12,7 @@ extension MenuWindow {
         private let sections: ContiguousArray<String>
         private let removalSections: Set<String>
         private let viewCriterion: GroupingCriterion?
+        private var context: SettingsCache?
 
         private static let propertiesToFetch = { () -> [NSExpressionDescription] in
             let iodD = NSExpressionDescription()
@@ -57,6 +58,8 @@ extension MenuWindow {
         func reloadData(filter: String?) {
             itemIds.removeAll(keepingCapacity: false)
 
+            context = nil
+            
             let f = ListableItem.requestForItems(of: type, withFilter: filter, sectionIndex: -1, criterion: viewCriterion)
             f.resultType = .dictionaryResultType
             f.fetchBatchSize = 0
@@ -80,12 +83,22 @@ extension MenuWindow {
             switch itemIds[row] {
             case let .id(id):
                 if let i = try? DataManager.main.existingObject(with: id) as? ListableItem {
-                    return TrailerCell(item: i)
+                    return TrailerCell(item: i, context: usedContext)
                 } else {
                     return nil
                 }
             case let .section(title):
                 return SectionHeader(title: title, showRemoveAllButton: removalSections.contains(title))
+            }
+        }
+        
+        private var usedContext: SettingsCache {
+            if let context {
+                return context
+            } else {
+                let usedContext = SettingsCache()
+                context = usedContext
+                return usedContext
             }
         }
 

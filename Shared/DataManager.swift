@@ -78,7 +78,7 @@ enum DataManager {
         }
     }
 
-    private static func processCommentAndReviewNotifications(postProcessContext: PostProcessContext) async {
+    private static func processCommentAndReviewNotifications(postProcessContext: SettingsCache) async {
         await runInChild(of: main) { child in
             for c in PRComment.newItems(in: child) {
                 c.processNotifications(postProcessContext: postProcessContext)
@@ -86,20 +86,20 @@ enum DataManager {
             }
 
             for r in Review.newOrUpdatedItems(in: child) {
-                r.processNotifications()
+                r.processNotifications(context: postProcessContext)
                 r.postSyncAction = PostSyncAction.doNothing.rawValue
             }
         }
     }
 
-    private static func processStatusNotifications(postProcessContext: PostProcessContext) async {
+    private static func processStatusNotifications(postProcessContext: SettingsCache) async {
         await runInChild(of: main) { child in
             let latestStatuses = PRStatus.newItems(in: child)
             var coveredPrs = Set<NSManagedObjectID>()
             if postProcessContext.notifyOnStatusUpdates {
-                for pr in latestStatuses.map(\.pullRequest) where pr.shouldAnnounceStatus && !coveredPrs.contains(pr.objectID) {
+                for pr in latestStatuses.map(\.pullRequest) where pr.shouldAnnounceStatus(context: postProcessContext) && !coveredPrs.contains(pr.objectID) {
                     coveredPrs.insert(pr.objectID)
-                    if let s = pr.displayedStatuses.first {
+                    if let s = pr.displayedStatusLines(context: postProcessContext).first {
                         let displayText = s.descriptionText
                         if pr.lastStatusNotified != displayText, pr.postSyncAction != PostSyncAction.isNew.rawValue {
                             NotificationQueue.add(type: .newStatus, for: s)
@@ -140,7 +140,7 @@ enum DataManager {
     static func sendNotificationsIndexAndSave() async {
         await saveDB() // get IDs
 
-        let postProcessContext = PostProcessContext()
+        let postProcessContext = SettingsCache()
 
         await postProcessAllItems(in: main, postProcessContext: postProcessContext)
 
@@ -156,7 +156,7 @@ enum DataManager {
             let nothing = PostSyncAction.doNothing.rawValue
 
             for r in Reaction.newOrUpdatedItems(in: child) {
-                r.checkNotifications()
+                r.checkNotifications(context: postProcessContext)
                 r.postSyncAction = nothing
             }
 
@@ -394,7 +394,7 @@ enum DataManager {
         }
     }
 
-    static func postProcessAllItems(in context: NSManagedObjectContext, postProcessContext: PostProcessContext = PostProcessContext()) async {
+    static func postProcessAllItems(in context: NSManagedObjectContext, postProcessContext: SettingsCache = SettingsCache()) async {
         let start = Date()
         let increment = 200
 

@@ -89,7 +89,7 @@ final class SectionController: CommonController {
                     default: break
                     }
 
-                    if let section = items[itemSection] as? [AnyHashable: Any], let count = section["total"] as? Int, let unread = section["unread"] as? Int, count > 0 {
+                    if let section = items[itemSection.sectionIndex] as? [AnyHashable: Any], let count = section["total"] as? Int, let unread = section["unread"] as? Int, count > 0 {
                         let s = SectionRow()
                         s.section = itemSection
                         s.totalCount = count

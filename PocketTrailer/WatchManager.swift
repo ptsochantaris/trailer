@@ -113,6 +113,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
     @MainActor
     private func processList(message: JSON) async -> JSON {
         var result = JSON()
+        let context = PostProcessContext()
 
         switch (message["list"] as? String).orEmpty {
         case "overview":
@@ -127,11 +128,12 @@ final class WatchManager: NSObject, WCSessionDelegate {
                 apiServerUri: message["apiUri"] as! String,
                 group: message["group"] as! String,
                 count: message["count"] as! Int,
-                onlyUnread: message["onlyUnread"] as! Bool
+                onlyUnread: message["onlyUnread"] as! Bool,
+                context: context
             )
 
         case "item_detail":
-            if let lid = message["localId"] as? String, let details = buildItemDetail(localId: lid) {
+            if let lid = message["localId"] as? String, let details = buildItemDetail(localId: lid, context: context) {
                 result["result"] = details
                 return reportSuccess(result: result)
             } else {
@@ -159,7 +161,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
     ////////////////////////////
 
     @MainActor
-    private func buildItemList(type: String, sectionIndex: Int, from: Int, apiServerUri: String, group: String, count: Int, onlyUnread: Bool) async -> JSON {
+    private func buildItemList(type: String, sectionIndex: Int, from: Int, apiServerUri: String, group: String, count: Int, onlyUnread: Bool, context: PostProcessContext) async -> JSON {
         let showLabels = Settings.showLabels
         let entity: ListableItem.Type
         if type == "prs" {
@@ -182,13 +184,13 @@ final class WatchManager: NSObject, WCSessionDelegate {
         f.fetchOffset = from
         f.fetchLimit = count
 
-        let items = try! DataManager.main.fetch(f).map { self.baseDataForItem(item: $0, showLabels: showLabels) }
+        let items = try! DataManager.main.fetch(f).map { self.baseDataForItem(item: $0, showLabels: showLabels, context: context) }
         let compressedData = (try? NSKeyedArchiver.archivedData(withRootObject: items, requiringSecureCoding: false).data(operation: .compress)) ?? Data()
         return ["result": compressedData]
     }
 
     @MainActor
-    private func baseDataForItem(item: ListableItem, showLabels: Bool) -> JSON {
+    private func baseDataForItem(item: ListableItem, showLabels: Bool, context: PostProcessContext) -> JSON {
         let font = UIFont.systemFont(ofSize: UIFont.systemFontSize)
         let smallFont = UIFont.systemFont(ofSize: UIFont.systemFontSize - 4)
 
@@ -206,7 +208,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
             itemData["labels"] = labelsForItem(item: item)
         }
         if let item = item as? PullRequest, item.section.shouldListStatuses {
-            itemData["statuses"] = statusLinesForPr(pr: item)
+            itemData["statuses"] = statusLinesForPr(pr: item, context: context)
         }
         return itemData
     }
@@ -224,9 +226,9 @@ final class WatchManager: NSObject, WCSessionDelegate {
     }
 
     @MainActor
-    private func statusLinesForPr(pr: PullRequest) -> [JSON] {
+    private func statusLinesForPr(pr: PullRequest, context: PostProcessContext) -> [JSON] {
         var statusLines = [JSON]()
-        for status in pr.displayedStatuses {
+        for status in pr.displayedStatusLines(context: context) {
             statusLines.append([
                 "color": status.colorForDisplay,
                 "text": status.descriptionText.orEmpty
@@ -238,9 +240,9 @@ final class WatchManager: NSObject, WCSessionDelegate {
     /////////////////////////////
 
     @MainActor
-    private func buildItemDetail(localId: String) -> Data? {
+    private func buildItemDetail(localId: String, context: PostProcessContext) -> Data? {
         if let oid = DataManager.id(for: localId), let item = try? DataManager.main.existingObject(with: oid) as? ListableItem {
-            var result = baseDataForItem(item: item, showLabels: Settings.showLabels)
+            var result = baseDataForItem(item: item, showLabels: Settings.showLabels, context: context)
             result["description"] = item.body
             result["comments"] = commentsForItem(item: item)
 
