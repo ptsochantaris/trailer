@@ -409,7 +409,7 @@ enum API {
 
         for repo in server.repos.filter(\.manuallyAdded) {
             do {
-                try await fetchRepo(fullName: repo.fullName ?? "", from: server, moc: moc)
+                try await fetchRepo(fullName: repo.fullName.orEmpty, from: server, moc: moc)
             } catch {
                 server.lastSyncSucceeded = false
             }
@@ -442,7 +442,7 @@ enum API {
     }
 
     static func fetchRepo(fullName: String, from server: ApiServer, moc: NSManagedObjectContext) async throws {
-        let path = "\(server.apiPath ?? "")/repos/\(fullName)"
+        let path = "\(server.apiPath.orEmpty)/repos/\(fullName)"
         let (data, _, _) = try await RestAccess.getData(in: path, from: server)
         if let repoData = data as? JSON {
             await Repo.syncRepos(from: [repoData], server: server, addNewRepos: true, manuallyAdded: true, moc: moc)
@@ -450,7 +450,7 @@ enum API {
     }
 
     static func fetchAllRepos(owner: String, from server: ApiServer, moc: NSManagedObjectContext) async throws {
-        let userPath = "\(server.apiPath ?? "")/users/\(owner)/repos"
+        let userPath = "\(server.apiPath.orEmpty)/users/\(owner)/repos"
         let userTask = Task { () -> [JSON] in
             var userList = [JSON]()
             let result = await RestAccess.getPagedData(at: userPath, from: server) { data, _ -> Bool in
@@ -473,7 +473,7 @@ enum API {
             }
         }
 
-        let orgPath = "\(server.apiPath ?? "")/orgs/\(owner)/repos"
+        let orgPath = "\(server.apiPath.orEmpty)/orgs/\(owner)/repos"
         let orgTask = Task { () -> [JSON] in
             var orgList = [JSON]()
             let result = await RestAccess.getPagedData(at: orgPath, from: server) { data, _ -> Bool in

@@ -347,7 +347,7 @@ enum DataManager {
     static func info(for item: DataItem) -> JSON {
         if let item = item as? PRComment {
             let uri = item.objectID.uriRepresentation().absoluteString
-            let parentUri = item.parent?.objectID.uriRepresentation().absoluteString ?? ""
+            let parentUri = (item.parent?.objectID.uriRepresentation().absoluteString).orEmpty
             return [COMMENT_ID_KEY: uri, LISTABLE_URI_KEY: parentUri]
 
         } else if let item = item as? ListableItem {
@@ -376,7 +376,7 @@ enum DataManager {
                 return [NOTIFICATION_URL_KEY: pr.webUrl!, LISTABLE_URI_KEY: uri]
             } else if let comment = item.comment {
                 let uri = comment.objectID.uriRepresentation().absoluteString
-                let parentUri = comment.parent?.objectID.uriRepresentation().absoluteString ?? ""
+                let parentUri = (comment.parent?.objectID.uriRepresentation().absoluteString).orEmpty
                 return [COMMENT_ID_KEY: uri, LISTABLE_URI_KEY: parentUri]
             } else {
                 abort()

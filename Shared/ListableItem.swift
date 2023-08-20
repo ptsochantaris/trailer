@@ -1334,7 +1334,7 @@ class ListableItem: DataItem, Listable {
 
     #if os(iOS)
         var dragItemForUrl: UIDragItem {
-            let url = URL(string: urlForOpening ?? repo.webUrl ?? "") ?? URL(string: "https://github.com")!
+            let url = URL(string: urlForOpening ?? repo.webUrl.orEmpty) ?? URL(string: "https://github.com")!
             let text = "#\(number) - \(title.orEmpty)"
             let provider = NSItemProvider(object: url as NSURL)
             provider.registerObject(text as NSString, visibility: .all)

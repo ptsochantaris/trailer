@@ -115,7 +115,7 @@ final class SectionController: CommonController {
                 markReeadButton.setHidden(totalUnread == 0)
 
             } else if showEmptyDescriptions {
-                let error = (items["error"] as? String) ?? ""
+                let error = items["error"].stringOrEmpty
                 let pt = TitleRow()
                 pt.label = "\(label): \(error)"
                 rowControllers.append(pt)

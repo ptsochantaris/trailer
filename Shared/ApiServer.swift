@@ -362,8 +362,8 @@ final class ApiServer: NSManagedObject {
     // MARK: GraphQL
 
     func run(queries: Lista<Query>) async throws {
-        let path = graphQLPath ?? ""
-        let token = authToken ?? ""
+        let path = graphQLPath.orEmpty
+        let token = authToken.orEmpty
 
         try await GraphQL.runQueries(queries: queries, on: path, token: token) { [weak self] newStats in
             self?.managedObjectContext?.perform {

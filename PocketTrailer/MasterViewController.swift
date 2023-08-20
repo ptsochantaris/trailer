@@ -50,7 +50,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
     private var currentTabBarSet: TabBarSet?
 
     private var searchTimer: PopTimer!
-    private var context: PostProcessContext?
+    private var context: SettingsCache?
 
     private var pluralNameForItems: String {
         viewingPrs ? "pull requests" : "issues"
@@ -1013,11 +1013,11 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         sectionsChanged = true
     }
     
-    private var usedContext: PostProcessContext {
+    private var usedContext: SettingsCache {
         if let context {
             return context
         }
-        let used = PostProcessContext()
+        let used = SettingsCache()
         context = used
         return used
     }
@@ -1061,7 +1061,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         }
     }
 
-    private func configureCell(cell: UITableViewCell, withObject: ListableItem, context: PostProcessContext) {
+    private func configureCell(cell: UITableViewCell, withObject: ListableItem, context: SettingsCache) {
         guard let c = cell as? PRCell else { return }
         if let o = withObject as? PullRequest {
             c.setPullRequest(pullRequest: o, context: context)

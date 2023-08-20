@@ -161,18 +161,20 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 
         let urlToOpen = item.urlForOpening
         item.catchUpWithComments()
-        updateRelatedMenus(for: item)
-
-        let window = item is PullRequest ? menuBarSet.prMenu : menuBarSet.issuesMenu
-        let reSelectIndex = alternativeSelect ? window.table.selectedRow : -1
-        _ = window.filter.becomeFirstResponder()
-
-        if reSelectIndex > -1, reSelectIndex < window.table.numberOfRows {
-            window.table.selectRowIndexes(IndexSet(integer: reSelectIndex), byExtendingSelection: false)
-        }
-
-        if let urlToOpen, let url = URL(string: urlToOpen) {
-            openItem(url)
+        Task {
+            await updateRelatedMenus(for: item)
+            
+            let window = item is PullRequest ? menuBarSet.prMenu : menuBarSet.issuesMenu
+            let reSelectIndex = alternativeSelect ? window.table.selectedRow : -1
+            _ = window.filter.becomeFirstResponder()
+            
+            if reSelectIndex > -1, reSelectIndex < window.table.numberOfRows {
+                window.table.selectRowIndexes(IndexSet(integer: reSelectIndex), byExtendingSelection: false)
+            }
+            
+            if let urlToOpen, let url = URL(string: urlToOpen) {
+                openItem(url)
+            }
         }
     }
 
@@ -519,20 +521,18 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
     }
 
     @MainActor
-    func updateRelatedMenus(for i: ListableItem) {
+    func updateRelatedMenus(for i: ListableItem) async {
         let menus = relatedMenus(for: i)
-        Task {
-            if i is PullRequest {
-                for menu in menus {
-                    await menu.updatePrMenu()
-                }
-            } else if i is Issue {
-                for menu in menus {
-                    await menu.updateIssuesMenu()
-                }
+        if i is PullRequest {
+            for menu in menus {
+                await menu.updatePrMenu()
             }
-            await ensureAtLeastOneMenuVisible()
+        } else if i is Issue {
+            for menu in menus {
+                await menu.updateIssuesMenu()
+            }
         }
+        await ensureAtLeastOneMenuVisible()
     }
 
     @MainActor
@@ -754,12 +754,13 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 
                     guard let selectedItem = focusedItem(blink: false) else { return incomingEvent }
 
-                    switch incomingEvent.charactersIgnoringModifiers ?? "" {
+                    let chars = incomingEvent.charactersIgnoringModifiers.orEmpty
+                    switch chars {
                     case "m":
                         selectedItem.setMute(to: !selectedItem.muted)
                         Task {
                             await DataManager.saveDB()
-                            app.updateRelatedMenus(for: selectedItem)
+                            await app.updateRelatedMenus(for: selectedItem)
                         }
                         return nil
                     case "o":
@@ -768,18 +769,16 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                             return nil
                         }
                     default:
-                        if !incomingEvent.modifierFlags.contains(.option) {
+                        guard incomingEvent.modifierFlags.contains(.option), let snoozeIndex = Int(chars) else {
                             return incomingEvent
                         }
-                        if let snoozeIndex = Int(incomingEvent.charactersIgnoringModifiers ?? "") {
-                            if snoozeIndex > 0, !selectedItem.isSnoozing {
-                                if snooze(item: selectedItem, snoozeIndex: snoozeIndex - 1, window: w) {
-                                    return nil
-                                }
-                            } else if snoozeIndex == 0, selectedItem.isSnoozing {
-                                wake(item: selectedItem, window: w)
+                        if snoozeIndex > 0, !selectedItem.isSnoozing {
+                            if snooze(item: selectedItem, snoozeIndex: snoozeIndex - 1, window: w) {
                                 return nil
                             }
+                        } else if snoozeIndex == 0, selectedItem.isSnoozing {
+                            wake(item: selectedItem, window: w)
+                            return nil
                         }
                     }
                 }
@@ -794,7 +793,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         item.wakeUp()
         Task {
             await DataManager.saveDB()
-            app.updateRelatedMenus(for: item)
+            await app.updateRelatedMenus(for: item)
             scrollToNearest(index: oldIndex, window: window, preferDown: false)
         }
     }
@@ -807,7 +806,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
             item.snooze(using: s[snoozeIndex])
             Task {
                 await DataManager.saveDB()
-                updateRelatedMenus(for: item)
+                await updateRelatedMenus(for: item)
                 scrollToNearest(index: oldIndex, window: window, preferDown: true)
             }
             return true

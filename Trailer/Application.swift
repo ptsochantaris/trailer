@@ -52,7 +52,7 @@ final class Application: NSApplication {
                             }
                             Task { @MainActor in
                                 await DataManager.saveDB()
-                                app.updateRelatedMenus(for: i)
+                                await app.updateRelatedMenus(for: i)
                             }
                             return
                         } else if sendAction(#selector(NSResponder.selectAll), to: nil, from: self) {

@@ -217,7 +217,7 @@ enum GraphQL {
                 gotUserNode = true
             }
         }
-        _ = try await run(testQuery, for: apiServer.graphQLPath ?? "", authToken: apiServer.authToken ?? "", expectedNodeCost: nil, attempts: 1) { _ in }
+        _ = try await run(testQuery, for: apiServer.graphQLPath.orEmpty, authToken: apiServer.authToken.orEmpty, expectedNodeCost: nil, attempts: 1) { _ in }
         if !gotUserNode {
             throw ApiError.noUserRecordFound
         }
@@ -716,7 +716,7 @@ enum GraphQL {
     private static func checkAuthoredIssueClosures(nodes: [String: Lista<Node>], in server: ApiServer) {
         let fetchedIssueIds = Set(nodes["Issue"]?.map(\.id) ?? []) // investigate missing issues
         for repo in server.repos.filter({ $0.displayPolicyForIssues == RepoDisplayPolicy.authoredOnly.rawValue }) {
-            for issue in repo.issues where !fetchedIssueIds.contains(issue.nodeId ?? "") {
+            for issue in repo.issues where !fetchedIssueIds.contains(issue.nodeId.orEmpty) {
                 issue.stateChanged = ListableItem.StateChange.closed.rawValue
                 issue.condition = ItemCondition.closed.rawValue
             }

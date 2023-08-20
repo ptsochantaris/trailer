@@ -83,7 +83,7 @@ final class PullRequest: ListableItem {
     }
 
     var statusesLink: String? {
-        repo.apiUrl?.appending(pathComponent: "statuses").appending(pathComponent: mergeCommitSha ?? "")
+        repo.apiUrl?.appending(pathComponent: "statuses").appending(pathComponent: mergeCommitSha.orEmpty)
     }
 
     static func syncPullRequests(from data: [JSON]?, in repo: Repo, moc: NSManagedObjectContext) async {

@@ -65,7 +65,7 @@ final class NotificationManager: NSObject {
         Task {
             await DataManager.saveDB()
             #if os(macOS)
-                app.updateRelatedMenus(for: relatedItem)
+                await app.updateRelatedMenus(for: relatedItem)
             #endif
         }
     }

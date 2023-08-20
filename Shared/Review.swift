@@ -115,7 +115,7 @@ final class Review: DataItem {
     }
 
     func processNotifications(context: SettingsCache) {
-        guard !isMine, pullRequest.canBadge(context: context), let newState = State(rawValue: state ?? "") else {
+        guard !isMine, pullRequest.canBadge(context: context), let newState = State(rawValue: state.orEmpty) else {
             return
         }
 

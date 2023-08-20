@@ -329,14 +329,14 @@ struct ApiStats {
         } else {
             date = nil
         }
-        let remaining = Int(headers["x-ratelimit-remaining"] as? String ?? "") ?? 10000
-        let limit = Int(headers["x-ratelimit-limit"] as? String ?? "") ?? 10000
+        let remaining = Int(headers["x-ratelimit-remaining"].stringOrEmpty) ?? 10000
+        let limit = Int(headers["x-ratelimit-limit"].stringOrEmpty) ?? 10000
         return ApiStats(nodeCount: 0, cost: 1, remaining: remaining, limit: limit, resetAt: date, migratedIds: nil)
     }
 
     static func fromV4(json: JSON?, migratedIds: [String: String]?) -> ApiStats? {
         guard let info = json?["rateLimit"] as? JSON else { return nil }
-        let date = apiDateFormatter.date(from: info["resetAt"] as? String ?? "")
+        let date = apiDateFormatter.date(from: info["resetAt"].stringOrEmpty)
         return ApiStats(nodeCount: info["nodeCount"] as? Int ?? 0,
                         cost: info["cost"] as? Int ?? 0,
                         remaining: info["remaining"] as? Int ?? 10000,

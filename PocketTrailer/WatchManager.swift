@@ -113,7 +113,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
     @MainActor
     private func processList(message: JSON) async -> JSON {
         var result = JSON()
-        let context = PostProcessContext()
+        let context = SettingsCache()
 
         switch (message["list"] as? String).orEmpty {
         case "overview":
@@ -161,7 +161,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
     ////////////////////////////
 
     @MainActor
-    private func buildItemList(type: String, sectionIndex: Int, from: Int, apiServerUri: String, group: String, count: Int, onlyUnread: Bool, context: PostProcessContext) async -> JSON {
+    private func buildItemList(type: String, sectionIndex: Int, from: Int, apiServerUri: String, group: String, count: Int, onlyUnread: Bool, context: SettingsCache) async -> JSON {
         let showLabels = Settings.showLabels
         let entity: ListableItem.Type
         if type == "prs" {
@@ -190,7 +190,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
     }
 
     @MainActor
-    private func baseDataForItem(item: ListableItem, showLabels: Bool, context: PostProcessContext) -> JSON {
+    private func baseDataForItem(item: ListableItem, showLabels: Bool, context: SettingsCache) -> JSON {
         let font = UIFont.systemFont(ofSize: UIFont.systemFontSize)
         let smallFont = UIFont.systemFont(ofSize: UIFont.systemFontSize - 4)
 
@@ -226,7 +226,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
     }
 
     @MainActor
-    private func statusLinesForPr(pr: PullRequest, context: PostProcessContext) -> [JSON] {
+    private func statusLinesForPr(pr: PullRequest, context: SettingsCache) -> [JSON] {
         var statusLines = [JSON]()
         for status in pr.displayedStatusLines(context: context) {
             statusLines.append([
@@ -240,7 +240,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
     /////////////////////////////
 
     @MainActor
-    private func buildItemDetail(localId: String, context: PostProcessContext) -> Data? {
+    private func buildItemDetail(localId: String, context: SettingsCache) -> Data? {
         if let oid = DataManager.id(for: localId), let item = try? DataManager.main.existingObject(with: oid) as? ListableItem {
             var result = baseDataForItem(item: item, showLabels: Settings.showLabels, context: context)
             result["description"] = item.body

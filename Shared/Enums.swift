@@ -346,6 +346,12 @@ extension String? {
     }
 }
 
+extension Any? {
+    var stringOrEmpty: String {
+        (self as? String).orEmpty
+    }
+}
+
 let shortDateFormatter: DateFormatter = {
     let d = DateFormatter()
     d.dateStyle = .short

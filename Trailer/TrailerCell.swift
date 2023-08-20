@@ -267,9 +267,9 @@ final class TrailerCell: NSTableCellView {
     @objc private func removeSelected() {
         if let associatedDataItem {
             associatedDataItem.sectionIndex = Section.hidden(cause: .unknown).sectionIndex
-            app.updateRelatedMenus(for: associatedDataItem) // saveAndRequestMenuUpdate won't work in this case
-            DataManager.main.delete(associatedDataItem)
             Task {
+                await app.updateRelatedMenus(for: associatedDataItem) // saveAndRequestMenuUpdate won't work in this case
+                DataManager.main.delete(associatedDataItem)
                 await DataManager.saveDB()
             }
         }
@@ -325,7 +325,7 @@ final class TrailerCell: NSTableCellView {
     private func saveAndRequestMenuUpdate(_ item: ListableItem) {
         Task {
             await DataManager.saveDB()
-            app.updateRelatedMenus(for: item)
+            await app.updateRelatedMenus(for: item)
         }
     }
 

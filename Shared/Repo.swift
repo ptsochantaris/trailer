@@ -128,7 +128,7 @@ final class Repo: DataItem {
     }
 
     var apiUrl: String? {
-        apiServer.apiPath?.appending(pathComponent: "repos").appending(pathComponent: fullName ?? "")
+        apiServer.apiPath?.appending(pathComponent: "repos").appending(pathComponent: fullName.orEmpty)
     }
 
     var isMine: Bool {

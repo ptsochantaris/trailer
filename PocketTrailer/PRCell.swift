@@ -85,7 +85,7 @@ final class PRCell: UITableViewCell {
 
     private weak var item: ListableItem?
 
-    func setPullRequest(pullRequest: PullRequest, context: PostProcessContext) {
+    func setPullRequest(pullRequest: PullRequest, context: SettingsCache) {
         item = pullRequest
 
         let separator = traitCollection.containsTraits(in: compactTraits) ? "\n" : "   "
