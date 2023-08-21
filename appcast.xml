@@ -7,6 +7,30 @@
 		<language>en</language>
 
         <item>
+            <title>Version 1.8.8</title>
+            <sparkle:minimumSystemVersion>11.0.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[<font face="sans-serif" size="3"><ul>
+                <li>GitHub access tokens will now be stored in the system keychain and not in the local Trailer database for extra security, and are no longer visible in the Trailer UI. This migration is performed automatically. If you need to downgrade to a previous version of Trailer for whatever reason, please search your keychain for “trailer” and copy/paste the tokens back to that.</li>
+                <li>New option to auto-remove closed and merged items if they have not been updated for a certain period of time.</li>
+                <li>New option in the “Misc” preferences section to list items that are synced but not being displayed for whatever reason.</li>
+                <li>If using multithreaded queries, Trailer will “boost” the original batch slightly to ensure that short syncs complete faster. Longer syncs will still continue with the standard lower rate to ensure there are no timeouts.</li>
+                <li>Performance improvements and cleanups related to reading settings, especially as part of batch operations.</li>
+                <li>A fix related to handling window sizing and scroll position on macOS.</li>
+                <li>Fixed: If there were no people assigned to review a PR, team assignments would not be detected.</li>
+                <li>Fixed: Closed items from a repo not actively watched could result in repeating close notifications until the item was removed.</li>
+                </ul>
+                </font>]]></description>
+            <pubDate>Fri, 21 Aug 2023 21:00:00 +0000</pubDate>
+            <enclosure
+            url="https://github.com/ptsochantaris/trailer/releases/download/1.8.8/Trailer-188.zip"
+            sparkle:version="1708"
+            sparkle:shortVersionString="1.8.8"
+            sparkle:dsaSignature="MCwCFH2mAuxvkWrL8ZPFCkxlidXETypZAhQltfDwVYASoA5Ax/2DUskHh+a0pw=="
+            sparkle:edSignature="Xq7i/sdNf0Nd0zCCfGGAnwsXR7YnbthLNhrAgS4kU2tqFm77GKYinL9btAosu/XYcUsPg3azQGn5Qt1uF+6LAg==" length="4025231"
+            type="application/octet-stream"/>
+        </item>
+
+        <item>
             <title>Version 1.8.7</title>
             <sparkle:minimumSystemVersion>11.0.0</sparkle:minimumSystemVersion>
             <description><![CDATA[<font face="sans-serif" size="3"><ul>
