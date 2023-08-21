@@ -716,7 +716,7 @@ enum GraphQL {
     private static func checkAuthoredIssueClosures(nodes: [String: Lista<Node>], in server: ApiServer) {
         let fetchedIssueIds = Set(nodes["Issue"]?.map(\.id) ?? []) // investigate missing issues
         for repo in server.repos.filter({ $0.displayPolicyForIssues == RepoDisplayPolicy.authoredOnly.rawValue }) {
-            for issue in repo.issues where !fetchedIssueIds.contains(issue.nodeId.orEmpty) {
+            for issue in repo.issues where !fetchedIssueIds.contains(issue.nodeId.orEmpty) && issue.shouldCheckForClosing {
                 issue.stateChanged = ListableItem.StateChange.closed.rawValue
                 issue.condition = ItemCondition.closed.rawValue
             }

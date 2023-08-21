@@ -1236,7 +1236,7 @@ class ListableItem: DataItem, Listable {
     }
 
     final var shouldCheckForClosing: Bool {
-        repo.shouldSync && repo.postSyncAction != PostSyncAction.delete.rawValue && apiServer.lastSyncSucceeded
+        condition == ItemCondition.open.rawValue && repo.shouldSync && repo.postSyncAction != PostSyncAction.delete.rawValue && apiServer.lastSyncSucceeded
     }
 
     @MainActor
