@@ -118,7 +118,7 @@ extension API {
         }
     }
 
-    static func v3Sync(_ repos: [Repo], to moc: NSManagedObjectContext) async {
+    static func v3Sync(_ repos: [Repo], to moc: NSManagedObjectContext, settings: Settings.Cache) async {
         await fetchItems(for: repos, in: moc)
         let reposWithSomeItems = repos.filter { !$0.issues.isEmpty || !$0.pullRequests.isEmpty }
         await markExtraUpdatedItems(from: reposWithSomeItems)
@@ -129,7 +129,7 @@ extension API {
 
             if Settings.showStatusItems {
                 group.addTask { @MainActor in
-                    await fetchStatusesForCurrentPullRequests(to: moc)
+                    await fetchStatusesForCurrentPullRequests(to: moc, settings: settings)
                 }
             } else {
                 for p in PullRequest.allItems(in: moc) {
@@ -142,12 +142,12 @@ extension API {
 
             if Settings.notifyOnItemReactions {
                 group.addTask { @MainActor in
-                    let items = PullRequest.reactionCheckBatch(in: moc)
+                    let items = PullRequest.reactionCheckBatch(in: moc, settings: settings)
                     await fetchItemReactionsIfNeeded(for: items, to: moc)
                 }
 
                 group.addTask { @MainActor in
-                    let items = Issue.reactionCheckBatch(in: moc)
+                    let items = Issue.reactionCheckBatch(in: moc, settings: settings)
                     await fetchItemReactionsIfNeeded(for: items, to: moc)
                 }
             }
@@ -173,14 +173,14 @@ extension API {
                 await detectAssignedPullRequests(for: newOrUpdatedPrs)
             }
 
-            if Settings.cache.shouldSyncReviewAssignments {
+            if settings.shouldSyncReviewAssignments {
                 group.addTask { @MainActor in
                     await fetchReviewAssignmentsForCurrentPullRequests(for: newOrUpdatedPrs)
                 }
             }
 
             await withTaskGroup(of: Void.self) { commentGroup in
-                if Settings.cache.shouldSyncReviews {
+                if settings.shouldSyncReviews {
                     commentGroup.addTask { @MainActor in
                         await fetchReviewsForForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
                         await fetchCommentsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
@@ -544,8 +544,8 @@ extension API {
         }
     }
 
-    private static func fetchStatusesForCurrentPullRequests(to moc: NSManagedObjectContext) async {
-        let prs = PullRequest.statusCheckBatch(in: moc)
+    private static func fetchStatusesForCurrentPullRequests(to moc: NSManagedObjectContext, settings: Settings.Cache) async {
+        let prs = PullRequest.statusCheckBatch(in: moc, settings: settings)
         if prs.isEmpty {
             return
         }

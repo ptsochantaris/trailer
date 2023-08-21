@@ -12,19 +12,21 @@ final class TabBarSet {
     var tabItems: [UITabBarItem] {
         let label = viewCriterion?.label
         var items = [UITabBarItem]()
+        
+        let settings = Settings.cache
 
-        let prf = ListableItem.requestForItems(of: PullRequest.self, withFilter: nil, sectionIndex: -1, criterion: viewCriterion)
+        let prf = ListableItem.requestForItems(of: PullRequest.self, withFilter: nil, sectionIndex: -1, criterion: viewCriterion, settings: settings)
         if try! DataManager.main.count(for: prf) > 0 {
             let i = UITabBarItem(title: label ?? "Pull Requests", image: UIImage(named: "prsTab"), selectedImage: nil)
-            let prUnreadCount = PullRequest.badgeCount(in: DataManager.main, criterion: viewCriterion)
+            let prUnreadCount = PullRequest.badgeCount(in: DataManager.main, criterion: viewCriterion, settings: settings)
             i.badgeValue = prUnreadCount > 0 ? "\(prUnreadCount)" : nil
             items.append(i)
             prItem = i
         }
-        let isf = ListableItem.requestForItems(of: Issue.self, withFilter: nil, sectionIndex: -1, criterion: viewCriterion)
+        let isf = ListableItem.requestForItems(of: Issue.self, withFilter: nil, sectionIndex: -1, criterion: viewCriterion, settings: settings)
         if try! DataManager.main.count(for: isf) > 0 {
             let i = UITabBarItem(title: label ?? "Issues", image: UIImage(named: "issuesTab"), selectedImage: nil)
-            let issuesUnreadCount = Issue.badgeCount(in: DataManager.main, criterion: viewCriterion)
+            let issuesUnreadCount = Issue.badgeCount(in: DataManager.main, criterion: viewCriterion, settings: settings)
             i.badgeValue = issuesUnreadCount > 0 ? "\(issuesUnreadCount)" : nil
             items.append(i)
             issuesItem = i
@@ -74,7 +76,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         })
         if (tabs.items?.count ?? 0) > 1 {
             a.addAction(UIAlertAction(title: "On Other Tabs Too", style: .destructive) { _ in
-                app.markEverythingRead()
+                app.markEverythingRead(settings: Settings.cache)
             })
         }
         present(a, animated: true)
@@ -132,8 +134,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
     }
 
     private func markAllAsRead() {
+        let settings = Settings.cache
         for i in fetchedResultsController?.fetchedObjects ?? [] {
-            i.catchUpWithComments()
+            i.catchUpWithComments(settings: settings)
         }
     }
 
@@ -336,7 +339,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
             }
             if i.isSnoozing {
                 if canIssueKeyForIndexPath(action: .wake(date: i.snoozeUntil), indexPath: ip) {
-                    i.wakeUp()
+                    i.wakeUp(settings: Settings.cache)
                 }
             } else {
                 let presets = SnoozePreset.allSnoozePresets(in: DataManager.main)
@@ -368,7 +371,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         if let ip = tableView.indexPathForSelectedRow, let i = fetchedResultsController?.object(at: ip) {
             let isMuted = i.muted
             if (!isMuted && canIssueKeyForIndexPath(action: .mute, indexPath: ip)) || (isMuted && canIssueKeyForIndexPath(action: .unmute, indexPath: ip)) {
-                i.setMute(to: !isMuted)
+                i.setMute(to: !isMuted, settings: Settings.cache)
             }
         }
     }
@@ -530,7 +533,8 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         let r = Range(uncheckedBounds: (lower: 0, upper: fetchedResultsController?.sections?.count ?? 0))
         let currentIndexes = IndexSet(integersIn: r)
 
-        updateQuery(newFetchRequest: itemFetchRequest)
+        let settings = Settings.cache
+        updateQuery(newFetchRequest: itemFetchRequest(settings: settings))
 
         let r2 = Range(uncheckedBounds: (lower: 0, upper: fetchedResultsController?.sections?.count ?? 0))
         let dataIndexes = IndexSet(integersIn: r2)
@@ -629,12 +633,13 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
             viewingPrs = true
         }
 
+        let settings = Settings.cache
+        let newFetchRequest = itemFetchRequest(settings: settings)
         if fetchedResultsController == nil {
-            updateQuery(newFetchRequest: itemFetchRequest)
+            updateQuery(newFetchRequest: newFetchRequest)
             tableView.reloadData()
         } else {
             let latestFetchRequest = fetchedResultsController?.fetchRequest
-            let newFetchRequest = itemFetchRequest
             let newCount = tabs.items?.count ?? 0
             if newCount != lastTabCount || latestFetchRequest != newFetchRequest {
                 updateQuery(newFetchRequest: newFetchRequest)
@@ -812,7 +817,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
     private func showDetail(url: URL, objectId: NSManagedObjectID) {
         if let item = try? DataManager.main.existingObject(with: objectId) as? ListableItem {
-            item.catchUpWithComments()
+            item.catchUpWithComments(settings: Settings.cache)
         }
         UIApplication.shared.open(url, options: [:])
     }
@@ -872,12 +877,12 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
             case .mute:
                 return UIAction(title: action.title, image: UIImage(systemName: "speaker.slash")) { _ in
-                    item.setMute(to: true)
+                    item.setMute(to: true, settings: Settings.cache)
                 }
 
             case .unmute:
                 return UIAction(title: action.title, image: UIImage(systemName: "speaker.2")) { _ in
-                    item.setMute(to: false)
+                    item.setMute(to: false, settings: Settings.cache)
                 }
 
             case .openRepo:
@@ -894,7 +899,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
             case let .snooze(presets):
                 var presetItems = presets.map { preset -> UIAction in
                     UIAction(title: preset.listDescription) { _ in
-                        item.snooze(using: preset)
+                        item.snooze(using: preset, settings: Settings.cache)
                     }
                 }
                 presetItems.append(UIAction(title: "Configure...", image: UIImage(systemName: "gear"), identifier: nil) { _ in
@@ -904,7 +909,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
             case .wake:
                 return UIAction(title: action.title, image: UIImage(systemName: "sun.max")) { _ in
-                    item.wakeUp()
+                    item.wakeUp(settings: Settings.cache)
                 }
             }
         }
@@ -933,7 +938,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         animator.preferredCommitStyle = .dismiss
         animator.addCompletion {
             if let id = configuration.identifier as? NSManagedObjectID, let item = try? DataManager.main.existingObject(with: id) as? ListableItem, let urlString = item.urlForOpening, let url = URL(string: urlString) {
-                item.catchUpWithComments()
+                item.catchUpWithComments(settings: Settings.cache)
                 UIApplication.shared.open(url, options: [:])
             }
         }
@@ -944,7 +949,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
             i = itemUri,
             let oid = DataManager.id(for: i),
             let o = try? DataManager.main.existingObject(with: oid) as? ListableItem {
-            o.catchUpWithComments()
+            o.catchUpWithComments(settings: Settings.cache)
         }
     }
 
@@ -954,7 +959,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
             let oid = DataManager.id(for: i),
             let o = try? DataManager.main.existingObject(with: oid) as? ListableItem {
             o.latestReadCommentDate = .distantPast
-            o.postProcess()
+            o.postProcess(settings: Settings.cache)
         }
     }
 
@@ -966,17 +971,17 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
                                   preferredStyle: .alert)
         for preset in snoozePresets {
             a.addAction(UIAlertAction(title: preset.listDescription, style: .default) { _ in
-                i.snooze(using: preset)
+                i.snooze(using: preset, settings: Settings.cache)
             })
         }
         a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         present(a, animated: true)
     }
 
-    private var itemFetchRequest: NSFetchRequest<ListableItem> {
+    private func itemFetchRequest(settings: Settings.Cache) -> NSFetchRequest<ListableItem> {
         let type: ListableItem.Type = viewingPrs ? PullRequest.self : Issue.self
         let text = navigationItem.searchController?.searchBar.text
-        return ListableItem.requestForItems(of: type, withFilter: text, sectionIndex: -1, criterion: currentTabBarSet?.viewCriterion)
+        return ListableItem.requestForItems(of: type, withFilter: text, sectionIndex: -1, criterion: currentTabBarSet?.viewCriterion, settings: settings)
     }
 
     private var animatedUpdates = false
@@ -1049,9 +1054,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
     private func configureCell(cell: UITableViewCell, withObject: ListableItem) {
         guard let c = cell as? PRCell else { return }
         if let o = withObject as? PullRequest {
-            c.setPullRequest(pullRequest: o)
+            c.setPullRequest(pullRequest: o, settings: Settings.cache)
         } else if let o = withObject as? Issue {
-            c.setIssue(issue: o)
+            c.setIssue(issue: o, settings: Settings.cache)
         }
     }
 
@@ -1128,7 +1133,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
     func resetView(becauseOfChanges: Bool) async {
         await safeScrollToTop()
-        updateQuery(newFetchRequest: itemFetchRequest)
+        updateQuery(newFetchRequest: itemFetchRequest(settings: Settings.cache))
         updateStatus(becauseOfChanges: becauseOfChanges)
         tableView.reloadData()
     }

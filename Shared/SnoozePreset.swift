@@ -62,12 +62,12 @@ final class SnoozePreset: NSManagedObject {
         }
     }
 
-    func wakeUpAllAssociatedItems() {
+    func wakeUpAllAssociatedItems(settings: Settings.Cache) {
         for p in appliedToPullRequests {
-            p.wakeUp()
+            p.wakeUp(settings: settings)
         }
         for i in appliedToIssues {
-            i.wakeUp()
+            i.wakeUp(settings: settings)
         }
     }
 

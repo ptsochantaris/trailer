@@ -22,7 +22,7 @@ final class TrailerCell: NSTableCellView {
     private let subtitle = CenterTextField(frame: .zero)
     private var trackingArea: NSTrackingArea?
 
-    init(item: ListableItem) {
+    init(item: ListableItem, settings: Settings.Cache) {
         dataItemId = item.objectID
 
         super.init(frame: .zero)
@@ -34,8 +34,7 @@ final class TrailerCell: NSTableCellView {
         let showUnpin = item.condition != ItemCondition.open.rawValue
         if showUnpin { W -= REMOVE_BUTTON_WIDTH } else { W -= 4 }
 
-        let context = Settings.cache
-        let showAvatar = !context.hideAvatars
+        let showAvatar = !settings.hideAvatars
         let shift: CGFloat = showAvatar ? AVATAR_SIZE + AVATAR_PADDING : -4
         W -= shift
 
@@ -51,13 +50,13 @@ final class TrailerCell: NSTableCellView {
             y += height
         }
 
-        if let pullRequest = item as? PullRequest, item.section.shouldListStatuses {
-            let statuses = pullRequest.displayedStatusLines.reversed()
+        if let pullRequest = item as? PullRequest, item.section.shouldListStatuses(settings: settings) {
+            let statuses = pullRequest.displayedStatusLines(settings: settings).reversed()
             if !statuses.isEmpty {
                 for status in statuses {
                     let statusLabel = LinkField(frame: .zero)
                     statusLabel.targetUrl = status.targetUrl
-                    statusLabel.needsCommand = !context.makeStatusItemsSelectable
+                    statusLabel.needsCommand = !settings.makeStatusItemsSelectable
                     statusLabel.attributedStringValue = NSAttributedString(string: status.displayText, attributes: TrailerCell.statusAttributes)
                     statusLabel.textColor = status.colorForDisplay
                     statusLabel.alphaValue = faded ? DISABLED_FADE : 1.0
@@ -67,7 +66,7 @@ final class TrailerCell: NSTableCellView {
             }
         }
 
-        updateText(for: item)
+        updateText(for: item, settings: settings)
         append(subtitle)
         append(reviews)
         y += 1
@@ -135,11 +134,11 @@ final class TrailerCell: NSTableCellView {
         selected = false
     }
 
-    private func updateText(for item: ListableItem) {
-        title.attributedStringValue = item.title(with: titleFont, labelFont: detailFont, titleColor: .controlTextColor, numberColor: .secondaryLabelColor)
-        labels.attributedStringValue = item.labelsAttributedString(labelFont: detailFont) ?? emptyAttributedString
-        reviews.attributedStringValue = (item as? PullRequest)?.reviewsAttributedString(labelFont: detailFont) ?? emptyAttributedString
-        subtitle.attributedStringValue = item.subtitle(with: detailFont, lightColor: .tertiaryLabelColor, darkColor: .secondaryLabelColor, separator: "   ")
+    private func updateText(for item: ListableItem, settings: Settings.Cache) {
+        title.attributedStringValue = item.title(with: titleFont, labelFont: detailFont, titleColor: .controlTextColor, numberColor: .secondaryLabelColor, settings: settings)
+        labels.attributedStringValue = item.labelsAttributedString(labelFont: detailFont, settings: settings) ?? emptyAttributedString
+        reviews.attributedStringValue = (item as? PullRequest)?.reviewsAttributedString(labelFont: detailFont, settings: settings) ?? emptyAttributedString
+        subtitle.attributedStringValue = item.subtitle(with: detailFont, lightColor: .tertiaryLabelColor, darkColor: .secondaryLabelColor, separator: "   ", settings: settings)
     }
 
     var selected = false {
@@ -147,7 +146,7 @@ final class TrailerCell: NSTableCellView {
             guard let table = app.visibleWindow?.table else { return }
 
             if let associatedDataItem {
-                updateText(for: associatedDataItem)
+                updateText(for: associatedDataItem, settings: Settings.cache)
             }
 
             if selected {
@@ -282,21 +281,21 @@ final class TrailerCell: NSTableCellView {
 
     @objc private func snoozeSelected(_ sender: NSMenuItem) {
         if let associatedDataItem, let oid = sender.representedObject as? NSManagedObjectID, let snoozeItem = try? DataManager.main.existingObject(with: oid) as? SnoozePreset {
-            associatedDataItem.snooze(using: snoozeItem)
+            associatedDataItem.snooze(using: snoozeItem, settings: Settings.cache)
             saveAndRequestMenuUpdate(associatedDataItem)
         }
     }
 
     @objc private func wakeUpSelected() {
         if let associatedDataItem {
-            associatedDataItem.wakeUp()
+            associatedDataItem.wakeUp(settings: Settings.cache)
             saveAndRequestMenuUpdate(associatedDataItem)
         }
     }
 
     @objc private func markReadSelected() {
         if let associatedDataItem {
-            associatedDataItem.catchUpWithComments()
+            associatedDataItem.catchUpWithComments(settings: Settings.cache)
             saveAndRequestMenuUpdate(associatedDataItem)
         }
     }
@@ -304,21 +303,21 @@ final class TrailerCell: NSTableCellView {
     @objc private func markUnreadSelected() {
         if let associatedDataItem {
             associatedDataItem.latestReadCommentDate = .distantPast
-            associatedDataItem.postProcess()
+            associatedDataItem.postProcess(settings: Settings.cache)
             saveAndRequestMenuUpdate(associatedDataItem)
         }
     }
 
     @objc private func muteSelected() {
         if let associatedDataItem {
-            associatedDataItem.setMute(to: true)
+            associatedDataItem.setMute(to: true, settings: Settings.cache)
             saveAndRequestMenuUpdate(associatedDataItem)
         }
     }
 
     @objc private func unMuteSelected() {
         if let associatedDataItem {
-            associatedDataItem.setMute(to: false)
+            associatedDataItem.setMute(to: false, settings: Settings.cache)
             saveAndRequestMenuUpdate(associatedDataItem)
         }
     }

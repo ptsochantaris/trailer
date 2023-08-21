@@ -87,7 +87,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         NotificationManager.shared.setup()
 
         Task {
-            await DataManager.postProcessAllItems(in: DataManager.main)
+            await DataManager.postProcessAllItems(in: DataManager.main, settings: Settings.cache)
             await API.updateLimitsFromServer()
         }
 
@@ -160,7 +160,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         ignoreNextFocusLoss = alternativeSelect
 
         let urlToOpen = item.urlForOpening
-        item.catchUpWithComments()
+        item.catchUpWithComments(settings: Settings.cache)
         Task {
             await updateRelatedMenus(for: item)
             
@@ -270,7 +270,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         }
         Task {
             await DataManager.saveDB()
-            await menuBarSet.updatePrMenu()
+            await menuBarSet.updatePrMenu(settings: Settings.cache)
             await ensureAtLeastOneMenuVisible()
         }
     }
@@ -282,7 +282,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         }
         Task {
             await DataManager.saveDB()
-            await menuBarSet.updatePrMenu()
+            await menuBarSet.updatePrMenu(settings: Settings.cache)
             await ensureAtLeastOneMenuVisible()
         }
     }
@@ -294,7 +294,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         }
         Task {
             await DataManager.saveDB()
-            await menuBarSet.updateIssuesMenu()
+            await menuBarSet.updateIssuesMenu(settings: Settings.cache)
             await ensureAtLeastOneMenuVisible()
         }
     }
@@ -305,13 +305,14 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         DataManager.main.delete(item)
         Task {
             await DataManager.saveDB()
+            let settings = Settings.cache
             if item is PullRequest {
                 for menu in menus {
-                    await menu.updatePrMenu()
+                    await menu.updatePrMenu(settings: settings)
                 }
             } else if item is Issue {
                 for menu in menus {
-                    await menu.updateIssuesMenu()
+                    await menu.updateIssuesMenu(settings: settings)
                 }
             }
             await ensureAtLeastOneMenuVisible()
@@ -336,17 +337,18 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 
         let prMenu = window === menuBarSet.prMenu
         let type: ListableItem.Type = prMenu ? PullRequest.self : Issue.self
-        let f = ListableItem.requestForItems(of: type, withFilter: window.filter.stringValue, sectionIndex: -1, criterion: menuBarSet.viewCriterion)
+        let f = ListableItem.requestForItems(of: type, withFilter: window.filter.stringValue, sectionIndex: -1, criterion: menuBarSet.viewCriterion, settings: Settings.cache)
+        let settings = Settings.cache
         for r in try! DataManager.main.fetch(f) {
-            r.catchUpWithComments()
+            r.catchUpWithComments(settings: settings)
         }
 
         Task {
             await DataManager.saveDB()
             if prMenu {
-                await menuBarSet.updatePrMenu()
+                await menuBarSet.updatePrMenu(settings: Settings.cache)
             } else {
-                await menuBarSet.updateIssuesMenu()
+                await menuBarSet.updateIssuesMenu(settings: Settings.cache)
             }
             await ensureAtLeastOneMenuVisible()
         }
@@ -405,7 +407,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
             _ = alert.runModal()
             return false
         }
-        await DataManager.postProcessAllItems(in: DataManager.main)
+        await DataManager.postProcessAllItems(in: DataManager.main, settings: Settings.cache)
         await DataManager.saveDB()
         preferencesWindow?.reloadSettings()
         setupWindows()
@@ -523,13 +525,14 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
     @MainActor
     func updateRelatedMenus(for i: ListableItem) async {
         let menus = relatedMenus(for: i)
+        let settings = Settings.cache
         if i is PullRequest {
             for menu in menus {
-                await menu.updatePrMenu()
+                await menu.updatePrMenu(settings: settings)
             }
         } else if i is Issue {
             for menu in menus {
-                await menu.updateIssuesMenu()
+                await menu.updateIssuesMenu(settings: settings)
             }
         }
         await ensureAtLeastOneMenuVisible()
@@ -554,10 +557,12 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         return false
     }
 
+    @MainActor
     func updateAllMenus() async {
+        let settings = Settings.cache
         for d in menuBarSets {
-            await d.updatePrMenu()
-            await d.updateIssuesMenu()
+            await d.updatePrMenu(settings: settings)
+            await d.updateIssuesMenu(settings: settings)
         }
         await ensureAtLeastOneMenuVisible()
     }
@@ -568,7 +573,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         if !atLeastOneMenuVisible, let firstMenu = menuBarSets.first(where: { $0.viewCriterion?.label == nil }) ?? menuBarSets.first {
             // Safety net: Ensure that at the very least (usually while importing
             // from an empty DB, with all repos in groups) *some* menu stays visible
-            await firstMenu.updatePrMenu(forceVisible: true)
+            await firstMenu.updatePrMenu(forceVisible: true, settings: Settings.cache)
         }
     }
 
@@ -596,7 +601,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         }
 
         Task {
-            await API.performSync()
+            await API.performSync(settings: Settings.cache)
 
             if Settings.V4IdMigrationPhase == .failedPending {
                 let alert = NSAlert()
@@ -757,7 +762,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                     let chars = incomingEvent.charactersIgnoringModifiers.orEmpty
                     switch chars {
                     case "m":
-                        selectedItem.setMute(to: !selectedItem.muted)
+                        selectedItem.setMute(to: !selectedItem.muted, settings: Settings.cache)
                         Task {
                             await DataManager.saveDB()
                             await app.updateRelatedMenus(for: selectedItem)
@@ -790,7 +795,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
     @MainActor
     private func wake(item: ListableItem, window: MenuWindow) {
         let oldIndex = window.table.selectedRow
-        item.wakeUp()
+        item.wakeUp(settings: Settings.cache)
         Task {
             await DataManager.saveDB()
             await app.updateRelatedMenus(for: item)
@@ -803,7 +808,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         let s = SnoozePreset.allSnoozePresets(in: DataManager.main)
         if s.count > snoozeIndex {
             let oldIndex = window.table.selectedRow
-            item.snooze(using: s[snoozeIndex])
+            item.snooze(using: s[snoozeIndex], settings: Settings.cache)
             Task {
                 await DataManager.saveDB()
                 await updateRelatedMenus(for: item)

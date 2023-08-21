@@ -31,8 +31,9 @@ final class HiddenItemWindow: NSWindow, NSWindowDelegate {
 
             var hiddenCount = 0
 
+            let settings = Settings.cache
             func report(for item: ListableItem) {
-                let section = item.postProcess()
+                let section = item.postProcess(settings: settings)
                 switch section {
                 case let .hidden(cause):
                     let title = item.title ?? "<no title>"

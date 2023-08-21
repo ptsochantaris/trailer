@@ -234,7 +234,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         n.addObserver(self, selector: #selector(updateImportExportSettings), name: .SettingsExported, object: nil)
 
         deferredUpdateTimer = PopTimer(timeInterval: 1) { @MainActor [weak self] in
-            await DataManager.postProcessAllItems(in: DataManager.main)
+            await DataManager.postProcessAllItems(in: DataManager.main, settings: Settings.cache)
             guard let self else {
                 return
             }
@@ -2007,7 +2007,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
                     case .alertFirstButtonReturn:
                         break
                     case .alertSecondButtonReturn:
-                        selectedSnoozePreset.wakeUpAllAssociatedItems()
+                        selectedSnoozePreset.wakeUpAllAssociatedItems(settings: Settings.cache)
                         fallthrough
                     case .alertThirdButtonReturn:
                         self.completeSnoozeDelete(for: selectedSnoozePreset, index)

@@ -96,7 +96,7 @@ final class CommentBlacklistViewController: UITableViewController {
             Settings.itemAuthorBlacklist = newList
         }
         Task {
-            await DataManager.postProcessAllItems(in: DataManager.main)
+            await DataManager.postProcessAllItems(in: DataManager.main, settings: Settings.cache)
         }
     }
 

@@ -52,7 +52,7 @@ final class Issue: ListableItem {
         ["Issue", "Issues"] + super.searchKeywords
     }
 
-    static func markEverythingRead(in section: Section, in moc: NSManagedObjectContext) {
+    static func markEverythingRead(in section: Section, in moc: NSManagedObjectContext, settings: Settings.Cache) {
         let f = NSFetchRequest<Issue>(entityName: "Issue")
         f.returnsObjectsAsFaults = false
         f.includesSubentities = false
@@ -60,7 +60,7 @@ final class Issue: ListableItem {
             f.predicate = section.matchingPredicate
         }
         for pr in try! moc.fetch(f) {
-            pr.catchUpWithComments()
+            pr.catchUpWithComments(settings: settings)
         }
     }
 
@@ -72,8 +72,8 @@ final class Issue: ListableItem {
     }
 
     @MainActor
-    static func badgeCount(in moc: NSManagedObjectContext, criterion: GroupingCriterion?) -> Int {
-        let f = requestForItems(of: Issue.self, withFilter: nil, sectionIndex: -1, criterion: criterion)
+    static func badgeCount(in moc: NSManagedObjectContext, criterion: GroupingCriterion?, settings: Settings.Cache) -> Int {
+        let f = requestForItems(of: Issue.self, withFilter: nil, sectionIndex: -1, criterion: criterion, settings: settings)
         return badgeCount(from: f, in: moc)
     }
 

@@ -45,10 +45,10 @@ final class Application: NSApplication {
                     case "a":
                         if let i = app.focusedItem(blink: true) {
                             if i.hasUnreadCommentsOrAlert {
-                                i.catchUpWithComments()
+                                i.catchUpWithComments(settings: Settings.cache)
                             } else {
                                 i.latestReadCommentDate = .distantPast
-                                i.postProcess()
+                                i.postProcess(settings: Settings.cache)
                             }
                             Task { @MainActor in
                                 await DataManager.saveDB()

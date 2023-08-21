@@ -31,7 +31,7 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
         }
 
         settingsChangedTimer = PopTimer(timeInterval: 1.0) { @MainActor in
-            await DataManager.postProcessAllItems(in: DataManager.main)
+            await DataManager.postProcessAllItems(in: DataManager.main, settings: Settings.cache)
         }
 
         tableView.tableHeaderView = header
@@ -175,7 +175,7 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
         if settingsChangedTimer.isPushed {
             settingsChangedTimer.abort()
             Task {
-                await DataManager.postProcessAllItems(in: DataManager.main)
+                await DataManager.postProcessAllItems(in: DataManager.main, settings: Settings.cache)
             }
         }
     }

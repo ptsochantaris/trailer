@@ -29,22 +29,10 @@ enum MigrationStatus: Int {
 }
 
 enum Settings {
-    private static var _cache: Cache?
-    private static let cacheAccess = DispatchSemaphore(value: 1)
+    @MainActor
+    static var cache = Cache()
     
-    static var cache: Cache {
-        cacheAccess.wait()
-        if let _cache {
-            cacheAccess.signal()
-            return _cache
-        }
-        let new = Cache()
-        _cache = new
-        cacheAccess.signal()
-        return new
-    }
-    
-    struct Cache {
+    final class Cache {
         let excludedLabels = Set(Settings.labelBlacklist.map(\.comparableForm))
         let excludedAuthors = Set(Settings.itemAuthorBlacklist.map(\.comparableForm))
         let excludedCommentAuthors = Set(Settings.commentAuthorBlacklist.map(\.comparableForm))
@@ -74,6 +62,8 @@ enum Settings {
         let hidePrsThatArentPassing = Settings.hidePrsThatArentPassing
         let hidePrsThatDontPassOnlyInAll = Settings.hidePrsThatDontPassOnlyInAll
         let notifyOnReviewAssignments = Settings.notifyOnReviewAssignments
+        let queryAuthoredIssues = Settings.queryAuthoredIssues
+        let showRequestedTeamReviews = Settings.showRequestedTeamReviews
         
         let showCommentsEverywhere = Settings.showCommentsEverywhere
         let scanClosedAndMergedItems = Settings.scanClosedAndMergedItems
@@ -295,16 +285,12 @@ enum Settings {
             } else {
                 sharedDefaults.removeObject(forKey: key)
             }
-            Logging.log("Invalidating settings cache")
-            cacheAccess.wait()
-            _cache = nil
-            cacheAccess.signal()
-
-#if os(macOS)
             Task { @MainActor in
+                cache = Cache()
+#if os(macOS)
                 possibleExport(key)
-            }
 #endif
+            }
         }
     }
 

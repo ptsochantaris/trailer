@@ -45,7 +45,7 @@ enum DataManager {
         ApiServer.ensureAtLeastGithub(in: main)
     }
 
-    private static func processNotificationsForItems(of type: (some ListableItem).Type, newNotification: NotificationType, reopenedNotification: NotificationType, assignmentNotification: NotificationType) async {
+    private static func processNotificationsForItems(of type: (some ListableItem).Type, newNotification: NotificationType, reopenedNotification: NotificationType, assignmentNotification: NotificationType, settings: Settings.Cache) async {
         await runInChild(of: main) { child in
             for i in type.allItems(in: child) {
                 if i.stateChanged != 0 {
@@ -55,10 +55,10 @@ enum DataManager {
                         i.announced = true
 
                     case ListableItem.StateChange.merged.rawValue:
-                        i.handleMerging()
+                        i.handleMerging(settings: settings)
 
                     case ListableItem.StateChange.closed.rawValue:
-                        i.handleClosing()
+                        i.handleClosing(settings: settings)
 
                     default: break
                     }
@@ -78,28 +78,28 @@ enum DataManager {
         }
     }
 
-    private static func processCommentAndReviewNotifications() async {
+    private static func processCommentAndReviewNotifications(settings: Settings.Cache) async {
         await runInChild(of: main) { child in
             for c in PRComment.newItems(in: child) {
-                c.processNotifications()
+                c.processNotifications(settings: settings)
                 c.postSyncAction = PostSyncAction.doNothing.rawValue
             }
 
             for r in Review.newOrUpdatedItems(in: child) {
-                r.processNotifications()
+                r.processNotifications(settings: settings)
                 r.postSyncAction = PostSyncAction.doNothing.rawValue
             }
         }
     }
 
-    private static func processStatusNotifications() async {
+    private static func processStatusNotifications(settings: Settings.Cache) async {
         await runInChild(of: main) { child in
             let latestStatuses = PRStatus.newItems(in: child)
             var coveredPrs = Set<NSManagedObjectID>()
-            if Settings.cache.notifyOnStatusUpdates {
-                for pr in latestStatuses.map(\.pullRequest) where pr.shouldAnnounceStatus() && !coveredPrs.contains(pr.objectID) {
+            if settings.notifyOnStatusUpdates {
+                for pr in latestStatuses.map(\.pullRequest) where pr.shouldAnnounceStatus(settings: settings) && !coveredPrs.contains(pr.objectID) {
                     coveredPrs.insert(pr.objectID)
-                    if let s = pr.displayedStatusLines.first {
+                    if let s = pr.displayedStatusLines(settings: settings).first {
                         let displayText = s.descriptionText
                         if pr.lastStatusNotified != displayText, pr.postSyncAction != PostSyncAction.isNew.rawValue {
                             NotificationQueue.add(type: .newStatus, for: s)
@@ -115,7 +115,7 @@ enum DataManager {
             for pr in latestStatuses.map(\.pullRequest) where pr.isSnoozing && pr.shouldWakeOnStatusChange && !coveredPrs.contains(pr.objectID) {
                 coveredPrs.insert(pr.objectID)
                 Logging.log("Waking up snoozed PR ID \(pr.nodeId ?? "<no ID>") because of a status update")
-                pr.wakeUp()
+                pr.wakeUp(settings: settings)
             }
 
             for s in latestStatuses {
@@ -137,24 +137,24 @@ enum DataManager {
         }
     }
 
-    static func sendNotificationsIndexAndSave() async {
+    static func sendNotificationsIndexAndSave(settings: Settings.Cache) async {
         await saveDB() // get IDs
 
-        await postProcessAllItems(in: main)
+        await postProcessAllItems(in: main, settings: settings)
 
-        await processNotificationsForItems(of: PullRequest.self, newNotification: .newPr, reopenedNotification: .prReopened, assignmentNotification: .newPrAssigned)
+        await processNotificationsForItems(of: PullRequest.self, newNotification: .newPr, reopenedNotification: .prReopened, assignmentNotification: .newPrAssigned, settings: settings)
 
-        await processNotificationsForItems(of: Issue.self, newNotification: .newIssue, reopenedNotification: .issueReopened, assignmentNotification: .newIssueAssigned)
+        await processNotificationsForItems(of: Issue.self, newNotification: .newIssue, reopenedNotification: .issueReopened, assignmentNotification: .newIssueAssigned, settings: settings)
 
-        await processCommentAndReviewNotifications()
+        await processCommentAndReviewNotifications(settings: settings)
 
-        await processStatusNotifications()
+        await processStatusNotifications(settings: settings)
 
         await runInChild(of: main) { child in
             let nothing = PostSyncAction.doNothing.rawValue
 
             for r in Reaction.newOrUpdatedItems(in: child) {
-                r.checkNotifications()
+                r.checkNotifications(settings: settings)
                 r.postSyncAction = nothing
             }
 
@@ -223,9 +223,10 @@ enum DataManager {
 
         let itemsToIndex = Lista<CSSearchableItem>()
         let itemsToRemove = Lista<String>()
+        let settings = Settings.cache
 
         for pr in PullRequest.allItems(in: main) {
-            switch await pr.handleSpotlight() {
+            switch await pr.handleSpotlight(settings: settings) {
             case let .needsIndexing(item):
                 itemsToIndex.append(item)
             case let .needsRemoval(uri):
@@ -234,7 +235,7 @@ enum DataManager {
         }
 
         for issue in Issue.allItems(in: main) {
-            switch await issue.handleSpotlight() {
+            switch await issue.handleSpotlight(settings: settings) {
             case let .needsIndexing(item):
                 itemsToIndex.append(item)
             case let .needsRemoval(uri):
@@ -312,11 +313,12 @@ enum DataManager {
         }
         let urisToDelete = Lista<String>()
         let itemsToReIndex = Lista<CSSearchableItem>()
+        let settings = Settings.cache
         for updatedItem in updates {
             guard let updatedItem = updatedItem as? ListableItem else {
                 continue
             }
-            let result = await updatedItem.handleSpotlight()
+            let result = await updatedItem.handleSpotlight(settings: settings)
             switch result {
             case let .needsIndexing(item):
                 itemsToReIndex.append(item)
@@ -392,7 +394,7 @@ enum DataManager {
         }
     }
 
-    static func postProcessAllItems(in context: NSManagedObjectContext) async {
+    static func postProcessAllItems(in context: NSManagedObjectContext, settings: Settings.Cache) async {
         let start = Date()
         let increment = 200
 
@@ -402,7 +404,7 @@ enum DataManager {
                 group.addTask(priority: .high) {
                     await runInChild(of: context) { child in
                         for p in PullRequest.allItems(offset: i, count: increment, in: child, prefetchRelationships: ["comments", "reactions", "reviews"]) {
-                            p.postProcess()
+                            p.postProcess(settings: settings)
                         }
                     }
                 }
@@ -413,7 +415,7 @@ enum DataManager {
                 group.addTask(priority: .high) {
                     await runInChild(of: context) { child in
                         for i in Issue.allItems(offset: i, count: increment, in: child, prefetchRelationships: ["comments", "reactions"]) {
-                            i.postProcess()
+                            i.postProcess(settings: settings)
                         }
                     }
                 }

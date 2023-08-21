@@ -53,13 +53,13 @@ final class MenuBarSet {
     func setTimers() {
         prFilterTimer = PopTimer(timeInterval: 0.2) { @MainActor [weak self] in
             guard let self else { return }
-            await updatePrMenu()
+            await updatePrMenu(settings: Settings.cache)
             prMenu.scrollToTop()
         }
 
         issuesFilterTimer = PopTimer(timeInterval: 0.2) { @MainActor [weak self] in
             guard let self else { return }
-            await updateIssuesMenu()
+            await updateIssuesMenu(settings: Settings.cache)
             issuesMenu.scrollToTop()
         }
     }
@@ -71,7 +71,7 @@ final class MenuBarSet {
 
         if prMenu.messageView != nil {
             Task {
-                await updatePrMenu()
+                await updatePrMenu(settings: Settings.cache)
             }
         }
         prMenu.refreshMenuItem.title = " Refreshing…"
@@ -79,7 +79,7 @@ final class MenuBarSet {
 
         if issuesMenu.messageView != nil {
             Task {
-                await updateIssuesMenu()
+                await updateIssuesMenu(settings: Settings.cache)
             }
         }
         issuesMenu.refreshMenuItem.title = " Refreshing…"
@@ -108,8 +108,8 @@ final class MenuBarSet {
     private static let normalText = [NSAttributedString.Key.font: NSFont.menuBarFont(ofSize: 10),
                                      NSAttributedString.Key.foregroundColor: NSColor.controlTextColor]
 
-    private func shouldShow(type: ListableItem.Type) -> Bool {
-        let fc = ListableItem.requestForItems(of: type, withFilter: nil, sectionIndex: -1, criterion: viewCriterion)
+    private func shouldShow(type: ListableItem.Type, settings: Settings.Cache) -> Bool {
+        let fc = ListableItem.requestForItems(of: type, withFilter: nil, sectionIndex: -1, criterion: viewCriterion, settings: settings)
         fc.fetchLimit = 1
         return try! DataManager.main.count(for: fc) > 0
     }
@@ -118,8 +118,9 @@ final class MenuBarSet {
                             menu: MenuWindow,
                             forceVisible: Bool,
                             hasUnread: Bool,
+                            settings: Settings.Cache,
                             reasonForEmpty: @escaping @MainActor (String) async -> NSAttributedString) async {
-        if forceVisible || shouldShow(type: type) {
+        if forceVisible || shouldShow(type: type, settings: settings) {
             let isRefreshing = API.isRefreshing
             let shouldGray = Settings.grayOutWhenRefreshing && isRefreshing
 
@@ -127,7 +128,7 @@ final class MenuBarSet {
             let attributes = somethingFailed || hasUnread ? MenuBarSet.redText : MenuBarSet.normalText
 
             let excludeSnoozed = !Settings.countVisibleSnoozedItems
-            let f = ListableItem.requestForItems(of: type, withFilter: menu.filter.stringValue, sectionIndex: -1, criterion: viewCriterion, excludeSnoozed: excludeSnoozed)
+            let f = ListableItem.requestForItems(of: type, withFilter: menu.filter.stringValue, sectionIndex: -1, criterion: viewCriterion, excludeSnoozed: excludeSnoozed, settings: settings)
             let countString = somethingFailed ? "X" : (Settings.hideMenubarCounts ? "" : String(try! DataManager.main.count(for: f)))
 
             Logging.log("Updating \(viewCriterion?.label ?? "general") \(type) menu, \(countString) total items")
@@ -166,10 +167,10 @@ final class MenuBarSet {
         menu.size(andShow: false)
     }
 
-    func updateIssuesMenu(forceVisible: Bool = false) async {
+    func updateIssuesMenu(forceVisible: Bool = false, settings: Settings.Cache) async {
         if forceVisible || Repo.mayProvideIssuesForDisplay(fromServerWithId: viewCriterion?.apiServerId) {
-            let hasUnread = Issue.badgeCount(in: DataManager.main, criterion: viewCriterion) > 0
-            await updateMenu(of: Issue.self, menu: issuesMenu, forceVisible: forceVisible, hasUnread: hasUnread) {
+            let hasUnread = Issue.badgeCount(in: DataManager.main, criterion: viewCriterion, settings: settings) > 0
+            await updateMenu(of: Issue.self, menu: issuesMenu, forceVisible: forceVisible, hasUnread: hasUnread, settings: settings) {
                 Issue.reasonForEmpty(with: $0, criterion: self.viewCriterion)
             }
 
@@ -178,11 +179,11 @@ final class MenuBarSet {
         }
     }
 
-    func updatePrMenu(forceVisible: Bool = false) async {
+    func updatePrMenu(forceVisible: Bool = false, settings: Settings.Cache) async {
         let sid = viewCriterion?.apiServerId
         if forceVisible || Repo.mayProvidePrsForDisplay(fromServerWithId: sid) || !Repo.mayProvideIssuesForDisplay(fromServerWithId: sid) {
-            let hasUnread = PullRequest.badgeCount(in: DataManager.main, criterion: viewCriterion) > 0
-            await updateMenu(of: PullRequest.self, menu: prMenu, forceVisible: forceVisible, hasUnread: hasUnread) {
+            let hasUnread = PullRequest.badgeCount(in: DataManager.main, criterion: viewCriterion, settings: settings) > 0
+            await updateMenu(of: PullRequest.self, menu: prMenu, forceVisible: forceVisible, hasUnread: hasUnread, settings: settings) {
                 PullRequest.reasonForEmpty(with: $0, criterion: self.viewCriterion)
             }
 

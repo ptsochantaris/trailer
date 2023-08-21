@@ -55,7 +55,7 @@ final class WatchlistSettingsViewController: UITableViewController, PickerViewCo
                 if Settings.hideArchivedRepos, Repo.hideArchivedRepos(in: DataManager.main) {
                     Task {
                         await DataManager.saveDB()
-                        await DataManager.postProcessAllItems(in: DataManager.main)
+                        await DataManager.postProcessAllItems(in: DataManager.main, settings: Settings.cache)
                     }
                 }
             }

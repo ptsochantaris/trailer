@@ -157,7 +157,7 @@ final class PullRequest: ListableItem {
         return nil
     }
 
-    func shouldContributeToCount(since: Date) -> Bool {
+    func shouldContributeToCount(since: Date, settings: Settings.Cache) -> Bool {
         guard !createdByMe,
               let userLogin,
               let createdAt,
@@ -165,7 +165,7 @@ final class PullRequest: ListableItem {
         else {
             return false
         }
-        return !Settings.cache.excludedCommentAuthors.contains(userLogin.comparableForm)
+        return !settings.excludedCommentAuthors.contains(userLogin.comparableForm)
     }
 
     override var shouldHideBecauseOfRepoHidingPolicy: Section.HidingCause? {
@@ -258,7 +258,7 @@ final class PullRequest: ListableItem {
         return try! moc.count(for: f) > 0
     }
 
-    static func markEverythingRead(in section: Section, in moc: NSManagedObjectContext) {
+    static func markEverythingRead(in section: Section, in moc: NSManagedObjectContext, settings: Settings.Cache) {
         let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
         f.returnsObjectsAsFaults = false
         f.includesSubentities = false
@@ -266,13 +266,13 @@ final class PullRequest: ListableItem {
             f.predicate = section.matchingPredicate
         }
         for pr in try! moc.fetch(f) {
-            pr.catchUpWithComments()
+            pr.catchUpWithComments(settings: settings)
         }
     }
 
-    override func catchUpWithComments() {
+    override func catchUpWithComments(settings: Settings.Cache) {
         hasNewCommits = false
-        super.catchUpWithComments()
+        super.catchUpWithComments(settings: settings)
     }
 
     override class func badgeCount(from fetch: NSFetchRequest<some ListableItem>, in moc: NSManagedObjectContext) -> Int {
@@ -302,8 +302,8 @@ final class PullRequest: ListableItem {
     }
 
     @MainActor
-    static func badgeCount(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
-        let f = requestForItems(of: PullRequest.self, withFilter: nil, sectionIndex: -1, criterion: criterion)
+    static func badgeCount(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, settings: Settings.Cache) -> Int {
+        let f = requestForItems(of: PullRequest.self, withFilter: nil, sectionIndex: -1, criterion: criterion, settings: settings)
         return badgeCount(from: f, in: moc)
     }
 
@@ -320,9 +320,8 @@ final class PullRequest: ListableItem {
         headRefName
     }
 
-    override func shouldHideBecauseOfRedStatuses(in section: Section) -> Section.HidingCause? {
-        let context = Settings.cache
-        guard context.hidePrsThatArentPassing else {
+    override func shouldHideBecauseOfRedStatuses(in section: Section, settings: Settings.Cache) -> Section.HidingCause? {
+        guard settings.hidePrsThatArentPassing else {
             return nil
         }
 
@@ -331,7 +330,7 @@ final class PullRequest: ListableItem {
             break
 
         case .mine, .participated:
-            if context.hidePrsThatDontPassOnlyInAll {
+            if settings.hidePrsThatDontPassOnlyInAll {
                 return nil
             }
 
@@ -339,7 +338,7 @@ final class PullRequest: ListableItem {
             return nil
         }
         
-        let allSuccesses = displayedStatusLines.allSatisfy { $0.state == "success" }
+        let allSuccesses = displayedStatusLines(settings: settings).allSatisfy { $0.state == "success" }
 
         guard allSuccesses else {
             return .containsNonGreenStatuses
@@ -348,18 +347,18 @@ final class PullRequest: ListableItem {
         return nil
     }
 
-    override func countReviews() -> Int {
-        guard Settings.cache.requiresReviewApis else {
+    override func countReviews(settings: Settings.Cache) -> Int {
+        guard settings.requiresReviewApis else {
             return 0
         }
         var count = 0
-        for r in reviews where r.shouldContributeToCount(since: .distantPast) {
+        for r in reviews where r.shouldContributeToCount(since: .distantPast, settings: settings) {
             count += 1
         }
         return count
     }
 
-    static func statusCheckBatch(in moc: NSManagedObjectContext) -> [PullRequest] {
+    static func statusCheckBatch(in moc: NSManagedObjectContext, settings: Settings.Cache) -> [PullRequest] {
         let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
         f.predicate = NSPredicate(format: "apiServer.lastSyncSucceeded == YES")
         f.sortDescriptors = [
@@ -367,7 +366,7 @@ final class PullRequest: ListableItem {
             NSSortDescriptor(key: "updatedAt", ascending: false)
         ]
         let prs = try! moc.fetch(f)
-            .filter(\.section.shouldCheckStatuses)
+            .filter { $0.section.shouldCheckStatuses(settings: settings) }
             .prefix(Settings.statusItemRefreshBatchSize)
 
         prs.forEach {
@@ -378,14 +377,13 @@ final class PullRequest: ListableItem {
         return Array(prs)
     }
 
-    var displayedStatusLines: [PRStatus] {
-        let context = Settings.cache
-        let red = context.statusRed
-        let yellow = context.statusYellow
-        let green = context.statusGreen
-        let gray = context.statusGray
-        let mode = context.statusMode
-        let terms = context.statusTerms
+    func displayedStatusLines(settings: Settings.Cache) -> [PRStatus] {
+        let red = settings.statusRed
+        let yellow = settings.statusYellow
+        let green = settings.statusGreen
+        let gray = settings.statusGray
+        let mode = settings.statusMode
+        let terms = settings.statusTerms
         
         var contexts = [String: PRStatus]()
         let filteredStatuses: Set<PRStatus>
@@ -442,13 +440,13 @@ final class PullRequest: ListableItem {
         Section(sectionIndex: sectionIndex).prMenuName
     }
 
-    func shouldAnnounceStatus() -> Bool {
-        canBadge()
-        && (Settings.cache.notifyOnStatusUpdatesForAllPrs
+    func shouldAnnounceStatus(settings: Settings.Cache) -> Bool {
+        canBadge(settings: settings)
+        && (settings.notifyOnStatusUpdatesForAllPrs
             || createdByMe
-            || shouldGo(to: .participated)
-            || shouldGo(to: .mine)
-            || shouldGo(to: .mentioned))
+            || shouldGo(to: .participated, settings: settings)
+            || shouldGo(to: .mine, settings: settings)
+            || shouldGo(to: .mentioned, settings: settings))
     }
 
     func linesAttributedString(labelFont: FONT_CLASS) -> NSAttributedString? {
@@ -481,10 +479,9 @@ final class PullRequest: ListableItem {
         repo.displayPolicyForPrs
     }
 
-    override func shouldHideDueToMyReview() -> Section.HidingCause? {
-        let context = Settings.cache
-        let hideIfApproved = context.hidePrsIfApproved
-        let hideIfRejected = context.hidePrsIfRejected
+    override func shouldHideDueToMyReview(settings: Settings.Cache) -> Section.HidingCause? {
+        let hideIfApproved = settings.hidePrsIfApproved
+        let hideIfRejected = settings.hidePrsIfRejected
 
         guard hideIfApproved || hideIfRejected,
               let myName = apiServer.userName,
@@ -509,14 +506,14 @@ final class PullRequest: ListableItem {
         return nil
     }
 
-    func reviewsAttributedString(labelFont: FONT_CLASS) -> NSAttributedString? {
+    func reviewsAttributedString(labelFont: FONT_CLASS, settings: Settings.Cache) -> NSAttributedString? {
         if !Settings.displayReviewsOnItems {
             return nil
         }
 
         let res = NSMutableAttributedString()
 
-        if Settings.showRequestedTeamReviews {
+        if settings.showRequestedTeamReviews {
             let teamReviewRequests = teamReviewers.components(separatedBy: ",")
             let names = teamReviewRequests.compactMap {
                 if let moc = managedObjectContext {
@@ -605,7 +602,7 @@ final class PullRequest: ListableItem {
         return res
     }
 
-    override final func handleMerging() {
+    override final func handleMerging(settings: Settings.Cache) {
         let byUserId = mergedByNodeId
         let myUserId = apiServer.userNodeId
         Logging.log("Detected merged PR: \(title.orEmpty) by user \(byUserId.orEmpty), local user id is: \(myUserId.orEmpty), handling policy is \(Settings.mergeHandlingPolicy), coming from section \(sectionIndex)")
@@ -618,9 +615,9 @@ final class PullRequest: ListableItem {
             Logging.log("Will not keep PR merged by me")
             managedObjectContext?.delete(self)
 
-        } else if shouldKeep(accordingTo: Settings.mergeHandlingPolicy) {
+        } else if shouldKeep(accordingTo: Settings.mergeHandlingPolicy, settings: settings) {
             Logging.log("Will keep merged PR")
-            keep(as: .merged, notification: .prMerged)
+            keep(as: .merged, notification: .prMerged, settings: settings)
 
         } else {
             Logging.log("Will not keep merged PR")

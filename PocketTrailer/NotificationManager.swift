@@ -44,13 +44,14 @@ final class NotificationManager: NSObject {
             return
         }
 
+        let settings = Settings.cache
         switch action {
         case "mute":
-            relatedItem.setMute(to: true)
+            relatedItem.setMute(to: true, settings: settings)
         case "read":
-            relatedItem.catchUpWithComments()
+            relatedItem.catchUpWithComments(settings: settings)
         default:
-            relatedItem.catchUpWithComments()
+            relatedItem.catchUpWithComments(settings: settings)
 
             if let urlToOpen = userInfo[NOTIFICATION_URL_KEY] as? String ?? relatedComment?.webUrl ?? relatedItem.webUrl,
                let u = URL(string: urlToOpen) {

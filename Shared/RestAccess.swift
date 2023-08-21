@@ -88,36 +88,26 @@ enum RestAccess {
         } else {
             throw ApiError.cancelled
         }
-
+        
         let expandedPath = path.hasPrefix("/") ? server.apiPath.orEmpty.appending(pathComponent: path) : path
-
+        
         guard let url = URL(string: expandedPath) else {
             throw ApiError.invalidUrl(expandedPath)
         }
         var request = URLRequest(url: url)
-        var acceptTypes = [String]()
-        let context = Settings.cache
-        if context.shouldSyncReactions {
-            acceptTypes.append("application/vnd.github.squirrel-girl-preview")
-        }
-        if context.requiresReviewApis, !server.isGitHub {
-            acceptTypes.append("application/vnd.github.black-cat-preview+json")
-        }
-        acceptTypes.append("application/vnd.github.shadow-cat-preview+json") // draft indicators
-        acceptTypes.append("application/vnd.github.v3+json")
-        request.setValue(acceptTypes.joined(separator: ", "), forHTTPHeaderField: "Accept")
+        request.setValue("application/vnd.github.squirrel-girl-preview, application/vnd.github.black-cat-preview+json, application/vnd.github.shadow-cat-preview+json, application/vnd.github.v3+json", forHTTPHeaderField: "Accept")
         if let a = server.authToken {
             request.setValue("token \(a)", forHTTPHeaderField: "Authorization")
         }
         if Settings.V4IdMigrationPhase.wantsNewIds {
             request.setValue("1", forHTTPHeaderField: "X-Github-Next-Global-ID")
         }
-
+        
         do {
             let output = try await HTTP.getJsonData(for: request, attempts: attempts)
             Logging.log("(\(apiServerLabel) GET \(expandedPath) - RESULT: \(output.result.logValue)")
             return output
-
+            
         } catch {
             let error = error as NSError
             Logging.log("(\(apiServerLabel) GET \(expandedPath) - FAILED: (code \(error.code) \(error.localizedDescription)")

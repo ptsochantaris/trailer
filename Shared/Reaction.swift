@@ -73,7 +73,7 @@ final class Reaction: DataItem {
         }
     }
 
-    func shouldContributeToCount(since: Date) -> Bool {
+    func shouldContributeToCount(since: Date, settings: Settings.Cache) -> Bool {
         guard !isMine,
               let userName,
               let createdAt,
@@ -81,17 +81,16 @@ final class Reaction: DataItem {
         else {
             return false
         }
-        return !Settings.cache.excludedCommentAuthors.contains(userName.comparableForm)
+        return !settings.excludedCommentAuthors.contains(userName.comparableForm)
     }
 
     @MainActor
-    func checkNotifications() {
+    func checkNotifications(settings: Settings.Cache) {
         if postSyncAction == PostSyncAction.isNew.rawValue, !isMine {
-            let context = Settings.cache
-            if context.notifyOnItemReactions, let parentItem = (pullRequest ?? issue), parentItem.canBadge() {
+            if settings.notifyOnItemReactions, let parentItem = (pullRequest ?? issue), parentItem.canBadge(settings: settings) {
                 NotificationQueue.add(type: .newReaction, for: self)
 
-            } else if context.notifyOnCommentReactions, let comment, let parentItem = (comment.pullRequest ?? comment.issue), parentItem.canBadge() {
+            } else if settings.notifyOnCommentReactions, let comment, let parentItem = (comment.pullRequest ?? comment.issue), parentItem.canBadge(settings: settings) {
                 NotificationQueue.add(type: .newReaction, for: self)
             }
         }

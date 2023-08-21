@@ -79,7 +79,7 @@ final class PRComment: DataItem {
         }
     }
 
-    func shouldContributeToCount(since: Date) -> Bool {
+    func shouldContributeToCount(since: Date, settings: Settings.Cache) -> Bool {
         guard !createdByMe,
               let userName,
               let createdAt,
@@ -87,15 +87,15 @@ final class PRComment: DataItem {
         else {
             return false
         }
-        return !Settings.cache.excludedCommentAuthors.contains(userName.comparableForm)
+        return !settings.excludedCommentAuthors.contains(userName.comparableForm)
     }
 
-    func processNotifications() {
-        guard !createdByMe, let parent, parent.canBadge() else {
+    func processNotifications(settings: Settings.Cache) {
+        guard !createdByMe, let parent, parent.canBadge(settings: settings) else {
             return
         }
 
-        if let userName, Settings.cache.excludedCommentAuthors.contains(userName.comparableForm) {
+        if let userName, settings.excludedCommentAuthors.contains(userName.comparableForm) {
             Logging.log("Ignoring comment from user '\(userName)' as their name is on the blacklist")
             return
         }
@@ -103,7 +103,7 @@ final class PRComment: DataItem {
         if contains(terms: ["@\(apiServer.userName!)"]) {
             if parent.isSnoozing, parent.shouldWakeOnMention {
                 Logging.log("Waking up snoozed item ID \(parent.nodeId ?? "<no ID>") because of mention")
-                parent.wakeUp()
+                parent.wakeUp(settings: settings)
             }
             NotificationQueue.add(type: .newMention, for: self)
             return
@@ -111,7 +111,7 @@ final class PRComment: DataItem {
 
         if parent.isSnoozing, parent.shouldWakeOnComment {
             Logging.log("Waking up snoozed item ID \(parent.nodeId ?? "<no ID>") because of posted comment")
-            parent.wakeUp()
+            parent.wakeUp(settings: settings)
         }
 
         if Settings.disableAllCommentNotifications {

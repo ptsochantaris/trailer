@@ -39,16 +39,16 @@ extension API {
         }
     }
 
-    static func v4Sync(_ repos: [Repo], to moc: NSManagedObjectContext) async throws {
+    static func v4Sync(_ repos: [Repo], to moc: NSManagedObjectContext, settings: Settings.Cache) async throws {
         let servers = ApiServer.allApiServers(in: moc).filter(\.goodToGo)
 
         var steps: SyncSteps = [.comments]
 
-        if Settings.cache.shouldSyncReviewAssignments {
+        if settings.shouldSyncReviewAssignments {
             steps.insert(.reviewRequests)
         }
-
-        if Settings.cache.shouldSyncReviews {
+        
+        if settings.shouldSyncReviews {
             steps.insert(.reviews)
         } else {
             for r in Review.allItems(in: moc) {
@@ -60,13 +60,13 @@ extension API {
             await withTaskGroup(of: Void.self) { group in
                 if !servers.isEmpty {
                     group.addTask { @MainActor in
-                        await GraphQL.fetchAllAuthoredPrs(from: servers)
+                        await GraphQL.fetchAllAuthoredPrs(from: servers, settings: settings)
                         Logging.log("Fetching authored PRs phase complete")
                     }
                 }
                 if !repos.isEmpty {
                     group.addTask { @MainActor in
-                        await GraphQL.fetchAllSubscribedPrs(from: repos)
+                        await GraphQL.fetchAllSubscribedPrs(from: repos, profile: settings.syncProfile)
                         Logging.log("Fetching subscribed PRs phase complete")
                     }
                 }
@@ -74,10 +74,10 @@ extension API {
             let newOrUpdatedPrs = PullRequest.newOrUpdatedItems(in: moc, fromSuccessfulSyncOnly: true)
 
             try await withThrowingTaskGroup(of: Void.self) { group in
-                if Settings.showStatusItems {
+                if settings.showStatusItems {
                     group.addTask { @MainActor in
-                        let prs = PullRequest.statusCheckBatch(in: moc)
-                        try await GraphQL.update(for: prs, steps: [.statuses])
+                        let prs = PullRequest.statusCheckBatch(in: moc, settings: settings)
+                        try await GraphQL.update(for: prs, steps: [.statuses], settings: settings)
                         Logging.log("Status fetch phase complete")
                     }
                 } else {
@@ -88,21 +88,21 @@ extension API {
                         }
                     }
                 }
-                if Settings.notifyOnItemReactions {
+                if settings.notifyOnItemReactions {
                     group.addTask { @MainActor in
-                        let rp = PullRequest.reactionCheckBatch(in: moc)
-                        try await GraphQL.update(for: rp, steps: [.reactions])
+                        let rp = PullRequest.reactionCheckBatch(in: moc, settings: settings)
+                        try await GraphQL.update(for: rp, steps: [.reactions], settings: settings)
                         Logging.log("PR reactions fetch phase complete")
                     }
                 }
                 try await group.waitForAll()
             }
 
-            try await GraphQL.update(for: newOrUpdatedPrs, steps: steps)
+            try await GraphQL.update(for: newOrUpdatedPrs, steps: steps, settings: settings)
             Logging.log("PR extras fetch phase complete")
 
             let reviews = Review.newOrUpdatedItems(in: moc, fromSuccessfulSyncOnly: true)
-            try await GraphQL.updateComments(for: reviews)
+            try await GraphQL.updateComments(for: reviews, profile: settings.syncProfile)
             Logging.log("Review comment fetch phase complete")
         }
 
@@ -110,25 +110,25 @@ extension API {
             await withTaskGroup(of: Void.self) { group in
                 if !servers.isEmpty {
                     group.addTask { @MainActor in
-                        await GraphQL.fetchAllAuthoredIssues(from: servers)
+                        await GraphQL.fetchAllAuthoredIssues(from: servers, settings: settings)
                         Logging.log("Fetching authored issues phase complete")
                     }
                 }
                 if !repos.isEmpty {
                     group.addTask { @MainActor in
-                        await GraphQL.fetchAllSubscribedIssues(from: repos)
+                        await GraphQL.fetchAllSubscribedIssues(from: repos, profile: settings.syncProfile)
                         Logging.log("Fetching subscribed issues phase complete")
                     }
                 }
             }
 
             let newOrUpdatedIssues = Issue.newOrUpdatedItems(in: moc, fromSuccessfulSyncOnly: true)
-            try await GraphQL.update(for: newOrUpdatedIssues, steps: steps)
+            try await GraphQL.update(for: newOrUpdatedIssues, steps: steps, settings: settings)
             Logging.log("Issue extras fetch phase complete")
 
-            if Settings.notifyOnItemReactions {
-                let ri = Issue.reactionCheckBatch(in: moc)
-                try await GraphQL.update(for: ri, steps: [.reactions])
+            if settings.notifyOnItemReactions {
+                let ri = Issue.reactionCheckBatch(in: moc, settings: settings)
+                try await GraphQL.update(for: ri, steps: [.reactions], settings: settings)
                 Logging.log("Issue reaction fetch phase complete")
             }
         }
@@ -136,7 +136,7 @@ extension API {
         try await prTask.value
         try await issueTask.value
 
-        if Settings.notifyOnCommentReactions {
+        if settings.notifyOnCommentReactions {
             let comments = PRComment.commentsThatNeedReactionsToBeRefreshed(in: moc)
             for c in comments {
                 c.pendingReactionScan = false
@@ -144,7 +144,7 @@ extension API {
                     r.postSyncAction = PostSyncAction.delete.rawValue
                 }
             }
-            try await GraphQL.updateReactions(for: comments)
+            try await GraphQL.updateReactions(for: comments, profile: settings.syncProfile)
             Logging.log("Comment reaction fetch phase complete")
         }
 

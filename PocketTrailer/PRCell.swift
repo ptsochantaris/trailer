@@ -85,20 +85,20 @@ final class PRCell: UITableViewCell {
 
     private weak var item: ListableItem?
 
-    func setPullRequest(pullRequest: PullRequest) {
+    func setPullRequest(pullRequest: PullRequest, settings: Settings.Cache) {
         item = pullRequest
 
         let separator = traitCollection.containsTraits(in: compactTraits) ? "\n" : "   "
 
         let detailFont = _description.font!
-        _title.attributedText = pullRequest.title(with: _title.font, labelFont: detailFont, titleColor: UIColor.label, numberColor: UIColor.secondaryLabel)
+        _title.attributedText = pullRequest.title(with: _title.font, labelFont: detailFont, titleColor: UIColor.label, numberColor: UIColor.secondaryLabel, settings: settings)
 
-        let l = pullRequest.labelsAttributedString(labelFont: _labels.font)
+        let l = pullRequest.labelsAttributedString(labelFont: _labels.font, settings: settings)
         _labels.attributedText = l
         _labels.isHidden = (l?.length ?? 0) == 0
 
-        let sub = pullRequest.subtitle(with: detailFont, lightColor: UIColor.secondaryLabel, darkColor: UIColor.label, separator: separator)
-        let r = pullRequest.reviewsAttributedString(labelFont: detailFont)
+        let sub = pullRequest.subtitle(with: detailFont, lightColor: UIColor.secondaryLabel, darkColor: UIColor.label, separator: separator, settings: settings)
+        let r = pullRequest.reviewsAttributedString(labelFont: detailFont, settings: settings)
         if let r, r.length > 0 {
             let s = NSMutableAttributedString(attributedString: r)
             s.append(NSAttributedString(string: "\n"))
@@ -109,12 +109,12 @@ final class PRCell: UITableViewCell {
         }
 
         let muted = pullRequest.muted
-        setCountsImageAndFade(item: pullRequest, muted: muted)
+        setCountsImageAndFade(item: pullRequest, muted: muted, settings: settings)
 
         var statusText: NSMutableAttributedString?
         var totalStatuses = 0
-        if pullRequest.section.shouldListStatuses {
-            let statusItems = pullRequest.displayedStatusLines
+        if pullRequest.section.shouldListStatuses(settings: settings) {
+            let statusItems = pullRequest.displayedStatusLines(settings: settings)
             var statusCount = statusItems.count
             totalStatuses = statusCount
             var lineAttributes = statusAttributes
@@ -133,43 +133,43 @@ final class PRCell: UITableViewCell {
         _statuses.isHidden = totalStatuses == 0
 
         if totalStatuses > 0, let statusString = statusText?.string {
-            var title = pullRequest.accessibleTitle
+            var title = pullRequest.accessibleTitle(settings: settings)
             if muted {
                 title = "(Muted) - \(title)"
             }
-            accessibilityLabel = "\(title), \(unreadCount.text.orEmpty) unread comments, \(readCount.text.orEmpty) total comments, \(pullRequest.accessibleSubtitle). \(totalStatuses) statuses: \(statusString)"
+            accessibilityLabel = "\(title), \(unreadCount.text.orEmpty) unread comments, \(readCount.text.orEmpty) total comments, \(pullRequest.accessibleSubtitle(settings: settings)). \(totalStatuses) statuses: \(statusString)"
         } else {
-            accessibilityLabel = "\(pullRequest.accessibleTitle), \(unreadCount.text.orEmpty) unread comments, \(readCount.text.orEmpty) total comments, \(pullRequest.accessibleSubtitle)"
+            accessibilityLabel = "\(pullRequest.accessibleTitle(settings: settings)), \(unreadCount.text.orEmpty) unread comments, \(readCount.text.orEmpty) total comments, \(pullRequest.accessibleSubtitle(settings: settings))"
         }
     }
 
-    func setIssue(issue: Issue) {
+    func setIssue(issue: Issue, settings: Settings.Cache) {
         item = issue
 
         let separator = traitCollection.containsTraits(in: compactTraits) ? "\n" : "   "
 
         let detailFont = _description.font!
-        _title.attributedText = issue.title(with: _title.font, labelFont: detailFont, titleColor: UIColor.label, numberColor: UIColor.secondaryLabel)
+        _title.attributedText = issue.title(with: _title.font, labelFont: detailFont, titleColor: UIColor.label, numberColor: UIColor.secondaryLabel, settings: settings)
 
-        let l = issue.labelsAttributedString(labelFont: _labels.font)
+        let l = issue.labelsAttributedString(labelFont: _labels.font, settings: settings)
         _labels.attributedText = l
         _labels.isHidden = (l?.length ?? 0) == 0
 
-        _description.attributedText = issue.subtitle(with: detailFont, lightColor: UIColor.secondaryLabel, darkColor: UIColor.label, separator: separator)
+        _description.attributedText = issue.subtitle(with: detailFont, lightColor: UIColor.secondaryLabel, darkColor: UIColor.label, separator: separator, settings: settings)
 
         _statuses.attributedText = nil
         _statuses.isHidden = true
 
         let muted = issue.muted
-        setCountsImageAndFade(item: issue, muted: muted)
-        var title = issue.accessibleTitle
+        setCountsImageAndFade(item: issue, muted: muted, settings: settings)
+        var title = issue.accessibleTitle(settings: settings)
         if muted {
             title = "(Muted) - \(title)"
         }
-        accessibilityLabel = "\(title), \(unreadCount.text.orEmpty) unread comments, \(readCount.text.orEmpty) total comments, \(issue.accessibleSubtitle)"
+        accessibilityLabel = "\(title), \(unreadCount.text.orEmpty) unread comments, \(readCount.text.orEmpty) total comments, \(issue.accessibleSubtitle(settings: settings))"
     }
 
-    private func setCountsImageAndFade(item: ListableItem, muted: Bool) {
+    private func setCountsImageAndFade(item: ListableItem, muted: Bool, settings: Settings.Cache) {
         let _commentsTotal = Int(item.totalComments)
         let _commentsNew = Int(item.unreadComments)
         let fade = muted || item.isSnoozing
@@ -177,7 +177,7 @@ final class PRCell: UITableViewCell {
         readCount.text = numberFormatter.string(for: _commentsTotal)
         readCount.isHidden = _commentsTotal == 0
 
-        if let p = item as? PullRequest, Settings.cache.markPrsAsUnreadOnNewCommits, p.hasNewCommits {
+        if let p = item as? PullRequest, settings.markPrsAsUnreadOnNewCommits, p.hasNewCommits {
             unreadCount.isHidden = false
             unreadCount.text = _commentsNew == 0 ? "!" : numberFormatter.string(for: _commentsNew)
         } else {

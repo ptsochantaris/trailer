@@ -19,7 +19,7 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 
                 a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
                 a.addAction(UIAlertAction(title: "Wake Them Up", style: .destructive) { _ in
-                    snoozeItem.wakeUpAllAssociatedItems()
+                    snoozeItem.wakeUpAllAssociatedItems(settings: Settings.cache)
                     self.deletePreset()
                 })
                 a.addAction(UIAlertAction(title: "Keep Them Snoozed", style: .destructive) { _ in

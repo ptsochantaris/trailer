@@ -23,7 +23,7 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         Task {
-            await DataManager.postProcessAllItems(in: DataManager.main)
+            await DataManager.postProcessAllItems(in: DataManager.main, settings: Settings.cache)
         }
 
         if ApiServer.someServersHaveAuthTokens(in: DataManager.main) {
@@ -60,7 +60,7 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate {
             completionHandler(true)
 
         case "mark-all-read":
-            markEverythingRead()
+            markEverythingRead(settings: Settings.cache)
             completionHandler(true)
 
         default:
@@ -167,7 +167,7 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate {
         }
 
         Task {
-            await API.performSync()
+            await API.performSync(settings: Settings.cache)
 
             if Settings.V4IdMigrationPhase == .failedPending {
                 showMessage("ID migration failed", "Trailer tried to automatically migrate your IDs during the most recent sync but it failed for some reason. Since GitHub servers require using a new set of IDs soon please visit Trailer Preferences -> Servers -> V4 API Settings and select the option to try migrating IDs again soon.")
@@ -204,9 +204,9 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate {
         scheduleRefreshTask()
     }
 
-    func markEverythingRead() {
-        PullRequest.markEverythingRead(in: .hidden(cause: .unknown), in: DataManager.main)
-        Issue.markEverythingRead(in: .hidden(cause: .unknown), in: DataManager.main)
+    func markEverythingRead(settings: Settings.Cache) {
+        PullRequest.markEverythingRead(in: .hidden(cause: .unknown), in: DataManager.main, settings: settings)
+        Issue.markEverythingRead(in: .hidden(cause: .unknown), in: DataManager.main, settings: settings)
     }
 
     func clearAllClosed() {

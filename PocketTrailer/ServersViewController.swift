@@ -158,7 +158,7 @@ final class ServersViewController: UITableViewController {
         }
         Task {
             await DataManager.saveDB()
-            await DataManager.postProcessAllItems(in: DataManager.main)
+            await DataManager.postProcessAllItems(in: DataManager.main, settings: Settings.cache)
             _ = await app.startRefresh()
         }
     }

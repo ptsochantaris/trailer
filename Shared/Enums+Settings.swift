@@ -1,12 +1,12 @@
 import Foundation
 
 extension Section {
-    var shouldBadgeComments: Bool {
+    func shouldBadgeComments(settings: Settings.Cache) -> Bool {
         switch self {
         case .all:
-            return Settings.cache.showCommentsEverywhere
+            return settings.showCommentsEverywhere
         case .closed, .merged:
-            return Settings.cache.scanClosedAndMergedItems
+            return settings.scanClosedAndMergedItems
         case .mentioned, .mine, .participated:
             return true
         case .hidden, .snoozed:
@@ -14,22 +14,20 @@ extension Section {
         }
     }
 
-    @MainActor
-    var shouldListReactions: Bool {
-        if Settings.cache.shouldSyncReactions {
-            return shouldBadgeComments
+    func shouldListReactions(settings: Settings.Cache) -> Bool {
+        if settings.shouldSyncReactions {
+            return shouldBadgeComments(settings: settings)
         }
         return false
     }
 
-    @MainActor
-    var shouldListStatuses: Bool {
-        if !Settings.cache.showStatusItems {
+    func shouldListStatuses(settings: Settings.Cache) -> Bool {
+        if !settings.showStatusItems {
             return false
         }
         switch self {
         case .all, .closed, .merged:
-            return Settings.cache.showStatusesOnAllItems
+            return settings.showStatusesOnAllItems
         case .mentioned, .mine, .participated:
             return true
         case .hidden, .snoozed:
@@ -37,18 +35,17 @@ extension Section {
         }
     }
 
-    @MainActor
-    var shouldCheckStatuses: Bool {
-        if !Settings.cache.showStatusItems {
+    func shouldCheckStatuses(settings: Settings.Cache) -> Bool {
+        if !settings.showStatusItems {
             return false
         }
         switch self {
         case .all, .closed, .merged:
-            return Settings.cache.showStatusesOnAllItems
+            return settings.showStatusesOnAllItems
         case .mentioned, .mine, .participated, .snoozed:
             return true
         case .hidden:
-            return Settings.cache.hidePrsThatArentPassing // if visibility depends on statuses, check for statuses on hidden PRs because they may change
+            return settings.hidePrsThatArentPassing // if visibility depends on statuses, check for statuses on hidden PRs because they may change
         }
     }
 }

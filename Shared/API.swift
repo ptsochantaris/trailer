@@ -196,11 +196,11 @@ enum API {
         }
     }
 
-    static func performSync() async {
+    static func performSync(settings: Settings.Cache) async {
         let syncMoc = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
         syncMoc.undoManager = nil
         syncMoc.parent = DataManager.main
-
+        
         let useV4 = Settings.useV4API
 
         await HTTP.gateKeeper.setBonusTickets(8)
@@ -256,13 +256,13 @@ enum API {
 
         if useV4 {
             do {
-                try await v4Sync(repos, to: syncMoc)
+                try await v4Sync(repos, to: syncMoc, settings: settings)
             } catch {
                 Logging.log("Sync aborted due to error: \(error.localizedDescription)")
             }
 
         } else {
-            await v3Sync(repos, to: syncMoc)
+            await v3Sync(repos, to: syncMoc, settings: settings)
         }
 
         // Transfer done, process
@@ -286,7 +286,7 @@ enum API {
                 Logging.log("Committing synced data")
                 try syncMoc.save()
                 Logging.log("Synced data committed")
-                await DataManager.sendNotificationsIndexAndSave()
+                await DataManager.sendNotificationsIndexAndSave(settings: settings)
             } catch {
                 Logging.log("Committing sync failed: \(error.localizedDescription)")
             }

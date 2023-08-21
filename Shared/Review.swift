@@ -103,7 +103,7 @@ final class Review: DataItem {
         }
     }
 
-    func shouldContributeToCount(since: Date) -> Bool {
+    func shouldContributeToCount(since: Date, settings: Settings.Cache) -> Bool {
         guard !isMine,
               let username,
               let createdAt,
@@ -111,26 +111,25 @@ final class Review: DataItem {
         else {
             return false
         }
-        return !Settings.cache.excludedCommentAuthors.contains(username.comparableForm)
+        return !settings.excludedCommentAuthors.contains(username.comparableForm)
     }
 
-    func processNotifications() {
-        guard !isMine, pullRequest.canBadge(), let newState = State(rawValue: state.orEmpty) else {
+    func processNotifications(settings: Settings.Cache) {
+        guard !isMine, pullRequest.canBadge(settings: settings), let newState = State(rawValue: state.orEmpty) else {
             return
         }
 
-        let context = Settings.cache
         switch newState {
         case .CHANGES_REQUESTED:
-            if context.notifyOnAllReviewChangeRequests || (context.notifyOnReviewChangeRequests && pullRequest.createdByMe) {
+            if settings.notifyOnAllReviewChangeRequests || (settings.notifyOnReviewChangeRequests && pullRequest.createdByMe) {
                 NotificationQueue.add(type: .changesRequested, for: self)
             }
         case .APPROVED:
-            if context.notifyOnAllReviewAcceptances || (context.notifyOnReviewAcceptances && pullRequest.createdByMe) {
+            if settings.notifyOnAllReviewAcceptances || (settings.notifyOnReviewAcceptances && pullRequest.createdByMe) {
                 NotificationQueue.add(type: .changesApproved, for: self)
             }
         case .DISMISSED:
-            if context.notifyOnAllReviewDismissals || (context.notifyOnReviewDismissals && pullRequest.createdByMe) {
+            if settings.notifyOnAllReviewDismissals || (settings.notifyOnReviewDismissals && pullRequest.createdByMe) {
                 NotificationQueue.add(type: .changesDismissed, for: self)
             }
         }
