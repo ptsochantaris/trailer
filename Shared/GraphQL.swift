@@ -779,7 +779,8 @@ enum GraphQL {
                    let repo = node.parent,
                    let updatedAt = node.jsonPayload["updatedAt"] as? String,
                    let d = DataItem.parseGH8601(updatedAt),
-                   d < prRepoIdToLatestExistingUpdate[repo.id]! {
+                   let repoLatestUpdate = prRepoIdToLatestExistingUpdate[repo.id],
+                   d < repoLatestUpdate {
                     throw TQL.Error.alreadyParsed
                 }
             }
@@ -834,19 +835,20 @@ enum GraphQL {
             var nodes = [String: Lista<Node>]()
 
             let perNodeBlock: Query.PerNodeBlock = { node in
-
+                
                 let type = node.elementType
                 if let existingList = nodes[type] {
                     existingList.append(node)
                 } else {
                     nodes[type] = Lista<Node>(value: node)
                 }
-
+                
                 if type == "Issue",
                    let repo = node.parent,
                    let updatedAt = node.jsonPayload["updatedAt"] as? String,
                    let d = DataItem.parseGH8601(updatedAt),
-                   d < issueRepoIdToLatestExistingUpdate[repo.id]! {
+                   let latestRepoUpdate = issueRepoIdToLatestExistingUpdate[repo.id],
+                   d < latestRepoUpdate {
                     throw TQL.Error.alreadyParsed
                 }
             }

@@ -843,6 +843,7 @@
                         <segue destination="iSf-H9-TPW" kind="show" identifier="editServer" id="uv4-xw-XIN"/>
                         <segue destination="mbE-6c-bD6" kind="show" identifier="apiOptions" id="ato-uD-I2b"/>
                         <segue destination="146-cR-Z8A" kind="show" identifier="liveLog" id="I0p-oU-Fiy"/>
+                        <segue destination="Pie-E2-Xob" kind="show" identifier="hiddenItems" id="EnW-d7-IB6"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="s0g-Gs-kMQ" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -1119,7 +1120,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="rlP-UK-pna" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1132" y="3071"/>
+            <point key="canvasLocation" x="2070" y="3071"/>
         </scene>
         <!--API Server Details-->
         <scene sceneID="Mrr-Mu-sAc">
@@ -1313,7 +1314,7 @@ Tokens need at least all the 'repo' permissions, and the 'read:org' permission.<
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="IqD-pm-wNg" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1946" y="3105"/>
+            <point key="canvasLocation" x="2041" y="2288"/>
         </scene>
         <!--Picker View Controller-->
         <scene sceneID="5Tx-Cn-3zg">
@@ -1719,6 +1720,77 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
                 <placeholder placeholderIdentifier="IBFirstResponder" id="wWb-nC-H6i" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="278" y="3071"/>
+        </scene>
+        <!--Hidden Item Scan-->
+        <scene sceneID="Yd3-9c-ig5">
+            <objects>
+                <viewController id="Pie-E2-Xob" customClass="HiddenItemScan" customModule="PocketTrailer" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="UTI-md-DyJ">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="Saz-uo-tc1">
+                                <rect key="frame" x="0.0" y="92" width="414" height="672"/>
+                                <subviews>
+                                    <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="nu4-Eh-aXy">
+                                        <rect key="frame" x="0.0" y="0.0" width="414" height="614"/>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <color key="textColor" systemColor="labelColor"/>
+                                        <fontDescription key="fontDescription" name="Menlo-Regular" family="Menlo" pointSize="10"/>
+                                        <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" smartDashesType="no" smartInsertDeleteType="no" smartQuotesType="no"/>
+                                    </textView>
+                                    <stackView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" spacing="16" translatesAutoresizingMaskIntoConstraints="NO" id="IG3-kF-Lhq">
+                                        <rect key="frame" x="0.0" y="622" width="414" height="50"/>
+                                        <subviews>
+                                            <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iPs-az-NyF">
+                                                <rect key="frame" x="0.0" y="0.0" width="100.5" height="50"/>
+                                                <state key="normal" title="Button"/>
+                                                <buttonConfiguration key="configuration" style="plain" title="Sync Now"/>
+                                                <connections>
+                                                    <action selector="syncNowSelected:" destination="Pie-E2-Xob" eventType="touchUpInside" id="GGl-8J-d7y"/>
+                                                </connections>
+                                            </button>
+                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3sk-G2-gnt">
+                                                <rect key="frame" x="116.5" y="0.0" width="172.5" height="50"/>
+                                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            </view>
+                                            <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ejZ-9E-Ta0">
+                                                <rect key="frame" x="305" y="0.0" width="109" height="50"/>
+                                                <state key="normal" title="Button"/>
+                                                <buttonConfiguration key="configuration" style="plain" title="Scan Again"/>
+                                                <connections>
+                                                    <action selector="rescanSelected:" destination="Pie-E2-Xob" eventType="touchUpInside" id="0aB-ZO-7xQ"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                    </stackView>
+                                </subviews>
+                            </stackView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="XNH-Vz-qjp"/>
+                        <color key="backgroundColor" systemColor="secondarySystemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="Saz-uo-tc1" secondAttribute="trailing" id="Eyf-99-EG2"/>
+                            <constraint firstItem="XNH-Vz-qjp" firstAttribute="bottom" secondItem="Saz-uo-tc1" secondAttribute="bottom" id="Yuk-un-Yy8"/>
+                            <constraint firstItem="Saz-uo-tc1" firstAttribute="leading" secondItem="UTI-md-DyJ" secondAttribute="leading" id="jIR-kg-mDm"/>
+                            <constraint firstItem="Saz-uo-tc1" firstAttribute="top" secondItem="XNH-Vz-qjp" secondAttribute="top" id="rcw-Cb-OMW"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="VBh-9d-MpH">
+                        <barButtonItem key="rightBarButtonItem" title="Copy" id="unN-5g-ssY">
+                            <connections>
+                                <action selector="copySelected:" destination="Pie-E2-Xob" id="UhB-CB-Q7e"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="scanButton" destination="ejZ-9E-Ta0" id="7JO-TY-ACe"/>
+                        <outlet property="textView" destination="nu4-Eh-aXy" id="2Fe-7F-1P4"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="7YW-D0-P8k" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1132" y="3071"/>
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>

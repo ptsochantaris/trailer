@@ -98,6 +98,8 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
     private func testMode() {
         view.endEditing(true)
 
+        try? DataManager.main.save() // permanent ID for generated server
+        
         for v in otherViews {
             v.isHidden = true
         }

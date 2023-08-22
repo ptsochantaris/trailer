@@ -326,8 +326,10 @@ final class ApiServer: NSManagedObject {
         for apiServer in allApiServers(in: DataManager.main) {
             DataManager.main.delete(apiServer)
         }
+        
+        var servers = [String: ApiServer]()
 
-        for (_, apiServerData) in archive {
+        for (authToken, apiServerData) in archive {
             let a = insertNewServer(in: DataManager.main)
             for (k, v) in apiServerData {
                 if k == "repos" {
@@ -340,9 +342,15 @@ final class ApiServer: NSManagedObject {
                 }
             }
             a.resetSyncState()
+            servers[authToken] = a
         }
 
         await DataManager.saveDB()
+        
+        for (k, a) in servers {
+            a.authToken = k
+        }
+        
         return true
     }
 

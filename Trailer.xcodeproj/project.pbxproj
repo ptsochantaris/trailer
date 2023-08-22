@@ -31,6 +31,7 @@
 		162002DD1A2A58B900FF95F3 /* CenterTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002DC1A2A58B900FF95F3 /* CenterTextField.swift */; };
 		162002DF1A2A5C9200FF95F3 /* LinkField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002DE1A2A5C9200FF95F3 /* LinkField.swift */; };
 		162002E71A2A75BD00FF95F3 /* AvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002E61A2A75BD00FF95F3 /* AvatarView.swift */; };
+		16200B8F2A94EFCD00FA4D26 /* HiddenItemScan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16200B8E2A94EFCD00FA4D26 /* HiddenItemScan.swift */; };
 		162484562A76CE9F00C69515 /* LogMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162484552A76CE9F00C69515 /* LogMonitor.swift */; };
 		162530511B7AAE49000E3F3B /* ExtensionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162530501B7AAE49000E3F3B /* ExtensionDelegate.swift */; };
 		16259BCE1A449400009C5745 /* OpenInSafariActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16259BCD1A449400009C5745 /* OpenInSafariActivity.swift */; };
@@ -299,6 +300,7 @@
 		162002DC1A2A58B900FF95F3 /* CenterTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CenterTextField.swift; sourceTree = "<group>"; };
 		162002DE1A2A5C9200FF95F3 /* LinkField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = LinkField.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		162002E61A2A75BD00FF95F3 /* AvatarView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AvatarView.swift; sourceTree = "<group>"; };
+		16200B8E2A94EFCD00FA4D26 /* HiddenItemScan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HiddenItemScan.swift; sourceTree = "<group>"; };
 		162484552A76CE9F00C69515 /* LogMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogMonitor.swift; sourceTree = "<group>"; };
 		162530501B7AAE49000E3F3B /* ExtensionDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ExtensionDelegate.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16259BCD1A449400009C5745 /* OpenInSafariActivity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenInSafariActivity.swift; sourceTree = "<group>"; };
@@ -947,6 +949,7 @@
 				169205651E34DACA00FB9547 /* WatchlistSettingsViewController.swift */,
 				1686DEBA2A5E337C00AED26E /* ApiSettingsViewController.swift */,
 				162484552A76CE9F00C69515 /* LogMonitor.swift */,
+				16200B8E2A94EFCD00FA4D26 /* HiddenItemScan.swift */,
 			);
 			name = Settings;
 			sourceTree = "<group>";
@@ -1286,6 +1289,7 @@
 				166ADEC61CCAFF77001BA61F /* SnoozingViewController.swift in Sources */,
 				16B3B3181A34E8E2000BE6CC /* ApiServer.swift in Sources */,
 				16259BCE1A449400009C5745 /* OpenInSafariActivity.swift in Sources */,
+				16200B8F2A94EFCD00FA4D26 /* HiddenItemScan.swift in Sources */,
 				1668CFE91D5E16B70021CDC5 /* Reachability.swift in Sources */,
 				1694008D1E7AAE32002C5DAD /* Reaction.swift in Sources */,
 				169205661E34DACA00FB9547 /* WatchlistSettingsViewController.swift in Sources */,
@@ -1622,7 +1626,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1707;
+				CURRENT_PROJECT_VERSION = 1709;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -1686,7 +1690,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1707;
+				CURRENT_PROJECT_VERSION = 1709;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEPLOYMENT_POSTPROCESSING = YES;
