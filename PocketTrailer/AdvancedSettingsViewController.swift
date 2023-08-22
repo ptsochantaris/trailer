@@ -313,6 +313,15 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
                 title: "Highlight comments on closed or merged items",
                 description: Settings.scanClosedAndMergedItemsHelp,
                 valueDisplayed: { Settings.scanClosedAndMergedItems ? "✓" : " " }),
+        
+        Setting(section: .History,
+                title: "Auto-remove merged items",
+                description: Settings.autoRemoveMergedItemsHelp,
+                valueDisplayed: { Settings.autoRemoveMergedItems == 0 ? "Never" : "After \(Settings.autoRemoveMergedItems)d" }),
+        Setting(section: .History,
+                title: "Auto-remove closed items",
+                description: Settings.autoRemoveMergedItemsHelp,
+                valueDisplayed: { Settings.autoRemoveClosedItems == 0 ? "Never" : "After \(Settings.autoRemoveClosedItems)d" }),
 
         Setting(section: .Confirm,
                 title: "Removing all merged items",
@@ -839,6 +848,20 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
                 Settings.removeNotificationsWhenItemIsRemoved = !Settings.removeNotificationsWhenItemIsRemoved
             case 4:
                 Settings.scanClosedAndMergedItems = !Settings.scanClosedAndMergedItems
+            case 5:
+                var values = ["Never", "After 1 day"]
+                for f in 2 ..< 999 {
+                    values.append("After \(f) day(s)")
+                }
+                let v = PickerViewController.Info(title: setting.title, values: values, selectedIndex: Settings.autoRemoveMergedItems, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                performSegue(withIdentifier: "showPicker", sender: v)
+            case 6:
+                var values = ["Never", "After 1 day"]
+                for f in 2 ..< 999 {
+                    values.append("After \(f) day(s)")
+                }
+                let v = PickerViewController.Info(title: setting.title, values: values, selectedIndex: Settings.autoRemoveClosedItems, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                performSegue(withIdentifier: "showPicker", sender: v)
             default: break
             }
 
@@ -940,6 +963,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
                 Settings.mergeHandlingPolicy = KeepPolicy(rawValue: didSelectIndexPath.row) ?? Settings.mergeHandlingPolicy
             } else if sip.row == 1 {
                 Settings.closeHandlingPolicy = KeepPolicy(rawValue: didSelectIndexPath.row) ?? Settings.closeHandlingPolicy
+            } else if sip.row == 5 {
+                Settings.autoRemoveMergedItems = didSelectIndexPath.row
+            } else if sip.row == 6 {
+                Settings.autoRemoveClosedItems = didSelectIndexPath.row
             }
 
         } else if sip.section == SettingsSection.Stauses.rawValue {
