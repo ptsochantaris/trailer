@@ -392,11 +392,11 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
         navigationItem.hidesSearchBarWhenScrolling = false
 
-        searchTimer = PopTimer(timeInterval: 0.2) { @MainActor [weak self] in
+        searchTimer = PopTimer(timeInterval: 0.2) { [weak self] in
             self?.reload(searchChanged: true)
         }
 
-        settingsChangedTimer = PopTimer(timeInterval: 1.0) { @MainActor in
+        settingsChangedTimer = PopTimer(timeInterval: 1.0) {
             await DataManager.postProcessAllItems(in: DataManager.main, settings: Settings.cache)
         }
 

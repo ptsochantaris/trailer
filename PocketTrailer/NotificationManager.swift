@@ -291,7 +291,7 @@ final class NotificationManager: NSObject {
     }
 
     private let removalQueue = Lista<String>()
-    private lazy var removalTimer = PopTimer(timeInterval: 0.5) { @MainActor [weak self] in
+    private lazy var removalTimer = PopTimer(timeInterval: 0.5) { [weak self] in
         guard let self else { return }
         let idSet = Set(removalQueue)
         removalQueue.removeAll()

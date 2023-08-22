@@ -43,7 +43,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 
         navigationItem.hidesSearchBarWhenScrolling = false
 
-        searchTimer = PopTimer(timeInterval: 0.4) { @MainActor [weak self] in
+        searchTimer = PopTimer(timeInterval: 0.4) { [weak self] in
             self?.reloadData()
         }
     }

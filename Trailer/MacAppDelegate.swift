@@ -78,7 +78,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
             return
         }
 
-        mouseIgnoreTimer = PopTimer(timeInterval: 0.4) { @MainActor in
+        mouseIgnoreTimer = PopTimer(timeInterval: 0.4) {
             app.isManuallyScrolling = false
         }
 

@@ -294,7 +294,7 @@ enum Settings {
         }
     }
 
-    private static let saveTimer = PopTimer(timeInterval: 2) { @MainActor in
+    private static let saveTimer = PopTimer(timeInterval: 2) {
         if let e = Settings.lastExportUrl {
             Settings.writeToURL(e)
         }

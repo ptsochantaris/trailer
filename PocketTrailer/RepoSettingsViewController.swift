@@ -30,7 +30,7 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
             groupField.isHidden = true
         }
 
-        settingsChangedTimer = PopTimer(timeInterval: 1.0) { @MainActor in
+        settingsChangedTimer = PopTimer(timeInterval: 1.0) {
             await DataManager.postProcessAllItems(in: DataManager.main, settings: Settings.cache)
         }
 

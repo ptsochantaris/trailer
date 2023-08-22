@@ -188,7 +188,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         searchController.searchBar.autocapitalizationType = .none
         navigationItem.searchController = searchController
 
-        searchTimer = PopTimer(timeInterval: 0.3) { @MainActor [weak self] in
+        searchTimer = PopTimer(timeInterval: 0.3) { [weak self] in
             self?.updateSearch()
         }
 

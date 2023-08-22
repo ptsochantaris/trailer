@@ -233,7 +233,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         let n = NotificationCenter.default
         n.addObserver(self, selector: #selector(updateImportExportSettings), name: .SettingsExported, object: nil)
 
-        deferredUpdateTimer = PopTimer(timeInterval: 1) { @MainActor [weak self] in
+        deferredUpdateTimer = PopTimer(timeInterval: 1) { [weak self] in
             await DataManager.postProcessAllItems(in: DataManager.main, settings: Settings.cache)
             guard let self else {
                 return

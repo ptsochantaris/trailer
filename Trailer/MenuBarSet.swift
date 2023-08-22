@@ -51,13 +51,13 @@ final class MenuBarSet {
     }
 
     func setTimers() {
-        prFilterTimer = PopTimer(timeInterval: 0.2) { @MainActor [weak self] in
+        prFilterTimer = PopTimer(timeInterval: 0.2) { [weak self] in
             guard let self else { return }
             await updatePrMenu(settings: Settings.cache)
             prMenu.scrollToTop()
         }
 
-        issuesFilterTimer = PopTimer(timeInterval: 0.2) { @MainActor [weak self] in
+        issuesFilterTimer = PopTimer(timeInterval: 0.2) { [weak self] in
             guard let self else { return }
             await updateIssuesMenu(settings: Settings.cache)
             issuesMenu.scrollToTop()
