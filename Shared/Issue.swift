@@ -48,6 +48,10 @@ final class Issue: ListableItem {
         }
     }
 
+    override var asIssue: Issue? {
+        return self
+    }
+
     override var searchKeywords: [String] {
         ["Issue", "Issues"] + super.searchKeywords
     }

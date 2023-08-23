@@ -80,6 +80,10 @@ final class Review: DataItem {
         }
     }
 
+    override var asReview: Review? {
+        return self
+    }
+
     static func syncReviews(from data: [JSON]?, withParent: PullRequest, moc: NSManagedObjectContext) async {
         let parentId = withParent.objectID
         let apiServerId = withParent.apiServer.objectID

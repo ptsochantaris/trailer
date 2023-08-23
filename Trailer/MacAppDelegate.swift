@@ -164,7 +164,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         Task {
             await updateRelatedMenus(for: item)
             
-            let window = item is PullRequest ? menuBarSet.prMenu : menuBarSet.issuesMenu
+            let window = item.isPr ? menuBarSet.prMenu : menuBarSet.issuesMenu
             let reSelectIndex = alternativeSelect ? window.table.selectedRow : -1
             _ = window.filter.becomeFirstResponder()
             
@@ -306,11 +306,11 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         Task {
             await DataManager.saveDB()
             let settings = Settings.cache
-            if item is PullRequest {
+            if item.isPr {
                 for menu in menus {
                     await menu.updatePrMenu(settings: settings)
                 }
-            } else if item is Issue {
+            } else {
                 for menu in menus {
                     await menu.updateIssuesMenu(settings: settings)
                 }
@@ -440,10 +440,8 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
     func windowDidResignKey(_ notification: Notification) {
         if ignoreNextFocusLoss {
             NSApp.activate(ignoringOtherApps: true)
-        } else if !openingWindow {
-            if let w = notification.object as? MenuWindow {
-                w.closeMenu()
-            }
+        } else if !openingWindow, let w = notification.object as? MenuWindow {
+            w.closeMenu()
         }
     }
 
@@ -526,11 +524,11 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
     func updateRelatedMenus(for i: ListableItem) async {
         let menus = relatedMenus(for: i)
         let settings = Settings.cache
-        if i is PullRequest {
+        if i.isPr {
             for menu in menus {
                 await menu.updatePrMenu(settings: settings)
             }
-        } else if i is Issue {
+        } else {
             for menu in menus {
                 await menu.updateIssuesMenu(settings: settings)
             }

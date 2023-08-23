@@ -87,15 +87,15 @@ class ListableItem: DataItem, Listable {
         repo.webUrl
     }
 
-    var commentsLink: String? {
+    final var commentsLink: String? {
         issueUrl?.appending(pathComponent: "comments")
     }
 
-    var issueUrl: String? {
+    final var issueUrl: String? {
         repo.apiUrl?.appending(pathComponent: "issues").appending(pathComponent: String(number))
     }
 
-    var reactionsUrl: String? {
+    final var reactionsUrl: String? {
         issueUrl?.appending(pathComponent: "reactions")
     }
 
@@ -299,7 +299,7 @@ class ListableItem: DataItem, Listable {
                 }
             }
         }
-        if let p = self as? PullRequest {
+        if let p = asPr {
             p.hasNewCommits = false
             for r in p.reviews {
                 if let reviewCreation = r.createdAt {
@@ -792,7 +792,7 @@ class ListableItem: DataItem, Listable {
         let titleAttributes: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: titleColor]
         _title.append(NSAttributedString(string: title, attributes: titleAttributes))
 
-        if let p = self as? PullRequest {
+        if let p = asPr {
             if settings.showPrLines, let l = p.linesAttributedString(labelFont: labelFont) {
                 _title.append(NSAttributedString(string: " ", attributes: titleAttributes))
                 _title.append(l)
@@ -1279,7 +1279,7 @@ class ListableItem: DataItem, Listable {
 
         } else if shouldKeep(accordingTo: Settings.closeHandlingPolicy, settings: settings) {
             Logging.log("Will keep closed item")
-            keep(as: .closed, notification: self is Issue ? .issueClosed : .prClosed, settings: settings)
+            keep(as: .closed, notification: isPr ? .prClosed : .issueClosed, settings: settings)
 
         } else {
             Logging.log("Will not keep closed item")

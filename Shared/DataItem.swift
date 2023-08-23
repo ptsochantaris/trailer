@@ -438,4 +438,36 @@ class DataItem: NSManagedObject, Querying {
     }
 
     class func shouldCreate(from _: Node) -> Bool { true }
+
+    var isPr: Bool {
+        false
+    }
+
+    var asPr: PullRequest? {
+        return nil
+    }
+
+    var asIssue: Issue? {
+        return nil
+    }
+
+    var asComment: PRComment? {
+        return nil
+    }
+
+    var asReview: Review? {
+        return nil
+    }
+
+    var asRepo: Repo? {
+        return nil
+    }
+
+    var asStatus: PRStatus? {
+        return nil
+    }
+
+    var asReaction: Reaction? {
+        return nil
+    }
 }

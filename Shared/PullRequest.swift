@@ -78,6 +78,10 @@ final class PullRequest: ListableItem {
         }
     }
 
+    override var asPr: PullRequest? {
+        return self
+    }
+
     var reviewCommentLink: String? {
         repo.apiUrl?.appending(pathComponent: "pulls").appending(pathComponent: String(number)).appending(pathComponent: "comments")
     }
@@ -279,7 +283,7 @@ final class PullRequest: ListableItem {
         var badgeCount = super.badgeCount(from: fetch, in: moc)
         if Settings.markPrsAsUnreadOnNewCommits {
             for i in try! moc.fetch(fetch) {
-                if let i = i as? PullRequest, i.hasNewCommits {
+                if let i = i.asPr, i.hasNewCommits {
                     badgeCount += 1
                 }
             }

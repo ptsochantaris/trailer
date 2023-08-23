@@ -166,11 +166,11 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
             }
         }
 
-        var menuWidth = MENU_WIDTH
-        if #available(macOS 11.0, *) {
-            if rowCount > 0 {
-                menuWidth += table.layoutMarginsGuide.frame.origin.x * 2
-            }
+        let menuWidth: CGFloat
+        if rowCount > 0 {
+            menuWidth = MENU_WIDTH + table.layoutMarginsGuide.frame.origin.x * 2
+        } else {
+            menuWidth = MENU_WIDTH
         }
 
         var menuLeft = windowFrame.origin.x

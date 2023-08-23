@@ -177,7 +177,7 @@ final class PRCell: UITableViewCell {
         readCount.text = numberFormatter.string(for: _commentsTotal)
         readCount.isHidden = _commentsTotal == 0
 
-        if let p = item as? PullRequest, settings.markPrsAsUnreadOnNewCommits, p.hasNewCommits {
+        if let p = item.asPr, settings.markPrsAsUnreadOnNewCommits, p.hasNewCommits {
             unreadCount.isHidden = false
             unreadCount.text = _commentsNew == 0 ? "!" : numberFormatter.string(for: _commentsNew)
         } else {

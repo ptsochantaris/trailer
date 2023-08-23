@@ -50,7 +50,7 @@ final class TrailerCell: NSTableCellView {
             y += height
         }
 
-        if let pullRequest = item as? PullRequest, item.section.shouldListStatuses(settings: settings) {
+        if let pullRequest = item.asPr, item.section.shouldListStatuses(settings: settings) {
             let statuses = pullRequest.displayedStatusLines(settings: settings).reversed()
             if !statuses.isEmpty {
                 for status in statuses {
@@ -86,7 +86,7 @@ final class TrailerCell: NSTableCellView {
 
         let accesoryCenterY = y - AVATAR_SIZE * 0.5 - cellPadding - 7
 
-        let hasNewCommits = (item as? PullRequest)?.hasNewCommits ?? false
+        let hasNewCommits = item.asPr?.hasNewCommits ?? false
         addCounts(total: item.totalComments, unread: item.unreadComments, alert: hasNewCommits, faded: faded, centerY: accesoryCenterY)
 
         if showAvatar {
@@ -137,7 +137,7 @@ final class TrailerCell: NSTableCellView {
     private func updateText(for item: ListableItem, settings: Settings.Cache) {
         title.attributedStringValue = item.title(with: titleFont, labelFont: detailFont, titleColor: .controlTextColor, numberColor: .secondaryLabelColor, settings: settings)
         labels.attributedStringValue = item.labelsAttributedString(labelFont: detailFont, settings: settings) ?? emptyAttributedString
-        reviews.attributedStringValue = (item as? PullRequest)?.reviewsAttributedString(labelFont: detailFont, settings: settings) ?? emptyAttributedString
+        reviews.attributedStringValue = item.asPr?.reviewsAttributedString(labelFont: detailFont, settings: settings) ?? emptyAttributedString
         subtitle.attributedStringValue = item.subtitle(with: detailFont, lightColor: .tertiaryLabelColor, darkColor: .secondaryLabelColor, separator: "   ", settings: settings)
     }
 
@@ -184,7 +184,7 @@ final class TrailerCell: NSTableCellView {
     }
 
     @objc private func copyBranchToClipboard() {
-        if let a = associatedDataItem as? PullRequest, let name = a.headRefName {
+        if let a = associatedDataItem?.asPr, let name = a.headRefName {
             let p = NSPasteboard.general
             p.clearContents()
             p.declareTypes([NSPasteboard.PasteboardType.string], owner: self)

@@ -135,6 +135,10 @@ final class Repo: DataItem {
         ownerNodeId == apiServer.userNodeId
     }
 
+    override var asRepo: Repo? {
+        return self
+    }
+
     var shouldSync: Bool {
         var go = false
         switch displayPolicyForPrs {

@@ -74,6 +74,10 @@ final class PRStatus: DataItem {
         }
     }
 
+    override var asStatus: PRStatus? {
+        return self
+    }
+
     var displayText: String {
         var text: String
 

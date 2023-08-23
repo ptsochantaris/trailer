@@ -345,29 +345,29 @@ enum DataManager {
     }
 
     static func info(for item: DataItem) -> JSON {
-        if let item = item as? PRComment {
+        if let item = item.asComment {
             let uri = item.objectID.uriRepresentation().absoluteString
             let parentUri = (item.parent?.objectID.uriRepresentation().absoluteString).orEmpty
             return [COMMENT_ID_KEY: uri, LISTABLE_URI_KEY: parentUri]
 
-        } else if let item = item as? ListableItem {
+        } else if let item = item.asPr ?? item.asIssue {
             let uri = item.objectID.uriRepresentation().absoluteString
             return [NOTIFICATION_URL_KEY: item.webUrl!, LISTABLE_URI_KEY: uri]
 
-        } else if let item = item as? Review {
+        } else if let item = item.asReview {
             let pr = item.pullRequest
             let uri = pr.objectID.uriRepresentation().absoluteString
             return [NOTIFICATION_URL_KEY: pr.webUrl!, LISTABLE_URI_KEY: uri]
 
-        } else if let item = item as? Repo {
+        } else if let item = item.asRepo {
             return [NOTIFICATION_URL_KEY: item.webUrl!]
 
-        } else if let item = item as? PRStatus {
+        } else if let item = item.asStatus {
             let pr = item.pullRequest
             let uri = pr.objectID.uriRepresentation().absoluteString
             return [NOTIFICATION_URL_KEY: pr.webUrl!, LISTABLE_URI_KEY: uri]
 
-        } else if let item = item as? Reaction {
+        } else if let item = item.asReaction {
             if let issue = item.issue {
                 let uri = issue.objectID.uriRepresentation().absoluteString
                 return [NOTIFICATION_URL_KEY: issue.webUrl!, LISTABLE_URI_KEY: uri]

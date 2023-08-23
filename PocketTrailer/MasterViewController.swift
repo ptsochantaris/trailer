@@ -742,7 +742,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         var tabItem: UITabBarItem?
         for d in tabBarSets {
             if d.viewCriterion == nil || d.viewCriterion?.isRelated(to: item) ?? false {
-                tabItem = item is PullRequest ? d.prItem : d.issuesItem
+                tabItem = item.isPr ? d.prItem : d.issuesItem
                 break
             }
         }
@@ -1053,9 +1053,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
     private func configureCell(cell: UITableViewCell, withObject: ListableItem) {
         guard let c = cell as? PRCell else { return }
-        if let o = withObject as? PullRequest {
+        if let o = withObject.asPr {
             c.setPullRequest(pullRequest: o, settings: Settings.cache)
-        } else if let o = withObject as? Issue {
+        } else if let o = withObject.asIssue {
             c.setIssue(issue: o, settings: Settings.cache)
         }
     }

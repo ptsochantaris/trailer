@@ -202,13 +202,13 @@ final class WatchManager: NSObject, WCSessionDelegate {
             "title": item.title(with: font, labelFont: font, titleColor: .white, numberColor: .gray, settings: settings),
             "subtitle": item.subtitle(with: smallFont, lightColor: .lightGray, darkColor: .gray, separator: "\n", settings: settings),
             "labels": item.labelsAttributedString(labelFont: smallFont, settings: settings) ?? emptyAttributedString,
-            "reviews": (item as? PullRequest)?.reviewsAttributedString(labelFont: smallFont, settings: settings) ?? emptyAttributedString
+            "reviews": item.asPr?.reviewsAttributedString(labelFont: smallFont, settings: settings) ?? emptyAttributedString
         ]
 
         if showLabels {
             itemData["labels"] = labelsForItem(item: item)
         }
-        if let item = item as? PullRequest, item.section.shouldListStatuses(settings: settings) {
+        if let item = item.asPr, item.section.shouldListStatuses(settings: settings) {
             itemData["statuses"] = statusLinesForPr(pr: item, settings: settings)
         }
         return itemData

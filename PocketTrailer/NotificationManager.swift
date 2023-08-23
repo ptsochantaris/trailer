@@ -102,7 +102,7 @@ final class NotificationManager: NSObject {
 
         switch type {
         case .newMention:
-            guard let c = item as? PRComment,
+            guard let c = item.asComment,
                   let parent = c.parent,
                   !parent.shouldSkipNotifications
             else { return }
@@ -112,35 +112,35 @@ final class NotificationManager: NSObject {
             notification.categoryIdentifier = "mutable"
 
         case .newComment:
-            guard let c = item as? PRComment, let parent = c.parent, !parent.shouldSkipNotifications else { return }
+            guard let c = item.asComment, let parent = c.parent, !parent.shouldSkipNotifications else { return }
             notification.title = "@\(c.userName.orEmpty) Commented"
             notification.subtitle = c.notificationSubtitle
             notification.body = c.body.orEmpty
             notification.categoryIdentifier = "mutable"
 
         case .newPr:
-            guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
+            guard let p = item.asPr, !p.shouldSkipNotifications else { return }
             notification.title = "New PR"
             notification.subtitle = p.repo.fullName.orEmpty
             notification.body = p.title.orEmpty
             notification.categoryIdentifier = "mutable"
 
         case .prReopened:
-            guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
+            guard let p = item.asPr, !p.shouldSkipNotifications else { return }
             notification.title = "Re-Opened PR"
             notification.subtitle = p.repo.fullName.orEmpty
             notification.body = p.title.orEmpty
             notification.categoryIdentifier = "mutable"
 
         case .prMerged:
-            guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
+            guard let p = item.asPr, !p.shouldSkipNotifications else { return }
             notification.title = "PR Merged!"
             notification.subtitle = p.repo.fullName.orEmpty
             notification.body = p.title.orEmpty
             notification.categoryIdentifier = "mutable"
 
         case .prClosed:
-            guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
+            guard let p = item.asPr, !p.shouldSkipNotifications else { return }
             notification.title = "PR Closed"
             notification.subtitle = p.repo.fullName.orEmpty
             notification.body = p.title.orEmpty
@@ -159,49 +159,49 @@ final class NotificationManager: NSObject {
             notification.categoryIdentifier = "repo"
 
         case .newPrAssigned:
-            guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
+            guard let p = item.asPr, !p.shouldSkipNotifications else { return }
             notification.title = "PR Assigned"
             notification.subtitle = p.repo.fullName.orEmpty
             notification.body = p.title.orEmpty
             notification.categoryIdentifier = "mutable"
 
         case .newStatus:
-            guard let s = item as? PRStatus, !s.pullRequest.shouldSkipNotifications else { return }
+            guard let s = item.asStatus, !s.pullRequest.shouldSkipNotifications else { return }
             notification.title = "PR Status Update"
             notification.subtitle = s.descriptionText.orEmpty
             notification.body = s.pullRequest.title.orEmpty
             notification.categoryIdentifier = "mutable"
 
         case .newIssue:
-            guard let i = item as? Issue, !i.shouldSkipNotifications else { return }
+            guard let i = item.asIssue, !i.shouldSkipNotifications else { return }
             notification.title = "New Issue"
             notification.subtitle = i.repo.fullName.orEmpty
             notification.body = i.title.orEmpty
             notification.categoryIdentifier = "mutable"
 
         case .issueReopened:
-            guard let i = item as? Issue, !i.shouldSkipNotifications else { return }
+            guard let i = item.asIssue, !i.shouldSkipNotifications else { return }
             notification.title = "Re-Opened Issue"
             notification.subtitle = i.repo.fullName.orEmpty
             notification.body = i.title.orEmpty
             notification.categoryIdentifier = "mutable"
 
         case .issueClosed:
-            guard let i = item as? Issue, !i.shouldSkipNotifications else { return }
+            guard let i = item.asIssue, !i.shouldSkipNotifications else { return }
             notification.title = "Issue Closed"
             notification.subtitle = i.repo.fullName.orEmpty
             notification.body = i.title.orEmpty
             notification.categoryIdentifier = "mutable"
 
         case .newIssueAssigned:
-            guard let i = item as? Issue, !i.shouldSkipNotifications else { return }
+            guard let i = item.asIssue, !i.shouldSkipNotifications else { return }
             notification.title = "Issue Assigned"
             notification.subtitle = i.repo.fullName.orEmpty
             notification.body = i.title.orEmpty
             notification.categoryIdentifier = "mutable"
 
         case .changesApproved:
-            guard let r = item as? Review else { return }
+            guard let r = item.asReview else { return }
             let p = r.pullRequest
             if p.shouldSkipNotifications { return }
             notification.title = "@\(r.username.orEmpty) Approved Changes"
@@ -215,7 +215,7 @@ final class NotificationManager: NSObject {
             }
 
         case .changesRequested:
-            guard let r = item as? Review else { return }
+            guard let r = item.asReview else { return }
             let p = r.pullRequest
             if p.shouldSkipNotifications { return }
             notification.title = "@\(r.username.orEmpty) Requests Changes"
@@ -229,7 +229,7 @@ final class NotificationManager: NSObject {
             }
 
         case .changesDismissed:
-            guard let r = item as? Review else { return }
+            guard let r = item.asReview else { return }
             let p = r.pullRequest
             if p.shouldSkipNotifications { return }
             notification.title = "@\(r.username.orEmpty) Dismissed A Review"
@@ -238,21 +238,21 @@ final class NotificationManager: NSObject {
             notification.categoryIdentifier = "mutable"
 
         case .assignedForReview:
-            guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
+            guard let p = item.asPr, !p.shouldSkipNotifications else { return }
             notification.title = "PR Review Requested"
             notification.subtitle = p.repo.fullName.orEmpty
             notification.body = p.title.orEmpty
             notification.categoryIdentifier = "mutable"
 
         case .assignedToTeamForReview:
-            guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
+            guard let p = item.asPr, !p.shouldSkipNotifications else { return }
             notification.title = "PR Review Request to Team"
             notification.subtitle = p.repo.fullName.orEmpty
             notification.body = p.title.orEmpty
             notification.categoryIdentifier = "mutable"
 
         case .newReaction:
-            guard let r = item as? Reaction else { return }
+            guard let r = item.asReaction else { return }
             notification.title = r.displaySymbol
             notification.subtitle = "@\(r.userName.orEmpty)"
             if let c = r.comment, let p = c.pullRequest, !p.shouldSkipNotifications {
@@ -272,8 +272,9 @@ final class NotificationManager: NSObject {
         notification.userInfo = DataManager.info(for: item)
 
         let attachmentUrl = Settings.hideAvatarsInNotifications ? nil :
-            (item as? PRComment)?.avatarUrl ??
-            (item as? ListableItem)?.userAvatarUrl
+        item.asComment?.avatarUrl ??
+        item.asPr?.userAvatarUrl ??
+        item.asIssue?.userAvatarUrl
 
         Task {
             if let attachmentUrl,

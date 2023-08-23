@@ -58,8 +58,8 @@ final class PRComment: DataItem {
         let parentId = parent.objectID
         await v3items(with: data, type: PRComment.self, serverId: parent.apiServer.objectID, moc: moc) { item, info, newOrUpdated, syncMoc in
             if newOrUpdated, let parent = try? syncMoc.existingObject(with: parentId) as? ListableItem {
-                item.pullRequest = parent as? PullRequest
-                item.issue = parent as? Issue
+                item.pullRequest = parent.asPr
+                item.issue = parent.asIssue
                 item.fill(from: info)
                 item.fastForwardIfNeeded(parent: parent)
                 item.reactionsUrl = (info["reactions"] as? JSON)?["url"] as? String
@@ -167,5 +167,9 @@ final class PRComment: DataItem {
             return terms.contains(where: { !$0.isEmpty && body.localizedCaseInsensitiveContains($0) })
         }
         return false
+    }
+
+    override var asComment: PRComment? {
+        return self
     }
 }

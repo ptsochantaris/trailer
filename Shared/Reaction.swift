@@ -22,9 +22,9 @@ final class Reaction: DataItem {
 
             if node.created {
                 let parent = parentType.asParent(with: parentId, in: moc, parentCache: parentCache)
-                reaction.pullRequest = parent as? PullRequest
-                reaction.issue = parent as? Issue
-                reaction.comment = parent as? PRComment
+                reaction.pullRequest = parent?.asPr
+                reaction.issue = parent?.asIssue
+                reaction.comment = parent?.asComment
                 if parent == nil {
                     Logging.log("Warning: Reaction without parent")
                 }
@@ -41,6 +41,10 @@ final class Reaction: DataItem {
         }
     }
 
+    override var asReaction: Reaction? {
+        return self
+    }
+
     static func syncReactions(from data: [JSON]?, commentId: NSManagedObjectID, serverId: NSManagedObjectID, moc: NSManagedObjectContext) async {
         await v3items(with: data, type: Reaction.self, serverId: serverId, moc: moc) { item, info, isNewOrUpdated, syncMoc in
             if isNewOrUpdated, let parent = try? syncMoc.existingObject(with: commentId) as? PRComment {
@@ -55,9 +59,9 @@ final class Reaction: DataItem {
     static func syncReactions(from data: [JSON]?, parentId: NSManagedObjectID, serverId: NSManagedObjectID, moc: NSManagedObjectContext) async {
         await v3items(with: data, type: Reaction.self, serverId: serverId, moc: moc) { item, info, isNewOrUpdated, syncMoc in
             if isNewOrUpdated {
-                let parent = try! syncMoc.existingObject(with: parentId)
-                item.pullRequest = parent as? PullRequest
-                item.issue = parent as? Issue
+                let parent = try! syncMoc.existingObject(with: parentId) as? ListableItem
+                item.pullRequest = parent?.asPr
+                item.issue = parent?.asIssue
                 item.comment = nil
                 item.fill(from: info)
             }
