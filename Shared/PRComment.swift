@@ -23,24 +23,21 @@ final class PRComment: DataItem {
     static func sync(from nodes: Lista<Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
         syncItems(of: PRComment.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { comment, node in
             guard node.created || node.updated,
-                  let parentId = node.parent?.id
+                  let parent = node.parent
             else { return }
 
             if node.created {
-                let review = Review.asParent(with: parentId, in: moc, parentCache: parentCache)
-                comment.review = review
+                let parentId = parent.id
+                let parentType = parent.elementType
 
-                let pr = PullRequest.asParent(with: parentId, in: moc, parentCache: parentCache)
-                if pr == nil, let review {
-                    comment.pullRequest = review.pullRequest
-                } else {
+                if parentType == "PullRequest", let pr = PullRequest.asParent(with: parentId, in: moc, parentCache: parentCache) {
                     comment.pullRequest = pr
-                }
-
-                let issue = Issue.asParent(with: parentId, in: moc, parentCache: parentCache)
-                comment.issue = issue
-
-                if issue == nil, pr == nil, review == nil {
+                } else if parentType == "Issue", let issue = Issue.asParent(with: parentId, in: moc, parentCache: parentCache) {
+                    comment.issue = issue
+                } else if let review = Review.asParent(with: parentId, in: moc, parentCache: parentCache) {
+                    comment.pullRequest = review.pullRequest
+                    comment.review = review
+                } else {
                     Logging.log("Warning: PRComment without parent")
                 }
             }

@@ -102,7 +102,8 @@ extension Querying {
     }
 
     static func asParent(with nodeId: String, in moc: NSManagedObjectContext, parentCache: FetchCache) -> Self? {
-        if let existingObject = parentCache.object(forKey: nodeId as NSString) as? Self {
+        let nid = nodeId as NSString
+        if let existingObject = parentCache.object(forKey: nid) as? Self {
             return existingObject
         }
         let f = NSFetchRequest<Self>(entityName: typeName)
@@ -112,7 +113,7 @@ extension Querying {
         f.predicate = NSPredicate(format: "nodeId == %@", nodeId)
         let object = try! moc.fetch(f).first
         if let object {
-            parentCache.setObject(object, forKey: nodeId as NSString)
+            parentCache.setObject(object, forKey: nid)
         }
         return object
     }
