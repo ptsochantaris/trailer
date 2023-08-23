@@ -19,18 +19,21 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        view.isUserInteractionEnabled = false
+
         let a: ApiServer
         if let serverLocalId {
             a = try! DataManager.main.existingObject(with: serverLocalId) as! ApiServer
         } else {
             a = ApiServer.addDefaultGithub(in: DataManager.main)
-            view.isUserInteractionEnabled = false
-            Task {
-                await DataManager.saveDB()
-                serverLocalId = a.objectID
-                view.isUserInteractionEnabled = true
-            }
         }
+
+        Task {
+            await DataManager.saveDB()
+            serverLocalId = a.objectID
+            view.isUserInteractionEnabled = true
+        }
+
         name.text = a.label
         apiPath.text = a.apiPath
         graphQLPath.text = a.graphQLPath
