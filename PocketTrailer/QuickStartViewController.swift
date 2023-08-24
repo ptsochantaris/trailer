@@ -99,7 +99,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
         view.endEditing(true)
 
         try? DataManager.main.save() // permanent ID for generated server
-        
+
         for v in otherViews {
             v.isHidden = true
         }

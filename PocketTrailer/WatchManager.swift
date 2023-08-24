@@ -278,7 +278,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
             var totalUnreadIssueCount = 0
 
             let settings = Settings.cache
-            
+
             for c in allViewCriteria {
                 let myPrs = WatchManager.counts(for: PullRequest.self, in: .mine, criterion: c, moc: tempMoc)
                 let participatedPrs = WatchManager.counts(for: PullRequest.self, in: .participated, criterion: c, moc: tempMoc)

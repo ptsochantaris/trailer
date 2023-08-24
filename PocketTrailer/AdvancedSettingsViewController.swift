@@ -12,7 +12,8 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
         let section: SettingsSection
         let title: String
         let description: String
-        var valueDisplayed: () -> String?
+        let valueDisplayed: () -> String?
+        let optionSelected: (Int, SettingsSection, Setting) -> Void
 
         func isRelevant(to searchText: String?, showingHelp: Bool) -> Bool {
             if let searchText, !searchText.isEmpty {
@@ -23,334 +24,771 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
         }
     }
 
-    private let settings = [
+    private lazy var settings = [
         Setting(section: .Refresh,
                 title: "Background refresh interval (minimum)",
                 description: Settings.backgroundRefreshPeriodHelp,
-                valueDisplayed: { String(format: "%.0f minutes", Settings.backgroundRefreshPeriod / 60.0) }),
+                valueDisplayed: { String(format: "%.0f minutes", Settings.backgroundRefreshPeriod / 60.0) },
+                optionSelected: { [weak self] originalIndex, section, setting in
+                    guard let self else { return }
+                    var values = [String]()
+                    var count = 0
+                    var previousIndex: Int?
+                    // minutes
+                    let period = Int(Settings.backgroundRefreshPeriod / 60)
+                    for f in 2 ..< 1000 {
+                        if f == period { previousIndex = count }
+                        values.append("\(f) minutes")
+                        count += 1
+                    }
+                    let v = PickerViewController.Info(title: setting.title, values: values, selectedIndex: previousIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                    performSegue(withIdentifier: "showPicker", sender: v)
+                }),
         Setting(section: .Refresh,
                 title: "Watchlist & team list refresh interval",
                 description: Settings.newRepoCheckPeriodHelp,
-                valueDisplayed: { String(format: "%.0f hours", Settings.newRepoCheckPeriod) }),
+                valueDisplayed: { String(format: "%.0f hours", Settings.newRepoCheckPeriod) },
+                optionSelected: { [weak self] originalIndex, section, setting in
+                    guard let self else { return }
+                    var values = [String]()
+                    var count = 0
+                    var previousIndex: Int?
+                    // hours
+                    let period = Int(Settings.newRepoCheckPeriod)
+                    for f in 2 ..< 100 {
+                        if f == period { previousIndex = count }
+                        values.append("\(f) hours")
+                        count += 1
+                    }
+                    let v = PickerViewController.Info(title: setting.title, values: values, selectedIndex: previousIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                    performSegue(withIdentifier: "showPicker", sender: v)
+                }),
 
         Setting(section: .Display,
                 title: "Show item labels",
                 description: Settings.showLabelsHelp,
-                valueDisplayed: { Settings.showLabels ? "✓" : " " }),
+                valueDisplayed: { Settings.showLabels ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    let newValue = !Settings.showLabels
+                    Settings.showLabels = newValue
+                    if newValue, Settings.showLabels {
+                        ApiServer.resetSyncOfEverything()
+                        preferencesDirty = true
+                        showLongSyncWarning()
+                    }
+                    settingsChangedTimer.push()
+                }),
         Setting(section: .Display,
                 title: "Display item creation times instead of update times",
                 description: Settings.showCreatedInsteadOfUpdatedHelp,
-                valueDisplayed: { Settings.showCreatedInsteadOfUpdated ? "✓" : " " }),
+                valueDisplayed: { Settings.showCreatedInsteadOfUpdated ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.showCreatedInsteadOfUpdated.toggle()
+                    settingsChangedTimer.push()
+                }),
         Setting(section: .Display,
                 title: "Display relative times and dates",
                 description: Settings.showRelativeDatesHelp,
-                valueDisplayed: { Settings.showRelativeDates ? "✓" : " " }),
+                valueDisplayed: { Settings.showRelativeDates ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.showRelativeDates.toggle()
+                    settingsChangedTimer.push()
+                }),
         Setting(section: .Display,
                 title: "Assigned items to me",
                 description: Settings.assignedItemDirectHandlingPolicyHelp,
-                valueDisplayed: { Settings.assignedItemDirectHandlingPolicy.placementName }),
+                valueDisplayed: { Settings.assignedItemDirectHandlingPolicy.placementName },
+                optionSelected: { [weak self] originalIndex, section, setting in
+                    guard let self else { return }
+                    let v = PickerViewController.Info(title: setting.title, values: Section.assignmentPlacementLabels, selectedIndex: Settings.assignedItemDirectHandlingPolicy.assignmentPolictMenuIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                    performSegue(withIdentifier: "showPicker", sender: v)
+                }),
         Setting(section: .Display,
                 title: "Assigned items to my team(s)",
                 description: Settings.assignedItemTeamHandlingPolicyHelp,
-                valueDisplayed: { Settings.assignedItemTeamHandlingPolicy.placementName }),
+                valueDisplayed: { Settings.assignedItemTeamHandlingPolicy.placementName },
+                optionSelected: { [weak self] originalIndex, section, setting in
+                    guard let self else { return }
+                    let v = PickerViewController.Info(title: setting.title, values: Section.assignmentPlacementLabels, selectedIndex: Settings.assignedItemTeamHandlingPolicy.assignmentPolictMenuIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                    performSegue(withIdentifier: "showPicker", sender: v)
+                }),
         Setting(section: .Display,
                 title: "Display repository names",
                 description: Settings.showReposInNameHelp,
-                valueDisplayed: { Settings.showReposInName ? "✓" : " " }),
+                valueDisplayed: { Settings.showReposInName ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.showReposInName.toggle()
+                    settingsChangedTimer.push()
+                }),
         Setting(section: .Display,
                 title: "…including base and head branches",
                 description: Settings.showBaseAndHeadBranchesHelp,
-                valueDisplayed: { Settings.showBaseAndHeadBranches ? "✓" : " " }),
+                valueDisplayed: { Settings.showBaseAndHeadBranches ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.showBaseAndHeadBranches.toggle()
+                    settingsChangedTimer.push()
+                }),
         Setting(section: .Display,
                 title: "Separate API servers into their own groups",
                 description: Settings.showSeparateApiServersInMenuHelp,
-                valueDisplayed: { Settings.showSeparateApiServersInMenu ? "✓" : " " }),
+                valueDisplayed: { Settings.showSeparateApiServersInMenu ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.showSeparateApiServersInMenu.toggle()
+                    Task { @MainActor in
+                        popupManager.masterController.updateStatus(becauseOfChanges: true)
+                    }
+                    settingsChangedTimer.push()
+                }),
         Setting(section: .Display,
                 title: "Highlight PRs with new commits",
                 description: Settings.markPrsAsUnreadOnNewCommitsHelp,
-                valueDisplayed: { Settings.markPrsAsUnreadOnNewCommits ? "✓" : " " }),
+                valueDisplayed: { Settings.markPrsAsUnreadOnNewCommits ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.markPrsAsUnreadOnNewCommits.toggle()
+                    settingsChangedTimer.push()
+                }),
         Setting(section: .Display,
                 title: "Display milestones",
                 description: Settings.showMilestonesHelp,
-                valueDisplayed: { Settings.showMilestones ? "✓" : " " }),
+                valueDisplayed: { Settings.showMilestones ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.showMilestones.toggle()
+                    settingsChangedTimer.push()
+                }),
         Setting(section: .Display,
                 title: "Prefix PR/Issue numbers in item titles",
                 description: Settings.displayNumbersForItemsHelp,
-                valueDisplayed: { Settings.displayNumbersForItems ? "✓" : " " }),
+                valueDisplayed: { Settings.displayNumbersForItems ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.displayNumbersForItems.toggle()
+                    settingsChangedTimer.push()
+                }),
         Setting(section: .Display,
                 title: "Draft PRs",
                 description: Settings.draftHandlingPolicyHelp,
-                valueDisplayed: { Settings.draftHandlingPolicy.label }),
+                valueDisplayed: { Settings.draftHandlingPolicy.label },
+                optionSelected: { [weak self] originalIndex, section, setting in
+                    guard let self else { return }
+                    let v = PickerViewController.Info(title: setting.title, values: DraftHandlingPolicy.allCases.map(\.label), selectedIndex: Settings.draftHandlingPolicy.rawValue, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                    performSegue(withIdentifier: "showPicker", sender: v)
+                }),
         Setting(section: .Display,
                 title: "Mark non-mergeable PRs (v4 API only)",
                 description: Settings.markUnmergeablePrsHelp,
-                valueDisplayed: { Settings.markUnmergeablePrs ? "✓" : " " }),
+                valueDisplayed: { Settings.markUnmergeablePrs ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.markUnmergeablePrs.toggle()
+                    settingsChangedTimer.push()
+                }),
         Setting(section: .Display,
                 title: "Show PR line counts (v4 API only)",
                 description: Settings.showPrLinesHelp,
-                valueDisplayed: { Settings.showPrLines ? "✓" : " " }),
+                valueDisplayed: { Settings.showPrLines ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.showPrLines.toggle()
+                    settingsChangedTimer.push()
+
+                }),
         Setting(section: .Display,
                 title: "Show items that close or are closed by this item (v4 API only)",
                 description: Settings.showClosingInfoHelp,
-                valueDisplayed: { Settings.showClosingInfo ? "✓" : " " }),
+                valueDisplayed: { Settings.showClosingInfo ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.showClosingInfo.toggle()
+                    settingsChangedTimer.push()
+                }),
 
         Setting(section: .Filtering,
                 title: "Include item titles",
                 description: Settings.includeTitlesInFilterHelp,
-                valueDisplayed: { Settings.includeTitlesInFilter ? "✓" : " " }),
+                valueDisplayed: { Settings.includeTitlesInFilter ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.includeTitlesInFilter.toggle()
+                    settingsChangedTimer.push()
+                }),
         Setting(section: .Filtering,
                 title: "Include repository names",
                 description: Settings.includeReposInFilterHelp,
-                valueDisplayed: { Settings.includeReposInFilter ? "✓" : " " }),
+                valueDisplayed: { Settings.includeReposInFilter ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.includeReposInFilter.toggle()
+                    settingsChangedTimer.push()
+                }),
         Setting(section: .Filtering,
                 title: "Include labels",
                 description: Settings.includeLabelsInFilterHelp,
-                valueDisplayed: { Settings.includeLabelsInFilter ? "✓" : " " }),
+                valueDisplayed: { Settings.includeLabelsInFilter ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.includeLabelsInFilter.toggle()
+                    settingsChangedTimer.push()
+                }),
         Setting(section: .Filtering,
                 title: "Include statuses",
                 description: Settings.includeStatusesInFilterHelp,
-                valueDisplayed: { Settings.includeStatusesInFilter ? "✓" : " " }),
+                valueDisplayed: { Settings.includeStatusesInFilter ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.includeStatusesInFilter.toggle()
+                    settingsChangedTimer.push()
+
+                }),
         Setting(section: .Filtering,
                 title: "Include servers",
                 description: Settings.includeServersInFilterHelp,
-                valueDisplayed: { Settings.includeServersInFilter ? "✓" : " " }),
+                valueDisplayed: { Settings.includeServersInFilter ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.includeServersInFilter.toggle()
+                    settingsChangedTimer.push()
+                }),
         Setting(section: .Filtering,
                 title: "Include usernames",
                 description: Settings.includeUsersInFilterHelp,
-                valueDisplayed: { Settings.includeUsersInFilter ? "✓" : " " }),
+                valueDisplayed: { Settings.includeUsersInFilter ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.includeUsersInFilter.toggle()
+                    settingsChangedTimer.push()
+                }),
         Setting(section: .Filtering,
                 title: "Include PR or issue numbers",
                 description: Settings.includeNumbersInFilterHelp,
-                valueDisplayed: { Settings.includeNumbersInFilter ? "✓" : " " }),
+                valueDisplayed: { Settings.includeNumbersInFilter ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.includeNumbersInFilter.toggle()
+                    settingsChangedTimer.push()
+                }),
         Setting(section: .Filtering,
                 title: "Include milestones",
                 description: Settings.includeMilestonesInFilterHelp,
-                valueDisplayed: { Settings.includeMilestonesInFilter ? "✓" : " " }),
+                valueDisplayed: { Settings.includeMilestonesInFilter ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.includeMilestonesInFilter.toggle()
+                    settingsChangedTimer.push()
+                }),
         Setting(section: .Filtering,
                 title: "Include assignee names",
                 description: Settings.includeAssigneeInFilterHelp,
-                valueDisplayed: { Settings.includeAssigneeNamesInFilter ? "✓" : " " }),
+                valueDisplayed: { Settings.includeAssigneeNamesInFilter ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.includeAssigneeNamesInFilter.toggle()
+                    settingsChangedTimer.push()
+
+                }),
         Setting(section: .Filtering,
                 title: "Hide items created by these usernames…",
                 description: Settings.itemAuthorBlacklistHelp,
-                valueDisplayed: { ">" }),
+                valueDisplayed: { ">" },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    performSegue(withIdentifier: "showBlacklist", sender: CommentBlacklistViewController.Mode.itemAuthors)
+                }),
         Setting(section: .Filtering,
                 title: "Hide items that contain these labels…",
                 description: Settings.itemAuthorBlacklistHelp,
-                valueDisplayed: { ">" }),
+                valueDisplayed: { ">" },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    performSegue(withIdentifier: "showBlacklist", sender: CommentBlacklistViewController.Mode.labels)
+                }),
 
         Setting(section: .AppleWatch,
                 title: "Prefer issues instead of PRs in Apple Watch complications",
                 description: Settings.preferIssuesInWatchHelp,
-                valueDisplayed: { Settings.preferIssuesInWatch ? "✓" : " " }),
+                valueDisplayed: { Settings.preferIssuesInWatch ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.preferIssuesInWatch.toggle()
+                    settingsChangedTimer.push()
+                }),
         Setting(section: .AppleWatch,
                 title: "Hide descriptions in Apple Watch detail views",
                 description: Settings.hideDescriptionInWatchDetailHelp,
-                valueDisplayed: { Settings.hideDescriptionInWatchDetail ? "✓" : " " }),
+                valueDisplayed: { Settings.hideDescriptionInWatchDetail ? "✓" : " " },
+                optionSelected: { _, _, _ in
+                    Settings.hideDescriptionInWatchDetail.toggle()
+                }),
 
         Setting(section: .Comments,
                 title: "Badge & send alerts for the 'all' section too",
                 description: Settings.showCommentsEverywhereHelp,
-                valueDisplayed: { Settings.showCommentsEverywhere ? "✓" : " " }),
+                valueDisplayed: { Settings.showCommentsEverywhere ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.showCommentsEverywhere.toggle()
+                    settingsChangedTimer.push()
+                }),
         Setting(section: .Comments,
                 title: "Only display items with unread badges",
                 description: Settings.hideUncommentedItemsHelp,
-                valueDisplayed: { Settings.hideUncommentedItems ? "✓" : " " }),
+                valueDisplayed: { Settings.hideUncommentedItems ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.hideUncommentedItems.toggle()
+                    settingsChangedTimer.push()
+                }),
         Setting(section: .Comments,
                 title: "Move items mentioning me to…",
                 description: Settings.newMentionMovePolicyHelp,
-                valueDisplayed: { Settings.newMentionMovePolicy.placementName }),
+                valueDisplayed: { Settings.newMentionMovePolicy.placementName },
+                optionSelected: { [weak self] originalIndex, section, setting in
+                    guard let self else { return }
+                    let v = PickerViewController.Info(title: setting.title, values: Section.movePlacementLabels, selectedIndex: Settings.newMentionMovePolicy.movePolicyMenuIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                    performSegue(withIdentifier: "showPicker", sender: v)
+                }),
         Setting(section: .Comments,
                 title: "Move items mentioning my teams to…",
                 description: Settings.teamMentionMovePolicyHelp,
-                valueDisplayed: { Settings.teamMentionMovePolicy.placementName }),
+                valueDisplayed: { Settings.teamMentionMovePolicy.placementName },
+                optionSelected: { [weak self] originalIndex, section, setting in
+                    guard let self else { return }
+                    let v = PickerViewController.Info(title: setting.title, values: Section.movePlacementLabels, selectedIndex: Settings.teamMentionMovePolicy.movePolicyMenuIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                    performSegue(withIdentifier: "showPicker", sender: v)
+                }),
         Setting(section: .Comments,
                 title: "Move items created in my repos to…",
                 description: Settings.newItemInOwnedRepoMovePolicyHelp,
-                valueDisplayed: { Settings.newItemInOwnedRepoMovePolicy.placementName }),
+                valueDisplayed: { Settings.newItemInOwnedRepoMovePolicy.placementName },
+                optionSelected: { [weak self] originalIndex, section, setting in
+                    guard let self else { return }
+                    let v = PickerViewController.Info(title: setting.title, values: Section.movePlacementLabels, selectedIndex: Settings.newItemInOwnedRepoMovePolicy.movePolicyMenuIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                    performSegue(withIdentifier: "showPicker", sender: v)
+                }),
         Setting(section: .Comments,
                 title: "Open items at first unread comment",
                 description: Settings.openPrAtFirstUnreadCommentHelp,
-                valueDisplayed: { Settings.openPrAtFirstUnreadComment ? "✓" : " " }),
+                valueDisplayed: { Settings.openPrAtFirstUnreadComment ? "✓" : " " },
+                optionSelected: { _, _, _ in
+                    Settings.openPrAtFirstUnreadComment.toggle()
+                }),
         Setting(section: .Comments,
                 title: "Block comment notifications from usernames…",
                 description: "A list of usernames whose comments you don't want to receive notifications for.",
-                valueDisplayed: { ">" }),
+                valueDisplayed: { ">" },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    performSegue(withIdentifier: "showBlacklist", sender: CommentBlacklistViewController.Mode.commentAuthors)
+                }),
         Setting(section: .Comments,
                 title: "Disable all comment notifications",
                 description: Settings.disableAllCommentNotificationsHelp,
-                valueDisplayed: { Settings.disableAllCommentNotifications ? "✓" : " " }),
+                valueDisplayed: { Settings.disableAllCommentNotifications ? "✓" : " " },
+                optionSelected: { _, _, _ in
+                    Settings.disableAllCommentNotifications.toggle()
+                }),
         Setting(section: .Comments,
                 title: "Mark any comments before my own as read",
                 description: Settings.assumeReadItemIfUserHasNewerCommentsHelp,
-                valueDisplayed: { Settings.assumeReadItemIfUserHasNewerComments ? "✓" : " " }),
+                valueDisplayed: { Settings.assumeReadItemIfUserHasNewerComments ? "✓" : " " },
+                optionSelected: { _, _, _ in
+                    Settings.assumeReadItemIfUserHasNewerComments.toggle()
+                }),
 
         Setting(section: .Watchlist,
                 title: "PR visibility for new repos",
                 description: Settings.displayPolicyForNewPrsHelp,
-                valueDisplayed: { Settings.displayPolicyForNewPrs.name }),
+                valueDisplayed: { Settings.displayPolicyForNewPrs.name },
+                optionSelected: { [weak self] originalIndex, section, setting in
+                    guard let self else { return }
+                    var previousIndex = Settings.displayPolicyForNewPrs.rawValue
+                    let v = PickerViewController.Info(title: setting.title, values: RepoDisplayPolicy.labels, selectedIndex: previousIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                    performSegue(withIdentifier: "showPicker", sender: v)
+                }),
         Setting(section: .Watchlist,
                 title: "Issue visibility for new repos",
                 description: Settings.displayPolicyForNewIssuesHelp,
-                valueDisplayed: { Settings.displayPolicyForNewIssues.name }),
+                valueDisplayed: { Settings.displayPolicyForNewIssues.name },
+                optionSelected: { [weak self] originalIndex, section, setting in
+                    guard let self else { return }
+                    var previousIndex = Settings.displayPolicyForNewIssues.rawValue
+                    let v = PickerViewController.Info(title: setting.title, values: RepoDisplayPolicy.labels, selectedIndex: previousIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                    performSegue(withIdentifier: "showPicker", sender: v)
+                }),
 
         Setting(section: .Reviews,
                 title: "Show reviews for PRs",
                 description: Settings.displayReviewsOnItemsHelp,
-                valueDisplayed: { Settings.displayReviewsOnItems ? "✓" : " " }),
+                valueDisplayed: { Settings.displayReviewsOnItems ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    let previousShouldSync = Settings.cache.requiresReviewApis
+                    Settings.displayReviewsOnItems.toggle()
+                    showOptionalReviewWarning(previousSync: previousShouldSync)
+                }),
         Setting(section: .Reviews,
                 title: "Show teams asked to review",
                 description: Settings.showRequestedTeamReviewsHelp,
-                valueDisplayed: { Settings.showRequestedTeamReviews ? "✓" : " " }),
+                valueDisplayed: { Settings.showRequestedTeamReviews ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    let previousShouldSync = Settings.cache.requiresReviewApis
+                    Settings.showRequestedTeamReviews.toggle()
+                    showOptionalReviewWarning(previousSync: previousShouldSync)
+                }),
         Setting(section: .Reviews,
                 title: "When a PR is assigned to me for review",
                 description: Settings.assignedDirectReviewHandlingPolicyHelp,
-                valueDisplayed: { Settings.assignedDirectReviewHandlingPolicy.placementName }),
+                valueDisplayed: { Settings.assignedDirectReviewHandlingPolicy.placementName },
+                optionSelected: { [weak self] originalIndex, section, setting in
+                    guard let self else { return }
+                    let v = PickerViewController.Info(title: setting.title, values: Section.assignmentPlacementLabels, selectedIndex: Settings.assignedDirectReviewHandlingPolicy.assignmentPolictMenuIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                    performSegue(withIdentifier: "showPicker", sender: v)
+                }),
         Setting(section: .Reviews,
                 title: "When a PR is assigned to my team(s) for review",
                 description: Settings.assignedTeamReviewHandlingPolicyHelp,
-                valueDisplayed: { Settings.assignedTeamReviewHandlingPolicy.placementName }),
+                valueDisplayed: { Settings.assignedTeamReviewHandlingPolicy.placementName },
+                optionSelected: { [weak self] originalIndex, section, setting in
+                    guard let self else { return }
+                    let v = PickerViewController.Info(title: setting.title, values: Section.assignmentPlacementLabels, selectedIndex: Settings.assignedTeamReviewHandlingPolicy.assignmentPolictMenuIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                    performSegue(withIdentifier: "showPicker", sender: v)
+                }),
         Setting(section: .Reviews,
                 title: "Notify on change requests",
                 description: Settings.notifyOnReviewChangeRequestsHelp,
-                valueDisplayed: { Settings.notifyOnReviewChangeRequests ? "✓" : " " }),
+                valueDisplayed: { Settings.notifyOnReviewChangeRequests ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    let previousShouldSync = Settings.cache.requiresReviewApis
+                    Settings.notifyOnReviewChangeRequests.toggle()
+                    showOptionalReviewWarning(previousSync: previousShouldSync)
+                    if !Settings.notifyOnReviewChangeRequests {
+                        Settings.notifyOnAllReviewChangeRequests = false
+                    }
+                }),
         Setting(section: .Reviews,
                 title: "…for all change requests",
                 description: Settings.notifyOnAllReviewChangeRequestsHelp,
-                valueDisplayed: { Settings.notifyOnAllReviewChangeRequests ? "✓" : " " }),
+                valueDisplayed: { Settings.notifyOnAllReviewChangeRequests ? "✓" : " " },
+                optionSelected: { _, _, _ in
+                    Settings.notifyOnAllReviewChangeRequests.toggle()
+                }),
         Setting(section: .Reviews,
                 title: "Notify on approvals",
                 description: Settings.notifyOnReviewAcceptancesHelp,
-                valueDisplayed: { Settings.notifyOnReviewAcceptances ? "✓" : " " }),
+                valueDisplayed: { Settings.notifyOnReviewAcceptances ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    let previousShouldSync = Settings.cache.requiresReviewApis
+                    Settings.notifyOnReviewAcceptances.toggle()
+                    showOptionalReviewWarning(previousSync: previousShouldSync)
+                }),
         Setting(section: .Reviews,
                 title: "…for all approvals",
                 description: Settings.notifyOnAllReviewAcceptancesHelp,
-                valueDisplayed: { Settings.notifyOnAllReviewAcceptances ? "✓" : " " }),
+                valueDisplayed: { Settings.notifyOnAllReviewAcceptances ? "✓" : " " },
+                optionSelected: { _, _, _ in
+                    Settings.notifyOnAllReviewAcceptances.toggle()
+                    if !Settings.notifyOnReviewAcceptances {
+                        Settings.notifyOnAllReviewAcceptances = false
+                    }
+                }),
         Setting(section: .Reviews,
                 title: "Notify on dismissals",
                 description: Settings.notifyOnReviewDismissalsHelp,
-                valueDisplayed: { Settings.notifyOnReviewDismissals ? "✓" : " " }),
+                valueDisplayed: { Settings.notifyOnReviewDismissals ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    let previousShouldSync = Settings.cache.requiresReviewApis
+                    Settings.notifyOnReviewDismissals.toggle()
+                    showOptionalReviewWarning(previousSync: previousShouldSync)
+                    if !Settings.notifyOnReviewDismissals {
+                        Settings.notifyOnAllReviewDismissals = false
+                    }
+                }),
         Setting(section: .Reviews,
                 title: "…for all dismissals",
                 description: Settings.notifyOnAllReviewDismissalsHelp,
-                valueDisplayed: { Settings.notifyOnAllReviewDismissals ? "✓" : " " }),
+                valueDisplayed: { Settings.notifyOnAllReviewDismissals ? "✓" : " " },
+                optionSelected: { _, _, _ in
+                    Settings.notifyOnAllReviewDismissals.toggle()
+
+                }),
         Setting(section: .Reviews,
                 title: "Notify on assignments",
                 description: Settings.notifyOnReviewAssignmentsHelp,
-                valueDisplayed: { Settings.notifyOnReviewAssignments ? "✓" : " " }),
+                valueDisplayed: { Settings.notifyOnReviewAssignments ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    let previousShouldSync = Settings.cache.requiresReviewApis
+                    Settings.notifyOnReviewAssignments.toggle()
+                    showOptionalReviewWarning(previousSync: previousShouldSync)
+                }),
 
         Setting(section: .Reactions,
                 title: "Count / notify on item reactions",
                 description: Settings.notifyOnItemReactionsHelp,
-                valueDisplayed: { Settings.notifyOnItemReactions ? "✓" : " " }),
+                valueDisplayed: { Settings.notifyOnItemReactions ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.notifyOnItemReactions.toggle()
+                    settingsChangedTimer.push()
+                }),
         Setting(section: .Reactions,
                 title: "Count / notify on comment reactions",
                 description: Settings.notifyOnCommentReactionsHelp,
-                valueDisplayed: { Settings.notifyOnCommentReactions ? "✓" : " " }),
+                valueDisplayed: { Settings.notifyOnCommentReactions ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.notifyOnCommentReactions.toggle()
+                    settingsChangedTimer.push()
+                }),
         Setting(section: .Reactions,
                 title: "Scan for reactions",
                 description: Settings.reactionScanningBatchSizeHelp,
-                valueDisplayed: { "\(Settings.reactionScanningBatchSize) items per refresh" }),
+                valueDisplayed: { "\(Settings.reactionScanningBatchSize) items per refresh" },
+                optionSelected: { [weak self] originalIndex, section, setting in
+                    guard let self else { return }
+                    var values = [String]()
+                    values.append("1 item per refresh")
+                    for f in 2 ..< 999 {
+                        values.append("\(f) items per refresh")
+                    }
+                    let v = PickerViewController.Info(title: setting.title, values: values, selectedIndex: Settings.reactionScanningBatchSize - 1, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                    performSegue(withIdentifier: "showPicker", sender: v)
+                }),
 
         Setting(section: .Stauses,
                 title: "Show statuses",
                 description: Settings.showStatusItemsHelp,
-                valueDisplayed: { Settings.showStatusItems ? "✓" : " " }),
+                valueDisplayed: { Settings.showStatusItems ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.showStatusItems.toggle()
+                    settingsChangedTimer.push()
+                    if Settings.showStatusItems {
+                        preferencesDirty = true
+                    }
+                }),
         Setting(section: .Stauses,
                 title: "…for all PRs",
                 description: Settings.showStatusesOnAllItemsHelp,
-                valueDisplayed: { Settings.showStatusesOnAllItems ? "✓" : " " }),
+                valueDisplayed: { Settings.showStatusesOnAllItems ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.showStatusesOnAllItems.toggle()
+                    settingsChangedTimer.push()
+                    if Settings.showStatusesOnAllItems {
+                        preferencesDirty = true
+                    }
+                }),
         Setting(section: .Stauses,
                 title: "Scan for statuses",
                 description: Settings.statusItemRefreshBatchSizeHelp,
-                valueDisplayed: { "\(Settings.statusItemRefreshBatchSize) items per refresh" }),
+                valueDisplayed: { "\(Settings.statusItemRefreshBatchSize) items per refresh" },
+                optionSelected: { [weak self] originalIndex, section, setting in
+                    guard let self else { return }
+                    var values = [String]()
+                    values.append("1 item per refresh")
+                    for f in 2 ..< 999 {
+                        values.append("\(f) items per refresh")
+                    }
+                    let v = PickerViewController.Info(title: setting.title, values: values, selectedIndex: Settings.statusItemRefreshBatchSize - 1, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                    performSegue(withIdentifier: "showPicker", sender: v)
+                }),
         Setting(section: .Stauses,
                 title: "Notify status changes for my & participated PRs",
                 description: Settings.notifyOnStatusUpdatesHelp,
-                valueDisplayed: { Settings.notifyOnStatusUpdates ? "✓" : " " }),
+                valueDisplayed: { Settings.notifyOnStatusUpdates ? "✓" : " " },
+                optionSelected: { _, _, _ in
+                    Settings.notifyOnStatusUpdates.toggle()
+
+                }),
         Setting(section: .Stauses,
                 title: "…in the 'All' section too",
                 description: Settings.notifyOnStatusUpdatesForAllPrsHelp,
-                valueDisplayed: { Settings.notifyOnStatusUpdatesForAllPrs ? "✓" : " " }),
+                valueDisplayed: { Settings.notifyOnStatusUpdatesForAllPrs ? "✓" : " " },
+                optionSelected: { _, _, _ in
+                    Settings.notifyOnStatusUpdatesForAllPrs.toggle()
+                }),
         Setting(section: .Stauses,
                 title: "Hide PRs whose status items are not all green",
                 description: Settings.hidePrsThatArentPassingHelp,
-                valueDisplayed: { Settings.hidePrsThatArentPassing ? "✓" : " " }),
+                valueDisplayed: { Settings.hidePrsThatArentPassing ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.hidePrsThatArentPassing.toggle()
+                    settingsChangedTimer.push()
+                }),
         Setting(section: .Stauses,
                 title: "…only in the 'All' section",
                 description: Settings.hidePrsThatDontPassOnlyInAllHelp,
-                valueDisplayed: { Settings.hidePrsThatDontPassOnlyInAll ? "✓" : " " }),
+                valueDisplayed: { Settings.hidePrsThatDontPassOnlyInAll ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.hidePrsThatDontPassOnlyInAll.toggle()
+                    settingsChangedTimer.push()
+                }),
         Setting(section: .Stauses,
                 title: "Show neutral statuses",
                 description: Settings.showStatusesGrayHelp,
-                valueDisplayed: { Settings.showStatusesGray ? "✓" : " " }),
+                valueDisplayed: { Settings.showStatusesGray ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.showStatusesGray.toggle()
+                    settingsChangedTimer.push()
+                }),
         Setting(section: .Stauses,
                 title: "Show green statuses",
                 description: Settings.showStatusesGreenHelp,
-                valueDisplayed: { Settings.showStatusesGreen ? "✓" : " " }),
+                valueDisplayed: { Settings.showStatusesGreen ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.showStatusesGreen.toggle()
+                    settingsChangedTimer.push()
+                }),
         Setting(section: .Stauses,
                 title: "Show yellow statuses",
                 description: Settings.showStatusesYellowHelp,
-                valueDisplayed: { Settings.showStatusesYellow ? "✓" : " " }),
+                valueDisplayed: { Settings.showStatusesYellow ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.showStatusesYellow.toggle()
+                    settingsChangedTimer.push()
+
+                }),
         Setting(section: .Stauses,
                 title: "Show red statuses",
                 description: Settings.showStatusesRedHelp,
-                valueDisplayed: { Settings.showStatusesRed ? "✓" : " " }),
+                valueDisplayed: { Settings.showStatusesRed ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.showStatusesRed.toggle()
+                    settingsChangedTimer.push()
+                }),
 
         Setting(section: .History,
                 title: "When something is merged",
                 description: Settings.mergeHandlingPolicyHelp,
-                valueDisplayed: { Settings.mergeHandlingPolicy.name }),
+                valueDisplayed: { Settings.mergeHandlingPolicy.name },
+                optionSelected: { [weak self] originalIndex, section, setting in
+                    guard let self else { return }
+                    let v = PickerViewController.Info(title: setting.title, values: KeepPolicy.labels, selectedIndex: Settings.mergeHandlingPolicy.rawValue, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                    performSegue(withIdentifier: "showPicker", sender: v)
+                }),
         Setting(section: .History,
                 title: "When something is closed",
                 description: Settings.closeHandlingPolicyHelp,
-                valueDisplayed: { Settings.closeHandlingPolicy.name }),
+                valueDisplayed: { Settings.closeHandlingPolicy.name },
+                optionSelected: { [weak self] originalIndex, section, setting in
+                    guard let self else { return }
+                    let v = PickerViewController.Info(title: setting.title, values: KeepPolicy.labels, selectedIndex: Settings.closeHandlingPolicy.rawValue, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                    performSegue(withIdentifier: "showPicker", sender: v)
+                }),
         Setting(section: .History,
                 title: "Don't keep PRs merged by me",
                 description: Settings.dontKeepPrsMergedByMeHelp,
-                valueDisplayed: { Settings.dontKeepPrsMergedByMe ? "✓" : " " }),
+                valueDisplayed: { Settings.dontKeepPrsMergedByMe ? "✓" : " " },
+                optionSelected: { _, _, _ in
+                    Settings.dontKeepPrsMergedByMe.toggle()
+
+                }),
         Setting(section: .History,
                 title: "Clear notifications of removed items",
                 description: Settings.removeNotificationsWhenItemIsRemovedHelp,
-                valueDisplayed: { Settings.removeNotificationsWhenItemIsRemoved ? "✓" : " " }),
+                valueDisplayed: { Settings.removeNotificationsWhenItemIsRemoved ? "✓" : " " },
+                optionSelected: { _, _, _ in
+                    Settings.removeNotificationsWhenItemIsRemoved.toggle()
+
+                }),
         Setting(section: .History,
                 title: "Highlight comments on closed or merged items",
                 description: Settings.scanClosedAndMergedItemsHelp,
-                valueDisplayed: { Settings.scanClosedAndMergedItems ? "✓" : " " }),
-        
+                valueDisplayed: { Settings.scanClosedAndMergedItems ? "✓" : " " },
+                optionSelected: { _, _, _ in
+                    Settings.scanClosedAndMergedItems.toggle()
+
+                }),
         Setting(section: .History,
                 title: "Auto-remove merged items",
                 description: Settings.autoRemoveMergedItemsHelp,
-                valueDisplayed: { Settings.autoRemoveMergedItems == 0 ? "Never" : "After \(Settings.autoRemoveMergedItems)d" }),
+                valueDisplayed: { Settings.autoRemoveMergedItems == 0 ? "Never" : "After \(Settings.autoRemoveMergedItems)d" },
+                optionSelected: { [weak self] originalIndex, section, setting in
+                    guard let self else { return }
+                    var values = ["Never", "After 1 day"]
+                    for f in 2 ..< 999 {
+                        values.append("After \(f) day(s)")
+                    }
+                    let v = PickerViewController.Info(title: setting.title, values: values, selectedIndex: Settings.autoRemoveMergedItems, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                    performSegue(withIdentifier: "showPicker", sender: v)
+                }),
         Setting(section: .History,
                 title: "Auto-remove closed items",
                 description: Settings.autoRemoveMergedItemsHelp,
-                valueDisplayed: { Settings.autoRemoveClosedItems == 0 ? "Never" : "After \(Settings.autoRemoveClosedItems)d" }),
+                valueDisplayed: { Settings.autoRemoveClosedItems == 0 ? "Never" : "After \(Settings.autoRemoveClosedItems)d" },
+                optionSelected: { [weak self] originalIndex, section, setting in
+                    guard let self else { return }
+                    var values = ["Never", "After 1 day"]
+                    for f in 2 ..< 999 {
+                        values.append("After \(f) day(s)")
+                    }
+                    let v = PickerViewController.Info(title: setting.title, values: values, selectedIndex: Settings.autoRemoveClosedItems, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                    performSegue(withIdentifier: "showPicker", sender: v)
+                }),
 
         Setting(section: .Confirm,
                 title: "Removing all merged items",
                 description: Settings.dontAskBeforeWipingMergedHelp,
-                valueDisplayed: { Settings.dontAskBeforeWipingMerged ? "✓" : " " }),
+                valueDisplayed: { Settings.dontAskBeforeWipingMerged ? "✓" : " " },
+                optionSelected: { _, _, _ in
+                    Settings.dontAskBeforeWipingMerged.toggle()
+                }),
         Setting(section: .Confirm,
                 title: "Removing all closed items",
                 description: Settings.dontAskBeforeWipingClosedHelp,
-                valueDisplayed: { Settings.dontAskBeforeWipingClosed ? "✓" : " " }),
+                valueDisplayed: { Settings.dontAskBeforeWipingClosed ? "✓" : " " },
+                optionSelected: { _, _, _ in
+                    Settings.dontAskBeforeWipingClosed.toggle()
+                }),
 
         Setting(section: .Sort,
                 title: "Direction",
                 description: Settings.sortDescendingHelp,
-                valueDisplayed: { Settings.sortDescending ? "Reverse" : "Normal" }),
+                valueDisplayed: { Settings.sortDescending ? "Reverse" : "Normal" },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.sortDescending.toggle()
+                    settingsChangedTimer.push()
+                }),
         Setting(section: .Sort,
                 title: "Criterion",
                 description: Settings.sortMethodHelp,
                 valueDisplayed: {
                     let m = Settings.sortMethod
                     return Settings.sortDescending ? m.reverseTitle : m.normalTitle
+                }, optionSelected: { [weak self] originalIndex, section, setting in
+                    guard let self else { return }
+                    let valuesToPush = Settings.sortDescending ? SortingMethod.allCases.map(\.reverseTitle) : SortingMethod.allCases.map(\.normalTitle)
+                    let v = PickerViewController.Info(title: setting.title, values: valuesToPush, selectedIndex: Settings.sortMethod.rawValue, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                    performSegue(withIdentifier: "showPicker", sender: v)
                 }),
         Setting(section: .Sort,
                 title: "Bunch by repository",
                 description: Settings.groupByRepoHelp,
-                valueDisplayed: { Settings.groupByRepo ? "✓" : " " })
+                valueDisplayed: { Settings.groupByRepo ? "✓" : " " },
+                optionSelected: { [weak self] _, _, _ in
+                    guard let self else { return }
+                    Settings.groupByRepo.toggle()
+                    settingsChangedTimer.push()
+                })
     ]
 
     private var settingsChangedTimer: PopTimer!
@@ -541,361 +979,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
         let section = filteredSections[indexPath.section]
         let unFilteredItemsForSection = settings.filter { $0.section == section }
 
-        var originalIndex = 0
-        for x in unFilteredItemsForSection {
-            if x.title == setting.title {
-                break
-            }
-            originalIndex += 1
+        if let originalIndex = unFilteredItemsForSection.firstIndex(where: { $0.title == setting.title }) {
+            setting.optionSelected(originalIndex, section, setting)
+            reload()
         }
-
-        if section == .Refresh {
-            var values = [String]()
-            var count = 0
-            var previousIndex: Int?
-            switch originalIndex {
-            case 0:
-                // minutes
-                let period = Int(Settings.backgroundRefreshPeriod / 60)
-                for f in 2 ..< 1000 {
-                    if f == period { previousIndex = count }
-                    values.append("\(f) minutes")
-                    count += 1
-                }
-            case 1:
-                // hours
-                let period = Int(Settings.newRepoCheckPeriod)
-                for f in 2 ..< 100 {
-                    if f == period { previousIndex = count }
-                    values.append("\(f) hours")
-                    count += 1
-                }
-            default: break
-            }
-            let v = PickerViewController.Info(title: setting.title, values: values, selectedIndex: previousIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
-            performSegue(withIdentifier: "showPicker", sender: v)
-
-        } else if section == .Display {
-            switch originalIndex {
-            case 0:
-                let newValue = !Settings.showLabels
-                Settings.showLabels = newValue
-                if newValue, Settings.showLabels {
-                    ApiServer.resetSyncOfEverything()
-                    preferencesDirty = true
-                    showLongSyncWarning()
-                }
-                settingsChangedTimer.push()
-            case 1:
-                Settings.showCreatedInsteadOfUpdated.toggle()
-                settingsChangedTimer.push()
-            case 2:
-                Settings.showRelativeDates.toggle()
-                settingsChangedTimer.push()
-            case 3:
-                let v = PickerViewController.Info(title: setting.title, values: Section.placementLabels, selectedIndex: Settings.assignedItemDirectHandlingPolicy.assignmentPolictMenuIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
-                performSegue(withIdentifier: "showPicker", sender: v)
-            case 4:
-                let v = PickerViewController.Info(title: setting.title, values: Section.placementLabels, selectedIndex: Settings.assignedItemTeamHandlingPolicy.assignmentPolictMenuIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
-                performSegue(withIdentifier: "showPicker", sender: v)
-            case 5:
-                Settings.showReposInName.toggle()
-                settingsChangedTimer.push()
-            case 6:
-                Settings.showBaseAndHeadBranches.toggle()
-                settingsChangedTimer.push()
-            case 7:
-                Settings.showSeparateApiServersInMenu.toggle()
-                Task { @MainActor in
-                    popupManager.masterController.updateStatus(becauseOfChanges: true)
-                }
-                settingsChangedTimer.push()
-            case 8:
-                Settings.markPrsAsUnreadOnNewCommits.toggle()
-                settingsChangedTimer.push()
-            case 9:
-                Settings.showMilestones.toggle()
-                settingsChangedTimer.push()
-            case 10:
-                Settings.displayNumbersForItems.toggle()
-                settingsChangedTimer.push()
-            case 11:
-                let v = PickerViewController.Info(title: setting.title, values: DraftHandlingPolicy.allCases.map(\.label), selectedIndex: Settings.draftHandlingPolicy.rawValue, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
-                performSegue(withIdentifier: "showPicker", sender: v)
-            case 12:
-                Settings.markUnmergeablePrs.toggle()
-                settingsChangedTimer.push()
-            case 13:
-                Settings.showPrLines.toggle()
-                settingsChangedTimer.push()
-            case 14:
-                Settings.showClosingInfo.toggle()
-                settingsChangedTimer.push()
-            default: break
-            }
-
-        } else if section == .Filtering {
-            switch originalIndex {
-            case 0:
-                Settings.includeTitlesInFilter.toggle()
-            case 1:
-                Settings.includeReposInFilter.toggle()
-            case 2:
-                Settings.includeLabelsInFilter.toggle()
-            case 3:
-                Settings.includeStatusesInFilter.toggle()
-            case 4:
-                Settings.includeServersInFilter.toggle()
-            case 5:
-                Settings.includeUsersInFilter.toggle()
-            case 6:
-                Settings.includeNumbersInFilter.toggle()
-            case 7:
-                Settings.includeMilestonesInFilter.toggle()
-            case 8:
-                Settings.includeAssigneeNamesInFilter.toggle()
-            case 9:
-                performSegue(withIdentifier: "showBlacklist", sender: CommentBlacklistViewController.Mode.itemAuthors)
-            case 10:
-                performSegue(withIdentifier: "showBlacklist", sender: CommentBlacklistViewController.Mode.labels)
-            default: break
-            }
-            settingsChangedTimer.push()
-
-        } else if section == .AppleWatch {
-            switch originalIndex {
-            case 0:
-                Settings.preferIssuesInWatch.toggle()
-                settingsChangedTimer.push()
-            case 1:
-                Settings.hideDescriptionInWatchDetail.toggle()
-            default: break
-            }
-
-        } else if section == .Comments {
-            switch originalIndex {
-            case 0:
-                Settings.showCommentsEverywhere.toggle()
-                settingsChangedTimer.push()
-            case 1:
-                Settings.hideUncommentedItems.toggle()
-                settingsChangedTimer.push()
-            case 2, 3, 4:
-                let previousIndex = originalIndex == 2 ? Settings.newMentionMovePolicy :
-                    originalIndex == 3 ? Settings.teamMentionMovePolicy :
-                    Settings.newItemInOwnedRepoMovePolicy
-                let v = PickerViewController.Info(title: setting.title, values: Section.placementLabels, selectedIndex: previousIndex.movePolicyMenuIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
-                performSegue(withIdentifier: "showPicker", sender: v)
-            case 5:
-                Settings.openPrAtFirstUnreadComment.toggle()
-            case 6:
-                performSegue(withIdentifier: "showBlacklist", sender: CommentBlacklistViewController.Mode.commentAuthors)
-            case 7:
-                Settings.disableAllCommentNotifications .toggle()
-            case 8:
-                Settings.assumeReadItemIfUserHasNewerComments.toggle()
-            default: break
-            }
-
-        } else if section == .Reviews {
-            switch originalIndex {
-            case 0:
-                let previousShouldSync = Settings.cache.requiresReviewApis
-                Settings.displayReviewsOnItems.toggle()
-                showOptionalReviewWarning(previousSync: previousShouldSync)
-
-            case 1:
-                let previousShouldSync = Settings.cache.requiresReviewApis
-                Settings.showRequestedTeamReviews.toggle()
-                showOptionalReviewWarning(previousSync: previousShouldSync)
-
-            case 2:
-                let v = PickerViewController.Info(title: setting.title, values: Section.placementLabels, selectedIndex: Settings.assignedDirectReviewHandlingPolicy.assignmentPolictMenuIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
-                performSegue(withIdentifier: "showPicker", sender: v)
-
-            case 3:
-                let v = PickerViewController.Info(title: setting.title, values: Section.placementLabels, selectedIndex: Settings.assignedTeamReviewHandlingPolicy.assignmentPolictMenuIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
-                performSegue(withIdentifier: "showPicker", sender: v)
-
-            case 4:
-                let previousShouldSync = Settings.cache.requiresReviewApis
-                Settings.notifyOnReviewChangeRequests.toggle()
-                showOptionalReviewWarning(previousSync: previousShouldSync)
-
-            case 5:
-                Settings.notifyOnAllReviewChangeRequests.toggle()
-
-            case 6:
-                let previousShouldSync = Settings.cache.requiresReviewApis
-                Settings.notifyOnReviewAcceptances.toggle()
-                showOptionalReviewWarning(previousSync: previousShouldSync)
-
-            case 7:
-                Settings.notifyOnAllReviewAcceptances.toggle()
-
-            case 8:
-                let previousShouldSync = Settings.cache.requiresReviewApis
-                Settings.notifyOnReviewDismissals.toggle()
-                showOptionalReviewWarning(previousSync: previousShouldSync)
-
-            case 9:
-                Settings.notifyOnAllReviewDismissals.toggle()
-
-            case 10:
-                let previousShouldSync = Settings.cache.requiresReviewApis
-                Settings.notifyOnReviewAssignments.toggle()
-                showOptionalReviewWarning(previousSync: previousShouldSync)
-
-            default: break
-            }
-
-            if !Settings.notifyOnReviewChangeRequests {
-                Settings.notifyOnAllReviewChangeRequests = false
-            }
-            if !Settings.notifyOnReviewDismissals {
-                Settings.notifyOnAllReviewDismissals = false
-            }
-            if !Settings.notifyOnReviewAcceptances {
-                Settings.notifyOnAllReviewAcceptances = false
-            }
-
-        } else if section == .Reactions {
-            switch originalIndex {
-            case 0:
-                Settings.notifyOnItemReactions.toggle()
-                settingsChangedTimer.push()
-
-            case 1:
-                Settings.notifyOnCommentReactions.toggle()
-                settingsChangedTimer.push()
-
-            case 2:
-                var values = [String]()
-                values.append("1 item per refresh")
-                for f in 2 ..< 999 {
-                    values.append("\(f) items per refresh")
-                }
-                let v = PickerViewController.Info(title: setting.title, values: values, selectedIndex: Settings.reactionScanningBatchSize - 1, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
-                performSegue(withIdentifier: "showPicker", sender: v)
-
-            default: break
-            }
-
-        } else if section == .Watchlist {
-            var previousIndex: Int?
-            switch originalIndex {
-            case 0:
-                previousIndex = Settings.displayPolicyForNewPrs.rawValue
-            case 1:
-                previousIndex = Settings.displayPolicyForNewIssues.rawValue
-            default: break
-            }
-            let v = PickerViewController.Info(title: setting.title, values: RepoDisplayPolicy.labels, selectedIndex: previousIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
-            performSegue(withIdentifier: "showPicker", sender: v)
-
-        } else if section == .Stauses {
-            switch originalIndex {
-            case 0:
-                Settings.showStatusItems.toggle()
-                settingsChangedTimer.push()
-                if Settings.showStatusItems {
-                    preferencesDirty = true
-                }
-            case 1:
-                Settings.showStatusesOnAllItems.toggle()
-                settingsChangedTimer.push()
-                if Settings.showStatusesOnAllItems {
-                    preferencesDirty = true
-                }
-            case 2:
-                var values = [String]()
-                values.append("1 item per refresh")
-                for f in 2 ..< 999 {
-                    values.append("\(f) items per refresh")
-                }
-                let v = PickerViewController.Info(title: setting.title, values: values, selectedIndex: Settings.statusItemRefreshBatchSize - 1, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
-                performSegue(withIdentifier: "showPicker", sender: v)
-            case 3:
-                Settings.notifyOnStatusUpdates.toggle()
-            case 4:
-                Settings.notifyOnStatusUpdatesForAllPrs.toggle()
-            case 5:
-                Settings.hidePrsThatArentPassing.toggle()
-                settingsChangedTimer.push()
-            case 6:
-                Settings.hidePrsThatDontPassOnlyInAll.toggle()
-                settingsChangedTimer.push()
-            case 7:
-                Settings.showStatusesGray.toggle()
-                settingsChangedTimer.push()
-            case 8:
-                Settings.showStatusesGreen.toggle()
-                settingsChangedTimer.push()
-            case 9:
-                Settings.showStatusesYellow.toggle()
-                settingsChangedTimer.push()
-            case 10:
-                Settings.showStatusesRed.toggle()
-                settingsChangedTimer.push()
-            default:
-                break
-            }
-
-        } else if section == .History {
-            switch originalIndex {
-            case 0:
-                let v = PickerViewController.Info(title: setting.title, values: KeepPolicy.labels, selectedIndex: Settings.mergeHandlingPolicy.rawValue, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
-                performSegue(withIdentifier: "showPicker", sender: v)
-            case 1:
-                let v = PickerViewController.Info(title: setting.title, values: KeepPolicy.labels, selectedIndex: Settings.closeHandlingPolicy.rawValue, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
-                performSegue(withIdentifier: "showPicker", sender: v)
-            case 2:
-                Settings.dontKeepPrsMergedByMe.toggle()
-            case 3:
-                Settings.removeNotificationsWhenItemIsRemoved.toggle()
-            case 4:
-                Settings.scanClosedAndMergedItems.toggle()
-            case 5:
-                var values = ["Never", "After 1 day"]
-                for f in 2 ..< 999 {
-                    values.append("After \(f) day(s)")
-                }
-                let v = PickerViewController.Info(title: setting.title, values: values, selectedIndex: Settings.autoRemoveMergedItems, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
-                performSegue(withIdentifier: "showPicker", sender: v)
-            case 6:
-                var values = ["Never", "After 1 day"]
-                for f in 2 ..< 999 {
-                    values.append("After \(f) day(s)")
-                }
-                let v = PickerViewController.Info(title: setting.title, values: values, selectedIndex: Settings.autoRemoveClosedItems, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
-                performSegue(withIdentifier: "showPicker", sender: v)
-            default: break
-            }
-
-        } else if section == .Confirm {
-            switch originalIndex {
-            case 0:
-                Settings.dontAskBeforeWipingMerged.toggle()
-            case 1:
-                Settings.dontAskBeforeWipingClosed.toggle()
-            default: break
-            }
-        } else if section == .Sort {
-            switch originalIndex {
-            case 0:
-                Settings.sortDescending.toggle()
-                settingsChangedTimer.push()
-            case 1:
-                let valuesToPush = Settings.sortDescending ? SortingMethod.allCases.map(\.reverseTitle) : SortingMethod.allCases.map(\.normalTitle)
-                let v = PickerViewController.Info(title: setting.title, values: valuesToPush, selectedIndex: Settings.sortMethod.rawValue, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
-                performSegue(withIdentifier: "showPicker", sender: v)
-            case 2:
-                Settings.groupByRepo.toggle()
-                settingsChangedTimer.push()
-            default: break
-            }
-        }
-        reload()
     }
 
     override func tableView(_: UITableView, numberOfRowsInSection section: Int) -> Int {

@@ -200,7 +200,7 @@ enum API {
         let syncMoc = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
         syncMoc.undoManager = nil
         syncMoc.parent = DataManager.main
-        
+
         let useV4 = Settings.useV4API
 
         await HTTP.gateKeeper.setBonusTickets(8)

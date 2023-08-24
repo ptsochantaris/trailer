@@ -47,7 +47,7 @@ extension API {
         if settings.shouldSyncReviewAssignments {
             steps.insert(.reviewRequests)
         }
-        
+
         if settings.shouldSyncReviews {
             steps.insert(.reviews)
         } else {

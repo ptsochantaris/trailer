@@ -165,7 +165,7 @@ enum DataManager {
             for r in PRComment.newOrUpdatedItems(in: child) {
                 r.postSyncAction = nothing
             }
-            
+
             removeUntouchedMergedOrClosedItems(in: child)
 
             for p in PullRequest.newOrUpdatedItems(in: child) {
@@ -183,7 +183,7 @@ enum DataManager {
 
         preferencesDirty = false
     }
-    
+
     private static func removeUntouchedMergedOrClosedItems(in child: NSManagedObjectContext) {
         let mergeExpiration = TimeInterval(Settings.autoRemoveMergedItems)
         if mergeExpiration > 0 {

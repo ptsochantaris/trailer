@@ -81,7 +81,7 @@ final class Review: DataItem {
     }
 
     override var asReview: Review? {
-        return self
+        self
     }
 
     static func syncReviews(from data: [JSON]?, withParent: PullRequest, moc: NSManagedObjectContext) async {

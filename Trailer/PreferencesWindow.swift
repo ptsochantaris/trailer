@@ -67,7 +67,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     @IBOutlet private var autoRemoveClosedItems: NSStepper!
     @IBOutlet private var autoRemoveMergedItemsLabel: NSTextField!
     @IBOutlet private var autoRemoveClosedItemsLabel: NSTextField!
-    
+
     // Statuses
     @IBOutlet private var showStatusItems: NSButton!
     @IBOutlet private var makeStatusItemsSelectable: NSButton!
@@ -239,8 +239,8 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
             guard let self else {
                 return
             }
-            if self.serversDirty {
-                self.serversDirty = false
+            if serversDirty {
+                serversDirty = false
                 await DataManager.saveDB()
                 Settings.possibleExport(nil)
                 app.setupWindows()
@@ -505,12 +505,12 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         dontKeepPrsMergedByMe.toolTip = Settings.dontKeepPrsMergedByMeHelp
         removeNotificationsWhenItemIsRemoved.toolTip = Settings.removeNotificationsWhenItemIsRemovedHelp
         scanClosedAndMergedItems.toolTip = Settings.scanClosedAndMergedItemsHelp
-        
+
         autoRemoveMergedItems.toolTip = Settings.autoRemoveMergedItemsHelp
         autoRemoveMergedItemsLabel.toolTip = Settings.autoRemoveMergedItemsHelp
         autoRemoveClosedItems.toolTip = Settings.autoRemoveClosedItemsHelp
         autoRemoveClosedItemsLabel.toolTip = Settings.autoRemoveClosedItemsHelp
-        
+
         dontConfirmRemoveAllClosed.toolTip = Settings.dontAskBeforeWipingClosedHelp
         dontConfirmRemoveAllMerged.toolTip = Settings.dontAskBeforeWipingMergedHelp
         showAllComments.toolTip = Settings.showCommentsEverywhereHelp
@@ -671,7 +671,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
 
         autoHidePrsIApproved.integerValue = Settings.autoHidePrsIApproved.asInt
         autoHidePrsIRejected.integerValue = Settings.autoHidePrsIRejected.asInt
-        
+
         autoRemoveMergedItems.integerValue = Settings.autoRemoveMergedItems
         autoRemoveClosedItems.integerValue = Settings.autoRemoveClosedItems
 
@@ -961,7 +961,6 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     }
 
     private func updateHistoryOptions() {
-
         let mergePolicy = Settings.mergeHandlingPolicy
         prMergedPolicy.selectItem(at: mergePolicy.rawValue)
         let mergePolicyIsActive = mergePolicy != .nothing
@@ -1188,7 +1187,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         reactionIntervalLabel.isEnabled = enabled
         reactionIntervalLabel.textColor = enabled ? NSColor.labelColor : NSColor.disabledControlTextColor
     }
-    
+
     @IBAction private func autoRemoveMergedItemsChanged(_ sender: NSStepper) {
         Settings.autoRemoveMergedItems = sender.integerValue
         updateHistoryOptions()

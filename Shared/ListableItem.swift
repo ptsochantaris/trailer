@@ -99,7 +99,7 @@ class ListableItem: DataItem, Listable {
         issueUrl?.appending(pathComponent: "reactions")
     }
 
-    func handleMerging(settings: Settings.Cache) {}
+    func handleMerging(settings _: Settings.Cache) {}
 
     final func baseNodeSync(node: Node, parent: Repo) {
         repo = parent
@@ -468,7 +468,7 @@ class ListableItem: DataItem, Listable {
                 return .closed
             }
         }
-        
+
         if shouldMoveToSnoozing(settings: settings) {
             return .snoozed
         }
@@ -488,7 +488,7 @@ class ListableItem: DataItem, Listable {
         if let section = preferredSectionBasedOnReviewAssignment {
             return section
         }
-                
+
         if let section = settings.preferredMovePolicySection,
            contains(terms: ["@\(apiServer.userName.orEmpty)"]) {
             return section
@@ -509,7 +509,7 @@ class ListableItem: DataItem, Listable {
 
     func canBadge(in targetSection: Section? = nil, settings: Settings.Cache) -> Bool {
         let targetSection = targetSection ?? Section(sectionIndex: sectionIndex)
-        
+
         if !targetSection.shouldBadgeComments(settings: settings) || muted || postSyncAction == PostSyncAction.isNew.rawValue {
             return false
         }
@@ -552,7 +552,7 @@ class ListableItem: DataItem, Listable {
 
         return nil
     }
-    
+
     private func shouldHideBecauseOfBlockedContent(settings: Settings.Cache) -> Section.HidingCause? {
         let excluded = settings.excludedLabels
         if !excluded.isEmpty {
@@ -561,7 +561,7 @@ class ListableItem: DataItem, Listable {
                 return .containsBlockedLabel
             }
         }
-        
+
         let excludeAuthors = settings.excludedAuthors
         if !excludeAuthors.isEmpty,
            let login = userLogin?.comparableForm {
@@ -569,14 +569,14 @@ class ListableItem: DataItem, Listable {
                 return .containsBlockedAuthor
             }
         }
-        
+
         return nil
     }
-    
-    func shouldHideBecauseOfRedStatuses(in section: Section, settings: Settings.Cache) -> Section.HidingCause? {
+
+    func shouldHideBecauseOfRedStatuses(in _: Section, settings _: Settings.Cache) -> Section.HidingCause? {
         nil
     }
-    
+
     private func shouldHideBecauseOfDraftStatus(settings: Settings.Cache) -> Section.HidingCause? {
         if settings.shouldHideDrafts, draft {
             return .hidingDrafts
@@ -591,11 +591,11 @@ class ListableItem: DataItem, Listable {
         if let snoozeUntil, snoozeUntil < Date() { // our snooze-by date is past
             disableSnoozing(explicityAwoke: true)
         }
-        
+
         if shouldWakeBecauseOfCommit { // we wake on comments and have a new commit alarm
             return wakeUp(settings: settings) // re-process as awake item
         }
-        
+
         var targetSection: Section
 
         if let cause = shouldHideBecauseOfDraftStatus(settings: settings)
@@ -605,15 +605,14 @@ class ListableItem: DataItem, Listable {
             targetSection = .hidden(cause: cause)
         } else {
             targetSection = preferredSection(takingItemConditionIntoAccount: true, settings: settings)
-            
+
             if targetSection.visible, let cause
                 = shouldHideBecauseOfRepoDisplayPolicy(targetSection: targetSection)
                 ?? shouldHideBecauseOfRedStatuses(in: targetSection, settings: settings) {
-                
                 targetSection = .hidden(cause: cause)
             }
         }
-                
+
         if canBadge(in: targetSection, settings: settings) {
             var latestDate = latestReadCommentDate ?? .distantPast
 
@@ -637,9 +636,9 @@ class ListableItem: DataItem, Listable {
                 targetSection = .hidden(cause: .wasUncommented)
             } else {
                 totalComments = countComments(settings: settings)
-                + (settings.notifyOnItemReactions ? countReactions(settings: settings) : 0)
-                + (settings.notifyOnCommentReactions ? countCommentReactions(settings: settings) : 0)
-                + countReviews(settings: settings)
+                    + (settings.notifyOnItemReactions ? countReactions(settings: settings) : 0)
+                    + (settings.notifyOnCommentReactions ? countCommentReactions(settings: settings) : 0)
+                    + countReviews(settings: settings)
 
                 updateClosingInformation()
             }
@@ -650,7 +649,7 @@ class ListableItem: DataItem, Listable {
         return targetSection
     }
 
-    func countReviews(settings: Settings.Cache) -> Int {
+    func countReviews(settings _: Settings.Cache) -> Int {
         0
     }
 
@@ -1051,7 +1050,7 @@ class ListableItem: DataItem, Listable {
     @MainActor
     static func requestForItems<T: ListableItem>(of itemType: T.Type, withFilter: String?, sectionIndex: Int, criterion: GroupingCriterion? = nil, onlyUnread: Bool = false, excludeSnoozed: Bool = false, settings: Settings.Cache) -> NSFetchRequest<T> {
         let andPredicates = Lista<NSPredicate>()
-        
+
         if onlyUnread {
             andPredicates.append(itemType.includeInUnreadPredicate)
         }
@@ -1176,7 +1175,7 @@ class ListableItem: DataItem, Listable {
         }
     }
 
-    func shouldHideDueToMyReview(settings: Settings.Cache) -> Section.HidingCause? {
+    func shouldHideDueToMyReview(settings _: Settings.Cache) -> Section.HidingCause? {
         nil
     }
 

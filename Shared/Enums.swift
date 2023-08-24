@@ -13,29 +13,29 @@ enum Section: CaseIterable, Equatable {
              containsBlockedLabel, containsBlockedAuthor, wasUncommented, hidingDrafts, assignedDirectReview,
              assignedTeamReview, hidingMyAuthoredPrs, repoShowMineAndParticipated, repoHideAllItems,
              repoShowMineOnly
-        
+
         var description: String {
             switch self {
             case .unknown: return "Unknown reason"
-                
+
             case .hidingAllMyAuthoredItems: return "Repo setting: Item authored by me"
             case .hidingMyAuthoredIssues: return "IRepo setting: ssue authored by me"
             case .hidingAllOthersItems: return "Repo setting: Item not authored by me"
             case .hidingOthersIssues: return "Repo setting: Issue authored by others"
             case .hidingOthersPrs: return "Repo setting: PR authored by others"
             case .hidingDrafts: return "Display setting: Is marked as being a draft"
-                
+
             case .containsBlockedLabel: return "Blocked item: Label"
             case .containsBlockedAuthor: return "Blocked item: Author"
-                
+
             case .wasUncommented: return "Comment setting: Does not have any comments"
-                
+
             case .assignedDirectReview: return "Review setting: Assigned section based on direct review"
             case .assignedTeamReview: return "Review setting: Assigned section based on team review"
             case .approvedByMe: return "Review setting: Approved by me"
             case .rejectedByMe: return "Review setting: Rejected by me"
             case .containsNonGreenStatuses: return "Review setting: PR statuses aren't all green"
-                
+
             case .hidingMyAuthoredPrs: return "Repo setting: PR authored by me"
             case .repoShowMineAndParticipated: return "Repo setting: Only Mine and Participated sections allowed"
             case .repoHideAllItems: return "Repo setting: All items hidden"
@@ -220,10 +220,15 @@ enum Section: CaseIterable, Equatable {
 
     ///////////////////////////////////////////////////////////
 
-    static let placementLabels = [Section.mine.placementName,
-                                  Section.participated.placementName,
-                                  Section.mentioned.placementName,
-                                  Section.hidden(cause: .unknown).placementName]
+    static let assignmentPlacementLabels = [Section.mine.placementName,
+                                            Section.participated.placementName,
+                                            Section.mentioned.placementName,
+                                            Section.hidden(cause: .unknown).placementName]
+
+    static let movePlacementLabels = [Section.hidden(cause: .unknown).placementName,
+                                      Section.mine.placementName,
+                                      Section.participated.placementName,
+                                      Section.mentioned.placementName]
 
     var placementName: String {
         switch self {

@@ -115,11 +115,11 @@ final class PullRequest: ListableItem {
     }
 
     override var isPr: Bool {
-        return true
+        true
     }
 
     override var asPr: PullRequest? {
-        return self
+        self
     }
 
     var reviewCommentLink: String? {
@@ -262,7 +262,7 @@ final class PullRequest: ListableItem {
     func checkAndStoreReviewAssignments(_ reviewerNames: Set<String>, _ reviewerTeams: Set<String>) {
         reviewers = reviewerNames.joined(separator: ",")
         teamReviewers = reviewerTeams.joined(separator: ",")
-        
+
         if reviewerNames.contains(apiServer.userName.orEmpty) {
             setAssignedReviewStatus(to: .me)
         } else if reviewerTeams.isEmpty {
@@ -381,13 +381,13 @@ final class PullRequest: ListableItem {
         case .closed, .hidden, .mentioned, .merged, .snoozed:
             return nil
         }
-        
+
         let allSuccesses = displayedStatusLines(settings: settings).allSatisfy { $0.state == "success" }
 
         guard allSuccesses else {
             return .containsNonGreenStatuses
         }
-        
+
         return nil
     }
 
@@ -428,7 +428,7 @@ final class PullRequest: ListableItem {
         let gray = settings.statusGray
         let mode = settings.statusMode
         let terms = settings.statusTerms
-        
+
         var contexts = [String: PRStatus]()
         let filteredStatuses: Set<PRStatus>
         if red, yellow, green, gray {
@@ -486,11 +486,11 @@ final class PullRequest: ListableItem {
 
     func shouldAnnounceStatus(settings: Settings.Cache) -> Bool {
         canBadge(settings: settings)
-        && (settings.notifyOnStatusUpdatesForAllPrs
-            || createdByMe
-            || shouldGo(to: .participated, settings: settings)
-            || shouldGo(to: .mine, settings: settings)
-            || shouldGo(to: .mentioned, settings: settings))
+            && (settings.notifyOnStatusUpdatesForAllPrs
+                || createdByMe
+                || shouldGo(to: .participated, settings: settings)
+                || shouldGo(to: .mine, settings: settings)
+                || shouldGo(to: .mentioned, settings: settings))
     }
 
     func linesAttributedString(labelFont: FONT_CLASS) -> NSAttributedString? {

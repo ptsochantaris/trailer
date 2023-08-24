@@ -44,7 +44,7 @@ extension Querying {
         }
         return try! moc.fetch(f)
     }
-    
+
     static func untouchedMergedItems(in moc: NSManagedObjectContext) -> [Self] {
         let f = NSFetchRequest<Self>(entityName: typeName)
         f.returnsObjectsAsFaults = false
@@ -444,30 +444,30 @@ class DataItem: NSManagedObject, Querying {
     }
 
     var asPr: PullRequest? {
-        return nil
+        nil
     }
 
     var asIssue: Issue? {
-        return nil
+        nil
     }
 
     var asComment: PRComment? {
-        return nil
+        nil
     }
 
     var asReview: Review? {
-        return nil
+        nil
     }
 
     var asRepo: Repo? {
-        return nil
+        nil
     }
 
     var asStatus: PRStatus? {
-        return nil
+        nil
     }
 
     var asReaction: Reaction? {
-        return nil
+        nil
     }
 }

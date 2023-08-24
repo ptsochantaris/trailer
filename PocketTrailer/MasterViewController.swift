@@ -12,7 +12,7 @@ final class TabBarSet {
     var tabItems: [UITabBarItem] {
         let label = viewCriterion?.label
         var items = [UITabBarItem]()
-        
+
         let settings = Settings.cache
 
         let prf = ListableItem.requestForItems(of: PullRequest.self, withFilter: nil, sectionIndex: -1, criterion: viewCriterion, settings: settings)
@@ -1012,7 +1012,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
         sectionsChanged = true
     }
-    
+
     func controller(_: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         guard animatedUpdates else { return }
 

@@ -31,7 +31,7 @@ enum MigrationStatus: Int {
 enum Settings {
     @MainActor
     static var cache = Cache()
-    
+
     final class Cache {
         let excludedLabels = Set(Settings.labelBlacklist.map(\.comparableForm))
         let excludedAuthors = Set(Settings.itemAuthorBlacklist.map(\.comparableForm))
@@ -64,7 +64,7 @@ enum Settings {
         let notifyOnReviewAssignments = Settings.notifyOnReviewAssignments
         let queryAuthoredIssues = Settings.queryAuthoredIssues
         let showRequestedTeamReviews = Settings.showRequestedTeamReviews
-        
+
         let showCommentsEverywhere = Settings.showCommentsEverywhere
         let scanClosedAndMergedItems = Settings.scanClosedAndMergedItems
         let showStatusesOnAllItems = Settings.showStatusesOnAllItems
@@ -81,7 +81,7 @@ enum Settings {
         let showRelativeDates = Settings.showRelativeDates
         let showCreatedInsteadOfUpdated = Settings.showCreatedInsteadOfUpdated
         let showClosingInfo = Settings.showClosingInfo
-        
+
         let statusRed = Settings.showStatusesRed
         let statusYellow = Settings.showStatusesYellow
         let statusGreen = Settings.showStatusesGreen
@@ -90,7 +90,7 @@ enum Settings {
         let statusTerms = Settings.statusFilteringTerms
         let markPrsAsUnreadOnNewCommits = Settings.markPrsAsUnreadOnNewCommits
         let removeNotificationsWhenItemIsRemoved = Settings.removeNotificationsWhenItemIsRemoved
-        
+
         let includeTitlesInFilter = Settings.includeTitlesInFilter
         let includeReposInFilter = Settings.includeReposInFilter
         let includeServersInFilter = Settings.includeServersInFilter
@@ -103,38 +103,38 @@ enum Settings {
         let sortDescending = Settings.sortDescending
         let sortField = Settings.sortMethod.field
         let groupByRepo = Settings.groupByRepo
-        
+
         let makeStatusItemsSelectable = Settings.makeStatusItemsSelectable
         let hideAvatars = Settings.hideAvatars
         let showLabels = Settings.showLabels
-        
+
         let requiresReviewApis: Bool
         let shouldSyncReactions: Bool
         let shouldSyncReviews: Bool
         let shouldSyncReviewAssignments: Bool
-        
+
         init() {
             Logging.log("(Re)creating settings cache")
 
             shouldSyncReactions = notifyOnItemReactions || notifyOnCommentReactions
-            
+
             shouldSyncReviews = displayReviewsOnItems
-            || notifyOnReviewDismissals
-            || notifyOnReviewAcceptances
-            || notifyOnReviewChangeRequests
-            || autoHidePrsIApproved
-            || autoHidePrsIRejected
-            
+                || notifyOnReviewDismissals
+                || notifyOnReviewAcceptances
+                || notifyOnReviewChangeRequests
+                || autoHidePrsIApproved
+                || autoHidePrsIRejected
+
             shouldSyncReviewAssignments = displayReviewsOnItems
-            || showRequestedTeamReviews
-            || notifyOnReviewAssignments
-            || (assignedDirectReviewHandlingPolicy.visible)
-            || (assignedTeamReviewHandlingPolicy.visible)
-            
+                || showRequestedTeamReviews
+                || notifyOnReviewAssignments
+                || (assignedDirectReviewHandlingPolicy.visible)
+                || (assignedTeamReviewHandlingPolicy.visible)
+
             requiresReviewApis = shouldSyncReviews || shouldSyncReviewAssignments
         }
     }
-    
+
     private static let sharedDefaults = UserDefaults(suiteName: "group.Trailer")!
 
     private static var allFields: [String] {
@@ -288,9 +288,9 @@ enum Settings {
             }
             Task { @MainActor in
                 cache = Cache()
-#if os(macOS)
-                possibleExport(key)
-#endif
+                #if os(macOS)
+                    possibleExport(key)
+                #endif
             }
         }
     }
@@ -302,19 +302,19 @@ enum Settings {
     }
 
     private static let goodKeys: Set<String> = ["LAST_SUCCESSFUL_REFRESH", "LAST_EXPORT_URL", "LAST_EXPORT_TIME"]
-    
-#if os(macOS)
-    static var isAppLoginItem: Bool {
-        get {
-            Settings["launchAtLogin"] as? Bool ?? false
-        }
-        set {
-            Settings["launchAtLogin"] = newValue
-            SMLoginItemSetEnabled(LauncherCommon.helperAppId as CFString, newValue)
-        }
-    }
 
-    static func possibleExport(_ key: String?) {
+    #if os(macOS)
+        static var isAppLoginItem: Bool {
+            get {
+                Settings["launchAtLogin"] as? Bool ?? false
+            }
+            set {
+                Settings["launchAtLogin"] = newValue
+                SMLoginItemSetEnabled(LauncherCommon.helperAppId as CFString, newValue)
+            }
+        }
+
+        static func possibleExport(_ key: String?) {
             if !Settings.autoRepeatSettingsExport {
                 return
             }
@@ -328,8 +328,8 @@ enum Settings {
             if keyIsGood, Settings.lastExportUrl != nil {
                 saveTimer.push()
             }
-    }
-#endif
+        }
+    #endif
 
     ///////////////////////////////// IMPORT / EXPORT
 

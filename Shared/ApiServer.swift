@@ -326,7 +326,7 @@ final class ApiServer: NSManagedObject {
         for apiServer in allApiServers(in: DataManager.main) {
             DataManager.main.delete(apiServer)
         }
-        
+
         var servers = [String: ApiServer]()
 
         for (authToken, apiServerData) in archive {
@@ -346,11 +346,11 @@ final class ApiServer: NSManagedObject {
         }
 
         await DataManager.saveDB()
-        
+
         for (k, a) in servers {
             a.authToken = k
         }
-        
+
         return true
     }
 

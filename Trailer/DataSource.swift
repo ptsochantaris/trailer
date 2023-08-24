@@ -88,7 +88,7 @@ extension MenuWindow {
                 return SectionHeader(title: title, showRemoveAllButton: removalSections.contains(title))
             }
         }
-        
+
         func numberOfRows(in _: NSTableView) -> Int {
             itemIds.count
         }

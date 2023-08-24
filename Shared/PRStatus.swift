@@ -75,7 +75,7 @@ final class PRStatus: DataItem {
     }
 
     override var asStatus: PRStatus? {
-        return self
+        self
     }
 
     var displayText: String {

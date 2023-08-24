@@ -88,9 +88,9 @@ enum RestAccess {
         } else {
             throw ApiError.cancelled
         }
-        
+
         let expandedPath = path.hasPrefix("/") ? server.apiPath.orEmpty.appending(pathComponent: path) : path
-        
+
         guard let url = URL(string: expandedPath) else {
             throw ApiError.invalidUrl(expandedPath)
         }
@@ -102,12 +102,12 @@ enum RestAccess {
         if Settings.V4IdMigrationPhase.wantsNewIds {
             request.setValue("1", forHTTPHeaderField: "X-Github-Next-Global-ID")
         }
-        
+
         do {
             let output = try await HTTP.getJsonData(for: request, attempts: attempts)
             Logging.log("(\(apiServerLabel) GET \(expandedPath) - RESULT: \(output.result.logValue)")
             return output
-            
+
         } catch {
             let error = error as NSError
             Logging.log("(\(apiServerLabel) GET \(expandedPath) - FAILED: (code \(error.code) \(error.localizedDescription)")

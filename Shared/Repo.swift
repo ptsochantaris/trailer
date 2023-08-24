@@ -136,7 +136,7 @@ final class Repo: DataItem {
     }
 
     override var asRepo: Repo? {
-        return self
+        self
     }
 
     var shouldSync: Bool {

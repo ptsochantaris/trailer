@@ -170,6 +170,6 @@ final class PRComment: DataItem {
     }
 
     override var asComment: PRComment? {
-        return self
+        self
     }
 }

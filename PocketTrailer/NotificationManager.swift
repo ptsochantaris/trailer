@@ -272,9 +272,9 @@ final class NotificationManager: NSObject {
         notification.userInfo = DataManager.info(for: item)
 
         let attachmentUrl = Settings.hideAvatarsInNotifications ? nil :
-        item.asComment?.avatarUrl ??
-        item.asPr?.userAvatarUrl ??
-        item.asIssue?.userAvatarUrl
+            item.asComment?.avatarUrl ??
+            item.asPr?.userAvatarUrl ??
+            item.asIssue?.userAvatarUrl
 
         Task {
             if let attachmentUrl,

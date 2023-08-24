@@ -42,7 +42,7 @@ final class Reaction: DataItem {
     }
 
     override var asReaction: Reaction? {
-        return self
+        self
     }
 
     static func syncReactions(from data: [JSON]?, commentId: NSManagedObjectID, serverId: NSManagedObjectID, moc: NSManagedObjectContext) async {

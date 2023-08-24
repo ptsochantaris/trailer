@@ -163,15 +163,15 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         item.catchUpWithComments(settings: Settings.cache)
         Task {
             await updateRelatedMenus(for: item)
-            
+
             let window = item.isPr ? menuBarSet.prMenu : menuBarSet.issuesMenu
             let reSelectIndex = alternativeSelect ? window.table.selectedRow : -1
             _ = window.filter.becomeFirstResponder()
-            
+
             if reSelectIndex > -1, reSelectIndex < window.table.numberOfRows {
                 window.table.selectRowIndexes(IndexSet(integer: reSelectIndex), byExtendingSelection: false)
             }
-            
+
             if let urlToOpen, let url = URL(string: urlToOpen) {
                 openItem(url)
             }

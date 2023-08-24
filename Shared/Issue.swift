@@ -67,7 +67,7 @@ final class Issue: ListableItem {
     }
 
     override var asIssue: Issue? {
-        return self
+        self
     }
 
     override var searchKeywords: [String] {

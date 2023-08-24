@@ -1,10 +1,3 @@
-//
-//  HiddenItemScan.swift
-//  PocketTrailer
-//
-//  Created by Paul Tsochantaris on 22/08/2023.
-//
-
 import Foundation
 
 import UIKit
@@ -12,7 +5,7 @@ import UIKit
 final class HiddenItemScan: UIViewController {
     @IBOutlet private var textView: UITextView!
     @IBOutlet private var scanButton: UIButton!
-    
+
     @IBAction private func rescanSelected(sender: UIButton) {
         sender.isEnabled = false
         Task {
@@ -73,11 +66,11 @@ final class HiddenItemScan: UIViewController {
     }
 
     private var textStorage: NSTextStorage!
-    
+
     @MainActor
     private func writeText(_ message: String) {
         textStorage.append(NSAttributedString(string: message))
-        let textCount = self.textStorage.length
+        let textCount = textStorage.length
         textView.scrollRangeToVisible(NSRange(location: textCount - 1, length: 1))
     }
 
