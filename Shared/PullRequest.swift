@@ -78,6 +78,10 @@ final class PullRequest: ListableItem {
         }
     }
 
+    override var isPr: Bool {
+        return true
+    }
+
     override var asPr: PullRequest? {
         return self
     }
