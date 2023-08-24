@@ -88,7 +88,7 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 0 {
-            Settings.hideSnoozedItems = !Settings.hideSnoozedItems
+            Settings.hideSnoozedItems.toggle()
             tableView.reloadData()
             settingsChangedTimer.push()
 

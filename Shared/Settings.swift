@@ -80,6 +80,7 @@ enum Settings {
         let showMilestones = Settings.showMilestones
         let showRelativeDates = Settings.showRelativeDates
         let showCreatedInsteadOfUpdated = Settings.showCreatedInsteadOfUpdated
+        let showClosingInfo = Settings.showClosingInfo
         
         let statusRed = Settings.showStatusesRed
         let statusYellow = Settings.showStatusesYellow
@@ -836,6 +837,10 @@ enum Settings {
     @UserDefault(key: "SHOW_PR_LINES", defaultValue: false)
     static var showPrLines: Bool
     static let showPrLinesHelp = "Sync and show the number of lines added and/or removed on PRs. This option only works for items synced via the new v4 API."
+
+    @UserDefault(key: "SHOW_CLOSING_INFO", defaultValue: false)
+    static var showClosingInfo: Bool
+    static let showClosingInfoHelp = "If a PR closes a certain issue, or an Issue is closed by a PR, this option will display that. This option only works for items synced via the new v4 API."
 
     @UserDefault(key: "SCAN_CLOSED_AND_MERGED", defaultValue: false)
     static var scanClosedAndMergedItems: Bool

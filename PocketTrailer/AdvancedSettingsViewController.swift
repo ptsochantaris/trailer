@@ -89,6 +89,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
                 title: "Show PR line counts (v4 API only)",
                 description: Settings.showPrLinesHelp,
                 valueDisplayed: { Settings.showPrLines ? "✓" : " " }),
+        Setting(section: .Display,
+                title: "Show items that close or are closed by this item (v4 API only)",
+                description: Settings.showClosingInfoHelp,
+                valueDisplayed: { Settings.showClosingInfo ? "✓" : " " }),
 
         Setting(section: .Filtering,
                 title: "Include item titles",
@@ -427,7 +431,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
     }
 
     @IBAction private func toggleHelp(button _: UIBarButtonItem) {
-        showHelp = !showHelp
+        showHelp.toggle()
         if let s = navigationItem.searchController?.searchBar.text, !s.isEmpty {
             reload()
         } else {
@@ -574,19 +578,19 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
         } else if section == .Display {
             switch originalIndex {
             case 0:
-                let wasOff = !Settings.showLabels
-                Settings.showLabels = !Settings.showLabels
-                if wasOff, Settings.showLabels {
+                let newValue = !Settings.showLabels
+                Settings.showLabels = newValue
+                if newValue, Settings.showLabels {
                     ApiServer.resetSyncOfEverything()
                     preferencesDirty = true
                     showLongSyncWarning()
                 }
                 settingsChangedTimer.push()
             case 1:
-                Settings.showCreatedInsteadOfUpdated = !Settings.showCreatedInsteadOfUpdated
+                Settings.showCreatedInsteadOfUpdated.toggle()
                 settingsChangedTimer.push()
             case 2:
-                Settings.showRelativeDates = !Settings.showRelativeDates
+                Settings.showRelativeDates.toggle()
                 settingsChangedTimer.push()
             case 3:
                 let v = PickerViewController.Info(title: setting.title, values: Section.placementLabels, selectedIndex: Settings.assignedItemDirectHandlingPolicy.assignmentPolictMenuIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
@@ -595,34 +599,37 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
                 let v = PickerViewController.Info(title: setting.title, values: Section.placementLabels, selectedIndex: Settings.assignedItemTeamHandlingPolicy.assignmentPolictMenuIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
                 performSegue(withIdentifier: "showPicker", sender: v)
             case 5:
-                Settings.showReposInName = !Settings.showReposInName
+                Settings.showReposInName.toggle()
                 settingsChangedTimer.push()
             case 6:
-                Settings.showBaseAndHeadBranches = !Settings.showBaseAndHeadBranches
+                Settings.showBaseAndHeadBranches.toggle()
                 settingsChangedTimer.push()
             case 7:
-                Settings.showSeparateApiServersInMenu = !Settings.showSeparateApiServersInMenu
+                Settings.showSeparateApiServersInMenu.toggle()
                 Task { @MainActor in
                     popupManager.masterController.updateStatus(becauseOfChanges: true)
                 }
                 settingsChangedTimer.push()
             case 8:
-                Settings.markPrsAsUnreadOnNewCommits = !Settings.markPrsAsUnreadOnNewCommits
+                Settings.markPrsAsUnreadOnNewCommits.toggle()
                 settingsChangedTimer.push()
             case 9:
-                Settings.showMilestones = !Settings.showMilestones
+                Settings.showMilestones.toggle()
                 settingsChangedTimer.push()
             case 10:
-                Settings.displayNumbersForItems = !Settings.displayNumbersForItems
+                Settings.displayNumbersForItems.toggle()
                 settingsChangedTimer.push()
             case 11:
                 let v = PickerViewController.Info(title: setting.title, values: DraftHandlingPolicy.allCases.map(\.label), selectedIndex: Settings.draftHandlingPolicy.rawValue, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
                 performSegue(withIdentifier: "showPicker", sender: v)
             case 12:
-                Settings.markUnmergeablePrs = !Settings.markUnmergeablePrs
+                Settings.markUnmergeablePrs.toggle()
                 settingsChangedTimer.push()
             case 13:
-                Settings.showPrLines = !Settings.showPrLines
+                Settings.showPrLines.toggle()
+                settingsChangedTimer.push()
+            case 14:
+                Settings.showClosingInfo.toggle()
                 settingsChangedTimer.push()
             default: break
             }
@@ -630,23 +637,23 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
         } else if section == .Filtering {
             switch originalIndex {
             case 0:
-                Settings.includeTitlesInFilter = !Settings.includeTitlesInFilter
+                Settings.includeTitlesInFilter.toggle()
             case 1:
-                Settings.includeReposInFilter = !Settings.includeReposInFilter
+                Settings.includeReposInFilter.toggle()
             case 2:
-                Settings.includeLabelsInFilter = !Settings.includeLabelsInFilter
+                Settings.includeLabelsInFilter.toggle()
             case 3:
-                Settings.includeStatusesInFilter = !Settings.includeStatusesInFilter
+                Settings.includeStatusesInFilter.toggle()
             case 4:
-                Settings.includeServersInFilter = !Settings.includeServersInFilter
+                Settings.includeServersInFilter.toggle()
             case 5:
-                Settings.includeUsersInFilter = !Settings.includeUsersInFilter
+                Settings.includeUsersInFilter.toggle()
             case 6:
-                Settings.includeNumbersInFilter = !Settings.includeNumbersInFilter
+                Settings.includeNumbersInFilter.toggle()
             case 7:
-                Settings.includeMilestonesInFilter = !Settings.includeMilestonesInFilter
+                Settings.includeMilestonesInFilter.toggle()
             case 8:
-                Settings.includeAssigneeNamesInFilter = !Settings.includeAssigneeNamesInFilter
+                Settings.includeAssigneeNamesInFilter.toggle()
             case 9:
                 performSegue(withIdentifier: "showBlacklist", sender: CommentBlacklistViewController.Mode.itemAuthors)
             case 10:
@@ -658,20 +665,20 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
         } else if section == .AppleWatch {
             switch originalIndex {
             case 0:
-                Settings.preferIssuesInWatch = !Settings.preferIssuesInWatch
+                Settings.preferIssuesInWatch.toggle()
                 settingsChangedTimer.push()
             case 1:
-                Settings.hideDescriptionInWatchDetail = !Settings.hideDescriptionInWatchDetail
+                Settings.hideDescriptionInWatchDetail.toggle()
             default: break
             }
 
         } else if section == .Comments {
             switch originalIndex {
             case 0:
-                Settings.showCommentsEverywhere = !Settings.showCommentsEverywhere
+                Settings.showCommentsEverywhere.toggle()
                 settingsChangedTimer.push()
             case 1:
-                Settings.hideUncommentedItems = !Settings.hideUncommentedItems
+                Settings.hideUncommentedItems.toggle()
                 settingsChangedTimer.push()
             case 2, 3, 4:
                 let previousIndex = originalIndex == 2 ? Settings.newMentionMovePolicy :
@@ -680,13 +687,13 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
                 let v = PickerViewController.Info(title: setting.title, values: Section.placementLabels, selectedIndex: previousIndex.movePolicyMenuIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
                 performSegue(withIdentifier: "showPicker", sender: v)
             case 5:
-                Settings.openPrAtFirstUnreadComment = !Settings.openPrAtFirstUnreadComment
+                Settings.openPrAtFirstUnreadComment.toggle()
             case 6:
                 performSegue(withIdentifier: "showBlacklist", sender: CommentBlacklistViewController.Mode.commentAuthors)
             case 7:
-                Settings.disableAllCommentNotifications = !Settings.disableAllCommentNotifications
+                Settings.disableAllCommentNotifications .toggle()
             case 8:
-                Settings.assumeReadItemIfUserHasNewerComments = !Settings.assumeReadItemIfUserHasNewerComments
+                Settings.assumeReadItemIfUserHasNewerComments.toggle()
             default: break
             }
 
@@ -694,12 +701,12 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
             switch originalIndex {
             case 0:
                 let previousShouldSync = Settings.cache.requiresReviewApis
-                Settings.displayReviewsOnItems = !Settings.displayReviewsOnItems
+                Settings.displayReviewsOnItems.toggle()
                 showOptionalReviewWarning(previousSync: previousShouldSync)
 
             case 1:
                 let previousShouldSync = Settings.cache.requiresReviewApis
-                Settings.showRequestedTeamReviews = !Settings.showRequestedTeamReviews
+                Settings.showRequestedTeamReviews.toggle()
                 showOptionalReviewWarning(previousSync: previousShouldSync)
 
             case 2:
@@ -712,31 +719,31 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
             case 4:
                 let previousShouldSync = Settings.cache.requiresReviewApis
-                Settings.notifyOnReviewChangeRequests = !Settings.notifyOnReviewChangeRequests
+                Settings.notifyOnReviewChangeRequests.toggle()
                 showOptionalReviewWarning(previousSync: previousShouldSync)
 
             case 5:
-                Settings.notifyOnAllReviewChangeRequests = !Settings.notifyOnAllReviewChangeRequests
+                Settings.notifyOnAllReviewChangeRequests.toggle()
 
             case 6:
                 let previousShouldSync = Settings.cache.requiresReviewApis
-                Settings.notifyOnReviewAcceptances = !Settings.notifyOnReviewAcceptances
+                Settings.notifyOnReviewAcceptances.toggle()
                 showOptionalReviewWarning(previousSync: previousShouldSync)
 
             case 7:
-                Settings.notifyOnAllReviewAcceptances = !Settings.notifyOnAllReviewAcceptances
+                Settings.notifyOnAllReviewAcceptances.toggle()
 
             case 8:
                 let previousShouldSync = Settings.cache.requiresReviewApis
-                Settings.notifyOnReviewDismissals = !Settings.notifyOnReviewDismissals
+                Settings.notifyOnReviewDismissals.toggle()
                 showOptionalReviewWarning(previousSync: previousShouldSync)
 
             case 9:
-                Settings.notifyOnAllReviewDismissals = !Settings.notifyOnAllReviewDismissals
+                Settings.notifyOnAllReviewDismissals.toggle()
 
             case 10:
                 let previousShouldSync = Settings.cache.requiresReviewApis
-                Settings.notifyOnReviewAssignments = !Settings.notifyOnReviewAssignments
+                Settings.notifyOnReviewAssignments.toggle()
                 showOptionalReviewWarning(previousSync: previousShouldSync)
 
             default: break
@@ -755,11 +762,11 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
         } else if section == .Reactions {
             switch originalIndex {
             case 0:
-                Settings.notifyOnItemReactions = !Settings.notifyOnItemReactions
+                Settings.notifyOnItemReactions.toggle()
                 settingsChangedTimer.push()
 
             case 1:
-                Settings.notifyOnCommentReactions = !Settings.notifyOnCommentReactions
+                Settings.notifyOnCommentReactions.toggle()
                 settingsChangedTimer.push()
 
             case 2:
@@ -789,13 +796,13 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
         } else if section == .Stauses {
             switch originalIndex {
             case 0:
-                Settings.showStatusItems = !Settings.showStatusItems
+                Settings.showStatusItems.toggle()
                 settingsChangedTimer.push()
                 if Settings.showStatusItems {
                     preferencesDirty = true
                 }
             case 1:
-                Settings.showStatusesOnAllItems = !Settings.showStatusesOnAllItems
+                Settings.showStatusesOnAllItems.toggle()
                 settingsChangedTimer.push()
                 if Settings.showStatusesOnAllItems {
                     preferencesDirty = true
@@ -809,26 +816,26 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
                 let v = PickerViewController.Info(title: setting.title, values: values, selectedIndex: Settings.statusItemRefreshBatchSize - 1, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
                 performSegue(withIdentifier: "showPicker", sender: v)
             case 3:
-                Settings.notifyOnStatusUpdates = !Settings.notifyOnStatusUpdates
+                Settings.notifyOnStatusUpdates.toggle()
             case 4:
-                Settings.notifyOnStatusUpdatesForAllPrs = !Settings.notifyOnStatusUpdatesForAllPrs
+                Settings.notifyOnStatusUpdatesForAllPrs.toggle()
             case 5:
-                Settings.hidePrsThatArentPassing = !Settings.hidePrsThatArentPassing
+                Settings.hidePrsThatArentPassing.toggle()
                 settingsChangedTimer.push()
             case 6:
-                Settings.hidePrsThatDontPassOnlyInAll = !Settings.hidePrsThatDontPassOnlyInAll
+                Settings.hidePrsThatDontPassOnlyInAll.toggle()
                 settingsChangedTimer.push()
             case 7:
-                Settings.showStatusesGray = !Settings.showStatusesGray
+                Settings.showStatusesGray.toggle()
                 settingsChangedTimer.push()
             case 8:
-                Settings.showStatusesGreen = !Settings.showStatusesGreen
+                Settings.showStatusesGreen.toggle()
                 settingsChangedTimer.push()
             case 9:
-                Settings.showStatusesYellow = !Settings.showStatusesYellow
+                Settings.showStatusesYellow.toggle()
                 settingsChangedTimer.push()
             case 10:
-                Settings.showStatusesRed = !Settings.showStatusesRed
+                Settings.showStatusesRed.toggle()
                 settingsChangedTimer.push()
             default:
                 break
@@ -843,11 +850,11 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
                 let v = PickerViewController.Info(title: setting.title, values: KeepPolicy.labels, selectedIndex: Settings.closeHandlingPolicy.rawValue, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
                 performSegue(withIdentifier: "showPicker", sender: v)
             case 2:
-                Settings.dontKeepPrsMergedByMe = !Settings.dontKeepPrsMergedByMe
+                Settings.dontKeepPrsMergedByMe.toggle()
             case 3:
-                Settings.removeNotificationsWhenItemIsRemoved = !Settings.removeNotificationsWhenItemIsRemoved
+                Settings.removeNotificationsWhenItemIsRemoved.toggle()
             case 4:
-                Settings.scanClosedAndMergedItems = !Settings.scanClosedAndMergedItems
+                Settings.scanClosedAndMergedItems.toggle()
             case 5:
                 var values = ["Never", "After 1 day"]
                 for f in 2 ..< 999 {
@@ -868,22 +875,22 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
         } else if section == .Confirm {
             switch originalIndex {
             case 0:
-                Settings.dontAskBeforeWipingMerged = !Settings.dontAskBeforeWipingMerged
+                Settings.dontAskBeforeWipingMerged.toggle()
             case 1:
-                Settings.dontAskBeforeWipingClosed = !Settings.dontAskBeforeWipingClosed
+                Settings.dontAskBeforeWipingClosed.toggle()
             default: break
             }
         } else if section == .Sort {
             switch originalIndex {
             case 0:
-                Settings.sortDescending = !Settings.sortDescending
+                Settings.sortDescending.toggle()
                 settingsChangedTimer.push()
             case 1:
                 let valuesToPush = Settings.sortDescending ? SortingMethod.allCases.map(\.reverseTitle) : SortingMethod.allCases.map(\.normalTitle)
                 let v = PickerViewController.Info(title: setting.title, values: valuesToPush, selectedIndex: Settings.sortMethod.rawValue, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
                 performSegue(withIdentifier: "showPicker", sender: v)
             case 2:
-                Settings.groupByRepo = !Settings.groupByRepo
+                Settings.groupByRepo.toggle()
                 settingsChangedTimer.push()
             default: break
             }

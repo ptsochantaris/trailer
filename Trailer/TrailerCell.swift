@@ -79,13 +79,15 @@ final class TrailerCell: NSTableCellView {
         append(subtitle)
         append(reviews)
 
-        if let p = item.asPr {
-            for issue in p.closesIssues.sorted(by: { $0.number < $1.number }).reversed() {
-                addLinkField(NSAttributedString(string: "Closes Issue #\(issue.number)", attributes: TrailerCell.closeAttributes), issue.webUrl, color: .labelColor)
-            }
-        } else if let i = item.asIssue {
-            for pr in i.closedByPullRequests.sorted(by: { $0.number < $1.number }).reversed() {
-                addLinkField(NSAttributedString(string: "Addressed by PR #\(pr.number)", attributes: TrailerCell.closeAttributes), pr.webUrl, color: .labelColor)
+        if settings.showClosingInfo {
+            if let p = item.asPr {
+                for issue in p.closesIssues.sorted(by: { $0.number < $1.number }).reversed() {
+                    addLinkField(NSAttributedString(string: "Closes Issue #\(issue.number)", attributes: TrailerCell.closeAttributes), issue.webUrl, color: .labelColor)
+                }
+            } else if let i = item.asIssue {
+                for pr in i.closedByPullRequests.sorted(by: { $0.number < $1.number }).reversed() {
+                    addLinkField(NSAttributedString(string: "Addressed by PR #\(pr.number)", attributes: TrailerCell.closeAttributes), pr.webUrl, color: .labelColor)
+                }
             }
         }
 

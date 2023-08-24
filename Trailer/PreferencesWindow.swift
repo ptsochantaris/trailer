@@ -123,6 +123,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     @IBOutlet private var displayNumbersForItems: NSButton!
     @IBOutlet private var draftHandlingPolicy: NSPopUpButton!
     @IBOutlet private var markUnmergeablePrs: NSButton!
+    @IBOutlet private var showClosingInfo: NSButton!
     @IBOutlet private var showPrLines: NSButton!
     @IBOutlet private var showBaseAndHeadBranches: NSButton!
 
@@ -305,6 +306,11 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
 
     @IBAction private func showBaseAndHeadBranchesSelected(_ sender: NSButton) {
         Settings.showBaseAndHeadBranches = sender.integerValue == 1
+        deferredUpdateTimer.push()
+    }
+
+    @IBAction private func showClosingInfoSelected(_ sender: NSButton) {
+        Settings.showClosingInfo = sender.integerValue == 1
         deferredUpdateTimer.push()
     }
 
@@ -556,6 +562,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         v4ApiSwitch.toolTip = Settings.useV4APIHelp
         markUnmergeablePrs.toolTip = Settings.markUnmergeablePrsHelp
         showPrLines.toolTip = Settings.showPrLinesHelp
+        showClosingInfo.toolTip = Settings.showClosingInfoHelp
         reloadAllDataHelp.stringValue = Settings.reloadAllDataHelp
         showBaseAndHeadBranches.toolTip = Settings.showBaseAndHeadBranchesHelp
         showStatusesGreen.toolTip = Settings.showStatusesGreenHelp
@@ -654,6 +661,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         v4ApiSwitch.integerValue = Settings.useV4API.asInt
         markUnmergeablePrs.integerValue = Settings.markUnmergeablePrs.asInt
         showPrLines.integerValue = Settings.showPrLines.asInt
+        showClosingInfo.integerValue = Settings.showClosingInfo.asInt
         showRequestedTeamReviews.integerValue = Settings.showRequestedTeamReviews.asInt
         showBaseAndHeadBranches.integerValue = Settings.showBaseAndHeadBranches.asInt
         showStatusesGreen.integerValue = Settings.showStatusesGreen.asInt

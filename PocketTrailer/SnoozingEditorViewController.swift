@@ -123,11 +123,11 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
         } else {
             switch indexPath.row {
             case 0:
-                snoozeItem?.wakeOnComment = !(snoozeItem?.wakeOnComment ?? false)
+                snoozeItem?.wakeOnComment.toggle()
             case 1:
-                snoozeItem?.wakeOnMention = !(snoozeItem?.wakeOnMention ?? false)
+                snoozeItem?.wakeOnMention.toggle()
             default:
-                snoozeItem?.wakeOnStatusChange = !(snoozeItem?.wakeOnStatusChange ?? false)
+                snoozeItem?.wakeOnStatusChange.toggle()
             }
             tableView.reloadData()
         }

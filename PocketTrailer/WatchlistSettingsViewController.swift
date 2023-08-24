@@ -47,11 +47,11 @@ final class WatchlistSettingsViewController: UITableViewController, PickerViewCo
             performSegue(withIdentifier: "showPicker", sender: v)
         } else if indexPath.section == 1 {
             if indexPath.row == 0 {
-                Settings.automaticallyAddNewReposFromWatchlist = !Settings.automaticallyAddNewReposFromWatchlist
+                Settings.automaticallyAddNewReposFromWatchlist.toggle()
             } else if indexPath.row == 1 {
-                Settings.automaticallyRemoveDeletedReposFromWatchlist = !Settings.automaticallyRemoveDeletedReposFromWatchlist
+                Settings.automaticallyRemoveDeletedReposFromWatchlist.toggle()
             } else {
-                Settings.hideArchivedRepos = !Settings.hideArchivedRepos
+                Settings.hideArchivedRepos.toggle()
                 if Settings.hideArchivedRepos, Repo.hideArchivedRepos(in: DataManager.main) {
                     Task {
                         await DataManager.saveDB()
@@ -62,9 +62,9 @@ final class WatchlistSettingsViewController: UITableViewController, PickerViewCo
             updateState()
         } else {
             if indexPath.row == 0 {
-                Settings.queryAuthoredPRs = !Settings.queryAuthoredPRs
+                Settings.queryAuthoredPRs.toggle()
             } else {
-                Settings.queryAuthoredIssues = !Settings.queryAuthoredIssues
+                Settings.queryAuthoredIssues.toggle()
             }
             lastRepoCheck = .distantPast
             preferencesDirty = true
