@@ -1,6 +1,6 @@
 import UIKit
 
-let statusAttributes: [NSAttributedString.Key: Any] = {
+private let statusAttributes: [NSAttributedString.Key: Any] = {
     let paragraphStyle = NSMutableParagraphStyle()
     paragraphStyle.paragraphSpacing = 6.0
     paragraphStyle.lineSpacing = 1
@@ -11,6 +11,8 @@ let statusAttributes: [NSAttributedString.Key: Any] = {
         NSAttributedString.Key.paragraphStyle: paragraphStyle
     ]
 }()
+
+private let closeAttributes = [NSAttributedString.Key.foregroundColor: UIColor.appLabel, NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .footnote)]
 
 final class PRCell: UITableViewCell {
     private let unreadCount = CountLabel(frame: CGRect())
@@ -98,6 +100,11 @@ final class PRCell: UITableViewCell {
         _labels.isHidden = (l?.length ?? 0) == 0
 
         let sub = pullRequest.subtitle(with: detailFont, lightColor: UIColor.secondaryLabel, darkColor: UIColor.label, separator: separator, settings: settings)
+
+        for issue in pullRequest.closesIssues.sorted(by: { $0.number < $1.number }) {
+            sub.insert(NSAttributedString(string: "Closes Issue #\(issue.number)\n", attributes: closeAttributes), at: 0)
+        }
+
         let r = pullRequest.reviewsAttributedString(labelFont: detailFont, settings: settings)
         if let r, r.length > 0 {
             let s = NSMutableAttributedString(attributedString: r)

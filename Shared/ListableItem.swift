@@ -584,6 +584,8 @@ class ListableItem: DataItem, Listable {
         return nil
     }
 
+    func updateClosingInformation() {}
+
     @discardableResult
     final func postProcess(settings: Settings.Cache) -> Section {
         if let snoozeUntil, snoozeUntil < Date() { // our snooze-by date is past
@@ -638,6 +640,8 @@ class ListableItem: DataItem, Listable {
                 + (settings.notifyOnItemReactions ? countReactions(settings: settings) : 0)
                 + (settings.notifyOnCommentReactions ? countCommentReactions(settings: settings) : 0)
                 + countReviews(settings: settings)
+
+                updateClosingInformation()
             }
         }
 
@@ -821,7 +825,7 @@ class ListableItem: DataItem, Listable {
     var headLabelText: String? { nil }
 
     func subtitle(with font: FONT_CLASS, lightColor: COLOR_CLASS, darkColor: COLOR_CLASS, separator: String, settings: Settings.Cache) -> NSMutableAttributedString {
-        var components = [String]()
+        let components = Lista<String>()
         if settings.showBaseAndHeadBranches, let baseLabelText, let headLabelText {
             let splitB = baseLabelText.components(separatedBy: ":")
             let splitH = headLabelText.components(separatedBy: ":")
@@ -863,23 +867,26 @@ class ListableItem: DataItem, Listable {
             components.append(repoFullName)
         }
 
-        var lightComponents = [separator]
+        let _subtitle = NSMutableAttributedString(string: components.joined(), attributes: [.foregroundColor: darkColor, .font: font])
+
+        components.removeAll()
+        components.append(separator)
 
         if settings.showMilestones, let m = milestone, !m.isEmpty {
-            lightComponents.append(m)
-            lightComponents.append(separator)
+            components.append(m)
+            components.append(separator)
         }
 
         if let userLogin {
-            lightComponents.append("@")
-            lightComponents.append(userLogin)
-            lightComponents.append(separator)
+            components.append("@")
+            components.append(userLogin)
+            components.append(separator)
         }
 
-        lightComponents.append(displayDate(settings: settings))
+        components.append(displayDate(settings: settings))
 
-        let _subtitle = NSMutableAttributedString(string: components.joined(), attributes: [.foregroundColor: darkColor, .font: font])
-        _subtitle.append(NSAttributedString(string: lightComponents.joined(), attributes: [.foregroundColor: lightColor, .font: font]))
+        _subtitle.append(NSAttributedString(string: components.joined(), attributes: [.foregroundColor: lightColor, .font: font]))
+
         return _subtitle
     }
 

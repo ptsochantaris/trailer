@@ -599,6 +599,7 @@ enum GraphQL {
             Group("mergedBy") { Fragment(on: "User") { Field.id } }
             Group("baseRepository") { nameWithOwnerField }
             Group("headRepository") { nameWithOwnerField }
+            Group("closingIssuesReferences", paging: syncProfile.smallPageSize) { Field.id }
             if includeRepo {
                 Group("repository") { repositoryFragment }
             }

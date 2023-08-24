@@ -6,6 +6,8 @@ import TrailerQL
 #endif
 
 final class Issue: ListableItem {
+    @NSManaged var closedByPullRequests: Set<PullRequest>
+
     override class var typeName: String { "Issue" }
 
     static func mostRecentItemUpdate(in repo: Repo) -> Date {
@@ -19,8 +21,24 @@ final class Issue: ListableItem {
     static func sync(from nodes: Lista<Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
         syncItems(of: Issue.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { issue, node in
 
+            let parentId: String
+            if let parent = node.parent {
+                parentId = parent.id
+
+                if parent.elementType == "PullRequest" {
+                    if let pr = PullRequest.asParent(with: parentId, in: moc, parentCache: parentCache) {
+                        pr.closesIssuesList.insert(node.id)
+                    }
+                    return
+                }
+
+            } else if let repoJson = node.jsonPayload["repository"] as? JSON, let pid = repoJson["id"] as? String {
+                parentId = pid
+            } else {
+                return
+            }
+
             guard node.created || node.updated,
-                  let parentId = node.parent?.id ?? (node.jsonPayload["repository"] as? JSON)?["id"] as? String,
                   let parent = Repo.asParent(with: parentId, in: moc, parentCache: parentCache)
             else { return }
 

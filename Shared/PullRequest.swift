@@ -23,6 +23,9 @@ final class PullRequest: ListableItem {
     @NSManaged var statuses: Set<PRStatus>
     @NSManaged var reviews: Set<Review>
 
+    @NSManaged var closesIssueIds: String?
+    @NSManaged var closesIssues: Set<Issue>
+
     override class var typeName: String { "PullRequest" }
 
     override var baseLabelText: String? { baseLabel }
@@ -35,6 +38,39 @@ final class PullRequest: ListableItem {
 
     static func mostRecentItemUpdate(in repo: Repo) -> Date {
         repo.pullRequests.reduce(.distantPast) { max($0, $1.updatedAt ?? .distantPast) }
+    }
+
+    var closesIssuesList: Set<String> {
+        get {
+            let list = closesIssueIds.orEmpty
+            if list.isEmpty {
+                return []
+            } else {
+                return Set(list.components(separatedBy: ",").map { String($0) })
+            }
+        }
+        set {
+            if newValue.isEmpty {
+                closesIssueIds = nil
+            } else {
+                closesIssueIds = newValue.joined(separator: ",")
+            }
+        }
+    }
+
+    override func updateClosingInformation() {
+        guard let moc = managedObjectContext else {
+            return
+        }
+        if closesIssuesList.isEmpty {
+            if !closesIssues.isEmpty {
+                closesIssues.removeAll()
+            }
+        } else {
+            let issues = closesIssuesList.compactMap { Issue.item(id: $0, in: moc) }
+            closesIssues.formIntersection(issues)
+            closesIssues.formUnion(issues)
+        }
     }
 
     static func sync(from nodes: Lista<Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {

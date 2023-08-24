@@ -11,16 +11,21 @@ final class TrailerCell: NSTableCellView {
         ]
     }()
 
+    private static let closeAttributes: [NSAttributedString.Key: Any] = [
+        .font: NSFont.systemFont(ofSize: NSFont.smallSystemFontSize, weight: .regular)
+    ]
+
     private let detailFont = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
-    private let titleFont = NSFont.systemFont(ofSize: NSFont.systemFontSize)
+    private let titleFont = NSFont.systemFont(ofSize: NSFont.systemFontSize, weight: .medium)
 
     private let dataItemId: NSManagedObjectID
+
+    private var trackingArea: NSTrackingArea?
 
     private let title = CenterTextField(frame: .zero)
     private let labels = CenterTextField(frame: .zero)
     private let reviews = CenterTextField(frame: .zero)
     private let subtitle = CenterTextField(frame: .zero)
-    private var trackingArea: NSTrackingArea?
 
     init(item: ListableItem, settings: Settings.Cache) {
         dataItemId = item.objectID
@@ -41,7 +46,7 @@ final class TrailerCell: NSTableCellView {
         var y: CGFloat = 8
         let widthLimit = CGSize(width: W, height: .greatestFiniteMagnitude)
 
-        func append(_ field: CenterTextField) {
+        func append(_ field: NSControl) {
             let a = field.attributedStringValue
             if a.length == 0 { return }
             let height = a.boundingRect(with: widthLimit, options: stringDrawingOptions).integral.size.height + 2
@@ -50,17 +55,21 @@ final class TrailerCell: NSTableCellView {
             y += height
         }
 
+        func addLinkField(_ text: NSAttributedString, _ link: String?, color: NSColor) {
+            let statusLabel = LinkField(frame: .zero)
+            statusLabel.targetUrl = link
+            statusLabel.needsCommand = !settings.makeStatusItemsSelectable
+            statusLabel.attributedStringValue = text
+            statusLabel.textColor = color
+            statusLabel.alphaValue = faded ? DISABLED_FADE : 1.0
+            append(statusLabel)
+        }
+
         if let pullRequest = item.asPr, item.section.shouldListStatuses(settings: settings) {
             let statuses = pullRequest.displayedStatusLines(settings: settings).reversed()
             if !statuses.isEmpty {
                 for status in statuses {
-                    let statusLabel = LinkField(frame: .zero)
-                    statusLabel.targetUrl = status.targetUrl
-                    statusLabel.needsCommand = !settings.makeStatusItemsSelectable
-                    statusLabel.attributedStringValue = NSAttributedString(string: status.displayText, attributes: TrailerCell.statusAttributes)
-                    statusLabel.textColor = status.colorForDisplay
-                    statusLabel.alphaValue = faded ? DISABLED_FADE : 1.0
-                    append(statusLabel)
+                    addLinkField(NSAttributedString(string: status.displayText, attributes: TrailerCell.statusAttributes), status.targetUrl, color: status.colorForDisplay)
                 }
                 y += 1
             }
@@ -69,7 +78,17 @@ final class TrailerCell: NSTableCellView {
         updateText(for: item, settings: settings)
         append(subtitle)
         append(reviews)
-        y += 1
+
+        if let p = item.asPr {
+            for issue in p.closesIssues.sorted(by: { $0.number < $1.number }).reversed() {
+                addLinkField(NSAttributedString(string: "Closes Issue #\(issue.number)", attributes: TrailerCell.closeAttributes), issue.webUrl, color: .labelColor)
+            }
+        } else if let i = item.asIssue {
+            for pr in i.closedByPullRequests.sorted(by: { $0.number < $1.number }).reversed() {
+                addLinkField(NSAttributedString(string: "Addressed by PR #\(pr.number)", attributes: TrailerCell.closeAttributes), pr.webUrl, color: .labelColor)
+            }
+        }
+
         append(labels)
         append(title)
 
