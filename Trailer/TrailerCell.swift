@@ -18,23 +18,23 @@ private final class TokenTextField: NSControl {
         let linesAndOrigins = zip(lines, origins)
 
         let sidePadding: CGFloat = 4
-        for line in linesAndOrigins {
-            let ctLine = line.0
-            let lineFrame = CTLineGetBoundsWithOptions(ctLine, [.useOpticalBounds])
+        for (ctLine, linePos) in linesAndOrigins {
+            let lineFrame = CTLineGetBoundsWithOptions(ctLine, .useOpticalBounds)
 
             for run in CTLineGetGlyphRuns(ctLine) as! [CTRun] {
                 let attributes = CTRunGetAttributes(run) as! [NSAttributedString.Key: Any]
 
                 if let bgColor = attributes[NSAttributedString.Key.trailerTagBackgroundColour] as? NSColor {
-                    context.setFillColor(bgColor.cgColor)
 
                     var runBounds = lineFrame
                     runBounds.size.width = CGFloat(CTRunGetImageBounds(run, context, emptyRange).width) + 8
                     runBounds.origin.x = CTLineGetOffsetForStringIndex(ctLine, CTRunGetStringRange(run).location, nil) + sidePadding
-                    runBounds.origin.y = line.1.y + 1
+                    runBounds.origin.y = linePos.y + 1
                     runBounds = runBounds.insetBy(dx: -sidePadding, dy: -2)
 
-                    context.addPath(CGPath(roundedRect: runBounds, cornerWidth: 8, cornerHeight: 8, transform: nil))
+                    let r = runBounds.height * 0.5
+                    context.setFillColor(bgColor.cgColor)
+                    context.addPath(CGPath(roundedRect: runBounds, cornerWidth: r, cornerHeight: r, transform: nil))
                     context.fillPath()
                 }
             }
@@ -138,7 +138,10 @@ final class TrailerCell: NSTableCellView {
             }
         }
 
+        y -= 1
         append(labels)
+        y -= 1
+
         append(title)
 
         let cellPadding: CGFloat = 5
