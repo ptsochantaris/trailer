@@ -783,23 +783,35 @@ class ListableItem: DataItem, Listable {
             return nil
         }
 
-        func isDark(color: COLOR_CLASS) -> Bool {
-            var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0
-            color.getRed(&r, green: &g, blue: &b, alpha: nil)
-            let lum = 0.2126 * r + 0.7152 * g + 0.0722 * b
-            return lum < 0.5
-        }
-
-        let labelAttributes: [NSAttributedString.Key: Any] = [.font: labelFont, .baselineOffset: 0]
         let res = NSMutableAttributedString()
+        let labelAttributes: [NSAttributedString.Key: Any]
+        #if os(macOS)
+            labelAttributes = [.font: labelFont, .paragraphStyle: {
+                let p = NSMutableParagraphStyle()
+                p.lineHeightMultiple = 1.65
+                return p
+            }()]
+        #else
+            labelAttributes = [.font: labelFont]
+        #endif
         for l in sorted {
-            var a = labelAttributes
             let color = l.colorForDisplay
-            a[.backgroundColor] = color
-            a[.foregroundColor] = isDark(color: color) ? COLOR_CLASS.white : COLOR_CLASS.black
+            var a = labelAttributes
+            #if os(macOS)
+                a[.trailerTagBackgroundColour] = color
+            #else
+                a[.backgroundColor] = color
+            #endif
+            a[.foregroundColor] = color.isDark ? COLOR_CLASS.white : COLOR_CLASS.black
             let name = l.name!.replacingOccurrences(of: " ", with: "\u{a0}")
-            res.append(NSAttributedString(string: "\u{a0}\(name)\u{a0}", attributes: a))
-            res.append(NSAttributedString(string: " ", attributes: labelAttributes))
+
+            #if os(macOS)
+                res.append(NSAttributedString(string: name, attributes: a))
+                res.append(NSAttributedString(string: "      ", attributes: labelAttributes))
+            #else
+                res.append(NSAttributedString(string: "\u{a0}\(name)\u{a0}", attributes: a))
+                res.append(NSAttributedString(string: " ", attributes: labelAttributes))
+            #endif
         }
         return res
     }
@@ -905,8 +917,6 @@ class ListableItem: DataItem, Listable {
             components.append(separator)
         }
 
-        components.append(displayDate(settings: settings))
-
         _subtitle.append(NSAttributedString(string: components.joined(), attributes: [.foregroundColor: lightColor, .font: font]))
 
         return _subtitle
@@ -937,9 +947,9 @@ class ListableItem: DataItem, Listable {
             }
         } else {
             if settings.showCreatedInsteadOfUpdated {
-                return "created " + itemDateFormatter.string(from: createdAt!)
+                return "Created " + itemDateFormatter.string(from: createdAt!)
             } else {
-                return "updated " + itemDateFormatter.string(from: updatedAt!)
+                return "Updated " + itemDateFormatter.string(from: updatedAt!)
             }
         }
     }

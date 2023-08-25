@@ -39,6 +39,10 @@
 
 #endif
 
+extension NSAttributedString.Key {
+    static let trailerTagBackgroundColour = NSAttributedString.Key("trailerTagBackgroundColour")
+}
+
 import KeyVine
 var keyVine = KeyVine(appIdentifier: "com.housetrip.Trailer", teamId: "X727JSJUGJ")
 

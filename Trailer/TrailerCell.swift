@@ -1,5 +1,49 @@
 import Cocoa
 
+private final class TokenTextField: NSControl {
+    override func draw(_ dirtyRect: NSRect) {
+        guard !attributedStringValue.string.isEmpty, let context = NSGraphicsContext.current?.cgContext else { return }
+
+        let emptyRange = CFRangeMake(0, 0)
+        let insideRect = CGRect(x: 7, y: 4, width: dirtyRect.width - 16, height: dirtyRect.height)
+        let framesetter = CTFramesetterCreateWithAttributedString(attributedStringValue)
+        let path = CGPath(rect: insideRect, transform: nil)
+        let totalFrame = CTFramesetterCreateFrame(framesetter, emptyRange, path, nil)
+
+        let lines = CTFrameGetLines(totalFrame) as! [CTLine]
+
+        var origins = [CGPoint](repeating: .zero, count: lines.count)
+        CTFrameGetLineOrigins(totalFrame, emptyRange, &origins)
+
+        let linesAndOrigins = zip(lines, origins)
+
+        let sidePadding: CGFloat = 4
+        for line in linesAndOrigins {
+            let ctLine = line.0
+            let lineFrame = CTLineGetBoundsWithOptions(ctLine, [.useOpticalBounds])
+
+            for run in CTLineGetGlyphRuns(ctLine) as! [CTRun] {
+                let attributes = CTRunGetAttributes(run) as! [NSAttributedString.Key: Any]
+
+                if let bgColor = attributes[NSAttributedString.Key.trailerTagBackgroundColour] as? NSColor {
+                    context.setFillColor(bgColor.cgColor)
+
+                    var runBounds = lineFrame
+                    runBounds.size.width = CGFloat(CTRunGetImageBounds(run, context, emptyRange).width) + 8
+                    runBounds.origin.x = CTLineGetOffsetForStringIndex(ctLine, CTRunGetStringRange(run).location, nil) + sidePadding
+                    runBounds.origin.y = line.1.y + 1
+                    runBounds = runBounds.insetBy(dx: -sidePadding, dy: -2)
+
+                    context.addPath(CGPath(roundedRect: runBounds, cornerWidth: 8, cornerHeight: 8, transform: nil))
+                    context.fillPath()
+                }
+            }
+        }
+
+        CTFrameDraw(totalFrame, context)
+    }
+}
+
 final class TrailerCell: NSTableCellView {
     private static let statusAttributes: [NSAttributedString.Key: Any] = {
         let paragraphStyle = NSMutableParagraphStyle()
@@ -15,17 +59,19 @@ final class TrailerCell: NSTableCellView {
         .font: NSFont.systemFont(ofSize: NSFont.smallSystemFontSize, weight: .regular)
     ]
 
-    private let detailFont = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
-    private let titleFont = NSFont.systemFont(ofSize: NSFont.systemFontSize, weight: .medium)
+    private static let detailFont = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
+    private static let titleFont = NSFont.systemFont(ofSize: NSFont.systemFontSize, weight: .medium)
+    private static let preTitleAttributes: [NSAttributedString.Key: Any] = [.font: detailFont, .foregroundColor: NSColor.tertiaryLabelColor]
 
     private let dataItemId: NSManagedObjectID
 
     private var trackingArea: NSTrackingArea?
 
     private let title = CenterTextField(frame: .zero)
-    private let labels = CenterTextField(frame: .zero)
+    private let labels = TokenTextField(frame: .zero)
     private let reviews = CenterTextField(frame: .zero)
     private let subtitle = CenterTextField(frame: .zero)
+    private let footer = CenterTextField(frame: .zero)
 
     init(item: ListableItem, settings: Settings.Cache) {
         dataItemId = item.objectID
@@ -76,6 +122,7 @@ final class TrailerCell: NSTableCellView {
         }
 
         updateText(for: item, settings: settings)
+        append(footer)
         append(subtitle)
         append(reviews)
 
@@ -132,6 +179,7 @@ final class TrailerCell: NSTableCellView {
         if faded {
             title.alphaValue = DISABLED_FADE
             subtitle.alphaValue = DISABLED_FADE
+            footer.alphaValue = DISABLED_FADE
             reviews.alphaValue = DISABLED_FADE
         }
     }
@@ -156,10 +204,12 @@ final class TrailerCell: NSTableCellView {
     }
 
     private func updateText(for item: ListableItem, settings: Settings.Cache) {
-        title.attributedStringValue = item.title(with: titleFont, labelFont: detailFont, titleColor: .controlTextColor, numberColor: .secondaryLabelColor, settings: settings)
-        labels.attributedStringValue = item.labelsAttributedString(labelFont: detailFont, settings: settings) ?? emptyAttributedString
-        reviews.attributedStringValue = item.asPr?.reviewsAttributedString(labelFont: detailFont, settings: settings) ?? emptyAttributedString
-        subtitle.attributedStringValue = item.subtitle(with: detailFont, lightColor: .tertiaryLabelColor, darkColor: .secondaryLabelColor, separator: "   ", settings: settings)
+        let font = TrailerCell.detailFont
+        title.attributedStringValue = item.title(with: TrailerCell.titleFont, labelFont: font, titleColor: .controlTextColor, numberColor: .secondaryLabelColor, settings: settings)
+        labels.attributedStringValue = item.labelsAttributedString(labelFont: font, settings: settings) ?? emptyAttributedString
+        reviews.attributedStringValue = item.asPr?.reviewsAttributedString(labelFont: font, settings: settings) ?? emptyAttributedString
+        subtitle.attributedStringValue = item.subtitle(with: font, lightColor: .tertiaryLabelColor, darkColor: .secondaryLabelColor, separator: "   ", settings: settings)
+        footer.attributedStringValue = NSAttributedString(string: item.displayDate(settings: settings), attributes: TrailerCell.preTitleAttributes)
     }
 
     var selected = false {

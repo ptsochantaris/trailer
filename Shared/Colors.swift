@@ -44,4 +44,11 @@ extension COLOR_CLASS {
             return .tertiaryLabelColor
         #endif
     }
+
+    var isDark: Bool {
+        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0
+        getRed(&r, green: &g, blue: &b, alpha: nil)
+        let lum = 0.2126 * r + 0.7152 * g + 0.0722 * b
+        return lum < 0.5
+    }
 }

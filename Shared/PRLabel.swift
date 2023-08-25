@@ -117,6 +117,11 @@ final class PRLabel: DataItem {
         let red: UInt32 = (c & 0xFF0000) >> 16
         let green: UInt32 = (c & 0x00FF00) >> 8
         let blue: UInt32 = c & 0x0000FF
+        #if os(macOS)
+            if red == 255, green == 255, blue == 255 {
+                return COLOR_CLASS(deviceRed: 0.9, green: 0.9, blue: 0.9, alpha: 0.6)
+            }
+        #endif
         let r = CGFloat(red) / 255.0
         let g = CGFloat(green) / 255.0
         let b = CGFloat(blue) / 255.0
