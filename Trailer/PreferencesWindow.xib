@@ -342,7 +342,7 @@ Token</string>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <clipView key="contentView" id="hCD-zR-3bF">
                                                 <rect key="frame" x="1" y="1" width="869" height="275"/>
-                                                <autoresizingMask key="autoresizingMask"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" rowHeight="20" headerView="qia-ub-v1J" id="6pK-a1-URw">
                                                         <rect key="frame" x="0.0" y="0.0" width="869" height="258"/>
@@ -1001,15 +1001,15 @@ Token</string>
                                             <rect key="frame" x="143" y="15" width="612" height="381"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <subviews>
-                                                <box fixedFrame="YES" borderType="line" title="Hide items that contain these labels" translatesAutoresizingMaskIntoConstraints="NO" id="CJA-2d-6Fl">
-                                                    <rect key="frame" x="17" y="87" width="406" height="135"/>
+                                                <box fixedFrame="YES" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="CJA-2d-6Fl">
+                                                    <rect key="frame" x="17" y="87" width="406" height="137"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                     <view key="contentView" id="abN-WY-hap">
-                                                        <rect key="frame" x="4" y="5" width="398" height="115"/>
+                                                        <rect key="frame" x="4" y="5" width="398" height="129"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <tokenField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xuj-Mv-Ff1">
-                                                                <rect key="frame" x="13" y="16" width="372" height="85"/>
+                                                                <rect key="frame" x="20" y="16" width="358" height="64"/>
                                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                 <tokenFieldCell key="cell" selectable="YES" editable="YES" borderStyle="bezel" alignment="left" placeholderString="Comma separated list of labels (case/accent insensitive)" drawsBackground="YES" allowsEditingTextAttributes="YES" tokenStyle="rounded" id="HVp-Uo-dvL">
                                                                     <font key="font" metaFont="cellTitle"/>
@@ -1020,6 +1020,25 @@ Token</string>
                                                                     <outlet property="delegate" destination="vQH-WF-vh2" id="fth-cD-7sT"/>
                                                                 </connections>
                                                             </tokenField>
+                                                            <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Rck-oY-ZPc">
+                                                                <rect key="frame" x="17" y="84" width="365" height="26"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <popUpButtonCell key="cell" type="push" title="Exclude items that contain any of these labels " bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="oZ3-Nc-OFO" id="7QE-xc-3J8">
+                                                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                                    <font key="font" metaFont="menu"/>
+                                                                    <menu key="menu" id="2DU-wA-mqH">
+                                                                        <items>
+                                                                            <menuItem title="Exclude items that contain any of these labels " state="on" id="oZ3-Nc-OFO"/>
+                                                                            <menuItem title="Only show items that contain any of these labels" id="aIw-GD-erQ"/>
+                                                                            <menuItem title="Exclude items that contain all of these labels" id="f1A-uz-ECO"/>
+                                                                            <menuItem title="Only show items that contain all of these labels" id="vkp-9w-srk"/>
+                                                                        </items>
+                                                                    </menu>
+                                                                </popUpButtonCell>
+                                                                <connections>
+                                                                    <action selector="labelBlacklistModeSelected:" target="vQH-WF-vh2" id="4Md-cU-niP"/>
+                                                                </connections>
+                                                            </popUpButton>
                                                         </subviews>
                                                     </view>
                                                 </box>
@@ -1150,15 +1169,15 @@ Token</string>
                                                         </subviews>
                                                     </view>
                                                 </box>
-                                                <box fixedFrame="YES" borderType="line" title="Hide items created by these usernames:" translatesAutoresizingMaskIntoConstraints="NO" id="FiQ-uv-PzX">
-                                                    <rect key="frame" x="17" y="226" width="406" height="135"/>
+                                                <box fixedFrame="YES" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="FiQ-uv-PzX">
+                                                    <rect key="frame" x="17" y="226" width="406" height="137"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                     <view key="contentView" id="y34-kJ-3XG">
-                                                        <rect key="frame" x="4" y="5" width="398" height="115"/>
+                                                        <rect key="frame" x="4" y="5" width="398" height="129"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <tokenField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="y6m-3H-gTe">
-                                                                <rect key="frame" x="13" y="16" width="372" height="85"/>
+                                                                <rect key="frame" x="20" y="16" width="358" height="64"/>
                                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                 <tokenFieldCell key="cell" selectable="YES" editable="YES" borderStyle="bezel" alignment="left" placeholderString="Comma separated list of usernames (case/accent insensitive, without the '@' prefix)" drawsBackground="YES" allowsEditingTextAttributes="YES" tokenStyle="rounded" id="x2t-Bq-4zJ">
                                                                     <font key="font" metaFont="cellTitle"/>
@@ -1169,6 +1188,23 @@ Token</string>
                                                                     <outlet property="delegate" destination="vQH-WF-vh2" id="vSv-tG-4Xb"/>
                                                                 </connections>
                                                             </tokenField>
+                                                            <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="g5C-Pe-fmG">
+                                                                <rect key="frame" x="17" y="84" width="365" height="26"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <popUpButtonCell key="cell" type="push" title="Exclude items created by any of these users " bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="qgT-vT-TX1" id="un1-N7-OPt">
+                                                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                                    <font key="font" metaFont="menu"/>
+                                                                    <menu key="menu" id="pz1-sr-n9q">
+                                                                        <items>
+                                                                            <menuItem title="Exclude items created by any of these users " state="on" id="qgT-vT-TX1"/>
+                                                                            <menuItem title="Only show items created by any of these users" id="d0o-nP-SlV"/>
+                                                                        </items>
+                                                                    </menu>
+                                                                </popUpButtonCell>
+                                                                <connections>
+                                                                    <action selector="itemAuthorBlacklistModeSelected:" target="vQH-WF-vh2" id="IyM-z2-vjL"/>
+                                                                </connections>
+                                                            </popUpButton>
                                                         </subviews>
                                                     </view>
                                                 </box>
@@ -1517,15 +1553,15 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                             <action selector="showAllCommentsSelected:" target="vQH-WF-vh2" id="Hsq-qd-D3i"/>
                                                         </connections>
                                                     </button>
-                                                    <box fixedFrame="YES" borderType="line" title="Ignore comments from these usernames:" translatesAutoresizingMaskIntoConstraints="NO" id="BtZ-XP-Seo">
-                                                        <rect key="frame" x="8" y="53" width="655" height="111"/>
+                                                    <box fixedFrame="YES" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="BtZ-XP-Seo">
+                                                        <rect key="frame" x="8" y="53" width="655" height="113"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="3Av-Xm-Bwe">
-                                                            <rect key="frame" x="4" y="5" width="647" height="91"/>
+                                                            <rect key="frame" x="4" y="5" width="647" height="105"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <tokenField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DTL-cq-VaA">
-                                                                    <rect key="frame" x="13" y="16" width="621" height="61"/>
+                                                                    <rect key="frame" x="20" y="20" width="607" height="36"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <tokenFieldCell key="cell" selectable="YES" editable="YES" borderStyle="bezel" alignment="left" placeholderString="Comma separated list of usernames (case/accent insensitive, without the '@' prefix)" drawsBackground="YES" allowsEditingTextAttributes="YES" tokenStyle="rounded" id="i7v-35-449">
                                                                         <font key="font" metaFont="cellTitle"/>
@@ -1536,6 +1572,23 @@ You can also use "state:" with unread/open/closed/merged/snoozed/draft/conflict 
                                                                         <outlet property="delegate" destination="vQH-WF-vh2" id="Muu-MZ-9WO"/>
                                                                     </connections>
                                                                 </tokenField>
+                                                                <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kUC-2w-J0s">
+                                                                    <rect key="frame" x="17" y="60" width="614" height="26"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <popUpButtonCell key="cell" type="push" title="Ignore comments and reactions created by these users " bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="M7D-xU-OU1" id="Oon-8f-R9O">
+                                                                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                                        <font key="font" metaFont="menu"/>
+                                                                        <menu key="menu" id="Jkg-Vn-LFe">
+                                                                            <items>
+                                                                                <menuItem title="Ignore comments and reactions created by these users " state="on" id="M7D-xU-OU1"/>
+                                                                                <menuItem title="Only count comments and reactions created by these users" id="GOZ-Yn-wfo"/>
+                                                                            </items>
+                                                                        </menu>
+                                                                    </popUpButtonCell>
+                                                                    <connections>
+                                                                        <action selector="commentAuthorBlacklistModeSelected:" target="vQH-WF-vh2" id="y1F-2o-kvJ"/>
+                                                                    </connections>
+                                                                </popUpButton>
                                                             </subviews>
                                                         </view>
                                                     </box>
@@ -2841,6 +2894,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="checkForUpdatesLabel" destination="hkX-Jd-o2h" id="X6n-gD-voM"/>
                 <outlet property="checkForUpdatesSelector" destination="AT5-aS-AgQ" id="s48-Pe-cgZ"/>
                 <outlet property="commentAuthorBlacklist" destination="DTL-cq-VaA" id="xWf-YT-bda"/>
+                <outlet property="commentAuthorBlacklistMode" destination="kUC-2w-J0s" id="T08-wm-Yz5"/>
                 <outlet property="countSnoozedItems" destination="fpY-gk-scj" id="Eel-zY-BHV"/>
                 <outlet property="defaultOpenApp" destination="9gm-ih-X7o" id="Itu-YH-f0g"/>
                 <outlet property="defaultOpenLinks" destination="BEH-9y-PVP" id="KRd-mp-FUE"/>
@@ -2879,8 +2933,10 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="includeStatusesInFiltering" destination="iap-Cs-Blf" id="YPm-td-7PW"/>
                 <outlet property="includeTitlesInFiltering" destination="2cb-4y-Hdc" id="wTk-6e-kGA"/>
                 <outlet property="includeUsersInFiltering" destination="BvB-LK-o71" id="ZDX-xU-4HZ"/>
-                <outlet property="itemFilteringBlacklist" destination="y6m-3H-gTe" id="hRr-ZE-PMH"/>
-                <outlet property="labelFilteringBlacklist" destination="xuj-Mv-Ff1" id="HwB-fT-Cal"/>
+                <outlet property="itemAuthorBlacklist" destination="y6m-3H-gTe" id="LNM-7P-8Sm"/>
+                <outlet property="itemAuthorBlacklistMode" destination="g5C-Pe-fmG" id="Q6Y-Rb-MDz"/>
+                <outlet property="labelBlacklist" destination="xuj-Mv-Ff1" id="vab-G2-ntq"/>
+                <outlet property="labelBlacklistMode" destination="Rck-oY-ZPc" id="0d2-ZI-fZQ"/>
                 <outlet property="lastExportReport" destination="zef-fb-l71" id="ld1-mW-3n5"/>
                 <outlet property="launchAtStartup" destination="H3d-cL-Izf" id="3dL-Lp-v9U"/>
                 <outlet property="makeStatusItemsSelectable" destination="KjN-FO-XTd" id="qFV-nW-SWA"/>

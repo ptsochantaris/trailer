@@ -10,9 +10,9 @@ enum Section: CaseIterable, Equatable {
     enum HidingCause {
         case unknown, approvedByMe, rejectedByMe, hidingAllMyAuthoredItems,
              hidingMyAuthoredIssues, hidingAllOthersItems, hidingOthersIssues, containsNonGreenStatuses, hidingOthersPrs,
-             containsBlockedLabel, containsBlockedAuthor, wasUncommented, hidingDrafts, assignedDirectReview,
+             containsLabel, containsAllLabels, containsAuthor, wasUncommented, hidingDrafts, assignedDirectReview,
              assignedTeamReview, hidingMyAuthoredPrs, repoShowMineAndParticipated, repoHideAllItems,
-             repoShowMineOnly
+             repoShowMineOnly, doesntContainLabel, doesntContainAllLabels, doesntContainAuthor
 
         var description: String {
             switch self {
@@ -25,8 +25,13 @@ enum Section: CaseIterable, Equatable {
             case .hidingOthersPrs: return "Repo setting: PR authored by others"
             case .hidingDrafts: return "Display setting: Is marked as being a draft"
 
-            case .containsBlockedLabel: return "Blocked item: Label"
-            case .containsBlockedAuthor: return "Blocked item: Author"
+            case .containsLabel: return "Blocked item: Label excluded"
+            case .containsAllLabels: return "Blocked item: All labels excluded"
+            case .doesntContainLabel: return "Blocked item: Doesn't contain label"
+            case .doesntContainAllLabels: return "Blocked item: Doesn't contain all labels"
+
+            case .containsAuthor: return "Blocked item: Author excluded"
+            case .doesntContainAuthor: return "Blocked item: Author required"
 
             case .wasUncommented: return "Comment setting: Does not have any comments"
 

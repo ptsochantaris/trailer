@@ -77,17 +77,6 @@ final class Reaction: DataItem {
         }
     }
 
-    func shouldContributeToCount(since: Date, settings: Settings.Cache) -> Bool {
-        guard !isMine,
-              let userName,
-              let createdAt,
-              createdAt > since
-        else {
-            return false
-        }
-        return !settings.excludedCommentAuthors.contains(userName.comparableForm)
-    }
-
     @MainActor
     func checkNotifications(settings: Settings.Cache) {
         if postSyncAction == PostSyncAction.isNew.rawValue, !isMine {

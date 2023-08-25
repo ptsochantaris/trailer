@@ -201,17 +201,6 @@ final class PullRequest: ListableItem {
         return nil
     }
 
-    func shouldContributeToCount(since: Date, settings: Settings.Cache) -> Bool {
-        guard !createdByMe,
-              let userLogin,
-              let createdAt,
-              createdAt > since
-        else {
-            return false
-        }
-        return !settings.excludedCommentAuthors.contains(userLogin.comparableForm)
-    }
-
     override var shouldHideBecauseOfRepoHidingPolicy: Section.HidingCause? {
         if createdByMe {
             switch repo.itemHidingPolicy {
@@ -396,7 +385,7 @@ final class PullRequest: ListableItem {
             return 0
         }
         var count = 0
-        for r in reviews where r.shouldContributeToCount(since: .distantPast, settings: settings) {
+        for r in reviews where settings.commenterInclusionRule.shouldContributeToCount(isMine: r.isMine, userName: r.username, createdAt: r.createdAt, since: .distantPast, settings: settings) {
             count += 1
         }
         return count

@@ -46,6 +46,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     @IBOutlet private var checkForUpdatesSelector: NSStepper!
     @IBOutlet private var openPrAtFirstUnreadComment: NSButton!
     @IBOutlet private var commentAuthorBlacklist: NSTokenField!
+    @IBOutlet private var commentAuthorBlacklistMode: NSPopUpButton!
 
     // Repositories
     @IBOutlet private var projectsTable: NSTableView!
@@ -95,8 +96,10 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     @IBOutlet private var includeServersInFiltering: NSButton!
     @IBOutlet private var includeUsersInFiltering: NSButton!
     @IBOutlet private var includeNumbersInFiltering: NSButton!
-    @IBOutlet private var itemFilteringBlacklist: NSTokenField!
-    @IBOutlet private var labelFilteringBlacklist: NSTokenField!
+    @IBOutlet private var itemAuthorBlacklist: NSTokenField!
+    @IBOutlet private var itemAuthorBlacklistMode: NSPopUpButton!
+    @IBOutlet private var labelBlacklist: NSTokenField!
+    @IBOutlet private var labelBlacklistMode: NSPopUpButton!
 
     // Comments
     @IBOutlet private var disableAllCommentNotifications: NSButton!
@@ -302,6 +305,24 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         } else {
             deferredUpdateTimer.push()
         }
+    }
+
+    @IBAction private func itemAuthorBlacklistModeSelected(_ sender: NSPopUpButton) {
+        guard let setting = InclusionSetting(rawValue: sender.indexOfSelectedItem) else { return }
+        Settings.authorsIncludionRule = setting
+        deferredUpdateTimer.push()
+    }
+
+    @IBAction private func commentAuthorBlacklistModeSelected(_ sender: NSPopUpButton) {
+        guard let setting = InclusionSetting(rawValue: sender.indexOfSelectedItem) else { return }
+        Settings.commenterInclusionRule = setting
+        deferredUpdateTimer.push()
+    }
+
+    @IBAction private func labelBlacklistModeSelected(_ sender: NSPopUpButton) {
+        guard let setting = InclusionSetting(rawValue: sender.indexOfSelectedItem) else { return }
+        Settings.labelsIncludionRule = setting
+        deferredUpdateTimer.push()
     }
 
     @IBAction private func showBaseAndHeadBranchesSelected(_ sender: NSButton) {
@@ -607,9 +628,15 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
             await API.updateLimitsFromServer()
         }
         updateStatusTermPreferenceControls()
+
         commentAuthorBlacklist.objectValue = Settings.commentAuthorBlacklist
-        labelFilteringBlacklist.objectValue = Settings.labelBlacklist
-        itemFilteringBlacklist.objectValue = Settings.itemAuthorBlacklist
+        commentAuthorBlacklistMode.selectItem(at: Settings.commenterInclusionRule.rawValue)
+
+        labelBlacklist.objectValue = Settings.labelBlacklist
+        labelBlacklistMode.selectItem(at: Settings.labelsIncludionRule.rawValue)
+
+        itemAuthorBlacklist.objectValue = Settings.itemAuthorBlacklist
+        itemAuthorBlacklistMode.selectItem(at: Settings.authorsIncludionRule.rawValue)
 
         setupSortMethodMenu()
         sortModeSelect.selectItem(at: Settings.sortMethod.rawValue)
@@ -1631,15 +1658,15 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
                 deferredUpdateTimer.push()
             }
 
-        } else if obj === itemFilteringBlacklist {
-            let newTokens = itemFilteringBlacklist.objectValue as! [String]
+        } else if obj === itemAuthorBlacklist {
+            let newTokens = itemAuthorBlacklist.objectValue as! [String]
             if Settings.itemAuthorBlacklist != newTokens {
                 Settings.itemAuthorBlacklist = newTokens
                 deferredUpdateTimer.push()
             }
 
-        } else if obj === labelFilteringBlacklist {
-            let newTokens = labelFilteringBlacklist.objectValue as! [String]
+        } else if obj === labelBlacklist {
+            let newTokens = labelBlacklist.objectValue as! [String]
             if Settings.labelBlacklist != newTokens {
                 Settings.labelBlacklist = newTokens
                 deferredUpdateTimer.push()

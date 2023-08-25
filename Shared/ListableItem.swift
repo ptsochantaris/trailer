@@ -553,20 +553,43 @@ class ListableItem: DataItem, Listable {
         return nil
     }
 
-    private func shouldHideBecauseOfBlockedContent(settings: Settings.Cache) -> Section.HidingCause? {
-        let excluded = settings.excludedLabels
-        if !excluded.isEmpty {
+    private func shouldHideBecauseOfInclusionRules(settings: Settings.Cache) -> Section.HidingCause? {
+        let labelFilterList = settings.labelFilterList
+        if !labelFilterList.isEmpty {
             let mine = Set(labels.compactMap { $0.name?.comparableForm })
-            if !excluded.isDisjoint(with: mine) {
-                return .containsBlockedLabel
+
+            switch settings.labelsIncludionRule {
+            case .excludeIfAny:
+                if !labelFilterList.isDisjoint(with: mine) {
+                    return .containsLabel
+                }
+            case .includeIfAny:
+                if labelFilterList.isDisjoint(with: mine) {
+                    return .doesntContainLabel
+                }
+            case .excludeIfAll:
+                if labelFilterList.isSubset(of: mine) {
+                    return .containsAllLabels
+                }
+            case .includeIfAll:
+                if !labelFilterList.isSubset(of: mine) {
+                    return .doesntContainAllLabels
+                }
             }
         }
 
-        let excludeAuthors = settings.excludedAuthors
-        if !excludeAuthors.isEmpty,
+        let authorFilterList = settings.authorFilterList
+        if !authorFilterList.isEmpty,
            let login = userLogin?.comparableForm {
-            if excludeAuthors.contains(login) {
-                return .containsBlockedAuthor
+            switch settings.authorsIncludionRule {
+            case .excludeIfAll, .excludeIfAny:
+                if authorFilterList.contains(login) {
+                    return .containsAuthor
+                }
+            case .includeIfAll, .includeIfAny:
+                if !authorFilterList.contains(login) {
+                    return .doesntContainAuthor
+                }
             }
         }
 
@@ -601,7 +624,7 @@ class ListableItem: DataItem, Listable {
         if let cause = shouldHideBecauseOfDraftStatus(settings: settings)
             ?? shouldHideBecauseOfRepoHidingPolicy
             ?? shouldHideDueToMyReview(settings: settings)
-            ?? shouldHideBecauseOfBlockedContent(settings: settings) {
+            ?? shouldHideBecauseOfInclusionRules(settings: settings) {
             targetSection = .hidden(cause: cause)
         } else {
             targetSection = preferredSection(takingItemConditionIntoAccount: true, settings: settings)
@@ -655,7 +678,7 @@ class ListableItem: DataItem, Listable {
 
     private func countComments(settings: Settings.Cache) -> Int {
         var count = 0
-        for c in comments where c.shouldContributeToCount(since: .distantPast, settings: settings) {
+        for c in comments where settings.commenterInclusionRule.shouldContributeToCount(isMine: c.createdByMe, userName: c.userName, createdAt: c.createdAt, since: .distantPast, settings: settings) {
             count += 1
         }
         return count
@@ -663,7 +686,7 @@ class ListableItem: DataItem, Listable {
 
     private func countReactions(settings: Settings.Cache) -> Int {
         var count = 0
-        for r in reactions where r.shouldContributeToCount(since: .distantPast, settings: settings) {
+        for r in reactions where settings.commenterInclusionRule.shouldContributeToCount(isMine: r.isMine, userName: r.userName, createdAt: r.createdAt, since: .distantPast, settings: settings) {
             count += 1
         }
         return count
@@ -671,8 +694,8 @@ class ListableItem: DataItem, Listable {
 
     private func countCommentReactions(settings: Settings.Cache) -> Int {
         var count = 0
-        for c in comments where c.shouldContributeToCount(since: .distantPast, settings: settings) {
-            for r in c.reactions where r.shouldContributeToCount(since: .distantPast, settings: settings) {
+        for c in comments where settings.commenterInclusionRule.shouldContributeToCount(isMine: c.createdByMe, userName: c.userName, createdAt: c.createdAt, since: .distantPast, settings: settings) {
+            for r in c.reactions where settings.commenterInclusionRule.shouldContributeToCount(isMine: r.isMine, userName: r.userName, createdAt: r.createdAt, since: .distantPast, settings: settings) {
                 count += 1
             }
         }
@@ -690,17 +713,17 @@ class ListableItem: DataItem, Listable {
     private final func countOthersComments(since startDate: Date, settings: Settings.Cache) -> Int {
         var count = 0
         for c in comments {
-            if c.shouldContributeToCount(since: startDate, settings: settings) {
+            if settings.commenterInclusionRule.shouldContributeToCount(isMine: c.createdByMe, userName: c.userName, createdAt: c.createdAt, since: startDate, settings: settings) {
                 count += 1
             }
             if settings.notifyOnCommentReactions {
-                for r in c.reactions where r.shouldContributeToCount(since: startDate, settings: settings) {
+                for r in c.reactions where settings.commenterInclusionRule.shouldContributeToCount(isMine: r.isMine, userName: r.userName, createdAt: r.createdAt, since: startDate, settings: settings) {
                     count += 1
                 }
             }
         }
         if settings.notifyOnItemReactions {
-            for r in reactions where r.shouldContributeToCount(since: startDate, settings: settings) {
+            for r in reactions where settings.commenterInclusionRule.shouldContributeToCount(isMine: r.isMine, userName: r.userName, createdAt: r.createdAt, since: startDate, settings: settings) {
                 count += 1
             }
         }

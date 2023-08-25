@@ -107,17 +107,6 @@ final class Review: DataItem {
         }
     }
 
-    func shouldContributeToCount(since: Date, settings: Settings.Cache) -> Bool {
-        guard !isMine,
-              let username,
-              let createdAt,
-              createdAt > since
-        else {
-            return false
-        }
-        return !settings.excludedCommentAuthors.contains(username.comparableForm)
-    }
-
     func processNotifications(settings: Settings.Cache) {
         guard !isMine, pullRequest.canBadge(settings: settings), let newState = State(rawValue: state.orEmpty) else {
             return

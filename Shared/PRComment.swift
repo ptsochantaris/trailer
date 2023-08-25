@@ -76,23 +76,12 @@ final class PRComment: DataItem {
         }
     }
 
-    func shouldContributeToCount(since: Date, settings: Settings.Cache) -> Bool {
-        guard !createdByMe,
-              let userName,
-              let createdAt,
-              createdAt > since
-        else {
-            return false
-        }
-        return !settings.excludedCommentAuthors.contains(userName.comparableForm)
-    }
-
     func processNotifications(settings: Settings.Cache) {
         guard !createdByMe, let parent, parent.canBadge(settings: settings) else {
             return
         }
 
-        if let userName, settings.excludedCommentAuthors.contains(userName.comparableForm) {
+        if let userName, settings.commentAuthorList.contains(userName.comparableForm) {
             Logging.log("Ignoring comment from user '\(userName)' as their name is on the blacklist")
             return
         }
