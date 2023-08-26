@@ -5,34 +5,31 @@ private final class TokenTextField: NSControl {
         guard !attributedStringValue.string.isEmpty, let context = NSGraphicsContext.current?.cgContext else { return }
 
         let emptyRange = CFRangeMake(0, 0)
-        let insideRect = CGRect(x: 7, y: 4, width: dirtyRect.width - 16, height: dirtyRect.height)
+        let insideRect = CGRect(x: 6, y: 4, width: dirtyRect.width - 16, height: dirtyRect.height)
         let framesetter = CTFramesetterCreateWithAttributedString(attributedStringValue)
         let path = CGPath(rect: insideRect, transform: nil)
         let totalFrame = CTFramesetterCreateFrame(framesetter, emptyRange, path, nil)
 
         let lines = CTFrameGetLines(totalFrame) as! [CTLine]
-
         var origins = [CGPoint](repeating: .zero, count: lines.count)
         CTFrameGetLineOrigins(totalFrame, emptyRange, &origins)
 
-        let linesAndOrigins = zip(lines, origins)
-
-        let sidePadding: CGFloat = 4
-        for (ctLine, linePos) in linesAndOrigins {
+        let sidePadding: CGFloat = 3
+        for (ctLine, linePos) in zip(lines, origins) {
             let lineFrame = CTLineGetBoundsWithOptions(ctLine, .useOpticalBounds)
 
             for run in CTLineGetGlyphRuns(ctLine) as! [CTRun] {
-                let attributes = CTRunGetAttributes(run) as! [NSAttributedString.Key: Any]
+                let attributes = CTRunGetAttributes(run) as! [AnyHashable: Any]
 
                 if let bgColor = attributes[NSAttributedString.Key.trailerTagBackgroundColour] as? NSColor {
 
                     var runBounds = lineFrame
-                    runBounds.size.width = CGFloat(CTRunGetImageBounds(run, context, emptyRange).width) + 8
+                    runBounds.size.width = CGFloat(CTRunGetImageBounds(run, context, emptyRange).width) + 7
                     runBounds.origin.x = CTLineGetOffsetForStringIndex(ctLine, CTRunGetStringRange(run).location, nil) + sidePadding
                     runBounds.origin.y = linePos.y + 1
-                    runBounds = runBounds.insetBy(dx: -sidePadding, dy: -2)
+                    runBounds = runBounds.insetBy(dx: -sidePadding, dy: -1.5)
 
-                    let r = runBounds.height * 0.5
+                    let r = runBounds.height * 0.45
                     context.setFillColor(bgColor.cgColor)
                     context.addPath(CGPath(roundedRect: runBounds, cornerWidth: r, cornerHeight: r, transform: nil))
                     context.fillPath()

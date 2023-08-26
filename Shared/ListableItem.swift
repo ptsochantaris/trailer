@@ -788,7 +788,7 @@ class ListableItem: DataItem, Listable {
         #if os(macOS)
             labelAttributes = [.font: labelFont, .paragraphStyle: {
                 let p = NSMutableParagraphStyle()
-                p.lineHeightMultiple = 1.65
+                p.lineHeightMultiple = 1.55
                 return p
             }()]
         #else
@@ -807,7 +807,7 @@ class ListableItem: DataItem, Listable {
 
             #if os(macOS)
                 res.append(NSAttributedString(string: name, attributes: a))
-                res.append(NSAttributedString(string: "      ", attributes: labelAttributes))
+                res.append(NSAttributedString(string: "     ", attributes: labelAttributes))
             #else
                 res.append(NSAttributedString(string: "\u{a0}\(name)\u{a0}", attributes: a))
                 res.append(NSAttributedString(string: " ", attributes: labelAttributes))
