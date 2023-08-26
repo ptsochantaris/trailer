@@ -320,17 +320,17 @@ final class PullRequest: ListableItem {
         return badgeCount
     }
 
-    static func badgeCount(in section: Section, in moc: NSManagedObjectContext) -> Int {
+    static func badgeCount(in section: Section, in moc: NSManagedObjectContext, settings: Settings.Cache) -> Int {
         let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
         f.includesSubentities = false
-        f.predicate = NSCompoundPredicate(type: .and, subpredicates: [section.matchingPredicate, includeInUnreadPredicate])
+        f.predicate = NSCompoundPredicate(type: .and, subpredicates: [section.matchingPredicate, includeInUnreadPredicate(settings: settings)])
         return badgeCount(from: f, in: moc)
     }
 
-    static func badgeCount(in moc: NSManagedObjectContext) -> Int {
+    static func badgeCount(in moc: NSManagedObjectContext, settings: Settings.Cache) -> Int {
         let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
         f.includesSubentities = false
-        f.predicate = NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, includeInUnreadPredicate])
+        f.predicate = NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, includeInUnreadPredicate(settings: settings)])
         return badgeCount(from: f, in: moc)
     }
 
@@ -341,8 +341,8 @@ final class PullRequest: ListableItem {
     }
 
     private static let _unreadOrNewCommitsPredicate = NSPredicate(format: "unreadComments > 0 or hasNewCommits == YES")
-    override class var includeInUnreadPredicate: NSPredicate {
-        Settings.markPrsAsUnreadOnNewCommits ? _unreadOrNewCommitsPredicate : super.includeInUnreadPredicate
+    override class func includeInUnreadPredicate(settings: Settings.Cache) -> NSPredicate {
+        settings.markPrsAsUnreadOnNewCommits ? _unreadOrNewCommitsPredicate : super.includeInUnreadPredicate(settings: settings)
     }
 
     override var contextMenuTitle: String {
@@ -393,7 +393,7 @@ final class PullRequest: ListableItem {
 
     static func statusCheckBatch(in moc: NSManagedObjectContext, settings: Settings.Cache) -> [PullRequest] {
         let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
-        f.predicate = NSPredicate(format: "apiServer.lastSyncSucceeded == YES")
+        f.predicate = ApiServer.lastSyncSucceededPredicate
         f.sortDescriptors = [
             NSSortDescriptor(key: "lastStatusScan", ascending: true),
             NSSortDescriptor(key: "updatedAt", ascending: false)

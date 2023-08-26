@@ -33,6 +33,8 @@ final class ApiServer: NSManagedObject {
         nil
     }
 
+    static let lastSyncSucceededPredicate = NSPredicate(format: "apiServer.lastSyncSucceeded == YES")
+
     private var _cachedAuthToken: String??
     var authToken: String? {
         get {

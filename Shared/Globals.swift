@@ -106,25 +106,11 @@ func bootUp() {
 enum ItemCondition: Int {
     case open, closed, merged
 
-    private static var predicateMatchCache = [ItemCondition: NSPredicate]()
-    var matchingPredicate: NSPredicate {
-        if let predicate = ItemCondition.predicateMatchCache[self] {
-            return predicate
-        }
-        let predicate = NSPredicate(format: "condition == \(rawValue)")
-        ItemCondition.predicateMatchCache[self] = predicate
-        return predicate
-    }
+    private static let matchingPredicates = ContiguousArray((0 ... 2).map { NSPredicate(format: "condition == \($0)") })
+    var matchingPredicate: NSPredicate { ItemCondition.matchingPredicates[rawValue] }
 
-    private static var predicateExcludeCache = [ItemCondition: NSPredicate]()
-    var excludingPredicate: NSPredicate {
-        if let predicate = ItemCondition.predicateExcludeCache[self] {
-            return predicate
-        }
-        let predicate = NSPredicate(format: "condition != \(rawValue)")
-        ItemCondition.predicateExcludeCache[self] = predicate
-        return predicate
-    }
+    private static let excludingPredicates = ContiguousArray((0 ... 2).map { NSPredicate(format: "condition != \($0)") })
+    var excludingPredicate: NSPredicate { ItemCondition.excludingPredicates[rawValue] }
 }
 
 enum StatusFilter: Int {
@@ -134,25 +120,11 @@ enum StatusFilter: Int {
 enum PostSyncAction: Int {
     case doNothing, delete, isNew, isUpdated
 
-    private static var predicateMatchCache = [PostSyncAction: NSPredicate]()
-    var matchingPredicate: NSPredicate {
-        if let predicate = PostSyncAction.predicateMatchCache[self] {
-            return predicate
-        }
-        let predicate = NSPredicate(format: "postSyncAction == %lld", rawValue)
-        PostSyncAction.predicateMatchCache[self] = predicate
-        return predicate
-    }
+    private static let matchingPredicates = ContiguousArray((0 ... 3).map { NSPredicate(format: "postSyncAction == \($0)") })
+    var matchingPredicate: NSPredicate { PostSyncAction.matchingPredicates[rawValue] }
 
-    private static var predicateExcludeCache = [PostSyncAction: NSPredicate]()
-    var excludingPredicate: NSPredicate {
-        if let predicate = PostSyncAction.predicateExcludeCache[self] {
-            return predicate
-        }
-        let predicate = NSPredicate(format: "postSyncAction != %lld", rawValue)
-        PostSyncAction.predicateExcludeCache[self] = predicate
-        return predicate
-    }
+    private static let excludingPredicates = ContiguousArray((0 ... 3).map { NSPredicate(format: "postSyncAction != \($0)") })
+    var excludingPredicate: NSPredicate { PostSyncAction.excludingPredicates[rawValue] }
 }
 
 enum NotificationType {

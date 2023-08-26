@@ -201,26 +201,14 @@ enum Section: CaseIterable, Equatable {
 
     static let nonZeroPredicate = NSPredicate(format: "sectionIndex > 0")
 
-    private static var predicateMatchCache = NSCache<NSNumber, NSPredicate>()
+    private static let matchingPredicates = ContiguousArray((0 ... 7).map { NSPredicate(format: "sectionIndex == \($0)") })
     var matchingPredicate: NSPredicate {
-        let key = NSNumber(value: sectionIndex)
-        if let predicate = Section.predicateMatchCache.object(forKey: key) {
-            return predicate
-        }
-        let predicate = NSPredicate(format: "sectionIndex == %lld", sectionIndex)
-        Section.predicateMatchCache.setObject(predicate, forKey: key)
-        return predicate
+        Section.matchingPredicates[sectionIndex]
     }
 
-    private static var predicateExcludeCache = NSCache<NSNumber, NSPredicate>()
+    private static let excludePredicates = ContiguousArray((0 ... 7).map { NSPredicate(format: "sectionIndex != \($0)") })
     var excludingPredicate: NSPredicate {
-        let key = NSNumber(value: sectionIndex)
-        if let predicate = Section.predicateExcludeCache.object(forKey: key) {
-            return predicate
-        }
-        let predicate = NSPredicate(format: "sectionIndex != %lld", sectionIndex)
-        Section.predicateExcludeCache.setObject(predicate, forKey: key)
-        return predicate
+        Section.excludePredicates[sectionIndex]
     }
 
     ///////////////////////////////////////////////////////////

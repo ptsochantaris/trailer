@@ -22,7 +22,6 @@ private final class TokenTextField: NSControl {
                 let attributes = CTRunGetAttributes(run) as! [AnyHashable: Any]
 
                 if let bgColor = attributes[NSAttributedString.Key.trailerTagBackgroundColour] as? NSColor {
-
                     var runBounds = lineFrame
                     runBounds.size.width = CGFloat(CTRunGetImageBounds(run, context, emptyRange).width) + 7
                     runBounds.origin.x = CTLineGetOffsetForStringIndex(ctLine, CTRunGetStringRange(run).location, nil) + sidePadding

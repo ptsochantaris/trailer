@@ -280,28 +280,28 @@ final class WatchManager: NSObject, WCSessionDelegate {
             let settings = Settings.cache
 
             for c in allViewCriteria {
-                let myPrs = WatchManager.counts(for: PullRequest.self, in: .mine, criterion: c, moc: tempMoc)
-                let participatedPrs = WatchManager.counts(for: PullRequest.self, in: .participated, criterion: c, moc: tempMoc)
-                let mentionedPrs = WatchManager.counts(for: PullRequest.self, in: .mentioned, criterion: c, moc: tempMoc)
-                let mergedPrs = WatchManager.counts(for: PullRequest.self, in: .merged, criterion: c, moc: tempMoc)
-                let closedPrs = WatchManager.counts(for: PullRequest.self, in: .closed, criterion: c, moc: tempMoc)
-                let otherPrs = WatchManager.counts(for: PullRequest.self, in: .all, criterion: c, moc: tempMoc)
-                let snoozedPrs = WatchManager.counts(for: PullRequest.self, in: .snoozed, criterion: c, moc: tempMoc)
+                let myPrs = WatchManager.counts(for: PullRequest.self, in: .mine, criterion: c, moc: tempMoc, settings: settings)
+                let participatedPrs = WatchManager.counts(for: PullRequest.self, in: .participated, criterion: c, moc: tempMoc, settings: settings)
+                let mentionedPrs = WatchManager.counts(for: PullRequest.self, in: .mentioned, criterion: c, moc: tempMoc, settings: settings)
+                let mergedPrs = WatchManager.counts(for: PullRequest.self, in: .merged, criterion: c, moc: tempMoc, settings: settings)
+                let closedPrs = WatchManager.counts(for: PullRequest.self, in: .closed, criterion: c, moc: tempMoc, settings: settings)
+                let otherPrs = WatchManager.counts(for: PullRequest.self, in: .all, criterion: c, moc: tempMoc, settings: settings)
+                let snoozedPrs = WatchManager.counts(for: PullRequest.self, in: .snoozed, criterion: c, moc: tempMoc, settings: settings)
                 let totalPrs = [myPrs, participatedPrs, mentionedPrs, mergedPrs, closedPrs, otherPrs, snoozedPrs].reduce(0) { $0 + $1["total"]! }
 
-                let totalOpenPrs = WatchManager.countOpenAndVisible(of: PullRequest.self, criterion: c, moc: tempMoc)
+                let totalOpenPrs = WatchManager.countOpenAndVisible(of: PullRequest.self, criterion: c, moc: tempMoc, settings: settings)
                 let unreadPrCount = PullRequest.badgeCount(in: tempMoc, criterion: c, settings: settings)
                 totalUnreadPrCount += unreadPrCount
 
-                let myIssues = WatchManager.counts(for: Issue.self, in: .mine, criterion: c, moc: tempMoc)
-                let participatedIssues = WatchManager.counts(for: Issue.self, in: .participated, criterion: c, moc: tempMoc)
-                let mentionedIssues = WatchManager.counts(for: Issue.self, in: .mentioned, criterion: c, moc: tempMoc)
-                let closedIssues = WatchManager.counts(for: Issue.self, in: .closed, criterion: c, moc: tempMoc)
-                let otherIssues = WatchManager.counts(for: Issue.self, in: .all, criterion: c, moc: tempMoc)
-                let snoozedIssues = WatchManager.counts(for: Issue.self, in: .snoozed, criterion: c, moc: tempMoc)
+                let myIssues = WatchManager.counts(for: Issue.self, in: .mine, criterion: c, moc: tempMoc, settings: settings)
+                let participatedIssues = WatchManager.counts(for: Issue.self, in: .participated, criterion: c, moc: tempMoc, settings: settings)
+                let mentionedIssues = WatchManager.counts(for: Issue.self, in: .mentioned, criterion: c, moc: tempMoc, settings: settings)
+                let closedIssues = WatchManager.counts(for: Issue.self, in: .closed, criterion: c, moc: tempMoc, settings: settings)
+                let otherIssues = WatchManager.counts(for: Issue.self, in: .all, criterion: c, moc: tempMoc, settings: settings)
+                let snoozedIssues = WatchManager.counts(for: Issue.self, in: .snoozed, criterion: c, moc: tempMoc, settings: settings)
                 let totalIssues = [myIssues, participatedIssues, mentionedIssues, closedIssues, otherIssues, snoozedIssues].reduce(0) { $0 + $1["total"]! }
 
-                let totalOpenIssues = WatchManager.countOpenAndVisible(of: Issue.self, criterion: c, moc: tempMoc)
+                let totalOpenIssues = WatchManager.countOpenAndVisible(of: Issue.self, criterion: c, moc: tempMoc, settings: settings)
                 let unreadIssueCount = Issue.badgeCount(in: tempMoc, criterion: c, settings: settings)
                 totalUnreadIssueCount += unreadIssueCount
 
@@ -339,48 +339,48 @@ final class WatchManager: NSObject, WCSessionDelegate {
     }
 
     @MainActor
-    private static func counts(for type: (some ListableItem).Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> [String: Int] {
-        ["total": countItems(of: type, in: section, criterion: criterion, moc: moc),
-         "unread": badgeCount(for: type, in: section, criterion: criterion, moc: moc)]
+    private static func counts(for type: (some ListableItem).Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext, settings: Settings.Cache) -> [String: Int] {
+        ["total": countItems(of: type, in: section, criterion: criterion, moc: moc, settings: settings),
+         "unread": badgeCount(for: type, in: section, criterion: criterion, moc: moc, settings: settings)]
     }
 
     @MainActor
-    private static func countallItems<T: ListableItem>(of type: T.Type, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> Int {
+    private static func countallItems<T: ListableItem>(of type: T.Type, criterion: GroupingCriterion?, moc: NSManagedObjectContext, settings: Settings.Cache) -> Int {
         let f = NSFetchRequest<T>(entityName: type.typeName)
         f.includesSubentities = false
         let p = Settings.hideUncommentedItems
-            ? NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, type.includeInUnreadPredicate])
+            ? NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, type.includeInUnreadPredicate(settings: settings)])
             : Section.nonZeroPredicate
         DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc)
         return try! moc.count(for: f)
     }
 
     @MainActor
-    private static func countItems<T: ListableItem>(of type: T.Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> Int {
+    private static func countItems<T: ListableItem>(of type: T.Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext, settings: Settings.Cache) -> Int {
         let f = NSFetchRequest<T>(entityName: type.typeName)
         f.includesSubentities = false
         let p = Settings.hideUncommentedItems
-            ? NSCompoundPredicate(type: .and, subpredicates: [section.matchingPredicate, type.includeInUnreadPredicate])
+            ? NSCompoundPredicate(type: .and, subpredicates: [section.matchingPredicate, type.includeInUnreadPredicate(settings: settings)])
             : section.matchingPredicate
         DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc)
         return try! moc.count(for: f)
     }
 
     @MainActor
-    private static func badgeCount<T: ListableItem>(for type: T.Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> Int {
+    private static func badgeCount<T: ListableItem>(for type: T.Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext, settings: Settings.Cache) -> Int {
         let f = NSFetchRequest<T>(entityName: type.typeName)
         f.includesSubentities = false
-        let p = NSCompoundPredicate(type: .and, subpredicates: [section.matchingPredicate, type.includeInUnreadPredicate])
+        let p = NSCompoundPredicate(type: .and, subpredicates: [section.matchingPredicate, type.includeInUnreadPredicate(settings: settings)])
         DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc)
         return ListableItem.badgeCount(from: f, in: moc)
     }
 
     @MainActor
-    private static func countOpenAndVisible<T: ListableItem>(of type: T.Type, criterion: GroupingCriterion?, moc: NSManagedObjectContext) -> Int {
+    private static func countOpenAndVisible<T: ListableItem>(of type: T.Type, criterion: GroupingCriterion?, moc: NSManagedObjectContext, settings: Settings.Cache) -> Int {
         let f = NSFetchRequest<T>(entityName: type.typeName)
         f.includesSubentities = false
         let p = Settings.hideUncommentedItems
-            ? NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, ItemCondition.open.matchingPredicate, type.includeInUnreadPredicate])
+            ? NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, ItemCondition.open.matchingPredicate, type.includeInUnreadPredicate(settings: settings)])
             : NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, ItemCondition.open.matchingPredicate])
         DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc)
         return try! moc.count(for: f)

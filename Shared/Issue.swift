@@ -86,10 +86,10 @@ final class Issue: ListableItem {
         }
     }
 
-    static func badgeCount(in moc: NSManagedObjectContext) -> Int {
+    static func badgeCount(in moc: NSManagedObjectContext, settings: Settings.Cache) -> Int {
         let f = NSFetchRequest<Issue>(entityName: "Issue")
         f.includesSubentities = false
-        f.predicate = NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, includeInUnreadPredicate])
+        f.predicate = NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, includeInUnreadPredicate(settings: settings)])
         return badgeCount(from: f, in: moc)
     }
 

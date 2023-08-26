@@ -2,7 +2,14 @@ import CoreData
 import Lista
 import TrailerQL
 
-typealias FetchCache = NSCache<NSString, NSManagedObject>
+final class FetchCache {
+    private var store = [String: NSManagedObject]()
+
+    subscript(key: String) -> NSManagedObject? {
+        get { store[key] }
+        set { store[key] = newValue }
+    }
+}
 
 protocol Querying: NSManagedObject {
     static var typeName: String { get }
@@ -51,7 +58,7 @@ extension Querying {
         f.includesSubentities = false
         f.predicate = NSCompoundPredicate(type: .and, subpredicates: [
             ItemCondition.merged.matchingPredicate,
-            NSPredicate(format: "apiServer.lastSyncSucceeded == YES"),
+            ApiServer.lastSyncSucceededPredicate,
             PostSyncAction.doNothing.matchingPredicate
         ])
         return try! moc.fetch(f)
@@ -63,7 +70,7 @@ extension Querying {
         f.includesSubentities = false
         f.predicate = NSCompoundPredicate(type: .and, subpredicates: [
             ItemCondition.closed.matchingPredicate,
-            NSPredicate(format: "apiServer.lastSyncSucceeded == YES"),
+            ApiServer.lastSyncSucceededPredicate,
             PostSyncAction.doNothing.matchingPredicate
         ])
         return try! moc.fetch(f)
@@ -76,7 +83,7 @@ extension Querying {
         let typePredicate = NSCompoundPredicate(type: .or, subpredicates: [PostSyncAction.isNew.matchingPredicate, PostSyncAction.isUpdated.matchingPredicate])
         if fromSuccessfulSyncOnly {
             f.predicate = NSCompoundPredicate(type: .and, subpredicates: [
-                NSPredicate(format: "apiServer.lastSyncSucceeded == YES"),
+                ApiServer.lastSyncSucceededPredicate,
                 typePredicate
             ])
         } else {
@@ -102,8 +109,7 @@ extension Querying {
     }
 
     static func asParent(with nodeId: String, in moc: NSManagedObjectContext, parentCache: FetchCache) -> Self? {
-        let nid = nodeId as NSString
-        if let existingObject = parentCache.object(forKey: nid) as? Self {
+        if let existingObject = parentCache[nodeId] as? Self {
             return existingObject
         }
         let f = NSFetchRequest<Self>(entityName: typeName)
@@ -113,7 +119,7 @@ extension Querying {
         f.predicate = NSPredicate(format: "nodeId == %@", nodeId)
         let object = try! moc.fetch(f).first
         if let object {
-            parentCache.setObject(object, forKey: nid)
+            parentCache[nodeId] = object
         }
         return object
     }
@@ -430,7 +436,7 @@ class DataItem: NSManagedObject, Querying {
                 let item = NSEntityDescription.insertNewObject(forEntityName: entityName, into: moc) as! T
                 item.apiServer = server
                 item.populate(node: node)
-                parentCache.setObject(item, forKey: node.id as NSString)
+                parentCache[node.id] = item
                 itemLookup[node.id] = item
                 perItemCallback(item, node)
             }

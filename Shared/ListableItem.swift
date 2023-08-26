@@ -19,7 +19,7 @@ protocol Listable: Querying {
 extension Listable {
     static func reactionCheckBatch(in moc: NSManagedObjectContext, settings: Settings.Cache) -> [Self] {
         let f = NSFetchRequest<Self>(entityName: typeName)
-        f.predicate = NSPredicate(format: "apiServer.lastSyncSucceeded == YES")
+        f.predicate = ApiServer.lastSyncSucceededPredicate
         f.sortDescriptors = [
             NSSortDescriptor(key: "lastReactionScan", ascending: true),
             NSSortDescriptor(key: "updatedAt", ascending: false)
@@ -1011,7 +1011,7 @@ class ListableItem: DataItem, Listable {
         return predicate(notTerms: notTerms, orTerms: orTerms)
     }
 
-    private static func statePredicate(from token: String, termAt: Int) -> NSPredicate? {
+    private static func statePredicate(from token: String, termAt: Int, settings: Settings.Cache) -> NSPredicate? {
         if token.count <= termAt {
             return nil
         }
@@ -1036,7 +1036,7 @@ class ListableItem: DataItem, Listable {
             case "merged":
                 P = ItemCondition.merged.matchingPredicate
             case "unread":
-                P = includeInUnreadPredicate
+                P = includeInUnreadPredicate(settings: settings)
             case "snoozed":
                 P = isSnoozingPredicate
             case "draft":
@@ -1085,7 +1085,7 @@ class ListableItem: DataItem, Listable {
         let andPredicates = Lista<NSPredicate>()
 
         if onlyUnread {
-            andPredicates.append(itemType.includeInUnreadPredicate)
+            andPredicates.append(itemType.includeInUnreadPredicate(settings: settings))
         }
 
         if sectionIndex < 0 {
@@ -1130,7 +1130,7 @@ class ListableItem: DataItem, Listable {
             if itemType.self == PullRequest.self {
                 check(forTag: "status") { predicate(from: $0, termAt: $1, format: filterStatusPredicate, numeric: false) }
             }
-            check(forTag: "state") { statePredicate(from: $0, termAt: $1) }
+            check(forTag: "state") { statePredicate(from: $0, termAt: $1, settings: settings) }
 
             if !fi.isEmpty {
                 let predicates = Lista<NSPredicate>()
@@ -1188,9 +1188,7 @@ class ListableItem: DataItem, Listable {
     }
 
     private static let _unreadPredicate = NSPredicate(format: "unreadComments > 0")
-    class var includeInUnreadPredicate: NSPredicate {
-        _unreadPredicate
-    }
+    class func includeInUnreadPredicate(settings _: Settings.Cache) -> NSPredicate { _unreadPredicate }
 
     private static let isSnoozingPredicate = NSPredicate(format: "snoozeUntil != nil")
 

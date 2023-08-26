@@ -164,6 +164,8 @@ final class Repo: DataItem {
         return try! moc.fetch(f)
     }
 
+    static let visibleRepoPredicate = NSPredicate(format: "displayPolicyForPrs > 0 or displayPolicyForIssues > 0")
+
     @MainActor
     static func anyVisibleRepos(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, excludeGrouped: Bool = false) -> Bool {
         func excludeGroupedRepos(_ p: NSPredicate) -> NSPredicate {
@@ -174,7 +176,7 @@ final class Repo: DataItem {
         let f = NSFetchRequest<Repo>(entityName: "Repo")
         f.includesSubentities = false
         f.fetchLimit = 1
-        let p = NSPredicate(format: "displayPolicyForPrs > 0 or displayPolicyForIssues > 0")
+        let p = visibleRepoPredicate
         if let criterion {
             switch criterion {
             case let .group(g):
@@ -227,21 +229,23 @@ final class Repo: DataItem {
         return Set<String>(labels).sorted()
     }
 
+    private static let syncableRepoPredicate = NSPredicate(format: "((displayPolicyForPrs > 0 and displayPolicyForPrs < 4) or (displayPolicyForIssues > 0 and displayPolicyForIssues < 4)) and inaccessible != YES")
     static func syncableRepos(in moc: NSManagedObjectContext) -> [Repo] {
         let f = NSFetchRequest<Repo>(entityName: "Repo")
         f.relationshipKeyPathsForPrefetching = ["issues", "pullRequests"]
         f.returnsObjectsAsFaults = false
         f.includesSubentities = false
-        f.predicate = NSPredicate(format: "((displayPolicyForPrs > 0 and displayPolicyForPrs < 4) or (displayPolicyForIssues > 0 and displayPolicyForIssues < 4)) and inaccessible != YES")
+        f.predicate = syncableRepoPredicate
         return try! moc.fetch(f)
     }
 
+    private static let unsyncableRepoPredicate = NSPredicate(format: "(not ((displayPolicyForPrs > 0 and displayPolicyForPrs < 4) or (displayPolicyForIssues > 0 and displayPolicyForIssues < 4))) or inaccessible = YES")
     static func unsyncableRepos(in moc: NSManagedObjectContext) -> [Repo] {
         let f = NSFetchRequest<Repo>(entityName: "Repo")
         f.relationshipKeyPathsForPrefetching = ["issues", "pullRequests"]
         f.returnsObjectsAsFaults = false
         f.includesSubentities = false
-        f.predicate = NSPredicate(format: "(not ((displayPolicyForPrs > 0 and displayPolicyForPrs < 4) or (displayPolicyForIssues > 0 and displayPolicyForIssues < 4))) or inaccessible = YES")
+        f.predicate = unsyncableRepoPredicate
         return try! moc.fetch(f)
     }
 
