@@ -1,7 +1,20 @@
+import CoreData
 import Foundation
 import Lista
 import Semalot
 import TrailerQL
+
+extension ParseOutput {
+    func asForcedUpdate() -> ParseOutput {
+        switch self {
+        case let .node(node):
+            node.forcedUpdate = true
+            return .node(node)
+        case .queryComplete, .queryPageComplete:
+            return self
+        }
+    }
+}
 
 extension Node {
     var creationSkipped: Bool {
@@ -211,10 +224,12 @@ enum GraphQL {
 
     static func testApi(to apiServer: ApiServer) async throws {
         var gotUserNode = false
-        let testQuery = Query(name: "Testing", rootElement: Group("viewer") { userFragment }) { node in
-            Logging.log("Got a node, type: \(node.elementType), id: \(node.id)")
-            if node.elementType == "User" {
-                gotUserNode = true
+        let testQuery = Query(name: "Testing", rootElement: Group("viewer") { userFragment }) {
+            if case let .node(node) = $0 {
+                Logging.log("Got a node, type: \(node.elementType), id: \(node.id)")
+                if node.elementType == "User" {
+                    gotUserNode = true
+                }
             }
         }
         _ = try await run(testQuery, for: apiServer.graphQLPath.orEmpty, authToken: apiServer.authToken.orEmpty, expectedNodeCost: nil, attempts: 1) { _ in }
@@ -529,22 +544,14 @@ enum GraphQL {
             }
         }
         for (server, ids) in itemIdsByServer {
-            var nodes = [String: Lista<Node>]()
+            let scanner = NodeScanner(server: server, parentType: parentType)
             let serverName = server.label ?? "<no label>"
-            let nodeBlock: Query.PerNodeBlock = { node in
-                let type = node.elementType
-                if let existingList = nodes[type] {
-                    existingList.append(node)
-                } else {
-                    nodes[type] = Lista<Node>(value: node)
-                }
-            }
-
+            let queries = Query.batching("\(serverName): \(name)", groupName: "nodes", idList: ids, maxCost: maxCost, perNode: { scanner.add(progress: $0) }, fields: fields)
             do {
-                let queries = Query.batching("\(serverName): \(name)", groupName: "nodes", idList: ids, maxCost: maxCost, perNode: nodeBlock, fields: fields)
                 try await server.run(queries: queries)
-                await scanNodes(nodes, from: server, parentType: parentType)
+                await scanner.done()
             } catch {
+                await scanner.done()
                 server.lastSyncSucceeded = false
                 throw error
             }
@@ -665,31 +672,31 @@ enum GraphQL {
         }
     }
 
-    static func fetchAllAuthoredItems(from server: ApiServer, label: String, @ElementsBuilder fields: () -> [any Element]) async -> [String: Lista<Node>]? {
-        var nodes = [String: Lista<Node>]()
+    static func fetchAllAuthoredItems(from server: ApiServer, label: String, @ElementsBuilder fields: () -> [any Element]) async -> Lista<Node>? {
         let group = Group("viewer", fields: fields)
-        let authoredItemsQuery = Query(name: "Authored \(label)", rootElement: group) { node in
-            let type = node.elementType
-            if let existingList = nodes[type] {
-                existingList.append(node)
-            } else {
-                nodes[type] = Lista<Node>(value: node)
-            }
-        }
+        let scanner = NodeScanner(server: server, parentType: nil)
         do {
+            let nodesList = Lista<Node>()
+            let authoredItemsQuery = Query(name: "Authored \(label)", rootElement: group) {
+                scanner.add(progress: $0)
+                if case let .node(node) = $0 {
+                    nodesList.append(node)
+                }
+            }
             try await server.run(queries: Lista(value: authoredItemsQuery))
-            await scanNodes(nodes, from: server, parentType: nil)
-            return nodes
+            await scanner.done()
+            return nodesList
 
         } catch {
+            await scanner.done()
             server.lastSyncSucceeded = false
             return nil
         }
     }
 
-    private static func checkAuthoredPrClosures(nodes: [String: Lista<Node>], in server: ApiServer, settings: Settings.Cache) async {
+    private static func checkAuthoredPrClosures(nodes: Lista<Node>, in server: ApiServer, settings: Settings.Cache) async {
         let prIdsToCheck = Lista<String>()
-        let fetchedPrIds = Set(nodes["PullRequest"]?.map(\.id) ?? [])
+        let fetchedPrIds = Set(nodes.map(\.id))
         for repo in server.repos.filter({ $0.displayPolicyForPrs == RepoDisplayPolicy.authoredOnly.rawValue }) {
             let ids = repo.pullRequests.compactMap(\.nodeId).filter { !fetchedPrIds.contains($0) }
             prIdsToCheck.append(from: ids)
@@ -701,21 +708,21 @@ enum GraphQL {
 
         let prGroup = Group("pullRequests") { prFragment(includeRepo: true, syncProfile: settings.syncProfile) }
         let group = BatchGroup(name: "nodes", templateGroup: prGroup, idList: prIdsToCheck)
-        let nodes = Lista<Node>()
-        let query = Query(name: "Closed Authored PRs", rootElement: group, allowsEmptyResponse: true) { node in
-            node.forcedUpdate = true
-            nodes.append(node)
+        let scanner = NodeScanner(server: server, parentType: nil)
+        let query = Query(name: "Closed Authored PRs", rootElement: group, allowsEmptyResponse: true) {
+            scanner.add(progress: $0.asForcedUpdate())
         }
         do {
             try await server.run(queries: Lista(value: query))
-            await scanNodes(["PullRequest": nodes], from: server, parentType: nil)
+            await scanner.done()
         } catch {
+            await scanner.done()
             server.lastSyncSucceeded = false
         }
     }
 
-    private static func checkAuthoredIssueClosures(nodes: [String: Lista<Node>], in server: ApiServer) {
-        let fetchedIssueIds = Set(nodes["Issue"]?.map(\.id) ?? []) // investigate missing issues
+    private static func checkAuthoredIssueClosures(nodes: Lista<Node>, in server: ApiServer) {
+        let fetchedIssueIds = Set(nodes.map(\.id)) // investigate missing issues
         for repo in server.repos.filter({ $0.displayPolicyForIssues == RepoDisplayPolicy.authoredOnly.rawValue }) {
             for issue in repo.issues where !fetchedIssueIds.contains(issue.nodeId.orEmpty) && issue.shouldCheckForClosing {
                 issue.stateChanged = ListableItem.StateChange.closed.rawValue
@@ -765,18 +772,12 @@ enum GraphQL {
         }
 
         for (server, reposInThisServer) in reposByServer {
-            var nodes = [String: Lista<Node>]()
+            let scanner = NodeScanner(server: server, parentType: nil)
 
-            let perNodeBlock: Query.PerNodeBlock = { node in
+            let perNodeBlock: Query.PerNodeBlock = { progress in
+                scanner.add(progress: progress)
 
-                let type = node.elementType
-                if let existingList = nodes[type] {
-                    existingList.append(node)
-                } else {
-                    nodes[type] = Lista<Node>(value: node)
-                }
-
-                if type == "PullRequest",
+                if case let .node(node) = progress, node.elementType == "PullRequest",
                    let repo = node.parent,
                    let updatedAt = node.jsonPayload["updatedAt"] as? String,
                    let d = DataItem.parseGH8601(updatedAt),
@@ -813,8 +814,9 @@ enum GraphQL {
 
             do {
                 try await server.run(queries: queriesForServer)
-                await scanNodes(nodes, from: server, parentType: nil)
+                await scanner.done()
             } catch {
+                await scanner.done()
                 server.lastSyncSucceeded = false
             }
         }
@@ -833,18 +835,12 @@ enum GraphQL {
         }
 
         for (server, reposInThisServer) in reposByServer {
-            var nodes = [String: Lista<Node>]()
+            let scanner = NodeScanner(server: server, parentType: nil)
 
-            let perNodeBlock: Query.PerNodeBlock = { node in
+            let perNodeBlock: Query.PerNodeBlock = { progress in
+                scanner.add(progress: progress)
 
-                let type = node.elementType
-                if let existingList = nodes[type] {
-                    existingList.append(node)
-                } else {
-                    nodes[type] = Lista<Node>(value: node)
-                }
-
-                if type == "Issue",
+                if case let .node(node) = progress, node.elementType == "Issue",
                    let repo = node.parent,
                    let updatedAt = node.jsonPayload["updatedAt"] as? String,
                    let d = DataItem.parseGH8601(updatedAt),
@@ -881,58 +877,10 @@ enum GraphQL {
 
             do {
                 try await server.run(queries: queriesForServer)
-                await scanNodes(nodes, from: server, parentType: nil)
+                await scanner.done()
             } catch {
+                await scanner.done()
                 server.lastSyncSucceeded = false
-            }
-        }
-    }
-
-    private static func scanNodes(_ nodes: [String: Lista<Node>], from server: ApiServer, parentType: (some DataItem).Type?) async {
-        guard nodes.count > 0, let moc = server.managedObjectContext else { return }
-        await DataManager.runInChild(of: moc) { child in
-            guard let server = try? child.existingObject(with: server.objectID) as? ApiServer else {
-                return
-            }
-
-            let parentCache = FetchCache()
-            // Order must be fixed, since labels may refer to PRs or Issues, ensure they are created first
-
-            if let nodeList = nodes["Repository"] {
-                Repo.sync(from: nodeList, on: server, moc: child, parentCache: parentCache)
-            }
-            if let nodeList = nodes["Issue"] {
-                Issue.sync(from: nodeList, on: server, moc: child, parentCache: parentCache)
-            }
-            if let nodeList = nodes["PullRequest"] {
-                PullRequest.sync(from: nodeList, on: server, moc: child, parentCache: parentCache)
-            }
-            if let nodeList = nodes["Label"] {
-                PRLabel.sync(from: nodeList, on: server, moc: child, parentCache: parentCache)
-            }
-            if let nodeList = nodes["CommentReaction"] {
-                Reaction.sync(from: nodeList, for: PRComment.self, on: server, moc: child, parentCache: parentCache)
-            }
-            if let nodeList = nodes["IssueComment"] {
-                PRComment.sync(from: nodeList, on: server, moc: child, parentCache: parentCache)
-            }
-            if let nodeList = nodes["PullRequestReviewComment"] {
-                PRComment.sync(from: nodeList, on: server, moc: child, parentCache: parentCache)
-            }
-            if let nodeList = nodes["Reaction"], let parentType {
-                Reaction.sync(from: nodeList, for: parentType, on: server, moc: child, parentCache: parentCache)
-            }
-            if let nodeList = nodes["ReviewRequest"] {
-                Review.syncRequests(from: nodeList, moc: child, parentCache: parentCache)
-            }
-            if let nodeList = nodes["PullRequestReview"] {
-                Review.sync(from: nodeList, on: server, moc: child, parentCache: parentCache)
-            }
-            if let nodeList = nodes["StatusContext"] {
-                PRStatus.sync(from: nodeList, on: server, moc: child, parentCache: parentCache)
-            }
-            if let nodeList = nodes["CheckRun"] {
-                PRStatus.sync(from: nodeList, on: server, moc: child, parentCache: parentCache)
             }
         }
     }
@@ -976,6 +924,97 @@ enum GraphQL {
         } catch {
             server.lastSyncSucceeded = false
             throw error
+        }
+    }
+
+    private final class NodeScanner {
+        private let scannerServer: ApiServer
+        private let scannerMoc: NSManagedObjectContext
+        private let parentType: DataItem.Type?
+        private let parentCache = FetchCache()
+        private var nodes = [String: Lista<Node>]()
+
+        init(server: ApiServer, parentType: (some DataItem).Type?) {
+            let child = server.managedObjectContext!.buildChildContext()
+            scannerMoc = child
+            scannerServer = try! child.existingObject(with: server.objectID) as! ApiServer
+            self.parentType = parentType
+        }
+
+        func add(progress: ParseOutput) {
+            scannerMoc.perform { [weak self] in
+                guard let self else { return }
+                switch progress {
+                case .queryPageComplete:
+                    flush()
+                    nodes.removeAll()
+                case .queryComplete:
+                    break
+                case let .node(node):
+                    let type = node.elementType
+                    if let existingList = nodes[type] {
+                        existingList.append(node)
+                    } else {
+                        nodes[type] = Lista<Node>(value: node)
+                    }
+                }
+            }
+        }
+
+        func done() async {
+            await withCheckedContinuation { continuation in
+                scannerMoc.perform { [weak self] in
+                    guard let self else { return }
+                    flush()
+                    continuation.resume()
+                }
+            }
+        }
+
+        private func flush() {
+            if nodes.isEmpty { return }
+
+            // Order must be fixed, since labels may refer to PRs or Issues, ensure they are created first
+
+            if let nodeList = nodes["Repository"] {
+                Repo.sync(from: nodeList, on: scannerServer, moc: scannerMoc, parentCache: parentCache)
+            }
+            if let nodeList = nodes["Issue"] {
+                Issue.sync(from: nodeList, on: scannerServer, moc: scannerMoc, parentCache: parentCache)
+            }
+            if let nodeList = nodes["PullRequest"] {
+                PullRequest.sync(from: nodeList, on: scannerServer, moc: scannerMoc, parentCache: parentCache)
+            }
+            if let nodeList = nodes["Label"] {
+                PRLabel.sync(from: nodeList, on: scannerServer, moc: scannerMoc, parentCache: parentCache)
+            }
+            if let nodeList = nodes["CommentReaction"] {
+                Reaction.sync(from: nodeList, for: PRComment.self, on: scannerServer, moc: scannerMoc, parentCache: parentCache)
+            }
+            if let nodeList = nodes["IssueComment"] {
+                PRComment.sync(from: nodeList, on: scannerServer, moc: scannerMoc, parentCache: parentCache)
+            }
+            if let nodeList = nodes["PullRequestReviewComment"] {
+                PRComment.sync(from: nodeList, on: scannerServer, moc: scannerMoc, parentCache: parentCache)
+            }
+            if let nodeList = nodes["Reaction"], let parentType {
+                Reaction.sync(from: nodeList, for: parentType, on: scannerServer, moc: scannerMoc, parentCache: parentCache)
+            }
+            if let nodeList = nodes["ReviewRequest"] {
+                Review.syncRequests(from: nodeList, moc: scannerMoc, parentCache: parentCache)
+            }
+            if let nodeList = nodes["PullRequestReview"] {
+                Review.sync(from: nodeList, on: scannerServer, moc: scannerMoc, parentCache: parentCache)
+            }
+            if let nodeList = nodes["StatusContext"] {
+                PRStatus.sync(from: nodeList, on: scannerServer, moc: scannerMoc, parentCache: parentCache)
+            }
+            if let nodeList = nodes["CheckRun"] {
+                PRStatus.sync(from: nodeList, on: scannerServer, moc: scannerMoc, parentCache: parentCache)
+            }
+            if scannerMoc.hasChanges {
+                try? scannerMoc.save()
+            }
         }
     }
 }

@@ -420,7 +420,7 @@ class DataItem: NSManagedObject, Querying {
         let existingItems = try! moc.fetch(f)
         let existingItemIds = existingItems.map(\.nodeId)
         var itemLookup = Dictionary(zip(existingItemIds, existingItems)) { one, two in
-            Logging.log("Warning: Duplicate item of type \(entityName) claiming to be node ID \(one.nodeId ?? "<no node id>") - will delete")
+            Logging.log("Warning: Duplicate item of type \(entityName) claiming to be node ID \(one.nodeId ?? "<no node id>") - will discard")
             two.postSyncAction = PostSyncAction.delete.rawValue
             return one
         }
