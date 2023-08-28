@@ -7,6 +7,25 @@
 		<language>en</language>
 
         <item>
+            <title>Version 1.8.10</title>
+            <sparkle:minimumSystemVersion>11.0.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[<font face="sans-serif" size="3"><ul>
+                <li>Options to modify the behaviour of author, commenter, or label lists, so instead of exclusions/filters they can instead be used as inclusion lists.</li>
+                <li>Nicer rendering of item labels.</li>
+                <li>Option to sync and display links to items that close, or are closed by, other items.</li>
+                <li>The usual round of performance improvements, in line with keeping Trailer as lightweight as possible.</li>
+                </ul></font>]]></description>
+            <pubDate>Mon, 28 Aug 2023 16:00:00 +0000</pubDate>
+            <enclosure
+            url="https://github.com/ptsochantaris/trailer/releases/download/1.8.10/Trailer-1810.zip"
+            sparkle:version="1717"
+            sparkle:shortVersionString="1.8.10"
+            sparkle:dsaSignature="MC0CFC96epHrycN5PyUK5D4U0V5aFP6jAhUAnZ5r/uyqSLQ0+L8ZF7Iyjrb47yU="
+            sparkle:edSignature="I6bcFCHA5wHYvoySgvu4C86blDDcajj2eFYFMt+sv+g/l8MhewjP3/pEVh5OU73o55DeL/xu5PPs1gu+2SqvAA==" length="4081757"
+            type="application/octet-stream"/>
+        </item>
+
+        <item>
             <title>Version 1.8.9</title>
             <sparkle:minimumSystemVersion>11.0.0</sparkle:minimumSystemVersion>
             <description><![CDATA[<font face="sans-serif" size="3"><ul>
