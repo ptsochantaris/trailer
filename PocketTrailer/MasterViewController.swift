@@ -321,7 +321,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
     }
 
     private func canIssueKeyForIndexPath(action: ListableItem.MenuAction, indexPath: IndexPath) -> Bool {
-        guard let actions = fetchedResultsController?.object(at: indexPath).contextActions else {
+        guard let actions = fetchedResultsController?.object(at: indexPath).contextActions(settings: Settings.cache) else {
             return false
         }
         if actions.contains(action) {
@@ -857,8 +857,8 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         40
     }
 
-    private func createShortcutActions(for item: ListableItem) -> UIMenu? {
-        var children = item.contextActions.map { action -> UIMenuElement in
+    private func createShortcutActions(for item: ListableItem, settings: Settings.Cache) -> UIMenu? {
+        var children = item.contextActions(settings: settings).map { action -> UIMenuElement in
             switch action {
             case .copy:
                 return UIAction(title: action.title, image: UIImage(systemName: "doc.on.doc")) { _ in
@@ -877,12 +877,12 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
             case .mute:
                 return UIAction(title: action.title, image: UIImage(systemName: "speaker.slash")) { _ in
-                    item.setMute(to: true, settings: Settings.cache)
+                    item.setMute(to: true, settings: settings)
                 }
 
             case .unmute:
                 return UIAction(title: action.title, image: UIImage(systemName: "speaker.2")) { _ in
-                    item.setMute(to: false, settings: Settings.cache)
+                    item.setMute(to: false, settings: settings)
                 }
 
             case .openRepo:
@@ -899,7 +899,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
             case let .snooze(presets):
                 var presetItems = presets.map { preset -> UIAction in
                     UIAction(title: preset.listDescription) { _ in
-                        item.snooze(using: preset, settings: Settings.cache)
+                        item.snooze(using: preset, settings: settings)
                     }
                 }
                 presetItems.append(UIAction(title: "Configure...", image: UIImage(systemName: "gear"), identifier: nil) { _ in
@@ -909,7 +909,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
             case .wake:
                 return UIAction(title: action.title, image: UIImage(systemName: "sun.max")) { _ in
-                    item.wakeUp(settings: Settings.cache)
+                    item.wakeUp(settings: settings)
                 }
             }
         }
@@ -930,7 +930,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         guard let item = fetchedResultsController?.object(at: indexPath) else { return nil }
 
         return UIContextMenuConfiguration(identifier: item.objectID, previewProvider: nil) { [weak self] _ in
-            self?.createShortcutActions(for: item)
+            self?.createShortcutActions(for: item, settings: Settings.cache)
         }
     }
 

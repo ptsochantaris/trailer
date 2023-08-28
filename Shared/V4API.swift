@@ -66,7 +66,7 @@ extension API {
                 }
                 if !repos.isEmpty {
                     group.addTask { @MainActor in
-                        await GraphQL.fetchAllSubscribedPrs(from: repos, profile: settings.syncProfile)
+                        await GraphQL.fetchAllSubscribedPrs(from: repos, settings: settings)
                         Logging.log("Fetching subscribed PRs phase complete")
                     }
                 }
@@ -116,7 +116,7 @@ extension API {
                 }
                 if !repos.isEmpty {
                     group.addTask { @MainActor in
-                        await GraphQL.fetchAllSubscribedIssues(from: repos, profile: settings.syncProfile)
+                        await GraphQL.fetchAllSubscribedIssues(from: repos, settings: settings)
                         Logging.log("Fetching subscribed issues phase complete")
                     }
                 }

@@ -279,7 +279,7 @@ final class TrailerCell: NSTableCellView {
 
         m.addItem(NSMenuItem.separator())
 
-        for a in associatedDataItem.contextActions {
+        for a in associatedDataItem.contextActions(settings: Settings.cache) {
             switch a {
             case .copy:
                 let c = m.addItem(withTitle: a.title, action: #selector(copyToClipboard), keyEquivalent: "c")

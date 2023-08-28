@@ -15,7 +15,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
 
         NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: .main) { [weak self] _ in
             Task { [weak self] in
-                _ = await self?.buildOverview()
+                _ = await self?.buildOverview(settings: await Settings.cache)
             }
         }
     }
@@ -32,7 +32,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
 
     func session(_: WCSession, didReceiveMessage message: JSON, replyHandler: @escaping (JSON) -> Void) {
         Task {
-            let reply = await handle(message: message)
+            let reply = await handle(message: message, settings: await Settings.cache)
             replyHandler(reply)
         }
     }
@@ -44,9 +44,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
     }
 
     @MainActor
-    private func handle(message: JSON) async -> JSON {
-        let settings = Settings.cache
-
+    private func handle(message: JSON, settings: Settings.Cache) async -> JSON {
         switch (message["command"] as? String).orEmpty {
         case "refresh":
             let status = await app.startRefresh()
@@ -118,7 +116,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
 
         switch (message["list"] as? String).orEmpty {
         case "overview":
-            result["result"] = await buildOverview()
+            result["result"] = await buildOverview(settings: Settings.cache)
             return reportSuccess(result: result)
 
         case "item_list":
@@ -269,15 +267,13 @@ final class WatchManager: NSObject, WCSessionDelegate {
     //////////////////////////////
 
     @MainActor
-    private func buildOverview() async -> JSON {
+    private func buildOverview(settings: Settings.Cache) async -> JSON {
         let allViewCriteria = popupManager.masterController.allTabSets.map(\.viewCriterion)
 
         return await DataManager.runInChild(of: DataManager.main) { tempMoc in
             var views = [JSON]()
             var totalUnreadPrCount = 0
             var totalUnreadIssueCount = 0
-
-            let settings = Settings.cache
 
             for c in allViewCriteria {
                 let myPrs = WatchManager.counts(for: PullRequest.self, in: .mine, criterion: c, moc: tempMoc, settings: settings)

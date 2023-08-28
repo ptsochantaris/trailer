@@ -214,7 +214,7 @@ enum DataManager {
         }
     }
 
-    private static func updateIndexingFromScratch() async {
+    private static func updateIndexingFromScratch(settings: Settings.Cache) async {
         guard CSSearchableIndex.isIndexingAvailable() else {
             return
         }
@@ -223,7 +223,6 @@ enum DataManager {
 
         let itemsToIndex = Lista<CSSearchableItem>()
         let itemsToRemove = Lista<String>()
-        let settings = Settings.cache
 
         for pr in PullRequest.allItems(in: main) {
             switch await pr.handleSpotlight(settings: settings) {
@@ -266,54 +265,57 @@ enum DataManager {
 
     static func saveDB() async {
         Maintini.startMaintaining()
-
+        defer {
+            Maintini.endMaintaining()
+        }
+        
+        let settings = Settings.cache
+        
         guard main.hasChanges else {
             Logging.log("No DB changes")
             if migrated {
-                await processSpotlight(newItems: [])
+                migrated = false
+                Task {
+                    await Maintini.maintain {
+                        await updateIndexingFromScratch(settings: settings)
+                    }
+                }
             }
             return
         }
-
-        if !migrated {
-            Maintini.startMaintaining()
-            Task {
-                await processSpotlight(updates: main.updatedObjects, deletions: main.deletedObjects)
-                Maintini.endMaintaining()
-            }
-        }
-
-        let newObjects = main.insertedObjects
-
+        
+        let newObjects = main.insertedObjects.union(main.updatedObjects)
+        let deletedObjects = main.deletedObjects
+        
         Logging.log("Saving DB")
         do {
             try main.save()
         } catch {
             Logging.log("Error while saving DB: \(error.localizedDescription)")
         }
-
-        Task {
-            await processSpotlight(newItems: newObjects)
-        }
-    }
-
-    private static func processSpotlight(newItems: Set<NSManagedObject>) async {
+        
         if migrated {
             migrated = false
-            await updateIndexingFromScratch()
+            Task {
+                await Maintini.maintain {
+                    await updateIndexingFromScratch(settings: settings)
+                }
+            }
         } else {
-            await processSpotlight(updates: newItems, deletions: [])
+            Task {
+                await Maintini.maintain {
+                    await processSpotlight(updates: newObjects, deletions: deletedObjects, settings: settings)
+                }
+            }
         }
-        Maintini.endMaintaining()
     }
 
-    private static func processSpotlight(updates: Set<NSManagedObject>, deletions: Set<NSManagedObject>) async {
+    private static func processSpotlight(updates: Set<NSManagedObject>, deletions: Set<NSManagedObject>, settings: Settings.Cache) async {
         guard CSSearchableIndex.isIndexingAvailable() else {
             return
         }
         let urisToDelete = Lista<String>()
         let itemsToReIndex = Lista<CSSearchableItem>()
-        let settings = Settings.cache
         for updatedItem in updates {
             guard let updatedItem = updatedItem as? ListableItem else {
                 continue

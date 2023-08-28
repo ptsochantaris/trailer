@@ -245,15 +245,16 @@ class ListableItem: DataItem, Listable {
 
     override final func prepareForDeletion() {
         let uri = objectID.uriRepresentation().absoluteString
-        ListableItem.hideFromNotifications(uri: uri)
+        Task { @MainActor in
+            ListableItem.hideFromNotifications(uri: uri, settings: Settings.cache)
+        }
         super.prepareForDeletion()
     }
 
-    private static func hideFromNotifications(uri: String) {
-        Task { @MainActor in
-            if Settings.cache.removeNotificationsWhenItemIsRemoved {
-                NotificationManager.shared.removeRelatedNotifications(for: uri)
-            }
+    @MainActor
+    private static func hideFromNotifications(uri: String, settings: Settings.Cache) {
+        if settings.removeNotificationsWhenItemIsRemoved {
+            NotificationManager.shared.removeRelatedNotifications(for: uri)
         }
     }
 
@@ -1230,7 +1231,9 @@ class ListableItem: DataItem, Listable {
             let item = await indexForSpotlight(uri: uri, settings: settings)
             return .needsIndexing(item)
         } else {
-            ListableItem.hideFromNotifications(uri: uri)
+            Task { @MainActor in
+                ListableItem.hideFromNotifications(uri: uri, settings: settings)
+            }
             return .needsRemoval(uri)
         }
     }
@@ -1367,12 +1370,11 @@ class ListableItem: DataItem, Listable {
     }
 
     @MainActor
-    var contextActions: [MenuAction] {
+    func contextActions(settings: Settings.Cache) -> [MenuAction] {
         var actions: [MenuAction] = [.copy, .openRepo]
 
         if !isSnoozing {
             let section = Section(sectionIndex: sectionIndex)
-            let settings = Settings.cache
             if section.shouldBadgeComments(settings: settings) {
                 if hasUnreadCommentsOrAlert {
                     actions.append(.markRead)
