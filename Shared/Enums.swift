@@ -258,7 +258,7 @@ enum Section: CaseIterable, Equatable {
         }
     }
 
-    var assignmentPolictMenuIndex: Int {
+    var assignmentPolicyMenuIndex: Int {
         switch self {
         case .mine:
             return 0
@@ -273,11 +273,11 @@ enum Section: CaseIterable, Equatable {
 
     init(assignmentPolicyMenuIndex: Int) {
         switch assignmentPolicyMenuIndex {
-        case Section.mine.assignmentPolictMenuIndex:
+        case Section.mine.assignmentPolicyMenuIndex:
             self = .mine
-        case Section.participated.assignmentPolictMenuIndex:
+        case Section.participated.assignmentPolicyMenuIndex:
             self = .participated
-        case Section.mentioned.assignmentPolictMenuIndex:
+        case Section.mentioned.assignmentPolicyMenuIndex:
             self = .mentioned
         default:
             self = .hidden(cause: .unknown)

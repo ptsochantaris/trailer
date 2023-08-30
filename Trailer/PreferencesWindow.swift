@@ -702,8 +702,8 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         autoRemoveMergedItems.integerValue = Settings.autoRemoveMergedItems
         autoRemoveClosedItems.integerValue = Settings.autoRemoveClosedItems
 
-        assignedItemDirectHandlingPolicy.selectItem(at: Settings.assignedItemDirectHandlingPolicy.assignmentPolictMenuIndex)
-        assignedItemTeamHandlingPolicy.selectItem(at: Settings.assignedItemTeamHandlingPolicy.assignmentPolictMenuIndex)
+        assignedItemDirectHandlingPolicy.selectItem(at: Settings.assignedItemDirectHandlingPolicy.assignmentPolicyMenuIndex)
+        assignedItemTeamHandlingPolicy.selectItem(at: Settings.assignedItemTeamHandlingPolicy.assignmentPolicyMenuIndex)
 
         defaultOpenApp.stringValue = Settings.defaultAppForOpeningItems
         defaultOpenLinks.stringValue = Settings.defaultAppForOpeningWeb
@@ -724,10 +724,10 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         hotkeyOptionModifier.integerValue = Settings.hotkeyOptionModifier.asInt
         hotkeyShiftModifier.integerValue = Settings.hotkeyShiftModifier.asInt
 
-        let assignedDirectMenuIndex = Settings.assignedDirectReviewHandlingPolicy.assignmentPolictMenuIndex
+        let assignedDirectMenuIndex = Settings.assignedDirectReviewHandlingPolicy.assignmentPolicyMenuIndex
         assignedDirectReviewHandlingPolicy.select(assignedDirectReviewHandlingPolicy.item(at: assignedDirectMenuIndex))
 
-        let assignedTeamMenuIndex = Settings.assignedTeamReviewHandlingPolicy.assignmentPolictMenuIndex
+        let assignedTeamMenuIndex = Settings.assignedTeamReviewHandlingPolicy.assignmentPolicyMenuIndex
         assignedTeamReviewHandlingPolicy.select(assignedTeamReviewHandlingPolicy.item(at: assignedTeamMenuIndex))
 
         enableHotkeySegments()

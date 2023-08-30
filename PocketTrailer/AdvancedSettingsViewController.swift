@@ -103,7 +103,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
                 valueDisplayed: { Settings.assignedItemDirectHandlingPolicy.placementName },
                 optionSelected: { [weak self] originalIndex, section, setting in
                     guard let self else { return }
-                    let v = PickerViewController.Info(title: setting.title, values: Section.assignmentPlacementLabels, selectedIndex: Settings.assignedItemDirectHandlingPolicy.assignmentPolictMenuIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                    let v = PickerViewController.Info(title: setting.title, values: Section.assignmentPlacementLabels, selectedIndex: Settings.assignedItemDirectHandlingPolicy.assignmentPolicyMenuIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
                     performSegue(withIdentifier: "showPicker", sender: v)
                 }),
         Setting(section: .Display,
@@ -112,7 +112,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
                 valueDisplayed: { Settings.assignedItemTeamHandlingPolicy.placementName },
                 optionSelected: { [weak self] originalIndex, section, setting in
                     guard let self else { return }
-                    let v = PickerViewController.Info(title: setting.title, values: Section.assignmentPlacementLabels, selectedIndex: Settings.assignedItemTeamHandlingPolicy.assignmentPolictMenuIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                    let v = PickerViewController.Info(title: setting.title, values: Section.assignmentPlacementLabels, selectedIndex: Settings.assignedItemTeamHandlingPolicy.assignmentPolicyMenuIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
                     performSegue(withIdentifier: "showPicker", sender: v)
                 }),
         Setting(section: .Display,
@@ -449,7 +449,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
                 valueDisplayed: { Settings.assignedDirectReviewHandlingPolicy.placementName },
                 optionSelected: { [weak self] originalIndex, section, setting in
                     guard let self else { return }
-                    let v = PickerViewController.Info(title: setting.title, values: Section.assignmentPlacementLabels, selectedIndex: Settings.assignedDirectReviewHandlingPolicy.assignmentPolictMenuIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                    let v = PickerViewController.Info(title: setting.title, values: Section.assignmentPlacementLabels, selectedIndex: Settings.assignedDirectReviewHandlingPolicy.assignmentPolicyMenuIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
                     performSegue(withIdentifier: "showPicker", sender: v)
                 }),
         Setting(section: .Reviews,
@@ -458,7 +458,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
                 valueDisplayed: { Settings.assignedTeamReviewHandlingPolicy.placementName },
                 optionSelected: { [weak self] originalIndex, section, setting in
                     guard let self else { return }
-                    let v = PickerViewController.Info(title: setting.title, values: Section.assignmentPlacementLabels, selectedIndex: Settings.assignedTeamReviewHandlingPolicy.assignmentPolictMenuIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
+                    let v = PickerViewController.Info(title: setting.title, values: Section.assignmentPlacementLabels, selectedIndex: Settings.assignedTeamReviewHandlingPolicy.assignmentPolicyMenuIndex, sourceIndexPath: IndexPath(row: originalIndex, section: section.rawValue))
                     performSegue(withIdentifier: "showPicker", sender: v)
                 }),
         Setting(section: .Reviews,

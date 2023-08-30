@@ -327,11 +327,11 @@ class ListableItem: DataItem, Listable {
             return true
 
         case .mineAndParticipated:
-            let preConditionSection = preferredSection(takingItemConditionIntoAccount: false, settings: settings)
+            let preConditionSection = highestPreferredSection(takingItemConditionIntoAccount: false, settings: settings)
             return preConditionSection == .mine || preConditionSection == .participated
 
         case .mine:
-            let preConditionSection = preferredSection(takingItemConditionIntoAccount: false, settings: settings)
+            let preConditionSection = highestPreferredSection(takingItemConditionIntoAccount: false, settings: settings)
             return preConditionSection == .mine
 
         case .nothing:
@@ -349,10 +349,12 @@ class ListableItem: DataItem, Listable {
             return false
 
         case .me:
-            return section == settings.assignedItemDirectHandlingPolicy
+            let policy = settings.assignedItemDirectHandlingPolicy
+            return policy.visible && section == policy
 
         case .myTeam:
-            return section == settings.assignedItemTeamHandlingPolicy
+            let policy = settings.assignedItemTeamHandlingPolicy
+            return policy.visible && section == policy
         }
     }
 
@@ -460,7 +462,7 @@ class ListableItem: DataItem, Listable {
         nil
     }
 
-    private func preferredSection(takingItemConditionIntoAccount: Bool, settings: Settings.Cache) -> Section {
+    private func highestPreferredSection(takingItemConditionIntoAccount: Bool, settings: Settings.Cache) -> Section {
         if takingItemConditionIntoAccount {
             if condition == ItemCondition.merged.rawValue {
                 return .merged
@@ -478,34 +480,42 @@ class ListableItem: DataItem, Listable {
             return .mine
         }
 
-        if shouldGo(to: .participated, settings: settings) || commentedByMe || reviewedByMe {
-            return .participated
+        var targetSection = Section.all
+
+        if targetSection.sectionIndex > Section.participated.sectionIndex,
+           shouldGo(to: .participated, settings: settings) || commentedByMe || reviewedByMe {
+            targetSection = .participated
         }
 
-        if shouldGo(to: .mentioned, settings: settings) {
-            return .mentioned
+        if targetSection.sectionIndex > Section.mentioned.sectionIndex,
+           shouldGo(to: .mentioned, settings: settings) {
+            targetSection = .mentioned
         }
 
-        if let section = preferredSectionBasedOnReviewAssignment {
-            return section
-        }
-
-        if let section = settings.preferredMovePolicySection,
+        if let potentialSection = settings.preferredMovePolicySection,
+           potentialSection.sectionIndex < targetSection.sectionIndex,
            contains(terms: ["@\(apiServer.userName.orEmpty)"]) {
-            return section
+            targetSection = potentialSection
         }
 
-        if let section = settings.preferredTeamMentionPolicy,
+        if let potentialSection = settings.preferredTeamMentionPolicy,
+           potentialSection.sectionIndex < targetSection.sectionIndex,
            contains(terms: apiServer.teams.compactMap(\.calculatedReferral)) {
-            return section
+            targetSection = potentialSection
         }
 
-        if let section = settings.newItemInOwnedRepoMovePolicy,
+        if let potentialSection = settings.newItemInOwnedRepoMovePolicy,
+           potentialSection.sectionIndex < targetSection.sectionIndex,
            repo.isMine {
-            return section
+            targetSection = potentialSection
         }
 
-        return .all
+        if let potentialSection = preferredSectionBasedOnReviewAssignment,
+           potentialSection.sectionIndex < targetSection.sectionIndex {
+            targetSection = potentialSection
+        }
+
+        return targetSection
     }
 
     func canBadge(in targetSection: Section? = nil, settings: Settings.Cache) -> Bool {
@@ -516,7 +526,7 @@ class ListableItem: DataItem, Listable {
         }
 
         if targetSection == .closed || targetSection == .merged {
-            return preferredSection(takingItemConditionIntoAccount: false, settings: settings).shouldBadgeComments(settings: settings)
+            return highestPreferredSection(takingItemConditionIntoAccount: false, settings: settings).shouldBadgeComments(settings: settings)
         }
 
         return true
@@ -628,8 +638,8 @@ class ListableItem: DataItem, Listable {
             ?? shouldHideBecauseOfInclusionRules(settings: settings) {
             targetSection = .hidden(cause: cause)
         } else {
-            targetSection = preferredSection(takingItemConditionIntoAccount: true, settings: settings)
-
+            targetSection = highestPreferredSection(takingItemConditionIntoAccount: true, settings: settings)
+            
             if targetSection.visible, let cause
                 = shouldHideBecauseOfRepoDisplayPolicy(targetSection: targetSection)
                 ?? shouldHideBecauseOfRedStatuses(in: targetSection, settings: settings) {
