@@ -7,6 +7,23 @@
 		<language>en</language>
 
         <item>
+            <title>Version 1.8.11</title>
+            <sparkle:minimumSystemVersion>11.0.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[<font face="sans-serif" size="3"><ul>
+                <li>Fix: Corrects an issue where the preference options for review assignments were incorrectly displayed. If you use this feature and changed your review settings recently, please visit preferences and check if the "moving" options under the "Review" tab are set correctly.</li>
+                <li>Updated sorting logic so that an item will go to the "highest" section that the settings allow for, irrespective of the internal evaluation order of those rules.</li>
+                </ul></font>]]></description>
+            <pubDate>Wed, 30 Aug 2023 13:00:00 +0000</pubDate>
+            <enclosure
+            url="https://github.com/ptsochantaris/trailer/releases/download/1.8.11/Trailer-1811.zip"
+            sparkle:version="1719"
+            sparkle:shortVersionString="1.8.11"
+            sparkle:dsaSignature="MCwCFDEw1QADH2DiwP7ipARer6G6k8xrAhQye424Rr8DESfh28gmllHzwo/n5Q=="
+            sparkle:edSignature="IvJeuGRNK1tMCLCtt1K6nYGPYGZ1/CypO/RxmLDOhRBRl9ibB6ifgZ426UpwYRiu9QpXcsuLszKF3+D5odgGBg==" length="4082115"
+            type="application/octet-stream"/>
+        </item>
+
+        <item>
             <title>Version 1.8.10</title>
             <sparkle:minimumSystemVersion>11.0.0</sparkle:minimumSystemVersion>
             <description><![CDATA[<font face="sans-serif" size="3"><ul>
