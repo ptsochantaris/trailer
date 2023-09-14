@@ -15,7 +15,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
 
         NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: .main) { [weak self] _ in
             Task { [weak self] in
-                _ = await self?.buildOverview(settings: await Settings.cache)
+                _ = await self?.buildOverview(settings: Settings.cache)
             }
         }
     }
@@ -32,7 +32,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
 
     func session(_: WCSession, didReceiveMessage message: JSON, replyHandler: @escaping (JSON) -> Void) {
         Task {
-            let reply = await handle(message: message, settings: await Settings.cache)
+            let reply = await handle(message: message, settings: Settings.cache)
             replyHandler(reply)
         }
     }

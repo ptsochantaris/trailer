@@ -10,12 +10,12 @@ enum DataResult {
 
     var logValue: String {
         switch self {
-        case .success: return "Success"
-        case .deleted: return "Deleted"
-        case .notFound: return "Not Found"
-        case .cancelled: return "Cancelled"
-        case .ignored: return "Ignored"
-        case let .failed(code): return "Error Code \(code)"
+        case .success: "Success"
+        case .deleted: "Deleted"
+        case .notFound: "Not Found"
+        case .cancelled: "Cancelled"
+        case .ignored: "Ignored"
+        case let .failed(code): "Error Code \(code)"
         }
     }
 }

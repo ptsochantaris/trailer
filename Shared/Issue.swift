@@ -130,20 +130,20 @@ final class Issue: ListableItem {
         if createdByMe {
             switch repo.itemHidingPolicy {
             case RepoHidingPolicy.hideAllMyAuthoredItems.rawValue:
-                return .hidingMyAuthoredIssues
+                .hidingMyAuthoredIssues
             case RepoHidingPolicy.hideMyAuthoredIssues.rawValue:
-                return .hidingMyAuthoredIssues
+                .hidingMyAuthoredIssues
             default:
-                return nil
+                nil
             }
         } else {
             switch repo.itemHidingPolicy {
             case RepoHidingPolicy.hideAllOthersItems.rawValue:
-                return .hidingAllOthersItems
+                .hidingAllOthersItems
             case RepoHidingPolicy.hideOthersIssues.rawValue:
-                return .hidingOthersIssues
+                .hidingOthersIssues
             default:
-                return nil
+                nil
             }
         }
     }

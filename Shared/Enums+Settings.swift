@@ -4,13 +4,13 @@ extension Section {
     func shouldBadgeComments(settings: Settings.Cache) -> Bool {
         switch self {
         case .all:
-            return settings.showCommentsEverywhere
+            settings.showCommentsEverywhere
         case .closed, .merged:
-            return settings.scanClosedAndMergedItems
+            settings.scanClosedAndMergedItems
         case .mentioned, .mine, .participated:
-            return true
+            true
         case .hidden, .snoozed:
-            return false
+            false
         }
     }
 

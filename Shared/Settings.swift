@@ -12,18 +12,18 @@ enum MigrationStatus: Int {
     var needed: Bool {
         switch self {
         case .inProgress, .pending:
-            return true
+            true
         case .done, .failedAnnounced, .failedPending:
-            return false
+            false
         }
     }
 
     var wantsNewIds: Bool {
         switch self {
         case .done, .inProgress:
-            return true
+            true
         case .failedAnnounced, .failedPending, .pending:
-            return false
+            false
         }
     }
 }

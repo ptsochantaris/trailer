@@ -62,11 +62,10 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
     }
 
     @IBAction private func editSelected(_ sender: UIBarButtonItem) {
-        let promptTitle: String
-        if let l = currentTabBarSet?.viewCriterion?.label {
-            promptTitle = "\(pluralNameForItems.capitalized) in '\(l)'"
+        let promptTitle: String = if let l = currentTabBarSet?.viewCriterion?.label {
+            "\(pluralNameForItems.capitalized) in '\(l)'"
         } else {
-            promptTitle = pluralNameForItems.capitalized
+            pluralNameForItems.capitalized
         }
 
         let a = UIAlertController(title: promptTitle, message: nil, preferredStyle: .actionSheet)

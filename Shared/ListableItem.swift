@@ -112,11 +112,10 @@ class ListableItem: DataItem, Listable {
         milestone = (info["milestone"] as? JSON)?["title"] as? String
         draft = info["isDraft"] as? Bool ?? false
 
-        let newCondition: Int
-        switch info["state"] as? String {
-        case "MERGED": newCondition = ItemCondition.merged.rawValue
-        case "CLOSED": newCondition = ItemCondition.closed.rawValue
-        default: newCondition = ItemCondition.open.rawValue
+        let newCondition: Int = switch info["state"] as? String {
+        case "MERGED": ItemCondition.merged.rawValue
+        case "CLOSED": ItemCondition.closed.rawValue
+        default: ItemCondition.open.rawValue
         }
 
         switch condition {
@@ -639,7 +638,7 @@ class ListableItem: DataItem, Listable {
             targetSection = .hidden(cause: cause)
         } else {
             targetSection = highestPreferredSection(takingItemConditionIntoAccount: true, settings: settings)
-            
+
             if targetSection.visible, let cause
                 = shouldHideBecauseOfRepoDisplayPolicy(targetSection: targetSection)
                 ?? shouldHideBecauseOfRedStatuses(in: targetSection, settings: settings) {
@@ -952,15 +951,15 @@ class ListableItem: DataItem, Listable {
     final func displayDate(settings: Settings.Cache) -> String {
         if settings.showRelativeDates {
             if settings.showCreatedInsteadOfUpdated {
-                return agoFormat(prefix: "created", since: createdAt)
+                agoFormat(prefix: "created", since: createdAt)
             } else {
-                return agoFormat(prefix: "updated", since: updatedAt)
+                agoFormat(prefix: "updated", since: updatedAt)
             }
         } else {
             if settings.showCreatedInsteadOfUpdated {
-                return "Created " + itemDateFormatter.string(from: createdAt!)
+                "Created " + itemDateFormatter.string(from: createdAt!)
             } else {
-                return "Updated " + itemDateFormatter.string(from: updatedAt!)
+                "Updated " + itemDateFormatter.string(from: updatedAt!)
             }
         }
     }
@@ -1353,19 +1352,19 @@ class ListableItem: DataItem, Listable {
 
         var title: String {
             switch self {
-            case .remove: return "Remove"
-            case .copy: return "Copy URL"
-            case .markRead: return "Mark as Read"
-            case .markUnread: return "Mark as Unread"
-            case .openRepo: return "Open Repo"
-            case .mute: return "Mute"
-            case .unmute: return "Un-Mute"
-            case .snooze: return "Snooze"
+            case .remove: "Remove"
+            case .copy: "Copy URL"
+            case .markRead: "Mark as Read"
+            case .markUnread: "Mark as Unread"
+            case .openRepo: "Open Repo"
+            case .mute: "Mute"
+            case .unmute: "Un-Mute"
+            case .snooze: "Snooze"
             case let .wake(date):
                 if let date, date != .distantFuture, date != autoSnoozeSentinelDate {
-                    return "Wake (auto: " + itemDateFormatter.string(from: date) + ")"
+                    "Wake (auto: " + itemDateFormatter.string(from: date) + ")"
                 } else {
-                    return "Wake"
+                    "Wake"
                 }
             }
         }

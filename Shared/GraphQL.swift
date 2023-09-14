@@ -97,91 +97,91 @@ enum GraphQL {
         var rawValue: Int {
             switch self {
             case .high:
-                return 10
+                10
             case .moderate:
-                return 0
+                0
             case .cautious:
-                return -10
+                -10
             case .light:
-                return -20
+                -20
             }
         }
 
         var itemInitialBatchCost: Int {
             switch self {
             case .high:
-                return 40000
+                40000
             case .moderate:
-                return 10000
+                10000
             case .cautious:
-                return 2000
+                2000
             case .light:
-                return 1000
+                1000
             }
         }
 
         var itemIncrementalBatchCost: Int {
             switch self {
             case .high:
-                return 20000
+                20000
             case .moderate:
-                return 6000
+                6000
             case .cautious:
-                return 2000
+                2000
             case .light:
-                return 1000
+                1000
             }
         }
 
         var itemAccompanyingBatchCount: Int {
             switch self {
             case .high:
-                return 10000
+                10000
             case .moderate:
-                return 6000
+                6000
             case .cautious:
-                return 2000
+                2000
             case .light:
-                return 1000
+                1000
             }
         }
 
         var largePageSize: Group.Paging {
             switch self {
             case .high:
-                return .first(count: 80, paging: true)
+                .first(count: 80, paging: true)
             case .moderate:
-                return .first(count: 50, paging: true)
+                .first(count: 50, paging: true)
             case .cautious:
-                return .first(count: 20, paging: true)
+                .first(count: 20, paging: true)
             case .light:
-                return .first(count: 10, paging: true)
+                .first(count: 10, paging: true)
             }
         }
 
         var mediumPageSize: Group.Paging {
             switch self {
             case .high:
-                return .first(count: 40, paging: true)
+                .first(count: 40, paging: true)
             case .moderate:
-                return .first(count: 20, paging: true)
+                .first(count: 20, paging: true)
             case .cautious:
-                return .first(count: 10, paging: true)
+                .first(count: 10, paging: true)
             case .light:
-                return .first(count: 8, paging: true)
+                .first(count: 8, paging: true)
             }
         }
 
         var smallPageSize: Group.Paging {
             switch self {
             case .light:
-                return .first(count: 5, paging: true)
+                .first(count: 5, paging: true)
             case .cautious:
-                return .first(count: 5, paging: true)
+                .first(count: 5, paging: true)
             case .moderate:
-                return .first(count: 10, paging: true)
+                .first(count: 10, paging: true)
             case .high:
-                return .first(count: 20, paging: true)
+                .first(count: 20, paging: true)
             }
         }
     }

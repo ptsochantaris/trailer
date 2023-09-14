@@ -126,11 +126,10 @@ final class StatusItemView: NSView {
         } else {
             tintedIcon.draw(at: .zero, from: .zero, operation: .sourceOver, fraction: 1)
 
-            let countLabelRect: CGRect
-            if icon === StatusItemView.prIcon {
-                countLabelRect = CGRect(x: bounds.size.height - 2, y: -5, width: bounds.size.width, height: bounds.size.height)
+            let countLabelRect = if icon === StatusItemView.prIcon {
+                CGRect(x: bounds.size.height - 2, y: -5, width: bounds.size.width, height: bounds.size.height)
             } else {
-                countLabelRect = CGRect(x: bounds.size.height - 0, y: -5, width: bounds.size.width, height: bounds.size.height)
+                CGRect(x: bounds.size.height - 0, y: -5, width: bounds.size.width, height: bounds.size.height)
             }
             countLabel.draw(in: countLabelRect, withAttributes: countAttributes)
         }

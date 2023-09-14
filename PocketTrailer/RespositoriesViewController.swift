@@ -8,11 +8,11 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 
         var descriptor: NSSortDescriptor {
             switch self {
-            case .name: return NSSortDescriptor(key: "fullName", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
-            case .prVisibility: return NSSortDescriptor(key: "displayPolicyForPrs", ascending: false)
-            case .issueVisibility: return NSSortDescriptor(key: "displayPolicyForIssues", ascending: false)
-            case .hidingSetting: return NSSortDescriptor(key: "itemHidingPolicy", ascending: false)
-            case .isFork: return NSSortDescriptor(key: "fork", ascending: false)
+            case .name: NSSortDescriptor(key: "fullName", ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
+            case .prVisibility: NSSortDescriptor(key: "displayPolicyForPrs", ascending: false)
+            case .issueVisibility: NSSortDescriptor(key: "displayPolicyForIssues", ascending: false)
+            case .hidingSetting: NSSortDescriptor(key: "itemHidingPolicy", ascending: false)
+            case .isFork: NSSortDescriptor(key: "fork", ascending: false)
             }
         }
     }

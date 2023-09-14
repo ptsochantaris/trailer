@@ -49,9 +49,9 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 
     func tableView(_: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 || section == 1 {
-            return 1
+            1
         } else {
-            return SnoozePreset.allSnoozePresets(in: DataManager.main).count
+            SnoozePreset.allSnoozePresets(in: DataManager.main).count
         }
     }
 
@@ -78,11 +78,11 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 
     func tableView(_: UITableView, titleForHeaderInSection section: Int) -> String? {
         if section == 0 {
-            return "You can create presets here that can be used to 'snooze' items for a specific time duration, until a date, or if a specific event occurs."
+            "You can create presets here that can be used to 'snooze' items for a specific time duration, until a date, or if a specific event occurs."
         } else if section == 1 {
-            return "Automatically snooze items after a specific amount of time…"
+            "Automatically snooze items after a specific amount of time…"
         } else {
-            return "Existing presets:"
+            "Existing presets:"
         }
     }
 

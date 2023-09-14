@@ -9,9 +9,9 @@ extension Data {
         var params: (flags: Int32, operation: compression_stream_operation) {
             switch self {
             case .compress:
-                return (Int32(COMPRESSION_STREAM_FINALIZE.rawValue), COMPRESSION_STREAM_ENCODE)
+                (Int32(COMPRESSION_STREAM_FINALIZE.rawValue), COMPRESSION_STREAM_ENCODE)
             case .decompress:
-                return (0, COMPRESSION_STREAM_DECODE)
+                (0, COMPRESSION_STREAM_DECODE)
             }
         }
     }

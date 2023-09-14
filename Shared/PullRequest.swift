@@ -205,20 +205,20 @@ final class PullRequest: ListableItem {
         if createdByMe {
             switch repo.itemHidingPolicy {
             case RepoHidingPolicy.hideAllMyAuthoredItems.rawValue:
-                return .hidingAllMyAuthoredItems
+                .hidingAllMyAuthoredItems
             case RepoHidingPolicy.hideMyAuthoredPrs.rawValue:
-                return .hidingMyAuthoredPrs
+                .hidingMyAuthoredPrs
             default:
-                return nil
+                nil
             }
         } else {
             switch repo.itemHidingPolicy {
             case RepoHidingPolicy.hideAllOthersItems.rawValue:
-                return .hidingAllOthersItems
+                .hidingAllOthersItems
             case RepoHidingPolicy.hideOthersPrs.rawValue:
-                return .hidingOthersPrs
+                .hidingOthersPrs
             default:
-                return nil
+                nil
             }
         }
     }
@@ -419,11 +419,10 @@ final class PullRequest: ListableItem {
         let terms = settings.statusTerms
 
         var contexts = [String: PRStatus]()
-        let filteredStatuses: Set<PRStatus>
-        if red, yellow, green, gray {
-            filteredStatuses = statuses
+        let filteredStatuses: Set<PRStatus> = if red, yellow, green, gray {
+            statuses
         } else {
-            filteredStatuses = statuses.filter {
+            statuses.filter {
                 let c = $0.colorForDisplay
                 if c == .appRed { return red }
                 if c == .appYellow { return yellow }
@@ -550,9 +549,9 @@ final class PullRequest: ListableItem {
             let teamReviewRequests = teamReviewers.components(separatedBy: ",")
             let names = teamReviewRequests.compactMap {
                 if let moc = managedObjectContext {
-                    return Team.team(with: $0, in: moc)?.calculatedReferral
+                    Team.team(with: $0, in: moc)?.calculatedReferral
                 } else {
-                    return nil
+                    nil
                 }
             }.joined(separator: ", ")
             if !names.isEmpty {

@@ -6,33 +6,33 @@ final class CommentBlacklistViewController: UITableViewController {
 
         var title: String {
             switch self {
-            case .commentAuthors: return "Block Commenters"
-            case .labels: return "Block Labels"
-            case .itemAuthors: return "Block Authors"
+            case .commentAuthors: "Block Commenters"
+            case .labels: "Block Labels"
+            case .itemAuthors: "Block Authors"
             }
         }
 
         var placeholder: String {
             switch self {
-            case .commentAuthors: return "Username"
-            case .labels: return "Label"
-            case .itemAuthors: return "Username"
+            case .commentAuthors: "Username"
+            case .labels: "Label"
+            case .itemAuthors: "Username"
             }
         }
 
         var inputTitle: String {
             switch self {
-            case .commentAuthors: return "Block commenter"
-            case .labels: return "Block label"
-            case .itemAuthors: return "Block author"
+            case .commentAuthors: "Block commenter"
+            case .labels: "Block label"
+            case .itemAuthors: "Block author"
             }
         }
 
         var inputText: String {
             switch self {
-            case .commentAuthors: return "Comments from this user will not produce notifications"
-            case .labels: return "Items containing this label will be hidden"
-            case .itemAuthors: return "Items by this author will be hidden"
+            case .commentAuthors: "Comments from this user will not produce notifications"
+            case .labels: "Items containing this label will be hidden"
+            case .itemAuthors: "Items by this author will be hidden"
             }
         }
     }
@@ -78,11 +78,11 @@ final class CommentBlacklistViewController: UITableViewController {
     private func getBlacklist() -> [String] {
         switch mode {
         case .commentAuthors:
-            return Settings.commentAuthorBlacklist
+            Settings.commentAuthorBlacklist
         case .labels:
-            return Settings.labelBlacklist
+            Settings.labelBlacklist
         case .itemAuthors:
-            return Settings.itemAuthorBlacklist
+            Settings.itemAuthorBlacklist
         }
     }
 

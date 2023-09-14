@@ -21,11 +21,10 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 
         view.isUserInteractionEnabled = false
 
-        let a: ApiServer
-        if let serverLocalId {
-            a = try! DataManager.main.existingObject(with: serverLocalId) as! ApiServer
+        let a: ApiServer = if let serverLocalId {
+            try! DataManager.main.existingObject(with: serverLocalId) as! ApiServer
         } else {
-            a = ApiServer.addDefaultGithub(in: DataManager.main)
+            ApiServer.addDefaultGithub(in: DataManager.main)
         }
 
         Task {

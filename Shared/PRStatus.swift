@@ -64,13 +64,13 @@ final class PRStatus: DataItem {
     var colorForDisplay: COLOR_CLASS {
         switch state.orEmpty {
         case "", "neutral", "skipped":
-            return .appSecondaryLabel
+            .appSecondaryLabel
         case "expected", "pending":
-            return .appYellow
+            .appYellow
         case "success":
-            return .appGreen
+            .appGreen
         default:
-            return .appRed
+            .appRed
         }
     }
 
@@ -79,25 +79,23 @@ final class PRStatus: DataItem {
     }
 
     var displayText: String {
-        var text: String
-
-        switch state.orEmpty {
+        var text = switch state.orEmpty {
         case "":
-            text = "⏺ "
+            "⏺ "
         case "expected", "pending":
-            text = "⚡️ "
+            "⚡️ "
         case "skipped":
-            text = "⏭ "
+            "⏭ "
         case "neutral":
-            text = "ℹ️ "
+            "ℹ️ "
         case "action_required":
-            text = "⚠️ "
+            "⚠️ "
         case "cancelled":
-            text = "⛔️ "
+            "⛔️ "
         case "success":
-            text = "✅ "
+            "✅ "
         default:
-            text = "❌ "
+            "❌ "
         }
 
         if let context, !context.isEmpty {

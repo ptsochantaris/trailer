@@ -17,9 +17,9 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
         func isRelevant(to searchText: String?, showingHelp: Bool) -> Bool {
             if let searchText, !searchText.isEmpty {
-                return title.localizedCaseInsensitiveContains(searchText) || (showingHelp && description.localizedCaseInsensitiveContains(searchText))
+                title.localizedCaseInsensitiveContains(searchText) || (showingHelp && description.localizedCaseInsensitiveContains(searchText))
             } else {
-                return true
+                true
             }
         }
     }
@@ -900,15 +900,15 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
     override func tableView(_: UITableView, viewForFooterInSection section: Int) -> UIView? {
         switch filteredSections[section].title {
         case SettingsSection.Filtering.title:
-            return buildFooter("You can use title: server: label: repo: user: number: milestone: assignee: and status: to filter specific properties, e.g. \"label:bug,suggestion\". Prefix with '!' to exclude some terms. You can also use \"state:\" with unread/open/closed/merged/snoozed/draft/conflict as an argument, e.g. \"state:unread,draft\"")
+            buildFooter("You can use title: server: label: repo: user: number: milestone: assignee: and status: to filter specific properties, e.g. \"label:bug,suggestion\". Prefix with '!' to exclude some terms. You can also use \"state:\" with unread/open/closed/merged/snoozed/draft/conflict as an argument, e.g. \"state:unread,draft\"")
         case SettingsSection.Reviews.title:
-            return buildFooter("To disable usage of the Reviews API, uncheck all options above and set the moving option to \"Don't Move It\".")
+            buildFooter("To disable usage of the Reviews API, uncheck all options above and set the moving option to \"Don't Move It\".")
         case SettingsSection.Reactions.title:
-            return buildFooter("To completely disable all usage of the Reactions API, uncheck all above options.")
+            buildFooter("To completely disable all usage of the Reactions API, uncheck all above options.")
         case SettingsSection.Misc.title:
-            return buildFooter("You can open Trailer via the URL scheme \"pockettrailer://\" or run a search using the search query parameter, e.g.: \"pockettrailer://?search=author:john\"")
+            buildFooter("You can open Trailer via the URL scheme \"pockettrailer://\" or run a search using the search query parameter, e.g.: \"pockettrailer://?search=author:john\"")
         default:
-            return nil
+            nil
         }
     }
 

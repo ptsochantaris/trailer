@@ -202,22 +202,20 @@ final class Repo: DataItem {
 
     @MainActor
     static func mayProvideIssuesForDisplay(fromServerWithId id: NSManagedObjectID? = nil) -> Bool {
-        let all: [Repo]
-        if let id {
-            all = Repo.allItems(in: id, moc: DataManager.main)
+        let all: [Repo] = if let id {
+            Repo.allItems(in: id, moc: DataManager.main)
         } else {
-            all = Repo.allItems(in: DataManager.main)
+            Repo.allItems(in: DataManager.main)
         }
         return all.contains { $0.displayPolicyForIssues != RepoDisplayPolicy.hide.rawValue }
     }
 
     @MainActor
     static func mayProvidePrsForDisplay(fromServerWithId id: NSManagedObjectID? = nil) -> Bool {
-        let all: [Repo]
-        if let id {
-            all = Repo.allItems(in: id, moc: DataManager.main)
+        let all: [Repo] = if let id {
+            Repo.allItems(in: id, moc: DataManager.main)
         } else {
-            all = Repo.allItems(in: DataManager.main)
+            Repo.allItems(in: DataManager.main)
         }
         return all.contains { $0.displayPolicyForPrs != RepoDisplayPolicy.hide.rawValue }
     }

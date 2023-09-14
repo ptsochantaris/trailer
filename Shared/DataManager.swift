@@ -268,9 +268,9 @@ enum DataManager {
         defer {
             Maintini.endMaintaining()
         }
-        
+
         let settings = Settings.cache
-        
+
         guard main.hasChanges else {
             Logging.log("No DB changes")
             if migrated {
@@ -283,17 +283,17 @@ enum DataManager {
             }
             return
         }
-        
+
         let newObjects = main.insertedObjects.union(main.updatedObjects)
         let deletedObjects = main.deletedObjects
-        
+
         Logging.log("Saving DB")
         do {
             try main.save()
         } catch {
             Logging.log("Error while saving DB: \(error.localizedDescription)")
         }
-        
+
         if migrated {
             migrated = false
             Task {

@@ -118,15 +118,15 @@ final class Reaction: DataItem {
 
     var displaySymbol: String {
         switch content.orEmpty.lowercased() {
-        case "+1", "thumbs_up": return "👍"
-        case "-1", "thumbs_down": return "👎"
-        case "laugh": return "😄"
-        case "confused": return "😕"
-        case "heart": return "❤️"
-        case "hooray": return "🎉"
-        case "rocket": return "🚀"
-        case "eyes": return "👀"
-        default: return "<unknown>"
+        case "+1", "thumbs_up": "👍"
+        case "-1", "thumbs_down": "👎"
+        case "laugh": "😄"
+        case "confused": "😕"
+        case "heart": "❤️"
+        case "hooray": "🎉"
+        case "rocket": "🚀"
+        case "eyes": "👀"
+        default: "<unknown>"
         }
     }
 }

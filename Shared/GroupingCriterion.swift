@@ -28,9 +28,9 @@ enum GroupingCriterion {
     func isRelated(to i: ListableItem) -> Bool {
         switch self {
         case let .group(name):
-            return i.repo.groupLabel == name
+            i.repo.groupLabel == name
         case let .server(aid):
-            return i.apiServer.objectID == aid
+            i.apiServer.objectID == aid
         }
     }
 
@@ -48,18 +48,18 @@ enum GroupingCriterion {
     var repoGroup: String? {
         switch self {
         case let .group(name):
-            return name
+            name
         case .server:
-            return nil
+            nil
         }
     }
 
     var apiServerId: NSManagedObjectID? {
         switch self {
         case .group:
-            return nil
+            nil
         case let .server(aid):
-            return aid
+            aid
         }
     }
 }

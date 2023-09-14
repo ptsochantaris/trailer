@@ -16,35 +16,35 @@ enum Section: CaseIterable, Equatable {
 
         var description: String {
             switch self {
-            case .unknown: return "Unknown reason"
+            case .unknown: "Unknown reason"
 
-            case .hidingAllMyAuthoredItems: return "Repo setting: Item authored by me"
-            case .hidingMyAuthoredIssues: return "IRepo setting: ssue authored by me"
-            case .hidingAllOthersItems: return "Repo setting: Item not authored by me"
-            case .hidingOthersIssues: return "Repo setting: Issue authored by others"
-            case .hidingOthersPrs: return "Repo setting: PR authored by others"
-            case .hidingDrafts: return "Display setting: Is marked as being a draft"
+            case .hidingAllMyAuthoredItems: "Repo setting: Item authored by me"
+            case .hidingMyAuthoredIssues: "IRepo setting: ssue authored by me"
+            case .hidingAllOthersItems: "Repo setting: Item not authored by me"
+            case .hidingOthersIssues: "Repo setting: Issue authored by others"
+            case .hidingOthersPrs: "Repo setting: PR authored by others"
+            case .hidingDrafts: "Display setting: Is marked as being a draft"
 
-            case .containsLabel: return "Blocked item: Label excluded"
-            case .containsAllLabels: return "Blocked item: All labels excluded"
-            case .doesntContainLabel: return "Blocked item: Doesn't contain label"
-            case .doesntContainAllLabels: return "Blocked item: Doesn't contain all labels"
+            case .containsLabel: "Blocked item: Label excluded"
+            case .containsAllLabels: "Blocked item: All labels excluded"
+            case .doesntContainLabel: "Blocked item: Doesn't contain label"
+            case .doesntContainAllLabels: "Blocked item: Doesn't contain all labels"
 
-            case .containsAuthor: return "Blocked item: Author excluded"
-            case .doesntContainAuthor: return "Blocked item: Author required"
+            case .containsAuthor: "Blocked item: Author excluded"
+            case .doesntContainAuthor: "Blocked item: Author required"
 
-            case .wasUncommented: return "Comment setting: Does not have any comments"
+            case .wasUncommented: "Comment setting: Does not have any comments"
 
-            case .assignedDirectReview: return "Review setting: Assigned section based on direct review"
-            case .assignedTeamReview: return "Review setting: Assigned section based on team review"
-            case .approvedByMe: return "Review setting: Approved by me"
-            case .rejectedByMe: return "Review setting: Rejected by me"
-            case .containsNonGreenStatuses: return "Review setting: PR statuses aren't all green"
+            case .assignedDirectReview: "Review setting: Assigned section based on direct review"
+            case .assignedTeamReview: "Review setting: Assigned section based on team review"
+            case .approvedByMe: "Review setting: Approved by me"
+            case .rejectedByMe: "Review setting: Rejected by me"
+            case .containsNonGreenStatuses: "Review setting: PR statuses aren't all green"
 
-            case .hidingMyAuthoredPrs: return "Repo setting: PR authored by me"
-            case .repoShowMineAndParticipated: return "Repo setting: Only Mine and Participated sections allowed"
-            case .repoHideAllItems: return "Repo setting: All items hidden"
-            case .repoShowMineOnly: return "Repo setting: Mine section items hidden"
+            case .hidingMyAuthoredPrs: "Repo setting: PR authored by me"
+            case .repoShowMineAndParticipated: "Repo setting: Only Mine and Participated sections allowed"
+            case .repoHideAllItems: "Repo setting: All items hidden"
+            case .repoShowMineOnly: "Repo setting: Mine section items hidden"
             }
         }
     }
@@ -107,66 +107,66 @@ enum Section: CaseIterable, Equatable {
 
     var prMenuName: String {
         switch self {
-        case .hidden: return ""
-        case .mine: return "Mine"
-        case .participated: return "Participated"
-        case .mentioned: return "Mentioned"
-        case .merged: return "Recently Merged"
-        case .closed: return "Recently Closed"
-        case .all: return "All Pull Requests"
-        case .snoozed: return "Snoozed"
+        case .hidden: ""
+        case .mine: "Mine"
+        case .participated: "Participated"
+        case .mentioned: "Mentioned"
+        case .merged: "Recently Merged"
+        case .closed: "Recently Closed"
+        case .all: "All Pull Requests"
+        case .snoozed: "Snoozed"
         }
     }
 
     var issuesMenuName: String {
         switch self {
-        case .hidden: return ""
-        case .mine: return "Mine"
-        case .participated: return "Participated"
-        case .mentioned: return "Mentioned"
-        case .merged: return "Recently Merged"
-        case .closed: return "Recently Closed"
-        case .all: return "All Issues"
-        case .snoozed: return "Snoozed"
+        case .hidden: ""
+        case .mine: "Mine"
+        case .participated: "Participated"
+        case .mentioned: "Mentioned"
+        case .merged: "Recently Merged"
+        case .closed: "Recently Closed"
+        case .all: "All Issues"
+        case .snoozed: "Snoozed"
         }
     }
 
     var watchMenuName: String {
         switch self {
-        case .hidden: return ""
-        case .mine: return "Mine"
-        case .participated: return "Participated"
-        case .mentioned: return "Mentioned"
-        case .merged: return "Merged"
-        case .closed: return "Closed"
-        case .all: return "Other"
-        case .snoozed: return "Snoozed"
+        case .hidden: ""
+        case .mine: "Mine"
+        case .participated: "Participated"
+        case .mentioned: "Mentioned"
+        case .merged: "Merged"
+        case .closed: "Closed"
+        case .all: "Other"
+        case .snoozed: "Snoozed"
         }
     }
 
     var apiName: String {
         switch self {
-        case .hidden: return ""
-        case .mine: return "mine"
-        case .participated: return "participated"
-        case .mentioned: return "mentioned"
-        case .merged: return "merged"
-        case .closed: return "closed"
-        case .all: return "other"
-        case .snoozed: return "snoozed"
+        case .hidden: ""
+        case .mine: "mine"
+        case .participated: "participated"
+        case .mentioned: "mentioned"
+        case .merged: "merged"
+        case .closed: "closed"
+        case .all: "other"
+        case .snoozed: "snoozed"
         }
     }
 
     var sectionIndex: Int {
         switch self {
-        case .hidden: return 0
-        case .mine: return 1
-        case .participated: return 2
-        case .mentioned: return 3
-        case .merged: return 4
-        case .closed: return 5
-        case .all: return 6
-        case .snoozed: return 7
+        case .hidden: 0
+        case .mine: 1
+        case .participated: 2
+        case .mentioned: 3
+        case .merged: 4
+        case .closed: 5
+        case .all: 6
+        case .snoozed: 7
         }
     }
 
@@ -226,48 +226,48 @@ enum Section: CaseIterable, Equatable {
     var placementName: String {
         switch self {
         case .mine:
-            return "Move to \"Mine\""
+            "Move to \"Mine\""
         case .mentioned:
-            return "Move to \"Mentioned\""
+            "Move to \"Mentioned\""
         case .participated:
-            return "Move to \"Participated\""
+            "Move to \"Participated\""
         default:
-            return "Do Nothing"
+            "Do Nothing"
         }
     }
 
     var preferredSection: Section? {
         switch self {
         case .mentioned, .mine, .participated:
-            return self
+            self
         default:
-            return nil
+            nil
         }
     }
 
     var assignmentPolicySettingsValue: Int {
         switch self {
         case .mine:
-            return 0
+            0
         case .participated:
-            return 1
+            1
         case .mentioned:
-            return 3
+            3
         default:
-            return 2
+            2
         }
     }
 
     var assignmentPolicyMenuIndex: Int {
         switch self {
         case .mine:
-            return 0
+            0
         case .participated:
-            return 1
+            1
         case .mentioned:
-            return 2
+            2
         default:
-            return 3
+            3
         }
     }
 
@@ -295,23 +295,23 @@ enum Section: CaseIterable, Equatable {
 
     var movePolicySettingsValue: Int {
         switch self {
-        case .mine: return 1
-        case .participated: return 2
-        case .mentioned: return 3
-        default: return 0
+        case .mine: 1
+        case .participated: 2
+        case .mentioned: 3
+        default: 0
         }
     }
 
     var movePolicyMenuIndex: Int {
         switch self {
         case .mine:
-            return 1
+            1
         case .participated:
-            return 2
+            2
         case .mentioned:
-            return 3
+            3
         default:
-            return 0
+            0
         }
     }
 

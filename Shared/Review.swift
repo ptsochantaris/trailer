@@ -144,9 +144,9 @@ final class Review: DataItem {
     var affectsBottomLine: Bool {
         switch state {
         case State.APPROVED.rawValue, State.CHANGES_REQUESTED.rawValue, State.DISMISSED.rawValue:
-            return true
+            true
         default:
-            return false
+            false
         }
     }
 }

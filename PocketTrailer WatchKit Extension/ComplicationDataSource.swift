@@ -54,20 +54,20 @@ final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
         if let unit {
             if let count {
                 if count == 0 {
-                    return "No \(unit)s"
+                    "No \(unit)s"
                 } else if count > 1 {
-                    return "\(count) \(unit)s"
+                    "\(count) \(unit)s"
                 } else {
-                    return "1 \(unit)"
+                    "1 \(unit)"
                 }
             } else {
-                return "-- \(unit)s"
+                "-- \(unit)s"
             }
         } else {
             if let count {
-                return "\(count)"
+                "\(count)"
             } else {
-                return "--"
+                "--"
             }
         }
     }
@@ -141,13 +141,12 @@ final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
             }
 
         case .graphicBezel:
-            let textProvider: CLKSimpleTextProvider
-            if commentCount > 0 {
-                textProvider = CLKSimpleTextProvider(text: count(commentCount, unit: "New Comment"))
+            let textProvider = if commentCount > 0 {
+                CLKSimpleTextProvider(text: count(commentCount, unit: "New Comment"))
             } else if issues {
-                textProvider = CLKSimpleTextProvider(text: count(issueCount, unit: "Issue"))
+                CLKSimpleTextProvider(text: count(issueCount, unit: "Issue"))
             } else {
-                textProvider = CLKSimpleTextProvider(text: count(prCount, unit: "Pull Request"))
+                CLKSimpleTextProvider(text: count(prCount, unit: "Pull Request"))
             }
             let img = CLKComplicationTemplateGraphicCircularImage(
                 imageProvider: CLKFullColorImageProvider(fullColorImage: UIImage(named: issues ? "ComplicationIssues" : "ComplicationPrs")!)

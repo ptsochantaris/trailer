@@ -136,31 +136,31 @@ enum SortingMethod: Int, CaseIterable {
 
     var normalTitle: String {
         switch self {
-        case .creationDate: return "Oldest first"
-        case .recentActivity: return "Inactive for longest"
-        case .title: return "Alphabetically"
-        case .linesAdded: return "Least lines added"
-        case .linesRemoved: return "Least lines removed"
+        case .creationDate: "Oldest first"
+        case .recentActivity: "Inactive for longest"
+        case .title: "Alphabetically"
+        case .linesAdded: "Least lines added"
+        case .linesRemoved: "Least lines removed"
         }
     }
 
     var reverseTitle: String {
         switch self {
-        case .creationDate: return "Youngest first"
-        case .recentActivity: return "Most recently active"
-        case .title: return "Reverse alphabetically"
-        case .linesAdded: return "Most lines added"
-        case .linesRemoved: return "Most lines removed"
+        case .creationDate: "Youngest first"
+        case .recentActivity: "Most recently active"
+        case .title: "Reverse alphabetically"
+        case .linesAdded: "Most lines added"
+        case .linesRemoved: "Most lines removed"
         }
     }
 
     var field: String? {
         switch self {
-        case .creationDate: return "createdAt"
-        case .recentActivity: return "updatedAt"
-        case .title: return "title"
-        case .linesAdded: return "linesAdded"
-        case .linesRemoved: return "linesRemoved"
+        case .creationDate: "createdAt"
+        case .recentActivity: "updatedAt"
+        case .title: "title"
+        case .linesAdded: "linesAdded"
+        case .linesRemoved: "linesRemoved"
         }
     }
 }
@@ -181,48 +181,48 @@ enum RepoDisplayPolicy: Int, CaseIterable {
     var name: String {
         switch self {
         case .hide:
-            return "Hide"
+            "Hide"
         case .mine:
-            return "Mine"
+            "Mine"
         case .mineAndPaticipated:
-            return "Participated"
+            "Participated"
         case .all:
-            return "All"
+            "All"
         case .authoredOnly:
-            return "Authored"
+            "Authored"
         }
     }
 
     var bold: Bool {
         switch self {
         case .authoredOnly, .hide:
-            return false
+            false
         default:
-            return true
+            true
         }
     }
 
     var selectable: Bool {
         switch self {
         case .authoredOnly:
-            return false
+            false
         default:
-            return true
+            true
         }
     }
 
     var color: COLOR_CLASS {
         switch self {
         case .hide:
-            return COLOR_CLASS.appTertiaryLabel
+            COLOR_CLASS.appTertiaryLabel
         case .authoredOnly:
-            return COLOR_CLASS.appLabel
+            COLOR_CLASS.appLabel
         case .mine:
-            return COLOR_CLASS(red: 0.7, green: 0.0, blue: 0.0, alpha: 1.0)
+            COLOR_CLASS(red: 0.7, green: 0.0, blue: 0.0, alpha: 1.0)
         case .mineAndPaticipated:
-            return COLOR_CLASS(red: 0.8, green: 0.4, blue: 0.0, alpha: 1.0)
+            COLOR_CLASS(red: 0.8, green: 0.4, blue: 0.0, alpha: 1.0)
         case .all:
-            return COLOR_CLASS(red: 0.0, green: 0.5, blue: 0.0, alpha: 1.0)
+            COLOR_CLASS(red: 0.0, green: 0.5, blue: 0.0, alpha: 1.0)
         }
     }
 
@@ -236,9 +236,9 @@ enum DraftHandlingPolicy: Int, CaseIterable {
 
     var label: String {
         switch self {
-        case .nothing: return "Do Nothing"
-        case .display: return "Display in Title"
-        case .hide: return "Hide"
+        case .nothing: "Do Nothing"
+        case .display: "Display in Title"
+        case .hide: "Hide"
         }
     }
 }
@@ -249,9 +249,9 @@ enum AssignmentStatus: Int {
     var assignedStatus: AssignmentStatus? {
         switch self {
         case .none, .others:
-            return nil
+            nil
         case .me, .myTeam:
-            return self
+            self
         }
     }
 }
@@ -274,9 +274,9 @@ enum RepoHidingPolicy: Int {
     var bold: Bool {
         switch self {
         case .noHiding:
-            return false
+            false
         default:
-            return true
+            true
         }
     }
 

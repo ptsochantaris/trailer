@@ -6,11 +6,11 @@ enum NetworkStatus {
     var name: String {
         switch self {
         case .notReachable:
-            return "Down"
+            "Down"
         case .reachableViaWiFi:
-            return "Local"
+            "Local"
         case .reachableViaWWAN:
-            return "Cellular"
+            "Cellular"
         }
     }
 }

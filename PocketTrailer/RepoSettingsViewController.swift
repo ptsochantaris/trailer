@@ -100,10 +100,10 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
 
     override func tableView(_: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch section {
-        case 0: return "Pull Request Sections"
-        case 1: return "Issue Sections"
-        case 2: return "Author Based Hiding"
-        default: return nil
+        case 0: "Pull Request Sections"
+        case 1: "Issue Sections"
+        case 2: "Author Based Hiding"
+        default: nil
         }
     }
 

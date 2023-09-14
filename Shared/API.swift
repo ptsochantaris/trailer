@@ -29,21 +29,21 @@ enum ApiError: Error {
     var description: String {
         switch self {
         case let .errorCode(code):
-            return "HTTP Code \(code) received"
+            "HTTP Code \(code) received"
         case .nonHttpResponse:
-            return "Network response was not a HTTP response"
+            "Network response was not a HTTP response"
         case .cancelled:
-            return "Operation cancelled"
+            "Operation cancelled"
         case let .invalidUrl(url):
-            return "Invalid URL: \(url)"
+            "Invalid URL: \(url)"
         case .imageFetchFailed:
-            return "Image fetch failed"
+            "Image fetch failed"
         case .invalidImageData:
-            return "Invalid image data"
+            "Invalid image data"
         case .noUserRecordFound:
-            return "Could not read a valid user record from this endpoint"
+            "Could not read a valid user record from this endpoint"
         case let .graphQLFailure(text):
-            return "GraphQL issue: \(text)"
+            "GraphQL issue: \(text)"
         }
     }
 }

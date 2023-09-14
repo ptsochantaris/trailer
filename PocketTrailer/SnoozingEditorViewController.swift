@@ -182,36 +182,36 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
     private func detailColor(for number: Int) -> UIColor {
         if typeSelector.selectedSegmentIndex == 0 {
             if number == 0 {
-                return UIColor.tertiaryLabel
+                UIColor.tertiaryLabel
             } else {
-                return view.tintColor
+                view.tintColor
             }
         } else {
-            return view.tintColor
+            view.tintColor
         }
     }
 
     private var hourLabel: String {
         if typeSelector.selectedSegmentIndex == 0 {
-            return snoozeItem?.hour ?? 0 > 1 ? "Hours" : "Hour"
+            snoozeItem?.hour ?? 0 > 1 ? "Hours" : "Hour"
         } else {
-            return "Hour"
+            "Hour"
         }
     }
 
     private var dayLabel: String {
         if typeSelector.selectedSegmentIndex == 0 {
-            return snoozeItem?.day ?? 0 > 1 ? "Days" : "Day"
+            snoozeItem?.day ?? 0 > 1 ? "Days" : "Day"
         } else {
-            return "Day"
+            "Day"
         }
     }
 
     private var minuteLabel: String {
         if typeSelector.selectedSegmentIndex == 0 {
-            return snoozeItem?.minute ?? 0 > 1 ? "Minutes" : "Minute"
+            snoozeItem?.minute ?? 0 > 1 ? "Minutes" : "Minute"
         } else {
-            return "Minute"
+            "Minute"
         }
     }
 
@@ -324,9 +324,9 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 
     func tableView(_: UITableView, titleForHeaderInSection section: Int) -> String? {
         if section == 0 {
-            return typeSelector.selectedSegmentIndex == 0 ? "Snooze an item for a specific duration of time" : "Snooze an item until a specific time or day"
+            typeSelector.selectedSegmentIndex == 0 ? "Snooze an item for a specific duration of time" : "Snooze an item until a specific time or day"
         } else {
-            return "Wake up an item snoozed by this preset if any of these occur…"
+            "Wake up an item snoozed by this preset if any of these occur…"
         }
     }
 
@@ -334,14 +334,14 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
         if let pickerMode {
             switch pickerMode {
             case .Day:
-                return Int(snoozeItem?.day ?? 0)
+                Int(snoozeItem?.day ?? 0)
             case .Hour:
-                return Int(snoozeItem?.hour ?? 0)
+                Int(snoozeItem?.hour ?? 0)
             case .Minute:
-                return Int(snoozeItem?.minute ?? 0)
+                Int(snoozeItem?.minute ?? 0)
             }
         } else {
-            return 0
+            0
         }
     }
 
