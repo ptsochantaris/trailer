@@ -19,9 +19,9 @@ final class FilledView: NSView {
         if let backgroundColor {
             backgroundColor.set()
             if let cornerRadius {
-                NSBezierPath(roundedRect: dirtyRect, xRadius: cornerRadius, yRadius: cornerRadius).addClip()
+                NSBezierPath(roundedRect: bounds, xRadius: cornerRadius, yRadius: cornerRadius).addClip()
             }
-            dirtyRect.fill()
+            bounds.fill()
         }
     }
 

@@ -32,7 +32,7 @@ final class AvatarView: NSImageView {
 
     override func draw(_ dirtyRect: NSRect) {
         let radius = floor(AVATAR_SIZE / 2.0)
-        let path = NSBezierPath(roundedRect: dirtyRect, xRadius: radius, yRadius: radius)
+        let path = NSBezierPath(roundedRect: bounds, xRadius: radius, yRadius: radius)
         path.setClip()
         super.draw(dirtyRect)
     }

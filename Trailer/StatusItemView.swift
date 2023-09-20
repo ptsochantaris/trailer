@@ -85,7 +85,7 @@ final class StatusItemView: NSView {
         self.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
     }
 
-    override func draw(_ dirtyRect: NSRect) {
+    override func draw(_: NSRect) {
         var countAttributes = textAttributes
         let foreground: NSColor
 
@@ -111,12 +111,12 @@ final class StatusItemView: NSView {
         let tintedIcon = tintedImage(from: icon, tint: foreground)
 
         if let title {
-            let r = CGRect(x: 0, y: dirtyRect.height - 7, width: dirtyRect.width, height: 7)
+            let r = CGRect(x: 0, y: bounds.height - 7, width: bounds.width, height: 7)
             title.draw(in: r, withAttributes: titleAttributes(foregorund: foreground))
 
             let iconWidth = tintedIcon.size.width - 6
             let countLabelWidth = countLabel.size(withAttributes: textAttributes).width
-            let startX = ((dirtyRect.width - (iconWidth + labelSpacing + countLabelWidth)) * 0.5).rounded(.up)
+            let startX = ((bounds.width - (iconWidth + labelSpacing + countLabelWidth)) * 0.5).rounded(.up)
 
             tintedIcon.draw(in: CGRect(x: startX, y: 0, width: iconWidth, height: tintedIcon.size.height - 6))
 

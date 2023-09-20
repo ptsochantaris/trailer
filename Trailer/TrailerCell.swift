@@ -1,11 +1,11 @@
 import Cocoa
 
 private final class TokenTextField: NSControl {
-    override func draw(_ dirtyRect: NSRect) {
+    override func draw(_: NSRect) {
         guard !attributedStringValue.string.isEmpty, let context = NSGraphicsContext.current?.cgContext else { return }
 
         let emptyRange = CFRangeMake(0, 0)
-        let insideRect = CGRect(x: 6, y: 4, width: dirtyRect.width - 16, height: dirtyRect.height)
+        let insideRect = CGRect(x: 6, y: 4, width: bounds.width - 16, height: bounds.height)
         let framesetter = CTFramesetterCreateWithAttributedString(attributedStringValue)
         let path = CGPath(rect: insideRect, transform: nil)
         let totalFrame = CTFramesetterCreateFrame(framesetter, emptyRange, path, nil)
@@ -449,11 +449,12 @@ final class TrailerCell: NSTableCellView {
         let c = FilledView(frame: CGRect(x: left, y: centerY - height * 0.5, width: width, height: height).integral)
         c.cornerRadius = floor(height / 2.0)
 
-        countView = CenterTextField(frame: c.bounds)
-        countView!.vibrant = false
-        countView!.attributedStringValue = countString
-        if faded { countView!.alphaValue = DISABLED_FADE }
-        c.addSubview(countView!)
+        let cv = CenterTextField(frame: c.bounds)
+        countView = cv
+        cv.vibrant = false
+        cv.attributedStringValue = countString
+        if faded { cv.alphaValue = DISABLED_FADE }
+        c.addSubview(cv)
         addSubview(c)
 
         countBackground = c

@@ -26,9 +26,9 @@ final class CountLabel: UILabel {
     override func draw(_ rect: CGRect) {
         guard let b = badgeColor?.cgColor, let c = UIGraphicsGetCurrentContext() else { return }
         c.setFillColor(UIColor.systemBackground.cgColor)
-        c.fillEllipse(in: rect)
+        c.fillEllipse(in: bounds)
         c.setFillColor(b)
-        c.fillEllipse(in: rect)
+        c.fillEllipse(in: bounds)
         super.draw(rect)
     }
 }
