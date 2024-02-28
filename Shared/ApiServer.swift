@@ -135,7 +135,7 @@ final class ApiServer: NSManagedObject {
         Logging.log("Wiping all data for API server \(label ?? "<no API server name>")")
 
         let categories: [Set<NSManagedObject>] = [pullRequests, issues, labels, teams, comments, statuses, reviews, reactions]
-        categories.forEach { list in
+        for list in categories {
             list.forEach { managedObjectContext.delete($0) }
         }
     }

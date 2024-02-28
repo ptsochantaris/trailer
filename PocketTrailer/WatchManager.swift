@@ -162,11 +162,10 @@ final class WatchManager: NSObject, WCSessionDelegate {
     @MainActor
     private func buildItemList(type: String, sectionIndex: Int, from: Int, apiServerUri: String, group: String, count: Int, onlyUnread: Bool, settings: Settings.Cache) async -> JSON {
         let showLabels = Settings.showLabels
-        let entity: ListableItem.Type
-        if type == "prs" {
-            entity = PullRequest.self
+        let entity: ListableItem.Type = if type == "prs" {
+            PullRequest.self
         } else {
-            entity = Issue.self
+            Issue.self
         }
 
         let f: NSFetchRequest<ListableItem>

@@ -137,11 +137,10 @@ class ListableItem: DataItem, Listable {
             userNodeId = user["id"] as? String
         }
 
-        let i: [JSON]
-        if let assignees = (info["assignees"] as? JSON)?["edges"] as? [JSON] {
-            i = assignees.compactMap { $0["node"] as? JSON }
+        let i: [JSON] = if let assignees = (info["assignees"] as? JSON)?["edges"] as? [JSON] {
+            assignees.compactMap { $0["node"] as? JSON }
         } else {
-            i = []
+            []
         }
 
         processAssignmentStatus(from: ["assignees": i], idField: "id")
@@ -170,13 +169,12 @@ class ListableItem: DataItem, Listable {
     }
 
     final func processAssignmentStatus(from info: JSON?, idField: String) {
-        let assigneeJson: [JSON]?
-        if let assignees = info?["assignees"] as? [JSON] {
-            assigneeJson = assignees
+        let assigneeJson: [JSON]? = if let assignees = info?["assignees"] as? [JSON] {
+            assignees
         } else if let assignee = info?["assignee"] as? JSON {
-            assigneeJson = [assignee]
+            [assignee]
         } else {
-            assigneeJson = nil
+            nil
         }
 
         var directAssignmentToMe = false
@@ -874,11 +872,10 @@ class ListableItem: DataItem, Listable {
             let splitB = baseLabelText.components(separatedBy: ":")
             let splitH = headLabelText.components(separatedBy: ":")
 
-            let repoH: String?
-            if splitB.count == 2 && splitH.count == 2, splitB.first == splitH.first { // same repo
-                repoH = nil
+            let repoH: String? = if splitB.count == 2 && splitH.count == 2, splitB.first == splitH.first { // same repo
+                nil
             } else {
-                repoH = splitH.first
+                splitH.first
             }
 
             if let baseName = splitB.first ?? repo.fullName {
@@ -1006,11 +1003,10 @@ class ListableItem: DataItem, Listable {
         for term in items.components(separatedBy: ",") {
             let negative = term.hasPrefix("!")
             let T = negative ? String(term.dropFirst()) : term
-            let P: NSPredicate
-            if numeric, let n = UInt(T) {
-                P = NSPredicate(format: format, n)
+            let P = if numeric, let n = UInt(T) {
+                NSPredicate(format: format, n)
             } else {
-                P = NSPredicate(format: format, T)
+                NSPredicate(format: format, T)
             }
             if negative {
                 notTerms.append(NSCompoundPredicate(notPredicateWithSubpredicate: P))
@@ -1068,15 +1064,15 @@ class ListableItem: DataItem, Listable {
 
     private static func predicate(notTerms: [NSPredicate], orTerms: [NSPredicate]) -> NSPredicate? {
         if !notTerms.isEmpty, !orTerms.isEmpty {
-            return NSCompoundPredicate(andPredicateWithSubpredicates:
+            NSCompoundPredicate(andPredicateWithSubpredicates:
                 [NSCompoundPredicate(andPredicateWithSubpredicates: notTerms),
                  NSCompoundPredicate(orPredicateWithSubpredicates: orTerms)])
         } else if !notTerms.isEmpty {
-            return NSCompoundPredicate(andPredicateWithSubpredicates: notTerms)
+            NSCompoundPredicate(andPredicateWithSubpredicates: notTerms)
         } else if !orTerms.isEmpty {
-            return NSCompoundPredicate(orPredicateWithSubpredicates: orTerms)
+            NSCompoundPredicate(orPredicateWithSubpredicates: orTerms)
         } else {
-            return nil
+            nil
         }
     }
 

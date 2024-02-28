@@ -241,12 +241,12 @@ enum API {
         }
 
         let disabledRepos = Repo.unsyncableRepos(in: syncMoc)
-        disabledRepos.forEach {
-            $0.pullRequests.forEach {
-                $0.postSyncAction = PostSyncAction.delete.rawValue
+        for disabledRepo in disabledRepos {
+            for pullRequest in disabledRepo.pullRequests {
+                pullRequest.postSyncAction = PostSyncAction.delete.rawValue
             }
-            $0.issues.forEach {
-                $0.postSyncAction = PostSyncAction.delete.rawValue
+            for issue in disabledRepo.issues {
+                issue.postSyncAction = PostSyncAction.delete.rawValue
             }
         }
 

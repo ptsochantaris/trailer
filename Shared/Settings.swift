@@ -348,11 +348,10 @@ enum Settings {
                 return
             }
 
-            let keyIsGood: Bool
-            if let key {
-                keyIsGood = !goodKeys.contains(key)
+            let keyIsGood: Bool = if let key {
+                !goodKeys.contains(key)
             } else {
-                keyIsGood = true
+                true
             }
             if keyIsGood, Settings.lastExportUrl != nil {
                 saveTimer.push()
@@ -454,7 +453,7 @@ enum Settings {
 
     static let statusItemRefreshBatchSizeHelp = "Because querying statuses can be bandwidth and time intensive, Trailer will scan for updates on items that haven't been scanned for the longest time, at every refresh, up to a maximum of this number of items. Higher values mean longer sync times and more API usage."
     static var statusItemRefreshBatchSize: Int {
-        get { if let n = self["STATUS_ITEM_REFRESH_BATCH"] as? Int { return n > 0 ? n : 100 } else { return 100 } }
+        get { if let n = self["STATUS_ITEM_REFRESH_BATCH"] as? Int { n > 0 ? n : 100 } else { 100 } }
         set { self["STATUS_ITEM_REFRESH_BATCH"] = newValue }
     }
 
@@ -531,20 +530,20 @@ enum Settings {
     #if os(iOS)
         static let backgroundRefreshPeriodHelp = "The minimum amount of time to wait before requesting an update when the app is in the background. Even though this is quite efficient, it's still a good idea to keep this to a high value in order to keep battery and bandwidth use low. The default of half an hour is generally a good number. Please note that iOS may ignore this value and perform background refreshes at longer intervals depending on battery level and other reasons."
         static var backgroundRefreshPeriod: TimeInterval {
-            get { if let n = self["IOS_BACKGROUND_REFRESH_PERIOD_KEY"] as? TimeInterval { return n > 0 ? n : 1800 } else { return 1800 } }
+            get { if let n = self["IOS_BACKGROUND_REFRESH_PERIOD_KEY"] as? TimeInterval { n > 0 ? n : 1800 } else { 1800 } }
             set { self["IOS_BACKGROUND_REFRESH_PERIOD_KEY"] = newValue }
         }
     #else
         static let refreshPeriodHelp = "How often to refresh items when the app is active and in the foreground."
         static var refreshPeriod: TimeInterval {
-            get { if let n = self["REFRESH_PERIOD_KEY"] as? TimeInterval { return n < 60 ? 120 : n } else { return 120 } }
+            get { if let n = self["REFRESH_PERIOD_KEY"] as? TimeInterval { n < 60 ? 120 : n } else { 120 } }
             set { self["REFRESH_PERIOD_KEY"] = newValue }
         }
     #endif
 
     static let newRepoCheckPeriodHelp = "How long before reloading your team list and watched repositories from a server. Since this doesn't change often, it's good to keep this as high as possible in order to keep bandwidth use as low as possible during refreshes. Set this to a lower value if you often update your watched repositories or teams."
     static var newRepoCheckPeriod: Float {
-        get { if let n = self["NEW_REPO_CHECK_PERIOD"] as? Float { return max(n, 2) } else { return 2 } }
+        get { if let n = self["NEW_REPO_CHECK_PERIOD"] as? Float { max(n, 2) } else { 2 } }
         set { self["NEW_REPO_CHECK_PERIOD"] = newValue }
     }
 
@@ -561,9 +560,9 @@ enum Settings {
     static var lastExportUrl: URL? {
         get {
             if let s = self["LAST_EXPORT_URL"] as? String {
-                return URL(string: s)
+                URL(string: s)
             } else {
-                return nil
+                nil
             }
         }
         set { self["LAST_EXPORT_URL"] = newValue?.absoluteString }
@@ -913,14 +912,12 @@ enum Settings {
     static var commenterInclusionRule: InclusionSetting
     static let commenterIncludionRuleHelp = "How to handle the list of comment authors"
 
-    private static var filterLookup: [String: String] = {
-        if let data = sharedDefaults.data(forKey: "PERSISTED_TAB_FILTERS"),
-           let dict = try? JSONDecoder().decode([String: String].self, from: data) {
-            return dict
-        } else {
-            return [:]
-        }
-    }()
+    private static var filterLookup: [String: String] = if let data = sharedDefaults.data(forKey: "PERSISTED_TAB_FILTERS"),
+                                                           let dict = try? JSONDecoder().decode([String: String].self, from: data) {
+        dict
+    } else {
+        [:]
+    }
 
     static func filter(for key: String) -> String? {
         filterLookup[key]

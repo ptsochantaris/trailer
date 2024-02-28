@@ -75,8 +75,12 @@ extension API {
 
                         if isFirstEventSync {
                             Logging.log("First event check for this repo. Let's ensure all items are marked as updated")
-                            for i in r.pullRequests { i.setToUpdatedIfIdle() }
-                            for i in r.issues { i.setToUpdatedIfIdle() }
+                            for i in r.pullRequests {
+                                i.setToUpdatedIfIdle()
+                            }
+                            for i in r.issues {
+                                i.setToUpdatedIfIdle()
+                            }
                             r.lastScannedIssueEventId = data.first!["id"] as? Int ?? 0
                             return true
 
@@ -134,8 +138,8 @@ extension API {
             } else {
                 for p in PullRequest.allItems(in: moc) {
                     p.lastStatusScan = nil
-                    p.statuses.forEach {
-                        $0.postSyncAction = PostSyncAction.delete.rawValue
+                    for status in p.statuses {
+                        status.postSyncAction = PostSyncAction.delete.rawValue
                     }
                 }
             }

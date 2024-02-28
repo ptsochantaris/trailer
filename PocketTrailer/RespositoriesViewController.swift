@@ -165,11 +165,11 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
                 Task { @MainActor [weak self] in
                     guard let self else { return }
                     preferencesDirty = true
-                    self.navigationItem.title = originalName
-                    self.actionsButton.isEnabled = ApiServer.someServersHaveAuthTokens(in: DataManager.main)
-                    self.tableView.alpha = 1.0
-                    self.tableView.isUserInteractionEnabled = true
-                    self.navigationItem.rightBarButtonItem?.isEnabled = true
+                    navigationItem.title = originalName
+                    actionsButton.isEnabled = ApiServer.someServersHaveAuthTokens(in: DataManager.main)
+                    tableView.alpha = 1.0
+                    tableView.isUserInteractionEnabled = true
+                    navigationItem.rightBarButtonItem?.isEnabled = true
                     API.isRefreshing = false
                 }
             }
@@ -297,12 +297,12 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 
     private func groupTitleForRepo(repo: Repo) -> NSAttributedString {
         if let l = repo.groupLabel {
-            return NSAttributedString(string: "Group: \(l)", attributes: [
+            NSAttributedString(string: "Group: \(l)", attributes: [
                 .foregroundColor: UIColor.secondaryLabel,
                 .font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)
             ])
         } else {
-            return NSAttributedString(string: "Ungrouped", attributes: [
+            NSAttributedString(string: "Ungrouped", attributes: [
                 .foregroundColor: UIColor.tertiaryLabel,
                 .font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)
             ])

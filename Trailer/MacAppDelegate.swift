@@ -711,10 +711,14 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                     if app.isManuallyScrolling, w.table.selectedRow == -1 { return nil }
                     var i = w.table.selectedRow + 1
                     if i < w.table.numberOfRows {
-                        while w.dataSource.itemAtRow(i) == nil { i += 1 }
+                        while w.dataSource.itemAtRow(i) == nil {
+                            i += 1
+                        }
                     } else if w.table.numberOfRows > 0 {
                         i = 0
-                        while w.dataSource.itemAtRow(i) == nil { i += 1 }
+                        while w.dataSource.itemAtRow(i) == nil {
+                            i += 1
+                        }
                     }
                     scrollTo(index: i, inMenu: w)
                     return nil
@@ -727,7 +731,9 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                     if app.isManuallyScrolling, w.table.selectedRow == -1 { return nil }
                     var i = w.table.selectedRow - 1
                     if i > 0, w.table.numberOfRows > 0 {
-                        while w.dataSource.itemAtRow(i) == nil { i -= 1 }
+                        while w.dataSource.itemAtRow(i) == nil {
+                            i -= 1
+                        }
                     } else {
                         i = w.table.numberOfRows - 1
                     }

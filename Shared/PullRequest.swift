@@ -402,9 +402,9 @@ final class PullRequest: ListableItem {
             .filter { $0.section.shouldCheckStatuses(settings: settings) }
             .prefix(Settings.statusItemRefreshBatchSize)
 
-        prs.forEach {
-            $0.statuses.forEach {
-                $0.postSyncAction = PostSyncAction.delete.rawValue
+        for pr in prs {
+            for status in pr.statuses {
+                status.postSyncAction = PostSyncAction.delete.rawValue
             }
         }
         return Array(prs)

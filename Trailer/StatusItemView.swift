@@ -82,7 +82,7 @@ final class StatusItemView: NSView {
     }
 
     private var isDark: Bool {
-        self.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+        effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
     }
 
     override func draw(_: NSRect) {

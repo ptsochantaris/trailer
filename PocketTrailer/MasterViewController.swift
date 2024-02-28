@@ -482,7 +482,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
             if let tabItem {
                 group.addTask { @MainActor [weak self] in
                     guard let self else { return }
-                    await self.tabbing(self.tabs, didSelect: tabItem)
+                    await tabbing(tabs, didSelect: tabItem)
                 }
             }
         }

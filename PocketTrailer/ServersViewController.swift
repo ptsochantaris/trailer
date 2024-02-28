@@ -135,9 +135,9 @@ final class ServersViewController: UITableViewController {
 
     private func apiChanged() {
         updateApiLabel()
-        ApiServer.allApiServers(in: DataManager.main).forEach {
-            $0.deleteEverything()
-            $0.resetSyncState()
+        for apiServer in ApiServer.allApiServers(in: DataManager.main) {
+            apiServer.deleteEverything()
+            apiServer.resetSyncState()
         }
         Task {
             await DataManager.saveDB()

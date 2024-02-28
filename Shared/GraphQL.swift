@@ -380,19 +380,19 @@ enum GraphQL {
 
         if let prs = items as? [PullRequest] {
             if steps.contains(.reviews) {
-                prs.forEach {
-                    $0.reviews.forEach {
-                        $0.postSyncAction = PostSyncAction.delete.rawValue
+                for pr in prs {
+                    for review in pr.reviews {
+                        review.postSyncAction = PostSyncAction.delete.rawValue
                     }
                 }
             }
 
             if steps.contains(.statuses) {
                 let now = Date()
-                prs.forEach {
-                    $0.lastStatusScan = now
-                    $0.statuses.forEach {
-                        $0.postSyncAction = PostSyncAction.delete.rawValue
+                for pr in prs {
+                    pr.lastStatusScan = now
+                    for status in pr.statuses {
+                        status.postSyncAction = PostSyncAction.delete.rawValue
                     }
                 }
             }
@@ -400,18 +400,18 @@ enum GraphQL {
 
         if steps.contains(.reactions) {
             let now = Date()
-            items.forEach {
-                $0.lastReactionScan = now
-                $0.reactions.forEach {
-                    $0.postSyncAction = PostSyncAction.delete.rawValue
+            for item in items {
+                item.lastReactionScan = now
+                for reaction in item.reactions {
+                    reaction.postSyncAction = PostSyncAction.delete.rawValue
                 }
             }
         }
 
         if steps.contains(.comments) {
-            items.forEach {
-                $0.comments.forEach {
-                    $0.postSyncAction = PostSyncAction.delete.rawValue
+            for item in items {
+                for comment in item.comments {
+                    comment.postSyncAction = PostSyncAction.delete.rawValue
                 }
             }
         }

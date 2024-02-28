@@ -1,9 +1,11 @@
 #if os(iOS)
     import UIKit
+
     typealias COLOR_CLASS = UIColor
 
 #elseif os(macOS)
     import Cocoa
+
     typealias COLOR_CLASS = NSColor
 
 #endif

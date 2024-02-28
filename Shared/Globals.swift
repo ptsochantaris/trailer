@@ -44,6 +44,7 @@ extension NSAttributedString.Key {
 }
 
 import KeyVine
+
 var keyVine = KeyVine(appIdentifier: "com.housetrip.Trailer", teamId: "X727JSJUGJ")
 
 @MainActor var preferencesDirty = false
@@ -299,11 +300,10 @@ struct ApiStats {
     let migratedIds: [String: String]?
 
     static func fromV3(headers: [AnyHashable: Any]) -> ApiStats {
-        let date: Date?
-        if let epochSeconds = headers["x-ratelimit-reset"] as? String, let t = TimeInterval(epochSeconds) {
-            date = Date(timeIntervalSince1970: t)
+        let date: Date? = if let epochSeconds = headers["x-ratelimit-reset"] as? String, let t = TimeInterval(epochSeconds) {
+            Date(timeIntervalSince1970: t)
         } else {
-            date = nil
+            nil
         }
         let remaining = Int(headers["x-ratelimit-remaining"].stringOrEmpty) ?? 10000
         let limit = Int(headers["x-ratelimit-limit"].stringOrEmpty) ?? 10000
@@ -330,9 +330,7 @@ struct ApiStats {
     }
 }
 
-let currentAppVersion: String = {
-    (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String).orEmpty
-}()
+let currentAppVersion: String = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String).orEmpty
 
 let versionString: String = {
     let buildNumber = (Bundle.main.infoDictionary?["CFBundleVersion"] as? String).orEmpty

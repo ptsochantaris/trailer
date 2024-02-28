@@ -83,8 +83,8 @@ extension API {
                 } else {
                     for p in PullRequest.allItems(in: moc) {
                         p.lastStatusScan = nil
-                        p.statuses.forEach {
-                            $0.postSyncAction = PostSyncAction.delete.rawValue
+                        for status in p.statuses {
+                            status.postSyncAction = PostSyncAction.delete.rawValue
                         }
                     }
                 }
