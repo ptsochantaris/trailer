@@ -80,12 +80,12 @@ extension MenuWindow {
             switch itemIds[row] {
             case let .id(id):
                 if let i = try? DataManager.main.existingObject(with: id) as? ListableItem {
-                    return TrailerCell(item: i, settings: Settings.cache)
+                    TrailerCell(item: i, settings: Settings.cache)
                 } else {
-                    return nil
+                    nil
                 }
             case let .section(title):
-                return SectionHeader(title: title, showRemoveAllButton: removalSections.contains(title))
+                SectionHeader(title: title, showRemoveAllButton: removalSections.contains(title))
             }
         }
 

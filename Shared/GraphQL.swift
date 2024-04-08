@@ -328,13 +328,12 @@ enum GraphQL {
                 }
             }
 
-            let errorMessage: String?
-            if json.keys.contains("data") {
-                errorMessage = nil
+            let errorMessage: String? = if json.keys.contains("data") {
+                nil
             } else if let errors = json["errors"] as? [JSON] {
-                errorMessage = errors.first?["message"] as? String
+                errors.first?["message"] as? String
             } else {
-                errorMessage = json["message"] as? String
+                json["message"] as? String
             }
 
             if let errorMessage {
