@@ -890,6 +890,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
                         UIApplication.shared.open(url, options: [:])
                     }
                 }
+
             case .remove:
                 return UIAction(title: action.title, image: UIImage(systemName: "bin.xmark"), attributes: .destructive) { _ in
                     DataManager.main.delete(item)

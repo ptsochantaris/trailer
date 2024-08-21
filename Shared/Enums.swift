@@ -17,30 +17,24 @@ enum Section: CaseIterable, Equatable {
         var description: String {
             switch self {
             case .unknown: "Unknown reason"
-
             case .hidingAllMyAuthoredItems: "Repo setting: Item authored by me"
             case .hidingMyAuthoredIssues: "IRepo setting: ssue authored by me"
             case .hidingAllOthersItems: "Repo setting: Item not authored by me"
             case .hidingOthersIssues: "Repo setting: Issue authored by others"
             case .hidingOthersPrs: "Repo setting: PR authored by others"
             case .hidingDrafts: "Display setting: Is marked as being a draft"
-
             case .containsLabel: "Blocked item: Label excluded"
             case .containsAllLabels: "Blocked item: All labels excluded"
             case .doesntContainLabel: "Blocked item: Doesn't contain label"
             case .doesntContainAllLabels: "Blocked item: Doesn't contain all labels"
-
             case .containsAuthor: "Blocked item: Author excluded"
             case .doesntContainAuthor: "Blocked item: Author required"
-
             case .wasUncommented: "Comment setting: Does not have any comments"
-
             case .assignedDirectReview: "Review setting: Assigned section based on direct review"
             case .assignedTeamReview: "Review setting: Assigned section based on team review"
             case .approvedByMe: "Review setting: Approved by me"
             case .rejectedByMe: "Review setting: Rejected by me"
             case .containsNonGreenStatuses: "Review setting: PR statuses aren't all green"
-
             case .hidingMyAuthoredPrs: "Repo setting: PR authored by me"
             case .repoShowMineAndParticipated: "Repo setting: Only Mine and Participated sections allowed"
             case .repoHideAllItems: "Repo setting: All items hidden"

@@ -545,7 +545,6 @@ class ListableItem: DataItem, Listable {
         switch repoDisplayPolicy {
         case RepoDisplayPolicy.hide.rawValue:
             return .repoHideAllItems
-
         case RepoDisplayPolicy.mine.rawValue:
             if targetSection == .all || targetSection == .participated || targetSection == .mentioned {
                 return .repoShowMineOnly
