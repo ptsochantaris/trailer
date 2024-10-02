@@ -13,7 +13,7 @@ final class PRStatus: DataItem {
 
     override var alternateCreationDate: Bool { true }
 
-    override class var typeName: String { "PRStatus" }
+    override static var typeName: String { "PRStatus" }
 
     static func syncStatuses(from data: [JSON]?, pullRequest: PullRequest, moc: NSManagedObjectContext) async {
         let pullRequestId = pullRequest.objectID

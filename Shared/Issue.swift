@@ -8,7 +8,7 @@ import TrailerQL
 final class Issue: ListableItem {
     @NSManaged var closedByPullRequests: Set<PullRequest>
 
-    override class var typeName: String { "Issue" }
+    override static var typeName: String { "Issue" }
 
     static func mostRecentItemUpdate(in repo: Repo) -> Date {
         repo.issues.reduce(.distantPast) { max($0, $1.updatedAt ?? .distantPast) }
@@ -100,7 +100,7 @@ final class Issue: ListableItem {
     }
 
     @MainActor
-    override class func hasOpen(in moc: NSManagedObjectContext, criterion: GroupingCriterion?) -> Bool {
+    override static func hasOpen(in moc: NSManagedObjectContext, criterion: GroupingCriterion?) -> Bool {
         let f = NSFetchRequest<Issue>(entityName: "Issue")
         f.includesSubentities = false
         f.fetchLimit = 1

@@ -333,6 +333,7 @@ enum Settings {
     private static let goodKeys: Set<String> = ["LAST_SUCCESSFUL_REFRESH", "LAST_EXPORT_URL", "LAST_EXPORT_TIME"]
 
     #if os(macOS)
+        @MainActor
         static var isAppLoginItem: Bool {
             get {
                 Settings["launchAtLogin"] as? Bool ?? false

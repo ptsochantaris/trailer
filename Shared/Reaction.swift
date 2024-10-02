@@ -12,7 +12,7 @@ final class Reaction: DataItem {
     @NSManaged var issue: Issue?
     @NSManaged var comment: PRComment?
 
-    override class var typeName: String { "Reaction" }
+    override static var typeName: String { "Reaction" }
 
     static func sync(from nodes: Lista<Node>, for parentType: (some DataItem).Type, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
         syncItems(of: Reaction.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { reaction, node in

@@ -29,7 +29,7 @@ final class ApiServer: NSManagedObject {
     static var lastReportedOverLimit = Set<NSManagedObjectID>()
     static var lastReportedNearLimit = Set<NSManagedObjectID>()
 
-    override class func value(forUndefinedKey _: String) -> Any? {
+    override static func value(forUndefinedKey _: String) -> Any? {
         nil
     }
 
@@ -55,7 +55,7 @@ final class ApiServer: NSManagedObject {
             }
 
             if let legacy = value(forKey: "authToken") as? String, let legacyData = legacy.data(using: .utf8) {
-                Logging.log("Migrating server ID for \(label.orEmpty) to keychain...")
+                Logging.log("Migrating server ID for \(self.label.orEmpty) to keychain...")
                 keyVine[serverKey] = legacyData
                 setValue(nil, forKey: "authToken")
                 _cachedAuthToken = .some(legacy)
@@ -132,7 +132,7 @@ final class ApiServer: NSManagedObject {
     func deleteEverything() {
         guard let managedObjectContext else { return }
 
-        Logging.log("Wiping all data for API server \(label ?? "<no API server name>")")
+        Logging.log("Wiping all data for API server \(self.label ?? "<no API server name>")")
 
         let categories: [Set<NSManagedObject>] = [pullRequests, issues, labels, teams, comments, statuses, reviews, reactions]
         for list in categories {
@@ -204,7 +204,7 @@ final class ApiServer: NSManagedObject {
     }
 
     func rollBackAllUpdates(in moc: NSManagedObjectContext) {
-        Logging.log("Rolling back changes for failed sync on API server '\(label.orEmpty)'")
+        Logging.log("Rolling back changes for failed sync on API server '\(self.label.orEmpty)'")
         for set in [repos, pullRequests, comments, statuses, labels, issues, teams, reviews, reactions] as [Set<DataItem>] {
             var i = set.makeIterator()
             while let dataItem = i.next() {

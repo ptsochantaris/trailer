@@ -97,7 +97,7 @@ extension API {
                                         Logging.log("Parsed all repo issue events up to the one we already have")
                                         break // we're done
                                     }
-                                    if event["event"] as? String != nil {
+                                    if event["event"] is String {
                                         numbers.insert(issueNumber)
                                     }
                                 }

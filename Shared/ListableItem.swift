@@ -1261,7 +1261,7 @@ class ListableItem: DataItem, Listable {
         return CSSearchableItem(uniqueIdentifier: uri, domainIdentifier: nil, attributeSet: s)
     }
 
-    override final class func shouldCreate(from node: Node) -> Bool {
+    override static func shouldCreate(from node: Node) -> Bool {
         if node.jsonPayload["state"] as? String == "OPEN" {
             return true
         }
@@ -1315,7 +1315,7 @@ class ListableItem: DataItem, Listable {
     }
 
     final func handleClosing(settings: Settings.Cache) {
-        Logging.log("Detected closed item: \(title.orEmpty), handling policy is \(Settings.closeHandlingPolicy), coming from section \(sectionIndex)")
+        Logging.log("Detected closed item: \(self.title.orEmpty), handling policy is \(Settings.closeHandlingPolicy), coming from section \(self.sectionIndex)")
 
         if !isVisibleOnMenu {
             Logging.log("Closed item was hidden, won't announce")

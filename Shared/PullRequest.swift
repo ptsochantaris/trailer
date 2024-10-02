@@ -26,7 +26,7 @@ final class PullRequest: ListableItem {
     @NSManaged var closesIssueIds: String?
     @NSManaged var closesIssues: Set<Issue>
 
-    override class var typeName: String { "PullRequest" }
+    override static var typeName: String { "PullRequest" }
 
     override var baseLabelText: String? { baseLabel }
 
@@ -283,7 +283,7 @@ final class PullRequest: ListableItem {
         return try! moc.fetch(f)
     }
 
-    override class func hasOpen(in moc: NSManagedObjectContext, criterion: GroupingCriterion?) -> Bool {
+    override static func hasOpen(in moc: NSManagedObjectContext, criterion: GroupingCriterion?) -> Bool {
         let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
         f.includesSubentities = false
         f.fetchLimit = 1
@@ -308,7 +308,7 @@ final class PullRequest: ListableItem {
         super.catchUpWithComments(settings: settings)
     }
 
-    override class func badgeCount(from fetch: NSFetchRequest<some ListableItem>, in moc: NSManagedObjectContext) -> Int {
+    override static func badgeCount(from fetch: NSFetchRequest<some ListableItem>, in moc: NSManagedObjectContext) -> Int {
         var badgeCount = super.badgeCount(from: fetch, in: moc)
         if Settings.markPrsAsUnreadOnNewCommits {
             for i in try! moc.fetch(fetch) {
@@ -341,7 +341,7 @@ final class PullRequest: ListableItem {
     }
 
     private static let _unreadOrNewCommitsPredicate = NSPredicate(format: "unreadComments > 0 or hasNewCommits == YES")
-    override class func includeInUnreadPredicate(settings: Settings.Cache) -> NSPredicate {
+    override static func includeInUnreadPredicate(settings: Settings.Cache) -> NSPredicate {
         settings.markPrsAsUnreadOnNewCommits ? _unreadOrNewCommitsPredicate : super.includeInUnreadPredicate(settings: settings)
     }
 
@@ -637,7 +637,7 @@ final class PullRequest: ListableItem {
     override final func handleMerging(settings: Settings.Cache) {
         let byUserId = mergedByNodeId
         let myUserId = apiServer.userNodeId
-        Logging.log("Detected merged PR: \(title.orEmpty) by user \(byUserId.orEmpty), local user id is: \(myUserId.orEmpty), handling policy is \(Settings.mergeHandlingPolicy), coming from section \(sectionIndex)")
+        Logging.log("Detected merged PR: \(self.title.orEmpty) by user \(byUserId.orEmpty), local user id is: \(myUserId.orEmpty), handling policy is \(Settings.mergeHandlingPolicy), coming from section \(self.sectionIndex)")
 
         if !isVisibleOnMenu {
             Logging.log("Merged PR was hidden, won't announce")

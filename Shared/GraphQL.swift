@@ -223,7 +223,7 @@ enum GraphQL {
     }
 
     static func testApi(to apiServer: ApiServer) async throws {
-        var gotUserNode = false
+        nonisolated(unsafe) var gotUserNode = false
         let testQuery = Query(name: "Testing", rootElement: Group("viewer") { userFragment }) {
             if case let .node(node) = $0 {
                 Logging.log("Got a node, type: \(node.elementType), id: \(node.id)")
@@ -772,15 +772,16 @@ enum GraphQL {
     static func fetchAllSubscribedPrs(from repos: [Repo], settings: Settings.Cache) async {
         let reposByServer = Dictionary(grouping: repos) { $0.apiServer }
 
-        var prRepoIdToLatestExistingUpdate = [String: Date]()
+        var _prRepoIdToLatestExistingUpdate = [String: Date]()
 
         let hideValue = RepoDisplayPolicy.hide.rawValue
         for repo in repos {
             if let n = repo.nodeId, repo.displayPolicyForPrs != hideValue {
-                prRepoIdToLatestExistingUpdate[n] = PullRequest.mostRecentItemUpdate(in: repo)
+                _prRepoIdToLatestExistingUpdate[n] = PullRequest.mostRecentItemUpdate(in: repo)
             }
         }
 
+        let prRepoIdToLatestExistingUpdate = _prRepoIdToLatestExistingUpdate
         for (server, reposInThisServer) in reposByServer {
             let scanner = NodeScanner(server: server, parentType: nil)
 
@@ -837,15 +838,16 @@ enum GraphQL {
     static func fetchAllSubscribedIssues(from repos: [Repo], settings: Settings.Cache) async {
         let reposByServer = Dictionary(grouping: repos) { $0.apiServer }
 
-        var issueRepoIdToLatestExistingUpdate = [String: Date]()
+        var _issueRepoIdToLatestExistingUpdate = [String: Date]()
 
         let hideValue = RepoDisplayPolicy.hide.rawValue
         for repo in repos {
             if let n = repo.nodeId, repo.displayPolicyForIssues != hideValue {
-                issueRepoIdToLatestExistingUpdate[n] = Issue.mostRecentItemUpdate(in: repo)
+                _issueRepoIdToLatestExistingUpdate[n] = Issue.mostRecentItemUpdate(in: repo)
             }
         }
 
+        let issueRepoIdToLatestExistingUpdate = _issueRepoIdToLatestExistingUpdate
         for (server, reposInThisServer) in reposByServer {
             let scanner = NodeScanner(server: server, parentType: nil)
 

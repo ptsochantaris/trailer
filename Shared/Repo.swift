@@ -18,7 +18,7 @@ final class Repo: DataItem {
     @NSManaged var archived: Bool
     @NSManaged var lastScannedIssueEventId: Int
 
-    override class var typeName: String { "Repo" }
+    override static var typeName: String { "Repo" }
 
     override func resetSyncState() {
         super.resetSyncState()

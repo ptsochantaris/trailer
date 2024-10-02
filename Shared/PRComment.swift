@@ -18,7 +18,7 @@ final class PRComment: DataItem {
 
     @NSManaged var reactions: Set<Reaction>
 
-    override class var typeName: String { "PRComment" }
+    override static var typeName: String { "PRComment" }
 
     static func sync(from nodes: Lista<Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
         syncItems(of: PRComment.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { comment, node in
