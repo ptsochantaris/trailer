@@ -38,23 +38,23 @@ extension API {
             await withTaskGroup(of: Void.self) { group in
                 if r.displayPolicyForPrs != RepoDisplayPolicy.hide.rawValue {
                     let repoFullName = r.fullName.orEmpty
-                    group.addTask { @MainActor in
+                    group.addTask {
                         let result = await RestAccess.getPagedData(at: "/repos/\(repoFullName)/pulls", from: apiServer) { data, _ in
                             await PullRequest.syncPullRequests(from: data, in: r, moc: moc)
                             return false
                         }
-                        handleRepoSync(for: r, result: result)
+                        await handleRepoSync(for: r, result: result)
                     }
                 }
 
                 if r.displayPolicyForIssues != RepoDisplayPolicy.hide.rawValue {
                     let repoFullName = r.fullName.orEmpty
-                    group.addTask { @MainActor in
+                    group.addTask {
                         let result = await RestAccess.getPagedData(at: "/repos/\(repoFullName)/issues", from: apiServer) { data, _ in
                             await Issue.syncIssues(from: data, in: r, moc: moc)
                             return false
                         }
-                        handleRepoSync(for: r, result: result)
+                        await handleRepoSync(for: r, result: result)
                     }
                 }
             }
@@ -132,7 +132,7 @@ extension API {
         await withTaskGroup(of: Void.self) { group in
 
             if Settings.showStatusItems {
-                group.addTask { @MainActor in
+                group.addTask {
                     await fetchStatusesForCurrentPullRequests(to: moc, settings: settings)
                 }
             } else {
@@ -157,10 +157,10 @@ extension API {
             }
 
             if Settings.showLabels {
-                group.addTask { @MainActor in
+                group.addTask {
                     await fetchLabelsForCurrentPullRequests(for: newOrUpdatedPrs)
                 }
-                group.addTask { @MainActor in
+                group.addTask {
                     await fetchLabelsForCurrentIssues(for: newOrUpdatedIssues)
                 }
             } else {
@@ -169,23 +169,23 @@ extension API {
                 }
             }
 
-            group.addTask { @MainActor in
+            group.addTask {
                 await checkPrClosures(in: moc)
             }
 
-            group.addTask { @MainActor in
+            group.addTask {
                 await detectAssignedPullRequests(for: newOrUpdatedPrs)
             }
 
             if settings.shouldSyncReviewAssignments {
-                group.addTask { @MainActor in
+                group.addTask {
                     await fetchReviewAssignmentsForCurrentPullRequests(for: newOrUpdatedPrs)
                 }
             }
 
             await withTaskGroup(of: Void.self) { commentGroup in
                 if settings.shouldSyncReviews {
-                    commentGroup.addTask { @MainActor in
+                    commentGroup.addTask {
                         await fetchReviewsForForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
                         await fetchCommentsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
                     }
@@ -193,19 +193,19 @@ extension API {
                     for r in Review.allItems(in: moc) {
                         r.postSyncAction = PostSyncAction.delete.rawValue
                     }
-                    commentGroup.addTask { @MainActor in
+                    commentGroup.addTask {
                         await fetchCommentsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
                     }
                 }
 
-                commentGroup.addTask { @MainActor in
+                commentGroup.addTask {
                     await fetchCommentsForCurrentIssues(to: moc, for: newOrUpdatedIssues)
-                    checkIssueClosures(in: moc)
+                    await checkIssueClosures(in: moc)
                 }
             }
 
             if Settings.notifyOnCommentReactions {
-                group.addTask { @MainActor in
+                group.addTask {
                     await fetchCommentReactionsIfNeeded(to: moc)
                 }
             }
@@ -307,7 +307,6 @@ extension API {
             }
         }
 
-        @MainActor
         @Sendable func _fetchComments(issues: Bool) async {
             await withTaskGroup(of: Void.self) { group in
                 for p in prs {
@@ -331,10 +330,10 @@ extension API {
         }
 
         await withTaskGroup(of: Void.self) { group in
-            group.addTask { @MainActor in
+            group.addTask {
                 await _fetchComments(issues: true)
             }
-            group.addTask { @MainActor in
+            group.addTask {
                 await _fetchComments(issues: false)
             }
         }
@@ -443,7 +442,7 @@ extension API {
 
         await withTaskGroup(of: Void.self) { group in
             for r in prsToCheck {
-                group.addTask { @MainActor in
+                group.addTask {
                     await investigatePrClosure(for: r)
                 }
             }

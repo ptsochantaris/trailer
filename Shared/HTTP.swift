@@ -3,7 +3,7 @@ import Maintini
 import Semalot
 import TrailerJson
 
-typealias JSON = [String: Any]
+typealias JSON = [String: Sendable]
 
 enum DataResult {
     case success(headers: [AnyHashable: Any], data: Data), notFound, deleted, failed(code: Int), cancelled, ignored
@@ -20,6 +20,13 @@ enum DataResult {
     }
 }
 
+@globalActor
+public enum HTTPActor {
+    public final actor ActorType {}
+    public static let shared = ActorType()
+}
+
+@HTTPActor
 enum HTTP {
     static let gateKeeper = Semalot(tickets: 8)
 
@@ -47,7 +54,7 @@ enum HTTP {
         return URLSession(configuration: config)
     }()
 
-    static func getJsonData(for request: URLRequest, attempts: Int, logPrefix: String? = nil, retryOnInvalidJson: Bool = false) async throws -> (json: Any?, result: DataResult) {
+    static func getJsonData(for request: URLRequest, attempts: Int, logPrefix: String? = nil, retryOnInvalidJson: Bool = false) async throws -> (json: Sendable?, result: DataResult) {
         await gateKeeper.takeTicket()
         defer {
             gateKeeper.returnTicket()

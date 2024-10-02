@@ -4,6 +4,7 @@ import Lista
 import TrailerQL
 
 enum NotificationQueue {
+    @MainActor
     private static var queue = Lista<(NotificationType, NSManagedObjectID)>()
 
     static func add(type: NotificationType, for item: DataItem) {

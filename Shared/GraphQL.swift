@@ -643,7 +643,7 @@ enum GraphQL {
                     let g = Group("pullRequests", ("states", "[OPEN]"), paging: settings.syncProfile.mediumPageSize) {
                         prFragment(includeRepo: true, settings: settings)
                     }
-                    group.addTask { @MainActor in
+                    group.addTask {
                         if let nodes = await fetchAllAuthoredItems(from: server, label: "PRs", fields: { g }) {
                             await checkAuthoredPrClosures(nodes: nodes, in: server, settings: settings)
                         }
@@ -662,9 +662,9 @@ enum GraphQL {
                     let g = Group("issues", ("states", "[OPEN]"), paging: .max) {
                         issueFragment(includeRepo: true, settings: settings)
                     }
-                    group.addTask { @MainActor in
+                    group.addTask {
                         if let nodes = await fetchAllAuthoredItems(from: server, label: "Issues", fields: { g }) {
-                            checkAuthoredIssueClosures(nodes: nodes, in: server)
+                            await checkAuthoredIssueClosures(nodes: nodes, in: server)
                         }
                     }
                 } else {

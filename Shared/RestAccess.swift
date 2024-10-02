@@ -1,6 +1,12 @@
 import Foundation
 
-@MainActor
+@globalActor
+public enum RestActor {
+    public final actor ActorType {}
+    public static let shared = ActorType()
+}
+
+@RestActor
 enum RestAccess {
     private struct UrlBackOffEntry {
         var nextAttemptAt: Date

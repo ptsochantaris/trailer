@@ -320,7 +320,7 @@ class DataItem: NSManagedObject, Querying {
     }
 
     private static let dateQueue = DispatchQueue(label: "housetrip.com.dateFormatting")
-    private static var dateParserTemplate = "                   +0000".cString(using: .ascii)!
+    private nonisolated(unsafe) static var dateParserTemplate = "                   +0000".cString(using: .ascii)!
     static func parseGH8601(_ i: String?) -> Date? {
         guard let i, i.count > 18 else { return nil }
 

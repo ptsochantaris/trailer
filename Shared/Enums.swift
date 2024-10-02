@@ -6,6 +6,8 @@ extension Bool {
     }
 }
 
+extension NSPredicate: @retroactive @unchecked Sendable {}
+
 enum Section: CaseIterable, Equatable {
     enum HidingCause {
         case unknown, approvedByMe, rejectedByMe, hidingAllMyAuthoredItems,
@@ -335,6 +337,12 @@ extension String? {
 
     var orEmpty: String {
         self ?? ""
+    }
+}
+
+extension Sendable? {
+    var stringOrEmpty: String {
+        (self as? String).orEmpty
     }
 }
 

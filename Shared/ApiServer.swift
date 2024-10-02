@@ -26,7 +26,10 @@ final class ApiServer: NSManagedObject {
     @NSManaged var reviews: Set<Review>
     @NSManaged var reactions: Set<Reaction>
 
+    @MainActor
     static var lastReportedOverLimit = Set<NSManagedObjectID>()
+
+    @MainActor
     static var lastReportedNearLimit = Set<NSManagedObjectID>()
 
     override static func value(forUndefinedKey _: String) -> Any? {
@@ -81,6 +84,7 @@ final class ApiServer: NSManagedObject {
         super.prepareForDeletion()
     }
 
+    @MainActor
     var shouldReportOverTheApiLimit: Bool {
         if requestsRemaining == 0 {
             if !ApiServer.lastReportedOverLimit.contains(objectID) {
@@ -94,6 +98,7 @@ final class ApiServer: NSManagedObject {
         return false
     }
 
+    @MainActor
     var shouldReportCloseToApiLimit: Bool {
         if (100 * requestsRemaining / requestsLimit) < 20 {
             if !ApiServer.lastReportedNearLimit.contains(objectID) {

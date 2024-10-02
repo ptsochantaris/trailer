@@ -1,5 +1,5 @@
 import CoreData
-import CoreSpotlight
+@preconcurrency import CoreSpotlight
 import Lista
 import TrailerQL
 
@@ -1225,7 +1225,7 @@ class ListableItem: DataItem, Listable {
         #endif
     }
 
-    enum SpotLightResult {
+    enum SpotLightResult: Sendable {
         case needsIndexing(CSSearchableItem), needsRemoval(String)
     }
 

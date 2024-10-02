@@ -142,7 +142,6 @@ enum API {
 
     ////////////////////////////////////// API interface
 
-    @MainActor
     static func attemptV4Migration() async {
         while isRefreshing {
             try? await Task.sleep(nanoseconds: 1 * NSEC_PER_SEC)
@@ -318,7 +317,6 @@ enum API {
         }
     }
 
-    @MainActor
     static func fetchRepositories(to moc: NSManagedObjectContext) async {
         ApiServer.resetSyncSuccess(in: moc)
 
@@ -332,13 +330,13 @@ enum API {
 
         await withTaskGroup(of: Void.self) { group in
             for apiServer in goodToGoServers {
-                group.addTask { @MainActor in
+                group.addTask {
                     await syncWatchedRepos(from: apiServer, moc: moc)
                 }
-                group.addTask { @MainActor in
+                group.addTask {
                     await syncManuallyAddedRepos(from: apiServer, moc: moc)
                 }
-                group.addTask { @MainActor in
+                group.addTask {
                     await fetchUserTeams(from: apiServer, moc: moc)
                 }
             }
