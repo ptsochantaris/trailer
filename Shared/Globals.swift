@@ -45,7 +45,7 @@ extension NSAttributedString.Key {
 
 import KeyVine
 
-var keyVine = KeyVine(appIdentifier: "com.housetrip.Trailer", teamId: "X727JSJUGJ")
+nonisolated(unsafe) var keyVine = KeyVine(appIdentifier: "com.housetrip.Trailer", teamId: "X727JSJUGJ")
 
 @MainActor var preferencesDirty = false
 @MainActor var lastRepoCheck = Date.distantPast
@@ -177,7 +177,7 @@ enum KeepPolicy: Int {
 enum RepoDisplayPolicy: Int, CaseIterable {
     case hide, mine, mineAndPaticipated, all, authoredOnly
 
-    static var labels: [String] = allCases.map(\.name)
+    static let labels: [String] = allCases.map(\.name)
 
     var name: String {
         switch self {
