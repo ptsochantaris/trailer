@@ -319,16 +319,16 @@ class DataItem: NSManagedObject, Querying {
         }
     }
 
-    private static let dateQueue = DispatchQueue(label: "housetrip.com.dateFormatting")
+    private nonisolated(unsafe) static var _lock = os_unfair_lock_s()
     private nonisolated(unsafe) static var dateParserTemplate = "                   +0000".cString(using: .ascii)!
     static func parseGH8601(_ i: String?) -> Date? {
         guard let i, i.count > 18 else { return nil }
 
         var timeData = tm()
-        dateQueue.sync {
-            memcpy(&dateParserTemplate, i, 19)
-            strptime(dateParserTemplate, "%FT%T%z", &timeData)
-        }
+        os_unfair_lock_lock(&_lock)
+        memcpy(&dateParserTemplate, i, 19)
+        strptime(dateParserTemplate, "%FT%T%z", &timeData)
+        os_unfair_lock_unlock(&_lock)
 
         let t = mktime(&timeData)
         return Date(timeIntervalSince1970: TimeInterval(t))
