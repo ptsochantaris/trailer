@@ -74,8 +74,10 @@ extension Node {
 @MainActor
 enum GraphQL {
     static func setup() {
-        TQL.debugLog = { message in
-            Logging.log(message)
+        Task { @LogActor in
+            TQL.debugLog = { message in
+                Logging.log(message)
+            }
         }
     }
 
