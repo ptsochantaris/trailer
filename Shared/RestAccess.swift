@@ -1,4 +1,5 @@
 import Foundation
+import TrailerJson
 
 @globalActor
 public enum RestActor {
@@ -13,7 +14,7 @@ enum RestAccess {
         var nextIncrement: TimeInterval
     }
 
-    static func getPagedData(at path: String, from server: ApiServer, startingFrom page: Int = 1, perPage: @MainActor @escaping ([JSON]?, Bool) async -> Bool) async -> DataResult {
+    static func getPagedData(at path: String, from server: ApiServer, startingFrom page: Int = 1, perPage: @MainActor @escaping ([TypedJson.Entry]?, Bool) async -> Bool) async -> DataResult {
         if path.isEmpty {
             // handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
             return .success(headers: [:], data: Data())
@@ -22,7 +23,7 @@ enum RestAccess {
         do {
             let p = page > 1 ? "\(path)?page=\(page)&per_page=100" : "\(path)?per_page=100"
             let (data, lastPage, result) = try await getData(in: p, from: server)
-            if await perPage(data as? [JSON], lastPage) || lastPage {
+            if await perPage(data?.potentialArray, lastPage) || lastPage {
                 return result
             } else {
                 return await getPagedData(at: path, from: server, startingFrom: page + 1, perPage: perPage)
@@ -34,14 +35,14 @@ enum RestAccess {
 
     static func testApi(to apiServer: ApiServer) async throws {
         let (data, _) = try await start(call: "/user", on: apiServer, triggeredByUser: true, attempts: 1)
-        if let d = data as? JSON, let userName = d["login"] as? String, let userId = d["id"] as? Int {
+        if let data, let userName = data.potentialString(named: "login"), let userId = data.potentialInt(named: "id") {
             if userName.isEmpty || userId <= 0 {
                 throw ApiError.noUserRecordFound
             }
         }
     }
 
-    static func getData(in path: String, from server: ApiServer) async throws -> (Any?, Bool, DataResult) {
+    static func getData(in path: String, from server: ApiServer) async throws -> (TypedJson.Entry?, Bool, DataResult) {
         Task { @MainActor in
             API.currentOperationCount += 1
         }
@@ -77,7 +78,7 @@ enum RestAccess {
         return (data, lastPage, result)
     }
 
-    static func getRawData(at path: String, from server: ApiServer) async throws -> (Any?, DataResult) {
+    static func getRawData(at path: String, from server: ApiServer) async throws -> (TypedJson.Entry?, DataResult) {
         if path.isEmpty {
             // handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
             return (nil, .success(headers: [:], data: Data()))
@@ -87,7 +88,7 @@ enum RestAccess {
         return (data, result)
     }
 
-    static func start(call path: String, on server: ApiServer, triggeredByUser: Bool, attempts: Int = 5) async throws -> (Any?, DataResult) {
+    static func start(call path: String, on server: ApiServer, triggeredByUser: Bool, attempts: Int = 5) async throws -> (TypedJson.Entry?, DataResult) {
         let apiServerLabel: String
         if server.lastSyncSucceeded || triggeredByUser {
             apiServerLabel = server.label.orEmpty
@@ -112,7 +113,7 @@ enum RestAccess {
         do {
             let output = try await HTTP.getJsonData(for: request, attempts: attempts)
             Logging.log("(\(apiServerLabel) GET \(expandedPath) - RESULT: \(output.result.logValue)")
-            return output
+            return (output.json, output.result)
 
         } catch {
             let error = error as NSError

@@ -1,6 +1,7 @@
 import CoreData
 @preconcurrency import CoreSpotlight
 import Lista
+import TrailerJson
 import TrailerQL
 
 #if canImport(UIKit)
@@ -105,14 +106,14 @@ class ListableItem: DataItem, Listable {
         repo = parent
 
         let info = node.jsonPayload
-        url = info["url"] as? String
-        number = info["number"] as? Int ?? 0
-        title = info["title"] as? String ?? "(No title)"
-        body = info["bodyText"] as? String
-        milestone = (info["milestone"] as? JSON)?["title"] as? String
-        draft = info["isDraft"] as? Bool ?? false
+        url = info.potentialString(named: "url")
+        number = info.potentialInt(named: "number") ?? 0
+        title = info.potentialString(named: "title") ?? "(No title)"
+        body = info.potentialString(named: "bodyText")
+        milestone = info.potentialObject(named: "milestone")?.potentialString(named: "title")
+        draft = info.potentialBool(named: "isDraft") ?? false
 
-        let newCondition: Int = switch info["state"] as? String {
+        let newCondition: Int = switch info.potentialString(named: "state") {
         case "MERGED": ItemCondition.merged.rawValue
         case "CLOSED": ItemCondition.closed.rawValue
         default: ItemCondition.open.rawValue
@@ -131,47 +132,47 @@ class ListableItem: DataItem, Listable {
 
         condition = newCondition
 
-        if let user = info["author"] as? JSON {
-            userLogin = user["login"] as? String
-            userAvatarUrl = user["avatarUrl"] as? String
-            userNodeId = user["id"] as? String
+        if let user = info.potentialObject(named: "author") {
+            userLogin = user.potentialString(named: "login")
+            userAvatarUrl = user.potentialString(named: "avatarUrl")
+            userNodeId = user.potentialString(named: "id")
         }
 
-        let i: [JSON] = if let assignees = (info["assignees"] as? JSON)?["edges"] as? [JSON] {
-            assignees.compactMap { $0["node"] as? JSON }
+        let i: [TypedJson.Entry] = if let assignees = info.potentialObject(named: "assignees")?.potentialArray(named: "edges") {
+            assignees.compactMap { $0.potentialObject(named: "node") }
         } else {
             []
         }
 
-        processAssignmentStatus(from: ["assignees": i], idField: "id")
+        processAssignmentStatus(from: .object(["assignees": .array(i)]), idField: "id")
 
         if node.updated {
             labels.removeAll() // so not set delete post sync action, as label may not just be a child to this item. Orphaned labels are nuked afterwards
         }
     }
 
-    final func baseSync(from info: JSON, in parentRepo: Repo) {
+    final func baseSync(from info: TypedJson.Entry, in parentRepo: Repo) {
         repo = parentRepo
-        url = info["url"] as? String
-        number = info["number"] as? Int ?? 0
-        title = info["title"] as? String ?? "(No title)"
-        body = info["body"] as? String
-        milestone = (info["milestone"] as? JSON)?["title"] as? String
-        draft = info["draft"] as? Bool ?? false
+        url = info.potentialString(named: "url")
+        number = info.potentialInt(named: "number") ?? 0
+        title = info.potentialString(named: "title") ?? "(No title)"
+        body = info.potentialString(named: "body")
+        milestone = info.potentialObject(named: "milestone")?.potentialString(named: "title")
+        draft = info.potentialBool(named: "draft") ?? false
 
-        if let userInfo = info["user"] as? JSON {
-            userLogin = userInfo["login"] as? String
-            userAvatarUrl = userInfo["avatar_url"] as? String
-            userNodeId = userInfo["node_id"] as? String
+        if let userInfo = info.potentialObject(named: "user") {
+            userLogin = userInfo.potentialString(named: "login")
+            userAvatarUrl = userInfo.potentialString(named: "avatar_url")
+            userNodeId = userInfo.potentialString(named: "node_id")
         }
 
         processAssignmentStatus(from: info, idField: "node_id")
     }
 
-    final func processAssignmentStatus(from info: JSON?, idField: String) {
-        let assigneeJson: [JSON]? = if let assignees = info?["assignees"] as? [JSON] {
+    final func processAssignmentStatus(from info: TypedJson.Entry?, idField: String) {
+        let assigneeJson: [TypedJson.Entry]? = if let assignees = info?.potentialArray(named: "assignees") {
             assignees
-        } else if let assignee = info?["assignee"] as? JSON {
+        } else if let assignee = info?.potentialObject(named: "assignee") {
             [assignee]
         } else {
             nil
@@ -187,12 +188,12 @@ class ListableItem: DataItem, Listable {
             let myTeamNames = Set(apiServer.teams.compactMap(\.slug))
 
             for assignee in assigneeJson {
-                if let name = assignee["login"] as? String, let assigneeId = assignee[idField] as? String {
+                if let name = assignee.potentialString(named: "login"), let assigneeId = assignee.potentialString(named: idField) {
                     if !directAssignmentToMe, assigneeId == myIdOnThisRepo {
                         directAssignmentToMe = true
                     }
                     directAssigneeNames.append(name)
-                } else if let name = assignee["slug"] as? String {
+                } else if let name = assignee.potentialString(named: "slug") {
                     if !teamAssignmentToMe, myTeamNames.contains(name) {
                         teamAssignmentToMe = true
                     }
@@ -1262,7 +1263,7 @@ class ListableItem: DataItem, Listable {
     }
 
     override static func shouldCreate(from node: Node) -> Bool {
-        if node.jsonPayload["state"] as? String == "OPEN" {
+        if node.jsonPayload.potentialString(named: "state") == "OPEN" {
             return true
         }
         node.creationSkipped = true

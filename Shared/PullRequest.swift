@@ -1,6 +1,7 @@
 import CoreData
 import Lista
 import TrailerQL
+import TrailerJson
 #if os(iOS)
     import UIKit
 #endif
@@ -76,37 +77,37 @@ final class PullRequest: ListableItem {
     static func sync(from nodes: Lista<Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
         syncItems(of: PullRequest.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { pr, node in
             guard node.created || node.updated,
-                  let parentId = node.parent?.id ?? (node.jsonPayload["repository"] as? JSON)?["id"] as? String,
+                  let parentId = node.parent?.id ?? node.jsonPayload.potentialObject(named: "repository")?.potentialString(named: "id"),
                   let parent = Repo.asParent(with: parentId, in: moc, parentCache: parentCache)
             else { return }
 
             let json = node.jsonPayload
 
-            if let mergeField = json["mergeable"] as? String {
+            if let mergeField = json.potentialString(named: "mergeable") {
                 pr.isMergeable = mergeField != "CONFLICTING"
             } else {
                 pr.isMergeable = true
             }
-            pr.linesAdded = json["additions"] as? Int ?? 0
-            pr.linesRemoved = json["deletions"] as? Int ?? 0
-            pr.mergeCommitSha = json["headRefOid"] as? String
-            pr.mergedByNodeId = (json["mergedBy"] as? JSON)?["id"] as? String
+            pr.linesAdded = json.potentialInt(named: "additions") ?? 0
+            pr.linesRemoved = json.potentialInt(named: "deletions") ?? 0
+            pr.mergeCommitSha = json.potentialString(named: "headRefOid")
+            pr.mergedByNodeId = json.potentialObject(named: "mergedBy")?.potentialString(named: "id")
             pr.baseNodeSync(node: node, parent: parent)
             pr.reviewers = "" // will be populated by the review request API calls
             pr.teamReviewers = "" // will be populated by the review request API calls
 
-            let headRefName = json["headRefName"] as? String
+            let headRefName = json.potentialString(named: "headRefName")
             if let headRefName,
-               let headRepoName = (json["headRepository"] as? JSON)?["nameWithOwner"] as? String {
+               let headRepoName = json.potentialObject(named: "headRepository")?.potentialString(named: "nameWithOwner") {
                 pr.headLabel = headRepoName + ":" + headRefName
             } else {
                 pr.headLabel = nil
             }
             pr.headRefName = headRefName
 
-            let baseRefName = json["baseRefName"] as? String
+            let baseRefName = json.potentialString(named: "baseRefName")
             if let baseRefName,
-               let baseRepoName = (json["baseRepository"] as? JSON)?["nameWithOwner"] as? String {
+               let baseRepoName = json.potentialObject(named: "baseRepository")?.potentialString(named: "nameWithOwner") {
                 pr.baseLabel = baseRepoName + ":" + baseRefName
             } else {
                 pr.baseLabel = nil
@@ -130,7 +131,7 @@ final class PullRequest: ListableItem {
         repo.apiUrl?.appending(pathComponent: "statuses").appending(pathComponent: mergeCommitSha.orEmpty)
     }
 
-    static func syncPullRequests(from data: [JSON]?, in repo: Repo, moc: NSManagedObjectContext) async {
+    static func syncPullRequests(from data: [TypedJson.Entry]?, in repo: Repo, moc: NSManagedObjectContext) async {
         let apiServer = repo.apiServer
         let apiServerUserId = apiServer.userNodeId
         let repoId = repo.objectID
@@ -139,20 +140,20 @@ final class PullRequest: ListableItem {
                 let repo = try! syncMoc.existingObject(with: repoId) as! Repo
                 item.baseSync(from: info, in: repo)
 
-                let baseInfo = info["base"] as? JSON
-                item.baseLabel = baseInfo?["label"] as? String
+                let baseInfo = info.potentialObject(named: "base")
+                item.baseLabel = baseInfo?.potentialString(named: "label")
 
-                let headInfo = info["head"] as? JSON
-                item.headRefName = headInfo?["ref"] as? String
-                item.headLabel = headInfo?["label"] as? String
+                let headInfo = info.potentialObject(named: "head")
+                item.headRefName = headInfo?.potentialString(named: "ref")
+                item.headLabel = headInfo?.potentialString(named: "label")
 
                 item.reviewers = ""
                 item.teamReviewers = ""
 
                 if
-                    let newHeadCommitSha = headInfo?["sha"] as? String,
-                    let commitUserInfo = headInfo?["user"] as? JSON,
-                    let newHeadCommitUserId = commitUserInfo["node_id"] as? String {
+                    let newHeadCommitSha = headInfo?.potentialString(named: "sha"),
+                    let commitUserInfo = headInfo?.potentialObject(named: "user"),
+                    let newHeadCommitUserId = commitUserInfo.potentialString(named: "node_id") {
                     let currentSha = item.mergeCommitSha
                     if currentSha != nil, currentSha != newHeadCommitSha, apiServerUserId != newHeadCommitUserId {
                         item.hasNewCommits = Settings.markPrsAsUnreadOnNewCommits && item.postSyncAction != PostSyncAction.isNew.rawValue

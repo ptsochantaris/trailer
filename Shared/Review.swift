@@ -1,6 +1,7 @@
 import CoreData
 import Lista
 import TrailerQL
+import TrailerJson
 
 final class Review: DataItem {
     @NSManaged var body: String?
@@ -28,13 +29,13 @@ final class Review: DataItem {
                 continue
             }
 
-            if let reviewerJson = node.jsonPayload["requestedReviewer"] as? JSON {
-                if let login = reviewerJson["login"] as? String {
+            if let reviewerJson = node.jsonPayload.potentialObject(named: "requestedReviewer") {
+                if let login = reviewerJson.potentialString(named: "login") {
                     var previous = prIdsToAssignedUsers[parentId]
                     previous?.insert(login)
                     prIdsToAssignedUsers[parentId] = previous ?? [login]
                 }
-                if let slug = reviewerJson["slug"] as? String {
+                if let slug = reviewerJson.potentialString(named: "slug") {
                     var previous = prIdsToAssignedTeams[parentId]
                     previous?.insert(slug)
                     prIdsToAssignedTeams[parentId] = previous ?? [slug]
@@ -57,10 +58,10 @@ final class Review: DataItem {
         syncItems(of: Review.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { review, node in
 
             let info = node.jsonPayload
-            if info.count == 3 { // this node is a blank container (id, comments, typename)
+            if (try? info.keys)?.count == 3 { // this node is a blank container (id, comments, typename)
                 return
             }
-            let newState = info["state"] as? String
+            let newState = info.potentialString(named: "state")
             review.check(newState: newState)
 
             guard node.created || node.updated,
@@ -75,8 +76,8 @@ final class Review: DataItem {
                 }
             }
 
-            review.body = info["body"] as? String
-            review.username = (info["author"] as? JSON)?["login"] as? String
+            review.body = info.potentialString(named: "body")
+            review.username = info.potentialObject(named: "author")?.potentialString(named: "login")
         }
     }
 
@@ -84,16 +85,16 @@ final class Review: DataItem {
         self
     }
 
-    static func syncReviews(from data: [JSON]?, withParent: PullRequest, moc: NSManagedObjectContext) async {
+    static func syncReviews(from data: [TypedJson.Entry]?, withParent: PullRequest, moc: NSManagedObjectContext) async {
         let parentId = withParent.objectID
         let apiServerId = withParent.apiServer.objectID
         await v3items(with: data, type: Review.self, serverId: apiServerId, moc: moc) { item, info, isNewOrUpdated, syncMoc in
             if isNewOrUpdated, let parent = try? syncMoc.existingObject(with: parentId) as? PullRequest {
                 item.pullRequest = parent
-                item.body = info["body"] as? String
-                item.username = (info["user"] as? JSON)?["login"] as? String
+                item.body = info.potentialString(named: "body")
+                item.username = info.potentialObject(named: "user")?.potentialString(named: "login")
             }
-            let newState = info["state"] as? String
+            let newState = info.potentialString(named: "state")
             item.check(newState: newState)
         }
     }

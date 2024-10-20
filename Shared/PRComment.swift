@@ -2,6 +2,7 @@ import CoreData
 import Foundation
 import Lista
 import TrailerQL
+import TrailerJson
 
 final class PRComment: DataItem {
     @NSManaged var avatarUrl: String?
@@ -43,18 +44,18 @@ final class PRComment: DataItem {
             }
 
             let info = node.jsonPayload
-            comment.body = info["body"] as? String
-            comment.webUrl = info["url"] as? String
+            comment.body = info.potentialString(named: "body")
+            comment.webUrl = info.potentialString(named: "url")
 
-            if let userInfo = info["author"] as? JSON {
-                comment.userName = userInfo["login"] as? String
-                comment.userNodeId = userInfo["id"] as? String
-                comment.avatarUrl = userInfo["avatarUrl"] as? String
+            if let userInfo = info.potentialObject(named: "author") {
+                comment.userName = userInfo.potentialString(named: "login")
+                comment.userNodeId = userInfo.potentialString(named: "id")
+                comment.avatarUrl = userInfo.potentialString(named: "avatarUrl")
             }
         }
     }
 
-    static func syncComments(from data: [JSON]?, parent: ListableItem, moc: NSManagedObjectContext) async {
+    static func syncComments(from data: [TypedJson.Entry]?, parent: ListableItem, moc: NSManagedObjectContext) async {
         let parentId = parent.objectID
         await v3items(with: data, type: PRComment.self, serverId: parent.apiServer.objectID, moc: moc) { item, info, newOrUpdated, syncMoc in
             if newOrUpdated, let parent = try? syncMoc.existingObject(with: parentId) as? ListableItem {
@@ -62,7 +63,7 @@ final class PRComment: DataItem {
                 item.issue = parent.asIssue
                 item.fill(from: info)
                 item.fastForwardIfNeeded(parent: parent)
-                item.reactionsUrl = (info["reactions"] as? JSON)?["url"] as? String
+                item.reactionsUrl = info.potentialObject(named: "reactions")?.potentialString(named: "url")
             }
         }
     }
@@ -107,27 +108,27 @@ final class PRComment: DataItem {
         NotificationQueue.add(type: .newComment, for: self)
     }
 
-    private func fill(from info: JSON) {
-        body = info["body"] as? String
+    private func fill(from info: TypedJson.Entry) {
+        body = info.potentialString(named: "body")
 
-        if let id = info["pull_request_review_id"] as? Int, let moc = managedObjectContext, let r = Review.review(with: id, in: moc) {
+        if let id = info.potentialInt(named: "pull_request_review_id"), let moc = managedObjectContext, let r = Review.review(with: id, in: moc) {
             review = r
         } else {
             review = nil
         }
 
-        if let userInfo = info["user"] as? JSON {
-            userName = userInfo["login"] as? String
-            avatarUrl = userInfo["avatar_url"] as? String
-            userNodeId = userInfo["node_id"] as? String
+        if let userInfo = info.potentialObject(named: "user") {
+            userName = userInfo.potentialString(named: "login")
+            avatarUrl = userInfo.potentialString(named: "avatar_url")
+            userNodeId = userInfo.potentialString(named: "node_id")
         }
 
-        if let href = info["html_url"] as? String {
+        if let href = info.potentialString(named: "html_url") {
             webUrl = href
 
-        } else if let links = info["_links"] as? JSON,
-                  let html = links["html"] as? JSON,
-                  let href = html["href"] as? String {
+        } else if let links = info.potentialObject(named: "_links"),
+                  let html = links.potentialObject(named: "html"),
+                  let href = html.potentialString(named: "href") {
             webUrl = href
         }
     }

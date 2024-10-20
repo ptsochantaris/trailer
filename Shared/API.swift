@@ -1,5 +1,6 @@
 import CommonCrypto
 import CoreData
+import TrailerJson
 
 extension String {
     private func sha1() -> Data {
@@ -200,10 +201,9 @@ enum API {
         syncMoc.undoManager = nil
         syncMoc.parent = DataManager.main
 
-        let useV4 = Settings.useV4API
-
         await HTTP.gateKeeper.setBonusTickets(8)
 
+        let useV4 = Settings.useV4API
         if useV4 {
             if canUseV4API(for: syncMoc) != nil {
                 return
@@ -211,7 +211,6 @@ enum API {
             if Settings.V4IdMigrationPhase == .pending {
                 await attemptV4Migration()
             }
-
             if Settings.threadedSync {
                 await GraphQL.multiGateKeeper.setBonusTickets(2)
             }
@@ -426,15 +425,15 @@ enum API {
     static func fetchRepo(fullName: String, from server: ApiServer, moc: NSManagedObjectContext) async throws {
         let path = "\(server.apiPath.orEmpty)/repos/\(fullName)"
         let (data, _, _) = try await RestAccess.getData(in: path, from: server)
-        if let repoData = data as? JSON {
-            await Repo.syncRepos(from: [repoData], server: server, addNewRepos: true, manuallyAdded: true, moc: moc)
+        if let data {
+            await Repo.syncRepos(from: [data], server: server, addNewRepos: true, manuallyAdded: true, moc: moc)
         }
     }
 
     static func fetchAllRepos(owner: String, from server: ApiServer, moc: NSManagedObjectContext) async throws {
         let userPath = "\(server.apiPath.orEmpty)/users/\(owner)/repos"
-        let userTask = Task { () -> [JSON] in
-            var userList = [JSON]()
+        let userTask = Task { () -> [TypedJson.Entry] in
+            var userList = [TypedJson.Entry]()
             let result = await RestAccess.getPagedData(at: userPath, from: server) { data, _ -> Bool in
                 if let data {
                     userList.append(contentsOf: data)
@@ -456,8 +455,8 @@ enum API {
         }
 
         let orgPath = "\(server.apiPath.orEmpty)/orgs/\(owner)/repos"
-        let orgTask = Task { () -> [JSON] in
-            var orgList = [JSON]()
+        let orgTask = Task { () -> [TypedJson.Entry] in
+            var orgList = [TypedJson.Entry]()
             let result = await RestAccess.getPagedData(at: orgPath, from: server) { data, _ -> Bool in
                 if let data {
                     orgList.append(contentsOf: data)
@@ -488,9 +487,9 @@ enum API {
         for apiServer in ApiServer.allApiServers(in: moc).filter(\.goodToGo) {
             do {
                 let (data, _, _) = try await RestAccess.getData(in: "/user", from: apiServer)
-                if let d = data as? JSON {
-                    apiServer.userName = d["login"] as? String
-                    apiServer.userNodeId = d["node_id"] as? String
+                if let data {
+                    apiServer.userName = data.potentialString(named: "login")
+                    apiServer.userNodeId = data.potentialString(named: "node_id")
                 } else {
                     apiServer.lastSyncSucceeded = false
                 }

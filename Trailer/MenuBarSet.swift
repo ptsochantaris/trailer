@@ -192,7 +192,7 @@ final class MenuBarSet {
         }
     }
 
-    private func compare(dictionary from: JSON, to: JSON) -> Bool {
+    private func compare(dictionary from: [String: Sendable], to: [String: Sendable]) -> Bool {
         for (key, value) in from {
             if let v = to[key] {
                 if String(describing: v) != String(describing: value) {

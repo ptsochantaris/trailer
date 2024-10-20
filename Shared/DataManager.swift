@@ -346,7 +346,7 @@ enum DataManager {
         }
     }
 
-    static func info(for item: DataItem) -> JSON {
+    static func info(for item: DataItem) -> [String: Sendable] {
         if let item = item.asComment {
             let uri = item.objectID.uriRepresentation().absoluteString
             let parentUri = (item.parent?.objectID.uriRepresentation().absoluteString).orEmpty

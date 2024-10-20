@@ -1,4 +1,5 @@
 import CoreData
+import TrailerJson
 
 final class Team: DataItem {
     @NSManaged var slug: String?
@@ -16,10 +17,10 @@ final class Team: DataItem {
         return try? moc.fetch(f).first
     }
 
-    static func syncTeams(from data: [JSON]?, serverId: NSManagedObjectID, moc: NSManagedObjectContext) async {
+    static func syncTeams(from data: [TypedJson.Entry]?, serverId: NSManagedObjectID, moc: NSManagedObjectContext) async {
         await v3items(with: data, type: Team.self, serverId: serverId, moc: moc) { item, info, _, _ in
-            let slug = (info["slug"] as? String).orEmpty
-            let org = ((info["organization"] as? JSON)?["login"] as? String).orEmpty
+            let slug = info.potentialString(named: "slug").orEmpty
+            let org = (info.potentialObject(named: "organization")?.potentialString(named: "login")).orEmpty
             item.slug = slug
             item.organisationLogin = org
             if slug.isEmpty || org.isEmpty {

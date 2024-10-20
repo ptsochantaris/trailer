@@ -4,6 +4,7 @@ import TrailerQL
 #if os(iOS)
     import UIKit
 #endif
+import TrailerJson
 
 final class Issue: ListableItem {
     @NSManaged var closedByPullRequests: Set<PullRequest>
@@ -32,7 +33,7 @@ final class Issue: ListableItem {
                     return
                 }
 
-            } else if let repoJson = node.jsonPayload["repository"] as? JSON, let pid = repoJson["id"] as? String {
+            } else if let pid = node.jsonPayload.potentialObject(named: "repository")?.potentialString(named: "id") {
                 parentId = pid
             } else {
                 return
@@ -46,11 +47,11 @@ final class Issue: ListableItem {
         }
     }
 
-    static func syncIssues(from data: [JSON]?, in repo: Repo, moc: NSManagedObjectContext) async {
+    static func syncIssues(from data: [TypedJson.Entry]?, in repo: Repo, moc: NSManagedObjectContext) async {
         let apiServer = repo.apiServer
         let repoId = repo.objectID
 
-        let filteredData = data?.filter { $0["pull_request"] == nil } // don't sync issues which are pull requests, they are already synced
+        let filteredData = data?.filter { (try? $0.keys.contains("pull_request")) == false } // don't sync issues which are pull requests, they are already synced
         await v3items(with: filteredData, type: Issue.self, serverId: apiServer.objectID, prefetchRelationships: ["labels"], moc: moc) { item, info, isNewOrUpdated, syncMoc in
             if isNewOrUpdated, let repo = try? syncMoc.existingObject(with: repoId) as? Repo {
                 item.baseSync(from: info, in: repo)

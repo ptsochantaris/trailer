@@ -2,6 +2,7 @@ import CoreData
 import UIKit
 import WatchConnectivity
 
+@MainActor
 final class WatchManager: NSObject, WCSessionDelegate {
     private var session: WCSession?
 
@@ -20,17 +21,17 @@ final class WatchManager: NSObject, WCSessionDelegate {
         }
     }
 
-    func session(_: WCSession, activationDidCompleteWith _: WCSessionActivationState, error _: Error?) {}
+    nonisolated func session(_: WCSession, activationDidCompleteWith _: WCSessionActivationState, error _: Error?) {}
 
-    func sessionDidDeactivate(_: WCSession) {}
+    nonisolated func sessionDidDeactivate(_: WCSession) {}
 
-    func sessionDidBecomeInactive(_: WCSession) {}
+    nonisolated func sessionDidBecomeInactive(_: WCSession) {}
 
     private var overviewPath: URL {
         DataManager.dataFilesDirectory.appendingPathComponent("overview.plist")
     }
 
-    func session(_: WCSession, didReceiveMessage message: JSON, replyHandler: @escaping (JSON) -> Void) {
+    nonisolated func session(_: WCSession, didReceiveMessage message: [String: Any], replyHandler: @escaping ([String: Any]) -> Void) {
         Task {
             let reply = await handle(message: message, settings: Settings.cache)
             replyHandler(reply)
@@ -43,8 +44,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
         }
     }
 
-    @MainActor
-    private func handle(message: JSON, settings: Settings.Cache) async -> JSON {
+    private func handle(message: [String: Sendable], settings: Settings.Cache) async -> [String: Sendable] {
         switch (message["command"] as? String).orEmpty {
         case "refresh":
             let status = await app.startRefresh()
@@ -110,9 +110,8 @@ final class WatchManager: NSObject, WCSessionDelegate {
         }
     }
 
-    @MainActor
-    private func processList(message: JSON, settings: Settings.Cache) async -> JSON {
-        var result = JSON()
+    private func processList(message: [String: Sendable], settings: Settings.Cache) async -> [String: Sendable] {
+        var result = [String: Sendable]()
 
         switch (message["list"] as? String).orEmpty {
         case "overview":
@@ -144,14 +143,14 @@ final class WatchManager: NSObject, WCSessionDelegate {
         }
     }
 
-    private func reportFailure(reason: String, result: JSON) -> JSON {
+    private func reportFailure(reason: String, result: [String: Sendable]) -> [String: Sendable] {
         var r = result
         r["error"] = true
         r["status"] = reason
         return r
     }
 
-    private func reportSuccess(result: JSON) -> JSON {
+    private func reportSuccess(result: [String: Sendable]) -> [String: Sendable] {
         var r = result
         r["status"] = "Success"
         return r
@@ -159,8 +158,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
 
     ////////////////////////////
 
-    @MainActor
-    private func buildItemList(type: String, sectionIndex: Int, from: Int, apiServerUri: String, group: String, count: Int, onlyUnread: Bool, settings: Settings.Cache) async -> JSON {
+    private func buildItemList(type: String, sectionIndex: Int, from: Int, apiServerUri: String, group: String, count: Int, onlyUnread: Bool, settings: Settings.Cache) async -> [String: Sendable] {
         let showLabels = Settings.showLabels
         let entity: ListableItem.Type = if type == "prs" {
             PullRequest.self
@@ -187,12 +185,11 @@ final class WatchManager: NSObject, WCSessionDelegate {
         return ["result": compressedData]
     }
 
-    @MainActor
-    private func baseDataForItem(item: ListableItem, showLabels: Bool, settings: Settings.Cache) -> JSON {
+    private func baseDataForItem(item: ListableItem, showLabels: Bool, settings: Settings.Cache) -> [String: Sendable] {
         let font = UIFont.systemFont(ofSize: UIFont.systemFontSize)
         let smallFont = UIFont.systemFont(ofSize: UIFont.systemFontSize - 4)
 
-        var itemData: JSON = [
+        var itemData: [String: Sendable] = [
             "commentCount": item.totalComments,
             "unreadCount": item.unreadComments,
             "localId": item.objectID.uriRepresentation().absoluteString,
@@ -211,9 +208,8 @@ final class WatchManager: NSObject, WCSessionDelegate {
         return itemData
     }
 
-    @MainActor
-    private func labelsForItem(item: ListableItem) -> [JSON] {
-        var labels = [JSON]()
+    private func labelsForItem(item: ListableItem) -> [[String: Sendable]] {
+        var labels = [[String: Sendable]]()
         for l in item.labels {
             labels.append([
                 "color": l.colorForDisplay,
@@ -223,9 +219,8 @@ final class WatchManager: NSObject, WCSessionDelegate {
         return labels
     }
 
-    @MainActor
-    private func statusLinesForPr(pr: PullRequest, settings: Settings.Cache) -> [JSON] {
-        var statusLines = [JSON]()
+    private func statusLinesForPr(pr: PullRequest, settings: Settings.Cache) -> [[String: Sendable]] {
+        var statusLines = [[String: Sendable]]()
         for status in pr.displayedStatusLines(settings: settings) {
             statusLines.append([
                 "color": status.colorForDisplay,
@@ -237,7 +232,6 @@ final class WatchManager: NSObject, WCSessionDelegate {
 
     /////////////////////////////
 
-    @MainActor
     private func buildItemDetail(localId: String, settings: Settings.Cache) -> Data? {
         if let oid = DataManager.id(for: localId), let item = try? DataManager.main.existingObject(with: oid) as? ListableItem {
             var result = baseDataForItem(item: item, showLabels: Settings.showLabels, settings: settings)
@@ -249,9 +243,8 @@ final class WatchManager: NSObject, WCSessionDelegate {
         return nil
     }
 
-    @MainActor
-    private func commentsForItem(item: ListableItem) -> [JSON] {
-        var comments = [JSON]()
+    private func commentsForItem(item: ListableItem) -> [[String: Sendable]] {
+        var comments = [[String: Sendable]]()
         for comment in item.sortedComments(using: .orderedDescending) {
             comments.append([
                 "user": comment.userName.orEmpty,
@@ -265,12 +258,11 @@ final class WatchManager: NSObject, WCSessionDelegate {
 
     //////////////////////////////
 
-    @MainActor
-    private func buildOverview(settings: Settings.Cache) async -> JSON {
+    private func buildOverview(settings: Settings.Cache) async -> [String: Sendable] {
         let allViewCriteria = popupManager.masterController.allTabSets.map(\.viewCriterion)
 
         return await DataManager.runInChild(of: DataManager.main) { tempMoc in
-            var views = [JSON]()
+            var views = [[String: Sendable]]()
             var totalUnreadPrCount = 0
             var totalUnreadIssueCount = 0
 
@@ -305,14 +297,14 @@ final class WatchManager: NSObject, WCSessionDelegate {
                     "merged": mergedPrs, "closed": closedPrs, "other": otherPrs, "snoozed": snoozedPrs,
                     "total": totalPrs, "total_open": totalOpenPrs, "unread": unreadPrCount,
                     "error": totalPrs == 0 ? PullRequest.reasonForEmpty(with: nil, criterion: c).string : ""
-                ] as JSON
+                ] as [String: Sendable]
 
                 let issueList = [
                     "mine": myIssues, "participated": participatedIssues, "mentioned": mentionedIssues,
                     "closed": closedIssues, "other": otherIssues, "snoozed": snoozedIssues,
                     "total": totalIssues, "total_open": totalOpenIssues, "unread": unreadIssueCount,
                     "error": totalIssues == 0 ? Issue.reasonForEmpty(with: nil, criterion: c).string : ""
-                ] as JSON
+                ] as [String: Sendable]
 
                 views.append([
                     "title": (c?.label).orEmpty,
@@ -333,13 +325,11 @@ final class WatchManager: NSObject, WCSessionDelegate {
         }
     }
 
-    @MainActor
     private static func counts(for type: (some ListableItem).Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext, settings: Settings.Cache) -> [String: Int] {
         ["total": countItems(of: type, in: section, criterion: criterion, moc: moc, settings: settings),
          "unread": badgeCount(for: type, in: section, criterion: criterion, moc: moc, settings: settings)]
     }
 
-    @MainActor
     private static func countallItems<T: ListableItem>(of type: T.Type, criterion: GroupingCriterion?, moc: NSManagedObjectContext, settings: Settings.Cache) -> Int {
         let f = NSFetchRequest<T>(entityName: type.typeName)
         f.includesSubentities = false
@@ -350,7 +340,6 @@ final class WatchManager: NSObject, WCSessionDelegate {
         return try! moc.count(for: f)
     }
 
-    @MainActor
     private static func countItems<T: ListableItem>(of type: T.Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext, settings: Settings.Cache) -> Int {
         let f = NSFetchRequest<T>(entityName: type.typeName)
         f.includesSubentities = false
@@ -361,7 +350,6 @@ final class WatchManager: NSObject, WCSessionDelegate {
         return try! moc.count(for: f)
     }
 
-    @MainActor
     private static func badgeCount<T: ListableItem>(for type: T.Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext, settings: Settings.Cache) -> Int {
         let f = NSFetchRequest<T>(entityName: type.typeName)
         f.includesSubentities = false
@@ -370,7 +358,6 @@ final class WatchManager: NSObject, WCSessionDelegate {
         return ListableItem.badgeCount(from: f, in: moc)
     }
 
-    @MainActor
     private static func countOpenAndVisible<T: ListableItem>(of type: T.Type, criterion: GroupingCriterion?, moc: NSManagedObjectContext, settings: Settings.Cache) -> Int {
         let f = NSFetchRequest<T>(entityName: type.typeName)
         f.includesSubentities = false

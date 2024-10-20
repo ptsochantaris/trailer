@@ -4,6 +4,7 @@ import TrailerQL
 #if os(iOS)
     import UIKit
 #endif
+import TrailerJson
 
 final class PRLabel: DataItem {
     @NSManaged var color: Int
@@ -31,8 +32,8 @@ final class PRLabel: DataItem {
 
             if node.created || node.updated {
                 let info = node.jsonPayload
-                label.name = info["name"] as? String
-                if let c = info["color"] as? String {
+                label.name = info.potentialString(named: "name")
+                if let c = info.potentialString(named: "color") {
                     label.color = PRLabel.parse(from: c)
                 } else {
                     label.color = 0
@@ -41,14 +42,14 @@ final class PRLabel: DataItem {
         }
     }
 
-    private static func labels(from data: [JSON]?, fromParent: ListableItem, postProcessCallback: (PRLabel, JSON) -> Void) {
+    private static func labels(from data: [TypedJson.Entry]?, fromParent: ListableItem, postProcessCallback: (PRLabel, TypedJson.Entry) -> Void) {
         guard let data, !data.isEmpty else { return }
 
         var namesOfItems = [String]()
-        var namesToInfo = [String: JSON]()
+        var namesToInfo = [String: TypedJson.Entry]()
         namesToInfo.reserveCapacity(data.count)
         for info in data {
-            if let name = info["name"] as? String {
+            if let name = info.potentialString(named: "name") {
                 namesOfItems.append(name)
                 namesToInfo[name] = info
             }
@@ -70,7 +71,7 @@ final class PRLabel: DataItem {
             if let name = i.name, let idx = namesOfItems.firstIndex(of: name), let info = namesToInfo[name] {
                 namesOfItems.remove(at: idx)
                 Logging.log("Updating Label: \(name)")
-                if i.nodeId == nil, let nodeId = info["node_id"] as? String { // migrate
+                if i.nodeId == nil, let nodeId = info.potentialString(named: "node_id") { // migrate
                     i.nodeId = nodeId
                     Logging.log("Migrated label '\(name)' with node ID \(nodeId)")
                 }
@@ -83,7 +84,7 @@ final class PRLabel: DataItem {
                 Logging.log("Creating Label: \(name)")
                 let i = NSEntityDescription.insertNewObject(forEntityName: "PRLabel", into: fromParent.managedObjectContext!) as! PRLabel
                 i.name = name
-                i.nodeId = info["node_id"] as? String
+                i.nodeId = info.potentialString(named: "node_id")
                 i.updatedAt = .distantPast
                 i.createdAt = .distantPast
                 i.apiServer = fromParent.apiServer
@@ -93,9 +94,9 @@ final class PRLabel: DataItem {
         }
     }
 
-    static func syncLabels(from info: [JSON]?, withParent: ListableItem) {
+    static func syncLabels(from info: [TypedJson.Entry]?, withParent: ListableItem) {
         labels(from: info, fromParent: withParent) { label, info in
-            if let c = info["color"] as? String {
+            if let c = info.potentialString(named: "color") {
                 label.color = parse(from: c)
             } else {
                 label.color = 0

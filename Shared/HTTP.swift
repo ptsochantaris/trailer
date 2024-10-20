@@ -3,8 +3,6 @@ import Maintini
 import Semalot
 import TrailerJson
 
-typealias JSON = [String: Sendable]
-
 enum DataResult {
     case success(headers: [AnyHashable: Any], data: Data), notFound, deleted, failed(code: Int), cancelled, ignored
 
@@ -54,7 +52,7 @@ enum HTTP {
         return URLSession(configuration: config)
     }()
 
-    static func getJsonData(for request: URLRequest, attempts: Int, logPrefix: String? = nil, retryOnInvalidJson: Bool = false) async throws -> (json: Sendable?, result: DataResult) {
+    static func getJsonData(for request: URLRequest, attempts: Int, logPrefix: String? = nil, retryOnInvalidJson: Bool = false) async throws -> (json: TypedJson.Entry?, result: DataResult) {
         await gateKeeper.takeTicket()
         defer {
             gateKeeper.returnTicket()
@@ -70,7 +68,7 @@ enum HTTP {
         }
 
         do {
-            let json = try await Task.detached { try data.withUnsafeBytes { try TrailerJson.parse(bytes: $0) } }.value
+            let json = try await Task.detached { try data.asTypedJson() }.value
             return (json, result)
         } catch {
             if retryOnInvalidJson, attempts > 1 {

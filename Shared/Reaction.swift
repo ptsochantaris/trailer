@@ -1,6 +1,7 @@
 import CoreData
 import Lista
 import TrailerQL
+import TrailerJson
 
 final class Reaction: DataItem {
     @NSManaged var content: String?
@@ -31,12 +32,12 @@ final class Reaction: DataItem {
             }
 
             let info = node.jsonPayload
-            reaction.content = info["content"] as? String
+            reaction.content = info.potentialString(named: "content")
 
-            if let user = info["user"] as? JSON {
-                reaction.userName = user["login"] as? String
-                reaction.avatarUrl = user["avatarUrl"] as? String
-                reaction.userNodeId = user["id"] as? String
+            if let user = info.potentialObject(named: "user") {
+                reaction.userName = user.potentialString(named: "login")
+                reaction.avatarUrl = user.potentialString(named: "avatarUrl")
+                reaction.userNodeId = user.potentialString(named: "id")
             }
         }
     }
@@ -45,7 +46,7 @@ final class Reaction: DataItem {
         self
     }
 
-    static func syncReactions(from data: [JSON]?, commentId: NSManagedObjectID, serverId: NSManagedObjectID, moc: NSManagedObjectContext) async {
+    static func syncReactions(from data: [TypedJson.Entry]?, commentId: NSManagedObjectID, serverId: NSManagedObjectID, moc: NSManagedObjectContext) async {
         await v3items(with: data, type: Reaction.self, serverId: serverId, moc: moc) { item, info, isNewOrUpdated, syncMoc in
             if isNewOrUpdated, let parent = try? syncMoc.existingObject(with: commentId) as? PRComment {
                 item.pullRequest = nil
@@ -56,7 +57,7 @@ final class Reaction: DataItem {
         }
     }
 
-    static func syncReactions(from data: [JSON]?, parentId: NSManagedObjectID, serverId: NSManagedObjectID, moc: NSManagedObjectContext) async {
+    static func syncReactions(from data: [TypedJson.Entry]?, parentId: NSManagedObjectID, serverId: NSManagedObjectID, moc: NSManagedObjectContext) async {
         await v3items(with: data, type: Reaction.self, serverId: serverId, moc: moc) { item, info, isNewOrUpdated, syncMoc in
             if isNewOrUpdated {
                 let parent = try! syncMoc.existingObject(with: parentId) as? ListableItem
@@ -68,12 +69,12 @@ final class Reaction: DataItem {
         }
     }
 
-    private func fill(from info: JSON) {
-        content = info["content"] as? String
-        if let user = info["user"] as? JSON {
-            userName = user["login"] as? String
-            avatarUrl = user["avatar_url"] as? String
-            userNodeId = user["node_id"] as? String
+    private func fill(from info: TypedJson.Entry) {
+        content = info.potentialString(named: "content")
+        if let user = info.potentialObject(named: "user") {
+            userName = user.potentialString(named: "login")
+            avatarUrl = user.potentialString(named: "avatar_url")
+            userNodeId = user.potentialString(named: "node_id")
         }
     }
 
@@ -93,7 +94,7 @@ final class Reaction: DataItem {
         userNodeId == apiServer.userNodeId
     }
 
-    static func changesDetected(in reactions: Set<Reaction>, from info: JSON) -> String? {
+    static func changesDetected(in reactions: Set<Reaction>, from info: TypedJson.Entry) -> String? {
         var counts = [String: Int]()
         for r in reactions {
             if let c = r.content {
@@ -106,10 +107,10 @@ final class Reaction: DataItem {
         }
 
         for type in ["+1", "-1", "laugh", "confused", "heart", "hooray", "rocket", "eyes", "thumbs_up", "thumbs_down"] {
-            let serverCount = info[type] as? Int ?? 0
+            let serverCount = info.potentialInt(named: type) ?? 0
             let localCount = counts[type] ?? 0
             if serverCount != localCount {
-                return info["url"] as? String
+                return info.potentialString(named: "url")
             }
         }
 

@@ -1,5 +1,6 @@
 import CoreData
 import Foundation
+import TrailerJson
 
 extension API {
     private static func handleRepoSync(for repo: Repo, result: DataResult) {
@@ -81,14 +82,14 @@ extension API {
                             for i in r.issues {
                                 i.setToUpdatedIfIdle()
                             }
-                            r.lastScannedIssueEventId = data.first!["id"] as? Int ?? 0
+                            r.lastScannedIssueEventId = data.first!.potentialInt(named: "id") ?? 0
                             return true
 
                         } else {
                             var numbers = Set<Int>()
                             var foundLastEvent = false
                             for event in data {
-                                if let eventId = event["id"] as? Int, let issue = event["issue"] as? JSON, let issueNumber = issue["number"] as? Int {
+                                if let eventId = event.potentialInt(named: "id"), let issue = event.potentialObject(named: "issue"), let issueNumber = issue.potentialInt(named: "number") {
                                     if r.lastScannedIssueEventId == 0 {
                                         r.lastScannedIssueEventId = eventId
                                     }
@@ -97,7 +98,7 @@ extension API {
                                         Logging.log("Parsed all repo issue events up to the one we already have")
                                         break // we're done
                                     }
-                                    if event["event"] is String {
+                                    if event.potentialString(named: "event") != nil {
                                         numbers.insert(issueNumber)
                                     }
                                 }
@@ -408,8 +409,8 @@ extension API {
             let (data, _, result) = try await RestAccess.getData(in: path, from: pullRequest.apiServer)
             switch result {
             case .success:
-                if let d = data as? JSON {
-                    if let mergeInfo = d["merged_by"] as? JSON, let mergeUserId = mergeInfo["node_id"] as? String {
+                if let data {
+                    if let mergeInfo = data.potentialObject(named: "merged_by"), let mergeUserId = mergeInfo.potentialString(named: "node_id") {
                         pullRequest.mergedByNodeId = mergeUserId
                         pullRequest.stateChanged = ListableItem.StateChange.merged.rawValue
                         pullRequest.postSyncAction = PostSyncAction.isUpdated.rawValue // let handleMerging() decide
@@ -458,19 +459,19 @@ extension API {
                     var reviewUsers = Set<String>()
                     var reviewTeams = Set<String>()
 
-                    if let userList = data as? [JSON] {
+                    if let userList = data?.potentialArray {
                         // Legacy API results
-                        for userName in userList.compactMap({ $0["login"] as? String }) {
+                        for userName in userList.compactMap({ $0.potentialString(named: "login") }) {
                             reviewUsers.insert(userName)
                         }
                         p.checkAndStoreReviewAssignments(reviewUsers, reviewTeams)
 
-                    } else if let data = data as? JSON, let userList = data["users"] as? [JSON], let teamList = data["teams"] as? [JSON] {
+                    } else if let data, let userList = data.potentialArray(named: "users"), let teamList = data.potentialArray(named: "teams") {
                         // New API results
-                        for userName in userList.compactMap({ $0["login"] as? String }) {
+                        for userName in userList.compactMap({ $0.potentialString(named: "login") }) {
                             reviewUsers.insert(userName)
                         }
-                        for teamName in teamList.compactMap({ $0["slug"] as? String }) {
+                        for teamName in teamList.compactMap({ $0.potentialString(named: "slug") }) {
                             reviewTeams.insert(teamName)
                         }
                         p.checkAndStoreReviewAssignments(reviewUsers, reviewTeams)
@@ -593,8 +594,8 @@ extension API {
                     group.addTask { @MainActor in
                         do {
                             let (data, _, _) = try await RestAccess.getData(in: issueLink, from: apiServer)
-                            if let d = data as? JSON {
-                                p.processAssignmentStatus(from: d, idField: "node_id")
+                            if let data {
+                                p.processAssignmentStatus(from: data, idField: "node_id")
                             }
                         } catch {
                             apiServer.lastSyncSucceeded = false

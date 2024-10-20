@@ -44,6 +44,7 @@ extension NSAttributedString.Key {
 }
 
 import KeyVine
+import TrailerJson
 
 nonisolated(unsafe) var keyVine = KeyVine(appIdentifier: "com.housetrip.Trailer", teamId: "X727JSJUGJ")
 
@@ -310,13 +311,13 @@ struct ApiStats {
         return ApiStats(nodeCount: 0, cost: 1, remaining: remaining, limit: limit, resetAt: date, migratedIds: nil)
     }
 
-    static func fromV4(json: JSON?, migratedIds: [String: String]?) -> ApiStats? {
-        guard let info = json?["rateLimit"] as? JSON else { return nil }
-        let date = apiDateFormatter.date(from: info["resetAt"].stringOrEmpty)
-        return ApiStats(nodeCount: info["nodeCount"] as? Int ?? 0,
-                        cost: info["cost"] as? Int ?? 0,
-                        remaining: info["remaining"] as? Int ?? 10000,
-                        limit: info["limit"] as? Int ?? 10000,
+    static func fromV4(json: TypedJson.Entry?, migratedIds: [String: String]?) -> ApiStats? {
+        guard let info = json?.potentialObject(named: "rateLimit") else { return nil }
+        let date = apiDateFormatter.date(from: info.potentialString(named: "resetAt") ?? "")
+        return ApiStats(nodeCount: info.potentialInt(named: "nodeCount") ?? 0,
+                        cost: info.potentialInt(named: "cost") ?? 0,
+                        remaining: info.potentialInt(named: "remaining") ?? 10000,
+                        limit: info.potentialInt(named: "limit") ?? 10000,
                         resetAt: date,
                         migratedIds: migratedIds)
     }

@@ -1,6 +1,7 @@
 import CoreData
 import Lista
 import TrailerQL
+import TrailerJson
 
 final class Repo: DataItem {
     @NSManaged var fork: Bool
@@ -44,12 +45,12 @@ final class Repo: DataItem {
 
             if node.created || node.updated {
                 let json = node.jsonPayload
-                repo.fullName = json["nameWithOwner"] as? String
-                repo.fork = json["fork"] as? Bool ?? false
-                repo.webUrl = json["url"] as? String
+                repo.fullName = json.potentialString(named: "nameWithOwner")
+                repo.fork = json.potentialBool(named: "fork") ?? false
+                repo.webUrl = json.potentialString(named: "url")
                 repo.inaccessible = false
-                repo.archived = json["isArchived"] as? Bool ?? false
-                repo.ownerNodeId = (json["owner"] as? JSON)?["id"] as? String
+                repo.archived = json.potentialBool(named: "isArchived") ?? false
+                repo.ownerNodeId = json.potentialObject(named: "owner")?.potentialString(named: "id")
                 if node.created {
                     repo.displayPolicyForPrs = Settings.displayPolicyForNewPrs.rawValue
                     repo.displayPolicyForIssues = Settings.displayPolicyForNewIssues.rawValue
@@ -65,17 +66,17 @@ final class Repo: DataItem {
         }
     }
 
-    static func syncRepos(from data: [JSON]?, server: ApiServer, addNewRepos: Bool, manuallyAdded: Bool, moc: NSManagedObjectContext) async {
+    static func syncRepos(from data: [TypedJson.Entry]?, server: ApiServer, addNewRepos: Bool, manuallyAdded: Bool, moc: NSManagedObjectContext) async {
         let filteredData = data?.filter { info -> Bool in
-            if info["private"] as? Bool ?? false {
-                if let permissions = info["permissions"] as? JSON {
-                    let pull = permissions["pull"] as? Bool ?? false
-                    let push = permissions["push"] as? Bool ?? false
-                    let admin = permissions["admin"] as? Bool ?? false
+            if info.potentialBool(named: "private") ?? false {
+                if let permissions = info.potentialObject(named: "permissions") {
+                    let pull = permissions.potentialBool(named: "pull") ?? false
+                    let push = permissions.potentialBool(named: "push") ?? false
+                    let admin = permissions.potentialBool(named: "admin") ?? false
 
                     if pull || push || admin {
                         return true
-                    } else if let fullName = info["full_name"] as? String {
+                    } else if let fullName = info.potentialString(named: "full_name") {
                         Logging.log("Watched private repository '\(fullName)' seems to be inaccessible, skipping")
                     }
                 }
@@ -87,12 +88,12 @@ final class Repo: DataItem {
 
         await v3items(with: filteredData, type: Repo.self, serverId: server.objectID, createNewItems: addNewRepos, moc: moc) { item, info, newOrUpdated, _ in
             if newOrUpdated {
-                item.fullName = info["full_name"] as? String
-                item.fork = info["fork"] as? Bool ?? false
-                item.webUrl = info["html_url"] as? String
+                item.fullName = info.potentialString(named: "full_name")
+                item.fork = info.potentialBool(named: "fork") ?? false
+                item.webUrl = info.potentialString(named: "html_url")
                 item.inaccessible = false
-                item.archived = info["archived"] as? Bool ?? false
-                item.ownerNodeId = (info["owner"] as? JSON)?["node_id"] as? String
+                item.archived = info.potentialBool(named: "archived") ?? false
+                item.ownerNodeId = info.potentialObject(named: "owner")?.potentialString(named: "node_id")
                 item.manuallyAdded = manuallyAdded
                 if item.postSyncAction == PostSyncAction.isNew.rawValue {
                     item.displayPolicyForPrs = Settings.displayPolicyForNewPrs.rawValue

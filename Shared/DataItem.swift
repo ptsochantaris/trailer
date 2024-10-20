@@ -1,6 +1,7 @@
 import CoreData
 import Lista
 import TrailerQL
+import TrailerJson
 
 final class FetchCache {
     private var store = [String: NSManagedObject]()
@@ -209,19 +210,19 @@ class DataItem: NSManagedObject, Querying {
         }
     }
 
-    static func v3items<T: DataItem>(with data: [JSON]?,
+    static func v3items<T: DataItem>(with data: [TypedJson.Entry]?,
                                      type _: T.Type,
                                      serverId: NSManagedObjectID,
                                      prefetchRelationships: [String]? = nil,
                                      createNewItems: Bool = true,
                                      moc: NSManagedObjectContext,
-                                     postProcessCallback: @escaping (T, JSON, Bool, NSManagedObjectContext) -> Void) async {
+                                     postProcessCallback: @escaping (T, TypedJson.Entry, Bool, NSManagedObjectContext) -> Void) async {
         guard let data, !data.isEmpty else { return }
 
-        var nodeIdsToInfo = [String: JSON]()
+        var nodeIdsToInfo = [String: TypedJson.Entry]()
         nodeIdsToInfo.reserveCapacity(data.count)
         for info in data {
-            let nodeId = info["node_id"] as! String
+            let nodeId = info.potentialString(named: "node_id")!
             nodeIdsToInfo[nodeId] = info
         }
 
@@ -242,7 +243,7 @@ class DataItem: NSManagedObject, Querying {
 
             for i in existingItems {
                 if let nodeId = i.nodeId, let info = nodeIdsToInfo[nodeId] {
-                    let updatedDate = DataItem.parseGH8601(info["updated_at"] as? String) ?? i.createdAt ?? now
+                    let updatedDate = DataItem.parseGH8601(info.potentialString(named: "updated_at")) ?? i.createdAt ?? now
                     if updatedDate != i.updatedAt {
                         Logging.log("Updating \(entityName): \(nodeId) (v3)")
                         i.postSyncAction = PostSyncAction.isUpdated.rawValue
@@ -267,8 +268,8 @@ class DataItem: NSManagedObject, Querying {
                     i.apiServer = apiServer
                     i.nodeId = nodeId
 
-                    i.createdAt = DataItem.parseGH8601(info["created_at"] as? String) ?? now
-                    i.updatedAt = DataItem.parseGH8601(info["updated_at"] as? String) ?? i.createdAt
+                    i.createdAt = DataItem.parseGH8601(info.potentialString(named: "created_at")) ?? now
+                    i.updatedAt = DataItem.parseGH8601(info.potentialString(named: "updated_at")) ?? i.createdAt
 
                     postProcessCallback(i, info, true, child)
                 }
@@ -342,16 +343,16 @@ class DataItem: NSManagedObject, Querying {
 
         if node.created {
             nodeId = node.id
-            if !alternativeDate, let created = info["createdAt"] as? String {
+            if !alternativeDate, let created = info.potentialString(named: "createdAt") {
                 createdAt = DataItem.parseGH8601(created)!
             }
         }
 
-        if alternativeDate, let created = (info["completedAt"] ?? info["startedAt"]) as? String {
+        if alternativeDate, let created = info.potentialString(named: "completedAt") ?? info.potentialString(named: "startedAt") {
             createdAt = DataItem.parseGH8601(created)
         }
 
-        if let updated = DataItem.parseGH8601(info["updatedAt"] as? String) {
+        if let updated = DataItem.parseGH8601(info.potentialString(named: "updatedAt")) {
             if updatedAt != updated {
                 updatedAt = updated
                 if !node.created {

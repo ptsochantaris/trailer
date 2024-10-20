@@ -2,6 +2,7 @@ import CoreData
 import Foundation
 import Lista
 import Semalot
+import TrailerJson
 import TrailerQL
 
 extension ParseOutput {
@@ -243,7 +244,7 @@ enum GraphQL {
 
     static var callCount = 0
 
-    private static func fetchData(from urlString: String, for query: Query, authToken: String, attempts: Int) async throws -> JSON {
+    private static func fetchData(from urlString: String, for query: Query, authToken: String, attempts: Int) async throws -> TypedJson.Entry {
         let Q = query.queryText
 
         guard let url = URL(string: urlString) else {
@@ -280,7 +281,7 @@ enum GraphQL {
 
         Logging.log("\(query.logPrefix)Fetching: \(Q)")
 
-        guard let json = try await HTTP.getJsonData(for: request, attempts: attempts, logPrefix: query.logPrefix, retryOnInvalidJson: true).json as? JSON else {
+        guard let json = try await HTTP.getJsonData(for: request, attempts: attempts, logPrefix: query.logPrefix, retryOnInvalidJson: true).json else {
             throw ApiError.graphQLFailure("\(query.logPrefix)Retuned data is not JSON")
         }
 
@@ -298,16 +299,16 @@ enum GraphQL {
             let json = try await fetchData(from: urlString, for: query, authToken: authToken, attempts: attempts)
 
             var migratedIds = [String: String]()
-            if let extensions = json["extensions"] as? JSON, let warnings = extensions["warnings"] as? [JSON] {
-                let deprecations = warnings.compactMap { $0["data"] as? JSON }
+            if let extensions = json.potentialObject(named: "extensions"), let warnings = extensions.potentialArray(named: "warnings") {
+                let deprecations = warnings.compactMap { $0.potentialObject(named: "data") }
                 for deprecation in deprecations {
-                    if let oldId = deprecation["legacy_global_id"] as? String, let newId = deprecation["next_global_id"] as? String, oldId != newId {
+                    if let oldId = deprecation.potentialString(named: "legacy_global_id"), let newId = deprecation.potentialString(named: "next_global_id"), oldId != newId {
                         migratedIds[oldId] = newId
                     }
                 }
             }
 
-            let apiStats = ApiStats.fromV4(json: json["data"] as? JSON, migratedIds: migratedIds.isEmpty ? nil : migratedIds)
+            let apiStats = ApiStats.fromV4(json: json.potentialObject(named: "data"), migratedIds: migratedIds.isEmpty ? nil : migratedIds)
 
             if let expectedNodeCost {
                 if let apiStats {
@@ -328,12 +329,13 @@ enum GraphQL {
                 }
             }
 
-            let errorMessage: String? = if json.keys.contains("data") {
+            let hasData = (try? json.keys.contains("data")) == true
+            let errorMessage: String? = if hasData {
                 nil
-            } else if let errors = json["errors"] as? [JSON] {
-                errors.first?["message"] as? String
+            } else if let errors = json.potentialArray(named: "errors") {
+                errors.first?.potentialString(named: "message")
             } else {
-                json["message"] as? String
+                json.potentialString(named: "message")
             }
 
             if let errorMessage {
@@ -785,12 +787,12 @@ enum GraphQL {
         for (server, reposInThisServer) in reposByServer {
             let scanner = NodeScanner(server: server, parentType: nil)
 
-            let perNodeBlock: Query.PerNodeBlock = { progress in
+            let perNodeBlock: Query.PerNodeBlock = { progress throws(TQL.Error) in
                 scanner.add(progress: progress)
 
                 if case let .node(node) = progress, node.elementType == "PullRequest",
                    let repo = node.parent,
-                   let updatedAt = node.jsonPayload["updatedAt"] as? String,
+                   let updatedAt = node.jsonPayload.potentialString(named: "updatedAt"),
                    let d = DataItem.parseGH8601(updatedAt),
                    let repoLatestUpdate = prRepoIdToLatestExistingUpdate[repo.id],
                    d < repoLatestUpdate {
@@ -851,12 +853,12 @@ enum GraphQL {
         for (server, reposInThisServer) in reposByServer {
             let scanner = NodeScanner(server: server, parentType: nil)
 
-            let perNodeBlock: Query.PerNodeBlock = { progress in
+            let perNodeBlock: Query.PerNodeBlock = { progress throws(TQL.Error) in
                 scanner.add(progress: progress)
 
                 if case let .node(node) = progress, node.elementType == "Issue",
                    let repo = node.parent,
-                   let updatedAt = node.jsonPayload["updatedAt"] as? String,
+                   let updatedAt = node.jsonPayload.potentialString(named: "updatedAt"),
                    let d = DataItem.parseGH8601(updatedAt),
                    let latestRepoUpdate = issueRepoIdToLatestExistingUpdate[repo.id],
                    d < latestRepoUpdate {
@@ -980,7 +982,10 @@ enum GraphQL {
         func done() async {
             await withCheckedContinuation { continuation in
                 scannerMoc.perform { [weak self] in
-                    guard let self else { return }
+                    guard let self else {
+                        continuation.resume()
+                        return
+                    }
                     flush()
                     continuation.resume()
                 }

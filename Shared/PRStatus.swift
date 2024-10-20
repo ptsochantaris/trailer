@@ -2,6 +2,7 @@ import CoreData
 import Foundation
 import Lista
 import TrailerQL
+import TrailerJson
 
 final class PRStatus: DataItem {
     @NSManaged var descriptionText: String?
@@ -15,17 +16,17 @@ final class PRStatus: DataItem {
 
     override static var typeName: String { "PRStatus" }
 
-    static func syncStatuses(from data: [JSON]?, pullRequest: PullRequest, moc: NSManagedObjectContext) async {
+    static func syncStatuses(from data: [TypedJson.Entry]?, pullRequest: PullRequest, moc: NSManagedObjectContext) async {
         let pullRequestId = pullRequest.objectID
         let serverId = pullRequest.apiServer.objectID
         await v3items(with: data, type: PRStatus.self, serverId: serverId, moc: moc) { item, info, isNewOrUpdated, syncMoc in
             if isNewOrUpdated, let pr = try? syncMoc.existingObject(with: pullRequestId) as? PullRequest {
-                item.state = info["state"] as? String
-                item.context = info["context"] as? String
-                item.targetUrl = info["target_url"] as? String
+                item.state = info.potentialString(named: "state")
+                item.context = info.potentialString(named: "context")
+                item.targetUrl = info.potentialString(named: "target_url")
                 item.pullRequest = pr
 
-                if let ds = info["description"] as? String {
+                if let ds = info.potentialString(named: "description") {
                     item.descriptionText = ds.trim
                 }
             }
@@ -48,15 +49,15 @@ final class PRStatus: DataItem {
 
             let info = node.jsonPayload
             if node.elementType == "CheckRun" {
-                status.state = (info["conclusion"] as? String)?.lowercased()
+                status.state = info.potentialString(named: "conclusion")?.lowercased()
                 status.context = node.id
-                status.targetUrl = info["permalink"] as? String
-                status.descriptionText = info["name"] as? String
+                status.targetUrl = info.potentialString(named: "permalink")
+                status.descriptionText = info.potentialString(named: "name")
             } else {
-                status.state = (info["state"] as? String)?.lowercased()
-                status.context = info["context"] as? String
-                status.targetUrl = info["targetUrl"] as? String
-                status.descriptionText = info["description"] as? String
+                status.state = info.potentialString(named: "state")?.lowercased()
+                status.context = info.potentialString(named: "context")
+                status.targetUrl = info.potentialString(named: "targetUrl")
+                status.descriptionText = info.potentialString(named: "description")
             }
         }
     }
