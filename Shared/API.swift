@@ -265,8 +265,8 @@ enum API {
 
         // Transfer done, process
         let total = syncMoc.updatedObjects.count + syncMoc.insertedObjects.count + syncMoc.deletedObjects.count
-        if total > 1, let totalText = numberFormatter.string(for: total) {
-            currentOperationName = "Processing \(totalText) items…"
+        if total > 1 {
+            currentOperationName = "Processing \(total.formatted()) items…"
         } else {
             currentOperationName = "Processing update…"
         }

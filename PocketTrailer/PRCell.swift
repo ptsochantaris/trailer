@@ -181,15 +181,15 @@ final class PRCell: UITableViewCell {
         let _commentsNew = Int(item.unreadComments)
         let fade = muted || item.isSnoozing
 
-        readCount.text = numberFormatter.string(for: _commentsTotal)
+        readCount.text = _commentsTotal.formatted()
         readCount.isHidden = _commentsTotal == 0
 
         if let p = item.asPr, settings.markPrsAsUnreadOnNewCommits, p.hasNewCommits {
             unreadCount.isHidden = false
-            unreadCount.text = _commentsNew == 0 ? "!" : numberFormatter.string(for: _commentsNew)
+            unreadCount.text = _commentsNew == 0 ? "!" : _commentsNew.formatted()
         } else {
             unreadCount.isHidden = _commentsNew == 0
-            unreadCount.text = numberFormatter.string(for: _commentsNew)
+            unreadCount.text = _commentsNew.formatted()
         }
 
         let a = fade ? DISABLED_FADE : 1.0

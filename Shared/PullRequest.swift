@@ -1,7 +1,7 @@
 import CoreData
 import Lista
-import TrailerQL
 import TrailerJson
+import TrailerQL
 #if os(iOS)
     import UIKit
 #endif
@@ -493,17 +493,17 @@ final class PullRequest: ListableItem {
         let font = FONT_CLASS.boldSystemFont(ofSize: labelFont.pointSize - 3)
 
         let res = NSMutableAttributedString()
-        if added > 0, let addedString = numberFormatter.string(for: added) {
+        if added > 0 {
             let attributes: [NSAttributedString.Key: Any] = [.font: font, .baselineOffset: 4, .foregroundColor: COLOR_CLASS.appGreen]
-            res.append(NSAttributedString(string: "+\(addedString)", attributes: attributes))
+            res.append(NSAttributedString(string: "+\(added.formatted())", attributes: attributes))
             if removed > 0 {
                 let attributes: [NSAttributedString.Key: Any] = [.font: font, .baselineOffset: 4, .foregroundColor: COLOR_CLASS.lightGray]
                 res.append(NSAttributedString(string: "\u{a0}", attributes: attributes))
             }
         }
-        if removed > 0, let removedString = numberFormatter.string(for: removed) {
+        if removed > 0 {
             let attributes: [NSAttributedString.Key: Any] = [.font: font, .baselineOffset: 4, .foregroundColor: COLOR_CLASS.appRed]
-            res.append(NSAttributedString(string: "-\(removedString)", attributes: attributes))
+            res.append(NSAttributedString(string: "-\(removed.formatted())", attributes: attributes))
         }
         return res
     }
@@ -638,7 +638,7 @@ final class PullRequest: ListableItem {
     override final func handleMerging(settings: Settings.Cache) {
         let byUserId = mergedByNodeId
         let myUserId = apiServer.userNodeId
-        Logging.log("Detected merged PR: \(self.title.orEmpty) by user \(byUserId.orEmpty), local user id is: \(myUserId.orEmpty), handling policy is \(Settings.mergeHandlingPolicy), coming from section \(self.sectionIndex)")
+        Logging.log("Detected merged PR: \(title.orEmpty) by user \(byUserId.orEmpty), local user id is: \(myUserId.orEmpty), handling policy is \(Settings.mergeHandlingPolicy), coming from section \(sectionIndex)")
 
         if !isVisibleOnMenu {
             Logging.log("Merged PR was hidden, won't announce")

@@ -1,4 +1,5 @@
 import Cocoa
+import UniformTypeIdentifiers
 
 final class SetupAssistant: NSWindow, NSWindowDelegate, NSControlTextEditingDelegate {
     @IBOutlet private var quickstart: NSTextField!
@@ -143,7 +144,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate, NSControlTextEditingDele
         o.nameFieldLabel = "Settings File"
         o.message = "Import Settings From File…"
         o.isExtensionHidden = false
-        o.allowedFileTypes = ["trailerSettings"]
+        o.allowedContentTypes = [UTType.trailerSettings]
         o.beginSheetModal(for: self) { [weak self] response in
             guard let self else { return }
             if response == .OK, let url = o.url {

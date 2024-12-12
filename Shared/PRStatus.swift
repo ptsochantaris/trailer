@@ -1,8 +1,8 @@
 import CoreData
 import Foundation
 import Lista
-import TrailerQL
 import TrailerJson
+import TrailerQL
 
 final class PRStatus: DataItem {
     @NSManaged var descriptionText: String?
@@ -101,7 +101,7 @@ final class PRStatus: DataItem {
 
         if let context, !context.isEmpty {
             if context == nodeId, let createdAt {
-                text += shortDateFormatter.string(from: createdAt)
+                text += Date.Formatters.shortDateFormat.format(createdAt)
             } else {
                 text += context
             }

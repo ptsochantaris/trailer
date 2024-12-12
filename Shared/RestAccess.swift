@@ -64,7 +64,7 @@ enum RestAccess {
                         }
                     }
                 #else
-                    serverMoc.perform {
+                    await serverMoc.perform {
                         let latestLimits = ApiStats.fromV3(headers: allHeaders)
                         server.updateApiStats(latestLimits)
                     }

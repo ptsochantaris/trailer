@@ -27,14 +27,11 @@ final class ApiMonitorWindow: NSWindow, NSWindowDelegate {
         delegate = self
         textStorage = textView.textStorage
 
-        let logDateFormatter = DateFormatter()
-        logDateFormatter.dateFormat = "yyyyMMdd HH:mm:ss:SSS"
-
         Logging.monitorObservation = Logging.logPublisher
             .sink { [weak self] message in
                 guard let self else { return }
 
-                let date = logDateFormatter.string(from: Date())
+                let date = Date().formatted(Date.Formatters.logDateFormat)
                 let logString = NSAttributedString(string: ">>> \(date) - \(message())\n\n", attributes: ApiMonitorWindow.logAttributes)
                 Task { @MainActor in
                     self.textStorage.append(logString)

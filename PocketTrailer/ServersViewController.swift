@@ -59,7 +59,7 @@ final class ServersViewController: UITableViewController {
                 let total = Double(a.requestsLimit)
                 let used = Double(total - Double(a.requestsRemaining))
                 if a.resetDate != nil {
-                    D.text = String(format: "%.01f%% API used (%.0f / %.0f requests)\nNext reset: %@", 100 * used / total, used, total, shortDateFormatter.string(from: a.resetDate!))
+                    D.text = String(format: "%.01f%% API used (%.0f / %.0f requests)\nNext reset: %@", 100 * used / total, used, total, Date.Formatters.shortDateFormat.format(a.resetDate!))
                 } else {
                     D.text = String(format: "%.01f%% API used (%.0f / %.0f requests)", 100 * used / total, used, total)
                 }

@@ -954,9 +954,9 @@ class ListableItem: DataItem, Listable {
             }
         } else {
             if settings.showCreatedInsteadOfUpdated {
-                "Created " + itemDateFormatter.string(from: createdAt!)
+                "Created " + Date.Formatters.itemDateFormat.format(createdAt!)
             } else {
-                "Updated " + itemDateFormatter.string(from: updatedAt!)
+                "Updated " + Date.Formatters.itemDateFormat.format(updatedAt!)
             }
         }
     }
@@ -1316,7 +1316,7 @@ class ListableItem: DataItem, Listable {
     }
 
     final func handleClosing(settings: Settings.Cache) {
-        Logging.log("Detected closed item: \(self.title.orEmpty), handling policy is \(Settings.closeHandlingPolicy), coming from section \(self.sectionIndex)")
+        Logging.log("Detected closed item: \(title.orEmpty), handling policy is \(Settings.closeHandlingPolicy), coming from section \(sectionIndex)")
 
         if !isVisibleOnMenu {
             Logging.log("Closed item was hidden, won't announce")
@@ -1358,7 +1358,7 @@ class ListableItem: DataItem, Listable {
             case .snooze: "Snooze"
             case let .wake(date):
                 if let date, date != .distantFuture, date != autoSnoozeSentinelDate {
-                    "Wake (auto: " + itemDateFormatter.string(from: date) + ")"
+                    "Wake (auto: " + Date.Formatters.itemDateFormat.format(date) + ")"
                 } else {
                     "Wake"
                 }

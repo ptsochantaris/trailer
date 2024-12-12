@@ -465,7 +465,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
             if apiServer.goodToGo, apiServer.hasApiLimit, let resetDate = apiServer.resetDate {
                 if apiServer.shouldReportOverTheApiLimit {
                     let apiLabel = apiServer.label.orEmpty
-                    let resetDateString = itemDateFormatter.string(from: resetDate)
+                    let resetDateString = Date.Formatters.itemDateFormat.format(resetDate)
 
                     let alert = NSAlert()
                     alert.messageText = "Your API request usage for '\(apiLabel)' is over the limit!"
@@ -474,7 +474,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                     _ = alert.runModal()
                 } else if apiServer.shouldReportCloseToApiLimit {
                     let apiLabel = apiServer.label.orEmpty
-                    let resetDateString = itemDateFormatter.string(from: resetDate)
+                    let resetDateString = Date.Formatters.itemDateFormat.format(resetDate)
 
                     let alert = NSAlert()
                     alert.messageText = "Your API request usage for '\(apiLabel)' is close to full"

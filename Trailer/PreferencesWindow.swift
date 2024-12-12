@@ -1,6 +1,7 @@
 import Cocoa
 import Foundation
 import PopTimer
+import UniformTypeIdentifiers
 
 final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, NSTableViewDataSource, NSTabViewDelegate, NSControlTextEditingDelegate {
     private var deferredUpdateTimer: PopTimer!
@@ -885,7 +886,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         o.nameFieldLabel = "Application"
         o.message = "Select Application For Opening Items…"
         o.isExtensionHidden = true
-        o.allowedFileTypes = ["app"]
+        o.allowedContentTypes = [UTType.trailerApp]
         o.beginSheetModal(for: self) { [weak self] response in
             if response == .OK, let url = o.url {
                 Settings.defaultAppForOpeningItems = url.path
@@ -901,7 +902,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         o.nameFieldLabel = "Application"
         o.message = "Select Application For Opening Web Links…"
         o.isExtensionHidden = true
-        o.allowedFileTypes = ["app"]
+        o.allowedContentTypes = [UTType.trailerApp]
         o.beginSheetModal(for: self) { [weak self] response in
             if response == .OK, let url = o.url {
                 Settings.defaultAppForOpeningWeb = url.path
@@ -1408,7 +1409,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     @objc private func updateImportExportSettings() {
         repeatLastExportAutomatically.integerValue = Settings.autoRepeatSettingsExport.asInt
         if let lastExportDate = Settings.lastExportDate, let fileName = Settings.lastExportUrl?.absoluteString, let unescapedName = fileName.removingPercentEncoding {
-            let time = itemDateFormatter.string(from: lastExportDate)
+            let time = Date.Formatters.itemDateFormat.format(lastExportDate)
             lastExportReport.stringValue = "Last exported \(time) to \(unescapedName)"
         } else {
             lastExportReport.stringValue = ""
@@ -1427,7 +1428,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         s.message = "Export Current Settings…"
         s.isExtensionHidden = false
         s.nameFieldStringValue = "Trailer Settings"
-        s.allowedFileTypes = ["trailerSettings"]
+        s.allowedContentTypes = [UTType.trailerSettings]
         s.beginSheetModal(for: self) { response in
             if response == .OK, let url = s.url {
                 _ = Settings.writeToURL(url)
@@ -1443,7 +1444,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         o.nameFieldLabel = "Settings File"
         o.message = "Import Settings From File…"
         o.isExtensionHidden = false
-        o.allowedFileTypes = ["trailerSettings"]
+        o.allowedContentTypes = [UTType.trailerSettings]
         o.beginSheetModal(for: self) { response in
             if response == .OK, let url = o.url {
                 Task {

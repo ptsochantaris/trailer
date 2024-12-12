@@ -113,13 +113,13 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate {
             if apiServer.goodToGo, apiServer.hasApiLimit, let resetDate = apiServer.resetDate {
                 if apiServer.shouldReportOverTheApiLimit {
                     let apiLabel = apiServer.label.orEmpty
-                    let resetDateString = itemDateFormatter.string(from: resetDate)
+                    let resetDateString = Date.Formatters.itemDateFormat.format(resetDate)
 
                     showMessage("\(apiLabel) API request usage is over the limit!",
                                 "Your request cannot be completed until GitHub resets your hourly API allowance at \(resetDateString).\n\nIf you get this error often, try to make fewer manual refreshes or reducing the number of repos you are monitoring.\n\nYou can check your API usage at any time from the bottom of the preferences pane at any time.")
                 } else if apiServer.shouldReportCloseToApiLimit {
                     let apiLabel = apiServer.label.orEmpty
-                    let resetDateString = itemDateFormatter.string(from: resetDate)
+                    let resetDateString = Date.Formatters.itemDateFormat.format(resetDate)
 
                     showMessage("\(apiLabel) API request usage is close to full",
                                 "Try to make fewer manual refreshes, increasing the automatic refresh time, or reducing the number of repos you are monitoring.\n\nYour allowance will be reset by GitHub \(resetDateString).\n\nYou can check your API usage from the bottom of the preferences pane.")

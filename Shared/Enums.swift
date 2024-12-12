@@ -1,4 +1,5 @@
 import Foundation
+import UniformTypeIdentifiers
 
 extension Bool {
     var asInt: Int {
@@ -7,6 +8,11 @@ extension Bool {
 }
 
 extension NSPredicate: @retroactive @unchecked Sendable {}
+
+extension UTType {
+    static let trailerSettings = UTType(filenameExtension: "trailerSettings")!
+    static let trailerApp = UTType(filenameExtension: "app")!
+}
 
 enum Section: CaseIterable, Equatable {
     enum HidingCause {
@@ -352,22 +358,31 @@ extension Any? {
     }
 }
 
-let shortDateFormatter: DateFormatter = {
-    let d = DateFormatter()
-    d.dateStyle = .short
-    d.timeStyle = .short
-    d.doesRelativeDateFormatting = true
-    return d
-}()
+extension Date {
+    enum Formatters {
+        static let logDateFormat = FormatStyle.dateTime
+            .year(.defaultDigits)
+            .month(.twoDigits)
+            .day(.twoDigits)
+            .hour(.twoDigits(amPM: .omitted))
+            .minute(.twoDigits)
+            .second(.twoDigits)
+            .secondFraction(.fractional(3))
 
-private let agoFormatter: DateComponentsFormatter = {
-    let f = DateComponentsFormatter()
-    f.allowedUnits = [.year, .month, .day, .hour, .minute, .second]
-    f.unitsStyle = .abbreviated
-    f.collapsesLargestUnit = true
-    f.maximumUnitCount = 2
-    return f
-}()
+        static let shortDateFormat = FormatStyle.dateTime
+            .year(.defaultDigits)
+            .month(.twoDigits)
+            .day(.twoDigits)
+            .hour(.twoDigits(amPM: .omitted))
+            .minute(.twoDigits)
+
+        static let agoFormat = ComponentsFormatStyle.components(style: .abbreviated, fields: [.year, .month, .day, .hour, .minute, .second])
+
+        static let itemDateFormat = FormatStyle(date: .numeric, time: .shortened)
+
+        static let iso8601 = ISO8601FormatStyle.iso8601
+    }
+}
 
 func agoFormat(prefix: String, since: Date?) -> String {
     guard let since, since != .distantPast else {
@@ -378,7 +393,7 @@ func agoFormat(prefix: String, since: Date?) -> String {
     if now.timeIntervalSince(since) < 3 {
         return "\(prefix) just now"
     }
-    let duration = agoFormatter.string(from: since, to: now) ?? "unknown time"
+    let duration = (since ..< now).formatted(Date.Formatters.agoFormat)
     return "\(prefix) \(duration) ago"
 }
 

@@ -1,7 +1,7 @@
 import CoreData
 import Lista
-import TrailerQL
 import TrailerJson
+import TrailerQL
 
 final class FetchCache {
     private var store = [String: NSManagedObject]()

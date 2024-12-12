@@ -78,20 +78,6 @@ extension IMAGE_CLASS: @retroactive @unchecked Sendable {}
 
 let emptyAttributedString = NSAttributedString()
 
-let itemDateFormatter: DateFormatter = {
-    let f = DateFormatter()
-    f.dateStyle = .medium
-    f.timeStyle = .short
-    f.doesRelativeDateFormatting = true
-    return f
-}()
-
-let numberFormatter: NumberFormatter = {
-    let n = NumberFormatter()
-    n.numberStyle = .decimal
-    return n
-}()
-
 @MainActor
 func bootUp() {
     if CommandLine.arguments.contains("-useSystemLog") {
@@ -287,14 +273,6 @@ enum RepoHidingPolicy: Int {
     }
 }
 
-let apiDateFormatter: DateFormatter = {
-    let d = DateFormatter()
-    d.timeZone = TimeZone(abbreviation: "UTC")
-    d.locale = Locale(identifier: "en_US")
-    d.dateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'"
-    return d
-}()
-
 struct ApiStats {
     let nodeCount, cost, remaining, limit: Int
     let resetAt: Date?
@@ -313,7 +291,8 @@ struct ApiStats {
 
     static func fromV4(json: TypedJson.Entry?, migratedIds: [String: String]?) -> ApiStats? {
         guard let info = json?.potentialObject(named: "rateLimit") else { return nil }
-        let date = apiDateFormatter.date(from: info.potentialString(named: "resetAt") ?? "")
+        let dateString = info.potentialString(named: "resetAt") ?? ""
+        let date = try? Date.Formatters.iso8601.parse(dateString)
         return ApiStats(nodeCount: info.potentialInt(named: "nodeCount") ?? 0,
                         cost: info.potentialInt(named: "cost") ?? 0,
                         remaining: info.potentialInt(named: "remaining") ?? 10000,

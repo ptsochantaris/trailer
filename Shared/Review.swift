@@ -1,7 +1,7 @@
 import CoreData
 import Lista
-import TrailerQL
 import TrailerJson
+import TrailerQL
 
 final class Review: DataItem {
     @NSManaged var body: String?
