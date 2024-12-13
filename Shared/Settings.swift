@@ -54,7 +54,6 @@ enum InclusionSetting: Int {
 }
 
 enum Settings {
-    @MainActor
     static var cache = Cache()
 
     final class Cache {
@@ -145,7 +144,9 @@ enum Settings {
         let shouldSyncReviewAssignments: Bool
 
         init() {
-            Logging.log("(Re)creating settings cache")
+            Task {
+                await Logging.shared.log("(Re)creating settings cache")
+            }
 
             shouldSyncReactions = notifyOnItemReactions || notifyOnCommentReactions
 
@@ -297,7 +298,9 @@ enum Settings {
 
         #if os(macOS)
             if Settings.lastRunVersion != "", Settings["launchAtLogin"] == nil {
-                Logging.log("Migrated to the new startup mechanism, activating it by default")
+                Task {
+                    await Logging.shared.log("Migrated to the new startup mechanism, activating it by default")
+                }
                 isAppLoginItem = true
             }
         #endif
@@ -315,7 +318,7 @@ enum Settings {
             } else {
                 sharedDefaults.removeObject(forKey: key)
             }
-            Task { @MainActor in
+            Task {
                 cache = Cache()
                 #if os(macOS)
                     possibleExport(key)
@@ -326,21 +329,24 @@ enum Settings {
 
     private static let saveTimer = PopTimer(timeInterval: 2) {
         if let e = Settings.lastExportUrl {
-            Settings.writeToURL(e)
+            Task {
+                await Settings.writeToURL(e)
+            }
         }
     }
 
     private static let goodKeys: Set<String> = ["LAST_SUCCESSFUL_REFRESH", "LAST_EXPORT_URL", "LAST_EXPORT_TIME"]
 
     #if os(macOS)
-        @MainActor
         static var isAppLoginItem: Bool {
             get {
                 Settings["launchAtLogin"] as? Bool ?? false
             }
             set {
                 Settings["launchAtLogin"] = newValue
-                SMLoginItemSetEnabled(LauncherCommon.helperAppId as CFString, newValue)
+                Task { @MainActor in
+                    SMLoginItemSetEnabled(LauncherCommon.helperAppId as CFString, newValue)
+                }
             }
         }
 
@@ -364,7 +370,7 @@ enum Settings {
 
     @discardableResult
     @MainActor
-    static func writeToURL(_ url: URL) -> Bool {
+    static func writeToURL(_ url: URL) async -> Bool {
         saveTimer.abort()
 
         Settings.lastExportUrl = url
@@ -378,18 +384,17 @@ enum Settings {
         settings["DB_CONFIG_OBJECTS"] = ApiServer.archivedApiServers
         settings["DB_SNOOZE_OBJECTS"] = SnoozePreset.archivedPresets
         if !settings.write(to: url, atomically: true) {
-            Logging.log("Warning, exporting settings failed")
+            await Logging.shared.log("Warning, exporting settings failed")
             return false
         }
         NotificationCenter.default.post(name: .SettingsExported, object: nil)
-        Logging.log("Written settings to \(url.absoluteString)")
+        await Logging.shared.log("Written settings to \(url.absoluteString)")
         return true
     }
 
-    @MainActor
     static func readFromURL(_ url: URL) async -> Bool {
         if let settings = NSDictionary(contentsOf: url) {
-            Logging.log("Reading settings from \(url.absoluteString)")
+            await Logging.shared.log("Reading settings from \(url.absoluteString)")
             resetAllSettings()
             for k in allFields {
                 if let v = settings[k] {
@@ -929,7 +934,9 @@ enum Settings {
         if new != filterLookup[key] {
             filterLookup[key] = new
             if let data = try? JSONEncoder().encode(filterLookup) {
-                Logging.log("Persisting filters for menus")
+                Task {
+                    await Logging.shared.log("Persisting filters for menus")
+                }
                 sharedDefaults.setValue(data, forKey: "PERSISTED_TAB_FILTERS")
             }
         }

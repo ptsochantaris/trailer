@@ -228,7 +228,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         guard let relatedMoc = notification.object as? NSManagedObjectContext, relatedMoc === DataManager.main else { return }
 
         if let items = notification.userInfo?[NSInsertedObjectsKey] as? Set<NSManagedObject>, items.contains(where: { $0 is ListableItem }) {
-            // Logging.log(">>>>>>>>>>>>>>> detected inserted items")
+            // Logging.shared.log(">>>>>>>>>>>>>>> detected inserted items")
             Task { @MainActor in
                 self.updateStatus(becauseOfChanges: true)
             }
@@ -236,7 +236,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         }
 
         if let items = notification.userInfo?[NSDeletedObjectsKey] as? Set<NSManagedObject>, items.contains(where: { $0 is ListableItem }) {
-            // Logging.log(">>>>>>>>>>>>>>> detected deleted items")
+            // Logging.shared.log(">>>>>>>>>>>>>>> detected deleted items")
             Task { @MainActor in
                 self.updateStatus(becauseOfChanges: true)
             }
@@ -244,7 +244,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         }
 
         if let items = notification.userInfo?[NSUpdatedObjectsKey] as? Set<NSManagedObject>, items.contains(where: { ($0 as? ListableItem)?.hasPersistentChangedValues ?? false }) {
-            // Logging.log(">>>>>>>>>>>>>>> detected permanently changed items")
+            // Logging.shared.log(">>>>>>>>>>>>>>> detected permanently changed items")
             Task { @MainActor in
                 self.updateStatus(becauseOfChanges: true)
             }

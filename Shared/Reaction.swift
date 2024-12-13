@@ -27,7 +27,9 @@ final class Reaction: DataItem {
                 reaction.issue = parent?.asIssue
                 reaction.comment = parent?.asComment
                 if parent == nil {
-                    Logging.log("Warning: Reaction without parent")
+                    Task {
+                        await Logging.shared.log("Warning: Reaction without parent")
+                    }
                 }
             }
 

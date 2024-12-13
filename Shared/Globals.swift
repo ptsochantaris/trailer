@@ -81,7 +81,9 @@ let emptyAttributedString = NSAttributedString()
 @MainActor
 func bootUp() {
     if CommandLine.arguments.contains("-useSystemLog") {
-        Logging.setupConsoleLogging()
+        Task {
+            await Logging.shared.setupConsoleLogging()
+        }
     }
 
     Settings.checkMigration()

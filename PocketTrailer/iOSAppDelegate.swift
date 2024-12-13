@@ -13,7 +13,9 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate {
         bootUp()
 
         if DataManager.main.persistentStoreCoordinator == nil {
-            Logging.log("Database was corrupted on startup, removing DB files and resetting")
+            Task {
+                await Logging.shared.log("Database was corrupted on startup, removing DB files and resetting")
+            }
             DataManager.removeDatabaseFiles()
             abort()
         }
@@ -101,7 +103,7 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate {
             let howLongAgo = Date().timeIntervalSince(l).rounded()
             let howLongUntilNextSync = Settings.backgroundRefreshPeriod - howLongAgo
             if howLongUntilNextSync > 0 {
-                Logging.log("No need to refresh yet, will refresh in \(howLongUntilNextSync) sec")
+                await Logging.shared.log("No need to refresh yet, will refresh in \(howLongUntilNextSync) sec")
                 return
             }
         }
@@ -133,10 +135,12 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     private func wrapBackgroundProcessing(success: Bool) {
-        if success {
-            Logging.log("Background fetch completed")
-        } else {
-            Logging.log("Background fetch FAILED")
+        Task {
+            if success {
+                await Logging.shared.log("Background fetch completed")
+            } else {
+                await Logging.shared.log("Background fetch FAILED")
+            }
         }
         scheduleRefreshTask()
         backgroundProcessing?.setTaskCompleted(success: success)
@@ -240,9 +244,13 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate {
 
         do {
             try BGTaskScheduler.shared.submit(request)
-            Logging.log("Scheduled next refresh after \(request.earliestBeginDate!)")
+            Task {
+                await Logging.shared.log("Scheduled next refresh after \(request.earliestBeginDate!)")
+            }
         } catch {
-            Logging.log("Could not schedule app refresh: \(error)")
+            Task {
+                await Logging.shared.log("Could not schedule app refresh: \(error)")
+            }
         }
     }
 }

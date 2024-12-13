@@ -39,7 +39,9 @@ final class PRComment: DataItem {
                     comment.pullRequest = review.pullRequest
                     comment.review = review
                 } else {
-                    Logging.log("Warning: PRComment without parent")
+                    Task {
+                        await Logging.shared.log("Warning: PRComment without parent")
+                    }
                 }
             }
 
@@ -83,13 +85,17 @@ final class PRComment: DataItem {
         }
 
         if let userName, settings.commentAuthorList.contains(userName.comparableForm) {
-            Logging.log("Ignoring comment from user '\(userName)' as their name is on the blacklist")
+            Task {
+                await Logging.shared.log("Ignoring comment from user '\(userName)' as their name is on the blacklist")
+            }
             return
         }
 
         if contains(terms: ["@\(apiServer.userName!)"]) {
             if parent.isSnoozing, parent.shouldWakeOnMention {
-                Logging.log("Waking up snoozed item ID \(parent.nodeId ?? "<no ID>") because of mention")
+                Task {
+                    await Logging.shared.log("Waking up snoozed item ID \(parent.nodeId ?? "<no ID>") because of mention")
+                }
                 parent.wakeUp(settings: settings)
             }
             NotificationQueue.add(type: .newMention, for: self)
@@ -97,7 +103,9 @@ final class PRComment: DataItem {
         }
 
         if parent.isSnoozing, parent.shouldWakeOnComment {
-            Logging.log("Waking up snoozed item ID \(parent.nodeId ?? "<no ID>") because of posted comment")
+            Task {
+                await Logging.shared.log("Waking up snoozed item ID \(parent.nodeId ?? "<no ID>") because of posted comment")
+            }
             parent.wakeUp(settings: settings)
         }
 

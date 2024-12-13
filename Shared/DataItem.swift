@@ -131,7 +131,10 @@ extension Querying {
         f.predicate = NSPredicate(format: query)
         let orphaned = try! moc.fetch(f)
         if !orphaned.isEmpty {
-            Logging.log("Nuking \(orphaned.count) \(typeName) items that no longer have a parent")
+            let count = orphaned.count
+            Task {
+                await Logging.shared.log("Nuking \(count) \(typeName) items that no longer have a parent")
+            }
             for i in orphaned {
                 moc.delete(i)
             }
@@ -141,7 +144,10 @@ extension Querying {
     static func nukeDeletedItems(in moc: NSManagedObjectContext) -> Int {
         let discarded = items(surviving: false, in: moc)
         if !discarded.isEmpty {
-            Logging.log("Nuking \(discarded.count) \(typeName) items marked for deletion")
+            let count = discarded.count
+            Task {
+                await Logging.shared.log("Nuking \(count) \(typeName) items marked for deletion")
+            }
             for i in discarded {
                 moc.delete(i)
             }
@@ -172,7 +178,9 @@ extension Querying {
         do {
             return try moc.fetch(f).first
         } catch {
-            Logging.log("Fetch error: \(error.localizedDescription)")
+            Task {
+                await Logging.shared.log("Fetch error: \(error.localizedDescription)")
+            }
             return nil
         }
     }
@@ -245,12 +253,14 @@ class DataItem: NSManagedObject, Querying {
                 if let nodeId = i.nodeId, let info = nodeIdsToInfo[nodeId] {
                     let updatedDate = DataItem.parseGH8601(info.potentialString(named: "updated_at")) ?? i.createdAt ?? now
                     if updatedDate != i.updatedAt {
-                        Logging.log("Updating \(entityName): \(nodeId) (v3)")
+                        Task {
+                            await Logging.shared.log("Updating \(entityName): \(nodeId) (v3)")
+                        }
                         i.postSyncAction = PostSyncAction.isUpdated.rawValue
                         i.updatedAt = updatedDate
                         postProcessCallback(i, info, true, child)
                     } else {
-                        // Logging.log("Skipping %@: %@",type,serverId)
+                        // Logging.shared.log("Skipping %@: %@",type,serverId)
                         i.postSyncAction = PostSyncAction.doNothing.rawValue
                         postProcessCallback(i, info, false, child)
                     }
@@ -262,7 +272,9 @@ class DataItem: NSManagedObject, Querying {
 
             for nodeId in nodeIdsOfItems {
                 if let info = nodeIdsToInfo[nodeId], let apiServer = try? child.existingObject(with: serverId) as? ApiServer {
-                    Logging.log("Creating \(entityName): \(nodeId) (v3)")
+                    Task {
+                        await Logging.shared.log("Creating \(entityName): \(nodeId) (v3)")
+                    }
                     let i = NSEntityDescription.insertNewObject(forEntityName: entityName, into: child) as! T
                     i.postSyncAction = PostSyncAction.isNew.rawValue
                     i.apiServer = apiServer
@@ -296,7 +308,9 @@ class DataItem: NSManagedObject, Querying {
         count += Team.nukeDeletedItems(in: moc)
         count += Review.nukeDeletedItems(in: moc)
         count += Reaction.nukeDeletedItems(in: moc)
-        Logging.log("Nuked total \(count) items marked for deletion")
+        Task { [count] in
+            await Logging.shared.log("Nuked total \(count) items marked for deletion")
+        }
     }
 
     @MainActor
@@ -369,26 +383,30 @@ class DataItem: NSManagedObject, Querying {
         }
 
         if node.created {
-            Logging.log("Creating \(entityName) ID: \(node.id) (v4)")
+            Task {
+                await Logging.shared.log("Creating \(entityName) ID: \(node.id) (v4)")
+            }
             postSyncAction = PostSyncAction.isNew.rawValue
 
         } else if node.updated {
-            Logging.log("Updating \(entityName) ID: \(node.id) (v4)")
+            Task {
+                await Logging.shared.log("Updating \(entityName) ID: \(node.id) (v4)")
+            }
             postSyncAction = PostSyncAction.isUpdated.rawValue
 
         } else {
             /*
              switch PostSyncAction(rawValue: postSyncAction) {
              case .delete:
-                 Logging.log("Keeping %@ ID: %@", entityName, node.id)
+                 Logging.shared.log("Keeping %@ ID: %@", entityName, node.id)
              case .doNothing:
-                 Logging.log("Ignoring %@ ID: %@", entityName, node.id)
+                 Logging.shared.log("Ignoring %@ ID: %@", entityName, node.id)
              case .isNew:
-                 Logging.log("Is New %@ ID: %@", entityName, node.id)
+                 Logging.shared.log("Is New %@ ID: %@", entityName, node.id)
              case .isUpdated:
-                 Logging.log("Is Updated %@ ID: %@", entityName, node.id)
+                 Logging.shared.log("Is Updated %@ ID: %@", entityName, node.id)
              case .none:
-                 Logging.log("Other %@ ID: %@", entityName, node.id)
+                 Logging.shared.log("Other %@ ID: %@", entityName, node.id)
              }
               */
             if postSyncAction == PostSyncAction.delete.rawValue {
@@ -421,7 +439,10 @@ class DataItem: NSManagedObject, Querying {
         let existingItems = try! moc.fetch(f)
         let existingItemIds = existingItems.map(\.nodeId)
         var itemLookup = Dictionary(zip(existingItemIds, existingItems)) { one, two in
-            Logging.log("Warning: Duplicate item of type \(entityName) claiming to be node ID \(one.nodeId ?? "<no node id>") - will discard")
+            let nodeId = one.nodeId
+            Task {
+                await Logging.shared.log("Warning: Duplicate item of type \(entityName) claiming to be node ID \(nodeId ?? "<no node id>") - will discard")
+            }
             two.postSyncAction = PostSyncAction.delete.rawValue
             return one
         }

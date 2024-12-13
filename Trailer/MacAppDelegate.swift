@@ -127,11 +127,15 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 
     @objc private func systemWillSleep() {
         systemSleeping = true
-        Logging.log("System is going to sleep")
+        Task {
+            await Logging.shared.log("System is going to sleep")
+        }
     }
 
     @objc private func systemDidWake() {
-        Logging.log("System woke up")
+        Task {
+            await Logging.shared.log("System woke up")
+        }
         systemSleeping = false
         Task {
             try? await Task.sleep(nanoseconds: 2 * NSEC_PER_SEC)
@@ -364,8 +368,8 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         let url = URL(fileURLWithPath: filename)
         let ext = url.pathExtension
         if ext == "trailerSettings" {
-            Logging.log("Will open \(url.absoluteString)")
             Task {
+                await Logging.shared.log("Will open \(url.absoluteString)")
                 await tryLoadSettings(from: url, skipConfirm: Settings.dontConfirmSettingsImport)
             }
             return true
@@ -451,7 +455,9 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
             let howLongAgo = Date().timeIntervalSince(l).rounded()
             let howLongUntilNextSync = Settings.refreshPeriod - howLongAgo
             if howLongUntilNextSync > 0 {
-                Logging.log("No need to refresh yet, will refresh in \(howLongUntilNextSync) sec")
+                Task {
+                    await Logging.shared.log("No need to refresh yet, will refresh in \(howLongUntilNextSync) sec")
+                }
                 setupRefreshTask(in: howLongUntilNextSync)
                 return
             }
@@ -578,23 +584,23 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
     @MainActor
     func startRefresh() async {
         if API.isRefreshing {
-            Logging.log("Won't start refresh because refresh is already ongoing")
+            await Logging.shared.log("Won't start refresh because refresh is already ongoing")
             return
         }
 
         if systemSleeping {
-            Logging.log("Won't start refresh because the system is in power-nap / sleep")
+            await Logging.shared.log("Won't start refresh because the system is in power-nap / sleep")
             return
         }
 
         let hasConnection = API.hasNetworkConnection
         if !hasConnection {
-            Logging.log("Won't start refresh because internet connectivity is down")
+            await Logging.shared.log("Won't start refresh because internet connectivity is down")
             return
         }
 
         if !ApiServer.someServersHaveAuthTokens(in: DataManager.main) {
-            Logging.log("Won't start refresh because there are no configured API servers")
+            await Logging.shared.log("Won't start refresh because there are no configured API servers")
             return
         }
 
@@ -673,7 +679,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
             }
 
             if let w = incomingEvent.window as? MenuWindow {
-                // Logging.log("Keycode: %@", incomingEvent.keyCode)
+                // Logging.shared.log("Keycode: %@", incomingEvent.keyCode)
 
                 switch incomingEvent.keyCode {
                 case 123, 124:
@@ -1060,14 +1066,20 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 
 extension MacAppDelegate: SPUUpdaterDelegate {
     func updaterDidNotFindUpdate(_: SPUUpdater) {
-        Logging.log("No app updates available")
+        Task {
+            await Logging.shared.log("No app updates available")
+        }
     }
 
     func updaterDidNotFindUpdate(_: SPUUpdater, error: Error) {
-        Logging.log("Could not look for update: \(error.localizedDescription)")
+        Task {
+            await Logging.shared.log("Could not look for update: \(error.localizedDescription)")
+        }
     }
 
     func updater(_: SPUUpdater, didFindValidUpdate _: SUAppcastItem) {
-        Logging.log("Found update")
+        Task {
+            await Logging.shared.log("Found update")
+        }
     }
 }

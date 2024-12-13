@@ -63,8 +63,8 @@ enum HTTP {
             return (nil, result)
         }
 
-        if Logging.monitoringLog, let dataString = String(data: data, encoding: .utf8) {
-            Logging.log("API data from \(request.url?.absoluteString ?? "<nil>"): \(dataString)")
+        if await Logging.shared.monitoringLog, let dataString = String(data: data, encoding: .utf8) {
+            await Logging.shared.log("API data from \(request.url?.absoluteString ?? "<nil>"): \(dataString)")
         }
 
         do {
@@ -72,11 +72,11 @@ enum HTTP {
             return (json, result)
         } catch {
             if retryOnInvalidJson, attempts > 1 {
-                Logging.log("Retrying on invalid JSON result (attempts left: \(attempts)): \(error)")
+                await Logging.shared.log("Retrying on invalid JSON result (attempts left: \(attempts)): \(error)")
                 try? await Task.sleep(nanoseconds: 5 * NSEC_PER_SEC)
                 return try await getJsonData(for: request, attempts: attempts - 1, retryOnInvalidJson: true)
             }
-            Logging.log("JSON error: \(error)")
+            await Logging.shared.log("JSON error: \(error)")
             throw error
         }
     }
@@ -121,11 +121,12 @@ enum HTTP {
                 let url = request.url?.absoluteString ?? "<nil>"
                 attempt -= 1
                 if attempt > 0 {
-                    Logging.log("\(logPrefix.orEmpty)Will retry call to \(url) in \(retryDelay) seconds - \(error.localizedDescription)")
+                    let r = retryDelay
+                    await Logging.shared.log("\(logPrefix.orEmpty)Will retry call to \(url) in \(r) seconds - \(error.localizedDescription)")
                     try? await Task.sleep(nanoseconds: retryDelay * NSEC_PER_SEC)
                     retryDelay += 2
                 } else {
-                    Logging.log("\(logPrefix.orEmpty)Failed call to \(url) - \(error.localizedDescription)")
+                    await Logging.shared.log("\(logPrefix.orEmpty)Failed call to \(url) - \(error.localizedDescription)")
                     throw error
                 }
             }

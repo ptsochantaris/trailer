@@ -638,22 +638,34 @@ final class PullRequest: ListableItem {
     override final func handleMerging(settings: Settings.Cache) {
         let byUserId = mergedByNodeId
         let myUserId = apiServer.userNodeId
-        Logging.log("Detected merged PR: \(title.orEmpty) by user \(byUserId.orEmpty), local user id is: \(myUserId.orEmpty), handling policy is \(Settings.mergeHandlingPolicy), coming from section \(sectionIndex)")
+        let t = title.orEmpty
+        let s = sectionIndex
+        Task {
+            await Logging.shared.log("Detected merged PR: \(t) by user \(byUserId.orEmpty), local user id is: \(myUserId.orEmpty), handling policy is \(Settings.mergeHandlingPolicy), coming from section \(s)")
+        }
 
         if !isVisibleOnMenu {
-            Logging.log("Merged PR was hidden, won't announce")
+            Task {
+                await Logging.shared.log("Merged PR was hidden, won't announce")
+            }
             managedObjectContext?.delete(self)
 
         } else if byUserId == myUserId, Settings.dontKeepPrsMergedByMe {
-            Logging.log("Will not keep PR merged by me")
+            Task {
+                await Logging.shared.log("Will not keep PR merged by me")
+            }
             managedObjectContext?.delete(self)
 
         } else if shouldKeep(accordingTo: Settings.mergeHandlingPolicy, settings: settings) {
-            Logging.log("Will keep merged PR")
+            Task {
+                await Logging.shared.log("Will keep merged PR")
+            }
             keep(as: .merged, notification: .prMerged, settings: settings)
 
         } else {
-            Logging.log("Will not keep merged PR")
+            Task {
+                await Logging.shared.log("Will not keep merged PR")
+            }
             managedObjectContext?.delete(self)
         }
     }

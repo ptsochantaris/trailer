@@ -75,7 +75,7 @@ extension API {
                         guard let data, !data.isEmpty else { return true }
 
                         if isFirstEventSync {
-                            Logging.log("First event check for this repo. Let's ensure all items are marked as updated")
+                            await Logging.shared.log("First event check for this repo. Let's ensure all items are marked as updated")
                             for i in r.pullRequests {
                                 i.setToUpdatedIfIdle()
                             }
@@ -95,7 +95,7 @@ extension API {
                                     }
                                     if eventId == lastLocalEvent {
                                         foundLastEvent = true
-                                        Logging.log("Parsed all repo issue events up to the one we already have")
+                                        await Logging.shared.log("Parsed all repo issue events up to the one we already have")
                                         break // we're done
                                     }
                                     if event.potentialString(named: "event") != nil {
@@ -400,7 +400,7 @@ extension API {
     }
 
     private static func investigatePrClosure(for pullRequest: PullRequest) async {
-        Logging.log("Checking closed PR to see if it was merged: \(pullRequest.title.orEmpty)")
+        await Logging.shared.log("Checking closed PR to see if it was merged: \(pullRequest.title.orEmpty)")
 
         let repoFullName = pullRequest.repo.fullName.orEmpty
         let path = "/repos/\(repoFullName)/pulls/\(pullRequest.number)"

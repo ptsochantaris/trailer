@@ -43,7 +43,9 @@ final class PRStatus: DataItem {
                 if let parent = PullRequest.asParent(with: parentId, in: moc, parentCache: parentCache) {
                     status.pullRequest = parent
                 } else {
-                    Logging.log("Warning: PRStatus without parent")
+                    Task {
+                        await Logging.shared.log("Warning: PRStatus without parent")
+                    }
                 }
             }
 

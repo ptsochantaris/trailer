@@ -112,12 +112,12 @@ enum RestAccess {
 
         do {
             let output = try await HTTP.getJsonData(for: request, attempts: attempts)
-            Logging.log("(\(apiServerLabel) GET \(expandedPath) - RESULT: \(output.result.logValue)")
+            await Logging.shared.log("(\(apiServerLabel) GET \(expandedPath) - RESULT: \(output.result.logValue)")
             return (output.json, output.result)
 
         } catch {
             let error = error as NSError
-            Logging.log("(\(apiServerLabel) GET \(expandedPath) - FAILED: (code \(error.code) \(error.localizedDescription)")
+            await Logging.shared.log("(\(apiServerLabel) GET \(expandedPath) - FAILED: (code \(error.code) \(error.localizedDescription)")
             throw error
         }
     }

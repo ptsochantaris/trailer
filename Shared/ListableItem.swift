@@ -1180,7 +1180,7 @@ class ListableItem: DataItem, Listable {
             sortDescriptors.append(NSSortDescriptor(key: fieldName, ascending: !settings.sortDescending))
         }
 
-        // Logging.log("%@", andPredicates)
+        // Logging.shared.log("%@", andPredicates)
 
         let f = NSFetchRequest<T>(entityName: itemType.typeName)
         f.fetchBatchSize = 50
@@ -1316,18 +1316,28 @@ class ListableItem: DataItem, Listable {
     }
 
     final func handleClosing(settings: Settings.Cache) {
-        Logging.log("Detected closed item: \(title.orEmpty), handling policy is \(Settings.closeHandlingPolicy), coming from section \(sectionIndex)")
+        let title = title.orEmpty
+        let sectionIndex = sectionIndex
+        Task {
+            await Logging.shared.log("Detected closed item: \(title), handling policy is \(Settings.closeHandlingPolicy), coming from section \(sectionIndex)")
+        }
 
         if !isVisibleOnMenu {
-            Logging.log("Closed item was hidden, won't announce")
+            Task {
+                await Logging.shared.log("Closed item was hidden, won't announce")
+            }
             managedObjectContext?.delete(self)
 
         } else if shouldKeep(accordingTo: Settings.closeHandlingPolicy, settings: settings) {
-            Logging.log("Will keep closed item")
+            Task {
+                await Logging.shared.log("Will keep closed item")
+            }
             keep(as: .closed, notification: isPr ? .prClosed : .issueClosed, settings: settings)
 
         } else {
-            Logging.log("Will not keep closed item")
+            Task {
+                await Logging.shared.log("Will not keep closed item")
+            }
             managedObjectContext?.delete(self)
         }
     }

@@ -58,7 +58,9 @@ final class ApiServer: NSManagedObject {
             }
 
             if let legacy = value(forKey: "authToken") as? String, let legacyData = legacy.data(using: .utf8) {
-                Logging.log("Migrating server ID for \(label.orEmpty) to keychain...")
+                Task { [label] in
+                    await Logging.shared.log("Migrating server ID for \(label.orEmpty) to keychain...")
+                }
                 keyVine[serverKey] = legacyData
                 setValue(nil, forKey: "authToken")
                 _cachedAuthToken = .some(legacy)
@@ -121,7 +123,9 @@ final class ApiServer: NSManagedObject {
 
     @MainActor
     static func resetSyncOfEverything() {
-        Logging.log("Resetting sync state of all items")
+        Task {
+            await Logging.shared.log("Resetting sync state of all items")
+        }
         for r in Repo.allItems(in: DataManager.main, prefetchRelationships: ["pullRequests", "issues"]) {
             r.resetSyncState()
             for p in r.pullRequests {
@@ -137,8 +141,9 @@ final class ApiServer: NSManagedObject {
     func deleteEverything() {
         guard let managedObjectContext else { return }
 
-        Logging.log("Wiping all data for API server \(label ?? "<no API server name>")")
-
+        Task { [label] in
+            await Logging.shared.log("Wiping all data for API server \(label ?? "<no API server name>")")
+        }
         let categories: [Set<NSManagedObject>] = [pullRequests, issues, labels, teams, comments, statuses, reviews, reactions]
         for list in categories {
             list.forEach { managedObjectContext.delete($0) }
@@ -209,7 +214,9 @@ final class ApiServer: NSManagedObject {
     }
 
     func rollBackAllUpdates(in moc: NSManagedObjectContext) {
-        Logging.log("Rolling back changes for failed sync on API server '\(label.orEmpty)'")
+        Task { [label] in
+            await Logging.shared.log("Rolling back changes for failed sync on API server '\(label.orEmpty)'")
+        }
         for set in [repos, pullRequests, comments, statuses, labels, issues, teams, reviews, reactions] as [Set<DataItem>] {
             var i = set.makeIterator()
             while let dataItem = i.next() {
@@ -236,15 +243,15 @@ final class ApiServer: NSManagedObject {
     func test() async throws {
         try await withThrowingTaskGroup(of: Void.self) { group in
             if let graphQLPath {
-                group.addTask { @MainActor in
-                    Logging.log("Checking GraphQL interface on \(graphQLPath)")
+                group.addTask {
+                    await Logging.shared.log("Checking GraphQL interface on \(graphQLPath)")
                     try await GraphQL.testApi(to: self)
                 }
             }
 
             if let apiPath {
-                group.addTask { @MainActor in
-                    Logging.log("Checking REST interface on \(apiPath)")
+                group.addTask {
+                    await Logging.shared.log("Checking REST interface on \(apiPath)")
                     try await RestAccess.testApi(to: self)
                 }
             }
@@ -258,9 +265,7 @@ final class ApiServer: NSManagedObject {
         apiPath = "https://api.github.com"
         graphQLPath = "https://api.github.com/graphql"
         label = "GitHub"
-        Task { @MainActor in
-            resetSyncState()
-        }
+        resetSyncState()
     }
 
     func resetSyncState() {

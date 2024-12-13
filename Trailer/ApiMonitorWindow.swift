@@ -27,23 +27,21 @@ final class ApiMonitorWindow: NSWindow, NSWindowDelegate {
         delegate = self
         textStorage = textView.textStorage
 
-        Logging.monitorObservation = Logging.logPublisher
-            .sink { [weak self] message in
+        Task {
+            await Logging.shared.setupMonitorCallback { [weak self] logString in
                 guard let self else { return }
-
-                let date = Date().formatted(Date.Formatters.logDateFormat)
-                let logString = NSAttributedString(string: ">>> \(date) - \(message())\n\n", attributes: ApiMonitorWindow.logAttributes)
-                Task { @MainActor in
-                    self.textStorage.append(logString)
-                    if self.autoScroll {
-                        self.textView.scrollToEndOfDocument(nil)
-                    }
+                textStorage.append(logString)
+                if autoScroll {
+                    textView.scrollToEndOfDocument(nil)
                 }
             }
+        }
     }
 
     func windowWillClose(_: Notification) {
-        Logging.monitorObservation = nil
+        Task {
+            await Logging.shared.setupMonitorCallback(nil)
+        }
         prefs?.closedApiMonitorWindow()
     }
 

@@ -76,7 +76,9 @@ enum GraphQL {
     static func setup() {
         Task { @LogActor in
             TQL.debugLog = { message in
-                Logging.log(message)
+                Task {
+                    await Logging.shared.log(message)
+                }
             }
         }
     }
@@ -229,7 +231,7 @@ enum GraphQL {
         nonisolated(unsafe) var gotUserNode = false
         let testQuery = Query(name: "Testing", rootElement: Group("viewer") { userFragment }) {
             if case let .node(node) = $0 {
-                Logging.log("Got a node, type: \(node.elementType), id: \(node.id)")
+                await Logging.shared.log("Got a node, type: \(node.elementType), id: \(node.id)")
                 if node.elementType == "User" {
                     gotUserNode = true
                 }
@@ -272,8 +274,10 @@ enum GraphQL {
         let start = Date()
 
         defer {
-            gate.returnTicket()
-            Logging.log("\(query.logPrefix)Response time: \(-start.timeIntervalSinceNow) sec")
+            Task {
+                gate.returnTicket()
+                await Logging.shared.log("\(query.logPrefix)Response time: \(-start.timeIntervalSinceNow) sec")
+            }
         }
 
         Task { @MainActor in
@@ -281,7 +285,7 @@ enum GraphQL {
             API.currentOperationName = query.name + " (call \(callCount))"
         }
 
-        Logging.log("\(query.logPrefix)Fetching: \(Q)")
+        await Logging.shared.log("\(query.logPrefix)Fetching: \(Q)")
 
         guard let json = try await HTTP.getJsonData(for: request, attempts: attempts, logPrefix: query.logPrefix, retryOnInvalidJson: true).json else {
             throw ApiError.graphQLFailure("\(query.logPrefix)Retuned data is not JSON")
@@ -292,7 +296,7 @@ enum GraphQL {
 
     private static func run(_ query: Query, for urlString: String, authToken: String, expectedNodeCost: Int?, attempts: Int = 5, newStats: @escaping (ApiStats) -> Void) async throws {
         if let expectedNodeCost {
-            Logging.log("\(query.logPrefix)Queued - Expected Count: \(expectedNodeCost)")
+            await Logging.shared.log("\(query.logPrefix)Queued - Expected Count: \(expectedNodeCost)")
         }
 
         var currentAttempt = attempts
@@ -314,20 +318,20 @@ enum GraphQL {
 
             if let expectedNodeCost {
                 if let apiStats {
-                    Logging.log("\(query.logPrefix)Received page (Cost: \(apiStats.cost), Remaining: \(apiStats.remaining)/\(apiStats.limit) - Expected Count: \(expectedNodeCost) - Returned Count: \(apiStats.nodeCount))")
+                    await Logging.shared.log("\(query.logPrefix)Received page (Cost: \(apiStats.cost), Remaining: \(apiStats.remaining)/\(apiStats.limit) - Expected Count: \(expectedNodeCost) - Returned Count: \(apiStats.nodeCount))")
                     if expectedNodeCost != apiStats.nodeCount {
-                        Logging.log("Warning: Mismatched expected and received node count!")
+                        await Logging.shared.log("Warning: Mismatched expected and received node count!")
                     }
                     newStats(apiStats)
                 } else {
-                    Logging.log("\(query.logPrefix)Received page (No stats) - Expected Count: \(expectedNodeCost)")
+                    await Logging.shared.log("\(query.logPrefix)Received page (No stats) - Expected Count: \(expectedNodeCost)")
                 }
             } else {
                 if let apiStats {
-                    Logging.log("\(query.logPrefix)Received page (Cost: \(apiStats.cost), Remaining: \(apiStats.remaining)/\(apiStats.limit) - Returned Count: \(apiStats.nodeCount))")
+                    await Logging.shared.log("\(query.logPrefix)Received page (Cost: \(apiStats.cost), Remaining: \(apiStats.remaining)/\(apiStats.limit) - Returned Count: \(apiStats.nodeCount))")
                     newStats(apiStats)
                 } else {
-                    Logging.log("\(query.logPrefix)Received page (No stats)")
+                    await Logging.shared.log("\(query.logPrefix)Received page (No stats)")
                 }
             }
 
@@ -342,7 +346,8 @@ enum GraphQL {
 
             if let errorMessage {
                 if currentAttempt > 0 {
-                    Logging.log("Retrying on GitHub error (attempts left: \(currentAttempt)): \(errorMessage)")
+                    let c = currentAttempt
+                    await Logging.shared.log("Retrying on GitHub error (attempts left: \(c)): \(errorMessage)")
                     try? await Task.sleep(nanoseconds: 5 * NSEC_PER_SEC)
                     currentAttempt -= 1
                     continue
@@ -914,10 +919,10 @@ enum GraphQL {
         let serverName = server.label.orEmpty
 
         let typeName = type.typeName
-        Logging.log("Migrating V4 \(typeName) DSs in `\(serverName)`")
+        await Logging.shared.log("Migrating V4 \(typeName) DSs in `\(serverName)`")
 
         let ids = type.allIds(in: server, moc: moc)
-        Logging.log("\(ids.count) IDs to process")
+        await Logging.shared.log("\(ids.count) IDs to process")
         if ids.isEmpty {
             return
         }
@@ -932,7 +937,7 @@ enum GraphQL {
                     server.updateApiStats(newStats)
                     if let idMigrations = newStats.migratedIds {
                         for (k, v) in idMigrations where k != v {
-                            // Logging.log("Migrating \(typeName) ID \(k) to \(v)")
+                            // Logging.shared.log("Migrating \(typeName) ID \(k) to \(v)")
                             if let item = type.item(id: k, in: moc) {
                                 item.nodeId = v
                             }

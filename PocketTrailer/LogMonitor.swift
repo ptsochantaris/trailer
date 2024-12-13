@@ -27,23 +27,21 @@ final class LogMonitor: UIViewController {
 
         textStorage = textView.textStorage
 
-        Logging.monitorObservation = Logging.logPublisher
-            .sink { [weak self] message in
+        Task {
+            await Logging.shared.setupMonitorCallback { [weak self] logString in
                 guard let self else { return }
-
-                let dateString = Date().formatted(Date.Formatters.logDateFormat)
-                let logString = NSAttributedString(string: ">>> \(dateString)\n\(message())\n\n")
-                Task { @MainActor in
-                    self.textStorage.append(logString)
-                    if self.autoScrollSwitch.isOn {
-                        let textCount = self.textStorage.length
-                        self.textView.scrollRangeToVisible(NSRange(location: textCount - 1, length: 1))
-                    }
+                textStorage.append(logString)
+                if autoScrollSwitch.isOn {
+                    let textCount = textStorage.length
+                    textView.scrollRangeToVisible(NSRange(location: textCount - 1, length: 1))
                 }
             }
+        }
     }
 
     deinit {
-        Logging.monitorObservation = nil
+        Task {
+            await Logging.shared.setupMonitorCallback(nil)
+        }
     }
 }

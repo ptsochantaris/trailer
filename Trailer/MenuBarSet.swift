@@ -131,14 +131,15 @@ final class MenuBarSet {
             let f = ListableItem.requestForItems(of: type, withFilter: menu.filter.stringValue, sectionIndex: -1, criterion: viewCriterion, excludeSnoozed: excludeSnoozed, settings: settings)
             let countString = somethingFailed ? "X" : (Settings.hideMenubarCounts ? "" : String(try! DataManager.main.count(for: f)))
 
-            Logging.log("Updating \(viewCriterion?.label ?? "general") \(type) menu, \(countString) total items")
+            let label = viewCriterion?.label
+            await Logging.shared.log("Updating \(label ?? "general") \(type) menu, \(countString) total items")
 
             let siv = StatusItemView()
             siv.textAttributes = attributes
             siv.highlighted = menu.isVisible
             siv.grayOut = shouldGray
             siv.countLabel = countString
-            siv.title = viewCriterion?.label
+            siv.title = label
             siv.icon = type == PullRequest.self ? StatusItemView.prIcon : StatusItemView.issueIcon
             siv.sizeToFit()
 

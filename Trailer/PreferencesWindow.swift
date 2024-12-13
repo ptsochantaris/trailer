@@ -1431,8 +1431,10 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         s.allowedContentTypes = [UTType.trailerSettings]
         s.beginSheetModal(for: self) { response in
             if response == .OK, let url = s.url {
-                _ = Settings.writeToURL(url)
-                Logging.log("Exported settings to \(url.absoluteString)")
+                Task {
+                    _ = await Settings.writeToURL(url)
+                    await Logging.shared.log("Exported settings to \(url.absoluteString)")
+                }
             }
         }
     }

@@ -42,11 +42,15 @@ final class Reachability {
 
         if SCNetworkReachabilitySetCallback(reachability, ReachabilityCallback, &context) {
             if SCNetworkReachabilityScheduleWithRunLoop(reachability, CFRunLoopGetCurrent(), CFRunLoopMode.commonModes.rawValue) {
-                Logging.log("Reachability monitoring active")
+                Task {
+                    await Logging.shared.log("Reachability monitoring active")
+                }
                 return
             }
         }
-        Logging.log("Reachability monitoring start failed")
+        Task {
+            await Logging.shared.log("Reachability monitoring start failed")
+        }
     }
 
     deinit {

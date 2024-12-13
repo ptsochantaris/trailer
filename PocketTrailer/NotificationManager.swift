@@ -1,7 +1,7 @@
 import CoreSpotlight
 import Lista
 import PopTimer
-import UserNotifications
+@preconcurrency import UserNotifications
 
 @MainActor
 final class NotificationManager: NSObject {
@@ -40,7 +40,9 @@ final class NotificationManager: NSObject {
         }
 
         guard let relatedItem else {
-            Logging.log("Could not locate the item related to this notification")
+            Task {
+                await Logging.shared.log("Could not locate the item related to this notification")
+            }
             return
         }
 
@@ -87,12 +89,12 @@ final class NotificationManager: NSObject {
         Task {
             do {
                 if try await n.requestAuthorization(options: .provisional) {
-                    Logging.log("Successfully registered for local notifications")
+                    await Logging.shared.log("Successfully registered for local notifications")
                 } else {
-                    Logging.log("Denied permission for notifications")
+                    await Logging.shared.log("Denied permission for notifications")
                 }
             } catch {
-                Logging.log("Registering for local notifications failed: \(error.localizedDescription)")
+                await Logging.shared.log("Registering for local notifications failed: \(error.localizedDescription)")
             }
         }
     }
@@ -307,7 +309,7 @@ final class NotificationManager: NSObject {
         if idsToRemove.isEmpty {
             return
         }
-        Logging.log("Removing related notifications: \(idsToRemove)")
+        Logging.shared.log("Removing related notifications: \(idsToRemove)")
         nc.removeDeliveredNotifications(withIdentifiers: idsToRemove)
     }
 
@@ -318,11 +320,11 @@ final class NotificationManager: NSObject {
 }
 
 extension NotificationManager: UNUserNotificationCenterDelegate {
-    func userNotificationCenter(_: UNUserNotificationCenter, willPresent _: UNNotification) async -> UNNotificationPresentationOptions {
+    nonisolated func userNotificationCenter(_: UNUserNotificationCenter, willPresent _: UNNotification) async -> UNNotificationPresentationOptions {
         [.badge, .banner, .list, .sound]
     }
 
-    func userNotificationCenter(_: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
+    nonisolated func userNotificationCenter(_: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
         await NotificationManager.shared.handleLocalNotification(notification: response.notification.request.content, action: response.actionIdentifier)
     }
 }

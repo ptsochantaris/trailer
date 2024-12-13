@@ -60,7 +60,9 @@ enum API {
         GraphQL.setup()
 
         let n = reachability.status
-        Logging.log("Network is \(n.name)")
+        Task {
+            await Logging.shared.log("Network is \(n.name)")
+        }
         currentNetworkStatus = n
 
         NotificationCenter.default.addObserver(forName: ReachabilityChangedNotification, object: nil, queue: .main) { _ in
@@ -77,18 +79,26 @@ enum API {
         let newStatus = reachability.status
         if newStatus != currentNetworkStatus {
             currentNetworkStatus = newStatus
-            Logging.log("Network changed to \(newStatus.name)")
+            Task {
+                await Logging.shared.log("Network changed to \(newStatus.name)")
+            }
         }
     }
 
     static var hasNetworkConnection: Bool {
-        Logging.log("Actively verifying reported network availability state…")
+        Task {
+            await Logging.shared.log("Actively verifying reported network availability state…")
+        }
         let previousNetworkStatus = currentNetworkStatus
         checkNetworkAvailability()
         if previousNetworkStatus != currentNetworkStatus {
-            Logging.log("Network state seems to have changed without having been notified, noted")
+            Task {
+                await Logging.shared.log("Network state seems to have changed without having been notified, noted")
+            }
         } else {
-            Logging.log("No change to network state")
+            Task {
+                await Logging.shared.log("No change to network state")
+            }
         }
         return currentNetworkStatus != .notReachable
     }
@@ -97,7 +107,10 @@ enum API {
 
     static var currentOperationName = lastSuccessfulSyncAt {
         didSet {
-            Logging.log("Status update: \(currentOperationName)")
+            let name = currentOperationName
+            Task {
+                await Logging.shared.log("Status update: \(name)")
+            }
             NotificationCenter.default.post(name: .SyncProgressUpdate, object: nil)
         }
     }
@@ -121,13 +134,17 @@ enum API {
                 return
             }
             if isRefreshing {
-                Logging.log("Starting refresh")
+                Task {
+                    await Logging.shared.log("Starting refresh")
+                }
                 GraphQL.callCount = 0
                 DataManager.postMigrationTasks()
                 NotificationQueue.clear()
                 NotificationCenter.default.post(name: .RefreshStarting, object: nil)
             } else {
-                Logging.log("Refresh done")
+                Task {
+                    await Logging.shared.log("Refresh done")
+                }
                 GraphQL.callCount = 0
                 if ApiServer.shouldReportRefreshFailure(in: DataManager.main) {
                     currentOperationName = "Last update failed"
@@ -158,7 +175,7 @@ enum API {
         childMoc.parent = DataManager.main
 
         currentOperationName = "Migrating IDs…"
-        Logging.log("Staring v4 API ID migration")
+        await Logging.shared.log("Staring v4 API ID migration")
 
         do {
             let types = [Team.self,
@@ -187,12 +204,12 @@ enum API {
                 try childMoc.save()
                 await DataManager.saveDB()
             }
-            Logging.log("v4 sync ID migration complete")
+            await Logging.shared.log("v4 sync ID migration complete")
             Settings.V4IdMigrationPhase = .done
 
         } catch {
             Settings.V4IdMigrationPhase = .failedPending
-            Logging.log("ID Migration failed: \(error.localizedDescription)")
+            await Logging.shared.log("ID Migration failed: \(error.localizedDescription)")
         }
     }
 
@@ -250,13 +267,13 @@ enum API {
 
         let repos = Repo.syncableRepos(in: syncMoc)
 
-        Logging.log("Will sync items from: \(repos.compactMap(\.fullName).joined(separator: ", "))")
+        await Logging.shared.log("Will sync items from: \(repos.compactMap(\.fullName).joined(separator: ", "))")
 
         if useV4 {
             do {
                 try await v4Sync(repos, to: syncMoc, settings: settings)
             } catch {
-                Logging.log("Sync aborted due to error: \(error.localizedDescription)")
+                await Logging.shared.log("Sync aborted due to error: \(error.localizedDescription)")
             }
 
         } else {
@@ -281,15 +298,15 @@ enum API {
 
         if syncMoc.hasChanges {
             do {
-                Logging.log("Committing synced data")
+                await Logging.shared.log("Committing synced data")
                 try syncMoc.save()
-                Logging.log("Synced data committed")
+                await Logging.shared.log("Synced data committed")
                 await DataManager.sendNotificationsIndexAndSave(settings: settings)
             } catch {
-                Logging.log("Committing sync failed: \(error.localizedDescription)")
+                await Logging.shared.log("Committing sync failed: \(error.localizedDescription)")
             }
         } else {
-            Logging.log("No changes, skipping commit")
+            await Logging.shared.log("No changes, skipping commit")
         }
     }
 
@@ -354,7 +371,7 @@ enum API {
         }
 
         if needToCheck {
-            Logging.log("Some API servers don't have user details yet, will bring user credentials down for them")
+            await Logging.shared.log("Some API servers don't have user details yet, will bring user credentials down for them")
             await syncUserDetails(in: moc)
         }
     }

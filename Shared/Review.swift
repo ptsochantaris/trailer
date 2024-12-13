@@ -72,7 +72,9 @@ final class Review: DataItem {
                 if let parent = PullRequest.asParent(with: parentId, in: moc, parentCache: parentCache) {
                     review.pullRequest = parent
                 } else {
-                    Logging.log("Warning Review without parent")
+                    Task {
+                        await Logging.shared.log("Warning Review without parent")
+                    }
                 }
             }
 

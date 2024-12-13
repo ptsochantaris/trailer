@@ -2,26 +2,48 @@ import Combine
 import Foundation
 import os.log
 
-enum Logging {
-    static let logPublisher = PassthroughSubject<() -> String, Never>()
-    static var monitorObservation: Cancellable?
+final actor Logging {
+    static let shared = Logging()
 
-    static var monitoringLog: Bool {
+    private let logPublisher = PassthroughSubject<() -> String, Never>()
+    private var monitorObservation: Cancellable?
+
+    var monitoringLog: Bool {
         consoleObservation != nil || monitorObservation != nil
     }
 
-    static func log(_ message: @escaping @autoclosure () -> String) {
+    func log(_ message: @Sendable @escaping @autoclosure () -> String) {
         if monitoringLog {
             logPublisher.send(message)
         }
     }
 
-    private static var consoleObservation: Cancellable?
-    static func setupConsoleLogging() {
+    private var consoleObservation: Cancellable?
+    func setupConsoleLogging() {
         consoleObservation = logPublisher
             .sink { message in
                 os_log("%{public}@", message())
             }
         log(">>> Will log to the system log, as '-useSystemLog' has been specified")
+    }
+
+    func setupMonitorCallback(_ block: (@MainActor (NSAttributedString) -> Void)?) {
+        if let block {
+            monitorObservation = logPublisher
+                .sink { message in
+                    let dateString = Date().formatted(Date.Formatters.logDateFormat)
+                    #if canImport(AppKit)
+                        let labelColor = COLOR_CLASS.labelColor
+                    #else
+                        let labelColor = COLOR_CLASS.label
+                    #endif
+                    let logString = NSAttributedString(string: ">>> \(dateString)\n\(message())\n\n", attributes: [.foregroundColor: labelColor])
+                    Task { @MainActor in
+                        block(logString)
+                    }
+                }
+        } else {
+            monitorObservation = nil
+        }
     }
 }

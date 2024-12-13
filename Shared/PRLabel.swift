@@ -26,7 +26,9 @@ final class PRLabel: DataItem {
                 } else if parent.elementType == "Issue", let parentIssue = Issue.asParent(with: parent.id, in: moc, parentCache: parentCache) {
                     label.issues.insert(parentIssue)
                 } else {
-                    Logging.log("Warning: PRLabel without parent")
+                    Task {
+                        await Logging.shared.log("Warning: PRLabel without parent")
+                    }
                 }
             }
 
@@ -70,10 +72,14 @@ final class PRLabel: DataItem {
         for i in existingItems {
             if let name = i.name, let idx = namesOfItems.firstIndex(of: name), let info = namesToInfo[name] {
                 namesOfItems.remove(at: idx)
-                Logging.log("Updating Label: \(name)")
+                Task {
+                    await Logging.shared.log("Updating Label: \(name)")
+                }
                 if i.nodeId == nil, let nodeId = info.potentialString(named: "node_id") { // migrate
                     i.nodeId = nodeId
-                    Logging.log("Migrated label '\(name)' with node ID \(nodeId)")
+                    Task {
+                        await Logging.shared.log("Migrated label '\(name)' with node ID \(nodeId)")
+                    }
                 }
                 postProcessCallback(i, info)
             }
@@ -81,7 +87,9 @@ final class PRLabel: DataItem {
 
         for name in namesOfItems {
             if let info = namesToInfo[name] {
-                Logging.log("Creating Label: \(name)")
+                Task {
+                    await Logging.shared.log("Creating Label: \(name)")
+                }
                 let i = NSEntityDescription.insertNewObject(forEntityName: "PRLabel", into: fromParent.managedObjectContext!) as! PRLabel
                 i.name = name
                 i.nodeId = info.potentialString(named: "node_id")
