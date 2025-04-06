@@ -11,18 +11,6 @@
 #endif
 
 extension COLOR_CLASS {
-    static var appGreen: COLOR_CLASS {
-        COLOR_CLASS(named: "appGreen")!
-    }
-
-    static var appYellow: COLOR_CLASS {
-        COLOR_CLASS(named: "appYellow")!
-    }
-
-    static var appRed: COLOR_CLASS {
-        COLOR_CLASS(named: "appRed")!
-    }
-
     static var appLabel: COLOR_CLASS {
         #if os(iOS)
             return .label

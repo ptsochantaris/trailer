@@ -455,7 +455,7 @@ enum DataManager {
             let finalURL = appSupportURL.appendingPathComponent("com.housetrip.Trailer")
         #endif
         Task {
-            Logging.shared.log("Files in \(finalURL.path)")
+            await Logging.shared.log("Files in \(finalURL.path)")
         }
         return finalURL
     }()
@@ -492,7 +492,7 @@ enum DataManager {
         let dataDir = dataFilesDirectory
         let sqlStorePath = dataDir.appendingPathComponent("Trailer.sqlite")
         Task {
-            Logging.shared.log("DB: \(sqlStorePath.path)")
+            await Logging.shared.log("DB: \(sqlStorePath.path)")
         }
         let fileManager = FileManager.default
         if fileManager.fileExists(atPath: sqlStorePath.path) {
@@ -504,7 +504,7 @@ enum DataManager {
                 try fileManager.createDirectory(atPath: dataDir.path, withIntermediateDirectories: true, attributes: nil)
             } catch {
                 Task {
-                    Logging.shared.log("Database directory creation error: \(error.localizedDescription)")
+                    await Logging.shared.log("Database directory creation error: \(error.localizedDescription)")
                 }
                 return nil
             }
@@ -514,12 +514,12 @@ enum DataManager {
             let persistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel: mom)
             try persistentStoreCoordinator.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: sqlStorePath, options: storeOptions)
             Task {
-                Logging.shared.log("Database setup complete")
+                await Logging.shared.log("Database setup complete")
             }
             return persistentStoreCoordinator
         } catch {
             Task {
-                Logging.shared.log("Database setup error: \(error.localizedDescription)")
+                await Logging.shared.log("Database setup error: \(error.localizedDescription)")
             }
             return nil
         }

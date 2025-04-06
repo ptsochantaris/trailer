@@ -1,10 +1,27 @@
 import Cocoa
 
 final class StatusItemView: NSView {
-    var icon: NSImage!
-    var textAttributes = [NSAttributedString.Key: Any]()
-    var countLabel = ""
+    var icon: NSImage
+    var textAttributes: [NSAttributedString.Key: Any]
+    var countLabel: String
     var title: String?
+
+    init(icon: NSImage, textAttributes: [NSAttributedString.Key: Any], highlighted: Bool, grayOut: Bool, countLabel: String, title: String?) {
+        self.icon = icon
+        self.textAttributes = textAttributes
+        self.highlighted = highlighted
+        self.grayOut = grayOut
+        self.countLabel = countLabel
+        self.title = title
+        super.init(frame: .zero)
+
+        sizeToFit()
+    }
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override func hitTest(_: NSPoint) -> NSView? {
         nil
@@ -48,12 +65,12 @@ final class StatusItemView: NSView {
         return img.resized(to: size, offset: NSPoint(x: 3, y: 3))
     }()
 
-    private func titleAttributes(foregorund: NSColor) -> [NSAttributedString.Key: Any] {
+    private func titleAttributes(foreground: NSColor) -> [NSAttributedString.Key: Any] {
         let p = NSMutableParagraphStyle()
         p.alignment = .center
         p.lineBreakMode = .byTruncatingMiddle
         return [
-            .foregroundColor: foregorund,
+            .foregroundColor: foreground,
             .font: NSFont.menuFont(ofSize: 6),
             .paragraphStyle: p
         ]
@@ -66,7 +83,7 @@ final class StatusItemView: NSView {
         var itemWidth: CGFloat = 0
         if let title {
             itemWidth = icon.size.width - 6
-            let titleWidth = title.size(withAttributes: titleAttributes(foregorund: .appLabel)).width
+            let titleWidth = title.size(withAttributes: titleAttributes(foreground: .appLabel)).width
             itemWidth = max(itemWidth, titleWidth)
         } else {
             itemWidth = icon.size.width
@@ -112,7 +129,7 @@ final class StatusItemView: NSView {
 
         if let title {
             let r = CGRect(x: 0, y: bounds.height - 7, width: bounds.width, height: 7)
-            title.draw(in: r, withAttributes: titleAttributes(foregorund: foreground))
+            title.draw(in: r, withAttributes: titleAttributes(foreground: foreground))
 
             let iconWidth = tintedIcon.size.width - 6
             let countLabelWidth = countLabel.size(withAttributes: textAttributes).width

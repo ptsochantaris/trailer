@@ -992,8 +992,11 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 
     func statusItem(for view: NSView) -> NSStatusItem? {
         for d in menuBarSets {
-            if d.prMenu.statusItem?.statusView === view { return d.prMenu.statusItem }
-            if d.issuesMenu.statusItem?.statusView === view { return d.issuesMenu.statusItem }
+            if let prItem = d.prMenu.statusItem, prItem.statusView === view {
+                return prItem
+            } else if let issueItem = d.issuesMenu.statusItem, issueItem.statusView === view {
+                return issueItem
+            }
         }
         return nil
     }

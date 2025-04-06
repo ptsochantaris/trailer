@@ -17,7 +17,7 @@ final class TabBarSet {
 
         let prf = ListableItem.requestForItems(of: PullRequest.self, withFilter: nil, sectionIndex: -1, criterion: viewCriterion, settings: settings)
         if try! DataManager.main.count(for: prf) > 0 {
-            let i = UITabBarItem(title: label ?? "Pull Requests", image: UIImage(named: "prsTab"), selectedImage: nil)
+            let i = UITabBarItem(title: label ?? "Pull Requests", image: .prsTab, selectedImage: nil)
             let prUnreadCount = PullRequest.badgeCount(in: DataManager.main, criterion: viewCriterion, settings: settings)
             i.badgeValue = prUnreadCount > 0 ? "\(prUnreadCount)" : nil
             items.append(i)
@@ -25,7 +25,7 @@ final class TabBarSet {
         }
         let isf = ListableItem.requestForItems(of: Issue.self, withFilter: nil, sectionIndex: -1, criterion: viewCriterion, settings: settings)
         if try! DataManager.main.count(for: isf) > 0 {
-            let i = UITabBarItem(title: label ?? "Issues", image: UIImage(named: "issuesTab"), selectedImage: nil)
+            let i = UITabBarItem(title: label ?? "Issues", image: .issuesTab, selectedImage: nil)
             let issuesUnreadCount = Issue.badgeCount(in: DataManager.main, criterion: viewCriterion, settings: settings)
             i.badgeValue = issuesUnreadCount > 0 ? "\(issuesUnreadCount)" : nil
             items.append(i)
@@ -623,9 +623,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         }
 
         if let i = tabs.selectedItem?.image {
-            viewingPrs = i == UIImage(named: "prsTab") // not proud of this :(
+            viewingPrs = i == .prsTab // not proud of this :(
         } else if let currentTabBarSet {
-            viewingPrs = currentTabBarSet.tabItems.first?.image == UIImage(named: "prsTab") // or this :(
+            viewingPrs = currentTabBarSet.tabItems.first?.image == .prsTab // or this :(
         } else if Repo.anyVisibleRepos(in: DataManager.main, criterion: currentTabBarSet?.viewCriterion, excludeGrouped: true) {
             viewingPrs = Repo.mayProvidePrsForDisplay(fromServerWithId: currentTabBarSet?.viewCriterion?.apiServerId)
         } else {

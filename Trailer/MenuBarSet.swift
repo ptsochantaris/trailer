@@ -134,14 +134,12 @@ final class MenuBarSet {
             let label = viewCriterion?.label
             await Logging.shared.log("Updating \(label ?? "general") \(type) menu, \(countString) total items")
 
-            let siv = StatusItemView()
-            siv.textAttributes = attributes
-            siv.highlighted = menu.isVisible
-            siv.grayOut = shouldGray
-            siv.countLabel = countString
-            siv.title = label
-            siv.icon = type == PullRequest.self ? StatusItemView.prIcon : StatusItemView.issueIcon
-            siv.sizeToFit()
+            let siv = StatusItemView(icon: type == PullRequest.self ? StatusItemView.prIcon : StatusItemView.issueIcon,
+                                     textAttributes: attributes,
+                                     highlighted: menu.isVisible,
+                                     grayOut: shouldGray,
+                                     countLabel: countString,
+                                     title: label)
 
             if let existingItem = menu.statusItem {
                 existingItem.length = siv.frame.width

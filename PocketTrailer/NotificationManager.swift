@@ -309,7 +309,7 @@ final class NotificationManager: NSObject {
         if idsToRemove.isEmpty {
             return
         }
-        Logging.shared.log("Removing related notifications: \(idsToRemove)")
+        await Logging.shared.log("Removing related notifications: \(idsToRemove)")
         nc.removeDeliveredNotifications(withIdentifiers: idsToRemove)
     }
 

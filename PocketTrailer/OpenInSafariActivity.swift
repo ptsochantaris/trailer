@@ -14,7 +14,7 @@ final class OpenInSafariActivity: UIActivity {
     }
 
     override var activityImage: UIImage? {
-        UIImage(named: "safariShare")
+        .safariShare
     }
 
     override func prepare(withActivityItems activityItems: [Any]) {

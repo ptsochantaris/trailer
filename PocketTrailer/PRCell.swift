@@ -205,7 +205,7 @@ final class PRCell: UITableViewCell {
 
     private func loadImageAtPath(imagePath: String?) {
         waitingForImageInPath = imagePath
-        _image.image = UIImage(named: "avatarPlaceHolder")
+        _image.image = .avatarPlaceHolder
         failedToLoadImage = nil
         if let imagePath {
             Task {
