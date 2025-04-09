@@ -48,7 +48,7 @@ final class StatusItemView: NSView {
     }
 
     static let prIcon: NSImage = {
-        let img = NSImage(named: NSImage.Name("PullRequestIcon"))!
+        let img = NSImage.pullRequestIcon
         var size = img.size
         let scale = 16.0 / size.height
         size.width *= scale
@@ -57,7 +57,7 @@ final class StatusItemView: NSView {
     }()
 
     static let issueIcon: NSImage = {
-        let img = NSImage(named: NSImage.Name("IssueIcon"))!
+        let img = NSImage.issueIcon
         var size = img.size
         let scale = 16.0 / size.height
         size.width *= scale
