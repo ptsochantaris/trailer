@@ -241,7 +241,7 @@ final class ApiServer: NSManagedObject {
     }
 
     func test() async throws {
-        try await withThrowingTaskGroup(of: Void.self) { group in
+        try await withThrowingTaskGroup { group in
             if let graphQLPath {
                 group.addTask {
                     await Logging.shared.log("Checking GraphQL interface on \(graphQLPath)")

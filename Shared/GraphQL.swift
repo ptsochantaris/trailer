@@ -369,7 +369,7 @@ enum GraphQL {
     }
 
     static func runQueries(queries: Lista<Query>, on path: String, token: String, newStats: @escaping (ApiStats) -> Void) async throws {
-        try await withThrowingTaskGroup(of: Void.self) { group in
+        try await withThrowingTaskGroup { group in
             for query in queries {
                 group.addTask {
                     do {
@@ -646,7 +646,7 @@ enum GraphQL {
     }
 
     static func fetchAllAuthoredPrs(from servers: [ApiServer], settings: Settings.Cache) async {
-        await withTaskGroup(of: Void.self) { group in
+        await withTaskGroup { group in
             for server in servers {
                 if Settings.queryAuthoredPRs {
                     let g = Group("pullRequests", ("states", "[OPEN]"), paging: settings.syncProfile.mediumPageSize) {
@@ -665,7 +665,7 @@ enum GraphQL {
     }
 
     static func fetchAllAuthoredIssues(from servers: [ApiServer], settings: Settings.Cache) async {
-        await withTaskGroup(of: Void.self) { group in
+        await withTaskGroup { group in
             for server in servers {
                 if settings.queryAuthoredIssues {
                     let g = Group("issues", ("states", "[OPEN]"), paging: .max) {

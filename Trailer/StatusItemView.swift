@@ -103,6 +103,8 @@ final class StatusItemView: NSView {
     }
 
     override func draw(_: NSRect) {
+        // print(">>>", effectiveAppearance.attributeKeys) // TODO: handle fading
+
         var countAttributes = textAttributes
         let foreground: NSColor
 

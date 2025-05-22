@@ -29,7 +29,6 @@ final class Repo: DataItem {
 
     static func sync(from nodes: Lista<Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
         syncItems(of: Repo.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { repo, node in
-
             var neededByAuthoredPr = false
             var neededByAuthoredIssue = false
             if let parent = node.parent {

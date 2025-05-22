@@ -478,7 +478,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
     }
 
     private func requestTabFocus(tabItem: UITabBarItem?, item: ListableItem? = nil, overrideUrl: String? = nil, andOpen: Bool = false) async {
-        await withTaskGroup(of: Void.self) { group in
+        await withTaskGroup { group in
             if let tabItem {
                 group.addTask { @MainActor [weak self] in
                     guard let self else { return }

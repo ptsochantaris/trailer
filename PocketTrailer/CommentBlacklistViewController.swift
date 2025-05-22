@@ -107,7 +107,6 @@ final class CommentBlacklistViewController: UITableViewController {
         }
         a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         a.addAction(UIAlertAction(title: "Block", style: .default) { _ in
-
             guard let tf = a.textFields?.first, let n = tf.text?.trim else {
                 return
             }

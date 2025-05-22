@@ -189,7 +189,7 @@ enum API {
                          Repo.self]
 
             let goodToGoServers = ApiServer.allApiServers(in: childMoc).filter(\.goodToGo)
-            try await withThrowingTaskGroup(of: Void.self) { group in
+            try await withThrowingTaskGroup { group in
                 for server in goodToGoServers {
                     for type in types {
                         group.addTask {
@@ -344,7 +344,7 @@ enum API {
 
         let goodToGoServers = ApiServer.allApiServers(in: moc).filter(\.goodToGo)
 
-        await withTaskGroup(of: Void.self) { group in
+        await withTaskGroup { group in
             for apiServer in goodToGoServers {
                 group.addTask {
                     await syncWatchedRepos(from: apiServer, moc: moc)

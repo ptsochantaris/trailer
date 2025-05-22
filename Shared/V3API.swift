@@ -36,7 +36,7 @@ extension API {
             let apiServer = r.apiServer
             guard apiServer.lastSyncSucceeded else { continue }
 
-            await withTaskGroup(of: Void.self) { group in
+            await withTaskGroup { group in
                 if r.displayPolicyForPrs != RepoDisplayPolicy.hide.rawValue {
                     let repoFullName = r.fullName.orEmpty
                     group.addTask {
@@ -63,7 +63,7 @@ extension API {
     }
 
     private static func markExtraUpdatedItems(from repos: [Repo]) async {
-        await withTaskGroup(of: Void.self) { group in
+        await withTaskGroup { group in
             for r in repos {
                 let repoFullName = r.fullName.orEmpty
                 let lastLocalEvent = r.lastScannedIssueEventId
@@ -130,8 +130,7 @@ extension API {
         let newOrUpdatedPrs = PullRequest.newOrUpdatedItems(in: moc, fromSuccessfulSyncOnly: true)
         let newOrUpdatedIssues = Issue.newOrUpdatedItems(in: moc, fromSuccessfulSyncOnly: true)
 
-        await withTaskGroup(of: Void.self) { group in
-
+        await withTaskGroup { group in
             if Settings.showStatusItems {
                 group.addTask {
                     await fetchStatusesForCurrentPullRequests(to: moc, settings: settings)
@@ -184,7 +183,7 @@ extension API {
                 }
             }
 
-            await withTaskGroup(of: Void.self) { commentGroup in
+            await withTaskGroup { commentGroup in
                 if settings.shouldSyncReviews {
                     commentGroup.addTask {
                         await fetchReviewsForForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
@@ -239,7 +238,7 @@ extension API {
             return
         }
 
-        await withTaskGroup(of: Void.self) { group in
+        await withTaskGroup { group in
             for c in comments {
                 for r in c.reactions {
                     r.postSyncAction = PostSyncAction.delete.rawValue
@@ -269,7 +268,7 @@ extension API {
         }
 
         let now = Date()
-        await withTaskGroup(of: Void.self) { group in
+        await withTaskGroup { group in
             for i in items {
                 i.lastReactionScan = now
                 for r in i.reactions {
@@ -309,7 +308,7 @@ extension API {
         }
 
         @Sendable func _fetchComments(issues: Bool) async {
-            await withTaskGroup(of: Void.self) { group in
+            await withTaskGroup { group in
                 for p in prs {
                     if let link = (issues ? p.commentsLink : p.reviewCommentLink) {
                         let apiServer = p.apiServer
@@ -330,7 +329,7 @@ extension API {
             }
         }
 
-        await withTaskGroup(of: Void.self) { group in
+        await withTaskGroup { group in
             group.addTask {
                 await _fetchComments(issues: true)
             }
@@ -345,7 +344,7 @@ extension API {
             return
         }
 
-        await withTaskGroup(of: Void.self) { group in
+        await withTaskGroup { group in
             for i in issues {
                 for c in i.comments {
                     c.postSyncAction = PostSyncAction.delete.rawValue
@@ -376,7 +375,7 @@ extension API {
             return
         }
 
-        await withTaskGroup(of: Void.self) { group in
+        await withTaskGroup { group in
             for p in prs {
                 for l in p.reviews {
                     l.postSyncAction = PostSyncAction.delete.rawValue
@@ -441,7 +440,7 @@ extension API {
 
         let prsToCheck = try! moc.fetch(f).filter(\.shouldCheckForClosing)
 
-        await withTaskGroup(of: Void.self) { group in
+        await withTaskGroup { group in
             for r in prsToCheck {
                 group.addTask {
                     await investigatePrClosure(for: r)
@@ -451,7 +450,7 @@ extension API {
     }
 
     private static func fetchReviewAssignmentsForCurrentPullRequests(for prs: [PullRequest]) async {
-        await withThrowingTaskGroup(of: Void.self) { group in
+        await withThrowingTaskGroup { group in
             for p in prs {
                 group.addTask { @MainActor in
                     let repoFullName = p.repo.fullName.orEmpty
@@ -489,7 +488,7 @@ extension API {
             return
         }
 
-        await withTaskGroup(of: Void.self) { group in
+        await withTaskGroup { group in
             for p in prs {
                 for l in p.labels {
                     l.postSyncAction = PostSyncAction.delete.rawValue
@@ -521,7 +520,7 @@ extension API {
             return
         }
 
-        await withTaskGroup(of: Void.self) { group in
+        await withTaskGroup { group in
             for i in issues {
                 for l in i.labels {
                     l.postSyncAction = PostSyncAction.delete.rawValue
@@ -555,8 +554,7 @@ extension API {
         }
 
         let now = Date()
-        await withTaskGroup(of: Void.self) { group in
-
+        await withTaskGroup { group in
             for p in prs {
                 for s in p.statuses {
                     s.postSyncAction = PostSyncAction.delete.rawValue
@@ -587,7 +585,7 @@ extension API {
     }
 
     private static func detectAssignedPullRequests(for prs: [PullRequest]) async {
-        await withTaskGroup(of: Void.self) { group in
+        await withTaskGroup { group in
             for p in prs {
                 let apiServer = p.apiServer
                 if let issueLink = p.issueUrl {

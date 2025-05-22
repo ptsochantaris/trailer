@@ -56,7 +56,6 @@ final class Review: DataItem {
 
     static func sync(from nodes: Lista<Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
         syncItems(of: Review.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { review, node in
-
             let info = node.jsonPayload
             if (try? info.keys)?.count == 3 { // this node is a blank container (id, comments, typename)
                 return

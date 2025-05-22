@@ -21,7 +21,6 @@ final class Issue: ListableItem {
 
     static func sync(from nodes: Lista<Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
         syncItems(of: Issue.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { issue, node in
-
             let parentId: String
             if let parent = node.parent {
                 parentId = parent.id

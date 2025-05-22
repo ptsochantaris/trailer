@@ -413,7 +413,7 @@ enum DataManager {
         let start = Date()
         let increment = 200
 
-        await withTaskGroup(of: Void.self) { group in
+        await withTaskGroup { group in
             let prCount = PullRequest.countItems(in: context)
             for i in stride(from: 0, to: prCount, by: increment) {
                 group.addTask(priority: .high) {

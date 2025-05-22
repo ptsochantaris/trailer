@@ -671,7 +671,6 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         }
 
         keyDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] incomingEvent -> NSEvent? in
-
             guard let self else { return incomingEvent }
 
             if checkForHotkey(in: incomingEvent) {

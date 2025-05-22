@@ -61,7 +61,7 @@ extension API {
         }
 
         let prTask = Task {
-            await withTaskGroup(of: Void.self) { group in
+            await withTaskGroup { group in
                 if !servers.isEmpty {
                     group.addTask {
                         await GraphQL.fetchAllAuthoredPrs(from: servers, settings: settings)
@@ -77,7 +77,7 @@ extension API {
             }
             let newOrUpdatedPrs = PullRequest.newOrUpdatedItems(in: moc, fromSuccessfulSyncOnly: true)
 
-            try await withThrowingTaskGroup(of: Void.self) { group in
+            try await withThrowingTaskGroup { group in
                 if settings.showStatusItems {
                     group.addTask { @MainActor in
                         let prs = PullRequest.statusCheckBatch(in: moc, settings: settings)
@@ -111,7 +111,7 @@ extension API {
         }
 
         let issueTask = Task {
-            await withTaskGroup(of: Void.self) { group in
+            await withTaskGroup { group in
                 if !servers.isEmpty {
                     group.addTask {
                         await GraphQL.fetchAllAuthoredIssues(from: servers, settings: settings)
