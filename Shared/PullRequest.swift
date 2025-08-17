@@ -284,6 +284,7 @@ final class PullRequest: ListableItem {
         return try! moc.fetch(f)
     }
 
+    @MainActor
     override static func hasOpen(in moc: NSManagedObjectContext, criterion: GroupingCriterion?) -> Bool {
         let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
         f.includesSubentities = false

@@ -116,8 +116,9 @@ enum DataManager {
 
             for pr in latestStatuses.map(\.pullRequest) where pr.isSnoozing && pr.shouldWakeOnStatusChange && !coveredPrs.contains(pr.objectID) {
                 coveredPrs.insert(pr.objectID)
+                let prNodeId = pr.nodeId ?? "<no ID>"
                 Task {
-                    await Logging.shared.log("Waking up snoozed PR ID \(pr.nodeId ?? "<no ID>") because of a status update")
+                    await Logging.shared.log("Waking up snoozed PR ID \(prNodeId) because of a status update")
                 }
                 pr.wakeUp(settings: settings)
             }

@@ -307,6 +307,7 @@ extension API {
             }
         }
 
+        @MainActor
         @Sendable func _fetchComments(issues: Bool) async {
             await withTaskGroup { group in
                 for p in prs {
@@ -399,7 +400,8 @@ extension API {
     }
 
     private static func investigatePrClosure(for pullRequest: PullRequest) async {
-        await Logging.shared.log("Checking closed PR to see if it was merged: \(pullRequest.title.orEmpty)")
+        let prTitle = pullRequest.title.orEmpty
+        await Logging.shared.log("Checking closed PR to see if it was merged: \(prTitle)")
 
         let repoFullName = pullRequest.repo.fullName.orEmpty
         let path = "/repos/\(repoFullName)/pulls/\(pullRequest.number)"

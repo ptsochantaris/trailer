@@ -267,7 +267,8 @@ enum API {
 
         let repos = Repo.syncableRepos(in: syncMoc)
 
-        await Logging.shared.log("Will sync items from: \(repos.compactMap(\.fullName).joined(separator: ", "))")
+        let repoList = repos.compactMap(\.fullName).joined(separator: ", ")
+        await Logging.shared.log("Will sync items from: \(repoList)")
 
         if useV4 {
             do {

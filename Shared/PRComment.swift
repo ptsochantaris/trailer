@@ -91,10 +91,12 @@ final class PRComment: DataItem {
             return
         }
 
+        let parentNodeId = parent.nodeId ?? "<no ID>"
+
         if contains(terms: ["@\(apiServer.userName!)"]) {
             if parent.isSnoozing, parent.shouldWakeOnMention {
                 Task {
-                    await Logging.shared.log("Waking up snoozed item ID \(parent.nodeId ?? "<no ID>") because of mention")
+                    await Logging.shared.log("Waking up snoozed item ID \(parentNodeId) because of mention")
                 }
                 parent.wakeUp(settings: settings)
             }
@@ -104,7 +106,7 @@ final class PRComment: DataItem {
 
         if parent.isSnoozing, parent.shouldWakeOnComment {
             Task {
-                await Logging.shared.log("Waking up snoozed item ID \(parent.nodeId ?? "<no ID>") because of posted comment")
+                await Logging.shared.log("Waking up snoozed item ID \(parentNodeId) because of posted comment")
             }
             parent.wakeUp(settings: settings)
         }
