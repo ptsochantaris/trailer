@@ -12,7 +12,10 @@ final class SetupAssistant: NSWindow, NSWindowDelegate, NSControlTextEditingDele
     @IBOutlet private var welcomeLabel: NSTextField!
     @IBOutlet private var importButton: NSButton!
 
-    private let newServer = ApiServer.allApiServers(in: DataManager.main).first!
+    private lazy var newServer: ApiServer = {
+        ApiServer.ensureAtLeastGithub(in: DataManager.main)
+        return ApiServer.allApiServers(in: DataManager.main).first!
+    }()
 
     @MainActor
     override func awakeFromNib() {
@@ -133,6 +136,8 @@ final class SetupAssistant: NSWindow, NSWindowDelegate, NSControlTextEditingDele
         completeSetup.isHidden = true
         welcomeLabel.isHidden = true
         importButton.isHidden = true
+        // Save the server to Core Data first to get a permanent object ID
+        try! DataManager.main.save()
         newServer.authToken = tokenHolder.stringValue.trim
         newServer.lastSyncSucceeded = true
     }
