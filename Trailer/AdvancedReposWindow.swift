@@ -115,6 +115,7 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
         }
     }
 
+    @MainActor
     private func prepareReposForSync() async {
         lastRepoCheck = .distantPast
         for a in ApiServer.allApiServers(in: DataManager.main) {

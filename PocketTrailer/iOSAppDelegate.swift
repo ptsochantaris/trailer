@@ -98,6 +98,7 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate {
         NotificationCenter.default.removeObserver(self)
     }
 
+    @MainActor
     func startRefreshIfItIsDue() async {
         if let l = Settings.lastSuccessfulRefresh {
             let howLongAgo = Date().timeIntervalSince(l).rounded()

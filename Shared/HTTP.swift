@@ -4,7 +4,7 @@ import Semalot
 import TrailerJson
 
 enum DataResult {
-    case success(headers: [AnyHashable: Any], data: Data), notFound, deleted, failed(code: Int), cancelled, ignored
+    case success(headers: [String: Sendable], data: Data), notFound, deleted, failed(code: Int), cancelled, ignored
 
     var logValue: String {
         switch self {
@@ -111,7 +111,13 @@ enum HTTP {
                 case 400...:
                     return .failed(code: code)
                 default:
-                    return .success(headers: httpResponse.allHeaderFields, data: response.0)
+                    var headers = [String: Sendable]()
+                    for (k, v) in httpResponse.allHeaderFields {
+                        if let k = k as? String {
+                            headers[k] = v
+                        }
+                    }
+                    return .success(headers: headers, data: response.0)
                 }
             } catch {
                 if (error as NSError).code == -999 {

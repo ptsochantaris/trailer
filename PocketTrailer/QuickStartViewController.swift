@@ -1,6 +1,7 @@
 import SafariServices
 
 extension UIViewController {
+    @MainActor
     func dismiss(animated: Bool) async {
         await withCheckedContinuation { continuation in
             dismiss(animated: animated) {

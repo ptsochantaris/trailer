@@ -86,6 +86,7 @@ final class Review: DataItem {
         self
     }
 
+    @MainActor
     static func syncReviews(from data: [TypedJson.Entry]?, withParent: PullRequest, moc: NSManagedObjectContext) async {
         let parentId = withParent.objectID
         let apiServerId = withParent.apiServer.objectID

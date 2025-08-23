@@ -173,13 +173,14 @@ final class ApiServer: NSManagedObject {
     }
 
     @MainActor
-    static func ensureAtLeastGithub(in moc: NSManagedObjectContext) {
+    static func ensureAtLeastGithub(in moc: NSManagedObjectContext) -> ApiServer? {
         let f = NSFetchRequest<ApiServer>(entityName: "ApiServer")
         f.fetchLimit = 1
         let numberOfExistingApiServers = try! moc.count(for: f)
         if numberOfExistingApiServers == 0 {
-            _ = addDefaultGithub(in: moc)
+            return addDefaultGithub(in: moc)
         }
+        return nil
     }
 
     @MainActor

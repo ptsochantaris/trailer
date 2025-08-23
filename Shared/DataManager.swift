@@ -35,16 +35,16 @@ enum DataManager {
     static func checkMigration() {
         guard let count = persistentStoreCoordinator?.persistentStores.count, count > 0 else { return }
 
+        _ = ApiServer.ensureAtLeastGithub(in: main)
+
         if Settings.lastRunVersion != versionString {
             Task {
                 await Logging.shared.log("VERSION UPDATE MAINTENANCE NEEDED")
             }
-            ApiServer.ensureAtLeastGithub(in: main)
             ApiServer.resetSyncOfEverything()
             Settings.lastRunVersion = versionString
             migrated = true
         }
-        ApiServer.ensureAtLeastGithub(in: main)
     }
 
     private static func processNotificationsForItems(of type: (some ListableItem).Type, newNotification: NotificationType, reopenedNotification: NotificationType, assignmentNotification: NotificationType, settings: Settings.Cache) async {

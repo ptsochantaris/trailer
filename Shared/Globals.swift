@@ -56,7 +56,6 @@ let COMMENT_ID_KEY = "commentIdKey"
 let NOTIFICATION_URL_KEY = "urlKey"
 
 extension NSAttributedString: @retroactive @unchecked Sendable {}
-extension IMAGE_CLASS: @retroactive @unchecked Sendable {}
 
 ////////////////////////// Utilities
 
@@ -280,7 +279,7 @@ struct ApiStats {
     let resetAt: Date?
     let migratedIds: [String: String]?
 
-    static func fromV3(headers: [AnyHashable: Any]) -> ApiStats {
+    static func fromV3(headers: [String: Sendable]) -> ApiStats {
         let date: Date? = if let epochSeconds = headers["x-ratelimit-reset"] as? String, let t = TimeInterval(epochSeconds) {
             Date(timeIntervalSince1970: t)
         } else {

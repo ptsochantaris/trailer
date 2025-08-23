@@ -16,6 +16,7 @@ final class PRStatus: DataItem {
 
     override static var typeName: String { "PRStatus" }
 
+    @MainActor
     static func syncStatuses(from data: [TypedJson.Entry]?, pullRequest: PullRequest, moc: NSManagedObjectContext) async {
         let pullRequestId = pullRequest.objectID
         let serverId = pullRequest.apiServer.objectID

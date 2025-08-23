@@ -12,10 +12,19 @@ final class SetupAssistant: NSWindow, NSWindowDelegate, NSControlTextEditingDele
     @IBOutlet private var welcomeLabel: NSTextField!
     @IBOutlet private var importButton: NSButton!
 
-    private lazy var newServer: ApiServer = {
-        ApiServer.ensureAtLeastGithub(in: DataManager.main)
-        return ApiServer.allApiServers(in: DataManager.main).first!
-    }()
+    @MainActor
+    private var newServer: ApiServer {
+        get async {
+            if let existing = ApiServer.allApiServers(in: DataManager.main).first {
+                return existing
+            }
+            if let created = ApiServer.ensureAtLeastGithub(in: DataManager.main) {
+                await DataManager.saveDB()
+                return created
+            }
+            fatalError("No API server found")
+        }
+    }
 
     @MainActor
     override func awakeFromNib() {
@@ -63,12 +72,16 @@ final class SetupAssistant: NSWindow, NSWindowDelegate, NSControlTextEditingDele
         } else {
             testingState()
             Task {
+                let server = await newServer
+                server.authToken = tokenHolder.stringValue.trim
+                server.lastSyncSucceeded = true
+
                 do {
-                    try await newServer.test()
+                    try await server.test()
                     quickstart.stringValue = "\nFetching your watchlist. This will take a moment…"
                     Settings.lastSuccessfulRefresh = nil
                     await app.startRefreshIfItIsDue()
-                    await checkRefreshDone()
+                    await checkRefreshDone(server: server)
                 } catch {
                     let alert = NSAlert()
                     alert.messageText = "Testing the token failed - please check that you have pasted your token correctly"
@@ -82,12 +95,13 @@ final class SetupAssistant: NSWindow, NSWindowDelegate, NSControlTextEditingDele
         }
     }
 
-    private func checkRefreshDone() async {
+    @MainActor
+    private func checkRefreshDone(server: ApiServer) async {
         while API.isRefreshing {
             try? await Task.sleep(nanoseconds: 200 * NSEC_PER_MSEC)
         }
 
-        if newServer.lastSyncSucceeded {
+        if server.lastSyncSucceeded {
             close()
 
             guard let prefs = app.showPreferencesWindow(andSelect: 1) else {
@@ -136,10 +150,6 @@ final class SetupAssistant: NSWindow, NSWindowDelegate, NSControlTextEditingDele
         completeSetup.isHidden = true
         welcomeLabel.isHidden = true
         importButton.isHidden = true
-        // Save the server to Core Data first to get a permanent object ID
-        try! DataManager.main.save()
-        newServer.authToken = tokenHolder.stringValue.trim
-        newServer.lastSyncSucceeded = true
     }
 
     @IBAction private func importSettingsSelected(_: NSButton) {

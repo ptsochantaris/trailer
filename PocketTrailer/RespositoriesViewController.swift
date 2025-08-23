@@ -142,9 +142,9 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
         tempContext.perform { [weak self] in
             Task {
                 await API.fetchRepositories(to: tempContext)
-                if ApiServer.shouldReportRefreshFailure(in: tempContext) {
+                if await ApiServer.shouldReportRefreshFailure(in: tempContext) {
                     var errorServers = [String]()
-                    for apiServer in ApiServer.allApiServers(in: tempContext) where apiServer.goodToGo && !apiServer.lastSyncSucceeded {
+                    for apiServer in await ApiServer.allApiServers(in: tempContext) where apiServer.goodToGo && !apiServer.lastSyncSucceeded {
                         errorServers.append(apiServer.label.orEmpty)
                     }
                     let serverNames = errorServers.joined(separator: ", ")
