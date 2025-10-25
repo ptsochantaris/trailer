@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21219" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="24128" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21219"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="24128"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -18,7 +18,7 @@
             <windowCollectionBehavior key="collectionBehavior" transient="YES" ignoresCycle="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="0.0" y="0.0" width="376" height="710"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1415"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1049"/>
             <view key="contentView" id="FRg-h6-6Yy">
                 <rect key="frame" x="0.0" y="0.0" width="376" height="710"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -75,14 +75,14 @@
                                 </connections>
                             </searchField>
                             <popUpButton horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6GZ-ZC-FHj">
-                                <rect key="frame" x="7" y="3" width="22" height="26"/>
+                                <rect key="frame" x="7" y="4" width="22" height="24"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <popUpButtonCell key="cell" type="disclosure" bezelStyle="roundedDisclosure" imagePosition="only" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" pullsDown="YES" arrowPosition="noArrow" preferredEdge="maxY" id="tc8-dD-eIJ">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="menu"/>
+                                    <font key="font" metaFont="message"/>
                                     <menu key="menu" title="Options" showsStateColumn="NO" id="wx2-Q6-mBb">
                                         <items>
-                                            <menuItem isSeparatorItem="YES" hidden="YES" id="8Rg-HM-Rif"/>
+                                            <menuItem isSeparatorItem="YES" image="NSTouchBarGoDownTemplate" hidden="YES" id="8Rg-HM-Rif"/>
                                             <menuItem title=" Refresh" state="on" keyEquivalent="r" id="Kwu-bD-N83">
                                                 <connections>
                                                     <action selector="refreshSelected:" target="KHN-KI-GyO" id="M3z-0e-wQR"/>
@@ -131,4 +131,7 @@
             <point key="canvasLocation" x="639" y="-28"/>
         </window>
     </objects>
+    <resources>
+        <image name="NSTouchBarGoDownTemplate" width="18" height="11"/>
+    </resources>
 </document>

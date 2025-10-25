@@ -480,7 +480,7 @@ enum DataManager {
 
     private static var _justMigrated = false
 
-    static var persistentStoreCoordinator: NSPersistentStoreCoordinator? = {
+    static let persistentStoreCoordinator: NSPersistentStoreCoordinator? = {
         let storeOptions: [AnyHashable: Any] = [
             NSMigratePersistentStoresAutomaticallyOption: true,
             NSInferMappingModelAutomaticallyOption: true,
