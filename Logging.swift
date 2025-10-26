@@ -24,7 +24,7 @@ final actor Logging {
             .sink { message in
                 os_log("%{public}@", message())
             }
-        log(">>> Will log to the system log, as '-useSystemLog' has been specified")
+        log("Will log to the system log, as '-useSystemLog' has been specified")
     }
 
     func setupMonitorCallback(_ block: (@MainActor (NSAttributedString) -> Void)?) {

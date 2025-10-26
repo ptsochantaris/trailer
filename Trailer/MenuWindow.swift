@@ -189,7 +189,7 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
         setFrame(CGRect(x: menuLeft, y: bottom, width: menuWidth, height: menuHeight), display: false, animate: false)
 
         if makeVisible {
-            siv.highlighted = true
+            siv.state = .highlighted
             table.deselectAll(nil)
             app.openingWindow = true
             level = .mainMenu
@@ -212,9 +212,7 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
 
     func closeMenu() {
         if isVisible {
-            if let siv = statusItem?.statusView {
-                siv.highlighted = false
-            }
+            app.refresh(menu: self)
             table.deselectAll(nil)
             orderOut(nil)
         }

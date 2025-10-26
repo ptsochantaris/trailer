@@ -190,6 +190,16 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         menu.size(andShow: true)
     }
 
+    func refresh(menu: MenuWindow) {
+        guard let menuBarSet = menuBarSet(for: menu) else {
+            return
+        }
+        Task {
+            await menuBarSet.updatePrMenu(settings: Settings.cache)
+            await menuBarSet.updateIssuesMenu(settings: Settings.cache)
+        }
+    }
+
     @MainActor
     func removeSelected(on header: String) {
         guard let inMenu = visibleWindow, let menuBarSet = menuBarSet(for: inMenu) else { return }

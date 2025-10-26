@@ -66,24 +66,13 @@ final class MenuBarSet {
 
     func prepareForRefresh() {
         allowRefresh = false
-
-        let grayOut = Settings.grayOutWhenRefreshing
-
-        if prMenu.messageView != nil {
-            Task {
-                await updatePrMenu(settings: Settings.cache)
-            }
-        }
         prMenu.refreshMenuItem.title = " Refreshing…"
-        prMenu.statusItem?.statusView.grayOut = grayOut
-
-        if issuesMenu.messageView != nil {
-            Task {
-                await updateIssuesMenu(settings: Settings.cache)
-            }
-        }
         issuesMenu.refreshMenuItem.title = " Refreshing…"
-        issuesMenu.statusItem?.statusView.grayOut = grayOut
+
+        Task {
+            await updatePrMenu(settings: Settings.cache)
+            await updateIssuesMenu(settings: Settings.cache)
+        }
     }
 
     var allowRefresh = false {
@@ -102,12 +91,6 @@ final class MenuBarSet {
         }
     }
 
-    private static let redText = [NSAttributedString.Key.font: NSFont.boldSystemFont(ofSize: 10),
-                                  NSAttributedString.Key.foregroundColor: NSColor(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)]
-
-    private static let normalText = [NSAttributedString.Key.font: NSFont.menuBarFont(ofSize: 10),
-                                     NSAttributedString.Key.foregroundColor: NSColor.controlTextColor]
-
     private func shouldShow(type: ListableItem.Type, settings: Settings.Cache) -> Bool {
         let fc = ListableItem.requestForItems(of: type, withFilter: nil, sectionIndex: -1, criterion: viewCriterion, settings: settings)
         fc.fetchLimit = 1
@@ -122,10 +105,8 @@ final class MenuBarSet {
                             reasonForEmpty: @escaping @MainActor (String) async -> NSAttributedString) async {
         if forceVisible || shouldShow(type: type, settings: settings) {
             let isRefreshing = API.isRefreshing
-            let shouldGray = Settings.grayOutWhenRefreshing && isRefreshing
 
             let somethingFailed = ApiServer.shouldReportRefreshFailure(in: DataManager.main) && (viewCriterion?.relatedServerFailed ?? true)
-            let attributes = somethingFailed || hasUnread ? MenuBarSet.redText : MenuBarSet.normalText
 
             let excludeSnoozed = !Settings.countVisibleSnoozedItems
             let f = ListableItem.requestForItems(of: type, withFilter: menu.filter.stringValue, sectionIndex: -1, criterion: viewCriterion, excludeSnoozed: excludeSnoozed, settings: settings)
@@ -134,12 +115,18 @@ final class MenuBarSet {
             let label = viewCriterion?.label
             await Logging.shared.log("Updating \(label ?? "general") \(type) menu, \(countString) total items")
 
-            let siv = StatusItemView(icon: type == PullRequest.self ? StatusItemView.prIcon : StatusItemView.issueIcon,
-                                     textAttributes: attributes,
-                                     highlighted: menu.isVisible,
-                                     grayOut: shouldGray,
-                                     countLabel: countString,
-                                     title: label)
+            let state: StatusItemView.State = if menu.isVisible {
+                .highlighted
+            } else if somethingFailed || hasUnread {
+                .unread
+            } else if Settings.grayOutWhenRefreshing, isRefreshing {
+                .grayed
+            } else {
+                .regular
+            }
+
+            let icon: NSImage = type == PullRequest.self ? StatusItemView.prIcon : StatusItemView.issueIcon
+            let siv = StatusItemView(icon: icon, state: state, countLabel: countString, title: label)
 
             if let existingItem = menu.statusItem {
                 existingItem.length = siv.frame.width

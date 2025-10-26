@@ -1,21 +1,77 @@
 import Cocoa
 
 final class StatusItemView: NSView {
+    enum State {
+        case regular, grayed, highlighted, unread
+
+        var foreground: NSColor {
+            switch self {
+            case .regular:
+                .controlTextColor
+            case .grayed:
+                .controlTextColor.withAlphaComponent(0.6)
+            case .highlighted:
+                .selectedMenuItemTextColor
+            case .unread:
+                NSColor(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)
+            }
+        }
+
+        var titleAttributes: [NSAttributedString.Key: Any] {
+            let p = NSMutableParagraphStyle()
+            p.alignment = .center
+            p.lineBreakMode = .byTruncatingMiddle
+            return [
+                .foregroundColor: NSColor.controlTextColor,
+                .font: NSFont.menuFont(ofSize: 6),
+                .paragraphStyle: p
+            ]
+        }
+
+        var countAttributes: [NSAttributedString.Key: Any] {
+            switch self {
+            case .regular:
+                [.font: NSFont.menuBarFont(ofSize: 10), .foregroundColor: foreground]
+            case .grayed:
+                [.font: NSFont.menuBarFont(ofSize: 10), .foregroundColor: foreground]
+            case .highlighted:
+                [.font: NSFont.boldSystemFont(ofSize: 10), .foregroundColor: foreground]
+            case .unread:
+                [.font: NSFont.boldSystemFont(ofSize: 10), .foregroundColor: foreground]
+            }
+        }
+    }
+
     var icon: NSImage
-    var textAttributes: [NSAttributedString.Key: Any]
     var countLabel: String
     var title: String?
+    var state: State {
+        didSet {
+            if state != oldValue {
+                updateUI()
+            }
+        }
+    }
 
-    init(icon: NSImage, textAttributes: [NSAttributedString.Key: Any], highlighted: Bool, grayOut: Bool, countLabel: String, title: String?) {
+    private let iconView = NSImageView()
+    private let titleText = PlainTextField(frame: .zero)
+    private let countText = PlainTextField(frame: .zero)
+
+    init(icon: NSImage, state: State, countLabel: String, title: String?) {
         self.icon = icon
-        self.textAttributes = textAttributes
-        self.highlighted = highlighted
-        self.grayOut = grayOut
+        self.state = state
         self.countLabel = countLabel
         self.title = title
         super.init(frame: .zero)
 
-        sizeToFit()
+        addSubview(titleText)
+        addSubview(countText)
+        addSubview(iconView)
+
+        icon.isTemplate = true
+        iconView.image = icon
+
+        updateUI()
     }
 
     @available(*, unavailable)
@@ -25,22 +81,6 @@ final class StatusItemView: NSView {
 
     override func hitTest(_: NSPoint) -> NSView? {
         nil
-    }
-
-    var grayOut = false {
-        didSet {
-            if grayOut != oldValue {
-                needsDisplay = true
-            }
-        }
-    }
-
-    var highlighted = false {
-        didSet {
-            if highlighted != oldValue {
-                needsDisplay = true
-            }
-        }
     }
 
     override var tag: Int {
@@ -65,105 +105,57 @@ final class StatusItemView: NSView {
         return img.resized(to: size, offset: NSPoint(x: 3, y: 3))
     }()
 
-    private func titleAttributes(foreground: NSColor) -> [NSAttributedString.Key: Any] {
-        let p = NSMutableParagraphStyle()
-        p.alignment = .center
-        p.lineBreakMode = .byTruncatingMiddle
-        return [
-            .foregroundColor: foreground,
-            .font: NSFont.menuFont(ofSize: 6),
-            .paragraphStyle: p
-        ]
-    }
-
     private let labelSpacing: CGFloat = 2
 
-    func sizeToFit() {
+    private func updateUI() {
+        iconView.contentTintColor = state.foreground
+
         let H = NSStatusBar.system.thickness
-        var itemWidth: CGFloat = 0
-        if let title {
-            itemWidth = icon.size.width - 6
-            let titleWidth = title.size(withAttributes: titleAttributes(foreground: .appLabel)).width
-            itemWidth = max(itemWidth, titleWidth)
+        let iconWidth = icon.size.width - 2
+        let titleAttributes = state.titleAttributes
+        let countAttributes = state.countAttributes
+
+        let countWidth: CGFloat
+        if countLabel.isEmpty {
+            countText.isHidden = true
+            countWidth = 0
+
         } else {
-            itemWidth = icon.size.width
+            countText.attributedStringValue = NSAttributedString(string: countLabel, attributes: countAttributes)
+            countText.sizeToFit()
+            countText.isHidden = false
+            countWidth = countText.frame.width
         }
 
-        if !countLabel.isEmpty {
-            let countWidth = countLabel.size(withAttributes: textAttributes).width
-            let extra = title == nil ? 0 : labelSpacing
-            itemWidth = max(itemWidth, countWidth + icon.size.width + extra)
-        }
-
-        frame = CGRect(x: 0, y: 0, width: itemWidth, height: H)
-    }
-
-    private var isDark: Bool {
-        effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
-    }
-
-    override func draw(_: NSRect) {
-        // print(">>>", effectiveAppearance.attributeKeys) // TODO: handle fading
-
-        var countAttributes = textAttributes
-        let foreground: NSColor
-
-        if highlighted {
-            foreground = .selectedMenuItemTextColor
-        } else if isDark {
-            foreground = .selectedMenuItemTextColor
-            if countAttributes[.foregroundColor] as! NSColor == .labelColor {
-                countAttributes[.foregroundColor] = foreground
-            }
-        } else {
-            foreground = .controlTextColor
-        }
-
-        if grayOut {
-            if isDark {
-                countAttributes[.foregroundColor] = NSColor.secondaryLabelColor
-            } else {
-                countAttributes[.foregroundColor] = NSColor.disabledControlTextColor
-            }
-        }
-
-        let tintedIcon = tintedImage(from: icon, tint: foreground)
+        let iconAndCountWidth = countWidth + iconWidth + (countWidth == 0 ? 0 : labelSpacing)
+        let itemWidth: CGFloat
+        let isPr = icon === StatusItemView.prIcon
 
         if let title {
-            let r = CGRect(x: 0, y: bounds.height - 7, width: bounds.width, height: 7)
-            title.draw(in: r, withAttributes: titleAttributes(foreground: foreground))
+            titleText.attributedStringValue = NSAttributedString(string: title, attributes: titleAttributes)
+            titleText.sizeToFit()
+            let titleWidth = titleText.frame.width
+            itemWidth = max(iconAndCountWidth, titleWidth)
+            titleText.frame = CGRect(x: 0, y: H - 7, width: itemWidth, height: 7)
+            titleText.isHidden = false
 
-            let iconWidth = tintedIcon.size.width - 6
-            let countLabelWidth = countLabel.size(withAttributes: textAttributes).width
-            let startX = ((bounds.width - (iconWidth + labelSpacing + countLabelWidth)) * 0.5).rounded(.up)
+            let startX = ((itemWidth - iconAndCountWidth) * 0.5).rounded(.up)
+            iconView.frame = CGRect(x: startX, y: 0, width: iconWidth, height: icon.size.height - 6)
 
-            tintedIcon.draw(in: CGRect(x: startX, y: 0, width: iconWidth, height: tintedIcon.size.height - 6))
+            let iconWidth = icon.size.width - 6
+            let extra: CGFloat = isPr ? 1 : 0
+            countText.frame = CGRect(x: startX + iconWidth + labelSpacing + extra, y: -4, width: countWidth, height: H)
 
-            let countLabelRect = CGRect(x: startX + iconWidth + labelSpacing, y: -8, width: countLabelWidth, height: bounds.size.height)
-            countLabel.draw(in: countLabelRect, withAttributes: countAttributes)
+            frame = CGRect(x: 0, y: 0, width: itemWidth - 1, height: H)
 
         } else {
-            tintedIcon.draw(at: .zero, from: .zero, operation: .sourceOver, fraction: 1)
+            itemWidth = iconAndCountWidth
+            iconView.frame = CGRect(x: 0, y: 0, width: iconWidth, height: H)
+            titleText.isHidden = true
+            let deduction: CGFloat = isPr ? 5 : 2
+            countText.frame = CGRect(x: H - deduction, y: -1, width: countWidth, height: H)
 
-            let countLabelRect = if icon === StatusItemView.prIcon {
-                CGRect(x: bounds.size.height - 2, y: -5, width: bounds.size.width, height: bounds.size.height)
-            } else {
-                CGRect(x: bounds.size.height - 0, y: -5, width: bounds.size.width, height: bounds.size.height)
-            }
-            countLabel.draw(in: countLabelRect, withAttributes: countAttributes)
+            frame = CGRect(x: 0, y: 0, width: itemWidth - deduction, height: H)
         }
-    }
-
-    // With thanks to http://stackoverflow.com/questions/1413135/tinting-a-grayscale-nsimage-or-ciimage
-    private func tintedImage(from image: NSImage, tint: NSColor) -> NSImage {
-        let tinted = image.copy() as! NSImage
-        tinted.lockFocus()
-        tint.set()
-
-        let imageRect = NSRect(origin: .zero, size: image.size)
-        imageRect.fill(using: .sourceAtop)
-
-        tinted.unlockFocus()
-        return tinted
     }
 }
