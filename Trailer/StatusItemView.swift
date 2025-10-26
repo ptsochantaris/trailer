@@ -56,20 +56,34 @@ final class StatusItemView: NSView {
     private let iconView = NSImageView()
     private let titleText = PlainTextField(frame: .zero)
     private let countText = PlainTextField(frame: .zero)
+    private let stack = NSStackView()
+    private let iconHeight: NSLayoutConstraint
 
     init(icon: NSImage, state: State, countLabel: String, title: String?) {
         self.icon = icon
         self.state = state
         self.countLabel = countLabel
         self.title = title
-        super.init(frame: .zero)
 
-        addSubview(titleText)
-        addSubview(countText)
-        addSubview(iconView)
+        iconHeight = iconView.heightAnchor.constraint(equalToConstant: 10)
+        super.init(frame: .zero)
 
         icon.isTemplate = true
         iconView.image = icon
+        iconHeight.isActive = true
+
+        let bottomRow = NSStackView()
+        bottomRow.spacing = 0
+        bottomRow.orientation = .horizontal
+        bottomRow.addArrangedSubview(iconView)
+        bottomRow.addArrangedSubview(countText)
+
+        stack.spacing = -1
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.orientation = .vertical
+        stack.addArrangedSubview(titleText)
+        stack.addArrangedSubview(bottomRow)
+        addSubview(stack)
 
         updateUI()
     }
@@ -105,57 +119,32 @@ final class StatusItemView: NSView {
         return img.resized(to: size, offset: NSPoint(x: 3, y: 3))
     }()
 
-    private let labelSpacing: CGFloat = 2
+    private let labelSpacing: CGFloat = 4
 
     private func updateUI() {
         iconView.contentTintColor = state.foreground
 
-        let H = NSStatusBar.system.thickness
-        let iconWidth = icon.size.width - 2
-        let titleAttributes = state.titleAttributes
-        let countAttributes = state.countAttributes
-
-        let countWidth: CGFloat
         if countLabel.isEmpty {
             countText.isHidden = true
-            countWidth = 0
-
         } else {
-            countText.attributedStringValue = NSAttributedString(string: countLabel, attributes: countAttributes)
-            countText.sizeToFit()
+            countText.attributedStringValue = NSAttributedString(string: countLabel, attributes: state.countAttributes)
             countText.isHidden = false
-            countWidth = countText.frame.width
         }
 
-        let iconAndCountWidth = countWidth + iconWidth + (countWidth == 0 ? 0 : labelSpacing)
-        let itemWidth: CGFloat
-        let isPr = icon === StatusItemView.prIcon
-
-        if let title {
-            titleText.attributedStringValue = NSAttributedString(string: title, attributes: titleAttributes)
-            titleText.sizeToFit()
-            let titleWidth = titleText.frame.width
-            itemWidth = max(iconAndCountWidth, titleWidth)
-            titleText.frame = CGRect(x: 0, y: H - 7, width: itemWidth, height: 7)
+        if let title, !title.isEmpty {
+            titleText.attributedStringValue = NSAttributedString(string: title, attributes: state.titleAttributes)
             titleText.isHidden = false
-
-            let startX = ((itemWidth - iconAndCountWidth) * 0.5).rounded(.up)
-            iconView.frame = CGRect(x: startX, y: 0, width: iconWidth, height: icon.size.height - 6)
-
-            let iconWidth = icon.size.width - 6
-            let extra: CGFloat = isPr ? 1 : 0
-            countText.frame = CGRect(x: startX + iconWidth + labelSpacing + extra, y: -4, width: countWidth, height: H)
-
-            frame = CGRect(x: 0, y: 0, width: itemWidth - 1, height: H)
-
+            iconHeight.constant = 16
         } else {
-            itemWidth = iconAndCountWidth
-            iconView.frame = CGRect(x: 0, y: 0, width: iconWidth, height: H)
             titleText.isHidden = true
-            let deduction: CGFloat = isPr ? 5 : 2
-            countText.frame = CGRect(x: H - deduction, y: -1, width: countWidth, height: H)
-
-            frame = CGRect(x: 0, y: 0, width: itemWidth - deduction, height: H)
+            iconHeight.constant = 20
         }
+
+        let stackSize = stack.fittingSize
+        let H = NSStatusBar.system.thickness
+        let y = (H - stackSize.height) * 0.5
+        let origin = CGPoint(x: 0, y: y.rounded(.down))
+        stack.frame = CGRect(origin: origin, size: stackSize)
+        frame = CGRect(origin: .zero, size: CGSize(width: stackSize.width, height: H))
     }
 }

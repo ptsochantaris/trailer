@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		1606F1BB1A4703E60088368E /* iOSAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1606F1BA1A4703E60088368E /* iOSAppDelegate.swift */; };
 		1606F1BD1A471CDC0088368E /* RespositoriesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1606F1BC1A471CDC0088368E /* RespositoriesViewController.swift */; };
+		1607AD062EAE4FE80017EC10 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 1607AD052EAE4FE80017EC10 /* AppIcon.icon */; };
+		1607AD072EAE4FE80017EC10 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 1607AD052EAE4FE80017EC10 /* AppIcon.icon */; };
+		1607AD082EAE4FE80017EC10 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 1607AD052EAE4FE80017EC10 /* AppIcon.icon */; };
 		160823F51A44997F006F91AD /* UINavigationControllerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160823F31A44982F006F91AD /* UINavigationControllerExtensions.swift */; };
 		160CA03223A65152003FA0D8 /* GraphQL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160CA02B23A65152003FA0D8 /* GraphQL.swift */; };
 		160CA03323A65152003FA0D8 /* GraphQL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160CA02B23A65152003FA0D8 /* GraphQL.swift */; };
@@ -162,12 +165,6 @@
 		16CBE1C21A2DBB2700485053 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C01A2DBB2700485053 /* DataManager.swift */; };
 		16CBE1C51A2DFBA500485053 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C41A2DFBA500485053 /* Settings.swift */; };
 		16CBE1C61A2DFBA500485053 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C41A2DFBA500485053 /* Settings.swift */; };
-		16CDC2862ABB0A7900EFF910 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16FEB781283C4E320029FB0F /* WidgetKit.framework */; };
-		16CDC2872ABB0A7900EFF910 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16FEB783283C4E320029FB0F /* SwiftUI.framework */; };
-		16CDC28A2ABB0A7900EFF910 /* TrailerboardBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CDC2892ABB0A7900EFF910 /* TrailerboardBundle.swift */; };
-		16CDC28C2ABB0A7900EFF910 /* Trailerboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CDC28B2ABB0A7900EFF910 /* Trailerboard.swift */; };
-		16CDC28E2ABB0A7900EFF910 /* AppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CDC28D2ABB0A7900EFF910 /* AppIntent.swift */; };
-		16CDC2952ABB0A7A00EFF910 /* TrailerboardExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 16CDC2852ABB0A7900EFF910 /* TrailerboardExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		16CE47881B7755E00086F4DC /* PocketTrailer WatchKit App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 16522D7C1AB03AE500B1C3FB /* PocketTrailer WatchKit App.app */; };
 		16D2B875251FA54E00D86C89 /* Enums+Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D2B874251FA54E00D86C89 /* Enums+Settings.swift */; };
 		16D2B876251FA54E00D86C89 /* Enums+Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D2B874251FA54E00D86C89 /* Enums+Settings.swift */; };
@@ -204,13 +201,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		16CDC2932ABB0A7A00EFF910 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 168BC6A217EC2DF000BC4584 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 16CDC2842ABB0A7900EFF910;
-			remoteInfo = TrailerboardExtension;
-		};
 		16D780461B77E00D00A4D0BE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 168BC6A217EC2DF000BC4584 /* Project object */;
@@ -249,7 +239,6 @@
 			dstPath = "";
 			dstSubfolder = PlugIns;
 			files = (
-				16CDC2952ABB0A7A00EFF910 /* TrailerboardExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 		};
@@ -277,6 +266,7 @@
 		1605EDCB1D58B71900D91F50 /* Trailer 31.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 31.xcdatamodel"; sourceTree = "<group>"; };
 		1606F1BA1A4703E60088368E /* iOSAppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = iOSAppDelegate.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		1606F1BC1A471CDC0088368E /* RespositoriesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = RespositoriesViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		1607AD052EAE4FE80017EC10 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 		160823F31A44982F006F91AD /* UINavigationControllerExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UINavigationControllerExtensions.swift; sourceTree = "<group>"; };
 		160CA02B23A65152003FA0D8 /* GraphQL.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GraphQL.swift; path = Shared/GraphQL.swift; sourceTree = "<group>"; };
 		160D312B1A9619CE006B74BC /* FilledView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilledView.swift; sourceTree = "<group>"; };
@@ -436,12 +426,6 @@
 		16C9A2791A44DD0200EE54EC /* CommentBlacklistViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentBlacklistViewController.swift; sourceTree = "<group>"; };
 		16CBE1C01A2DBB2700485053 /* DataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = DataManager.swift; path = Shared/DataManager.swift; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16CBE1C41A2DFBA500485053 /* Settings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = Settings.swift; path = Shared/Settings.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		16CDC2852ABB0A7900EFF910 /* TrailerboardExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TrailerboardExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		16CDC2892ABB0A7900EFF910 /* TrailerboardBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrailerboardBundle.swift; sourceTree = "<group>"; };
-		16CDC28B2ABB0A7900EFF910 /* Trailerboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Trailerboard.swift; sourceTree = "<group>"; };
-		16CDC28D2ABB0A7900EFF910 /* AppIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntent.swift; sourceTree = "<group>"; };
-		16CDC2912ABB0A7A00EFF910 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		16CDC2922ABB0A7A00EFF910 /* Trailerboard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Trailerboard.entitlements; sourceTree = "<group>"; };
 		16D2B874251FA54E00D86C89 /* Enums+Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Enums+Settings.swift"; path = "Shared/Enums+Settings.swift"; sourceTree = "<group>"; };
 		16D97065235B243500871F81 /* Trailer 40.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 40.xcdatamodel"; sourceTree = "<group>"; };
 		16DB793B1E326C950076A36D /* AdvancedReposWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdvancedReposWindow.swift; sourceTree = "<group>"; };
@@ -512,13 +496,6 @@
 				16A7246A2A8FA73E005B32AB /* PopTimer in Frameworks */,
 				165880CA2A59C2AF0012A2B7 /* TrailerQL in Frameworks */,
 				161471CF2A881ED3006A903B /* KeyVine in Frameworks */,
-			);
-		};
-		16CDC2822ABB0A7900EFF910 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			files = (
-				16CDC2872ABB0A7900EFF910 /* SwiftUI.framework in Frameworks */,
-				16CDC2862ABB0A7900EFF910 /* WidgetKit.framework in Frameworks */,
 			);
 		};
 		16DEA91F235C6D7C004589B3 /* Frameworks */ = {
@@ -751,7 +728,6 @@
 				168BC6B317EC2DF000BC4584 /* Trailer */,
 				164DEAFA1AC0C8BB00AA6F73 /* Pocket Trailer */,
 				16DEA923235C6D7C004589B3 /* TrailerLauncher */,
-				16CDC2882ABB0A7900EFF910 /* Trailerboard */,
 				168BC6AC17EC2DF000BC4584 /* Frameworks */,
 				168BC6AB17EC2DF000BC4584 /* Products */,
 			);
@@ -764,7 +740,6 @@
 				1628A6B118789E73005EDA69 /* PocketTrailer.app */,
 				16522D7C1AB03AE500B1C3FB /* PocketTrailer WatchKit App.app */,
 				16DEA922235C6D7C004589B3 /* TrailerLauncher.app */,
-				16CDC2852ABB0A7900EFF910 /* TrailerboardExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -789,6 +764,7 @@
 				168A5C74185BB9D900CB6B02 /* UI Components */,
 				168BC6C817EC2DF000BC4584 /* Images.xcassets */,
 				16519EB31ACF0E91002171D0 /* Trailer.icns */,
+				1607AD052EAE4FE80017EC10 /* AppIcon.icon */,
 				168BC6B417EC2DF000BC4584 /* Supporting Files */,
 			);
 			path = Trailer;
@@ -849,18 +825,6 @@
 			);
 			name = Data;
 			path = Trailer;
-			sourceTree = "<group>";
-		};
-		16CDC2882ABB0A7900EFF910 /* Trailerboard */ = {
-			isa = PBXGroup;
-			children = (
-				16CDC2892ABB0A7900EFF910 /* TrailerboardBundle.swift */,
-				16CDC28B2ABB0A7900EFF910 /* Trailerboard.swift */,
-				16CDC28D2ABB0A7900EFF910 /* AppIntent.swift */,
-				16CDC2912ABB0A7A00EFF910 /* Info.plist */,
-				16CDC2922ABB0A7A00EFF910 /* Trailerboard.entitlements */,
-			);
-			path = Trailerboard;
 			sourceTree = "<group>";
 		};
 		16D845381AB4513F0098FB65 /* Sections */ = {
@@ -1037,7 +1001,6 @@
 			);
 			dependencies = (
 				16DEA93B235C6F17004589B3 /* PBXTargetDependency */,
-				16CDC2942ABB0A7A00EFF910 /* PBXTargetDependency */,
 			);
 			name = Trailer;
 			packageProductDependencies = (
@@ -1053,21 +1016,6 @@
 			productName = Trailer;
 			productReference = 168BC6AA17EC2DF000BC4584 /* Trailer.app */;
 			productType = "com.apple.product-type.application";
-		};
-		16CDC2842ABB0A7900EFF910 /* TrailerboardExtension */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 16CDC2962ABB0A7A00EFF910 /* Build configuration list for PBXNativeTarget "TrailerboardExtension" */;
-			buildPhases = (
-				16CDC2812ABB0A7900EFF910 /* Sources */,
-				16CDC2822ABB0A7900EFF910 /* Frameworks */,
-				16CDC2832ABB0A7900EFF910 /* Resources */,
-			);
-			buildRules = (
-			);
-			name = TrailerboardExtension;
-			productName = TrailerboardExtension;
-			productReference = 16CDC2852ABB0A7900EFF910 /* TrailerboardExtension.appex */;
-			productType = "com.apple.product-type.app-extension";
 		};
 		16DEA921235C6D7C004589B3 /* TrailerLauncher */ = {
 			isa = PBXNativeTarget;
@@ -1122,9 +1070,6 @@
 							};
 						};
 					};
-					16CDC2842ABB0A7900EFF910 = {
-						CreatedOnToolsVersion = 15.0;
-					};
 					16DEA921235C6D7C004589B3 = {
 						CreatedOnToolsVersion = 11.1;
 					};
@@ -1157,7 +1102,6 @@
 				16DEA921235C6D7C004589B3 /* TrailerLauncher */,
 				1628A6B018789E73005EDA69 /* PocketTrailer */,
 				16522D7B1AB03AE500B1C3FB /* PocketTrailer WatchKit App */,
-				16CDC2842ABB0A7900EFF910 /* TrailerboardExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -1168,6 +1112,7 @@
 			files = (
 				16C4ACF81EB553E20022C33B /* approvesChangesIcon.png in Resources */,
 				16C4ACF71EB553E20022C33B /* requestsChangesIcon.png in Resources */,
+				1607AD082EAE4FE80017EC10 /* AppIcon.icon in Resources */,
 				16954D3724333B0B0008AD4F /* Settings.storyboard in Resources */,
 				1628A6CB18789E73005EDA69 /* Main.storyboard in Resources */,
 				1628A6D618789E73005EDA69 /* Images.xcassets in Resources */,
@@ -1185,6 +1130,7 @@
 			files = (
 				16522D791AB03AE500B1C3FB /* Images.xcassets in Resources */,
 				16522D851AB03AE500B1C3FB /* Interface.storyboard in Resources */,
+				1607AD062EAE4FE80017EC10 /* AppIcon.icon in Resources */,
 				16522D871AB03AE500B1C3FB /* Images.xcassets in Resources */,
 			);
 		};
@@ -1197,6 +1143,7 @@
 				1655FD5C2A69CA0D0087F439 /* ApiMonitorWindow.xib in Resources */,
 				16A724702A901845005B32AB /* HiddenItemWindow.xib in Resources */,
 				160FB1421AE3F7C700EB5C8E /* PreferencesWindow.xib in Resources */,
+				1607AD072EAE4FE80017EC10 /* AppIcon.icon in Resources */,
 				164840C31ACFEFA9009E6383 /* MenuWindow.xib in Resources */,
 				164E4C0B2A7EB15A00BFE065 /* approvesChangesIcon.png in Resources */,
 				16DB793E1E326CD90076A36D /* AdvancedReposWindow.xib in Resources */,
@@ -1206,11 +1153,6 @@
 				168BC6C417EC2DF000BC4584 /* MainMenu.xib in Resources */,
 				164E4C0C2A7EB15A00BFE065 /* requestsChangesIcon.png in Resources */,
 				16DEA937235C6F00004589B3 /* TrailerLauncher.app in Resources */,
-			);
-		};
-		16CDC2832ABB0A7900EFF910 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			files = (
 			);
 		};
 		16DEA920235C6D7C004589B3 /* Resources */ = {
@@ -1232,6 +1174,7 @@
 				"fi",
 				"",
 				"",
+				"",
 			);
 		};
 		167165CF2854AFE60064CEBC /* SwiftLint */ = {
@@ -1243,6 +1186,7 @@
 				"if which swiftlint >/dev/null; then",
 				"  swiftlint",
 				"fi",
+				"",
 				"",
 				"",
 			);
@@ -1401,14 +1345,6 @@
 				16A7246E2A901815005B32AB /* HiddenItemWindow.swift in Sources */,
 			);
 		};
-		16CDC2812ABB0A7900EFF910 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			files = (
-				16CDC28C2ABB0A7900EFF910 /* Trailerboard.swift in Sources */,
-				16CDC28A2ABB0A7900EFF910 /* TrailerboardBundle.swift in Sources */,
-				16CDC28E2ABB0A7900EFF910 /* AppIntent.swift in Sources */,
-			);
-		};
 		16DEA91E235C6D7C004589B3 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
@@ -1420,11 +1356,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		16CDC2942ABB0A7A00EFF910 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 16CDC2842ABB0A7900EFF910 /* TrailerboardExtension */;
-			targetProxy = 16CDC2932ABB0A7A00EFF910 /* PBXContainerItemProxy */;
-		};
 		16D780471B77E00D00A4D0BE /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 16522D7B1AB03AE500B1C3FB /* PocketTrailer WatchKit App */;
@@ -1477,6 +1408,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = PocketTrailer/PocketTrailer.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
@@ -1494,6 +1426,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = PocketTrailer/PocketTrailer.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
@@ -1513,6 +1446,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
@@ -1540,6 +1474,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
@@ -1717,6 +1652,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = Trailer/Trailer.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
@@ -1746,6 +1682,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = Trailer/Trailer.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
@@ -1768,52 +1705,6 @@
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
-			};
-			name = Release;
-		};
-		16CDC2972ABB0A7A00EFF910 /* Debug configuration for PBXNativeTarget "TrailerboardExtension" */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = Trailerboard/Trailerboard.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				ENABLE_HARDENED_RUNTIME = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Trailerboard/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Trailerboard;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
-				MACOSX_DEPLOYMENT_TARGET = 14.6;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.housetrip.Trailer.Trailerboard;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = auto;
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		16CDC2982ABB0A7A00EFF910 /* Release configuration for PBXNativeTarget "TrailerboardExtension" */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = Trailerboard/Trailerboard.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				ENABLE_HARDENED_RUNTIME = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Trailerboard/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Trailerboard;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
-				MACOSX_DEPLOYMENT_TARGET = 14.6;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.housetrip.Trailer.Trailerboard;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = auto;
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
-				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -1932,14 +1823,6 @@
 			buildConfigurations = (
 				168BC6DF17EC2DF000BC4584 /* Debug configuration for PBXNativeTarget "Trailer" */,
 				168BC6E017EC2DF000BC4584 /* Release configuration for PBXNativeTarget "Trailer" */,
-			);
-			defaultConfigurationName = Release;
-		};
-		16CDC2962ABB0A7A00EFF910 /* Build configuration list for PBXNativeTarget "TrailerboardExtension" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				16CDC2972ABB0A7A00EFF910 /* Debug configuration for PBXNativeTarget "TrailerboardExtension" */,
-				16CDC2982ABB0A7A00EFF910 /* Release configuration for PBXNativeTarget "TrailerboardExtension" */,
 			);
 			defaultConfigurationName = Release;
 		};
