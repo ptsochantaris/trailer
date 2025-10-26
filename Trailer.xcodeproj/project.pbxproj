@@ -1231,6 +1231,7 @@
 				"  swiftlint",
 				"fi",
 				"",
+				"",
 			);
 		};
 		167165CF2854AFE60064CEBC /* SwiftLint */ = {
@@ -1242,6 +1243,7 @@
 				"if which swiftlint >/dev/null; then",
 				"  swiftlint",
 				"fi",
+				"",
 				"",
 			);
 		};
@@ -1595,7 +1597,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1732;
+				CURRENT_PROJECT_VERSION = 1733;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = X727JSJUGJ;
@@ -1671,7 +1673,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1732;
+				CURRENT_PROJECT_VERSION = 1733;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEPLOYMENT_POSTPROCESSING = YES;
