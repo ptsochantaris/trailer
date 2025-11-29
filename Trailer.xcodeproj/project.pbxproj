@@ -1041,7 +1041,7 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastSwiftMigration = 0700;
 				LastSwiftUpdateCheck = 1500;
-				LastUpgradeCheck = 2600;
+				LastUpgradeCheck = 2610;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
 					1628A6B018789E73005EDA69 = {
@@ -1175,6 +1175,7 @@
 				"",
 				"",
 				"",
+				"",
 			);
 		};
 		167165CF2854AFE60064CEBC /* SwiftLint */ = {
@@ -1186,6 +1187,7 @@
 				"if which swiftlint >/dev/null; then",
 				"  swiftlint",
 				"fi",
+				"",
 				"",
 				"",
 				"",
@@ -1532,7 +1534,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1733;
+				CURRENT_PROJECT_VERSION = 1734;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = X727JSJUGJ;
@@ -1560,7 +1562,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.4;
-				MARKETING_VERSION = 1.8.14;
+				MARKETING_VERSION = 1.9.0;
 				MERGED_BINARY_TYPE = automatic;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_SWIFT_FLAGS = "-D DEBUG";
@@ -1608,7 +1610,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1733;
+				CURRENT_PROJECT_VERSION = 1734;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEPLOYMENT_POSTPROCESSING = YES;
@@ -1634,7 +1636,7 @@
 				);
 				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 12.4;
-				MARKETING_VERSION = 1.8.14;
+				MARKETING_VERSION = 1.9.0;
 				MERGED_BINARY_TYPE = automatic;
 				SEPARATE_STRIP = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
