@@ -647,10 +647,10 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
     var statusItemList: [NSStatusItem] {
         var list = [NSStatusItem]()
         for s in menuBarSets {
-            if let i = s.prMenu.statusItem, i.statusView.frame.size.width > 0 {
+            if let i = s.prMenu.statusItem, let w = i.button?.frame.size.width, w > 0 {
                 list.append(i)
             }
-            if let i = s.issuesMenu.statusItem, i.statusView.frame.size.width > 0 {
+            if let i = s.issuesMenu.statusItem, let w = i.button?.frame.size.width, w > 0 {
                 list.append(i)
             }
         }
@@ -997,17 +997,6 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
     func closedPreferencesWindow() {
         preferencesWindow = nil
         preferencesWindowController = nil
-    }
-
-    func statusItem(for view: NSView) -> NSStatusItem? {
-        for d in menuBarSets {
-            if let prItem = d.prMenu.statusItem, prItem.statusView === view {
-                return prItem
-            } else if let issueItem = d.issuesMenu.statusItem, issueItem.statusView === view {
-                return issueItem
-            }
-        }
-        return nil
     }
 
     var visibleWindow: MenuWindow? {

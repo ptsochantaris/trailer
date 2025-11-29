@@ -29,7 +29,7 @@
 	<key>NSAppleEventsUsageDescription</key>
 	<string>Trailer Launcher needs to check if the main Trailer application is running to manage the application lifecycle.</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2014-2022 Paul Tsochantaris. All rights reserved.</string>
+	<string>Copyright © 2014-2025 Paul Tsochantaris. All rights reserved.</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 </dict>

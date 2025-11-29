@@ -1,11 +1,5 @@
 import Cocoa
 
-extension NSStatusItem {
-    var statusView: StatusItemView {
-        button!.viewWithTag(1947) as! StatusItemView
-    }
-}
-
 final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
     @IBOutlet var scrollView: NSScrollView!
     @IBOutlet private var header: ViewAllowsVibrancy!
@@ -140,8 +134,7 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
     }
 
     func size(andShow makeVisible: Bool) {
-        guard let siv = statusItem?.statusView,
-              let windowFrame = siv.window?.frame,
+        guard let windowFrame = windowController?.window?.frame,
               let screenFrame = NSScreen.screens.first(where: { $0.frame.contains(windowFrame) })?.visibleFrame
         else { return }
 
@@ -189,7 +182,7 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
         setFrame(CGRect(x: menuLeft, y: bottom, width: menuWidth, height: menuHeight), display: false, animate: false)
 
         if makeVisible {
-            siv.state = .highlighted
+            statusItem?.button?.cell?.isHighlighted = true
             table.deselectAll(nil)
             app.openingWindow = true
             level = .mainMenu

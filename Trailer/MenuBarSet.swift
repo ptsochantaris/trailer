@@ -126,18 +126,23 @@ final class MenuBarSet {
             }
 
             let icon: NSImage = type == PullRequest.self ? StatusItemView.prIcon : StatusItemView.issueIcon
-            let siv = StatusItemView(icon: icon, state: state, countLabel: countString, title: label)
+            let sivImage = StatusItemView.makeIcon(icon: icon, state: state, countLabel: countString, title: label)
+            let imageWidth = sivImage.size.width.rounded(.down) - 1
 
             if let existingItem = menu.statusItem {
-                existingItem.length = siv.frame.width
-                existingItem.button!.viewWithTag(siv.tag)?.removeFromSuperview()
+                existingItem.length = imageWidth
+                if let button = existingItem.button {
+                    button.image = sivImage
+                }
             } else {
-                menu.statusItem = NSStatusBar.system.statusItem(withLength: siv.frame.width)
+                let item = NSStatusBar.system.statusItem(withLength: imageWidth)
+                menu.statusItem = item
+                if let button = item.button {
+                    button.image = sivImage
+                    button.target = menu
+                    button.action = #selector(MenuWindow.buttonSelected)
+                }
             }
-            let button = menu.statusItem!.button!
-            button.addSubview(siv)
-            button.target = menu
-            button.action = #selector(MenuWindow.buttonSelected)
 
         } else {
             menu.hideStatusItem()

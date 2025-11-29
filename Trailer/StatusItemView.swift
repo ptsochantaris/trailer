@@ -1,6 +1,6 @@
 import Cocoa
 
-final class StatusItemView: NSView {
+enum StatusItemView {
     enum State {
         case regular, grayed, highlighted, unread
 
@@ -42,63 +42,54 @@ final class StatusItemView: NSView {
         }
     }
 
-    var icon: NSImage
-    var countLabel: String
-    var title: String?
-    var state: State {
-        didSet {
-            if state != oldValue {
-                updateUI()
-            }
-        }
-    }
+    static func makeIcon(icon: NSImage, state: State, countLabel: String, title: String?) -> NSImage {
+        let stack = NSStackView()
+        stack.spacing = 0
+        stack.orientation = .vertical
+        stack.alignment = .centerX
 
-    private let iconView = NSImageView()
-    private let titleText = PlainTextField(frame: .zero)
-    private let countText = PlainTextField(frame: .zero)
-    private let stack = NSStackView()
-    private let iconHeight: NSLayoutConstraint
-
-    init(icon: NSImage, state: State, countLabel: String, title: String?) {
-        self.icon = icon
-        self.state = state
-        self.countLabel = countLabel
-        self.title = title
-
-        iconHeight = iconView.heightAnchor.constraint(equalToConstant: 10)
-        super.init(frame: .zero)
-
-        icon.isTemplate = true
+        let iconView = NSImageView()
+        iconView.contentTintColor = state.foreground
+        iconView.imageAlignment = .alignCenter
         iconView.image = icon
-        iconHeight.isActive = true
 
         let bottomRow = NSStackView()
-        bottomRow.spacing = 0
         bottomRow.orientation = .horizontal
+        bottomRow.alignment = .centerY
         bottomRow.addArrangedSubview(iconView)
-        bottomRow.addArrangedSubview(countText)
 
-        stack.spacing = -1
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        stack.orientation = .vertical
-        stack.addArrangedSubview(titleText)
+        if let title, !title.isEmpty {
+            let titleText = PlainTextField(frame: .zero)
+            titleText.attributedStringValue = NSAttributedString(string: title, attributes: state.titleAttributes)
+            titleText.widthAnchor.constraint(equalToConstant: titleText.fittingSize.width).isActive = true
+            stack.addArrangedSubview(titleText)
+
+            iconView.heightAnchor.constraint(equalToConstant: 11).isActive = true
+            bottomRow.spacing = 0
+        } else {
+            iconView.heightAnchor.constraint(equalToConstant: 15).isActive = true
+            bottomRow.spacing = 1
+        }
+
+        if !countLabel.isEmpty {
+            let countText = PlainTextField(frame: .zero)
+            countText.attributedStringValue = NSAttributedString(string: countLabel, attributes: state.countAttributes)
+            countText.widthAnchor.constraint(equalToConstant: countText.fittingSize.width).isActive = true
+            bottomRow.addArrangedSubview(countText)
+        }
+
         stack.addArrangedSubview(bottomRow)
-        addSubview(stack)
 
-        updateUI()
-    }
+        let stackSize = stack.fittingSize
+        let stackRect = NSRect(origin: .zero, size: stackSize)
 
-    @available(*, unavailable)
-    required init?(coder _: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    override func hitTest(_: NSPoint) -> NSView? {
-        nil
-    }
-
-    override var tag: Int {
-        1947
+        let sivImage = NSImage(size: stackSize)
+        if let bir = stack.bitmapImageRepForCachingDisplay(in: stackRect) {
+            bir.size = stackSize
+            stack.cacheDisplay(in: stackRect, to: bir)
+            sivImage.addRepresentation(bir)
+        }
+        return sivImage
     }
 
     static let prIcon: NSImage = {
@@ -107,7 +98,9 @@ final class StatusItemView: NSView {
         let scale = 16.0 / size.height
         size.width *= scale
         size.height *= scale
-        return img.resized(to: size, offset: NSPoint(x: 3, y: 3))
+        let ret = img.resized(to: size, offset: .zero)
+        ret.isTemplate = true
+        return ret
     }()
 
     static let issueIcon: NSImage = {
@@ -116,35 +109,8 @@ final class StatusItemView: NSView {
         let scale = 16.0 / size.height
         size.width *= scale
         size.height *= scale
-        return img.resized(to: size, offset: NSPoint(x: 3, y: 3))
+        let ret = img.resized(to: size, offset: .zero)
+        ret.isTemplate = true
+        return ret
     }()
-
-    private let labelSpacing: CGFloat = 4
-
-    private func updateUI() {
-        iconView.contentTintColor = state.foreground
-
-        if countLabel.isEmpty {
-            countText.isHidden = true
-        } else {
-            countText.attributedStringValue = NSAttributedString(string: countLabel, attributes: state.countAttributes)
-            countText.isHidden = false
-        }
-
-        if let title, !title.isEmpty {
-            titleText.attributedStringValue = NSAttributedString(string: title, attributes: state.titleAttributes)
-            titleText.isHidden = false
-            iconHeight.constant = 16
-        } else {
-            titleText.isHidden = true
-            iconHeight.constant = 20
-        }
-
-        let stackSize = stack.fittingSize
-        let H = NSStatusBar.system.thickness
-        let y = (H - stackSize.height) * 0.5
-        let origin = CGPoint(x: 0, y: y.rounded(.down))
-        stack.frame = CGRect(origin: origin, size: stackSize)
-        frame = CGRect(origin: .zero, size: CGSize(width: stackSize.width, height: H))
-    }
 }

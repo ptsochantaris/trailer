@@ -57,7 +57,7 @@
 	<key>NSAppleEventsUsageDescription</key>
 	<string>Trailer needs to check if other applications are running to manage its launcher helper and to open URLs in your preferred applications.</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright (c) 2014-2022 Paul Tsochantaris. Parts copyright (c) 2013-2014 HouseTrip Ltd. Released under the terms of the MIT licence, see the file LICENCE for details.</string>
+	<string>Copyright (c) 2014-2025 Paul Tsochantaris. Parts copyright (c) 2013-2014 HouseTrip Ltd. Released under the terms of the MIT licence, see the file LICENCE for details.</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
