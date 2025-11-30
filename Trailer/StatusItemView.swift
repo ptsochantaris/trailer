@@ -89,6 +89,7 @@ enum StatusItemView {
             stack.cacheDisplay(in: stackRect, to: bir)
             sivImage.addRepresentation(bir)
         }
+        sivImage.isTemplate = true
         return sivImage
     }
 
@@ -98,9 +99,7 @@ enum StatusItemView {
         let scale = 16.0 / size.height
         size.width *= scale
         size.height *= scale
-        let ret = img.resized(to: size, offset: .zero)
-        ret.isTemplate = true
-        return ret
+        return img.resized(to: size, offset: .zero)
     }()
 
     static let issueIcon: NSImage = {
@@ -109,8 +108,6 @@ enum StatusItemView {
         let scale = 16.0 / size.height
         size.width *= scale
         size.height *= scale
-        let ret = img.resized(to: size, offset: .zero)
-        ret.isTemplate = true
-        return ret
+        return img.resized(to: size, offset: .zero)
     }()
 }
