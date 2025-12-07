@@ -91,7 +91,7 @@ final class TrailerCell: NSTableCellView {
         func append(_ field: NSControl) {
             let a = field.attributedStringValue
             if a.length == 0 { return }
-            let height = a.boundingRect(with: widthLimit, options: stringDrawingOptions).integral.size.height + 2
+            let height = a.boundingRect(with: widthLimit, options: stringDrawingOptions).integral.height + 2
             field.frame = CGRect(x: LEFTPADDING + shift, y: y, width: W, height: height)
             addSubview(field)
             y += height

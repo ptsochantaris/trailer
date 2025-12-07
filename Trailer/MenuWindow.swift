@@ -135,15 +135,19 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
 
     func size(andShow makeVisible: Bool) {
         guard let statusItemButtonFrame = statusItem?.button?.window?.frame,
-              let screenFrame = NSScreen.screens.first(where: { $0.frame.contains(statusItemButtonFrame) })?.visibleFrame
+              let currentScreen = NSScreen.screens.first(where: { $0.frame.contains(statusItemButtonFrame) })
         else { return }
+
+        let screenFrame = currentScreen.visibleFrame
 
         var menuHeight: CGFloat = 54
         let rowCount = table.numberOfRows
-        var screenHeight = screenFrame.size.height
+        var screenHeight = screenFrame.height
 
         if NSApp.presentationOptions.contains(.autoHideMenuBar) {
-            screenHeight -= 25
+            let desktopFrame = currentScreen.frame
+            let menuBarHeight = screenHeight - desktopFrame.height
+            screenHeight -= menuBarHeight
         }
 
         if rowCount == 0 {
@@ -152,7 +156,7 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
             for f in 0 ..< rowCount {
                 let rowView = table.view(atColumn: 0, row: f, makeIfNecessary: true)!
                 rowView.layoutSubtreeIfNeeded()
-                menuHeight += rowView.frame.size.height
+                menuHeight += rowView.frame.height
                 if menuHeight >= screenHeight {
                     break
                 }
@@ -166,7 +170,7 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
         }
 
         var menuLeft = statusItemButtonFrame.origin.x
-        let rightSide = screenFrame.origin.x + screenFrame.size.width
+        let rightSide = screenFrame.origin.x + screenFrame.width
         let overflow = (menuLeft + menuWidth) - rightSide
         if overflow > 0 {
             menuLeft -= overflow
@@ -182,7 +186,7 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
         setFrame(CGRect(x: menuLeft, y: bottom, width: menuWidth, height: menuHeight), display: false, animate: false)
 
         if makeVisible {
-            statusItem?.button?.cell?.isHighlighted = true
+            statusItem?.button?.appearsDisabled = true
             table.deselectAll(nil)
             app.openingWindow = true
             level = .mainMenu

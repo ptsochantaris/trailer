@@ -191,11 +191,11 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 
         if let info = notification.userInfo, let keyboardFrameValue = info[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
             let keyboardFrame = keyboardFrameValue.cgRectValue
-            let keyboardHeight = max(0, view.bounds.size.height - keyboardFrame.origin.y)
+            let keyboardHeight = max(0, view.bounds.height - keyboardFrame.origin.y)
             let firstResponderFrame = view.convert(focusedField!.frame, from: focusedField!.superview)
-            let bottomOfFirstResponder = (firstResponderFrame.origin.y + firstResponderFrame.size.height) + 36
+            let bottomOfFirstResponder = (firstResponderFrame.origin.y + firstResponderFrame.height) + 36
 
-            let topOfKeyboard = view.bounds.size.height - keyboardHeight
+            let topOfKeyboard = view.bounds.height - keyboardHeight
             if bottomOfFirstResponder > topOfKeyboard {
                 let distance = bottomOfFirstResponder - topOfKeyboard
                 scrollView.contentOffset = CGPoint(x: 0, y: scrollView.contentOffset.y + distance)
@@ -205,10 +205,11 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 
     @objc private func keyboardWillHide(notification _: NSNotification) {
         if !scrollView.isDragging {
+            let scrollBounds = scrollView.bounds
             scrollView.scrollRectToVisible(CGRect(x: 0,
-                                                  y: min(scrollView.contentOffset.y, scrollView.contentSize.height - scrollView.bounds.size.height),
-                                                  width: scrollView.bounds.size.width,
-                                                  height: scrollView.bounds.size.height),
+                                                  y: min(scrollView.contentOffset.y, scrollView.contentSize.height - scrollBounds.height),
+                                                  width: scrollBounds.width,
+                                                  height: scrollBounds.height),
                                            animated: false)
         }
     }

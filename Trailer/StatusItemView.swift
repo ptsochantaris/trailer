@@ -4,14 +4,20 @@ enum StatusItemView {
     enum State {
         case regular, grayed, highlighted, unread
 
+        var baseColor: NSColor {
+            if #available(macOS 26, *) {
+                .white
+            } else {
+                .textColor
+            }
+        }
+
         var foreground: NSColor {
             switch self {
-            case .regular:
-                .controlTextColor
+            case .regular, .highlighted:
+                baseColor
             case .grayed:
-                .controlTextColor.withAlphaComponent(0.6)
-            case .highlighted:
-                .selectedMenuItemTextColor
+                baseColor.withAlphaComponent(0.6)
             case .unread:
                 NSColor(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)
             }
@@ -22,7 +28,7 @@ enum StatusItemView {
             p.alignment = .center
             p.lineBreakMode = .byTruncatingMiddle
             return [
-                .foregroundColor: NSColor.controlTextColor,
+                .foregroundColor: baseColor,
                 .font: NSFont.menuFont(ofSize: 6),
                 .paragraphStyle: p
             ]
@@ -42,15 +48,24 @@ enum StatusItemView {
         }
     }
 
-    static func makeIcon(icon: NSImage, state: State, countLabel: String, title: String?) -> NSImage {
+    static func makeIcon(type: ListableItem.Type, state: State, countLabel: String, title: String?) -> NSImage {
         let stack = NSStackView()
         stack.spacing = 0
         stack.orientation = .vertical
         stack.alignment = .centerX
 
+        let img: NSImage = type == PullRequest.self ? .pullRequestIcon : .issueIcon
+        var size = img.size
+        let scale = 16.0 / size.height
+        size.width *= scale
+        size.height *= scale
+
         let iconView = NSImageView()
-        iconView.contentTintColor = state.foreground
+        iconView.contentTintColor = state.baseColor
         iconView.imageAlignment = .alignCenter
+
+        let icon = img.resized(to: size, offset: .zero)
+        icon.isTemplate = true
         iconView.image = icon
 
         let bottomRow = NSStackView()
@@ -89,25 +104,7 @@ enum StatusItemView {
             stack.cacheDisplay(in: stackRect, to: bir)
             sivImage.addRepresentation(bir)
         }
-        sivImage.isTemplate = true
+        
         return sivImage
     }
-
-    static let prIcon: NSImage = {
-        let img = NSImage.pullRequestIcon
-        var size = img.size
-        let scale = 16.0 / size.height
-        size.width *= scale
-        size.height *= scale
-        return img.resized(to: size, offset: .zero)
-    }()
-
-    static let issueIcon: NSImage = {
-        let img = NSImage.issueIcon
-        var size = img.size
-        let scale = 16.0 / size.height
-        size.width *= scale
-        size.height *= scale
-        return img.resized(to: size, offset: .zero)
-    }()
 }

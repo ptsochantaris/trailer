@@ -125,23 +125,24 @@ final class MenuBarSet {
                 .regular
             }
 
-            let icon: NSImage = type == PullRequest.self ? StatusItemView.prIcon : StatusItemView.issueIcon
-            let sivImage = StatusItemView.makeIcon(icon: icon, state: state, countLabel: countString, title: label)
+            let sivImage = StatusItemView.makeIcon(type: type, state: state, countLabel: countString, title: label)
             let imageWidth = sivImage.size.width.rounded(.down) - 1
+            var existingItem = menu.statusItem
 
-            if let existingItem = menu.statusItem {
+            if let existingItem {
                 existingItem.length = imageWidth
-                if let button = existingItem.button {
-                    button.image = sivImage
-                }
             } else {
-                let item = NSStatusBar.system.statusItem(withLength: imageWidth)
-                menu.statusItem = item
-                if let button = item.button {
-                    button.image = sivImage
+                existingItem = NSStatusBar.system.statusItem(withLength: imageWidth)
+                menu.statusItem = existingItem
+                if let button = existingItem?.button {
                     button.target = menu
                     button.action = #selector(MenuWindow.buttonSelected)
                 }
+            }
+
+            if let button = existingItem?.button {
+                button.image = sivImage
+                button.appearsDisabled = state == .highlighted
             }
 
         } else {

@@ -649,7 +649,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         if let tabScroll, let i = tabs.selectedItem, let ind = tabs.items?.firstIndex(of: i) {
             let w = tabs.bounds.size.width / CGFloat(tabs.items?.count ?? 1)
             let x = w * CGFloat(ind)
-            let f = CGRect(x: x, y: 0, width: w, height: tabs.bounds.size.height)
+            let f = CGRect(x: x, y: 0, width: w, height: tabs.bounds.height)
             tabScroll.scrollRectToVisible(f, animated: animated && tabsAlreadyWereVisible)
         }
         lastTabCount = tabs.items?.count ?? 0

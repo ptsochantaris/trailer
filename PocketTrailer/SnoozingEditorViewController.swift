@@ -348,7 +348,7 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
     private func showPicker() {
         picker.reloadAllComponents()
         picker.selectRow(indexForPicker, inComponent: 0, animated: false)
-        pickerBottom.constant = tabBarController?.tabBar.frame.size.height ?? 0
+        pickerBottom.constant = tabBarController?.tabBar.frame.height ?? 0
         UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut) {
             self.pickerShield.alpha = 1.0
             self.view.layoutIfNeeded()
@@ -358,7 +358,7 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
     }
 
     private func hidePickerAnimated(animate: Bool) {
-        pickerBottom.constant = -(picker.frame.size.height + pickerNavBar.frame.size.height)
+        pickerBottom.constant = -(picker.frame.height + pickerNavBar.frame.height)
 
         if animate {
             UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut) {
