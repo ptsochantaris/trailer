@@ -5,10 +5,12 @@ enum StatusItemView {
         case regular, grayed, highlighted, unread
 
         var baseColor: NSColor {
-            if #available(macOS 26, *) {
+            if #available(macOS 15, *) { // 15, 26
                 .white
-            } else {
-                .textColor
+            } else if #available(macOS 14, *) {
+                .black
+            } else { // macOS 12, 13
+                .white
             }
         }
 
