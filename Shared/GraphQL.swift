@@ -932,14 +932,18 @@ enum GraphQL {
                 Field.id
             }
 
+            let serverId = server.objectID
+
             try await GraphQL.runQueries(queries: queries, on: graphQLPath, token: authToken) { newStats in
                 moc.perform {
-                    server.updateApiStats(newStats)
-                    if let idMigrations = newStats.migratedIds {
-                        for (k, v) in idMigrations where k != v {
-                            // Logging.shared.log("Migrating \(typeName) ID \(k) to \(v)")
-                            if let item = type.item(id: k, in: moc) {
-                                item.nodeId = v
+                    if let taskServer = moc.registeredObject(for: serverId) as? ApiServer {
+                        taskServer.updateApiStats(newStats)
+                        if let idMigrations = newStats.migratedIds {
+                            for (k, v) in idMigrations where k != v {
+                                // Logging.shared.log("Migrating \(typeName) ID \(k) to \(v)")
+                                if let item = type.item(id: k, in: moc) {
+                                    item.nodeId = v
+                                }
                             }
                         }
                     }
@@ -952,12 +956,14 @@ enum GraphQL {
         }
     }
 
-    private final class NodeScanner {
-        private let scannerServer: ApiServer
+    private final class NodeScanner: Sendable {
         private let scannerMoc: NSManagedObjectContext
         private let parentType: DataItem.Type?
-        private let parentCache = FetchCache()
-        private var nodes = [String: Lista<Node>]()
+
+        // protected by scannerMoc
+        nonisolated(unsafe) private let scannerServer: ApiServer
+        nonisolated(unsafe) private let parentCache = FetchCache()
+        nonisolated(unsafe) private var nodes = [String: Lista<Node>]()
 
         init(server: ApiServer, parentType: (some DataItem).Type?) {
             let child = server.managedObjectContext!.buildChildContext()

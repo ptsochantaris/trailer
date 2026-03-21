@@ -356,7 +356,6 @@
 		1686DEB82A5DD12C00AED26E /* ApiOptionsWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiOptionsWindow.swift; sourceTree = "<group>"; };
 		1686DEBA2A5E337C00AED26E /* ApiSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiSettingsViewController.swift; sourceTree = "<group>"; };
 		168839C61DEF8C3B002D9448 /* ImportExport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImportExport.swift; sourceTree = "<group>"; };
-		168BA31A283CC310005D09EE /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		168BC6AA17EC2DF000BC4584 /* Trailer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Trailer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		168BC6B517EC2DF000BC4584 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		168BC6C317EC2DF000BC4584 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
@@ -460,9 +459,6 @@
 		16F51FA019DE8C78007B0BB1 /* PRIVACY */ = {isa = PBXFileReference; lastKnownFileType = text; lineEnding = 0; path = PRIVACY; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = "<none>"; };
 		16FEB781283C4E320029FB0F /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		16FEB783283C4E320029FB0F /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
-		16FEB786283C4E320029FB0F /* PocketTrailer_Widget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PocketTrailer_Widget.swift; sourceTree = "<group>"; };
-		16FEB788283C4E330029FB0F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		16FEB78A283C4E330029FB0F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -643,7 +639,6 @@
 			isa = PBXGroup;
 			children = (
 				1628A6BA18789E73005EDA69 /* App */,
-				16FEB785283C4E320029FB0F /* PocketTrailer Widget */,
 				16522D711AB03AE500B1C3FB /* WatchKit Extension */,
 				16522D801AB03AE500B1C3FB /* WatchKit App */,
 			);
@@ -926,17 +921,6 @@
 			name = Settings;
 			sourceTree = "<group>";
 		};
-		16FEB785283C4E320029FB0F /* PocketTrailer Widget */ = {
-			isa = PBXGroup;
-			children = (
-				16FEB786283C4E320029FB0F /* PocketTrailer_Widget.swift */,
-				168BA31A283CC310005D09EE /* MainView.swift */,
-				16FEB788283C4E330029FB0F /* Assets.xcassets */,
-				16FEB78A283C4E330029FB0F /* Info.plist */,
-			);
-			path = "PocketTrailer Widget";
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1041,7 +1025,7 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastSwiftMigration = 0700;
 				LastSwiftUpdateCheck = 1500;
-				LastUpgradeCheck = 2610;
+				LastUpgradeCheck = 2640;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
 					1628A6B018789E73005EDA69 = {
@@ -1507,7 +1491,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = apptint;
 				ASSETCATALOG_COMPILER_OPTIMIZATION = time;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -1583,7 +1567,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = apptint;
 				ASSETCATALOG_COMPILER_OPTIMIZATION = time;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CLANG_ANALYZER_NONNULL = YES;

@@ -56,19 +56,13 @@ enum RestAccess {
         var lastPage = true
         if case let .success(allHeaders, _) = result {
             if let serverMoc = server.managedObjectContext {
-                #if os(iOS)
-                    Task {
-                        await serverMoc.perform {
-                            let latestLimits = ApiStats.fromV3(headers: allHeaders)
-                            server.updateApiStats(latestLimits)
-                        }
-                    }
-                #else
-                    await serverMoc.perform {
+                let serverId = server.objectID
+                await serverMoc.perform {
+                    if let taskServer = serverMoc.registeredObject(for: serverId) as? ApiServer {
                         let latestLimits = ApiStats.fromV3(headers: allHeaders)
-                        server.updateApiStats(latestLimits)
+                        taskServer.updateApiStats(latestLimits)
                     }
-                #endif
+                }
             }
 
             if let linkHeader = allHeaders["Link"] as? String {

@@ -245,8 +245,10 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate {
 
         do {
             try BGTaskScheduler.shared.submit(request)
-            Task {
-                await Logging.shared.log("Scheduled next refresh after \(request.earliestBeginDate!)")
+            if let startDate = request.earliestBeginDate {
+                Task {
+                    await Logging.shared.log("Scheduled next refresh after \(startDate)")
+                }
             }
         } catch {
             Task {

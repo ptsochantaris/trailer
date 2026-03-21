@@ -385,10 +385,14 @@ final class ApiServer: NSManagedObject {
     func run(queries: Lista<Query>) async throws {
         let path = graphQLPath.orEmpty
         let token = authToken.orEmpty
+        let serverId = objectID
 
-        try await GraphQL.runQueries(queries: queries, on: path, token: token) { [weak self] newStats in
-            self?.managedObjectContext?.perform {
-                self?.updateApiStats(newStats)
+        try await GraphQL.runQueries(queries: queries, on: path, token: token) { [weak managedObjectContext] newStats in
+            guard let managedObjectContext else { return }
+            managedObjectContext.perform {
+                if let taskServer = managedObjectContext.registeredObject(for: serverId) as? ApiServer {
+                    taskServer.updateApiStats(newStats)
+                }
             }
         }
     }
