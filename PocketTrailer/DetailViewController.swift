@@ -151,7 +151,9 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
         searchController.searchBar.tintColor = view.tintColor
         searchController.searchBar.placeholder = "Filter"
         searchController.searchBar.autocapitalizationType = .none
-        navigationItem.preferredSearchBarPlacement = .stacked
+        if #available(iOS 26.0, *) {
+            navigationItem.preferredSearchBarPlacement = .integrated
+        }
         navigationItem.searchController = searchController
 
         searchTimer = PopTimer(timeInterval: 0.3) { [weak self] in

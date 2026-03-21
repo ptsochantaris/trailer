@@ -91,7 +91,7 @@
                     </tableView>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" title="Pull Requests" id="Zdf-7t-Un8">
-                        <barButtonItem key="rightBarButtonItem" image="checkmark.circle" catalog="system" id="vlQ-6x-FuM">
+                        <barButtonItem key="rightBarButtonItem" image="checklist.checked.rtl" catalog="system" id="vlQ-6x-FuM">
                             <connections>
                                 <action selector="editSelected:" destination="7bK-jq-Zjz" id="ciS-ir-tQR"/>
                             </connections>
@@ -179,7 +179,7 @@
     </scenes>
     <color key="tintColor" name="apptint"/>
     <resources>
-        <image name="checkmark.circle" catalog="system" width="128" height="123"/>
+        <image name="checklist.checked.rtl" catalog="system" width="128" height="107"/>
         <image name="gear" catalog="system" width="128" height="122"/>
         <namedColor name="apptint">
             <color red="0.20299999415874481" green="0.43000000715255737" blue="0.71799999475479126" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
