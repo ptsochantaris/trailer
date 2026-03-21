@@ -185,6 +185,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         searchController.searchBar.tintColor = view.tintColor
         searchController.searchBar.placeholder = "Filter"
         searchController.searchBar.autocapitalizationType = .none
+        navigationItem.preferredSearchBarPlacement = .stacked
         navigationItem.searchController = searchController
 
         searchTimer = PopTimer(timeInterval: 0.3) { [weak self] in
@@ -678,7 +679,11 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         ts.alwaysBounceHorizontal = true
         ts.scrollsToTop = false
         ts.contentInsetAdjustmentBehavior = .never
-        ts.backgroundColor = .systemBackground
+        if #available(iOS 26.0, *) {
+            ts.backgroundColor = .clear
+        } else {
+            ts.backgroundColor = .systemBackground
+        }
         ts.addSubview(tabs)
 
         let b = UIView()
