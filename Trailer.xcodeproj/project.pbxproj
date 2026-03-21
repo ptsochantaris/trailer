@@ -67,7 +67,6 @@
 		164E4C0B2A7EB15A00BFE065 /* approvesChangesIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 16C4ACF61EB553E20022C33B /* approvesChangesIcon.png */; };
 		164E4C0C2A7EB15A00BFE065 /* requestsChangesIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 16C4ACF51EB553E20022C33B /* requestsChangesIcon.png */; };
 		16519EB41ACF0E91002171D0 /* Trailer.icns in Resources */ = {isa = PBXBuildFile; fileRef = 16519EB31ACF0E91002171D0 /* Trailer.icns */; };
-		16522D791AB03AE500B1C3FB /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 16522D781AB03AE500B1C3FB /* Images.xcassets */; };
 		16522D851AB03AE500B1C3FB /* Interface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 16522D831AB03AE500B1C3FB /* Interface.storyboard */; };
 		16522D871AB03AE500B1C3FB /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 16522D861AB03AE500B1C3FB /* Images.xcassets */; };
 		1655FD5B2A69CA0D0087F439 /* ApiMonitorWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1655FD592A69CA0D0087F439 /* ApiMonitorWindow.swift */; };
@@ -319,8 +318,6 @@
 		164841011AD19933009E6383 /* NotificationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		164997471B127ED500D135A2 /* Trailer 21.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 21.xcdatamodel"; sourceTree = "<group>"; };
 		16519EB31ACF0E91002171D0 /* Trailer.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Trailer.icns; sourceTree = "<group>"; };
-		16522D731AB03AE500B1C3FB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		16522D781AB03AE500B1C3FB /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		16522D7C1AB03AE500B1C3FB /* PocketTrailer WatchKit App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "PocketTrailer WatchKit App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		16522D821AB03AE500B1C3FB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		16522D841AB03AE500B1C3FB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Interface.storyboard; sourceTree = "<group>"; };
@@ -343,7 +340,6 @@
 		167165D028550D600064CEBC /* Trailer 42.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 42.xcdatamodel"; sourceTree = "<group>"; };
 		1671A11E1AC73CCB0047440A /* SetupAssistant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SetupAssistant.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		1671A1221AC74BC30047440A /* SetupAssistant.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SetupAssistant.xib; sourceTree = "<group>"; };
-		1672DF2D1AB0D7CC00381AEB /* PocketTrailer WatchKit Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "PocketTrailer WatchKit Extension.entitlements"; sourceTree = "<group>"; };
 		16791B161C0A1B0D003A527F /* Trailer 23.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 23.xcdatamodel"; sourceTree = "<group>"; };
 		167B10551E6A856A00B0E1AE /* Trailer 34.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 34.xcdatamodel"; sourceTree = "<group>"; };
 		167B10561E6A86A300B0E1AE /* Review.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Review.swift; path = Shared/Review.swift; sourceTree = SOURCE_ROOT; };
@@ -639,7 +635,6 @@
 			isa = PBXGroup;
 			children = (
 				1628A6BA18789E73005EDA69 /* App */,
-				16522D711AB03AE500B1C3FB /* WatchKit Extension */,
 				16522D801AB03AE500B1C3FB /* WatchKit App */,
 			);
 			name = "Pocket Trailer";
@@ -654,25 +649,9 @@
 			name = Images;
 			sourceTree = "<group>";
 		};
-		16522D711AB03AE500B1C3FB /* WatchKit Extension */ = {
-			isa = PBXGroup;
-			children = (
-				16B6B7BE1BA3B903006A509F /* Core */,
-				16E93D151AB4681800CA967E /* Detail */,
-				16E93D101AB467BF00CA967E /* List */,
-				16D845381AB4513F0098FB65 /* Sections */,
-				16522D781AB03AE500B1C3FB /* Images.xcassets */,
-				16522D721AB03AE500B1C3FB /* Supporting Files */,
-			);
-			name = "WatchKit Extension";
-			path = "PocketTrailer WatchKit Extension";
-			sourceTree = "<group>";
-		};
 		16522D721AB03AE500B1C3FB /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				1672DF2D1AB0D7CC00381AEB /* PocketTrailer WatchKit Extension.entitlements */,
-				16522D731AB03AE500B1C3FB /* Info.plist */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -680,6 +659,11 @@
 		16522D801AB03AE500B1C3FB /* WatchKit App */ = {
 			isa = PBXGroup;
 			children = (
+				16B6B7BE1BA3B903006A509F /* Core */,
+				16E93D151AB4681800CA967E /* Detail */,
+				16E93D101AB467BF00CA967E /* List */,
+				16D845381AB4513F0098FB65 /* Sections */,
+				16522D721AB03AE500B1C3FB /* Supporting Files */,
 				16522D861AB03AE500B1C3FB /* Images.xcassets */,
 				16522D831AB03AE500B1C3FB /* Interface.storyboard */,
 				16522D821AB03AE500B1C3FB /* Info.plist */,
@@ -1112,7 +1096,6 @@
 		16522D7A1AB03AE500B1C3FB /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
-				16522D791AB03AE500B1C3FB /* Images.xcassets in Resources */,
 				16522D851AB03AE500B1C3FB /* Interface.storyboard in Resources */,
 				1607AD062EAE4FE80017EC10 /* AppIcon.icon in Resources */,
 				16522D871AB03AE500B1C3FB /* Images.xcassets in Resources */,
