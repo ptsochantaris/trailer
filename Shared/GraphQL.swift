@@ -961,9 +961,9 @@ enum GraphQL {
         private let parentType: DataItem.Type?
 
         // protected by scannerMoc
-        nonisolated(unsafe) private let scannerServer: ApiServer
-        nonisolated(unsafe) private let parentCache = FetchCache()
-        nonisolated(unsafe) private var nodes = [String: Lista<Node>]()
+        private nonisolated(unsafe) let scannerServer: ApiServer
+        private nonisolated(unsafe) let parentCache = FetchCache()
+        private nonisolated(unsafe) var nodes = [String: Lista<Node>]()
 
         init(server: ApiServer, parentType: (some DataItem).Type?) {
             let child = server.managedObjectContext!.buildChildContext()

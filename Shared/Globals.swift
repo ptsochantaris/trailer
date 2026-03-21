@@ -96,10 +96,14 @@ enum ItemCondition: Int {
     case open, closed, merged
 
     private static let matchingPredicates = ContiguousArray((0 ... 2).map { NSPredicate(format: "condition == \($0)") })
-    var matchingPredicate: NSPredicate { ItemCondition.matchingPredicates[rawValue] }
+    var matchingPredicate: NSPredicate {
+        ItemCondition.matchingPredicates[rawValue]
+    }
 
     private static let excludingPredicates = ContiguousArray((0 ... 2).map { NSPredicate(format: "condition != \($0)") })
-    var excludingPredicate: NSPredicate { ItemCondition.excludingPredicates[rawValue] }
+    var excludingPredicate: NSPredicate {
+        ItemCondition.excludingPredicates[rawValue]
+    }
 }
 
 enum StatusFilter: Int {
@@ -110,10 +114,14 @@ enum PostSyncAction: Int {
     case doNothing, delete, isNew, isUpdated
 
     private static let matchingPredicates = ContiguousArray((0 ... 3).map { NSPredicate(format: "postSyncAction == \($0)") })
-    var matchingPredicate: NSPredicate { PostSyncAction.matchingPredicates[rawValue] }
+    var matchingPredicate: NSPredicate {
+        PostSyncAction.matchingPredicates[rawValue]
+    }
 
     private static let excludingPredicates = ContiguousArray((0 ... 3).map { NSPredicate(format: "postSyncAction != \($0)") })
-    var excludingPredicate: NSPredicate { PostSyncAction.excludingPredicates[rawValue] }
+    var excludingPredicate: NSPredicate {
+        PostSyncAction.excludingPredicates[rawValue]
+    }
 }
 
 enum NotificationType {
@@ -215,7 +223,9 @@ enum RepoDisplayPolicy: Int, CaseIterable {
         }
     }
 
-    var intValue: Int { Int(rawValue) }
+    var intValue: Int {
+        Int(rawValue)
+    }
 }
 
 enum DraftHandlingPolicy: Int, CaseIterable {

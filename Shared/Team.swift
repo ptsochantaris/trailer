@@ -6,7 +6,9 @@ final class Team: DataItem {
     @NSManaged var organisationLogin: String?
     @NSManaged var calculatedReferral: String?
 
-    override static var typeName: String { "Team" }
+    override static var typeName: String {
+        "Team"
+    }
 
     static func team(with slug: String, in moc: NSManagedObjectContext) -> Team? {
         let f = NSFetchRequest<Team>(entityName: "Team")

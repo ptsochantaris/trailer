@@ -9,7 +9,9 @@ import TrailerJson
 final class Issue: ListableItem {
     @NSManaged var closedByPullRequests: Set<PullRequest>
 
-    override static var typeName: String { "Issue" }
+    override static var typeName: String {
+        "Issue"
+    }
 
     static func mostRecentItemUpdate(in repo: Repo) -> Date {
         repo.issues.reduce(.distantPast) { max($0, $1.updatedAt ?? .distantPast) }

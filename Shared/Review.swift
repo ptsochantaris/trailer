@@ -11,7 +11,9 @@ final class Review: DataItem {
     @NSManaged var pullRequest: PullRequest
     @NSManaged var comments: Set<PRComment>
 
-    override static var typeName: String { "Review" }
+    override static var typeName: String {
+        "Review"
+    }
 
     enum State: String {
         case CHANGES_REQUESTED

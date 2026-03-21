@@ -61,7 +61,7 @@ final class AdvancedReposWindow: NSWindow, NSWindowDelegate {
         prefs?.closedAdvancedWindow()
     }
 
-    // chain this to updateActivity from the main repferences window
+    /// chain this to updateActivity from the main repferences window
     func updateActivity() {
         let refreshing = API.isRefreshing
         if refreshing {

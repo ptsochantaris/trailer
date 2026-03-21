@@ -193,9 +193,13 @@ class DataItem: NSManagedObject, Querying {
     @NSManaged var updatedAt: Date?
     @NSManaged var apiServer: ApiServer
 
-    var alternateCreationDate: Bool { false }
+    var alternateCreationDate: Bool {
+        false
+    }
 
-    class var typeName: String { abort() }
+    class var typeName: String {
+        abort()
+    }
 
     override func value(forUndefinedKey _: String) -> Any? {
         nil
@@ -465,7 +469,9 @@ class DataItem: NSManagedObject, Querying {
         }
     }
 
-    class func shouldCreate(from _: Node) -> Bool { true }
+    class func shouldCreate(from _: Node) -> Bool {
+        true
+    }
 
     var isPr: Bool {
         false

@@ -13,7 +13,9 @@ final class PRLabel: DataItem {
     @NSManaged var pullRequests: Set<PullRequest>
     @NSManaged var issues: Set<Issue>
 
-    override static var typeName: String { "PRLabel" }
+    override static var typeName: String {
+        "PRLabel"
+    }
 
     static func sync(from nodes: Lista<Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
         syncItems(of: PRLabel.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { label, node in

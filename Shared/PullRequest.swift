@@ -27,11 +27,17 @@ final class PullRequest: ListableItem {
     @NSManaged var closesIssueIds: String?
     @NSManaged var closesIssues: Set<Issue>
 
-    override static var typeName: String { "PullRequest" }
+    override static var typeName: String {
+        "PullRequest"
+    }
 
-    override var baseLabelText: String? { baseLabel }
+    override var baseLabelText: String? {
+        baseLabel
+    }
 
-    override var headLabelText: String? { headLabel }
+    override var headLabelText: String? {
+        headLabel
+    }
 
     override var webUrl: String? {
         super.webUrl?.appending(pathComponent: "pull").appending(pathComponent: String(number))

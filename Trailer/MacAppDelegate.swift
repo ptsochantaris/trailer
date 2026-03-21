@@ -1024,7 +1024,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         NSApp.terminate(self)
     }
 
-    // With many thanks to http://vgable.com/blog/2008/10/05/restarting-your-cocoa-application/
+    /// With many thanks to http://vgable.com/blog/2008/10/05/restarting-your-cocoa-application/
     private func restartApp() {
         let ourPID = "\(ProcessInfo.processInfo.processIdentifier)"
         let shArgs = ["-c", "kill -9 $1 \n sleep 1 \n open \"$2\"", "", ourPID, Bundle.main.bundlePath]

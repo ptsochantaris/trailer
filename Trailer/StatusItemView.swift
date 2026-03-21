@@ -16,7 +16,7 @@ enum StatusItemView {
 
         var foreground: NSColor {
             switch self {
-            case .regular, .highlighted:
+            case .highlighted, .regular:
                 baseColor
             case .grayed:
                 baseColor.withAlphaComponent(0.6)
@@ -106,7 +106,7 @@ enum StatusItemView {
             stack.cacheDisplay(in: stackRect, to: bir)
             sivImage.addRepresentation(bir)
         }
-        
+
         return sivImage
     }
 }

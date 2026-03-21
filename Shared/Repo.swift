@@ -19,7 +19,9 @@ final class Repo: DataItem {
     @NSManaged var archived: Bool
     @NSManaged var lastScannedIssueEventId: Int
 
-    override static var typeName: String { "Repo" }
+    override static var typeName: String {
+        "Repo"
+    }
 
     override func resetSyncState() {
         super.resetSyncState()
@@ -267,7 +269,7 @@ final class Repo: DataItem {
     func markItemsAsUpdated(with numbers: Set<Int>) {
         let predicate = NSPredicate(format: "(number IN %@) AND (repo == %@)", numbers, self)
 
-        func mark<T>(type: T.Type) where T: ListableItem {
+        func mark<T: ListableItem>(type: T.Type) {
             let f = NSFetchRequest<T>(entityName: type.typeName)
             f.returnsObjectsAsFaults = false
             f.includesSubentities = false

@@ -862,9 +862,13 @@ class ListableItem: DataItem, Listable {
         return _title
     }
 
-    var baseLabelText: String? { nil }
+    var baseLabelText: String? {
+        nil
+    }
 
-    var headLabelText: String? { nil }
+    var headLabelText: String? {
+        nil
+    }
 
     func subtitle(with font: FONT_CLASS, lightColor: COLOR_CLASS, darkColor: COLOR_CLASS, separator: String, settings: Settings.Cache) -> NSMutableAttributedString {
         let components = Lista<String>()
@@ -1194,7 +1198,9 @@ class ListableItem: DataItem, Listable {
     }
 
     private static let _unreadPredicate = NSPredicate(format: "unreadComments > 0")
-    class func includeInUnreadPredicate(settings _: Settings.Cache) -> NSPredicate { _unreadPredicate }
+    class func includeInUnreadPredicate(settings _: Settings.Cache) -> NSPredicate {
+        _unreadPredicate
+    }
 
     private static let isSnoozingPredicate = NSPredicate(format: "snoozeUntil != nil")
 
@@ -1226,7 +1232,7 @@ class ListableItem: DataItem, Listable {
         #endif
     }
 
-    enum SpotLightResult: Sendable {
+    enum SpotLightResult {
         case needsIndexing(CSSearchableItem), needsRemoval(String)
     }
 

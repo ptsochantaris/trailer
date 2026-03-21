@@ -212,7 +212,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     @IBOutlet private var reactionIntervalLabel: NSTextField!
     @IBOutlet private var reactionIntervalStepper: NSStepper!
 
-    // Tabs
+    /// Tabs
     @IBOutlet var tabs: NSTabView!
 
     @MainActor
