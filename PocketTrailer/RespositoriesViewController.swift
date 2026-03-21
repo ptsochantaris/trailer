@@ -38,7 +38,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
         searchController.searchResultsUpdater = self
         searchController.searchBar.tintColor = view.tintColor
         searchController.searchBar.placeholder = "Filter"
-        searchController.hidesNavigationBarDuringPresentation = true
+        searchController.hidesNavigationBarDuringPresentation = false
         navigationItem.preferredSearchBarPlacement = .stacked
         navigationItem.searchController = searchController
 
