@@ -1,29 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="RFw-pn-qBh">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="24765" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="2mI-Au-0Le">
     <device id="retina5_9" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24743"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Master-->
+        <!--Detail-->
         <scene sceneID="smW-Zh-WAh">
             <objects>
-                <tableViewController title="Master" extendedLayoutIncludesOpaqueBars="YES" definesPresentationContext="YES" clearsSelectionOnViewWillAppear="NO" id="7bK-jq-Zjz" customClass="MasterViewController" customModule="PocketTrailer" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController title="Master" extendedLayoutIncludesOpaqueBars="YES" definesPresentationContext="YES" clearsSelectionOnViewWillAppear="NO" id="7bK-jq-Zjz" userLabel="Detail" customClass="DetailViewController" customModule="PocketTrailer" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" layoutMarginsFollowReadableWidth="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="insetGrouped" separatorStyle="default" rowHeight="340" sectionHeaderHeight="18" sectionFooterHeight="18" id="r7i-6Z-zg0">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <prototypes>
                             <tableViewCell contentMode="scaleToFill" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" selectionStyle="default" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" rowHeight="340" id="WCw-Qf-5nD" customClass="PRCell" customModule="PocketTrailer" customModuleProvider="target">
-                                <rect key="frame" x="16" y="31.666666030883789" width="343" height="340"/>
+                                <rect key="frame" x="16" y="55.333332061767578" width="343" height="340"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" tableViewCell="WCw-Qf-5nD" id="Ccv-UH-bok">
                                     <rect key="frame" x="0.0" y="0.0" width="343" height="340"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <stackView opaque="NO" contentMode="scaleToFill" alignment="top" spacing="11" translatesAutoresizingMaskIntoConstraints="NO" id="W1j-m4-s4j">
-                                            <rect key="frame" x="11" y="11" width="321" height="318"/>
+                                            <rect key="frame" x="11" y="15" width="321" height="310"/>
                                             <subviews>
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="1000" verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="dbg-hz-tPt" userLabel="Avatar">
                                                     <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
@@ -90,11 +91,6 @@
                     </tableView>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" title="Pull Requests" id="Zdf-7t-Un8">
-                        <barButtonItem key="leftBarButtonItem" image="gear" catalog="system" id="uCG-Gj-QGq">
-                            <connections>
-                                <segue destination="HRN-4r-OxE" kind="presentation" identifier="showPreferences" modalPresentationStyle="formSheet" id="Z9a-R6-dGL"/>
-                            </connections>
-                        </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" image="checkmark.circle" catalog="system" id="vlQ-6x-FuM">
                             <connections>
                                 <action selector="editSelected:" destination="7bK-jq-Zjz" id="ciS-ir-tQR"/>
@@ -112,25 +108,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Rux-fX-hf1" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="854" y="-33"/>
-        </scene>
-        <!--Navigation Controller-->
-        <scene sceneID="G34-pc-zxQ">
-            <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="RFw-pn-qBh" sceneMemberID="viewController">
-                    <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" largeTitles="YES" id="17D-F1-Sn8">
-                        <rect key="frame" x="0.0" y="44" width="375" height="96"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </navigationBar>
-                    <nil name="viewControllers"/>
-                    <connections>
-                        <segue destination="7bK-jq-Zjz" kind="relationship" relationship="rootViewController" id="hWL-Ac-Bha"/>
-                    </connections>
-                </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="ryQ-BO-oWi" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="-10" y="-33"/>
+            <point key="canvasLocation" x="825" y="-37"/>
         </scene>
         <!--Settings-->
         <scene sceneID="KXW-4X-WXH">
@@ -138,7 +116,7 @@
                 <viewControllerPlaceholder storyboardName="Settings" id="HRN-4r-OxE" sceneMemberID="viewController"/>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="wsI-VN-CJx" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1508" y="-146"/>
+            <point key="canvasLocation" x="1478" y="-794"/>
         </scene>
         <!--Quickstart-->
         <scene sceneID="4De-Ud-RqP">
@@ -146,18 +124,71 @@
                 <viewControllerPlaceholder storyboardName="Quickstart" id="6Fo-Br-pdL" sceneMemberID="viewController"/>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="f60-XG-fgC" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1518" y="47"/>
+            <point key="canvasLocation" x="1528" y="-38"/>
+        </scene>
+        <!--Trailer-->
+        <scene sceneID="zVD-bg-Wiv">
+            <objects>
+                <tableViewController id="aHs-EY-xHA" customClass="SectionListViewController" customModule="PocketTrailer" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="MHJ-o3-xy9">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="Section" id="uFz-Mt-fnG">
+                                <rect key="frame" x="0.0" y="50" width="375" height="51"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="uFz-Mt-fnG" id="kpX-lh-hEp">
+                                    <rect key="frame" x="0.0" y="0.0" width="348.66666666666669" height="51"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="aHs-EY-xHA" id="4XN-ik-jGD"/>
+                            <outlet property="delegate" destination="aHs-EY-xHA" id="WpO-5U-h8X"/>
+                        </connections>
+                    </tableView>
+                    <toolbarItems/>
+                    <navigationItem key="navigationItem" title="Trailer" id="bg0-UO-tpE">
+                        <barButtonItem key="rightBarButtonItem" image="gear" catalog="system" id="uCG-Gj-QGq">
+                            <connections>
+                                <segue destination="HRN-4r-OxE" kind="presentation" identifier="showPreferences" modalPresentationStyle="formSheet" id="Z9a-R6-dGL"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="kLh-rW-iJX" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="825" y="-794"/>
+        </scene>
+        <!--Split View Controller-->
+        <scene sceneID="U6o-oq-jzM">
+            <objects>
+                <splitViewController allowDoubleColumnStyle="YES" primaryBackgroundStyle="sidebar" id="2mI-Au-0Le" sceneMemberID="viewController">
+                    <connections>
+                        <segue destination="7bK-jq-Zjz" kind="relationship" relationship="detailViewController" id="gA5-YS-hB0"/>
+                        <segue destination="aHs-EY-xHA" kind="relationship" relationship="masterViewController" id="3dA-k2-a8b"/>
+                    </connections>
+                </splitViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Xkl-Se-M9f" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-103" y="-437"/>
         </scene>
     </scenes>
     <color key="tintColor" name="apptint"/>
     <resources>
-        <image name="checkmark.circle" catalog="system" width="128" height="121"/>
-        <image name="gear" catalog="system" width="128" height="119"/>
+        <image name="checkmark.circle" catalog="system" width="128" height="123"/>
+        <image name="gear" catalog="system" width="128" height="122"/>
         <namedColor name="apptint">
             <color red="0.20299999415874481" green="0.43000000715255737" blue="0.71799999475479126" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <systemColor name="secondaryLabelColor">
             <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="tableCellGroupedBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

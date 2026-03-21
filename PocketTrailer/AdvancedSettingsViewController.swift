@@ -143,7 +143,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
                     guard let self else { return }
                     Settings.showSeparateApiServersInMenu.toggle()
                     Task { @MainActor in
-                        popupManager.masterController.updateStatus(becauseOfChanges: true)
+                        popupManager.detailController.updateStatus(becauseOfChanges: true)
                     }
                     settingsChangedTimer.push()
                 }),

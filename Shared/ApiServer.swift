@@ -71,7 +71,6 @@ final class ApiServer: NSManagedObject {
             return nil
         }
         set {
-            assert(!objectID.isTemporaryID)
             _cachedAuthToken = .some(newValue)
             let oid = objectID
             Task.detached {

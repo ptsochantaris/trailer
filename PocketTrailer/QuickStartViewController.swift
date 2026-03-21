@@ -70,9 +70,9 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 
         if newServer.lastSyncSucceeded {
             await dismiss(animated: true)
-            await popupManager.masterController.resetView(becauseOfChanges: true)
+            await popupManager.detailController.resetView(becauseOfChanges: true)
             Settings.lastPreferencesTabSelected = 1 // repos
-            popupManager.masterController.performSegue(withIdentifier: "showPreferences", sender: self)
+            popupManager.detailController.performSegue(withIdentifier: "showPreferences", sender: self)
             showMessage("Setup complete!", "This is the 'Repos' tab that displays your current GitHub watchlist. By default everything is hidden. Be sure to enable only the repos you need, in order to keep API (and data & battery) usage low.\n\nYou can tweak options & behaviour from the 'Advanced' tab. When you're done, just close this settings view from the top-left.\n\nTrailer has read-only access to your GitHub data, so feel free to experiment, you can't damage your data or settings on GitHub.")
 
         } else {

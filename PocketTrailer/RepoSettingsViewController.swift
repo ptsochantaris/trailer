@@ -168,7 +168,7 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
             repo.groupLabel = newText
             commit()
             Task { @MainActor in
-                popupManager.masterController.updateStatus(becauseOfChanges: true)
+                popupManager.detailController.updateStatus(becauseOfChanges: true)
             }
         }
         if settingsChangedTimer.isPushed {

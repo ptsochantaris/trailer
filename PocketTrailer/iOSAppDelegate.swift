@@ -58,7 +58,7 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate {
     func application(_: UIApplication, performActionFor shortcutItem: UIApplicationShortcutItem, completionHandler: @escaping (Bool) -> Void) {
         switch shortcutItem.type {
         case "search-items":
-            popupManager.masterController.focusFilter(terms: nil)
+            popupManager.detailController.focusFilter(terms: nil)
             completionHandler(true)
 
         case "mark-all-read":
@@ -80,7 +80,7 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate {
             if let items = c.queryItems, let index = items.firstIndex(where: { $0.name == "search" }) {
                 terms = items[index].value
             }
-            popupManager.masterController.focusFilter(terms: terms)
+            popupManager.detailController.focusFilter(terms: terms)
         } else {
             Task {
                 await settingsManager.loadSettingsFrom(url: url, confirmFromView: nil)
@@ -184,7 +184,7 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     @objc private func refreshStarting() {
-        popupManager.masterController.updateStatus(becauseOfChanges: false)
+        popupManager.detailController.updateStatus(becauseOfChanges: false)
     }
 
     @objc private func refreshDone(_ notification: Notification) {

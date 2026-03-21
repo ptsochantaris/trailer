@@ -29,8 +29,7 @@ final class PopupManager: NSObject {
 
     ////////////// Master view
 
-    var masterController: MasterViewController {
-        let s = app.window!.rootViewController as! UINavigationController
-        return s.viewControllers.first as! MasterViewController
+    var detailController: DetailViewController {
+        (app.window!.rootViewController as! UISplitViewController).viewController(for: .secondary) as! DetailViewController
     }
 }

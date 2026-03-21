@@ -64,13 +64,13 @@ final class WatchManager: NSObject, WCSessionDelegate {
 
         case "openItem":
             if let itemId = message["localId"] as? String {
-                popupManager.masterController.highightItemWithUriPath(uriPath: itemId)
+                popupManager.detailController.highightItemWithUriPath(uriPath: itemId)
             }
             return await processList(message: message, settings: settings)
 
         case "opencomment":
             if let itemId = message["id"] as? String {
-                popupManager.masterController.openCommentWithId(cId: itemId)
+                popupManager.detailController.openCommentWithId(cId: itemId)
             }
             return await processList(message: message, settings: settings)
 
@@ -259,7 +259,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
     //////////////////////////////
 
     private func buildOverview(settings: Settings.Cache) async -> [String: Sendable] {
-        let allViewCriteria = popupManager.masterController.allTabSets.map(\.viewCriterion)
+        let allViewCriteria = SectionListViewController.tabBarSets.map(\.viewCriterion)
 
         return await DataManager.runInChild(of: DataManager.main) { tempMoc in
             var views = [[String: Sendable]]()

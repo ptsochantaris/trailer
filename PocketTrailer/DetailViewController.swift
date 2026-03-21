@@ -3,62 +3,31 @@ import PopTimer
 import UIKit
 import UserNotifications
 
-@MainActor
-final class TabBarSet {
-    var prItem: UITabBarItem?
-    var issuesItem: UITabBarItem?
-    let viewCriterion: GroupingCriterion?
-
-    var tabItems: [UITabBarItem] {
-        let label = viewCriterion?.label
-        var items = [UITabBarItem]()
-
-        let settings = Settings.cache
-
-        let prf = ListableItem.requestForItems(of: PullRequest.self, withFilter: nil, sectionIndex: -1, criterion: viewCriterion, settings: settings)
-        if try! DataManager.main.count(for: prf) > 0 {
-            let i = UITabBarItem(title: label ?? "Pull Requests", image: .prsTab, selectedImage: nil)
-            let prUnreadCount = PullRequest.badgeCount(in: DataManager.main, criterion: viewCriterion, settings: settings)
-            i.badgeValue = prUnreadCount > 0 ? "\(prUnreadCount)" : nil
-            items.append(i)
-            prItem = i
-        }
-        let isf = ListableItem.requestForItems(of: Issue.self, withFilter: nil, sectionIndex: -1, criterion: viewCriterion, settings: settings)
-        if try! DataManager.main.count(for: isf) > 0 {
-            let i = UITabBarItem(title: label ?? "Issues", image: .issuesTab, selectedImage: nil)
-            let issuesUnreadCount = Issue.badgeCount(in: DataManager.main, criterion: viewCriterion, settings: settings)
-            i.badgeValue = issuesUnreadCount > 0 ? "\(issuesUnreadCount)" : nil
-            items.append(i)
-            issuesItem = i
-        }
-        return items
-    }
-
-    init(viewCriterion: GroupingCriterion?) {
-        self.viewCriterion = viewCriterion
-    }
+extension Notification.Name {
+    static let showPreferences = Self("ShowPreferences")
+    static let tabBarSetUpdate = Self("TabBarSetUpdate")
 }
 
-final class MasterViewController: UITableViewController, NSFetchedResultsControllerDelegate,
-    UITabBarControllerDelegate, UITabBarDelegate, UISearchResultsUpdating,
+final class DetailViewController: UITableViewController, NSFetchedResultsControllerDelegate,
+    UITabBarControllerDelegate, UISearchResultsUpdating,
     UITableViewDragDelegate {
     private var fetchedResultsController: NSFetchedResultsController<ListableItem>?
-
-    // Tabs
-    private var tabs = UITabBar()
-    private var tabScroll: UIScrollView?
-    private var tabBorder: UIView?
-    private var tabBarSets = [TabBarSet]()
-    private var currentTabBarSet: TabBarSet?
-
     private var searchTimer: PopTimer!
+    private var animatedUpdates = false
+    private var sectionsChanged = false
+    private var viewingPrs = true
+    private var firstAppearance = true
+    private var lastTabCount = 0
+    private let watchManager = WatchManager()
 
     private var pluralNameForItems: String {
         viewingPrs ? "pull requests" : "issues"
     }
 
-    var allTabSets: [TabBarSet] {
-        tabBarSets
+    var currentTabBarSet: TabBarSet? {
+        didSet {
+            updateSectionInfo()
+        }
     }
 
     @IBAction private func editSelected(_ sender: UIBarButtonItem) {
@@ -73,8 +42,8 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         a.addAction(UIAlertAction(title: "Mark All As Read", style: .default) { _ in
             self.markAllAsRead()
         })
-        if (tabs.items?.count ?? 0) > 1 {
-            a.addAction(UIAlertAction(title: "On Other Tabs Too", style: .destructive) { _ in
+        if !SectionListViewController.tabBarSets.isEmpty {
+            a.addAction(UIAlertAction(title: "On Other Sections Too", style: .destructive) { _ in
                 app.markEverythingRead(settings: Settings.cache)
             })
         }
@@ -156,7 +125,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         }
     }
 
-    private var firstAppearance = true
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
@@ -169,12 +137,10 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
             if ApiServer.countApiServers(in: DataManager.main) == 1, let a = ApiServer.allApiServers(in: DataManager.main).first, a.authToken == nil || a.authToken!.isEmpty {
                 performSegue(withIdentifier: "showQuickstart", sender: self)
             } else {
-                performSegue(withIdentifier: "showPreferences", sender: self)
+                NotificationCenter.default.post(name: .showPreferences, object: nil)
             }
         }
     }
-
-    let watchManager = WatchManager()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -205,9 +171,8 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         n.addObserver(self, selector: #selector(refreshEnded), name: .RefreshEnded, object: nil)
         n.addObserver(self, selector: #selector(dataUpdated(_:)), name: .NSManagedObjectContextObjectsDidChange, object: nil)
 
-        tabs.tintColor = UIColor(named: "apptint")
-
-        updateTabItems(animated: false)
+        newTabBarSets()
+        updateSectionInfo()
     }
 
     func tableView(_: UITableView, itemsForBeginning _: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
@@ -309,8 +274,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
             makeKeyCommand(input: "m", modifierFlags: .command, action: #selector(keyToggleMute), discoverabilityTitle: "Set item mute/unmute"),
             makeKeyCommand(input: "s", modifierFlags: .command, action: #selector(keyToggleSnooze), discoverabilityTitle: "Snooze/wake item"),
             makeKeyCommand(input: "r", modifierFlags: .command, action: #selector(keyForceRefresh), discoverabilityTitle: "Refresh now"),
-            makeKeyCommand(input: "\t", modifierFlags: .alternate, action: #selector(moveToNextTab), discoverabilityTitle: "Move to next tab"),
-            makeKeyCommand(input: "\t", modifierFlags: [.alternate, .shift], action: #selector(moveToPreviousTab), discoverabilityTitle: "Move to previous tab"),
             makeKeyCommand(input: " ", modifierFlags: [], action: #selector(keyShowSelectedItem), discoverabilityTitle: "Display current item"),
             makeKeyCommand(input: UIKeyCommand.inputDownArrow, modifierFlags: [], action: #selector(keyMoveToNextItem), discoverabilityTitle: "Next item"),
             makeKeyCommand(input: UIKeyCommand.inputUpArrow, modifierFlags: [], action: #selector(keyMoveToPreviousItem), discoverabilityTitle: "Previous item"),
@@ -454,44 +417,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         }
     }
 
-    @objc private func moveToNextTab() {
-        if let i = tabs.selectedItem, let items = tabs.items, let ind = items.firstIndex(of: i), items.count > 1 {
-            var nextIndex = ind + 1
-            if nextIndex >= items.count {
-                nextIndex = 0
-            }
-            Task {
-                await requestTabFocus(tabItem: items[nextIndex])
-            }
-        }
-    }
-
-    @objc private func moveToPreviousTab() {
-        if let i = tabs.selectedItem, let items = tabs.items, let ind = items.firstIndex(of: i), items.count > 1 {
-            var nextIndex = ind - 1
-            if nextIndex < 0 {
-                nextIndex = items.count - 1
-            }
-            Task {
-                await requestTabFocus(tabItem: items[nextIndex])
-            }
-        }
-    }
-
-    private func requestTabFocus(tabItem: UITabBarItem?, item: ListableItem? = nil, overrideUrl: String? = nil, andOpen: Bool = false) async {
-        await withTaskGroup { group in
-            if let tabItem {
-                group.addTask { @MainActor [weak self] in
-                    guard let self else { return }
-                    await tabbing(tabs, didSelect: tabItem)
-                }
-            }
-        }
-        if let item {
-            selectInCurrentTab(item: item, overrideUrl: overrideUrl, andOpen: andOpen)
-        }
-    }
-
     private func selectInCurrentTab(item: ListableItem, overrideUrl: String?, andOpen: Bool) {
         guard let ip = fetchedResultsController?.indexPath(forObject: item) else { return }
 
@@ -510,23 +435,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
                 tableView.deselectRow(at: ip, animated: true)
             }
         }
-    }
-
-    private func tabBarSetForTabItem(i: UITabBarItem?) -> TabBarSet? {
-        guard let i else { return tabBarSets.first }
-        return tabBarSets.first { $0.prItem === i || $0.issuesItem === i }
-    }
-
-    func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
-        Task {
-            await tabbing(tabBar, didSelect: item)
-        }
-    }
-
-    private func tabbing(_ tabBar: UITabBar, didSelect item: UITabBarItem) async {
-        await safeScrollToTop()
-        lastTabIndex = tabBar.items?.firstIndex(of: item) ?? 0
-        updateStatus(becauseOfChanges: false, updateItems: true)
     }
 
     private func updateSearch() {
@@ -574,56 +482,31 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         }
     }
 
-    private func updateTabItems(animated: Bool) {
-        tabBarSets.removeAll()
+    private func newTabBarSets() {
+        var newSets = [TabBarSet]()
 
         for groupLabel in Repo.allGroupLabels(in: DataManager.main) {
             let c = GroupingCriterion.group(groupLabel)
             let s = TabBarSet(viewCriterion: c)
-            tabBarSets.append(s)
+            newSets.append(s)
         }
 
         if Settings.showSeparateApiServersInMenu {
             for a in ApiServer.allApiServers(in: DataManager.main) where a.goodToGo {
                 let c = GroupingCriterion.server(a.objectID)
                 let s = TabBarSet(viewCriterion: c)
-                tabBarSets.append(s)
+                newSets.append(s)
             }
         } else {
             let s = TabBarSet(viewCriterion: nil)
-            tabBarSets.append(s)
+            newSets.append(s)
         }
 
-        let items = tabBarSets.reduce([]) { $0 + $1.tabItems }
+        SectionListViewController.tabBarSets = newSets
+    }
 
-        let tabsAlreadyWereVisible = tabScroll != nil
-
-        if items.count > 1 {
-            if splitViewController?.isCollapsed ?? false, (splitViewController?.viewControllers.first as? UINavigationController)?.viewControllers.count == 2 {
-                // collapsed split view, and detail view is showing
-            } else {
-                showTabBar()
-            }
-
-            tabs.items = items
-            if items.count > lastTabIndex {
-                tabs.selectedItem = items[lastTabIndex]
-                currentTabBarSet = tabBarSetForTabItem(i: items[lastTabIndex])
-            } else {
-                tabs.selectedItem = items.last
-                currentTabBarSet = tabBarSetForTabItem(i: items.last!)
-            }
-            tabsWidth?.constant = CGFloat(items.count * 64)
-            tabs.superview?.layoutIfNeeded()
-
-        } else {
-            tabs.items = items
-            tabs.selectedItem = items.first
-            currentTabBarSet = tabBarSetForTabItem(i: items.first)
-            hideTabBar()
-        }
-
-        if let i = tabs.selectedItem?.image {
+    private func updateSectionInfo() {
+        if let i = currentTabBarSet?.prItem?.image {
             viewingPrs = i == .prsTab // not proud of this :(
         } else if let currentTabBarSet {
             viewingPrs = currentTabBarSet.tabItems.first?.image == .prsTab // or this :(
@@ -640,119 +523,32 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
             tableView.reloadData()
         } else {
             let latestFetchRequest = fetchedResultsController?.fetchRequest
-            let newCount = tabs.items?.count ?? 0
+            let newCount = SectionListViewController.tabBarSets.count
             if newCount != lastTabCount || latestFetchRequest != newFetchRequest {
                 updateQuery(newFetchRequest: newFetchRequest)
                 tableView.reloadData()
             }
         }
 
-        if let tabScroll, let i = tabs.selectedItem, let ind = tabs.items?.firstIndex(of: i) {
-            let w = tabs.bounds.size.width / CGFloat(tabs.items?.count ?? 1)
-            let x = w * CGFloat(ind)
-            let f = CGRect(x: x, y: 0, width: w, height: tabs.bounds.height)
-            tabScroll.scrollRectToVisible(f, animated: animated && tabsAlreadyWereVisible)
-        }
-        lastTabCount = tabs.items?.count ?? 0
+        lastTabCount = SectionListViewController.tabBarSets.count
 
-        if let i = tabs.selectedItem, let ind = tabs.items?.firstIndex(of: i) {
-            lastTabIndex = ind
-        } else {
-            lastTabIndex = 0
-        }
+        updateTitle()
+        updateFooter()
     }
 
-    private var lastTabIndex = 0
-    private var lastTabCount = 0
-    private var tabsWidth: NSLayoutConstraint?
-
-    private func showTabBar() {
-        guard tabScroll == nil, let v = navigationController?.view else { return }
-
-        tabs.translatesAutoresizingMaskIntoConstraints = false
-        tabs.delegate = self
-
-        let ts = UIScrollView()
-        ts.translatesAutoresizingMaskIntoConstraints = false
-        ts.showsHorizontalScrollIndicator = false
-        ts.showsVerticalScrollIndicator = false
-        ts.alwaysBounceHorizontal = true
-        ts.scrollsToTop = false
-        ts.contentInsetAdjustmentBehavior = .never
-        if #available(iOS 26.0, *) {
-            ts.backgroundColor = .clear
-        } else {
-            ts.backgroundColor = .systemBackground
-        }
-        ts.addSubview(tabs)
-
-        let b = UIView()
-        b.translatesAutoresizingMaskIntoConstraints = false
-        b.backgroundColor = UIColor.separator
-        b.isUserInteractionEnabled = false
-        v.addSubview(b)
-        tabBorder = b
-
-        v.addSubview(ts)
-        tabScroll = ts
-
-        tabsWidth = tabs.widthAnchor.constraint(greaterThanOrEqualToConstant: 0)
-
-        let cl = ts.contentLayoutGuide
-        let top = cl.topAnchor
-        let bottom = cl.bottomAnchor
-
-        let frameHeight: CGFloat = 50
-
-        additionalSafeAreaInsets = UIEdgeInsets(top: 0, left: 0, bottom: frameHeight, right: 0)
-
-        NSLayoutConstraint.activate([
-            tabs.heightAnchor.constraint(equalTo: ts.heightAnchor),
-            tabs.widthAnchor.constraint(greaterThanOrEqualTo: v.widthAnchor),
-            tabsWidth!,
-
-            tabs.topAnchor.constraint(equalTo: top),
-            tabs.leadingAnchor.constraint(equalTo: cl.leadingAnchor),
-            tabs.trailingAnchor.constraint(equalTo: cl.trailingAnchor),
-            tabs.bottomAnchor.constraint(equalTo: bottom),
-
-            ts.bottomAnchor.constraint(equalTo: v.bottomAnchor),
-            ts.leadingAnchor.constraint(equalTo: v.leadingAnchor),
-            ts.trailingAnchor.constraint(equalTo: v.trailingAnchor),
-            ts.topAnchor.constraint(equalTo: v.safeAreaLayoutGuide.bottomAnchor, constant: -frameHeight),
-
-            b.heightAnchor.constraint(equalToConstant: 0.5),
-            b.bottomAnchor.constraint(equalTo: ts.topAnchor),
-            b.leadingAnchor.constraint(equalTo: ts.leadingAnchor),
-            b.trailingAnchor.constraint(equalTo: ts.trailingAnchor)
-        ])
-    }
-
-    private func hideTabBar() {
-        guard let ts = tabScroll, let b = tabBorder else { return }
-
-        additionalSafeAreaInsets = .zero
-
-        tabScroll = nil
-        tabBorder = nil
-        tabsWidth = nil
-
-        ts.removeFromSuperview()
-        b.removeFromSuperview()
-        tabs.removeFromSuperview()
-    }
-
-    private func selectTab(for item: ListableItem, overrideUrl: String?, andOpen: Bool) {
-        var tabItem: UITabBarItem?
-        for d in tabBarSets {
-            if d.viewCriterion == nil || d.viewCriterion?.isRelated(to: item) ?? false {
-                tabItem = item.isPr ? d.prItem : d.issuesItem
-                break
-            }
-        }
-        Task {
-            await requestTabFocus(tabItem: tabItem, item: item, overrideUrl: overrideUrl, andOpen: andOpen)
-        }
+    private func selectTab(for _: ListableItem, overrideUrl _: String?, andOpen _: Bool) {
+        /*
+         var tabItem: UITabBarItem?
+         for d in tabBarSets {
+             if d.viewCriterion == nil || d.viewCriterion?.isRelated(to: item) ?? false {
+                 tabItem = item.isPr ? d.prItem : d.issuesItem
+                 break
+             }
+         }
+         Task {
+             await requestTabFocus(tabItem: tabItem, item: item, overrideUrl: overrideUrl, andOpen: andOpen)
+         }
+          */
     }
 
     func highightItemWithUriPath(uriPath: String) {
@@ -908,7 +704,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
                     }
                 }
                 presetItems.append(UIAction(title: "Configure...", image: UIImage(systemName: "gear"), identifier: nil) { _ in
-                    self.performSegue(withIdentifier: "showPreferences", sender: 3)
+                    NotificationCenter.default.post(name: .showPreferences, object: 3)
                 })
                 return UIMenu(title: action.title, image: UIImage(systemName: "moon.zzz"), children: presetItems)
 
@@ -989,8 +785,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         return ListableItem.requestForItems(of: type, withFilter: text, sectionIndex: -1, criterion: currentTabBarSet?.viewCriterion, settings: settings)
     }
 
-    private var animatedUpdates = false
-
     func controllerWillChangeContent(_: NSFetchedResultsController<NSFetchRequestResult>) {
         animatedUpdates = UIApplication.shared.applicationState != .background
         sectionsChanged = false
@@ -998,8 +792,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
             tableView.beginUpdates()
         }
     }
-
-    private var sectionsChanged = false
 
     func controller(_: NSFetchedResultsController<NSFetchRequestResult>, didChange _: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
         guard animatedUpdates else { return }
@@ -1065,8 +857,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
         }
     }
 
-    private var viewingPrs = true
-
     func updateStatus(becauseOfChanges: Bool, updateItems: Bool = false) {
         guard isViewLoaded else {
             return
@@ -1076,7 +866,8 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
             if becauseOfChanges {
                 watchManager.updateContext()
             }
-            updateTabItems(animated: true)
+            newTabBarSets()
+            updateSectionInfo()
         }
 
         updateFooter()
