@@ -2,7 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="24765" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="2mI-Au-0Le">
     <device id="retina5_9" orientation="portrait" appearance="light"/>
     <dependencies>
-        <deployment identifier="iOS"/>
+        <deployment version="5888" identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24743"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -72,7 +72,6 @@
                                         <constraint firstAttribute="bottomMargin" secondItem="W1j-m4-s4j" secondAttribute="bottom" id="gvI-I0-Mx0"/>
                                     </constraints>
                                 </tableViewCellContentView>
-                                <color key="backgroundColor" systemColor="tableCellGroupedBackgroundColor"/>
                                 <edgeInsets key="layoutMargins" top="11" left="11" bottom="12" right="11"/>
                                 <connections>
                                     <outlet property="_description" destination="cqW-C7-a8P" id="sR3-4K-zdO"/>
@@ -188,9 +187,6 @@
             <color red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
-            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-        <systemColor name="tableCellGroupedBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
     </resources>

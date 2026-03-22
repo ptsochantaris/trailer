@@ -12,10 +12,7 @@ final class SectionListViewController: UITableViewController {
         tableView.reloadData()
     }
 
-    private var tabObservation: Cancellable?
-    private var syncObservation: Cancellable?
-    private var prefsObservation: Cancellable?
-    private var refreshObservation: Cancellable?
+    private var cancellables = [Cancellable]()
     private var firstAppearance = true
 
     private var statusMessage: String? {
@@ -53,31 +50,33 @@ final class SectionListViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        tabObservation = NotificationCenter.default.publisher(for: .tabBarSetUpdate)
+        let n = NotificationCenter.default
+
+        cancellables.append(n.publisher(for: .tabBarSetUpdate)
             .debounce(for: .seconds(0.01), scheduler: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.updateTabs()
-            }
+            })
 
-        prefsObservation = NotificationCenter.default.publisher(for: .showPreferences)
+        cancellables.append(n.publisher(for: .showPreferences)
             .debounce(for: .seconds(0.01), scheduler: DispatchQueue.main)
             .sink { [weak self] notification in
                 self?.performSegue(withIdentifier: "showPreferences", sender: notification.object as? Int)
-            }
+            })
 
-        syncObservation = NotificationCenter.default.publisher(for: .SyncProgressUpdate)
+        cancellables.append(n.publisher(for: .SyncProgressUpdate)
             .debounce(for: .seconds(0.1), scheduler: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.title = "Refreshing…"
                 self?.statusMessage = API.currentOperationName
-            }
+            })
 
-        refreshObservation = NotificationCenter.default.publisher(for: .RefreshEnded)
+        cancellables.append(n.publisher(for: .RefreshEnded)
             .debounce(for: .seconds(0.1), scheduler: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.title = "Sections"
                 self?.statusMessage = nil
-            }
+            })
 
         updateTabs()
     }
@@ -110,7 +109,12 @@ final class SectionListViewController: UITableViewController {
 
         var config = UIListContentConfiguration.valueCell()
         config.text = section.title
+        config.textProperties.font = .preferredFont(forTextStyle: .headline)
+
         config.secondaryText = section.badgeValue
+        config.secondaryTextProperties.color = .red
+        config.secondaryTextProperties.font = .preferredFont(forTextStyle: .caption1)
+
         config.image = UIImage(resource: section.image).withRenderingMode(.alwaysTemplate)
 
         cell.contentConfiguration = config

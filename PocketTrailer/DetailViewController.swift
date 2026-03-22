@@ -545,6 +545,10 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
     }
 
     private func updateQuery(newFetchRequest: NSFetchRequest<ListableItem>) {
+        if currentTabBar == nil {
+            return
+        }
+
         if fetchedResultsController == nil || fetchedResultsController?.fetchRequest.entityName != newFetchRequest.entityName {
             let c = NSFetchedResultsController(fetchRequest: newFetchRequest, managedObjectContext: DataManager.main, sectionNameKeyPath: "sectionName", cacheName: nil)
             fetchedResultsController = c
@@ -948,25 +952,25 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
 
     private func updateFooter() {
         let count = fetchedResultsController?.fetchedObjects?.count ?? 0
-        if count == 0 {
-            let reasonForEmpty: NSAttributedString
+        if count > 0 {
+            tableView.tableFooterView = nil
+            return
+        }
 
-            if currentTabBar == nil {
-                reasonForEmpty = NSAttributedString(string: "← Select a section")
+        let reasonForEmpty: NSAttributedString
 
-            } else {
-                let searchBarText = navigationItem.searchController?.searchBar.text
-                if viewingPrs {
-                    reasonForEmpty = PullRequest.reasonForEmpty(with: searchBarText, criterion: currentTabBar?.viewCriterion)
-                } else {
-                    reasonForEmpty = Issue.reasonForEmpty(with: searchBarText, criterion: currentTabBar?.viewCriterion)
-                }
-            }
-            tableView.tableFooterView = EmptyView(message: reasonForEmpty)
+        if currentTabBar == nil {
+            reasonForEmpty = NSAttributedString(string: "← Select a section")
 
         } else {
-            tableView.tableFooterView = nil
+            let searchBarText = navigationItem.searchController?.searchBar.text
+            if viewingPrs {
+                reasonForEmpty = PullRequest.reasonForEmpty(with: searchBarText, criterion: currentTabBar?.viewCriterion)
+            } else {
+                reasonForEmpty = Issue.reasonForEmpty(with: searchBarText, criterion: currentTabBar?.viewCriterion)
+            }
         }
+        tableView.tableFooterView = EmptyView(message: reasonForEmpty)
     }
 
     private func unreadCommentCount(count: Int) -> String {
