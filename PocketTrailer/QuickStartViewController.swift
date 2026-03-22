@@ -72,9 +72,11 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
             await dismiss(animated: true)
             await popupManager.detailController.resetView(becauseOfChanges: true)
             Settings.lastPreferencesTabSelected = 1 // repos
-            popupManager.detailController.performSegue(withIdentifier: "showPreferences", sender: self)
-            showMessage("Setup complete!", "This is the 'Repos' tab that displays your current GitHub watchlist. By default everything is hidden. Be sure to enable only the repos you need, in order to keep API (and data & battery) usage low.\n\nYou can tweak options & behaviour from the 'Advanced' tab. When you're done, just close this settings view from the top-left.\n\nTrailer has read-only access to your GitHub data, so feel free to experiment, you can't damage your data or settings on GitHub.")
-
+            NotificationCenter.default.post(name: .showPreferences, object: 1)
+            Task {
+                try await Task.sleep(for: .seconds(2))
+                showMessage("Setup complete!", "This is the 'Repos' tab that displays your current GitHub watchlist. By default everything is hidden. Be sure to enable only the repos you need, in order to keep API (and data & battery) usage low.\n\nYou can tweak options & behaviour from the 'Advanced' tab. When you're done, just close this settings view from the top-left.\n\nTrailer has read-only access to your GitHub data, so feel free to experiment, you can't damage your data or settings on GitHub.")
+            }
         } else {
             showMessage("Syncing with this server failed - please check that your network connection is working and that you have pasted your token correctly", nil)
             normalMode()

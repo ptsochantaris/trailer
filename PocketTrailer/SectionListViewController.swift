@@ -65,4 +65,28 @@ final class SectionListViewController: UITableViewController {
             splitViewController.show(.secondary)
         }
     }
+    
+    ////////////////// opening prefs
+
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        var allServersHaveTokens = true
+        for a in ApiServer.allApiServers(in: DataManager.main) where !a.goodToGo {
+            allServersHaveTokens = false
+            break
+        }
+
+        if let destination = segue.destination as? UITabBarController {
+            let index = sender as? Int ?? Settings.lastPreferencesTabSelected
+            if allServersHaveTokens {
+                destination.selectedIndex = min(index, (destination.viewControllers?.count ?? 1) - 1)
+            }
+            destination.delegate = self
+        }
+    }
+}
+
+extension SectionListViewController: UITabBarControllerDelegate {
+    func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
+        Settings.lastPreferencesTabSelected = tabBarController.viewControllers?.firstIndex(of: viewController) ?? 0
+    }
 }

@@ -9,7 +9,7 @@ extension Notification.Name {
 }
 
 final class DetailViewController: UITableViewController, NSFetchedResultsControllerDelegate,
-    UITabBarControllerDelegate, UISearchResultsUpdating,
+    UISearchResultsUpdating,
     UITableViewDragDelegate {
     private var fetchedResultsController: NSFetchedResultsController<ListableItem>?
     private var searchTimer: PopTimer!
@@ -934,27 +934,5 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
         updateQuery(newFetchRequest: itemFetchRequest(settings: Settings.cache))
         updateStatus(becauseOfChanges: becauseOfChanges)
         tableView.reloadData()
-    }
-
-    ////////////////// opening prefs
-
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        var allServersHaveTokens = true
-        for a in ApiServer.allApiServers(in: DataManager.main) where !a.goodToGo {
-            allServersHaveTokens = false
-            break
-        }
-
-        if let destination = segue.destination as? UITabBarController {
-            let index = sender as? Int ?? Settings.lastPreferencesTabSelected
-            if allServersHaveTokens {
-                destination.selectedIndex = min(index, (destination.viewControllers?.count ?? 1) - 1)
-            }
-            destination.delegate = self
-        }
-    }
-
-    func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
-        Settings.lastPreferencesTabSelected = tabBarController.viewControllers?.firstIndex(of: viewController) ?? 0
     }
 }
