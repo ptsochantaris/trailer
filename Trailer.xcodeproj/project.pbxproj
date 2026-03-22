@@ -169,7 +169,6 @@
 		16D107052F700B0A00A5AF88 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D107042F700B0A00A5AF88 /* Extensions.swift */; };
 		16D2B875251FA54E00D86C89 /* Enums+Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D2B874251FA54E00D86C89 /* Enums+Settings.swift */; };
 		16D2B876251FA54E00D86C89 /* Enums+Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D2B874251FA54E00D86C89 /* Enums+Settings.swift */; };
-		16D46C0F2F6F29D50003CB8D /* TabBarSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D46C0E2F6F29D50003CB8D /* TabBarSet.swift */; };
 		16D46C112F6F2BC20003CB8D /* SectionListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D46C102F6F2BBE0003CB8D /* SectionListViewController.swift */; };
 		16DB793C1E326C950076A36D /* AdvancedReposWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16DB793B1E326C950076A36D /* AdvancedReposWindow.swift */; };
 		16DB793E1E326CD90076A36D /* AdvancedReposWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 16DB793D1E326CD90076A36D /* AdvancedReposWindow.xib */; };
@@ -428,7 +427,6 @@
 		16D107022F700AD700A5AF88 /* TabInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabInfo.swift; sourceTree = "<group>"; };
 		16D107042F700B0A00A5AF88 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		16D2B874251FA54E00D86C89 /* Enums+Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Enums+Settings.swift"; path = "Shared/Enums+Settings.swift"; sourceTree = "<group>"; };
-		16D46C0E2F6F29D50003CB8D /* TabBarSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarSet.swift; sourceTree = "<group>"; };
 		16D46C102F6F2BBE0003CB8D /* SectionListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionListViewController.swift; sourceTree = "<group>"; };
 		16D97065235B243500871F81 /* Trailer 40.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 40.xcdatamodel"; sourceTree = "<group>"; };
 		16DB793B1E326C950076A36D /* AdvancedReposWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdvancedReposWindow.swift; sourceTree = "<group>"; };
@@ -530,7 +528,6 @@
 			isa = PBXGroup;
 			children = (
 				16D107022F700AD700A5AF88 /* TabInfo.swift */,
-				16D46C0E2F6F29D50003CB8D /* TabBarSet.swift */,
 				1606F1BA1A4703E60088368E /* iOSAppDelegate.swift */,
 				164840FF1AD198A6009E6383 /* WatchManager.swift */,
 				16259BCD1A449400009C5745 /* OpenInSafariActivity.swift */,
@@ -1205,7 +1202,6 @@
 				166ADEC81CCB009A001BA61F /* SnoozingEditorViewController.swift in Sources */,
 				165C49101BA63B45006BBCF5 /* AdvancedSettingsCell.swift in Sources */,
 				1657230523AAA2AC00F597EF /* V3API.swift in Sources */,
-				16D46C0F2F6F29D50003CB8D /* TabBarSet.swift in Sources */,
 				169205641E34DA9F00FB9547 /* CustomReposViewController.swift in Sources */,
 				16C6B9442A6AE04F00CBA836 /* Logging.swift in Sources */,
 				164840FC1AD196D6009E6383 /* SettingsManager.swift in Sources */,
@@ -1521,7 +1517,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1736;
+				CURRENT_PROJECT_VERSION = 1737;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = X727JSJUGJ;
@@ -1597,7 +1593,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1736;
+				CURRENT_PROJECT_VERSION = 1737;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEPLOYMENT_POSTPROCESSING = YES;

@@ -11,11 +11,11 @@ final class NotificationManager: NSObject {
         func handleUserActivity(activity: NSUserActivity) -> Bool {
             if let info = activity.userInfo {
                 if activity.activityType == CSSearchableItemActionType, let uid = info[CSSearchableItemActivityIdentifier] as? String {
-                    popupManager.detailController.highightItemWithUriPath(uriPath: uid)
+                    NotificationCenter.default.post(name: .highlightItem, object: uid)
                     return true
 
                 } else if activity.activityType == CSQueryContinuationActionType, let searchString = info[CSSearchQueryString] as? String {
-                    popupManager.detailController.focusFilter(terms: searchString)
+                    NotificationCenter.default.post(name: .focusFilter, object: searchString)
                     return true
                 }
             }
@@ -60,7 +60,7 @@ final class NotificationManager: NSObject {
                 #if os(macOS)
                     openItem(u)
                 #else
-                    popupManager.detailController.notificationSelected(for: relatedItem, urlToOpen: urlToOpen)
+                    NotificationCenter.default.post(name: .notificationSelected, object: (relatedItem, urlToOpen))
                 #endif
             }
         }

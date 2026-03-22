@@ -143,7 +143,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
                     guard let self else { return }
                     Settings.showSeparateApiServersInMenu.toggle()
                     Task { @MainActor in
-                        popupManager.detailController.updateStatus(becauseOfChanges: true)
+                        NotificationCenter.default.post(name: .dbSaved, object: nil)
                     }
                     settingsChangedTimer.push()
                 }),

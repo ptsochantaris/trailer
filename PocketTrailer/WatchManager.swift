@@ -64,13 +64,13 @@ final class WatchManager: NSObject, WCSessionDelegate {
 
         case "openItem":
             if let itemId = message["localId"] as? String {
-                popupManager.detailController.highightItemWithUriPath(uriPath: itemId)
+                NotificationCenter.default.post(name: .highlightItem, object: itemId)
             }
             return await processList(message: message, settings: settings)
 
         case "opencomment":
             if let itemId = message["id"] as? String {
-                popupManager.detailController.openCommentWithId(cId: itemId)
+                NotificationCenter.default.post(name: .openComment, object: itemId)
             }
             return await processList(message: message, settings: settings)
 

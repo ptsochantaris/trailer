@@ -9,7 +9,7 @@ final class SettingsManager {
         if await Settings.readFromURL(url) {
             Task {
                 await DataManager.saveDB()
-                await popupManager.detailController.resetView(becauseOfChanges: true)
+                NotificationCenter.default.post(name: .resetView, object: nil)
                 preferencesDirty = true
                 Settings.lastSuccessfulRefresh = nil
                 await app.startRefreshIfItIsDue()

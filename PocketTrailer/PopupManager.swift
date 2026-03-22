@@ -26,10 +26,4 @@ final class PopupManager: NSObject {
         let v = UIActivityViewController(activityItems: [url], applicationActivities: [a])
         showPopoverFromViewController(parentViewController: view, fromItem: buttonItem, viewController: v)
     }
-
-    ////////////// Master view
-
-    var detailController: DetailViewController {
-        (app.window!.rootViewController as! UISplitViewController).viewController(for: .secondary) as! DetailViewController
-    }
 }

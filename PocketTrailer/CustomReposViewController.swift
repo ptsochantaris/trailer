@@ -44,7 +44,7 @@ final class CustomReposViewController: UIViewController, UITableViewDelegate, UI
         DataManager.main.delete(r)
         Task { @MainActor in
             await DataManager.saveDB()
-            popupManager.detailController.updateStatus(becauseOfChanges: true)
+            NotificationCenter.default.post(name: .dbSaved, object: nil)
             updateRepos()
         }
     }
@@ -119,7 +119,7 @@ final class CustomReposViewController: UIViewController, UITableViewDelegate, UI
                     }
                     Task { @MainActor in
                         await DataManager.saveDB()
-                        popupManager.detailController.updateStatus(becauseOfChanges: true)
+                        NotificationCenter.default.post(name: .dbSaved, object: nil)
                         self.updateRepos()
                     }
                 } catch {
@@ -140,7 +140,7 @@ final class CustomReposViewController: UIViewController, UITableViewDelegate, UI
                     }
                     Task { @MainActor in
                         await DataManager.saveDB()
-                        popupManager.detailController.updateStatus(becauseOfChanges: true)
+                        NotificationCenter.default.post(name: .dbSaved, object: nil)
                     }
                     self.updateRepos()
                 } catch {

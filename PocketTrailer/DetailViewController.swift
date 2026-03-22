@@ -1,17 +1,18 @@
+import Combine
 import CoreData
 import PopTimer
 import UIKit
 import UserNotifications
 
-final class DetailViewController: UITableViewController, NSFetchedResultsControllerDelegate,
-    UISearchResultsUpdating,
-    UITableViewDragDelegate {
+final class DetailViewController: UITableViewController, NSFetchedResultsControllerDelegate, UISearchResultsUpdating, UITableViewDragDelegate {
     private var fetchedResultsController: NSFetchedResultsController<ListableItem>?
     private var searchTimer: PopTimer!
     private var animatedUpdates = false
     private var sectionsChanged = false
     private var lastTabCount = 0
     private let watchManager = WatchManager()
+
+    private var cancellables = [Cancellable]()
 
     private var viewingPrs: Bool {
         currentTabBar?.isPr == true
@@ -52,7 +53,7 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
     }
 
     func removeAllMerged() {
-        Task { @MainActor in
+        Task {
             if Settings.dontAskBeforeWipingMerged {
                 removeAllMergedConfirmed()
             } else {
@@ -67,7 +68,7 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
     }
 
     func removeAllClosed() {
-        Task { @MainActor in
+        Task {
             if Settings.dontAskBeforeWipingClosed {
                 removeAllClosedConfirmed()
             } else {
@@ -152,11 +153,73 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
         tableView.dragDelegate = self
 
         let n = NotificationCenter.default
-        n.addObserver(self, selector: #selector(refreshUpdated), name: .SyncProgressUpdate, object: nil)
-        n.addObserver(self, selector: #selector(refreshEnded), name: .RefreshEnded, object: nil)
-        n.addObserver(self, selector: #selector(dataUpdated(_:)), name: .NSManagedObjectContextObjectsDidChange, object: nil)
+
+        cancellables.append(n.publisher(for: .SyncProgressUpdate)
+            .debounce(for: .seconds(0.1), scheduler: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.refreshUpdated()
+            })
+
+        cancellables.append(n.publisher(for: .RefreshStarting)
+            .debounce(for: .seconds(0.1), scheduler: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateStatus(becauseOfChanges: false)
+            })
+
+        cancellables.append(n.publisher(for: .RefreshEnded)
+            .debounce(for: .seconds(0.1), scheduler: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.refreshEnded()
+            })
+
+        cancellables.append(n.publisher(for: .focusFilter)
+            .debounce(for: .seconds(0.1), scheduler: DispatchQueue.main)
+            .sink { [weak self] notification in
+                self?.focusFilter(terms: notification.object as? String)
+            })
+
+        cancellables.append(n.publisher(for: .highlightItem)
+            .debounce(for: .seconds(0.1), scheduler: DispatchQueue.main)
+            .sink { [weak self] notification in
+                if let uri = notification.object as? String {
+                    self?.highlightItemWithUriPath(uriPath: uri)
+                }
+            })
+
+        cancellables.append(n.publisher(for: .NSManagedObjectContextObjectsDidChange)
+            .debounce(for: .seconds(0.1), scheduler: DispatchQueue.main)
+            .sink { [weak self] notification in
+                self?.dataUpdated(notification)
+            })
+
+        cancellables.append(n.publisher(for: .dbSaved)
+            .debounce(for: .seconds(0.1), scheduler: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateStatus(becauseOfChanges: true)
+            })
+
+        cancellables.append(n.publisher(for: .resetView)
+            .sink { [weak self] _ in
+                self?.resetView()
+            })
+
+        cancellables.append(n.publisher(for: .notificationSelected)
+            .sink { [weak self] notification in
+                if let (item, url) = notification.object as? (ListableItem, String?) {
+                    self?.notificationSelected(for: item, urlToOpen: url)
+                }
+            })
+
+        cancellables.append(n.publisher(for: .openComment)
+            .debounce(for: .seconds(0.1), scheduler: DispatchQueue.main)
+            .sink { [weak self] notification in
+                if let id = notification.object as? String {
+                    self?.openCommentWithId(cId: id)
+                }
+            })
 
         newTabBarSets()
+
         updateSectionInfo()
     }
 
@@ -183,35 +246,35 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
         return []
     }
 
-    @objc private func dataUpdated(_ notification: Notification) {
+    private func dataUpdated(_ notification: Notification) {
         guard let relatedMoc = notification.object as? NSManagedObjectContext, relatedMoc === DataManager.main else { return }
 
         if let items = notification.userInfo?[NSInsertedObjectsKey] as? Set<NSManagedObject>, items.contains(where: { $0 is ListableItem }) {
             // Logging.shared.log(">>>>>>>>>>>>>>> detected inserted items")
-            Task { @MainActor in
-                self.updateStatus(becauseOfChanges: true)
+            Task {
+                updateStatus(becauseOfChanges: true)
             }
             return
         }
 
         if let items = notification.userInfo?[NSDeletedObjectsKey] as? Set<NSManagedObject>, items.contains(where: { $0 is ListableItem }) {
             // Logging.shared.log(">>>>>>>>>>>>>>> detected deleted items")
-            Task { @MainActor in
-                self.updateStatus(becauseOfChanges: true)
+            Task {
+                updateStatus(becauseOfChanges: true)
             }
             return
         }
 
         if let items = notification.userInfo?[NSUpdatedObjectsKey] as? Set<NSManagedObject>, items.contains(where: { ($0 as? ListableItem)?.hasPersistentChangedValues ?? false }) {
             // Logging.shared.log(">>>>>>>>>>>>>>> detected permanently changed items")
-            Task { @MainActor in
-                self.updateStatus(becauseOfChanges: true)
+            Task {
+                updateStatus(becauseOfChanges: true)
             }
             return
         }
     }
 
-    @objc private func refreshEnded() {
+    private func refreshEnded() {
         refreshControl?.endRefreshing()
         if fetchedResultsController?.sections?.count ?? 0 == 0 {
             updateStatus(becauseOfChanges: false)
@@ -252,7 +315,7 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
         }
     }
 
-    @objc private func refreshUpdated() {
+    private func refreshUpdated() {
         updateTitle()
         let name = API.currentOperationName
         refreshControl?.attributedTitle = NSAttributedString(string: name, attributes: nil)
@@ -498,26 +561,26 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
     }
 
     private func newTabBarSets() {
-        var newSets = [TabBarSet]()
+        var newSets = [TabInfo]()
 
         for groupLabel in Repo.allGroupLabels(in: DataManager.main) {
             let c = GroupingCriterion.group(groupLabel)
-            let s = TabBarSet(viewCriterion: c)
-            newSets.append(s)
+            let s = TabInfo.items(for: c)
+            newSets.append(contentsOf: s)
         }
 
         if Settings.showSeparateApiServersInMenu {
             for a in ApiServer.allApiServers(in: DataManager.main) where a.goodToGo {
                 let c = GroupingCriterion.server(a.objectID)
-                let s = TabBarSet(viewCriterion: c)
-                newSets.append(s)
+                let s = TabInfo.items(for: c)
+                newSets.append(contentsOf: s)
             }
         } else {
-            let s = TabBarSet(viewCriterion: nil)
-            newSets.append(s)
+            let s = TabInfo.items(for: nil)
+            newSets.append(contentsOf: s)
         }
 
-        SectionListViewController.tabBarSets = newSets.flatMap(\.tabItems)
+        SectionListViewController.tabBarSets = newSets
     }
 
     private func updateSectionInfo() {
@@ -541,44 +604,47 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
         updateFooter()
     }
 
-    private func selectTab(for _: ListableItem, overrideUrl _: String?, andOpen _: Bool) {
-        /*
-         var tabItem: UITabBarItem?
-         for d in tabBarSets {
-             if d.viewCriterion == nil || d.viewCriterion?.isRelated(to: item) ?? false {
-                 tabItem = item.isPr ? d.prItem : d.issuesItem
-                 break
-             }
-         }
-         Task {
-             await requestTabFocus(tabItem: tabItem, item: item, overrideUrl: overrideUrl, andOpen: andOpen)
-         }
-          */
-    }
-
-    func highightItemWithUriPath(uriPath: String) {
-        if
-            let itemId = DataManager.id(for: uriPath),
-            let item = try? DataManager.main.existingObject(with: itemId) as? ListableItem {
-            selectTab(for: item, overrideUrl: nil, andOpen: false)
+    private func selectTab(for item: ListableItem, overrideUrl: String?, andOpen: Bool) {
+        var tabItem: TabInfo?
+        for d in SectionListViewController.tabBarSets {
+            if d.viewCriterion == nil || d.viewCriterion?.isRelated(to: item) ?? false {
+                tabItem = d
+                break
+            }
+        }
+        Task {
+            if let tabItem {
+                currentTabBar = tabItem
+                try? await Task.sleep(for: .seconds(0.3))
+            }
+            selectInCurrentTab(item: item, overrideUrl: overrideUrl, andOpen: andOpen)
         }
     }
 
-    func openCommentWithId(cId: String) {
-        if let itemId = DataManager.id(for: cId),
-           let comment = try? DataManager.main.existingObject(with: itemId) as? PRComment,
-           let item = comment.parent {
-            selectTab(for: item, overrideUrl: nil, andOpen: true)
+    private func highlightItemWithUriPath(uriPath: String) {
+        guard let itemId = DataManager.id(for: uriPath),
+              let item = try? DataManager.main.existingObject(with: itemId) as? ListableItem else {
+            return
         }
+        selectTab(for: item, overrideUrl: nil, andOpen: false)
     }
 
-    func notificationSelected(for item: ListableItem, urlToOpen: String?) {
+    private func openCommentWithId(cId: String) {
+        guard let itemId = DataManager.id(for: cId),
+              let comment = try? DataManager.main.existingObject(with: itemId) as? PRComment,
+              let item = comment.parent else {
+            return
+        }
+        selectTab(for: item, overrideUrl: nil, andOpen: true)
+    }
+
+    private func notificationSelected(for item: ListableItem, urlToOpen: String?) {
         if let sc = navigationItem.searchController, sc.isActive {
             sc.searchBar.text = nil
             sc.isActive = false
         }
         Task {
-            try? await Task.sleep(nanoseconds: 100 * NSEC_PER_MSEC)
+            try? await Task.sleep(for: .seconds(0.1))
             selectTab(for: item, overrideUrl: urlToOpen, andOpen: true)
         }
     }
@@ -750,7 +816,7 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
         }
     }
 
-    func markItemAsRead(itemUri: String?) {
+    private func markItemAsRead(itemUri: String?) {
         if let
             i = itemUri,
             let oid = DataManager.id(for: i),
@@ -759,7 +825,7 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
         }
     }
 
-    func markItemAsUnRead(itemUri: String?) {
+    private func markItemAsUnRead(itemUri: String?) {
         if let
             i = itemUri,
             let oid = DataManager.id(for: i),
@@ -862,7 +928,7 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
         }
     }
 
-    func updateStatus(becauseOfChanges: Bool, updateItems: Bool = false) {
+    private func updateStatus(becauseOfChanges: Bool, updateItems: Bool = false) {
         guard isViewLoaded else {
             return
         }
@@ -940,10 +1006,12 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
         searchTimer.push()
     }
 
-    func resetView(becauseOfChanges: Bool) async {
-        await safeScrollToTop()
-        updateQuery(newFetchRequest: itemFetchRequest(settings: Settings.cache))
-        updateStatus(becauseOfChanges: becauseOfChanges)
-        tableView.reloadData()
+    private func resetView() {
+        Task {
+            await safeScrollToTop()
+            updateQuery(newFetchRequest: itemFetchRequest(settings: Settings.cache))
+            updateStatus(becauseOfChanges: true)
+            tableView.reloadData()
+        }
     }
 }

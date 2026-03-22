@@ -167,8 +167,8 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
         if let repo, repo.groupLabel != newText {
             repo.groupLabel = newText
             commit()
-            Task { @MainActor in
-                popupManager.detailController.updateStatus(becauseOfChanges: true)
+            Task {
+                NotificationCenter.default.post(name: .dbSaved, object: nil)
             }
         }
         if settingsChangedTimer.isPushed {

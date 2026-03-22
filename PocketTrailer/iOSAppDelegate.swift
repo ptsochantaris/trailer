@@ -49,7 +49,6 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate {
         NotificationManager.shared.setup()
 
         let n = NotificationCenter.default
-        n.addObserver(self, selector: #selector(refreshStarting), name: .RefreshStarting, object: nil)
         n.addObserver(self, selector: #selector(refreshDone(_:)), name: .RefreshEnded, object: nil)
 
         return true
@@ -58,7 +57,7 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate {
     func application(_: UIApplication, performActionFor shortcutItem: UIApplicationShortcutItem, completionHandler: @escaping (Bool) -> Void) {
         switch shortcutItem.type {
         case "search-items":
-            popupManager.detailController.focusFilter(terms: nil)
+            NotificationCenter.default.post(name: .focusFilter, object: nil)
             completionHandler(true)
 
         case "mark-all-read":
@@ -80,7 +79,7 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate {
             if let items = c.queryItems, let index = items.firstIndex(where: { $0.name == "search" }) {
                 terms = items[index].value
             }
-            popupManager.detailController.focusFilter(terms: terms)
+            NotificationCenter.default.post(name: .focusFilter, object: terms)
         } else {
             Task {
                 await settingsManager.loadSettingsFrom(url: url, confirmFromView: nil)
@@ -181,10 +180,6 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate {
         }
 
         return .started
-    }
-
-    @objc private func refreshStarting() {
-        popupManager.detailController.updateStatus(becauseOfChanges: false)
     }
 
     @objc private func refreshDone(_ notification: Notification) {
