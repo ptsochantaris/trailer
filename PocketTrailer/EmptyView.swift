@@ -1,19 +1,23 @@
 import UIKit
 
 final class EmptyView: UIView {
-    init(message: NSAttributedString, parentWidth: CGFloat) {
-        let rect = message.boundingRect(with: CGSize(width: 280, height: CGFloat.greatestFiniteMagnitude),
-                                        options: stringDrawingOptions,
-                                        context: nil)
-        let idealSize = rect.size
+    let textLabel: UILabel
 
-        super.init(frame: CGRect(x: 0, y: 0, width: parentWidth, height: idealSize.height + 10.0))
+    init(message: NSAttributedString) {
+        textLabel = UILabel(frame: .zero)
+        textLabel.numberOfLines = 0
+        textLabel.attributedText = message
 
-        let text = UILabel(frame: CGRect(x: (parentWidth - idealSize.width) * 0.5, y: 5.0, width: idealSize.width, height: idealSize.height + 4.0))
-        text.autoresizingMask = .flexibleWidth
-        text.numberOfLines = 0
-        text.attributedText = message
-        addSubview(text)
+        super.init(frame: .zero)
+
+        addSubview(textLabel)
+    }
+
+    override func layoutSubviews() {
+        textLabel.sizeToFit()
+
+        let x = readableContentGuide.layoutFrame.midX - textLabel.frame.width * 0.5
+        textLabel.frame.origin = CGPoint(x: x, y: 5)
     }
 
     @available(*, unavailable)

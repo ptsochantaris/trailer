@@ -2,7 +2,7 @@ import Combine
 import UIKit
 
 final class SectionListViewController: UITableViewController {
-    static var tabBarSets = [TabBarSet]() {
+    static var tabBarSets = [TabInfo]() {
         didSet {
             NotificationCenter.default.post(name: .tabBarSetUpdate, object: nil)
         }
@@ -40,19 +40,12 @@ final class SectionListViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Section", for: indexPath)
 
-        var config = UIListContentConfiguration.valueCell()
-
         let section = SectionListViewController.tabBarSets[indexPath.row]
 
-        config.text = section.prItem?.title ?? section.issuesItem?.title
-
-        config.secondaryText = section.prItem?.badgeValue ?? section.issuesItem?.badgeValue
-
-        if let resource = section.prItem?.image ?? section.issuesItem?.image {
-            config.image = UIImage(resource: resource).withRenderingMode(.alwaysTemplate)
-        } else {
-            config.image = nil
-        }
+        var config = UIListContentConfiguration.valueCell()
+        config.text = section.title
+        config.secondaryText = section.badgeValue
+        config.image = UIImage(resource: section.image).withRenderingMode(.alwaysTemplate)
 
         cell.contentConfiguration = config
 
@@ -61,11 +54,11 @@ final class SectionListViewController: UITableViewController {
 
     override func tableView(_: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let splitViewController, let detail = splitViewController.viewController(for: .secondary) as? DetailViewController {
-            detail.currentTabBarSet = SectionListViewController.tabBarSets[indexPath.row]
+            detail.currentTabBar = SectionListViewController.tabBarSets[indexPath.row]
             splitViewController.show(.secondary)
         }
     }
-    
+
     ////////////////// opening prefs
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {

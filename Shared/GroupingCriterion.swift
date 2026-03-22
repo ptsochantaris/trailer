@@ -3,6 +3,15 @@ import CoreData
 enum GroupingCriterion {
     case server(NSManagedObjectID), group(String)
 
+    var id: String {
+        switch self {
+        case let .server(id):
+            id.uriRepresentation().absoluteString
+        case let .group(label):
+            label
+        }
+    }
+
     @MainActor
     var label: String {
         switch self {

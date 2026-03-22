@@ -15,23 +15,29 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
     private var searchTimer: PopTimer!
     private var animatedUpdates = false
     private var sectionsChanged = false
-    private var viewingPrs = true
     private var firstAppearance = true
     private var lastTabCount = 0
     private let watchManager = WatchManager()
+
+    private var viewingPrs: Bool {
+        currentTabBar?.isPr == true
+    }
 
     private var pluralNameForItems: String {
         viewingPrs ? "pull requests" : "issues"
     }
 
-    var currentTabBarSet: TabBarSet? {
+    var currentTabBar: TabInfo? {
         didSet {
             updateSectionInfo()
+            Task {
+                tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+            }
         }
     }
 
     @IBAction private func editSelected(_ sender: UIBarButtonItem) {
-        let promptTitle: String = if let l = currentTabBarSet?.viewCriterion?.label {
+        let promptTitle: String = if let l = currentTabBar?.viewCriterion?.label {
             "\(pluralNameForItems.capitalized) in '\(l)'"
         } else {
             pluralNameForItems.capitalized
@@ -83,11 +89,11 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
 
     private func removeAllClosedConfirmed() {
         if viewingPrs {
-            for p in PullRequest.allClosed(in: DataManager.main, criterion: currentTabBarSet?.viewCriterion) {
+            for p in PullRequest.allClosed(in: DataManager.main, criterion: currentTabBar?.viewCriterion) {
                 DataManager.main.delete(p)
             }
         } else {
-            for p in Issue.allClosed(in: DataManager.main, criterion: currentTabBarSet?.viewCriterion) {
+            for p in Issue.allClosed(in: DataManager.main, criterion: currentTabBar?.viewCriterion) {
                 DataManager.main.delete(p)
             }
         }
@@ -95,7 +101,7 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
 
     private func removeAllMergedConfirmed() {
         if viewingPrs {
-            for p in PullRequest.allMerged(in: DataManager.main, criterion: currentTabBarSet?.viewCriterion) {
+            for p in PullRequest.allMerged(in: DataManager.main, criterion: currentTabBar?.viewCriterion) {
                 DataManager.main.delete(p)
             }
         }
@@ -233,25 +239,27 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
         if API.isRefreshing {
             newTitle = "Refreshing…"
 
-        } else if viewingPrs {
-            let item = currentTabBarSet?.prItem
-            let unreadCount = Int(item?.badgeValue ?? "0")!
-            let t = item?.title ?? "Pull Requests"
-            if unreadCount > 0 {
-                newTitle = t.appending(" (\(unreadCount))")
-            } else {
-                newTitle = t
-            }
+        } else if let item = currentTabBar {
+            if item.isPr {
+                let unreadCount = Int(item.badgeValue ?? "0")!
+                let t = item.title
+                if unreadCount > 0 {
+                    newTitle = t.appending(" (\(unreadCount))")
+                } else {
+                    newTitle = t
+                }
 
-        } else {
-            let item = currentTabBarSet?.issuesItem
-            let unreadCount = Int(item?.badgeValue ?? "0")!
-            let t = item?.title ?? "Issues"
-            if unreadCount > 0 {
-                newTitle = t.appending(" (\(unreadCount))")
             } else {
-                newTitle = t
+                let unreadCount = Int(item.badgeValue ?? "0")!
+                let t = item.title
+                if unreadCount > 0 {
+                    newTitle = t.appending(" (\(unreadCount))")
+                } else {
+                    newTitle = t
+                }
             }
+        } else {
+            newTitle = "Not Selected"
         }
 
         if title != newTitle {
@@ -276,6 +284,8 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
             makeKeyCommand(input: "m", modifierFlags: .command, action: #selector(keyToggleMute), discoverabilityTitle: "Set item mute/unmute"),
             makeKeyCommand(input: "s", modifierFlags: .command, action: #selector(keyToggleSnooze), discoverabilityTitle: "Snooze/wake item"),
             makeKeyCommand(input: "r", modifierFlags: .command, action: #selector(keyForceRefresh), discoverabilityTitle: "Refresh now"),
+            makeKeyCommand(input: "\t", modifierFlags: .alternate, action: #selector(moveToNextTab), discoverabilityTitle: "Move to next tab"),
+            makeKeyCommand(input: "\t", modifierFlags: [.alternate, .shift], action: #selector(moveToPreviousTab), discoverabilityTitle: "Move to previous tab"),
             makeKeyCommand(input: " ", modifierFlags: [], action: #selector(keyShowSelectedItem), discoverabilityTitle: "Display current item"),
             makeKeyCommand(input: UIKeyCommand.inputDownArrow, modifierFlags: [], action: #selector(keyMoveToNextItem), discoverabilityTitle: "Next item"),
             makeKeyCommand(input: UIKeyCommand.inputUpArrow, modifierFlags: [], action: #selector(keyMoveToPreviousItem), discoverabilityTitle: "Previous item"),
@@ -419,6 +429,24 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
         }
     }
 
+    @objc private func moveToNextTab() {
+        let items = SectionListViewController.tabBarSets
+
+        if items.count > 1, let i = currentTabBar, let ind = items.firstIndex(of: i) {
+            let nextIndex = (ind < items.count - 1) ? ind + 1 : 0
+            currentTabBar = SectionListViewController.tabBarSets[nextIndex]
+        }
+    }
+
+    @objc private func moveToPreviousTab() {
+        let items = SectionListViewController.tabBarSets
+
+        if items.count > 1, let i = currentTabBar, let ind = items.firstIndex(of: i) {
+            let nextIndex = (ind > 0) ? ind - 1 : items.count - 1
+            currentTabBar = SectionListViewController.tabBarSets[nextIndex]
+        }
+    }
+
     private func selectInCurrentTab(item: ListableItem, overrideUrl: String?, andOpen: Bool) {
         guard let ip = fetchedResultsController?.indexPath(forObject: item) else { return }
 
@@ -504,20 +532,10 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
             newSets.append(s)
         }
 
-        SectionListViewController.tabBarSets = newSets
+        SectionListViewController.tabBarSets = newSets.flatMap(\.tabItems)
     }
 
     private func updateSectionInfo() {
-        if let i = currentTabBarSet?.prItem?.image {
-            viewingPrs = i == .prsTab // not proud of this :(
-        } else if let currentTabBarSet {
-            viewingPrs = currentTabBarSet.tabItems.first?.image == .prsTab // or this :(
-        } else if Repo.anyVisibleRepos(in: DataManager.main, criterion: currentTabBarSet?.viewCriterion, excludeGrouped: true) {
-            viewingPrs = Repo.mayProvidePrsForDisplay(fromServerWithId: currentTabBarSet?.viewCriterion?.apiServerId)
-        } else {
-            viewingPrs = true
-        }
-
         let settings = Settings.cache
         let newFetchRequest = itemFetchRequest(settings: settings)
         if fetchedResultsController == nil {
@@ -784,7 +802,7 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
     private func itemFetchRequest(settings: Settings.Cache) -> NSFetchRequest<ListableItem> {
         let type: ListableItem.Type = viewingPrs ? PullRequest.self : Issue.self
         let text = navigationItem.searchController?.searchBar.text
-        return ListableItem.requestForItems(of: type, withFilter: text, sectionIndex: -1, criterion: currentTabBarSet?.viewCriterion, settings: settings)
+        return ListableItem.requestForItems(of: type, withFilter: text, sectionIndex: -1, criterion: currentTabBar?.viewCriterion, settings: settings)
     }
 
     func controllerWillChangeContent(_: NSFetchedResultsController<NSFetchRequestResult>) {
@@ -878,15 +896,23 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
     }
 
     private func updateFooter() {
-        if (fetchedResultsController?.fetchedObjects?.count ?? 0) == 0 {
+        let count = fetchedResultsController?.fetchedObjects?.count ?? 0
+        if count == 0 {
             let reasonForEmpty: NSAttributedString
-            let searchBarText = navigationItem.searchController?.searchBar.text
-            if viewingPrs {
-                reasonForEmpty = PullRequest.reasonForEmpty(with: searchBarText, criterion: currentTabBarSet?.viewCriterion)
+
+            if currentTabBar == nil {
+                reasonForEmpty = NSAttributedString(string: "← Select a section")
+
             } else {
-                reasonForEmpty = Issue.reasonForEmpty(with: searchBarText, criterion: currentTabBarSet?.viewCriterion)
+                let searchBarText = navigationItem.searchController?.searchBar.text
+                if viewingPrs {
+                    reasonForEmpty = PullRequest.reasonForEmpty(with: searchBarText, criterion: currentTabBar?.viewCriterion)
+                } else {
+                    reasonForEmpty = Issue.reasonForEmpty(with: searchBarText, criterion: currentTabBar?.viewCriterion)
+                }
             }
-            tableView.tableFooterView = EmptyView(message: reasonForEmpty, parentWidth: view.bounds.size.width)
+            tableView.tableFooterView = EmptyView(message: reasonForEmpty)
+
         } else {
             tableView.tableFooterView = nil
         }
