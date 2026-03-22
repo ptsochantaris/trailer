@@ -3,11 +3,6 @@ import PopTimer
 import UIKit
 import UserNotifications
 
-extension Notification.Name {
-    static let showPreferences = Self("ShowPreferences")
-    static let tabBarSetUpdate = Self("TabBarSetUpdate")
-}
-
 final class DetailViewController: UITableViewController, NSFetchedResultsControllerDelegate,
     UISearchResultsUpdating,
     UITableViewDragDelegate {
@@ -15,7 +10,6 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
     private var searchTimer: PopTimer!
     private var animatedUpdates = false
     private var sectionsChanged = false
-    private var firstAppearance = true
     private var lastTabCount = 0
     private let watchManager = WatchManager()
 
@@ -131,23 +125,6 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
         }
     }
 
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-
-        guard firstAppearance else {
-            return
-        }
-
-        firstAppearance = false
-        if !ApiServer.someServersHaveAuthTokens(in: DataManager.main) {
-            if ApiServer.countApiServers(in: DataManager.main) == 1, let a = ApiServer.allApiServers(in: DataManager.main).first, a.authToken == nil || a.authToken!.isEmpty {
-                performSegue(withIdentifier: "showQuickstart", sender: self)
-            } else {
-                NotificationCenter.default.post(name: .showPreferences, object: nil)
-            }
-        }
-    }
-
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -181,6 +158,14 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
 
         newTabBarSets()
         updateSectionInfo()
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+
+        if currentTabBar == nil, let splitViewController, splitViewController.isCollapsed {
+            splitViewController.show(.primary)
+        }
     }
 
     func tableView(_: UITableView, itemsForBeginning _: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {

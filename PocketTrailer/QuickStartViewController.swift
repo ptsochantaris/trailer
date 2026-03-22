@@ -1,16 +1,5 @@
 import SafariServices
 
-extension UIViewController {
-    @MainActor
-    func dismiss(animated: Bool) async {
-        await withCheckedContinuation { continuation in
-            dismiss(animated: animated) {
-                continuation.resume()
-            }
-        }
-    }
-}
-
 final class QuickStartViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet private var testButton: UIButton!
     @IBOutlet private var otherViews: [UIView]!

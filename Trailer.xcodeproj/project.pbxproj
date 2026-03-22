@@ -165,6 +165,8 @@
 		16CBE1C51A2DFBA500485053 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C41A2DFBA500485053 /* Settings.swift */; };
 		16CBE1C61A2DFBA500485053 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C41A2DFBA500485053 /* Settings.swift */; };
 		16CE47881B7755E00086F4DC /* PocketTrailer WatchKit App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 16522D7C1AB03AE500B1C3FB /* PocketTrailer WatchKit App.app */; };
+		16D107032F700AD700A5AF88 /* TabInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D107022F700AD700A5AF88 /* TabInfo.swift */; };
+		16D107052F700B0A00A5AF88 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D107042F700B0A00A5AF88 /* Extensions.swift */; };
 		16D2B875251FA54E00D86C89 /* Enums+Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D2B874251FA54E00D86C89 /* Enums+Settings.swift */; };
 		16D2B876251FA54E00D86C89 /* Enums+Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D2B874251FA54E00D86C89 /* Enums+Settings.swift */; };
 		16D46C0F2F6F29D50003CB8D /* TabBarSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D46C0E2F6F29D50003CB8D /* TabBarSet.swift */; };
@@ -423,6 +425,8 @@
 		16C9A2791A44DD0200EE54EC /* CommentBlacklistViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentBlacklistViewController.swift; sourceTree = "<group>"; };
 		16CBE1C01A2DBB2700485053 /* DataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = DataManager.swift; path = Shared/DataManager.swift; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16CBE1C41A2DFBA500485053 /* Settings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = Settings.swift; path = Shared/Settings.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		16D107022F700AD700A5AF88 /* TabInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabInfo.swift; sourceTree = "<group>"; };
+		16D107042F700B0A00A5AF88 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		16D2B874251FA54E00D86C89 /* Enums+Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Enums+Settings.swift"; path = "Shared/Enums+Settings.swift"; sourceTree = "<group>"; };
 		16D46C0E2F6F29D50003CB8D /* TabBarSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarSet.swift; sourceTree = "<group>"; };
 		16D46C102F6F2BBE0003CB8D /* SectionListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionListViewController.swift; sourceTree = "<group>"; };
@@ -525,6 +529,7 @@
 		162002D11A2A409900FF95F3 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				16D107022F700AD700A5AF88 /* TabInfo.swift */,
 				16D46C0E2F6F29D50003CB8D /* TabBarSet.swift */,
 				1606F1BA1A4703E60088368E /* iOSAppDelegate.swift */,
 				164840FF1AD198A6009E6383 /* WatchManager.swift */,
@@ -767,6 +772,7 @@
 		16B069711882EA1D0053620E /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				16D107042F700B0A00A5AF88 /* Extensions.swift */,
 				16D46C102F6F2BBE0003CB8D /* SectionListViewController.swift */,
 				16EE871A1A446BFE00A1D16F /* EmptyView.swift */,
 				1615045D1A464656001CF50C /* PRCell.swift */,
@@ -1219,6 +1225,7 @@
 				16E7C20F2A69934900F72BFE /* ImageCache.swift in Sources */,
 				16B3B3241A34E8E2000BE6CC /* Repo.swift in Sources */,
 				16C90F021B13BC180095E8D5 /* RepoSettingsViewController.swift in Sources */,
+				16D107052F700B0A00A5AF88 /* Extensions.swift in Sources */,
 				16B3B31E1A34E8E2000BE6CC /* PRLabel.swift in Sources */,
 				16EE871B1A446BFE00A1D16F /* EmptyView.swift in Sources */,
 				169205681E34EB4D00FB9547 /* CustomRepoCell.swift in Sources */,
@@ -1227,6 +1234,7 @@
 				164840C51AD04C3C009E6383 /* QuickStartViewController.swift in Sources */,
 				166A84BE1A457CA700A3B292 /* ServersViewController.swift in Sources */,
 				161504601A4651CB001CF50C /* DetailViewController.swift in Sources */,
+				16D107032F700AD700A5AF88 /* TabInfo.swift in Sources */,
 				16D2B876251FA54E00D86C89 /* Enums+Settings.swift in Sources */,
 				164840FE1AD19837009E6383 /* PopupManager.swift in Sources */,
 				16B3B31A1A34E8E2000BE6CC /* DataItem.swift in Sources */,

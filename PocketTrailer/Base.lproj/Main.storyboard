@@ -102,13 +102,10 @@
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="tintColor" red="0.20784313979999999" green="0.48235294220000002" blue="0.82352942230000004" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </refreshControl>
-                    <connections>
-                        <segue destination="6Fo-Br-pdL" kind="presentation" identifier="showQuickstart" modalPresentationStyle="formSheet" id="noo-V8-yYe"/>
-                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Rux-fX-hf1" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="825" y="-37"/>
+            <point key="canvasLocation" x="825" y="-103"/>
         </scene>
         <!--Settings-->
         <scene sceneID="KXW-4X-WXH">
@@ -116,7 +113,7 @@
                 <viewControllerPlaceholder storyboardName="Settings" id="HRN-4r-OxE" sceneMemberID="viewController"/>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="wsI-VN-CJx" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1478" y="-794"/>
+            <point key="canvasLocation" x="1478" y="-901"/>
         </scene>
         <!--Quickstart-->
         <scene sceneID="4De-Ud-RqP">
@@ -124,7 +121,7 @@
                 <viewControllerPlaceholder storyboardName="Quickstart" id="6Fo-Br-pdL" sceneMemberID="viewController"/>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="f60-XG-fgC" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1528" y="-38"/>
+            <point key="canvasLocation" x="1477" y="-668"/>
         </scene>
         <!--Trailer-->
         <scene sceneID="zVD-bg-Wiv">
@@ -158,6 +155,9 @@
                         </barButtonItem>
                     </navigationItem>
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
+                    <connections>
+                        <segue destination="6Fo-Br-pdL" kind="presentation" identifier="showQuickstart" modalPresentationStyle="formSheet" id="mov-GX-g3a"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="kLh-rW-iJX" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -174,7 +174,7 @@
                 </splitViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Xkl-Se-M9f" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-103" y="-437"/>
+            <point key="canvasLocation" x="-23" y="-469"/>
         </scene>
     </scenes>
     <color key="tintColor" name="apptint"/>
