@@ -315,7 +315,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
             }
             let badgeCount = totalUnreadPrCount + totalUnreadIssueCount
             Task { @MainActor in
-                UIApplication.shared.applicationIconBadgeNumber = badgeCount
+                UNUserNotificationCenter.current().setBadgeCount(badgeCount)
             }
             return [
                 "views": views,

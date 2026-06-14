@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 struct TabInfo: Equatable {
     let title: String

@@ -90,7 +90,7 @@ final class PRCell: UITableViewCell {
     func setPullRequest(pullRequest: PullRequest, settings: Settings.Cache) {
         item = pullRequest
 
-        let separator = traitCollection.containsTraits(in: compactTraits) ? "\n" : "   "
+        let separator = traitCollection.horizontalSizeClass == .compact ? "\n" : "   "
 
         let detailFont = _description.font!
         _title.attributedText = pullRequest.title(with: _title.font, labelFont: detailFont, titleColor: UIColor.label, numberColor: UIColor.secondaryLabel, settings: settings)
@@ -153,7 +153,7 @@ final class PRCell: UITableViewCell {
     func setIssue(issue: Issue, settings: Settings.Cache) {
         item = issue
 
-        let separator = traitCollection.containsTraits(in: compactTraits) ? "\n" : "   "
+        let separator = traitCollection.horizontalSizeClass == .compact ? "\n" : "   "
 
         let detailFont = _description.font!
         _title.attributedText = issue.title(with: _title.font, labelFont: detailFont, titleColor: UIColor.label, numberColor: UIColor.secondaryLabel, settings: settings)
