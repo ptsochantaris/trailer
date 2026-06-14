@@ -65,11 +65,11 @@ final class Review: DataItem {
             let newState = info.potentialString(named: "state")
             review.check(newState: newState)
 
-            guard node.created || node.updated,
+            guard node.created(in: moc) || node.updated(in: moc),
                   let parentId = node.parent?.id
             else { return }
 
-            if node.created {
+            if node.created(in: moc) {
                 if let parent = PullRequest.asParent(with: parentId, in: moc, parentCache: parentCache) {
                     review.pullRequest = parent
                 } else {

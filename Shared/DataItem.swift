@@ -356,10 +356,11 @@ class DataItem: NSManagedObject, Querying {
     private func populate(node: Node) {
         let info = node.jsonPayload
         let entityName = Self.typeName
+        let moc = managedObjectContext!
 
         let alternativeDate = alternateCreationDate
 
-        if node.created {
+        if node.created(in: moc) {
             nodeId = node.id
             if !alternativeDate, let created = info.potentialString(named: "createdAt") {
                 createdAt = DataItem.parseGH8601(created)!
@@ -373,26 +374,26 @@ class DataItem: NSManagedObject, Querying {
         if let updated = DataItem.parseGH8601(info.potentialString(named: "updatedAt")) {
             if updatedAt != updated {
                 updatedAt = updated
-                if !node.created {
-                    node.updated = true
+                if !node.created(in: moc) {
+                    node.markUpdated(in: moc)
                 }
             }
 
-        } else if node.created {
+        } else if node.created(in: moc) {
             updatedAt = createdAt
         }
 
-        if node.forcedUpdate {
-            node.updated = true
+        if node.forcedUpdate(in: moc) {
+            node.markUpdated(in: moc)
         }
 
-        if node.created {
+        if node.created(in: moc) {
             Task {
                 await Logging.shared.log("Creating \(entityName) ID: \(node.id) (v4)")
             }
             postSyncAction = PostSyncAction.isNew.rawValue
 
-        } else if node.updated {
+        } else if node.updated(in: moc) {
             Task {
                 await Logging.shared.log("Updating \(entityName) ID: \(node.id) (v4)")
             }
@@ -430,7 +431,7 @@ class DataItem: NSManagedObject, Querying {
     }
 
     static func syncItems<T: DataItem>(of _: T.Type, from nodes: Lista<Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache, perItemCallback: (T, Node) -> Void) {
-        let validNodes = nodes.filter { !($0.parent?.creationSkipped ?? false) }
+        let validNodes = nodes.filter { !($0.parent?.creationSkipped(in: moc) ?? false) }
         if validNodes.isEmpty {
             return
         }
@@ -456,9 +457,9 @@ class DataItem: NSManagedObject, Querying {
                 // there can be multiple updates for an item, because of multiple parents
                 existingItem.populate(node: node)
                 perItemCallback(existingItem, node)
-            } else if shouldCreate(from: node) {
+            } else if shouldCreate(from: node, moc: moc) {
                 // but only one creation
-                node.created = true
+                node.markCreated(in: moc)
                 let item = NSEntityDescription.insertNewObject(forEntityName: entityName, into: moc) as! T
                 item.apiServer = server
                 item.populate(node: node)
@@ -469,7 +470,7 @@ class DataItem: NSManagedObject, Querying {
         }
     }
 
-    class func shouldCreate(from _: Node) -> Bool {
+    class func shouldCreate(from _: Node, moc _: NSManagedObjectContext) -> Bool {
         true
     }
 

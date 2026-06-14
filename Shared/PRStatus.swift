@@ -40,11 +40,11 @@ final class PRStatus: DataItem {
 
     static func sync(from nodes: Lista<Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
         syncItems(of: PRStatus.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { status, node in
-            guard node.created || node.updated,
+            guard node.created(in: moc) || node.updated(in: moc),
                   let parentId = node.parent?.id
             else { return }
 
-            if node.created {
+            if node.created(in: moc) {
                 if let parent = PullRequest.asParent(with: parentId, in: moc, parentCache: parentCache) {
                     status.pullRequest = parent
                 } else {

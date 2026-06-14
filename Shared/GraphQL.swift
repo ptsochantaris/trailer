@@ -5,69 +5,61 @@ import Semalot
 import TrailerJson
 import TrailerQL
 
-extension ParseOutput {
-    func asForcedUpdate() -> ParseOutput {
-        switch self {
-        case let .node(node):
-            node.forcedUpdate = true
-            return .node(node)
-        case .queryComplete, .queryPageComplete:
-            return self
+final class NodeProcessingFlags {
+    var creationSkipped = Set<ObjectIdentifier>()
+    var created = Set<ObjectIdentifier>()
+    var updated = Set<ObjectIdentifier>()
+    var forcedUpdate = Set<ObjectIdentifier>()
+}
+
+extension NSManagedObjectContext {
+    private static let nodeProcessingFlagsKey = "com.housetrip.Trailer.nodeProcessingFlags"
+
+    var nodeProcessingFlags: NodeProcessingFlags {
+        if let existing = userInfo[Self.nodeProcessingFlagsKey] as? NodeProcessingFlags {
+            return existing
         }
+        let store = NodeProcessingFlags()
+        userInfo[Self.nodeProcessingFlagsKey] = store
+        return store
+    }
+
+    func clearNodeProcessingFlags() {
+        userInfo.removeObject(forKey: Self.nodeProcessingFlagsKey)
     }
 }
 
 extension Node {
-    var creationSkipped: Bool {
-        get {
-            flags & 0b0000_0001 != 0
-        }
-        set {
-            if newValue {
-                flags |= 0b0000_0001
-            } else {
-                flags &= 0b1111_1110
-            }
-        }
+    func creationSkipped(in moc: NSManagedObjectContext) -> Bool {
+        moc.nodeProcessingFlags.creationSkipped.contains(ObjectIdentifier(self))
     }
 
-    var created: Bool {
-        get {
-            flags & 0b0000_0010 != 0
-        }
-        set {
-            if newValue {
-                flags |= 0b0000_0010
-            } else {
-                flags &= 0b1111_1101
-            }
-        }
+    func markCreationSkipped(in moc: NSManagedObjectContext) {
+        moc.nodeProcessingFlags.creationSkipped.insert(ObjectIdentifier(self))
     }
 
-    var updated: Bool {
-        get {
-            flags & 0b0000_0100 != 0
-        }
-        set {
-            if newValue {
-                flags |= 0b0000_0100
-            } else {
-                flags &= 0b1111_1011
-            }
-        }
+    func created(in moc: NSManagedObjectContext) -> Bool {
+        moc.nodeProcessingFlags.created.contains(ObjectIdentifier(self))
     }
 
-    var forcedUpdate: Bool {
-        get {
-            flags & 0b0000_1000 != 0
-        }
-        set {
-            if newValue {
-                flags |= 0b0000_1000
-            } else {
-                flags &= 0b1111_0111
-            }
-        }
+    func markCreated(in moc: NSManagedObjectContext) {
+        moc.nodeProcessingFlags.created.insert(ObjectIdentifier(self))
+    }
+
+    func updated(in moc: NSManagedObjectContext) -> Bool {
+        moc.nodeProcessingFlags.updated.contains(ObjectIdentifier(self))
+    }
+
+    func markUpdated(in moc: NSManagedObjectContext) {
+        moc.nodeProcessingFlags.updated.insert(ObjectIdentifier(self))
+    }
+
+    func forcedUpdate(in moc: NSManagedObjectContext) -> Bool {
+        moc.nodeProcessingFlags.forcedUpdate.contains(ObjectIdentifier(self))
+    }
+
+    func markForcedUpdate(in moc: NSManagedObjectContext) {
+        moc.nodeProcessingFlags.forcedUpdate.insert(ObjectIdentifier(self))
     }
 }
 
@@ -721,7 +713,7 @@ enum GraphQL {
         let group = BatchGroup(name: "nodes", templateGroup: prGroup, idList: prIdsToCheck)
         let scanner = NodeScanner(server: server, parentType: nil)
         let query = Query(name: "Closed Authored PRs", rootElement: group, allowsEmptyResponse: true) {
-            scanner.add(progress: $0.asForcedUpdate())
+            scanner.add(progress: $0, forcedUpdate: true)
         }
         do {
             try await server.run(queries: Lista(value: query))
@@ -972,7 +964,7 @@ enum GraphQL {
             self.parentType = parentType
         }
 
-        func add(progress: ParseOutput) {
+        func add(progress: ParseOutput, forcedUpdate: Bool = false) {
             scannerMoc.perform { [weak self] in
                 guard let self else { return }
                 switch progress {
@@ -982,6 +974,9 @@ enum GraphQL {
                 case .queryComplete:
                     break
                 case let .node(node):
+                    if forcedUpdate {
+                        node.markForcedUpdate(in: scannerMoc)
+                    }
                     let type = node.elementType
                     if let existingList = nodes[type] {
                         existingList.append(node)
@@ -1049,6 +1044,10 @@ enum GraphQL {
             if scannerMoc.hasChanges {
                 try? scannerMoc.save()
             }
+
+            // The processed nodes are about to be released, so drop their transient
+            // flags to avoid stale state if memory addresses get reused next page.
+            scannerMoc.clearNodeProcessingFlags()
         }
     }
 }

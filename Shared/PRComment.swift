@@ -25,11 +25,11 @@ final class PRComment: DataItem {
 
     static func sync(from nodes: Lista<Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
         syncItems(of: PRComment.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { comment, node in
-            guard node.created || node.updated,
+            guard node.created(in: moc) || node.updated(in: moc),
                   let parent = node.parent
             else { return }
 
-            if node.created {
+            if node.created(in: moc) {
                 let parentId = parent.id
                 let parentType = parent.elementType
 

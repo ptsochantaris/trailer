@@ -40,7 +40,7 @@ final class Issue: ListableItem {
                 return
             }
 
-            guard node.created || node.updated,
+            guard node.created(in: moc) || node.updated(in: moc),
                   let parent = Repo.asParent(with: parentId, in: moc, parentCache: parentCache)
             else { return }
 

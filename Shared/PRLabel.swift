@@ -22,7 +22,7 @@ final class PRLabel: DataItem {
             guard
                 let parent = node.parent else { return }
 
-            if parent.updated || parent.created {
+            if parent.updated(in: moc) || parent.created(in: moc) {
                 if parent.elementType == "PullRequest", let parentPr = PullRequest.asParent(with: parent.id, in: moc, parentCache: parentCache) {
                     label.pullRequests.insert(parentPr)
                 } else if parent.elementType == "Issue", let parentIssue = Issue.asParent(with: parent.id, in: moc, parentCache: parentCache) {
@@ -34,7 +34,7 @@ final class PRLabel: DataItem {
                 }
             }
 
-            if node.created || node.updated {
+            if node.created(in: moc) || node.updated(in: moc) {
                 let info = node.jsonPayload
                 label.name = info.potentialString(named: "name")
                 if let c = info.potentialString(named: "color") {

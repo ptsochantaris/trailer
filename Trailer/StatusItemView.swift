@@ -7,10 +7,8 @@ enum StatusItemView {
         var baseColor: NSColor {
             if #available(macOS 15, *) { // 15, 26
                 .white
-            } else if #available(macOS 14, *) {
+            } else {
                 .black
-            } else { // macOS 12, 13
-                .white
             }
         }
 

@@ -82,7 +82,7 @@ final class PullRequest: ListableItem {
 
     static func sync(from nodes: Lista<Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
         syncItems(of: PullRequest.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { pr, node in
-            guard node.created || node.updated,
+            guard node.created(in: moc) || node.updated(in: moc),
                   let parentId = node.parent?.id ?? node.jsonPayload.potentialObject(named: "repository")?.potentialString(named: "id"),
                   let parent = Repo.asParent(with: parentId, in: moc, parentCache: parentCache)
             else { return }

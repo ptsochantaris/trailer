@@ -146,7 +146,7 @@ class ListableItem: DataItem, Listable {
 
         processAssignmentStatus(from: .object(["assignees": .array(i)]), idField: "id")
 
-        if node.updated {
+        if node.updated(in: managedObjectContext!) {
             labels.removeAll() // so not set delete post sync action, as label may not just be a child to this item. Orphaned labels are nuked afterwards
         }
     }
@@ -1268,11 +1268,11 @@ class ListableItem: DataItem, Listable {
         return CSSearchableItem(uniqueIdentifier: uri, domainIdentifier: nil, attributeSet: s)
     }
 
-    override static func shouldCreate(from node: Node) -> Bool {
+    override static func shouldCreate(from node: Node, moc: NSManagedObjectContext) -> Bool {
         if node.jsonPayload.potentialString(named: "state") == "OPEN" {
             return true
         }
-        node.creationSkipped = true
+        node.markCreationSkipped(in: moc)
         return false
     }
 

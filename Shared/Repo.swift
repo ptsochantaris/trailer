@@ -44,7 +44,7 @@ final class Repo: DataItem {
                 }
             }
 
-            if node.created || node.updated {
+            if node.created(in: moc) || node.updated(in: moc) {
                 let json = node.jsonPayload
                 repo.fullName = json.potentialString(named: "nameWithOwner")
                 repo.fork = json.potentialBool(named: "fork") ?? false
@@ -52,7 +52,7 @@ final class Repo: DataItem {
                 repo.inaccessible = false
                 repo.archived = json.potentialBool(named: "isArchived") ?? false
                 repo.ownerNodeId = json.potentialObject(named: "owner")?.potentialString(named: "id")
-                if node.created {
+                if node.created(in: moc) {
                     repo.displayPolicyForPrs = Settings.displayPolicyForNewPrs.rawValue
                     repo.displayPolicyForIssues = Settings.displayPolicyForNewIssues.rawValue
                 }
