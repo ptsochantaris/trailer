@@ -26,8 +26,13 @@ final class SetupAssistant: NSWindow, NSWindowDelegate, NSControlTextEditingDele
         }
     }
 
+    override nonisolated func awakeFromNib() {
+        // AppKit loads nibs on the main thread; the real work is main-actor isolated.
+        MainActor.assumeIsolated { awakeFromNibOnMain() }
+    }
+
     @MainActor
-    override func awakeFromNib() {
+    private func awakeFromNibOnMain() {
         Settings.isAppLoginItem = true
         startAtLogin.integerValue = 1
     }

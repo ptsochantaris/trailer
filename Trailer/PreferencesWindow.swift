@@ -215,8 +215,13 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
     /// Tabs
     @IBOutlet var tabs: NSTabView!
 
+    override nonisolated func awakeFromNib() {
+        // AppKit loads nibs on the main thread; the real work is main-actor isolated.
+        MainActor.assumeIsolated { awakeFromNibOnMain() }
+    }
+
     @MainActor
-    override func awakeFromNib() {
+    private func awakeFromNibOnMain() {
         super.awakeFromNib()
         delegate = self
 

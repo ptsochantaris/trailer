@@ -15,7 +15,13 @@ final class HiddenItemWindow: NSWindow, NSWindowDelegate {
         textStorage.append(NSAttributedString(string: message, attributes: ApiMonitorWindow.logAttributes))
     }
 
-    override func awakeFromNib() {
+    override nonisolated func awakeFromNib() {
+        // AppKit loads nibs on the main thread; the real work is main-actor isolated.
+        MainActor.assumeIsolated { awakeFromNibOnMain() }
+    }
+
+    @MainActor
+    private func awakeFromNibOnMain() {
         super.awakeFromNib()
         delegate = self
         textStorage = textView.textStorage
