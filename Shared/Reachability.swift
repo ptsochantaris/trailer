@@ -1,7 +1,7 @@
 import Foundation
-import SystemConfiguration
+import Network
 
-enum NetworkStatus {
+nonisolated enum NetworkStatus {
     case notReachable, reachableViaWiFi, reachableViaWWAN
     var name: String {
         switch self {
@@ -17,66 +17,60 @@ enum NetworkStatus {
 
 let ReachabilityChangedNotification = Notification.Name("ReachabilityChangedNotification")
 
-// Must stay nonisolated: SystemConfiguration invokes this via a C function pointer,
-// which can only be formed from a function that carries no actor isolation.
-nonisolated func ReachabilityCallback(target _: SCNetworkReachability, flags _: SCNetworkReachabilityFlags, info _: UnsafeMutableRawPointer?) {
-    Task { @MainActor in
-        NotificationCenter.default.post(name: ReachabilityChangedNotification, object: nil)
-    }
-}
-
 final class Reachability {
-    private let reachability: SCNetworkReachability
+    private let monitor = NWPathMonitor()
+    private var monitorTask: Task<Void, Never>?
 
-    init() {
-        var zeroAddress = sockaddr_in(sin_len: 0, sin_family: 0, sin_port: 0, sin_addr: in_addr(s_addr: 0), sin_zero: (0, 0, 0, 0, 0, 0, 0, 0))
-        zeroAddress.sin_len = UInt8(MemoryLayout<sockaddr_in>.size)
-        zeroAddress.sin_family = sa_family_t(AF_INET)
-
-        reachability = withUnsafePointer(to: &zeroAddress) { pointer in
-            let p = UnsafePointer<sockaddr>(OpaquePointer(pointer))
-            return SCNetworkReachabilityCreateWithAddress(kCFAllocatorDefault, p)!
-        }
+    /// Polled synchronously by `API.hasNetworkConnection`, which deliberately re-reads the
+    /// live state rather than trusting the last notification it received.
+    ///
+    /// This is not redundant: older macOS versions could fail to signal a network status
+    /// change after waking from sleep, leaving a purely push-based value stale — which for
+    /// this app means silently not syncing. That may well be fixed by now, but the failure
+    /// is invisible when it happens, so the poll stays. Please don't "simplify" this into a
+    /// cached property updated only by `startNotifier()`.
+    var status: NetworkStatus {
+        Reachability.status(for: monitor.currentPath)
     }
 
     func startNotifier() {
-        var context = SCNetworkReachabilityContext(version: 0, info: nil, retain: nil, release: nil, copyDescription: nil)
+        guard monitorTask == nil else { return }
 
-        if SCNetworkReachabilitySetCallback(reachability, ReachabilityCallback, &context) {
-            if SCNetworkReachabilityScheduleWithRunLoop(reachability, CFRunLoopGetCurrent(), CFRunLoopMode.commonModes.rawValue) {
-                Task {
-                    await Logging.shared.log("Reachability monitoring active")
+        // Iterate the same instance that `status` polls, so both see one started monitor.
+        // Capturing the monitor rather than self also avoids a retain cycle.
+        let monitor = monitor
+        monitorTask = Task {
+            var lastStatus: NetworkStatus?
+            for await path in monitor {
+                // NWPathMonitor reports interface-level changes that don't necessarily alter
+                // reachability, so only announce when the derived status actually moves.
+                // Observers treat every notification as a reason to consider refreshing.
+                let newStatus = Reachability.status(for: path)
+                if newStatus != lastStatus {
+                    lastStatus = newStatus
+                    NotificationCenter.default.post(name: ReachabilityChangedNotification, object: nil)
                 }
-                return
             }
         }
+
         Task {
-            await Logging.shared.log("Reachability monitoring start failed")
+            await Logging.shared.log("Reachability monitoring active")
         }
     }
 
     deinit {
-        SCNetworkReachabilityUnscheduleFromRunLoop(reachability, CFRunLoopGetCurrent(), CFRunLoopMode.commonModes.rawValue)
+        monitorTask?.cancel()
     }
 
-    var status: NetworkStatus {
-        var flags = SCNetworkReachabilityFlags()
-        var returnValue: NetworkStatus = .notReachable
-
-        if SCNetworkReachabilityGetFlags(reachability, &flags) {
-            if flags.contains(.reachable) {
-                if !flags.contains(.connectionRequired) { returnValue = .reachableViaWiFi }
-
-                if flags.contains(.connectionOnDemand) || flags.contains(.connectionOnTraffic) {
-                    if !flags.contains(.interventionRequired) { returnValue = .reachableViaWiFi }
-                }
-
-                #if os(iOS)
-                    if flags.contains(.isWWAN) { returnValue = .reachableViaWWAN }
-                #endif
-            }
+    private static func status(for path: NWPath) -> NetworkStatus {
+        guard path.status == .satisfied else {
+            return .notReachable
         }
-
-        return returnValue
+        #if os(iOS)
+            if path.usesInterfaceType(.cellular) {
+                return .reachableViaWWAN
+            }
+        #endif
+        return .reachableViaWiFi
     }
 }
