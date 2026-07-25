@@ -117,7 +117,7 @@ final class TrailerCell: NSTableCellView {
             let statuses = pullRequest.displayedStatusLines(settings: settings).reversed()
             if !statuses.isEmpty {
                 for status in statuses {
-                    addLinkField(NSAttributedString(string: status.displayText, attributes: TrailerCell.statusAttributes), status.targetUrl, color: status.colorForDisplay)
+                    addLinkField(NSAttributedString(string: status.displayText, attributes: TrailerCell.statusAttributes), status.targetUrl, color: status.displayColour.uiColour)
                 }
                 y += 1
             }

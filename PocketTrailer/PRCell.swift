@@ -128,7 +128,7 @@ final class PRCell: UITableViewCell {
 
             statusText = NSMutableAttributedString()
             for status in statusItems {
-                lineAttributes[.foregroundColor] = status.colorForDisplay
+                lineAttributes[.foregroundColor] = status.displayColour.uiColour
                 statusText?.append(NSAttributedString(string: status.displayText, attributes: lineAttributes))
                 statusCount -= 1
                 if statusCount > 0 {

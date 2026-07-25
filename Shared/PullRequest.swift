@@ -432,20 +432,12 @@ final nonisolated class PullRequest: ListableItem {
             statuses
         } else {
             statuses.filter {
-                let c = $0.colorForDisplay
-                if c == .appRed {
-                    return red
+                switch $0.displayColour {
+                case .red: return red
+                case .yellow: return yellow
+                case .green: return green
+                case .neutral: return gray
                 }
-                if c == .appYellow {
-                    return yellow
-                }
-                if c == .appGreen {
-                    return green
-                }
-                if c == .appSecondaryLabel {
-                    return gray
-                }
-                return false
             }
         }
         let sortedStatuses = filteredStatuses.sorted { $1.createdBefore($0) }

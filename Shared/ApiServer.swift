@@ -240,17 +240,18 @@ final nonisolated class ApiServer: NSManagedObject {
         resetDate = stats.resetAt
     }
 
+    @MainActor
     func test() async throws {
         try await withThrowingTaskGroup { group in
             if let graphQLPath {
-                group.addTask {
+                group.addTask { @MainActor in
                     await Logging.shared.log("Checking GraphQL interface on \(graphQLPath)")
                     try await GraphQL.testApi(to: self)
                 }
             }
 
             if let apiPath {
-                group.addTask {
+                group.addTask { @MainActor in
                     await Logging.shared.log("Checking REST interface on \(apiPath)")
                     try await RestAccess.testApi(to: self)
                 }

@@ -4,6 +4,12 @@ import Lista
 import TrailerJson
 import TrailerQL
 
+/// What a CI status means, independent of how it's drawn. Kept separate from the asset
+/// catalog colours so that filtering logic stays usable off the main actor.
+nonisolated enum StatusColour {
+    case red, yellow, green, neutral
+}
+
 final nonisolated class PRStatus: DataItem {
     @NSManaged var descriptionText: String?
     @NSManaged var state: String?
@@ -69,16 +75,20 @@ final nonisolated class PRStatus: DataItem {
         }
     }
 
-    var colorForDisplay: COLOR_CLASS {
+    /// The *meaning* of a status, not its appearance. Filtering logic compares these cases;
+    /// only the UI turns one into an actual colour, via `StatusColour.uiColour`. This used to
+    /// return a `COLOR_CLASS`, which meant sync-side filtering decided what to show by
+    /// comparing colour instances against the asset catalog.
+    var displayColour: StatusColour {
         switch state.orEmpty {
         case "", "neutral", "skipped":
-            .appSecondaryLabel
+            .neutral
         case "expected", "pending":
-            .appYellow
+            .yellow
         case "success":
-            .appGreen
+            .green
         default:
-            .appRed
+            .red
         }
     }
 

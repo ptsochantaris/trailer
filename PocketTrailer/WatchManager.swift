@@ -223,7 +223,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
         var statusLines = [[String: Sendable]]()
         for status in pr.displayedStatusLines(settings: settings) {
             statusLines.append([
-                "color": status.colorForDisplay,
+                "color": status.displayColour.uiColour,
                 "text": status.descriptionText.orEmpty
             ])
         }

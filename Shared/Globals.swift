@@ -202,6 +202,8 @@ nonisolated enum RepoDisplayPolicy: Int, CaseIterable {
         }
     }
 
+    // Reads asset-catalog colours, which are main-actor; every caller is UI.
+    @MainActor
     var color: COLOR_CLASS {
         switch self {
         case .hide:
@@ -253,6 +255,7 @@ nonisolated enum RepoHidingPolicy: Int {
     case noHiding, hideMyAuthoredPrs, hideMyAuthoredIssues, hideAllMyAuthoredItems, hideOthersPrs, hideOthersIssues, hideAllOthersItems
     static let labels = ["No Filter", "Hide My PRs", "Hide My Issues", "Hide All Mine", "Hide Others PRs", "Hide Others Issues", "Hide All Others"]
     static let policies = [noHiding, hideMyAuthoredPrs, hideMyAuthoredIssues, hideAllMyAuthoredItems, hideOthersPrs, hideOthersIssues, hideAllOthersItems]
+    @MainActor
     static let colors = [COLOR_CLASS.appTertiaryLabel,
                          COLOR_CLASS(red: 0.1, green: 0.1, blue: 0.5, alpha: 1.0),
                          COLOR_CLASS(red: 0.1, green: 0.1, blue: 0.5, alpha: 1.0),
@@ -273,6 +276,7 @@ nonisolated enum RepoHidingPolicy: Int {
         }
     }
 
+    @MainActor
     var color: COLOR_CLASS {
         RepoHidingPolicy.colors[rawValue]
     }

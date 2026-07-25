@@ -42,3 +42,17 @@ extension COLOR_CLASS {
         return lum < 0.5
     }
 }
+
+extension StatusColour {
+    /// The single place a status's meaning becomes an actual colour. Main-actor isolated,
+    /// because the asset-catalog accessors are — which is precisely why `PRStatus` returns
+    /// the enum rather than reaching for these itself.
+    var uiColour: COLOR_CLASS {
+        switch self {
+        case .red: .appRed
+        case .yellow: .appYellow
+        case .green: .appGreen
+        case .neutral: .appSecondaryLabel
+        }
+    }
+}
