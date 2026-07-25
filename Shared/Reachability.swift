@@ -17,7 +17,9 @@ enum NetworkStatus {
 
 let ReachabilityChangedNotification = Notification.Name("ReachabilityChangedNotification")
 
-func ReachabilityCallback(target _: SCNetworkReachability, flags _: SCNetworkReachabilityFlags, info _: UnsafeMutableRawPointer?) {
+// Must stay nonisolated: SystemConfiguration invokes this via a C function pointer,
+// which can only be formed from a function that carries no actor isolation.
+nonisolated func ReachabilityCallback(target _: SCNetworkReachability, flags _: SCNetworkReachabilityFlags, info _: UnsafeMutableRawPointer?) {
     Task { @MainActor in
         NotificationCenter.default.post(name: ReachabilityChangedNotification, object: nil)
     }

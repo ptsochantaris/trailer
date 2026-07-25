@@ -6,7 +6,7 @@ import TrailerQL
     import UIKit
 #endif
 
-final class PullRequest: ListableItem {
+nonisolated final class PullRequest: ListableItem {
     @NSManaged var lastStatusNotified: String?
     @NSManaged var mergeCommitSha: String?
     @NSManaged var hasNewCommits: Bool

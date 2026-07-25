@@ -1,7 +1,7 @@
 import Foundation
 import UniformTypeIdentifiers
 
-extension Bool {
+nonisolated extension Bool {
     var asInt: Int {
         self ? 1 : 0
     }
@@ -9,12 +9,12 @@ extension Bool {
 
 extension NSPredicate: @retroactive @unchecked Sendable {}
 
-extension UTType {
+nonisolated extension UTType {
     static let trailerSettings = UTType(filenameExtension: "trailerSettings")!
     static let trailerApp = UTType(filenameExtension: "app")!
 }
 
-enum Section: CaseIterable, Equatable {
+nonisolated enum Section: CaseIterable, Equatable {
     enum HidingCause {
         case unknown, approvedByMe, rejectedByMe, hidingAllMyAuthoredItems,
              hidingMyAuthoredIssues, hidingAllOthersItems, hidingOthersIssues, containsNonGreenStatuses, hidingOthersPrs,
@@ -203,14 +203,12 @@ enum Section: CaseIterable, Equatable {
 
     static let nonZeroPredicate = NSPredicate(format: "sectionIndex > 0")
 
-    private static let matchingPredicates = ContiguousArray((0 ... 7).map { NSPredicate(format: "sectionIndex == \($0)") })
     var matchingPredicate: NSPredicate {
-        Section.matchingPredicates[sectionIndex]
+        NSPredicate(format: "sectionIndex == %d", sectionIndex)
     }
 
-    private static let excludePredicates = ContiguousArray((0 ... 7).map { NSPredicate(format: "sectionIndex != \($0)") })
     var excludingPredicate: NSPredicate {
-        Section.excludePredicates[sectionIndex]
+        NSPredicate(format: "sectionIndex != %d", sectionIndex)
     }
 
     ///////////////////////////////////////////////////////////
@@ -336,7 +334,7 @@ enum Section: CaseIterable, Equatable {
     }
 }
 
-extension String? {
+nonisolated extension String? {
     var isEmpty: Bool {
         orEmpty.isEmpty
     }
@@ -346,19 +344,19 @@ extension String? {
     }
 }
 
-extension Sendable? {
+nonisolated extension Sendable? {
     var stringOrEmpty: String {
         (self as? String).orEmpty
     }
 }
 
-extension Any? {
+nonisolated extension Any? {
     var stringOrEmpty: String {
         (self as? String).orEmpty
     }
 }
 
-extension Date {
+nonisolated extension Date {
     enum Formatters {
         static let logDateFormat = FormatStyle.dateTime
             .year(.defaultDigits)
@@ -384,7 +382,7 @@ extension Date {
     }
 }
 
-func agoFormat(prefix: String, since: Date?) -> String {
+nonisolated func agoFormat(prefix: String, since: Date?) -> String {
     guard let since, since != .distantPast else {
         return "Not \(prefix.lowercased()) yet"
     }
@@ -399,7 +397,7 @@ func agoFormat(prefix: String, since: Date?) -> String {
 
 ////
 
-extension String {
+nonisolated extension String {
     var trim: String {
         trimmingCharacters(in: .whitespacesAndNewlines)
     }

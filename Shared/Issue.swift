@@ -6,7 +6,7 @@ import TrailerQL
 #endif
 import TrailerJson
 
-final class Issue: ListableItem {
+nonisolated final class Issue: ListableItem {
     @NSManaged var closedByPullRequests: Set<PullRequest>
 
     override static var typeName: String {

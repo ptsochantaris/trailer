@@ -3,7 +3,7 @@ import Lista
 import TrailerJson
 import TrailerQL
 
-final class Review: DataItem {
+nonisolated final class Review: DataItem {
     @NSManaged var body: String?
     @NSManaged var username: String?
     @NSManaged var state: String?

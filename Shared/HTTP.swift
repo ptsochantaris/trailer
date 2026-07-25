@@ -44,7 +44,6 @@ enum HTTP {
         #endif
 
         let config = URLSessionConfiguration.default
-        config.httpShouldUsePipelining = true
         config.requestCachePolicy = .useProtocolCachePolicy
         config.timeoutIntervalForRequest = 60
         config.urlCache = URLCache(memoryCapacity: 32 * 1024 * 1024, diskCapacity: 1024 * 1024 * 1024, diskPath: ImageCache.shared.cacheDirectory)

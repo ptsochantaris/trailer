@@ -56,7 +56,13 @@ enum InclusionSetting: Int {
 enum Settings {
     static var cache = Cache()
 
-    final class Cache {
+    // An immutable snapshot of the settings, taken at the start of a sync and passed
+    // down through it, so that a settings change mid-sync can't alter its behaviour.
+    // Built on the main actor (so the property defaults can read the Settings statics)
+    // but Sendable, and its properties are immutable `let`s of Sendable type, so sync
+    // work running off the main actor can read them directly.
+    @MainActor
+    final class Cache: Sendable {
         let labelFilterList = Set(Settings.labelBlacklist.map(\.comparableForm))
         let labelsIncludionRule = Settings.labelsIncludionRule
 

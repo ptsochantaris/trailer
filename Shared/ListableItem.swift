@@ -10,14 +10,14 @@ import TrailerQL
     import Cocoa
 #endif
 
-protocol Listable: Querying {
+nonisolated protocol Listable: Querying {
     var section: Section { get }
     var sectionIndex: Int { get }
     var comments: Set<PRComment> { get }
     var reactions: Set<Reaction> { get }
 }
 
-extension Listable {
+nonisolated extension Listable {
     static func reactionCheckBatch(in moc: NSManagedObjectContext, settings: Settings.Cache) -> [Self] {
         let f = NSFetchRequest<Self>(entityName: typeName)
         f.predicate = ApiServer.lastSyncSucceededPredicate
@@ -45,7 +45,7 @@ extension Listable {
     }
 }
 
-class ListableItem: DataItem, Listable {
+nonisolated class ListableItem: DataItem, Listable {
     enum StateChange: Int {
         case none, reopened, merged, closed
     }

@@ -6,7 +6,7 @@ import TrailerQL
 #endif
 import TrailerJson
 
-final class PRLabel: DataItem {
+nonisolated final class PRLabel: DataItem {
     @NSManaged var color: Int
     @NSManaged var name: String?
 

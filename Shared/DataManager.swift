@@ -480,11 +480,25 @@ enum DataManager {
 
     private static var _justMigrated = false
 
-    static let persistentStoreCoordinator: NSPersistentStoreCoordinator? = {
+    // Deliberately not a lazy `static let`: its setup reads and writes other main-actor
+    // state (`dataFilesDirectory`, `_justMigrated`), and a global initialiser has no
+    // well-defined isolation of its own. An explicit main-actor accessor makes the
+    // one-time setup happen on the main actor, where every caller already is.
+    private static var _persistentStoreCoordinator: NSPersistentStoreCoordinator?
+    private static var storeCoordinatorBuilt = false
+
+    static var persistentStoreCoordinator: NSPersistentStoreCoordinator? {
+        if !storeCoordinatorBuilt {
+            storeCoordinatorBuilt = true
+            _persistentStoreCoordinator = buildPersistentStoreCoordinator()
+        }
+        return _persistentStoreCoordinator
+    }
+
+    private static func buildPersistentStoreCoordinator() -> NSPersistentStoreCoordinator? {
         let storeOptions: [AnyHashable: Any] = [
             NSMigratePersistentStoresAutomaticallyOption: true,
-            NSInferMappingModelAutomaticallyOption: true,
-            NSSQLitePragmasOption: ["synchronous": "OFF"]
+            NSInferMappingModelAutomaticallyOption: true
         ]
 
         let modelPath = Bundle.main.url(forResource: "Trailer", withExtension: "momd")!
@@ -524,5 +538,5 @@ enum DataManager {
             }
             return nil
         }
-    }()
+    }
 }

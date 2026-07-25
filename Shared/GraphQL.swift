@@ -5,14 +5,14 @@ import Semalot
 import TrailerJson
 import TrailerQL
 
-final class NodeProcessingFlags {
+nonisolated final class NodeProcessingFlags {
     var creationSkipped = Set<ObjectIdentifier>()
     var created = Set<ObjectIdentifier>()
     var updated = Set<ObjectIdentifier>()
     var forcedUpdate = Set<ObjectIdentifier>()
 }
 
-extension NSManagedObjectContext {
+nonisolated extension NSManagedObjectContext {
     private static let nodeProcessingFlagsKey = "com.housetrip.Trailer.nodeProcessingFlags"
 
     var nodeProcessingFlags: NodeProcessingFlags {
@@ -29,7 +29,7 @@ extension NSManagedObjectContext {
     }
 }
 
-extension Node {
+nonisolated extension Node {
     func creationSkipped(in moc: NSManagedObjectContext) -> Bool {
         moc.nodeProcessingFlags.creationSkipped.contains(ObjectIdentifier(self))
     }

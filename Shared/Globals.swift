@@ -90,43 +90,39 @@ func bootUp() {
 
 //////////////////////// Enums
 
-enum ItemCondition: Int {
+nonisolated enum ItemCondition: Int {
     case open, closed, merged
 
-    private static let matchingPredicates = ContiguousArray((0 ... 2).map { NSPredicate(format: "condition == \($0)") })
     var matchingPredicate: NSPredicate {
-        ItemCondition.matchingPredicates[rawValue]
+        NSPredicate(format: "condition == %d", rawValue)
     }
 
-    private static let excludingPredicates = ContiguousArray((0 ... 2).map { NSPredicate(format: "condition != \($0)") })
     var excludingPredicate: NSPredicate {
-        ItemCondition.excludingPredicates[rawValue]
+        NSPredicate(format: "condition != %d", rawValue)
     }
 }
 
-enum StatusFilter: Int {
+nonisolated enum StatusFilter: Int {
     case all, include, exclude
 }
 
-enum PostSyncAction: Int {
+nonisolated enum PostSyncAction: Int {
     case doNothing, delete, isNew, isUpdated
 
-    private static let matchingPredicates = ContiguousArray((0 ... 3).map { NSPredicate(format: "postSyncAction == \($0)") })
     var matchingPredicate: NSPredicate {
-        PostSyncAction.matchingPredicates[rawValue]
+        NSPredicate(format: "postSyncAction == %d", rawValue)
     }
 
-    private static let excludingPredicates = ContiguousArray((0 ... 3).map { NSPredicate(format: "postSyncAction != \($0)") })
     var excludingPredicate: NSPredicate {
-        PostSyncAction.excludingPredicates[rawValue]
+        NSPredicate(format: "postSyncAction != %d", rawValue)
     }
 }
 
-enum NotificationType {
+nonisolated enum NotificationType {
     case newComment, newPr, prMerged, prReopened, newMention, prClosed, newRepoSubscribed, newRepoAnnouncement, newPrAssigned, newStatus, newIssue, issueClosed, newIssueAssigned, issueReopened, assignedForReview, changesRequested, changesApproved, changesDismissed, newReaction, assignedToTeamForReview
 }
 
-enum SortingMethod: Int, CaseIterable {
+nonisolated enum SortingMethod: Int, CaseIterable {
     case creationDate, recentActivity, title, linesAdded, linesRemoved
 
     var normalTitle: String {
@@ -160,7 +156,7 @@ enum SortingMethod: Int, CaseIterable {
     }
 }
 
-enum KeepPolicy: Int {
+nonisolated enum KeepPolicy: Int {
     case mine, mineAndParticipated, everything, nothing
     static let labels = ["Keep Mine", "Keep Mine & Participated", "Keep All", "Don't Keep"]
     var name: String {
@@ -168,7 +164,7 @@ enum KeepPolicy: Int {
     }
 }
 
-enum RepoDisplayPolicy: Int, CaseIterable {
+nonisolated enum RepoDisplayPolicy: Int, CaseIterable {
     case hide, mine, mineAndPaticipated, all, authoredOnly
 
     static let labels: [String] = allCases.map(\.name)
@@ -226,7 +222,7 @@ enum RepoDisplayPolicy: Int, CaseIterable {
     }
 }
 
-enum DraftHandlingPolicy: Int, CaseIterable {
+nonisolated enum DraftHandlingPolicy: Int, CaseIterable {
     case nothing, display, hide
 
     static let allCases: [DraftHandlingPolicy] = [.nothing, .display, .hide]
@@ -240,7 +236,7 @@ enum DraftHandlingPolicy: Int, CaseIterable {
     }
 }
 
-enum AssignmentStatus: Int {
+nonisolated enum AssignmentStatus: Int {
     case none, me, myTeam, others
 
     var assignedStatus: AssignmentStatus? {
@@ -253,7 +249,7 @@ enum AssignmentStatus: Int {
     }
 }
 
-enum RepoHidingPolicy: Int {
+nonisolated enum RepoHidingPolicy: Int {
     case noHiding, hideMyAuthoredPrs, hideMyAuthoredIssues, hideAllMyAuthoredItems, hideOthersPrs, hideOthersIssues, hideAllOthersItems
     static let labels = ["No Filter", "Hide My PRs", "Hide My Issues", "Hide All Mine", "Hide Others PRs", "Hide Others Issues", "Hide All Others"]
     static let policies = [noHiding, hideMyAuthoredPrs, hideMyAuthoredIssues, hideAllMyAuthoredItems, hideOthersPrs, hideOthersIssues, hideAllOthersItems]
@@ -282,7 +278,7 @@ enum RepoHidingPolicy: Int {
     }
 }
 
-struct ApiStats {
+nonisolated struct ApiStats {
     let nodeCount, cost, remaining, limit: Int
     let resetAt: Date?
     let migratedIds: [String: String]?

@@ -3,7 +3,7 @@ import Lista
 import TrailerJson
 import TrailerQL
 
-final class FetchCache {
+nonisolated final class FetchCache {
     private var store = [String: NSManagedObject]()
 
     subscript(key: String) -> NSManagedObject? {
@@ -12,12 +12,12 @@ final class FetchCache {
     }
 }
 
-protocol Querying: NSManagedObject {
+nonisolated protocol Querying: NSManagedObject {
     static var typeName: String { get }
     var nodeId: String? { get set }
 }
 
-extension Querying {
+nonisolated extension Querying {
     static func allItems(offset: Int? = nil, count: Int? = nil, in moc: NSManagedObjectContext, prefetchRelationships: [String]? = nil) -> [Self] {
         let f = NSFetchRequest<Self>(entityName: typeName)
         f.relationshipKeyPathsForPrefetching = prefetchRelationships
@@ -186,7 +186,7 @@ extension Querying {
     }
 }
 
-class DataItem: NSManagedObject, Querying {
+nonisolated class DataItem: NSManagedObject, Querying {
     @NSManaged var nodeId: String?
     @NSManaged var postSyncAction: Int
     @NSManaged var createdAt: Date?
@@ -338,19 +338,11 @@ class DataItem: NSManagedObject, Querying {
         }
     }
 
-    private nonisolated(unsafe) static var _lock = os_unfair_lock_s()
-    private nonisolated(unsafe) static var dateParserTemplate = "                   +0000".cString(using: .ascii)!
+    private static let iso8601 = Date.ISO8601FormatStyle()
+
     static func parseGH8601(_ i: String?) -> Date? {
         guard let i, i.count > 18 else { return nil }
-
-        var timeData = tm()
-        os_unfair_lock_lock(&_lock)
-        memcpy(&dateParserTemplate, i, 19)
-        strptime(dateParserTemplate, "%FT%T%z", &timeData)
-        os_unfair_lock_unlock(&_lock)
-
-        let t = mktime(&timeData)
-        return Date(timeIntervalSince1970: TimeInterval(t))
+        return try? iso8601.parse(i)
     }
 
     private func populate(node: Node) {
