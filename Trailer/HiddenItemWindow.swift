@@ -29,43 +29,39 @@ final class HiddenItemWindow: NSWindow, NSWindowDelegate {
                 sender.isEnabled = true
             }
 
-            var hiddenCount = 0
-
             let settings = Settings.cache
-            func report(for item: ListableItem) {
-                let section = item.postProcess(settings: settings)
-                switch section {
-                case let .hidden(cause):
-                    let title = item.title ?? "<no title>"
-                    let numberString = String(item.number)
-                    Task { @MainActor in
-                        writeText("[\(item.repo.fullName.orEmpty) #\(numberString)]: \(title) -- \(cause.description)\n\n")
-                        hiddenCount += 1
-                    }
-                default:
-                    break
-                }
-            }
 
             textStorage.replaceCharacters(in: NSRange(location: 0, length: textStorage.length), with: "")
             writeText("Scanning...\n\n")
 
-            await withCheckedContinuation { continuation in
-                let moc = DataManager.main.buildChildContext()
-                moc.perform {
-                    for p in PullRequest.allItems(in: moc, prefetchRelationships: ["comments", "reactions", "reviews"]) {
-                        report(for: p)
-                    }
+            // This is a read-only "what would be hidden" scan, so it runs in a throwaway
+            // child context which is deliberately never saved. Everything that touches a
+            // managed object stays on that context's own queue; only plain strings come back.
+            let moc = DataManager.main.buildChildContext()
+            let lines = await moc.perform {
+                var lines = [String]()
 
-                    for i in Issue.allItems(in: moc, prefetchRelationships: ["comments", "reactions"]) {
-                        report(for: i)
+                func report(for item: ListableItem) {
+                    guard case let .hidden(cause) = item.postProcess(settings: settings) else {
+                        return
                     }
-
-                    continuation.resume()
+                    let title = item.title ?? "<no title>"
+                    lines.append("[\(item.repo.fullName.orEmpty) #\(String(item.number))]: \(title) -- \(cause.description)\n\n")
                 }
+
+                for p in PullRequest.allItems(in: moc, prefetchRelationships: ["comments", "reactions", "reviews"]) {
+                    report(for: p)
+                }
+
+                for i in Issue.allItems(in: moc, prefetchRelationships: ["comments", "reactions"]) {
+                    report(for: i)
+                }
+
+                return lines
             }
 
-            writeText("Done - \(hiddenCount) hidden items\n")
+            writeText(lines.joined())
+            writeText("Done - \(lines.count) hidden items\n")
         }
     }
 
