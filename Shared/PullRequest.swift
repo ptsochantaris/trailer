@@ -6,7 +6,7 @@ import TrailerQL
     import UIKit
 #endif
 
-nonisolated final class PullRequest: ListableItem {
+final nonisolated class PullRequest: ListableItem {
     @NSManaged var lastStatusNotified: String?
     @NSManaged var mergeCommitSha: String?
     @NSManaged var hasNewCommits: Bool
@@ -317,9 +317,9 @@ nonisolated final class PullRequest: ListableItem {
         super.catchUpWithComments(settings: settings)
     }
 
-    override static func badgeCount(from fetch: NSFetchRequest<some ListableItem>, in moc: NSManagedObjectContext) -> Int {
-        var badgeCount = super.badgeCount(from: fetch, in: moc)
-        if Settings.markPrsAsUnreadOnNewCommits {
+    override static func badgeCount(from fetch: NSFetchRequest<some ListableItem>, in moc: NSManagedObjectContext, settings: Settings.Cache) -> Int {
+        var badgeCount = super.badgeCount(from: fetch, in: moc, settings: settings)
+        if settings.markPrsAsUnreadOnNewCommits {
             for i in try! moc.fetch(fetch) {
                 if let i = i.asPr, i.hasNewCommits {
                     badgeCount += 1
@@ -333,20 +333,20 @@ nonisolated final class PullRequest: ListableItem {
         let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
         f.includesSubentities = false
         f.predicate = NSCompoundPredicate(type: .and, subpredicates: [section.matchingPredicate, includeInUnreadPredicate(settings: settings)])
-        return badgeCount(from: f, in: moc)
+        return badgeCount(from: f, in: moc, settings: settings)
     }
 
     static func badgeCount(in moc: NSManagedObjectContext, settings: Settings.Cache) -> Int {
         let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
         f.includesSubentities = false
         f.predicate = NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, includeInUnreadPredicate(settings: settings)])
-        return badgeCount(from: f, in: moc)
+        return badgeCount(from: f, in: moc, settings: settings)
     }
 
     @MainActor
     static func badgeCount(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, settings: Settings.Cache) -> Int {
         let f = requestForItems(of: PullRequest.self, withFilter: nil, sectionIndex: -1, criterion: criterion, settings: settings)
-        return badgeCount(from: f, in: moc)
+        return badgeCount(from: f, in: moc, settings: settings)
     }
 
     private static let _unreadOrNewCommitsPredicate = NSPredicate(format: "unreadComments > 0 or hasNewCommits == YES")
@@ -433,10 +433,18 @@ nonisolated final class PullRequest: ListableItem {
         } else {
             statuses.filter {
                 let c = $0.colorForDisplay
-                if c == .appRed { return red }
-                if c == .appYellow { return yellow }
-                if c == .appGreen { return green }
-                if c == .appSecondaryLabel { return gray }
+                if c == .appRed {
+                    return red
+                }
+                if c == .appYellow {
+                    return yellow
+                }
+                if c == .appGreen {
+                    return green
+                }
+                if c == .appSecondaryLabel {
+                    return gray
+                }
                 return false
             }
         }

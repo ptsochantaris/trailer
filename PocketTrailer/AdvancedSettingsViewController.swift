@@ -39,7 +39,9 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
                     // minutes
                     let period = Int(Settings.backgroundRefreshPeriod / 60)
                     for f in 2 ..< 1000 {
-                        if f == period { previousIndex = count }
+                        if f == period {
+                            previousIndex = count
+                        }
                         values.append("\(f) minutes")
                         count += 1
                     }
@@ -58,7 +60,9 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
                     // hours
                     let period = Int(Settings.newRepoCheckPeriod)
                     for f in 2 ..< 100 {
-                        if f == period { previousIndex = count }
+                        if f == period {
+                            previousIndex = count
+                        }
                         values.append("\(f) hours")
                         count += 1
                     }

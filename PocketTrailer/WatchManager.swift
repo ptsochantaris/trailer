@@ -355,7 +355,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
         f.includesSubentities = false
         let p = NSCompoundPredicate(type: .and, subpredicates: [section.matchingPredicate, type.includeInUnreadPredicate(settings: settings)])
         DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc)
-        return ListableItem.badgeCount(from: f, in: moc)
+        return ListableItem.badgeCount(from: f, in: moc, settings: settings)
     }
 
     private static func countOpenAndVisible<T: ListableItem>(of type: T.Type, criterion: GroupingCriterion?, moc: NSManagedObjectContext, settings: Settings.Cache) -> Int {

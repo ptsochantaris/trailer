@@ -3,7 +3,7 @@ import Lista
 import TrailerJson
 import TrailerQL
 
-nonisolated final class FetchCache {
+final nonisolated class FetchCache {
     private var store = [String: NSManagedObject]()
 
     subscript(key: String) -> NSManagedObject? {
@@ -238,7 +238,9 @@ nonisolated class DataItem: NSManagedObject, Querying {
             nodeIdsToInfo[nodeId] = info
         }
 
-        if nodeIdsToInfo.isEmpty { return }
+        if nodeIdsToInfo.isEmpty {
+            return
+        }
 
         await DataManager.runInChild(of: moc) { child in
             let entityName = typeName

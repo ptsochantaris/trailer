@@ -1,6 +1,6 @@
 import CoreData
 
-nonisolated final class SnoozePreset: NSManagedObject {
+final nonisolated class SnoozePreset: NSManagedObject {
     @NSManaged var day: Int
     @NSManaged var hour: Int
     @NSManaged var minute: Int

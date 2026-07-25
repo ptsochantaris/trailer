@@ -6,7 +6,7 @@ import TrailerQL
 #endif
 import TrailerJson
 
-nonisolated final class PRLabel: DataItem {
+final nonisolated class PRLabel: DataItem {
     @NSManaged var color: Int
     @NSManaged var name: String?
 
@@ -59,7 +59,9 @@ nonisolated final class PRLabel: DataItem {
             }
         }
 
-        if namesOfItems.isEmpty { return }
+        if namesOfItems.isEmpty {
+            return
+        }
 
         let f = NSFetchRequest<PRLabel>(entityName: "PRLabel")
         f.returnsObjectsAsFaults = false

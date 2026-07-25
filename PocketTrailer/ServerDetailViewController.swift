@@ -187,7 +187,9 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
     ///////////////////////// keyboard
 
     @objc private func keyboardWillShow(notification: NSNotification) {
-        if focusedField?.superview == nil { return }
+        if focusedField?.superview == nil {
+            return
+        }
 
         if let info = notification.userInfo, let keyboardFrameValue = info[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
             let keyboardFrame = keyboardFrameValue.cgRectValue

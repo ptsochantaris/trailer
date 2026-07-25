@@ -23,7 +23,9 @@ enum LauncherCommon {
     }
 
     static func launchMainApp() {
-        if isMainAppRunning { return }
+        if isMainAppRunning {
+            return
+        }
         var finalPathComponents = [String.SubSequence]()
         for component in Bundle.main.bundlePath.split(separator: "/") {
             finalPathComponents.append(component)

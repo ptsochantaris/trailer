@@ -205,7 +205,9 @@ final class NotificationManager: NSObject {
         case .changesApproved:
             guard let r = item.asReview else { return }
             let p = r.pullRequest
-            if p.shouldSkipNotifications { return }
+            if p.shouldSkipNotifications {
+                return
+            }
             notification.title = "@\(r.username.orEmpty) Approved Changes"
             notification.subtitle = p.title.orEmpty
             notification.body = r.body.orEmpty
@@ -219,7 +221,9 @@ final class NotificationManager: NSObject {
         case .changesRequested:
             guard let r = item.asReview else { return }
             let p = r.pullRequest
-            if p.shouldSkipNotifications { return }
+            if p.shouldSkipNotifications {
+                return
+            }
             notification.title = "@\(r.username.orEmpty) Requests Changes"
             notification.subtitle = p.title.orEmpty
             notification.body = r.body.orEmpty
@@ -233,7 +237,9 @@ final class NotificationManager: NSObject {
         case .changesDismissed:
             guard let r = item.asReview else { return }
             let p = r.pullRequest
-            if p.shouldSkipNotifications { return }
+            if p.shouldSkipNotifications {
+                return
+            }
             notification.title = "@\(r.username.orEmpty) Dismissed A Review"
             notification.subtitle = p.title.orEmpty
             notification.body = r.body.orEmpty
@@ -258,13 +264,19 @@ final class NotificationManager: NSObject {
             notification.title = r.displaySymbol
             notification.subtitle = "@\(r.userName.orEmpty)"
             if let c = r.comment, let p = c.pullRequest, !p.shouldSkipNotifications {
-                if let b = c.body { notification.body = b }
+                if let b = c.body {
+                    notification.body = b
+                }
                 notification.categoryIdentifier = "mutable"
             } else if let p = r.pullRequest, !p.shouldSkipNotifications {
-                if let t = p.title { notification.body = t }
+                if let t = p.title {
+                    notification.body = t
+                }
                 notification.categoryIdentifier = "mutable"
             } else if let i = r.issue, !i.shouldSkipNotifications {
-                if let t = i.title { notification.body = t }
+                if let t = i.title {
+                    notification.body = t
+                }
                 notification.categoryIdentifier = "mutable"
             } else {
                 return

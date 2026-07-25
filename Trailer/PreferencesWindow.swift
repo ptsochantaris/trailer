@@ -1096,11 +1096,15 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
 
     @IBAction private func allPrsPolicySelected(_ sender: NSPopUpButton) {
         let index = sender.indexOfSelectedItem - 1
-        if index < 0 { return }
+        if index < 0 {
+            return
+        }
 
         for r in affectedReposFromSelection {
             r.displayPolicyForPrs = index
-            if index != RepoDisplayPolicy.hide.rawValue { r.resetSyncState() }
+            if index != RepoDisplayPolicy.hide.rawValue {
+                r.resetSyncState()
+            }
         }
         reloadRepositories()
         sender.selectItem(at: 0)
@@ -1109,11 +1113,15 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
 
     @IBAction private func allIssuesPolicySelected(_ sender: NSPopUpButton) {
         let index = sender.indexOfSelectedItem - 1
-        if index < 0 { return }
+        if index < 0 {
+            return
+        }
 
         for r in affectedReposFromSelection {
             r.displayPolicyForIssues = index
-            if index != RepoDisplayPolicy.hide.rawValue { r.resetSyncState() }
+            if index != RepoDisplayPolicy.hide.rawValue {
+                r.resetSyncState()
+            }
         }
         reloadRepositories()
         sender.selectItem(at: 0)
@@ -1122,7 +1130,9 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
 
     @IBAction private func allHidingPolicySelected(_ sender: NSPopUpButton) {
         let index = sender.indexOfSelectedItem - 1
-        if index < 0 { return }
+        if index < 0 {
+            return
+        }
 
         for r in affectedReposFromSelection {
             r.itemHidingPolicy = index

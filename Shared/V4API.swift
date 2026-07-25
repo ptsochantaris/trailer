@@ -34,11 +34,21 @@ extension API {
 
         var toString: String {
             var ret = [String]()
-            if contains(.reactions) { ret.append("Reactions") }
-            if contains(.reviews) { ret.append("Reviews") }
-            if contains(.comments) { ret.append("Comments") }
-            if contains(.reviewRequests) { ret.append("Requests") }
-            if contains(.statuses) { ret.append("Statuses") }
+            if contains(.reactions) {
+                ret.append("Reactions")
+            }
+            if contains(.reviews) {
+                ret.append("Reviews")
+            }
+            if contains(.comments) {
+                ret.append("Comments")
+            }
+            if contains(.reviewRequests) {
+                ret.append("Requests")
+            }
+            if contains(.statuses) {
+                ret.append("Statuses")
+            }
             return ret.joined(separator: ", ")
         }
     }

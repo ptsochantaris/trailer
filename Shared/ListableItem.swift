@@ -983,7 +983,7 @@ nonisolated class ListableItem: DataItem, Listable {
         #endif
     }
 
-    class func badgeCount(from fetch: NSFetchRequest<some ListableItem>, in moc: NSManagedObjectContext) -> Int {
+    class func badgeCount(from fetch: NSFetchRequest<some ListableItem>, in moc: NSManagedObjectContext, settings _: Settings.Cache) -> Int {
         var badgeCount = 0
         fetch.returnsObjectsAsFaults = false
         for i in try! moc.fetch(fetch) {
@@ -1152,16 +1152,34 @@ nonisolated class ListableItem: DataItem, Listable {
                     }
                 }
 
-                if settings.includeTitlesInFilter { appendPredicate(format: filterTitlePredicate, numeric: false) }
-                if settings.includeReposInFilter { appendPredicate(format: filterRepoPredicate, numeric: false) }
-                if settings.includeServersInFilter { appendPredicate(format: filterServerPredicate, numeric: false) }
-                if settings.includeUsersInFilter { appendPredicate(format: filterUserPredicate, numeric: false) }
-                if settings.includeNumbersInFilter { appendPredicate(format: filterNumberPredicate, numeric: true) }
-                if settings.includeMilestonesInFilter { appendPredicate(format: filterMilestonePredicate, numeric: false) }
-                if settings.includeAssigneeNamesInFilter { appendPredicate(format: filterAssigneePredicate, numeric: false) }
-                if settings.includeLabelsInFilter { appendPredicate(format: filterLabelPredicate, numeric: false) }
+                if settings.includeTitlesInFilter {
+                    appendPredicate(format: filterTitlePredicate, numeric: false)
+                }
+                if settings.includeReposInFilter {
+                    appendPredicate(format: filterRepoPredicate, numeric: false)
+                }
+                if settings.includeServersInFilter {
+                    appendPredicate(format: filterServerPredicate, numeric: false)
+                }
+                if settings.includeUsersInFilter {
+                    appendPredicate(format: filterUserPredicate, numeric: false)
+                }
+                if settings.includeNumbersInFilter {
+                    appendPredicate(format: filterNumberPredicate, numeric: true)
+                }
+                if settings.includeMilestonesInFilter {
+                    appendPredicate(format: filterMilestonePredicate, numeric: false)
+                }
+                if settings.includeAssigneeNamesInFilter {
+                    appendPredicate(format: filterAssigneePredicate, numeric: false)
+                }
+                if settings.includeLabelsInFilter {
+                    appendPredicate(format: filterLabelPredicate, numeric: false)
+                }
                 if itemType == PullRequest.self,
-                   settings.includeStatusesInFilter { appendPredicate(format: filterStatusPredicate, numeric: false) }
+                   settings.includeStatusesInFilter {
+                    appendPredicate(format: filterStatusPredicate, numeric: false)
+                }
 
                 if negative {
                     andPredicates.append(NSCompoundPredicate(andPredicateWithSubpredicates: Array(predicates)))

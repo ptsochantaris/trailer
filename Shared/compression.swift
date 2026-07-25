@@ -33,7 +33,9 @@ extension Data {
 
             var stream = streamPtr.pointee
             let status = compression_stream_init(&stream, params.operation, COMPRESSION_LZFSE)
-            if status == COMPRESSION_STATUS_ERROR { return nil }
+            if status == COMPRESSION_STATUS_ERROR {
+                return nil
+            }
             defer {
                 compression_stream_destroy(&stream)
             }

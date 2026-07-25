@@ -139,7 +139,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         systemSleeping = false
         Task {
             try? await Task.sleep(nanoseconds: 2 * NSEC_PER_SEC)
-            await themeCheck()
+            themeCheck()
             await startRefreshIfItIsDue()
         }
     }
@@ -723,7 +723,9 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                     if incomingEvent.modifierFlags.contains(.shift) {
                         return incomingEvent
                     }
-                    if app.isManuallyScrolling, w.table.selectedRow == -1 { return nil }
+                    if app.isManuallyScrolling, w.table.selectedRow == -1 {
+                        return nil
+                    }
                     var i = w.table.selectedRow + 1
                     if i < w.table.numberOfRows {
                         while w.dataSource.itemAtRow(i) == nil {
@@ -743,7 +745,9 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
                     if incomingEvent.modifierFlags.contains(.shift) {
                         return incomingEvent
                     }
-                    if app.isManuallyScrolling, w.table.selectedRow == -1 { return nil }
+                    if app.isManuallyScrolling, w.table.selectedRow == -1 {
+                        return nil
+                    }
                     var i = w.table.selectedRow - 1
                     if i > 0, w.table.numberOfRows > 0 {
                         while w.dataSource.itemAtRow(i) == nil {
@@ -879,16 +883,32 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
         var check = 0
 
         let cmdPressed = incomingEvent.modifierFlags.contains(.command)
-        if Settings.hotkeyCommandModifier { check += cmdPressed ? 1 : -1 } else { check += cmdPressed ? -1 : 1 }
+        if Settings.hotkeyCommandModifier {
+            check += cmdPressed ? 1 : -1
+        } else {
+            check += cmdPressed ? -1 : 1
+        }
 
         let ctrlPressed = incomingEvent.modifierFlags.contains(.control)
-        if Settings.hotkeyControlModifier { check += ctrlPressed ? 1 : -1 } else { check += ctrlPressed ? -1 : 1 }
+        if Settings.hotkeyControlModifier {
+            check += ctrlPressed ? 1 : -1
+        } else {
+            check += ctrlPressed ? -1 : 1
+        }
 
         let altPressed = incomingEvent.modifierFlags.contains(.option)
-        if Settings.hotkeyOptionModifier { check += altPressed ? 1 : -1 } else { check += altPressed ? -1 : 1 }
+        if Settings.hotkeyOptionModifier {
+            check += altPressed ? 1 : -1
+        } else {
+            check += altPressed ? -1 : 1
+        }
 
         let shiftPressed = incomingEvent.modifierFlags.contains(.shift)
-        if Settings.hotkeyShiftModifier { check += shiftPressed ? 1 : -1 } else { check += shiftPressed ? -1 : 1 }
+        if Settings.hotkeyShiftModifier {
+            check += shiftPressed ? 1 : -1
+        } else {
+            check += shiftPressed ? -1 : 1
+        }
 
         let keyMap = [
             "A": 0, "B": 11, "C": 8, "D": 2, "E": 14, "F": 3, "G": 5, "H": 4, "I": 34, "J": 38,
@@ -1001,8 +1021,12 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 
     var visibleWindow: MenuWindow? {
         for d in menuBarSets {
-            if d.prMenu.isVisible { return d.prMenu }
-            if d.issuesMenu.isVisible { return d.issuesMenu }
+            if d.prMenu.isVisible {
+                return d.prMenu
+            }
+            if d.issuesMenu.isVisible {
+                return d.issuesMenu
+            }
         }
         return nil
     }

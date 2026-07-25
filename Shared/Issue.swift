@@ -6,7 +6,7 @@ import TrailerQL
 #endif
 import TrailerJson
 
-nonisolated final class Issue: ListableItem {
+final nonisolated class Issue: ListableItem {
     @NSManaged var closedByPullRequests: Set<PullRequest>
 
     override static var typeName: String {
@@ -92,13 +92,13 @@ nonisolated final class Issue: ListableItem {
         let f = NSFetchRequest<Issue>(entityName: "Issue")
         f.includesSubentities = false
         f.predicate = NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, includeInUnreadPredicate(settings: settings)])
-        return badgeCount(from: f, in: moc)
+        return badgeCount(from: f, in: moc, settings: settings)
     }
 
     @MainActor
     static func badgeCount(in moc: NSManagedObjectContext, criterion: GroupingCriterion?, settings: Settings.Cache) -> Int {
         let f = requestForItems(of: Issue.self, withFilter: nil, sectionIndex: -1, criterion: criterion, settings: settings)
-        return badgeCount(from: f, in: moc)
+        return badgeCount(from: f, in: moc, settings: settings)
     }
 
     @MainActor

@@ -4,7 +4,7 @@ import Lista
 import TrailerJson
 import TrailerQL
 
-nonisolated final class PRComment: DataItem {
+final nonisolated class PRComment: DataItem {
     @NSManaged var avatarUrl: String?
     @NSManaged var body: String?
     @NSManaged var userNodeId: String?

@@ -29,9 +29,15 @@ final class Application: NSApplication {
             if modifiers == .command {
                 if let char = event.charactersIgnoringModifiers {
                     switch char {
-                    case "x": if sendAction(#selector(NSTextField.trailerCut), to: nil, from: self) { return }
-                    case "v": if sendAction(#selector(NSTextField.trailerPaste), to: nil, from: self) { return }
-                    case "z": if sendAction(#selector(NSTextField.trailerUndo), to: nil, from: self) { return }
+                    case "x": if sendAction(#selector(NSTextField.trailerCut), to: nil, from: self) {
+                            return
+                        }
+                    case "v": if sendAction(#selector(NSTextField.trailerPaste), to: nil, from: self) {
+                            return
+                        }
+                    case "z": if sendAction(#selector(NSTextField.trailerUndo), to: nil, from: self) {
+                            return
+                        }
                     case "c":
                         if let url = app.focusedItem(blink: true)?.webUrl {
                             let p = NSPasteboard.general
@@ -40,7 +46,9 @@ final class Application: NSApplication {
                             return
 
                         } else {
-                            if sendAction(#selector(NSTextField.trailerCopy), to: nil, from: self) { return }
+                            if sendAction(#selector(NSTextField.trailerCopy), to: nil, from: self) {
+                                return
+                            }
                         }
                     case "a":
                         if let i = app.focusedItem(blink: true) {
@@ -63,7 +71,9 @@ final class Application: NSApplication {
                 }
             } else if modifiers == [.command, .shift] {
                 if let char = event.charactersIgnoringModifiers {
-                    if char == "Z", sendAction(#selector(NSTextField.trailerRedo), to: nil, from: self) { return }
+                    if char == "Z", sendAction(#selector(NSTextField.trailerRedo), to: nil, from: self) {
+                        return
+                    }
                 }
             } else if modifiers == [.command, .option] {
                 if let char = event.charactersIgnoringModifiers {

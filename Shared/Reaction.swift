@@ -3,7 +3,7 @@ import Lista
 import TrailerJson
 import TrailerQL
 
-nonisolated final class Reaction: DataItem {
+final nonisolated class Reaction: DataItem {
     @NSManaged var content: String?
     @NSManaged var userName: String?
     @NSManaged var avatarUrl: String?

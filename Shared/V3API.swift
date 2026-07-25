@@ -44,7 +44,7 @@ extension API {
                             await PullRequest.syncPullRequests(from: data, in: r, moc: moc)
                             return false
                         }
-                        await handleRepoSync(for: r, result: result)
+                        handleRepoSync(for: r, result: result)
                     }
                 }
 
@@ -55,7 +55,7 @@ extension API {
                             await Issue.syncIssues(from: data, in: r, moc: moc)
                             return false
                         }
-                        await handleRepoSync(for: r, result: result)
+                        handleRepoSync(for: r, result: result)
                     }
                 }
             }
@@ -200,7 +200,7 @@ extension API {
 
                 commentGroup.addTask { @MainActor in
                     await fetchCommentsForCurrentIssues(to: moc, for: newOrUpdatedIssues)
-                    await checkIssueClosures(in: moc)
+                    checkIssueClosures(in: moc)
                 }
             }
 

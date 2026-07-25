@@ -79,7 +79,11 @@ final class TrailerCell: NSTableCellView {
         var W = MENU_WIDTH - LEFTPADDING - app.scrollBarWidth
 
         let showUnpin = item.condition != ItemCondition.open.rawValue
-        if showUnpin { W -= REMOVE_BUTTON_WIDTH } else { W -= 4 }
+        if showUnpin {
+            W -= REMOVE_BUTTON_WIDTH
+        } else {
+            W -= 4
+        }
 
         let showAvatar = !settings.hideAvatars
         let shift: CGFloat = showAvatar ? AVATAR_SIZE + AVATAR_PADDING : -4
@@ -90,7 +94,9 @@ final class TrailerCell: NSTableCellView {
 
         func append(_ field: NSControl) {
             let a = field.attributedStringValue
-            if a.length == 0 { return }
+            if a.length == 0 {
+                return
+            }
             let height = a.boundingRect(with: widthLimit, options: stringDrawingOptions).integral.height + 2
             field.frame = CGRect(x: LEFTPADDING + shift, y: y, width: W, height: height)
             addSubview(field)
@@ -195,7 +201,9 @@ final class TrailerCell: NSTableCellView {
     }
 
     override func mouseEntered(with _: NSEvent?) {
-        if !app.isManuallyScrolling { selected = true }
+        if !app.isManuallyScrolling {
+            selected = true
+        }
     }
 
     override func mouseExited(with _: NSEvent?) {
@@ -453,7 +461,9 @@ final class TrailerCell: NSTableCellView {
         countView = cv
         cv.vibrant = false
         cv.attributedStringValue = countString
-        if faded { cv.alphaValue = DISABLED_FADE }
+        if faded {
+            cv.alphaValue = DISABLED_FADE
+        }
         c.addSubview(cv)
         addSubview(c)
 
@@ -477,7 +487,9 @@ final class TrailerCell: NSTableCellView {
             let alertCount = CenterTextField(frame: cc.bounds)
             alertCount.vibrant = false
             alertCount.attributedStringValue = alertString
-            if faded { alertCount.alphaValue = DISABLED_FADE }
+            if faded {
+                alertCount.alphaValue = DISABLED_FADE
+            }
             cc.addSubview(alertCount)
             addSubview(cc)
 

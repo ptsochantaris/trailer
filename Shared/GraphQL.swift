@@ -5,7 +5,7 @@ import Semalot
 import TrailerJson
 import TrailerQL
 
-nonisolated final class NodeProcessingFlags {
+final nonisolated class NodeProcessingFlags {
     var creationSkipped = Set<ObjectIdentifier>()
     var created = Set<ObjectIdentifier>()
     var updated = Set<ObjectIdentifier>()
@@ -665,7 +665,7 @@ enum GraphQL {
                     }
                     group.addTask { @MainActor in
                         if let nodes = await fetchAllAuthoredItems(from: server, label: "Issues", fields: { g }) {
-                            await checkAuthoredIssueClosures(nodes: nodes, in: server)
+                            checkAuthoredIssueClosures(nodes: nodes, in: server)
                         }
                     }
                 } else {
@@ -1001,7 +1001,9 @@ enum GraphQL {
         }
 
         private func flush() {
-            if nodes.isEmpty { return }
+            if nodes.isEmpty {
+                return
+            }
 
             // Order must be fixed, since labels may refer to PRs or Issues, ensure they are created first
 

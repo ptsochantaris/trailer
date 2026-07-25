@@ -2,7 +2,7 @@ import CoreData
 import Lista
 import TrailerQL
 
-nonisolated final class ApiServer: NSManagedObject {
+final nonisolated class ApiServer: NSManagedObject {
     @NSManaged var apiPath: String?
     @NSManaged var graphQLPath: String?
     @NSManaged var label: String?

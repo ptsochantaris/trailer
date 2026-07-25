@@ -359,7 +359,9 @@ enum API {
             }
         }
 
-        if Settings.hideArchivedRepos { Repo.hideArchivedRepos(in: moc) }
+        if Settings.hideArchivedRepos {
+            Repo.hideArchivedRepos(in: moc)
+        }
         for r in Repo.newItems(in: moc) where r.shouldSync {
             NotificationQueue.add(type: .newRepoAnnouncement, for: r)
         }

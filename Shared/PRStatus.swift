@@ -4,7 +4,7 @@ import Lista
 import TrailerJson
 import TrailerQL
 
-nonisolated final class PRStatus: DataItem {
+final nonisolated class PRStatus: DataItem {
     @NSManaged var descriptionText: String?
     @NSManaged var state: String?
     @NSManaged var context: String?

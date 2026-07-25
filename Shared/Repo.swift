@@ -3,7 +3,7 @@ import Lista
 import TrailerJson
 import TrailerQL
 
-nonisolated final class Repo: DataItem {
+final nonisolated class Repo: DataItem {
     @NSManaged var fork: Bool
     @NSManaged var fullName: String?
     @NSManaged var groupLabel: String?

@@ -1,7 +1,7 @@
 import CoreData
 import TrailerJson
 
-nonisolated final class Team: DataItem {
+final nonisolated class Team: DataItem {
     @NSManaged var slug: String?
     @NSManaged var organisationLogin: String?
     @NSManaged var calculatedReferral: String?
