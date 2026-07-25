@@ -948,7 +948,7 @@ enum GraphQL {
         }
     }
 
-    private final class NodeScanner: Sendable {
+    private nonisolated final class NodeScanner: Sendable {
         private let scannerMoc: NSManagedObjectContext
         private let parentType: DataItem.Type?
 

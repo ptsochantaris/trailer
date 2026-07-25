@@ -824,6 +824,9 @@ nonisolated class ListableItem: DataItem, Listable {
         return res
     }
 
+    // Presentation: takes UI types and builds an attributed string for display.
+    // Main-actor isolated so it can use the (main-actor) asset-catalog colours.
+    @MainActor
     final func title(with font: FONT_CLASS, labelFont: FONT_CLASS, titleColor: COLOR_CLASS, numberColor: COLOR_CLASS, settings: Settings.Cache) -> NSMutableAttributedString {
         let _title = NSMutableAttributedString()
         guard let title else {

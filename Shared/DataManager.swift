@@ -4,7 +4,7 @@ import Lista
 import Maintini
 import TrailerQL
 
-extension NSManagedObjectContext {
+nonisolated extension NSManagedObjectContext {
     func buildChildContext() -> NSManagedObjectContext {
         let child = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         child.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)

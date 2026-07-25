@@ -2,7 +2,7 @@ import CommonCrypto
 import CoreData
 import TrailerJson
 
-extension String {
+nonisolated extension String {
     private func sha1() -> Data {
         utf8CString.withUnsafeBytes { bytes -> Data in
             let len = Int(CC_SHA1_DIGEST_LENGTH)

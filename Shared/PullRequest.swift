@@ -490,6 +490,9 @@ final nonisolated class PullRequest: ListableItem {
                 || shouldGo(to: .mentioned, settings: settings))
     }
 
+    // Presentation: takes UI types and builds an attributed string for display.
+    // Main-actor isolated so it can use the (main-actor) asset-catalog colours.
+    @MainActor
     func linesAttributedString(labelFont: FONT_CLASS) -> NSAttributedString? {
         let added = linesAdded
         let removed = linesRemoved
@@ -547,6 +550,9 @@ final nonisolated class PullRequest: ListableItem {
         return nil
     }
 
+    // Presentation: takes UI types and builds an attributed string for display.
+    // Main-actor isolated so it can use the (main-actor) asset-catalog colours.
+    @MainActor
     func reviewsAttributedString(labelFont: FONT_CLASS, settings: Settings.Cache) -> NSAttributedString? {
         if !settings.displayReviewsOnItems {
             return nil
