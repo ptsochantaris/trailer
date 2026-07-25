@@ -1,19 +1,13 @@
 import Foundation
 import TrailerJson
 
-@globalActor
-public enum RestActor {
-    public final actor ActorType {}
-    public static let shared = ActorType()
-}
-
-@RestActor
+// Main-actor isolated by default. This type holds no state of its own, so it previously
+// sat on a private global actor that protected nothing — while forcing every ApiServer
+// managed object to cross an actor boundary to reach it. The objects belong to a
+// main-queue context, so orchestrating from the main actor is what makes the property
+// reads in `start(call:on:...)` correct. Nothing here blocks the main thread: awaiting
+// HTTP.getJsonData suspends, and the request itself runs on URLSession's own threads.
 enum RestAccess {
-    private struct UrlBackOffEntry {
-        var nextAttemptAt: Date
-        var nextIncrement: TimeInterval
-    }
-
     static func getPagedData(at path: String, from server: ApiServer, startingFrom page: Int = 1, perPage: @MainActor @escaping ([TypedJson.Entry]?, Bool) async -> Bool) async -> DataResult {
         if path.isEmpty {
             // handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process

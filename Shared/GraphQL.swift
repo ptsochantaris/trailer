@@ -363,7 +363,7 @@ enum GraphQL {
     static func runQueries(queries: Lista<Query>, on path: String, token: String, newStats: @escaping (ApiStats) -> Void) async throws {
         try await withThrowingTaskGroup { group in
             for query in queries {
-                group.addTask {
+                group.addTask { @MainActor in
                     do {
                         try await run(query, for: path, authToken: token, expectedNodeCost: query.nodeCost, newStats: newStats)
                     } catch _ as CancellationError {
@@ -644,7 +644,7 @@ enum GraphQL {
                     let g = Group("pullRequests", ("states", "[OPEN]"), paging: settings.syncProfile.mediumPageSize) {
                         prFragment(includeRepo: true, settings: settings)
                     }
-                    group.addTask {
+                    group.addTask { @MainActor in
                         if let nodes = await fetchAllAuthoredItems(from: server, label: "PRs", fields: { g }) {
                             await checkAuthoredPrClosures(nodes: nodes, in: server, settings: settings)
                         }
@@ -663,7 +663,7 @@ enum GraphQL {
                     let g = Group("issues", ("states", "[OPEN]"), paging: .max) {
                         issueFragment(includeRepo: true, settings: settings)
                     }
-                    group.addTask {
+                    group.addTask { @MainActor in
                         if let nodes = await fetchAllAuthoredItems(from: server, label: "Issues", fields: { g }) {
                             await checkAuthoredIssueClosures(nodes: nodes, in: server)
                         }

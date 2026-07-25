@@ -192,7 +192,7 @@ enum API {
             try await withThrowingTaskGroup { group in
                 for server in goodToGoServers {
                     for type in types {
-                        group.addTask {
+                        group.addTask { @MainActor in
                             try await GraphQL.migrateV4Ids(for: type, in: server)
                         }
                     }
@@ -347,13 +347,13 @@ enum API {
 
         await withTaskGroup { group in
             for apiServer in goodToGoServers {
-                group.addTask {
+                group.addTask { @MainActor in
                     await syncWatchedRepos(from: apiServer, moc: moc)
                 }
-                group.addTask {
+                group.addTask { @MainActor in
                     await syncManuallyAddedRepos(from: apiServer, moc: moc)
                 }
-                group.addTask {
+                group.addTask { @MainActor in
                     await fetchUserTeams(from: apiServer, moc: moc)
                 }
             }

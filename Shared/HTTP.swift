@@ -18,13 +18,12 @@ enum DataResult {
     }
 }
 
-@globalActor
-public enum HTTPActor {
-    public final actor ActorType {}
-    public static let shared = ActorType()
-}
-
-@HTTPActor
+// Main-actor isolated by default. This type owns no mutable state — `gateKeeper` and
+// `urlSession` are both immutable and Sendable — so a dedicated global actor bought
+// nothing while pushing every caller across an actor boundary. Nothing here blocks: the
+// ticket wait, the URLSession call and the retry sleeps all suspend, releasing the main
+// actor. The one genuinely CPU-bound step, JSON parsing, escapes deliberately via the
+// `@concurrent parse(json:)` call below.
 enum HTTP {
     static let gateKeeper = Semalot(tickets: 8)
 
@@ -67,7 +66,7 @@ enum HTTP {
         }
 
         do {
-            let json = try await Task.detached { try data.asTypedJson() }.value
+            let json = try await parse(json: data)
             return (json, result)
         } catch {
             if retryOnInvalidJson, attempts > 1 {
@@ -80,12 +79,19 @@ enum HTTP {
         }
     }
 
+    // The only CPU-bound work in this type, so it's the only thing that needs to leave the
+    // main actor. `@concurrent` states that explicitly, rather than the blunter Task.detached.
+    @concurrent
+    private static func parse(json data: Data) async throws -> TypedJson.Entry? {
+        try data.asTypedJson()
+    }
+
     static func getData(for request: URLRequest, attempts: Int, logPrefix: String? = nil) async throws -> DataResult {
-        await Maintini.startMaintaining()
+        // Both calls are main-actor and synchronous now that this type is too, so neither
+        // the awaits nor the detour through a Task are needed any more.
+        Maintini.startMaintaining()
         defer {
-            Task {
-                await Maintini.endMaintaining()
-            }
+            Maintini.endMaintaining()
         }
 
         var attempt = attempts

@@ -7,7 +7,9 @@ enum NotificationQueue {
     @MainActor
     private static var queue = Lista<(NotificationType, NSManagedObjectID)>()
 
-    static func add(type: NotificationType, for item: DataItem) {
+    // Called from the (nonisolated) model layer, often on a private-queue context.
+    // Only the item's own objectID crosses to the main actor.
+    nonisolated static func add(type: NotificationType, for item: DataItem) {
         try? item.managedObjectContext?.obtainPermanentIDs(for: [item])
         let oid = item.objectID
         Task { @MainActor in

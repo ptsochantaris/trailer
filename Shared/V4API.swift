@@ -63,13 +63,13 @@ extension API {
         let prTask = Task {
             await withTaskGroup { group in
                 if !servers.isEmpty {
-                    group.addTask {
+                    group.addTask { @MainActor in
                         await GraphQL.fetchAllAuthoredPrs(from: servers, settings: settings)
                         await Logging.shared.log("Fetching authored PRs phase complete")
                     }
                 }
                 if !repos.isEmpty {
-                    group.addTask {
+                    group.addTask { @MainActor in
                         await GraphQL.fetchAllSubscribedPrs(from: repos, settings: settings)
                         await Logging.shared.log("Fetching subscribed PRs phase complete")
                     }
@@ -113,13 +113,13 @@ extension API {
         let issueTask = Task {
             await withTaskGroup { group in
                 if !servers.isEmpty {
-                    group.addTask {
+                    group.addTask { @MainActor in
                         await GraphQL.fetchAllAuthoredIssues(from: servers, settings: settings)
                         await Logging.shared.log("Fetching authored issues phase complete")
                     }
                 }
                 if !repos.isEmpty {
-                    group.addTask {
+                    group.addTask { @MainActor in
                         await GraphQL.fetchAllSubscribedIssues(from: repos, settings: settings)
                         await Logging.shared.log("Fetching subscribed issues phase complete")
                     }

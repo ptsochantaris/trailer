@@ -39,7 +39,7 @@ extension API {
             await withTaskGroup { group in
                 if r.displayPolicyForPrs != RepoDisplayPolicy.hide.rawValue {
                     let repoFullName = r.fullName.orEmpty
-                    group.addTask {
+                    group.addTask { @MainActor in
                         let result = await RestAccess.getPagedData(at: "/repos/\(repoFullName)/pulls", from: apiServer) { data, _ in
                             await PullRequest.syncPullRequests(from: data, in: r, moc: moc)
                             return false
@@ -50,7 +50,7 @@ extension API {
 
                 if r.displayPolicyForIssues != RepoDisplayPolicy.hide.rawValue {
                     let repoFullName = r.fullName.orEmpty
-                    group.addTask {
+                    group.addTask { @MainActor in
                         let result = await RestAccess.getPagedData(at: "/repos/\(repoFullName)/issues", from: apiServer) { data, _ in
                             await Issue.syncIssues(from: data, in: r, moc: moc)
                             return false
@@ -132,7 +132,7 @@ extension API {
 
         await withTaskGroup { group in
             if Settings.showStatusItems {
-                group.addTask {
+                group.addTask { @MainActor in
                     await fetchStatusesForCurrentPullRequests(to: moc, settings: settings)
                 }
             } else {
@@ -157,10 +157,10 @@ extension API {
             }
 
             if Settings.showLabels {
-                group.addTask {
+                group.addTask { @MainActor in
                     await fetchLabelsForCurrentPullRequests(for: newOrUpdatedPrs)
                 }
-                group.addTask {
+                group.addTask { @MainActor in
                     await fetchLabelsForCurrentIssues(for: newOrUpdatedIssues)
                 }
             } else {
@@ -169,23 +169,23 @@ extension API {
                 }
             }
 
-            group.addTask {
+            group.addTask { @MainActor in
                 await checkPrClosures(in: moc)
             }
 
-            group.addTask {
+            group.addTask { @MainActor in
                 await detectAssignedPullRequests(for: newOrUpdatedPrs)
             }
 
             if settings.shouldSyncReviewAssignments {
-                group.addTask {
+                group.addTask { @MainActor in
                     await fetchReviewAssignmentsForCurrentPullRequests(for: newOrUpdatedPrs)
                 }
             }
 
             await withTaskGroup { commentGroup in
                 if settings.shouldSyncReviews {
-                    commentGroup.addTask {
+                    commentGroup.addTask { @MainActor in
                         await fetchReviewsForForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
                         await fetchCommentsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
                     }
@@ -193,19 +193,19 @@ extension API {
                     for r in Review.allItems(in: moc) {
                         r.postSyncAction = PostSyncAction.delete.rawValue
                     }
-                    commentGroup.addTask {
+                    commentGroup.addTask { @MainActor in
                         await fetchCommentsForCurrentPullRequests(to: moc, for: newOrUpdatedPrs)
                     }
                 }
 
-                commentGroup.addTask {
+                commentGroup.addTask { @MainActor in
                     await fetchCommentsForCurrentIssues(to: moc, for: newOrUpdatedIssues)
                     await checkIssueClosures(in: moc)
                 }
             }
 
             if Settings.notifyOnCommentReactions {
-                group.addTask {
+                group.addTask { @MainActor in
                     await fetchCommentReactionsIfNeeded(to: moc)
                 }
             }
@@ -331,10 +331,10 @@ extension API {
         }
 
         await withTaskGroup { group in
-            group.addTask {
+            group.addTask { @MainActor in
                 await _fetchComments(issues: true)
             }
-            group.addTask {
+            group.addTask { @MainActor in
                 await _fetchComments(issues: false)
             }
         }
@@ -444,7 +444,7 @@ extension API {
 
         await withTaskGroup { group in
             for r in prsToCheck {
-                group.addTask {
+                group.addTask { @MainActor in
                     await investigatePrClosure(for: r)
                 }
             }
