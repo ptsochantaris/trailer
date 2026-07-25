@@ -163,7 +163,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 
         ignoreNextFocusLoss = alternativeSelect
 
-        let urlToOpen = item.urlForOpening
+        let urlToOpen = item.urlForOpening(settings: Settings.cache)
         item.catchUpWithComments(settings: Settings.cache)
         Task {
             await updateRelatedMenus(for: item)

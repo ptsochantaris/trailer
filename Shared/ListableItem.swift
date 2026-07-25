@@ -27,7 +27,7 @@ nonisolated extension Listable {
         ]
         let items = try! moc.fetch(f)
             .filter { $0.section.shouldListReactions(settings: settings) }
-            .prefix(Settings.reactionScanningBatchSize)
+            .prefix(settings.reactionScanningBatchSize)
 
         for item in items {
             for comment in item.comments {
@@ -738,8 +738,8 @@ nonisolated class ListableItem: DataItem, Listable {
         return count
     }
 
-    final var urlForOpening: String? {
-        if unreadComments > 0, Settings.openPrAtFirstUnreadComment {
+    final func urlForOpening(settings: Settings.Cache) -> String? {
+        if unreadComments > 0, settings.openPrAtFirstUnreadComment {
             var oldestComment: PRComment?
             for c in othersComments(since: latestReadCommentDate ?? .distantPast) {
                 if let o = oldestComment {
@@ -1325,7 +1325,7 @@ nonisolated class ListableItem: DataItem, Listable {
         let title = title.orEmpty
         let sectionIndex = sectionIndex
         Task {
-            await Logging.shared.log("Detected closed item: \(title), handling policy is \(Settings.closeHandlingPolicy), coming from section \(sectionIndex)")
+            await Logging.shared.log("Detected closed item: \(title), handling policy is \(settings.closeHandlingPolicy), coming from section \(sectionIndex)")
         }
 
         if !isVisibleOnMenu {
@@ -1334,7 +1334,7 @@ nonisolated class ListableItem: DataItem, Listable {
             }
             managedObjectContext?.delete(self)
 
-        } else if shouldKeep(accordingTo: Settings.closeHandlingPolicy, settings: settings) {
+        } else if shouldKeep(accordingTo: settings.closeHandlingPolicy, settings: settings) {
             Task {
                 await Logging.shared.log("Will keep closed item")
             }
@@ -1349,8 +1349,8 @@ nonisolated class ListableItem: DataItem, Listable {
     }
 
     #if os(iOS)
-        var dragItemForUrl: UIDragItem {
-            let url = URL(string: urlForOpening ?? repo.webUrl.orEmpty) ?? URL(string: "https://github.com")!
+        func dragItemForUrl(settings: Settings.Cache) -> UIDragItem {
+            let url = URL(string: urlForOpening(settings: settings) ?? repo.webUrl.orEmpty) ?? URL(string: "https://github.com")!
             let text = "#\(number) - \(title.orEmpty)"
             let provider = NSItemProvider(object: url as NSURL)
             provider.registerObject(text as NSString, visibility: .all)

@@ -37,7 +37,7 @@
 
 #endif
 
-extension NSAttributedString.Key {
+nonisolated extension NSAttributedString.Key {
     static let trailerTagBackgroundColour = NSAttributedString.Key("trailerTagBackgroundColour")
 }
 
@@ -48,10 +48,10 @@ nonisolated(unsafe) var keyVine = KeyVine(appIdentifier: "com.housetrip.Trailer"
 
 @MainActor var preferencesDirty = false
 @MainActor var lastRepoCheck = Date.distantPast
-let autoSnoozeSentinelDate = Date.distantFuture.addingTimeInterval(-1)
-let LISTABLE_URI_KEY = "listableUriKey"
-let COMMENT_ID_KEY = "commentIdKey"
-let NOTIFICATION_URL_KEY = "urlKey"
+nonisolated let autoSnoozeSentinelDate = Date.distantFuture.addingTimeInterval(-1)
+nonisolated let LISTABLE_URI_KEY = "listableUriKey"
+nonisolated let COMMENT_ID_KEY = "commentIdKey"
+nonisolated let NOTIFICATION_URL_KEY = "urlKey"
 
 extension NSAttributedString: @retroactive @unchecked Sendable {}
 
@@ -73,7 +73,7 @@ extension NSAttributedString: @retroactive @unchecked Sendable {}
 
 #endif
 
-let emptyAttributedString = NSAttributedString()
+nonisolated let emptyAttributedString = NSAttributedString()
 
 @MainActor
 func bootUp() {
@@ -315,9 +315,9 @@ nonisolated struct ApiStats {
     }
 }
 
-let currentAppVersion: String = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String).orEmpty
+nonisolated let currentAppVersion: String = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String).orEmpty
 
-let versionString: String = {
+nonisolated let versionString: String = {
     let buildNumber = (Bundle.main.infoDictionary?["CFBundleVersion"] as? String).orEmpty
     return "Version \(currentAppVersion) (\(buildNumber))"
 }()

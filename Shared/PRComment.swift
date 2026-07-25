@@ -113,7 +113,7 @@ nonisolated final class PRComment: DataItem {
             parent.wakeUp(settings: settings)
         }
 
-        if Settings.disableAllCommentNotifications {
+        if settings.disableAllCommentNotifications {
             return
         }
 

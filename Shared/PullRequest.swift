@@ -409,7 +409,7 @@ nonisolated final class PullRequest: ListableItem {
         ]
         let prs = try! moc.fetch(f)
             .filter { $0.section.shouldCheckStatuses(settings: settings) }
-            .prefix(Settings.statusItemRefreshBatchSize)
+            .prefix(settings.statusItemRefreshBatchSize)
 
         for pr in prs {
             for status in pr.statuses {
@@ -548,7 +548,7 @@ nonisolated final class PullRequest: ListableItem {
     }
 
     func reviewsAttributedString(labelFont: FONT_CLASS, settings: Settings.Cache) -> NSAttributedString? {
-        if !Settings.displayReviewsOnItems {
+        if !settings.displayReviewsOnItems {
             return nil
         }
 
@@ -649,7 +649,7 @@ nonisolated final class PullRequest: ListableItem {
         let t = title.orEmpty
         let s = sectionIndex
         Task {
-            await Logging.shared.log("Detected merged PR: \(t) by user \(byUserId.orEmpty), local user id is: \(myUserId.orEmpty), handling policy is \(Settings.mergeHandlingPolicy), coming from section \(s)")
+            await Logging.shared.log("Detected merged PR: \(t) by user \(byUserId.orEmpty), local user id is: \(myUserId.orEmpty), handling policy is \(settings.mergeHandlingPolicy), coming from section \(s)")
         }
 
         if !isVisibleOnMenu {
@@ -658,13 +658,13 @@ nonisolated final class PullRequest: ListableItem {
             }
             managedObjectContext?.delete(self)
 
-        } else if byUserId == myUserId, Settings.dontKeepPrsMergedByMe {
+        } else if byUserId == myUserId, settings.dontKeepPrsMergedByMe {
             Task {
                 await Logging.shared.log("Will not keep PR merged by me")
             }
             managedObjectContext?.delete(self)
 
-        } else if shouldKeep(accordingTo: Settings.mergeHandlingPolicy, settings: settings) {
+        } else if shouldKeep(accordingTo: settings.mergeHandlingPolicy, settings: settings) {
             Task {
                 await Logging.shared.log("Will keep merged PR")
             }

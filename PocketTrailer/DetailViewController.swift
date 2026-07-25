@@ -233,14 +233,14 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
 
     func tableView(_: UITableView, itemsForBeginning _: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
         if let p = fetchedResultsController?.object(at: indexPath) {
-            return [p.dragItemForUrl]
+            return [p.dragItemForUrl(settings: Settings.cache)]
         }
         return []
     }
 
     func tableView(_: UITableView, itemsForAddingTo session: UIDragSession, at indexPath: IndexPath, point _: CGPoint) -> [UIDragItem] {
         let p = fetchedResultsController?.object(at: indexPath)
-        if let dragItem = p?.dragItemForUrl {
+        if let dragItem = p?.dragItemForUrl(settings: Settings.cache) {
             return session.items.contains(dragItem) ? [] : [dragItem]
         }
         return []
@@ -683,7 +683,7 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
             becomeFirstResponder()
         }
 
-        if let p = fetchedResultsController?.object(at: indexPath), let u = p.urlForOpening, let url = URL(string: u) {
+        if let p = fetchedResultsController?.object(at: indexPath), let u = p.urlForOpening(settings: Settings.cache), let url = URL(string: u) {
             showDetail(url: url, objectId: p.objectID)
         }
 
@@ -813,7 +813,7 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
     override func tableView(_: UITableView, willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration, animator: UIContextMenuInteractionCommitAnimating) {
         animator.preferredCommitStyle = .dismiss
         animator.addCompletion {
-            if let id = configuration.identifier as? NSManagedObjectID, let item = try? DataManager.main.existingObject(with: id) as? ListableItem, let urlString = item.urlForOpening, let url = URL(string: urlString) {
+            if let id = configuration.identifier as? NSManagedObjectID, let item = try? DataManager.main.existingObject(with: id) as? ListableItem, let urlString = item.urlForOpening(settings: Settings.cache), let url = URL(string: urlString) {
                 item.catchUpWithComments(settings: Settings.cache)
                 UIApplication.shared.open(url, options: [:])
             }

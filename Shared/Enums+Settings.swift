@@ -1,6 +1,6 @@
 import Foundation
 
-extension Section {
+nonisolated extension Section {
     func shouldBadgeComments(settings: Settings.Cache) -> Bool {
         switch self {
         case .all:

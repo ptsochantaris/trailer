@@ -6,7 +6,7 @@
 #endif
 import PopTimer
 
-enum MigrationStatus: Int {
+nonisolated enum MigrationStatus: Int {
     case pending, inProgress, done, failedPending, failedAnnounced
 
     var needed: Bool {
@@ -28,7 +28,7 @@ enum MigrationStatus: Int {
     }
 }
 
-enum InclusionSetting: Int {
+nonisolated enum InclusionSetting: Int {
     case excludeIfAny, includeIfAny, excludeIfAll, includeIfAll
 
     func shouldContributeToCount(isMine: Bool, userName: String?, createdAt: Date?, since: Date, settings: Settings.Cache) -> Bool {
@@ -143,6 +143,18 @@ enum Settings {
         let makeStatusItemsSelectable = Settings.makeStatusItemsSelectable
         let hideAvatars = Settings.hideAvatars
         let showLabels = Settings.showLabels
+
+        // These were previously read live from the global Settings by code that already had
+        // this snapshot in scope, so a settings change mid-sync could make a sync behave
+        // inconsistently with the snapshot it started from.
+        let reactionScanningBatchSize = Settings.reactionScanningBatchSize
+        let statusItemRefreshBatchSize = Settings.statusItemRefreshBatchSize
+        let openPrAtFirstUnreadComment = Settings.openPrAtFirstUnreadComment
+        let closeHandlingPolicy = Settings.closeHandlingPolicy
+        let mergeHandlingPolicy = Settings.mergeHandlingPolicy
+        let dontKeepPrsMergedByMe = Settings.dontKeepPrsMergedByMe
+        let disableAllCommentNotifications = Settings.disableAllCommentNotifications
+        let displayReviewsOnItems = Settings.displayReviewsOnItems
 
         let requiresReviewApis: Bool
         let shouldSyncReactions: Bool
