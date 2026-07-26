@@ -168,14 +168,20 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
                 NotificationQueue.commit()
             }
 
-            guard let self else { return }
+            // Global state, so it must be reset even if this view controller was dismissed while the
+            // refresh was in flight. These used to sit below the `guard let self`, which meant
+            // navigating away mid-refresh left `API.isRefreshing` true forever — and since
+            // `startRefresh()` returns `.alreadyRefreshing` whenever it is set, that silently blocked
+            // every subsequent sync until the app was relaunched.
             preferencesDirty = true
+            API.isRefreshing = false
+
+            guard let self else { return }
             navigationItem.title = originalName
             actionsButton.isEnabled = ApiServer.someServersHaveAuthTokens(in: DataManager.main)
             tableView.alpha = 1.0
             tableView.isUserInteractionEnabled = true
             navigationItem.rightBarButtonItem?.isEnabled = true
-            API.isRefreshing = false
         }
     }
 
