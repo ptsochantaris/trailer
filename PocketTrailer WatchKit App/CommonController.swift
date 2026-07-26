@@ -66,14 +66,14 @@ class CommonController: WKInterfaceController {
                 }
                 update(from: response)
             }
-        } errorHandler: { error in
-            Task { @MainActor [weak self] in
+        } errorHandler: { [weak self] error in
+            Task { @MainActor in
                 guard let self else { return }
-                if loading == 5 {
-                    loadingFailed(with: error)
+                if self.loading == 5 {
+                    self.loadingFailed(with: error)
                 } else {
                     try? await Task.sleep(nanoseconds: 300 * NSEC_PER_MSEC)
-                    attempt(request: request)
+                    self.attempt(request: request)
                 }
             }
         }

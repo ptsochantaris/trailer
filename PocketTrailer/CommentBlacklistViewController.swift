@@ -106,24 +106,24 @@ final class CommentBlacklistViewController: UITableViewController {
             textField.placeholder = self.mode.placeholder
         }
         a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-        a.addAction(UIAlertAction(title: "Block", style: .default) { _ in
+        a.addAction(UIAlertAction(title: "Block", style: .default) { [weak self] _ in
             guard let tf = a.textFields?.first, let n = tf.text?.trim else {
                 return
             }
 
             let name = n.hasPrefix("@") ? String(n.dropFirst()) : n
 
-            Task { @MainActor [weak self] in
+            Task { @MainActor in
                 guard let self else { return }
-                var blackList = getBlacklist()
+                var blackList = self.getBlacklist()
                 if !name.isEmpty, !blackList.contains(name) {
                     blackList.append(name)
-                    storeBlacklist(blackList)
+                    self.storeBlacklist(blackList)
                     let ip = IndexPath(row: blackList.count - 1, section: 0)
                     if blackList.count == 1 { // first insert
-                        tableView.insertSections(IndexSet(integer: 0), with: .fade)
+                        self.tableView.insertSections(IndexSet(integer: 0), with: .fade)
                     } else {
-                        tableView.insertRows(at: [ip], with: .fade)
+                        self.tableView.insertRows(at: [ip], with: .fade)
                     }
                 }
             }

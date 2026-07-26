@@ -367,12 +367,38 @@ enum Settings {
     #if os(macOS)
         static var isAppLoginItem: Bool {
             get {
+                // Deliberately still the stored preference rather than `service.status`. A login item
+                // registered the old way does not necessarily report `.enabled` through SMAppService,
+                // so reading the live status would make the checkbox appear to switch itself off for
+                // anyone upgrading.
                 Settings["launchAtLogin"] as? Bool ?? false
             }
             set {
                 Settings["launchAtLogin"] = newValue
                 Task { @MainActor in
-                    SMLoginItemSetEnabled(LauncherCommon.helperAppId as CFString, newValue)
+                    setLoginItemRegistered(newValue)
+                }
+            }
+        }
+
+        /// `SMLoginItemSetEnabled` has been deprecated since macOS 13. The helper is embedded in
+        /// `Contents/Library/LoginItems`, which is exactly what `SMAppService.loginItem(identifier:)`
+        /// expects, so the identifier is unchanged.
+        @MainActor
+        private static func setLoginItemRegistered(_ registered: Bool) {
+            let service = SMAppService.loginItem(identifier: LauncherCommon.helperAppId)
+            do {
+                if registered {
+                    if service.status != .enabled {
+                        try service.register()
+                    }
+                } else if service.status == .enabled {
+                    try service.unregister()
+                }
+            } catch {
+                let description = error.localizedDescription
+                Task {
+                    await Logging.shared.log("Could not \(registered ? "register" : "unregister") the login item helper: \(description)")
                 }
             }
         }

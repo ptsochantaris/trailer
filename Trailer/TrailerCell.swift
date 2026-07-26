@@ -512,7 +512,11 @@ final class TrailerCell: NSTableCellView {
         case .dark:
             color = on ? .black : NSColor(red: 0.94, green: 0.94, blue: 0.94, alpha: 1.0)
             newBackground?.backgroundColor = NSColor(red: 1.0, green: 0.1, blue: 0.1, alpha: 1.0)
-            c.backgroundColor = on ? NSColor.white.withAlphaComponent(DISABLED_FADE) : NSColor.controlShadowColor
+            // `controlShadowColor` was deprecated in macOS 11 — it named the inner border of a
+            // skeuomorphic control bezel, so using it as a flat fill was already off-label.
+            // `separatorColor` is Apple's suggested replacement and is the closest subtle-grey fill.
+            // This does shift the unread-count badge's dark-mode background very slightly.
+            c.backgroundColor = on ? NSColor.white.withAlphaComponent(DISABLED_FADE) : NSColor.separatorColor
         }
 
         if let a = countView?.attributedStringValue.mutableCopy() as? NSMutableAttributedString {

@@ -33,12 +33,12 @@ final class ApiMonitorWindow: NSWindow, NSWindowDelegate {
         delegate = self
         textStorage = textView.textStorage
 
-        Task {
-            await Logging.shared.setupMonitorCallback { [weak self] logString in
+        Task { [weak self] in
+            await Logging.shared.setupMonitorCallback { logString in
                 guard let self else { return }
-                textStorage.append(logString)
-                if autoScroll {
-                    textView.scrollToEndOfDocument(nil)
+                self.textStorage.append(logString)
+                if self.autoScroll {
+                    self.textView.scrollToEndOfDocument(nil)
                 }
             }
         }

@@ -155,7 +155,7 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
             if ApiServer.shouldReportRefreshFailure(in: tempContext) {
                 let errorServers = ApiServer.allApiServers(in: tempContext)
                     .filter { $0.goodToGo && !$0.lastSyncSucceeded }
-                    .map { $0.label.orEmpty }
+                    .map(\.label.orEmpty)
                 let serverNames = errorServers.joined(separator: ", ")
                 showMessage("Error", "Could not refresh repository list from \(serverNames), please ensure that the tokens you are using are valid")
                 NotificationQueue.clear()

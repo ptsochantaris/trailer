@@ -27,13 +27,13 @@ final class LogMonitor: UIViewController {
 
         textStorage = textView.textStorage
 
-        Task {
-            await Logging.shared.setupMonitorCallback { [weak self] logString in
+        Task { [weak self] in
+            await Logging.shared.setupMonitorCallback { logString in
                 guard let self else { return }
-                textStorage.append(logString)
-                if autoScrollSwitch.isOn {
-                    let textCount = textStorage.length
-                    textView.scrollRangeToVisible(NSRange(location: textCount - 1, length: 1))
+                self.textStorage.append(logString)
+                if self.autoScrollSwitch.isOn {
+                    let textCount = self.textStorage.length
+                    self.textView.scrollRangeToVisible(NSRange(location: textCount - 1, length: 1))
                 }
             }
         }

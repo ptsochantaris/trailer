@@ -53,7 +53,8 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
     }
 
     func removeAllMerged() {
-        Task {
+        Task { [weak self] in
+            guard let self else { return }
             if Settings.dontAskBeforeWipingMerged {
                 removeAllMergedConfirmed()
             } else {
@@ -68,7 +69,8 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
     }
 
     func removeAllClosed() {
-        Task {
+        Task { [weak self] in
+            guard let self else { return }
             if Settings.dontAskBeforeWipingClosed {
                 removeAllClosedConfirmed()
             } else {
@@ -128,6 +130,17 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        // Replaces `traitCollectionDidChange`, deprecated in iOS 17. That fired for *any* trait change;
+        // these are the ones that actually change how a cell draws — appearance for colours, content
+        // size category for fonts, size class for layout. Declaring the first closure parameter as
+        // `self: Self` is what keeps this from capturing self strongly.
+        registerForTraitChanges([UITraitUserInterfaceStyle.self,
+                                 UITraitPreferredContentSizeCategory.self,
+                                 UITraitHorizontalSizeClass.self,
+                                 UITraitVerticalSizeClass.self]) { (self: Self, _: UITraitCollection) in
+            self.tableView.reloadData()
+        }
 
         let searchController = UISearchController(searchResultsController: nil)
         searchController.obscuresBackgroundDuringPresentation = false
@@ -655,11 +668,6 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
 
     deinit {
         NotificationCenter.default.removeObserver(self)
-    }
-
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        tableView.reloadData()
     }
 
     override func numberOfSections(in _: UITableView) -> Int {
