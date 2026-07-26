@@ -1,5 +1,4 @@
 import Cocoa
-import Combine
 import Foundation
 
 final class HiddenItemWindow: NSWindow, NSWindowDelegate {

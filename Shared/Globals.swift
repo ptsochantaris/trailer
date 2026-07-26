@@ -375,3 +375,44 @@ extension Notification.Name {
     static let SyncProgressUpdate = Notification.Name("SyncProgressUpdateNotification")
     static let SettingsExported = Notification.Name("SettingsExportedNotification")
 }
+
+import PopTimer
+
+/// Observes a notification and invokes `handler` on the main actor. Observation stops when the
+/// observer is released, mirroring how a Combine `Cancellable` behaved.
+///
+/// When `debounce` is set, notifications are coalesced exactly as Combine's
+/// `.debounce(for:scheduler:)` did: the handler runs that many seconds after the *last*
+/// notification, and receives only the most recent one. This matters for the high-frequency
+/// sync notifications — dropping the coalescing would turn a sync into a UI refresh storm.
+@MainActor
+final class NotificationObserver {
+    private var latest: Notification?
+    private var timer: PopTimer?
+    private var task: Task<Void, Never>?
+
+    init(_ name: Notification.Name, debounce: TimeInterval? = nil, handler: @escaping @MainActor (Notification) -> Void) {
+        if let debounce {
+            timer = PopTimer(timeInterval: debounce) { [weak self] in
+                guard let self, let pending = latest else { return }
+                latest = nil
+                handler(pending)
+            }
+        }
+        task = Task { [weak self] in
+            for await notification in NotificationCenter.default.notifications(named: name) {
+                guard let self else { return }
+                if let timer {
+                    latest = notification
+                    timer.push()
+                } else {
+                    handler(notification)
+                }
+            }
+        }
+    }
+
+    deinit {
+        task?.cancel()
+    }
+}

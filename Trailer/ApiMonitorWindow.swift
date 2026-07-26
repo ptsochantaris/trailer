@@ -1,5 +1,4 @@
 import Cocoa
-import Combine
 
 final class ApiMonitorWindow: NSWindow, NSWindowDelegate {
     @IBOutlet private var textView: NSTextView!

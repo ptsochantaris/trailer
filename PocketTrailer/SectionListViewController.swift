@@ -1,4 +1,3 @@
-import Combine
 import UIKit
 
 final class SectionListViewController: UITableViewController {
@@ -12,7 +11,7 @@ final class SectionListViewController: UITableViewController {
         tableView.reloadData()
     }
 
-    private var cancellables = [Cancellable]()
+    private var observers = [NotificationObserver]()
     private var firstAppearance = true
 
     private var statusMessage: String? {
@@ -50,33 +49,22 @@ final class SectionListViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let n = NotificationCenter.default
-
-        cancellables.append(n.publisher(for: .tabBarSetUpdate)
-            .debounce(for: .seconds(0.01), scheduler: DispatchQueue.main)
-            .sink { [weak self] _ in
+        observers = [
+            NotificationObserver(.tabBarSetUpdate, debounce: 0.01) { [weak self] _ in
                 self?.updateTabs()
-            })
-
-        cancellables.append(n.publisher(for: .showPreferences)
-            .debounce(for: .seconds(0.01), scheduler: DispatchQueue.main)
-            .sink { [weak self] notification in
+            },
+            NotificationObserver(.showPreferences, debounce: 0.01) { [weak self] notification in
                 self?.performSegue(withIdentifier: "showPreferences", sender: notification.object as? Int)
-            })
-
-        cancellables.append(n.publisher(for: .SyncProgressUpdate)
-            .debounce(for: .seconds(0.1), scheduler: DispatchQueue.main)
-            .sink { [weak self] _ in
+            },
+            NotificationObserver(.SyncProgressUpdate, debounce: 0.1) { [weak self] _ in
                 self?.title = "Refreshing…"
                 self?.statusMessage = API.currentOperationName
-            })
-
-        cancellables.append(n.publisher(for: .RefreshEnded)
-            .debounce(for: .seconds(0.1), scheduler: DispatchQueue.main)
-            .sink { [weak self] _ in
+            },
+            NotificationObserver(.RefreshEnded, debounce: 0.1) { [weak self] _ in
                 self?.title = "Sections"
                 self?.statusMessage = nil
-            })
+            }
+        ]
 
         updateTabs()
     }
@@ -93,7 +81,13 @@ final class SectionListViewController: UITableViewController {
             if ApiServer.countApiServers(in: DataManager.main) == 1, let a = ApiServer.allApiServers(in: DataManager.main).first, a.authToken == nil || a.authToken!.isEmpty {
                 performSegue(withIdentifier: "showQuickstart", sender: self)
             } else {
-                NotificationCenter.default.post(name: .showPreferences, object: nil)
+                // Deliberately delayed. Our own `.showPreferences` observer registers when its
+                // task first runs, which is a later main-actor turn than this one, so posting
+                // synchronously here would be missed on first launch.
+                Task {
+                    try? await Task.sleep(for: .milliseconds(100))
+                    NotificationCenter.default.post(name: .showPreferences, object: nil)
+                }
             }
         }
     }

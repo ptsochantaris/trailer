@@ -1,4 +1,3 @@
-import Combine
 import CoreData
 import PopTimer
 import UIKit
@@ -12,7 +11,7 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
     private var lastTabCount = 0
     private let watchManager = WatchManager()
 
-    private var cancellables = [Cancellable]()
+    private var observers = [NotificationObserver]()
 
     private var viewingPrs: Bool {
         currentTabBar?.isPr == true
@@ -165,71 +164,44 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
         clearsSelectionOnViewWillAppear = false
         tableView.dragDelegate = self
 
-        let n = NotificationCenter.default
-
-        cancellables.append(n.publisher(for: .SyncProgressUpdate)
-            .debounce(for: .seconds(0.1), scheduler: DispatchQueue.main)
-            .sink { [weak self] _ in
+        observers = [
+            NotificationObserver(.SyncProgressUpdate, debounce: 0.1) { [weak self] _ in
                 self?.refreshUpdated()
-            })
-
-        cancellables.append(n.publisher(for: .RefreshStarting)
-            .debounce(for: .seconds(0.1), scheduler: DispatchQueue.main)
-            .sink { [weak self] _ in
+            },
+            NotificationObserver(.RefreshStarting, debounce: 0.1) { [weak self] _ in
                 self?.updateStatus(becauseOfChanges: false)
-            })
-
-        cancellables.append(n.publisher(for: .RefreshEnded)
-            .debounce(for: .seconds(0.1), scheduler: DispatchQueue.main)
-            .sink { [weak self] _ in
+            },
+            NotificationObserver(.RefreshEnded, debounce: 0.1) { [weak self] _ in
                 self?.refreshEnded()
-            })
-
-        cancellables.append(n.publisher(for: .focusFilter)
-            .debounce(for: .seconds(0.1), scheduler: DispatchQueue.main)
-            .sink { [weak self] notification in
+            },
+            NotificationObserver(.focusFilter, debounce: 0.1) { [weak self] notification in
                 self?.focusFilter(terms: notification.object as? String)
-            })
-
-        cancellables.append(n.publisher(for: .highlightItem)
-            .debounce(for: .seconds(0.1), scheduler: DispatchQueue.main)
-            .sink { [weak self] notification in
+            },
+            NotificationObserver(.highlightItem, debounce: 0.1) { [weak self] notification in
                 if let uri = notification.object as? String {
                     self?.highlightItemWithUriPath(uriPath: uri)
                 }
-            })
-
-        cancellables.append(n.publisher(for: .NSManagedObjectContextObjectsDidChange)
-            .debounce(for: .seconds(0.1), scheduler: DispatchQueue.main)
-            .sink { [weak self] notification in
+            },
+            NotificationObserver(.NSManagedObjectContextObjectsDidChange, debounce: 0.1) { [weak self] notification in
                 self?.dataUpdated(notification)
-            })
-
-        cancellables.append(n.publisher(for: .dbSaved)
-            .debounce(for: .seconds(0.1), scheduler: DispatchQueue.main)
-            .sink { [weak self] _ in
+            },
+            NotificationObserver(.dbSaved, debounce: 0.1) { [weak self] _ in
                 self?.updateStatus(becauseOfChanges: true)
-            })
-
-        cancellables.append(n.publisher(for: .resetView)
-            .sink { [weak self] _ in
+            },
+            NotificationObserver(.resetView) { [weak self] _ in
                 self?.resetView()
-            })
-
-        cancellables.append(n.publisher(for: .notificationSelected)
-            .sink { [weak self] notification in
+            },
+            NotificationObserver(.notificationSelected) { [weak self] notification in
                 if let (item, url) = notification.object as? (ListableItem, String?) {
                     self?.notificationSelected(for: item, urlToOpen: url)
                 }
-            })
-
-        cancellables.append(n.publisher(for: .openComment)
-            .debounce(for: .seconds(0.1), scheduler: DispatchQueue.main)
-            .sink { [weak self] notification in
+            },
+            NotificationObserver(.openComment, debounce: 0.1) { [weak self] notification in
                 if let id = notification.object as? String {
                     self?.openCommentWithId(cId: id)
                 }
-            })
+            }
+        ]
 
         newTabBarSets()
 
