@@ -59,16 +59,26 @@ extension NSAttributedString: @retroactive @unchecked Sendable {}
 
 #if os(iOS)
 
+    /// The window now belongs to the scene rather than the app delegate, so it is resolved from the
+    /// connected scenes. Previously this read `app.window`, which UIKit populated only because the
+    /// app used `UIMainStoryboardFile`; under the scene life cycle UIKit assigns the window to the
+    /// scene delegate instead, leaving `app.window` permanently nil.
     @MainActor
-    func showMessage(_ title: String, _ message: String?) {
-        var viewController = app.window?.rootViewController
+    private var topmostViewController: UIViewController? {
+        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+        let scene = scenes.first { $0.activationState == .foregroundActive } ?? scenes.first
+        var viewController = (scene?.keyWindow ?? scene?.windows.first)?.rootViewController
         while viewController?.presentedViewController != nil {
             viewController = viewController?.presentedViewController
         }
+        return viewController
+    }
 
+    @MainActor
+    func showMessage(_ title: String, _ message: String?) {
         let a = UIAlertController(title: title, message: message, preferredStyle: .alert)
         a.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-        viewController?.present(a, animated: true)
+        topmostViewController?.present(a, animated: true)
     }
 
 #endif

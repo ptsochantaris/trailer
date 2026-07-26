@@ -4,9 +4,18 @@ import UserNotifications
 
 @main
 final class iOSAppDelegate: UIResponder, UIApplicationDelegate {
-    var window: UIWindow?
-
     private var backgroundProcessing: BGProcessingTask?
+
+    // Scene configuration is provided here rather than through a `UIApplicationSceneManifest` in
+    // Info.plist. Both routes are supported; doing it in code keeps the storyboard name and the
+    // delegate class next to the delegate itself. UIKit builds the window and installs the
+    // storyboard's initial view controller automatically, so `SceneDelegate` creates no UI.
+    func application(_: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options _: UIScene.ConnectionOptions) -> UISceneConfiguration {
+        let configuration = UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role)
+        configuration.delegateClass = SceneDelegate.self
+        configuration.storyboard = UIStoryboard(name: "Main", bundle: nil)
+        return configuration
+    }
 
     func application(_: UIApplication, willFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         app = self
@@ -54,22 +63,27 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
 
-    func application(_: UIApplication, performActionFor shortcutItem: UIApplicationShortcutItem, completionHandler: @escaping (Bool) -> Void) {
+    // The three `handle` methods below used to be `UIApplicationDelegate` callbacks. Under the scene
+    // life cycle UIKit delivers these to the scene delegate instead, so they are plain helpers now
+    // and `SceneDelegate` forwards to them.
+    @discardableResult
+    func handle(shortcutItem: UIApplicationShortcutItem) -> Bool {
         switch shortcutItem.type {
         case "search-items":
             NotificationCenter.default.post(name: .focusFilter, object: nil)
-            completionHandler(true)
+            return true
 
         case "mark-all-read":
             markEverythingRead(settings: Settings.cache)
-            completionHandler(true)
+            return true
 
         default:
-            completionHandler(false)
+            return false
         }
     }
 
-    func application(_: UIApplication, open url: URL, options _: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
+    @discardableResult
+    func handle(url: URL) -> Bool {
         guard let c = URLComponents(url: url, resolvingAgainstBaseURL: false), let scheme = c.scheme else {
             return false
         }
@@ -89,7 +103,8 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
 
-    func application(_: UIApplication, continue userActivity: NSUserActivity, restorationHandler _: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+    @discardableResult
+    func handle(userActivity: NSUserActivity) -> Bool {
         NotificationManager.shared.handleUserActivity(activity: userActivity)
     }
 
@@ -193,16 +208,10 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate {
         wrapBackgroundProcessing(success: success)
     }
 
-    func applicationDidBecomeActive(_: UIApplication) {
-        BGTaskScheduler.shared.cancelAllTaskRequests()
-        Task {
-            await startRefreshIfItIsDue()
-        }
-    }
-
-    func applicationWillResignActive(_: UIApplication) {
-        scheduleRefreshTask()
-    }
+    // `applicationDidBecomeActive` and `applicationWillResignActive` used to live here. UIKit does
+    // not call them once the scene life cycle is adopted, so they moved to `SceneDelegate` as
+    // `sceneDidBecomeActive` / `sceneWillResignActive`. Leaving them here would look correct and
+    // silently never run, taking foreground refresh and background scheduling with them.
 
     func markEverythingRead(settings: Settings.Cache) {
         PullRequest.markEverythingRead(in: .hidden(cause: .unknown), in: DataManager.main, settings: settings)
@@ -224,7 +233,7 @@ final class iOSAppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
 
-    private func scheduleRefreshTask() {
+    func scheduleRefreshTask() {
         BGTaskScheduler.shared.cancelAllTaskRequests()
 
         let request = BGProcessingTaskRequest(identifier: "com.housetrip.mobile.trailer.ios.PocketTrailer.refresh")

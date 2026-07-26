@@ -91,6 +91,7 @@
 		166A84C41A45CEE000A3B292 /* PickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166A84C31A45CEE000A3B292 /* PickerViewController.swift */; };
 		166ADEC61CCAFF77001BA61F /* SnoozingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166ADEC51CCAFF77001BA61F /* SnoozingViewController.swift */; };
 		166ADEC81CCB009A001BA61F /* SnoozingEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166ADEC71CCB009A001BA61F /* SnoozingEditorViewController.swift */; };
+		1670A486301668E3002DA018 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1670A485301668E3002DA018 /* SceneDelegate.swift */; };
 		1671A11F1AC73CCB0047440A /* SetupAssistant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1671A11E1AC73CCB0047440A /* SetupAssistant.swift */; };
 		1671A1231AC74BC30047440A /* SetupAssistant.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1671A1221AC74BC30047440A /* SetupAssistant.xib */; };
 		167B10571E6A86A300B0E1AE /* Review.swift in Sources */ = {isa = PBXBuildFile; fileRef = 167B10561E6A86A300B0E1AE /* Review.swift */; };
@@ -340,6 +341,7 @@
 		166A84C31A45CEE000A3B292 /* PickerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerViewController.swift; sourceTree = "<group>"; };
 		166ADEC51CCAFF77001BA61F /* SnoozingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SnoozingViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		166ADEC71CCB009A001BA61F /* SnoozingEditorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SnoozingEditorViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		1670A485301668E3002DA018 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		167165D028550D600064CEBC /* Trailer 42.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 42.xcdatamodel"; sourceTree = "<group>"; };
 		1671A11E1AC73CCB0047440A /* SetupAssistant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SetupAssistant.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		1671A1221AC74BC30047440A /* SetupAssistant.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SetupAssistant.xib; sourceTree = "<group>"; };
@@ -533,6 +535,7 @@
 				16259BCD1A449400009C5745 /* OpenInSafariActivity.swift */,
 				160823F31A44982F006F91AD /* UINavigationControllerExtensions.swift */,
 				168839C61DEF8C3B002D9448 /* ImportExport.swift */,
+				1670A485301668E3002DA018 /* SceneDelegate.swift */,
 			);
 			name = Core;
 			sourceTree = "<group>";
@@ -1184,6 +1187,7 @@
 				1686DEBB2A5E337C00AED26E /* ApiSettingsViewController.swift in Sources */,
 				164785AB1A2CE7BD00297764 /* Globals.swift in Sources */,
 				16C9A2761A44D12600EE54EC /* AboutTrailerViewController.swift in Sources */,
+				1670A486301668E3002DA018 /* SceneDelegate.swift in Sources */,
 				16CBE1C61A2DFBA500485053 /* Settings.swift in Sources */,
 				161B851D1AB8E12C00AD4C5D /* Team.swift in Sources */,
 				162484562A76CE9F00C69515 /* LogMonitor.swift in Sources */,
