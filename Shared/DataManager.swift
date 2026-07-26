@@ -144,7 +144,10 @@ enum DataManager {
         }
     }
 
-    static func runInChild<T>(of moc: NSManagedObjectContext, block: @escaping (NSManagedObjectContext) -> T) async -> T {
+    // `block` runs on the child's own *private* queue, so it genuinely crosses threads — `@Sendable`
+    // states what was already true rather than imposing anything new. Before this was annotated, the
+    // block literals were inferred main-actor and then invoked off-main, unchecked.
+    static func runInChild<T: Sendable>(of moc: NSManagedObjectContext, block: @Sendable @escaping (NSManagedObjectContext) -> T) async -> T {
         await withCheckedContinuation { continuation in
             let child = moc.buildChildContext()
             child.perform {
@@ -186,7 +189,7 @@ enum DataManager {
                 r.postSyncAction = nothing
             }
 
-            removeUntouchedMergedOrClosedItems(in: child)
+            removeUntouchedMergedOrClosedItems(in: child, settings: settings)
 
             for p in PullRequest.newOrUpdatedItems(in: child) {
                 p.postSyncAction = nothing
@@ -204,8 +207,10 @@ enum DataManager {
         preferencesDirty = false
     }
 
-    private static func removeUntouchedMergedOrClosedItems(in child: NSManagedObjectContext) {
-        let mergeExpiration = TimeInterval(Settings.autoRemoveMergedItems)
+    // Nonisolated because it runs on the child context's own private queue. It used to read the two
+    // expiry settings from the live main-actor globals while off-main; they come off the snapshot now.
+    private nonisolated static func removeUntouchedMergedOrClosedItems(in child: NSManagedObjectContext, settings: Settings.Cache) {
+        let mergeExpiration = TimeInterval(settings.autoRemoveMergedItems)
         if mergeExpiration > 0 {
             let cutoff = Date(timeIntervalSinceNow: -24 * 3600 * mergeExpiration)
             for untouched in PullRequest.untouchedMergedItems(in: child) {
@@ -219,7 +224,7 @@ enum DataManager {
             }
         }
 
-        let closeExpiration = TimeInterval(Settings.autoRemoveClosedItems)
+        let closeExpiration = TimeInterval(settings.autoRemoveClosedItems)
         if closeExpiration > 0 {
             let cutoff = Date(timeIntervalSinceNow: -24 * 3600 * closeExpiration)
             for untouched in PullRequest.untouchedClosedItems(in: child) {

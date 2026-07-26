@@ -138,7 +138,7 @@ final nonisolated class PullRequest: ListableItem {
     }
 
     @MainActor
-    static func syncPullRequests(from data: [TypedJson.Entry]?, in repo: Repo, moc: NSManagedObjectContext) async {
+    static func syncPullRequests(from data: [TypedJson.Entry]?, in repo: Repo, moc: NSManagedObjectContext, settings: Settings.Cache) async {
         let apiServer = repo.apiServer
         let apiServerUserId = apiServer.userNodeId
         let repoId = repo.objectID
@@ -163,7 +163,7 @@ final nonisolated class PullRequest: ListableItem {
                     let newHeadCommitUserId = commitUserInfo.potentialString(named: "node_id") {
                     let currentSha = item.mergeCommitSha
                     if currentSha != nil, currentSha != newHeadCommitSha, apiServerUserId != newHeadCommitUserId {
-                        item.hasNewCommits = Settings.markPrsAsUnreadOnNewCommits && item.postSyncAction != PostSyncAction.isNew.rawValue
+                        item.hasNewCommits = settings.markPrsAsUnreadOnNewCommits && item.postSyncAction != PostSyncAction.isNew.rawValue
                     }
                     item.mergeCommitSha = newHeadCommitSha
                 }
@@ -188,20 +188,20 @@ final nonisolated class PullRequest: ListableItem {
         reviews.contains { $0.isMine }
     }
 
-    override var preferredSectionBasedOnReviewAssignment: Section? {
+    override func preferredSectionBasedOnReviewAssignment(settings: Settings.Cache) -> Section? {
         switch AssignmentStatus(rawValue: assignedReviewStatus) {
         case nil, .none?, .others:
             break
 
         case .me:
-            if Settings.assignedDirectReviewHandlingPolicy.visible,
-               let section = Settings.assignedDirectReviewHandlingPolicy.preferredSection {
+            if settings.assignedDirectReviewHandlingPolicy.visible,
+               let section = settings.assignedDirectReviewHandlingPolicy.preferredSection {
                 return section.visible ? section : .hidden(cause: .assignedDirectReview)
             }
 
         case .myTeam:
-            if Settings.assignedTeamReviewHandlingPolicy.visible,
-               let section = Settings.assignedTeamReviewHandlingPolicy.preferredSection {
+            if settings.assignedTeamReviewHandlingPolicy.visible,
+               let section = settings.assignedTeamReviewHandlingPolicy.preferredSection {
                 return section.visible ? section : .hidden(cause: .assignedTeamReview)
             }
         }
@@ -235,7 +235,7 @@ final nonisolated class PullRequest: ListableItem {
         snoozeUntil != nil && shouldWakeOnComment && hasNewCommits
     }
 
-    private func setAssignedReviewStatus(to status: AssignmentStatus) {
+    private func setAssignedReviewStatus(to status: AssignmentStatus, settings: Settings.Cache) {
         if assignedReviewStatus == status.rawValue {
             return
         }
@@ -246,28 +246,28 @@ final nonisolated class PullRequest: ListableItem {
         case .none, .others:
             break
         case .me:
-            if Settings.notifyOnReviewAssignments {
+            if settings.notifyOnReviewAssignments {
                 NotificationQueue.add(type: .assignedForReview, for: self)
             }
         case .myTeam:
-            if Settings.notifyOnReviewAssignments {
+            if settings.notifyOnReviewAssignments {
                 NotificationQueue.add(type: .assignedToTeamForReview, for: self)
             }
         }
     }
 
-    func checkAndStoreReviewAssignments(_ reviewerNames: Set<String>, _ reviewerTeams: Set<String>) {
+    func checkAndStoreReviewAssignments(_ reviewerNames: Set<String>, _ reviewerTeams: Set<String>, settings: Settings.Cache) {
         reviewers = reviewerNames.joined(separator: ",")
         teamReviewers = reviewerTeams.joined(separator: ",")
 
         if reviewerNames.contains(apiServer.userName.orEmpty) {
-            setAssignedReviewStatus(to: .me)
+            setAssignedReviewStatus(to: .me, settings: settings)
         } else if reviewerTeams.isEmpty {
-            setAssignedReviewStatus(to: .none)
+            setAssignedReviewStatus(to: .none, settings: settings)
         } else if apiServer.teams.compactMap(\.slug).contains(where: { reviewerTeams.contains($0) }) {
-            setAssignedReviewStatus(to: .myTeam)
+            setAssignedReviewStatus(to: .myTeam, settings: settings)
         } else {
-            setAssignedReviewStatus(to: .others)
+            setAssignedReviewStatus(to: .others, settings: settings)
         }
     }
 
@@ -433,10 +433,10 @@ final nonisolated class PullRequest: ListableItem {
         } else {
             statuses.filter {
                 switch $0.displayColour {
-                case .red: return red
-                case .yellow: return yellow
-                case .green: return green
-                case .neutral: return gray
+                case .red: red
+                case .yellow: yellow
+                case .green: green
+                case .neutral: gray
                 }
             }
         }

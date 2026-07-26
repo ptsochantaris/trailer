@@ -82,8 +82,9 @@ final nonisolated class Reaction: DataItem {
         }
     }
 
-    @MainActor
-    func checkNotifications(settings: Settings.Cache) {
+    // Nonisolated because `runInChild` invokes this on the child context's own private queue. It only
+    // reads model state, the settings snapshot, and `NotificationQueue.add`, which is nonisolated.
+    nonisolated func checkNotifications(settings: Settings.Cache) {
         if postSyncAction == PostSyncAction.isNew.rawValue, !isMine {
             if settings.notifyOnItemReactions, let parentItem = (pullRequest ?? issue), parentItem.canBadge(settings: settings) {
                 NotificationQueue.add(type: .newReaction, for: self)

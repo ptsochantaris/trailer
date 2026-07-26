@@ -21,7 +21,7 @@ final nonisolated class Review: DataItem {
         case DISMISSED
     }
 
-    static func syncRequests(from nodes: Lista<Node>, moc: NSManagedObjectContext, parentCache: FetchCache) {
+    static func syncRequests(from nodes: Lista<Node>, moc: NSManagedObjectContext, parentCache: FetchCache, settings: Settings.Cache) {
         var prIdsToAssignedUsers = [String: Set<String>]()
         var prIdsToAssignedTeams = [String: Set<String>]()
 
@@ -52,7 +52,8 @@ final nonisolated class Review: DataItem {
                 continue
             }
             parent.checkAndStoreReviewAssignments(prIdsToAssignedUsers[parentId] ?? [],
-                                                  prIdsToAssignedTeams[parentId] ?? [])
+                                                  prIdsToAssignedTeams[parentId] ?? [],
+                                                  settings: settings)
         }
     }
 

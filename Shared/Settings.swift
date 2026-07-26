@@ -102,6 +102,11 @@ enum Settings {
         let notifyOnReviewAssignments = Settings.notifyOnReviewAssignments
         let queryAuthoredIssues = Settings.queryAuthoredIssues
         let showRequestedTeamReviews = Settings.showRequestedTeamReviews
+        let assignedDirectReviewHandlingPolicy = Settings.assignedDirectReviewHandlingPolicy
+        let assignedTeamReviewHandlingPolicy = Settings.assignedTeamReviewHandlingPolicy
+        let displayPolicyForNewPrs = Settings.displayPolicyForNewPrs
+        let displayPolicyForNewIssues = Settings.displayPolicyForNewIssues
+        let hideArchivedRepos = Settings.hideArchivedRepos
 
         let showCommentsEverywhere = Settings.showCommentsEverywhere
         let scanClosedAndMergedItems = Settings.scanClosedAndMergedItems

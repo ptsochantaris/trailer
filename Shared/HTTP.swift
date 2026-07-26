@@ -3,8 +3,12 @@ import Maintini
 import Semalot
 import TrailerJson
 
-enum DataResult {
-    case success(headers: [String: Sendable], data: Data), notFound, deleted, failed(code: Int), cancelled, ignored
+// A pure value type, so nonisolated — its `logValue` is read from nonisolated and Sendable contexts.
+nonisolated enum DataResult {
+    // Headers are `[String: String]` rather than `[String: Sendable]`: `allHeaderFields` hands back
+    // `Any` values, which do not conform to Sendable, and every reader here was casting them to
+    // String anyway. HTTP header values always are.
+    case success(headers: [String: String], data: Data), notFound, deleted, failed(code: Int), cancelled, ignored
 
     var logValue: String {
         switch self {
@@ -116,9 +120,9 @@ enum HTTP {
                 case 400...:
                     return .failed(code: code)
                 default:
-                    var headers = [String: Sendable]()
+                    var headers = [String: String]()
                     for (k, v) in httpResponse.allHeaderFields {
-                        if let k = k as? String {
+                        if let k = k as? String, let v = v as? String {
                             headers[k] = v
                         }
                     }

@@ -239,7 +239,7 @@ enum API {
             || !Repo.anyVisibleRepos(in: syncMoc)
 
         if shouldRefreshReposToo {
-            await fetchRepositories(to: syncMoc)
+            await fetchRepositories(to: syncMoc, settings: settings)
         } else {
             ApiServer.resetSyncSuccess(in: syncMoc)
             await ensureApiServersHaveUserIds(in: syncMoc)
@@ -306,8 +306,8 @@ enum API {
         return agoFormat(prefix: "updated", since: last).capitalFirstLetter
     }
 
-    static func fetchRepositories(to moc: NSManagedObjectContext) async {
-        await RepoSync(moc: moc).run()
+    static func fetchRepositories(to moc: NSManagedObjectContext, settings: Settings.Cache) async {
+        await RepoSync(moc: moc, settings: settings).run()
     }
 
     private static func ensureApiServersHaveUserIds(in moc: NSManagedObjectContext) async {
@@ -345,15 +345,15 @@ enum API {
         }
     }
 
-    static func fetchRepo(fullName: String, from server: ApiServer, moc: NSManagedObjectContext) async throws {
+    static func fetchRepo(fullName: String, from server: ApiServer, moc: NSManagedObjectContext, settings: Settings.Cache) async throws {
         let path = "\(server.apiPath.orEmpty)/repos/\(fullName)"
         let (data, _, _) = try await RestAccess.getData(in: path, from: server)
         if let data {
-            await Repo.syncRepos(from: [data], server: server, addNewRepos: true, manuallyAdded: true, moc: moc)
+            await Repo.syncRepos(from: [data], server: server, addNewRepos: true, manuallyAdded: true, moc: moc, settings: settings)
         }
     }
 
-    static func fetchAllRepos(owner: String, from server: ApiServer, moc: NSManagedObjectContext) async throws {
+    static func fetchAllRepos(owner: String, from server: ApiServer, moc: NSManagedObjectContext, settings: Settings.Cache) async throws {
         let userPath = "\(server.apiPath.orEmpty)/users/\(owner)/repos"
         let userTask = Task { () -> [TypedJson.Entry] in
             var userList = [TypedJson.Entry]()
@@ -403,7 +403,7 @@ enum API {
         let userList = try await userTask.value
         let orgList = try await orgTask.value
 
-        await Repo.syncRepos(from: userList + orgList, server: server, addNewRepos: true, manuallyAdded: true, moc: moc)
+        await Repo.syncRepos(from: userList + orgList, server: server, addNewRepos: true, manuallyAdded: true, moc: moc, settings: settings)
     }
 
     fileprivate static func syncUserDetails(in moc: NSManagedObjectContext) async {
@@ -461,9 +461,11 @@ private final class IdMigration {
 @MainActor
 private final class RepoSync {
     private let moc: NSManagedObjectContext
+    private let settings: Settings.Cache
 
-    init(moc: NSManagedObjectContext) {
+    init(moc: NSManagedObjectContext, settings: Settings.Cache) {
         self.moc = moc
+        self.settings = settings
     }
 
     func run() async {
@@ -529,7 +531,7 @@ private final class RepoSync {
 
         for repo in server.repos.filter(\.manuallyAdded) {
             do {
-                try await API.fetchRepo(fullName: repo.fullName.orEmpty, from: server, moc: moc)
+                try await API.fetchRepo(fullName: repo.fullName.orEmpty, from: server, moc: moc, settings: settings)
             } catch {
                 server.lastSyncSucceeded = false
             }
@@ -544,8 +546,8 @@ private final class RepoSync {
         }
 
         let createNewRepos = Settings.automaticallyRemoveDeletedReposFromWatchlist
-        let result = await RestAccess.getPagedData(at: "/user/subscriptions", from: server) { [moc] data, _ in
-            await Repo.syncRepos(from: data, server: server, addNewRepos: createNewRepos, manuallyAdded: false, moc: moc)
+        let result = await RestAccess.getPagedData(at: "/user/subscriptions", from: server) { [moc, settings] data, _ in
+            await Repo.syncRepos(from: data, server: server, addNewRepos: createNewRepos, manuallyAdded: false, moc: moc, settings: settings)
             return false
         }
         switch result {

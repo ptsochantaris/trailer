@@ -188,8 +188,8 @@ private final class V3Sync {
 
     private func fetchPullRequests(repoId: NSManagedObjectID, repoFullName: String) async {
         guard let r: Repo = await object(with: repoId) else { return }
-        let result = await RestAccess.getPagedData(at: "/repos/\(repoFullName)/pulls", from: r.apiServer) { [moc] data, _ in
-            await PullRequest.syncPullRequests(from: data, in: r, moc: moc)
+        let result = await RestAccess.getPagedData(at: "/repos/\(repoFullName)/pulls", from: r.apiServer) { [moc, settings] data, _ in
+            await PullRequest.syncPullRequests(from: data, in: r, moc: moc, settings: settings)
             return false
         }
         handleRepoSync(for: r, result: result)
@@ -579,7 +579,7 @@ private final class V3Sync {
             for userName in userList.compactMap({ $0.potentialString(named: "login") }) {
                 reviewUsers.insert(userName)
             }
-            p.checkAndStoreReviewAssignments(reviewUsers, reviewTeams)
+            p.checkAndStoreReviewAssignments(reviewUsers, reviewTeams, settings: settings)
 
         } else if let data, let userList = data.potentialArray(named: "users"), let teamList = data.potentialArray(named: "teams") {
             // New API results
@@ -589,7 +589,7 @@ private final class V3Sync {
             for teamName in teamList.compactMap({ $0.potentialString(named: "slug") }) {
                 reviewTeams.insert(teamName)
             }
-            p.checkAndStoreReviewAssignments(reviewUsers, reviewTeams)
+            p.checkAndStoreReviewAssignments(reviewUsers, reviewTeams, settings: settings)
 
         } else {
             p.apiServer.lastSyncSucceeded = false

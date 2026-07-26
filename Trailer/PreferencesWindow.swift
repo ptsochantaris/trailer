@@ -1336,7 +1336,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
             let alert = NSAlert()
             do {
                 if name == "*" {
-                    try await API.fetchAllRepos(owner: owner, from: server, moc: DataManager.main)
+                    try await API.fetchAllRepos(owner: owner, from: server, moc: DataManager.main, settings: Settings.cache)
                     let addedCount = Repo.newItems(in: DataManager.main).count
                     alert.messageText = "\(addedCount) repositories added for '\(owner)'"
                     if Settings.displayPolicyForNewPrs == .hide, Settings.displayPolicyForNewIssues == .hide {
@@ -1345,7 +1345,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
                         alert.informativeText = "The new repositories have been added to your local list. Trailer will refresh after you close preferences to fetch any items from them."
                     }
                 } else {
-                    try await API.fetchRepo(fullName: "\(owner)/\(name)", from: server, moc: DataManager.main)
+                    try await API.fetchRepo(fullName: "\(owner)/\(name)", from: server, moc: DataManager.main, settings: Settings.cache)
                     alert.messageText = "Repository added"
                     if Settings.displayPolicyForNewPrs == .hide, Settings.displayPolicyForNewIssues == .hide {
                         alert.informativeText = "WARNING: While the repository has been added successfully to your list, your default settings specify that it should be hidden. You probably want to change its visibility from the repositories list."
@@ -1372,7 +1372,7 @@ final class PreferencesWindow: NSWindow, NSWindowDelegate, NSTableViewDelegate, 
         }
         API.isRefreshing = true
         Task { @MainActor in
-            await API.fetchRepositories(to: DataManager.main)
+            await API.fetchRepositories(to: DataManager.main, settings: Settings.cache)
             if ApiServer.shouldReportRefreshFailure(in: DataManager.main) {
                 var errorServers = [String]()
                 for apiServer in ApiServer.allApiServers(in: DataManager.main) where apiServer.goodToGo && !apiServer.lastSyncSucceeded {

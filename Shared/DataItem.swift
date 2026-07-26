@@ -228,26 +228,29 @@ nonisolated class DataItem: NSManagedObject, Querying {
                                      prefetchRelationships: [String]? = nil,
                                      createNewItems: Bool = true,
                                      moc: NSManagedObjectContext,
-                                     postProcessCallback: @escaping (T, TypedJson.Entry, Bool, NSManagedObjectContext) -> Void) async {
+                                     postProcessCallback: @Sendable @escaping (T, TypedJson.Entry, Bool, NSManagedObjectContext) -> Void) async {
         guard let data, !data.isEmpty else { return }
 
-        var nodeIdsToInfo = [String: TypedJson.Entry]()
-        nodeIdsToInfo.reserveCapacity(data.count)
+        var infoByNodeId = [String: TypedJson.Entry]()
+        infoByNodeId.reserveCapacity(data.count)
         for info in data {
             let nodeId = info.potentialString(named: "node_id")!
-            nodeIdsToInfo[nodeId] = info
+            infoByNodeId[nodeId] = info
         }
 
-        if nodeIdsToInfo.isEmpty {
+        if infoByNodeId.isEmpty {
             return
         }
+
+        // Immutable from here on, so the block below can capture it: the block runs on the child
+        // context's private queue, and a captured `var` cannot cross that boundary.
+        let nodeIdsToInfo = infoByNodeId
 
         await DataManager.runInChild(of: moc) { child in
             let entityName = typeName
             let f = NSFetchRequest<T>(entityName: entityName)
             f.relationshipKeyPathsForPrefetching = prefetchRelationships
             f.returnsObjectsAsFaults = false
-            f.includesSubentities = false
 
             var nodeIdsOfItems = Set(nodeIdsToInfo.map { k, _ in k })
             f.predicate = NSPredicate(format: "nodeId in %@ and apiServer == %@", nodeIdsOfItems, serverId)

@@ -29,7 +29,7 @@ final nonisolated class Repo: DataItem {
         updatedAt = updatedAt?.addingTimeInterval(-1)
     }
 
-    static func sync(from nodes: Lista<Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache) {
+    static func sync(from nodes: Lista<Node>, on server: ApiServer, moc: NSManagedObjectContext, parentCache: FetchCache, settings: Settings.Cache) {
         syncItems(of: Repo.self, from: nodes, on: server, moc: moc, parentCache: parentCache) { repo, node in
             var neededByAuthoredPr = false
             var neededByAuthoredIssue = false
@@ -53,22 +53,22 @@ final nonisolated class Repo: DataItem {
                 repo.archived = json.potentialBool(named: "isArchived") ?? false
                 repo.ownerNodeId = json.potentialObject(named: "owner")?.potentialString(named: "id")
                 if node.created(in: moc) {
-                    repo.displayPolicyForPrs = Settings.displayPolicyForNewPrs.rawValue
-                    repo.displayPolicyForIssues = Settings.displayPolicyForNewIssues.rawValue
+                    repo.displayPolicyForPrs = settings.displayPolicyForNewPrs.rawValue
+                    repo.displayPolicyForIssues = settings.displayPolicyForNewIssues.rawValue
                 }
             }
 
-            if neededByAuthoredPr, repo.displayPolicyForPrs == RepoDisplayPolicy.hide.rawValue, !(repo.archived && Settings.hideArchivedRepos) {
+            if neededByAuthoredPr, repo.displayPolicyForPrs == RepoDisplayPolicy.hide.rawValue, !(repo.archived && settings.hideArchivedRepos) {
                 repo.displayPolicyForPrs = RepoDisplayPolicy.authoredOnly.rawValue
             }
-            if neededByAuthoredIssue, repo.displayPolicyForIssues == RepoDisplayPolicy.hide.rawValue, !(repo.archived && Settings.hideArchivedRepos) {
+            if neededByAuthoredIssue, repo.displayPolicyForIssues == RepoDisplayPolicy.hide.rawValue, !(repo.archived && settings.hideArchivedRepos) {
                 repo.displayPolicyForIssues = RepoDisplayPolicy.authoredOnly.rawValue
             }
         }
     }
 
     @MainActor
-    static func syncRepos(from data: [TypedJson.Entry]?, server: ApiServer, addNewRepos: Bool, manuallyAdded: Bool, moc: NSManagedObjectContext) async {
+    static func syncRepos(from data: [TypedJson.Entry]?, server: ApiServer, addNewRepos: Bool, manuallyAdded: Bool, moc: NSManagedObjectContext, settings: Settings.Cache) async {
         let filteredData = data?.filter { info -> Bool in
             if info.potentialBool(named: "private") ?? false {
                 if let permissions = info.potentialObject(named: "permissions") {
@@ -100,8 +100,8 @@ final nonisolated class Repo: DataItem {
                 item.ownerNodeId = info.potentialObject(named: "owner")?.potentialString(named: "node_id")
                 item.manuallyAdded = manuallyAdded
                 if item.postSyncAction == PostSyncAction.isNew.rawValue {
-                    item.displayPolicyForPrs = Settings.displayPolicyForNewPrs.rawValue
-                    item.displayPolicyForIssues = Settings.displayPolicyForNewIssues.rawValue
+                    item.displayPolicyForPrs = settings.displayPolicyForNewPrs.rawValue
+                    item.displayPolicyForIssues = settings.displayPolicyForNewIssues.rawValue
                 }
             }
         }

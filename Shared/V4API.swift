@@ -158,7 +158,7 @@ private final class V4Sync {
         await Logging.shared.log("PR extras fetch phase complete")
 
         let reviews = Review.newOrUpdatedItems(in: moc, fromSuccessfulSyncOnly: true)
-        try await GraphQL.updateComments(for: reviews, profile: settings.syncProfile)
+        try await GraphQL.updateComments(for: reviews, settings: settings)
         await Logging.shared.log("Review comment fetch phase complete")
     }
 
@@ -255,7 +255,7 @@ private final class V4Sync {
                 r.postSyncAction = PostSyncAction.delete.rawValue
             }
         }
-        try await GraphQL.updateReactions(for: comments, profile: settings.syncProfile)
+        try await GraphQL.updateReactions(for: comments, settings: settings)
         await Logging.shared.log("Comment reaction fetch phase complete")
     }
 }

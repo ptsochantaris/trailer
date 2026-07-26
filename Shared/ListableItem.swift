@@ -456,7 +456,7 @@ nonisolated class ListableItem: DataItem, Listable {
         wasAwokenFromSnooze = explicityAwoke
     }
 
-    var preferredSectionBasedOnReviewAssignment: Section? {
+    func preferredSectionBasedOnReviewAssignment(settings _: Settings.Cache) -> Section? {
         nil
     }
 
@@ -508,7 +508,7 @@ nonisolated class ListableItem: DataItem, Listable {
             targetSection = potentialSection
         }
 
-        if let potentialSection = preferredSectionBasedOnReviewAssignment,
+        if let potentialSection = preferredSectionBasedOnReviewAssignment(settings: settings),
            potentialSection.sectionIndex < targetSection.sectionIndex {
             targetSection = potentialSection
         }
@@ -781,6 +781,9 @@ nonisolated class ListableItem: DataItem, Listable {
         }
     }
 
+    // A presentation method: it already takes a FONT_CLASS and reads colours, so the annotation just
+    // states what it is. Matches `title(with:)`, `linesAttributedString` and friends.
+    @MainActor
     final func labelsAttributedString(labelFont: FONT_CLASS, settings: Settings.Cache) -> NSAttributedString? {
         if !settings.showLabels {
             return nil

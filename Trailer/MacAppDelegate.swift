@@ -2,10 +2,16 @@ import Cocoa
 import CoreSpotlight
 import PopTimer
 import Sparkle
+// For `kAXTrustedCheckOptionPrompt`, which ApplicationServices still imports as a mutable global.
+@preconcurrency import ApplicationServices
 
 enum Theme {
     case light, dark
 }
+
+// ApplicationServices imports `kAXTrustedCheckOptionPrompt` as a mutable global, which Swift 6 will
+// not let us read directly. It is a constant in practice, so read it once here.
+private let axTrustedCheckOptionPrompt = kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String
 
 @main
 final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUserNotificationCenterDelegate, NSOpenSavePanelDelegate, NSControlTextEditingDelegate {
@@ -661,8 +667,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
     func addHotKeySupport() {
         if Settings.hotkeyEnable {
             if globalKeyMonitor == nil {
-                let key = kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String
-                let options = [key: NSNumber(value: AXIsProcessTrusted() == false)] as CFDictionary
+                let options = [axTrustedCheckOptionPrompt: NSNumber(value: AXIsProcessTrusted() == false)] as CFDictionary
                 if AXIsProcessTrustedWithOptions(options) {
                     globalKeyMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { [weak self] incomingEvent in
                         _ = self?.checkForHotkey(in: incomingEvent)

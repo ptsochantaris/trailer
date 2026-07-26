@@ -59,7 +59,7 @@ enum RestAccess {
                 }
             }
 
-            if let linkHeader = allHeaders["Link"] as? String {
+            if let linkHeader = allHeaders["Link"] {
                 lastPage = !linkHeader.contains("rel=\"next\"")
             }
         }

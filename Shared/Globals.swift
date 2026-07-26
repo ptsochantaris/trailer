@@ -287,14 +287,14 @@ nonisolated struct ApiStats {
     let resetAt: Date?
     let migratedIds: [String: String]?
 
-    static func fromV3(headers: [String: Sendable]) -> ApiStats {
-        let date: Date? = if let epochSeconds = headers["x-ratelimit-reset"] as? String, let t = TimeInterval(epochSeconds) {
+    static func fromV3(headers: [String: String]) -> ApiStats {
+        let date: Date? = if let epochSeconds = headers["x-ratelimit-reset"], let t = TimeInterval(epochSeconds) {
             Date(timeIntervalSince1970: t)
         } else {
             nil
         }
-        let remaining = Int(headers["x-ratelimit-remaining"].stringOrEmpty) ?? 10000
-        let limit = Int(headers["x-ratelimit-limit"].stringOrEmpty) ?? 10000
+        let remaining = Int(headers["x-ratelimit-remaining"].orEmpty) ?? 10000
+        let limit = Int(headers["x-ratelimit-limit"].orEmpty) ?? 10000
         return ApiStats(nodeCount: 0, cost: 1, remaining: remaining, limit: limit, resetAt: date, migratedIds: nil)
     }
 
