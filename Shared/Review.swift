@@ -137,7 +137,6 @@ final nonisolated class Review: DataItem {
     static func review(with id: Int, in moc: NSManagedObjectContext) -> Review? {
         let f = NSFetchRequest<Review>(entityName: "Review")
         f.returnsObjectsAsFaults = false
-        f.includesSubentities = false
         f.fetchLimit = 1
         f.predicate = NSPredicate(format: "serverId == %d", id)
         return try! moc.fetch(f).first

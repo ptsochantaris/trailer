@@ -194,7 +194,6 @@ final nonisolated class ApiServer: NSManagedObject {
     static func allApiServers(in moc: NSManagedObjectContext) -> [ApiServer] {
         let f = NSFetchRequest<ApiServer>(entityName: "ApiServer")
         f.returnsObjectsAsFaults = false
-        f.includesSubentities = false
         f.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: true)]
         return try! moc.fetch(f)
     }
@@ -209,7 +208,6 @@ final nonisolated class ApiServer: NSManagedObject {
 
     static func countApiServers(in moc: NSManagedObjectContext) -> Int {
         let f = NSFetchRequest<ApiServer>(entityName: "ApiServer")
-        f.includesSubentities = false
         return try! moc.count(for: f)
     }
 

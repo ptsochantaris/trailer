@@ -14,7 +14,6 @@ final nonisolated class Team: DataItem {
         let f = NSFetchRequest<Team>(entityName: "Team")
         f.fetchLimit = 1
         f.returnsObjectsAsFaults = false
-        f.includesSubentities = false
         f.predicate = NSPredicate(format: "slug == %@", slug)
         return try? moc.fetch(f).first
     }

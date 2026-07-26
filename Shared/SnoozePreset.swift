@@ -74,7 +74,6 @@ final nonisolated class SnoozePreset: NSManagedObject {
     static func allSnoozePresets(in moc: NSManagedObjectContext) -> [SnoozePreset] {
         let f = NSFetchRequest<SnoozePreset>(entityName: "SnoozePreset")
         f.returnsObjectsAsFaults = false
-        f.includesSubentities = false
         f.sortDescriptors = [NSSortDescriptor(key: "sortOrder", ascending: true)]
         return try! moc.fetch(f)
     }

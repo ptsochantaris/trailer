@@ -383,7 +383,6 @@ final class WatchManager: NSObject, WCSessionDelegate {
 
     private nonisolated static func countallItems<T: ListableItem>(of type: T.Type, criterion: GroupingCriterion?, moc: NSManagedObjectContext, settings: Settings.Cache) -> Int {
         let f = NSFetchRequest<T>(entityName: type.typeName)
-        f.includesSubentities = false
         let p = settings.hideUncommentedItems
             ? NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, type.includeInUnreadPredicate(settings: settings)])
             : Section.nonZeroPredicate
@@ -393,7 +392,6 @@ final class WatchManager: NSObject, WCSessionDelegate {
 
     private nonisolated static func countItems<T: ListableItem>(of type: T.Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext, settings: Settings.Cache) -> Int {
         let f = NSFetchRequest<T>(entityName: type.typeName)
-        f.includesSubentities = false
         let p = settings.hideUncommentedItems
             ? NSCompoundPredicate(type: .and, subpredicates: [section.matchingPredicate, type.includeInUnreadPredicate(settings: settings)])
             : section.matchingPredicate
@@ -403,7 +401,6 @@ final class WatchManager: NSObject, WCSessionDelegate {
 
     private nonisolated static func badgeCount<T: ListableItem>(for type: T.Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext, settings: Settings.Cache) -> Int {
         let f = NSFetchRequest<T>(entityName: type.typeName)
-        f.includesSubentities = false
         let p = NSCompoundPredicate(type: .and, subpredicates: [section.matchingPredicate, type.includeInUnreadPredicate(settings: settings)])
         DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc)
         return ListableItem.badgeCount(from: f, in: moc, settings: settings)
@@ -411,7 +408,6 @@ final class WatchManager: NSObject, WCSessionDelegate {
 
     private nonisolated static func countOpenAndVisible<T: ListableItem>(of type: T.Type, criterion: GroupingCriterion?, moc: NSManagedObjectContext, settings: Settings.Cache) -> Int {
         let f = NSFetchRequest<T>(entityName: type.typeName)
-        f.includesSubentities = false
         let p = settings.hideUncommentedItems
             ? NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, ItemCondition.open.matchingPredicate, type.includeInUnreadPredicate(settings: settings)])
             : NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, ItemCondition.open.matchingPredicate])

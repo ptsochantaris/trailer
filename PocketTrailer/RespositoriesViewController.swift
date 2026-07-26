@@ -218,7 +218,6 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
             setAllPrsItem.title = "All repos…"
         }
         fetchRequest.returnsObjectsAsFaults = false
-        fetchRequest.includesSubentities = false
         fetchRequest.fetchBatchSize = 20
         fetchRequest.sortDescriptors = currentSortOptions.map(\.descriptor)
 

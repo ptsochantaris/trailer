@@ -167,7 +167,6 @@ final nonisolated class Repo: DataItem {
     static func repos(for group: String, in moc: NSManagedObjectContext) -> [Repo] {
         let f = NSFetchRequest<Repo>(entityName: "Repo")
         f.returnsObjectsAsFaults = false
-        f.includesSubentities = false
         f.predicate = NSPredicate(format: "groupLabel == %@", group)
         return try! moc.fetch(f)
     }
@@ -182,7 +181,6 @@ final nonisolated class Repo: DataItem {
         }
 
         let f = NSFetchRequest<Repo>(entityName: "Repo")
-        f.includesSubentities = false
         f.fetchLimit = 1
         let p = visibleRepoPredicate
         if let criterion {
@@ -241,7 +239,6 @@ final nonisolated class Repo: DataItem {
         let f = NSFetchRequest<Repo>(entityName: "Repo")
         f.relationshipKeyPathsForPrefetching = ["issues", "pullRequests"]
         f.returnsObjectsAsFaults = false
-        f.includesSubentities = false
         f.predicate = syncableRepoPredicate
         return try! moc.fetch(f)
     }
@@ -251,7 +248,6 @@ final nonisolated class Repo: DataItem {
         let f = NSFetchRequest<Repo>(entityName: "Repo")
         f.relationshipKeyPathsForPrefetching = ["issues", "pullRequests"]
         f.returnsObjectsAsFaults = false
-        f.includesSubentities = false
         f.predicate = unsyncableRepoPredicate
         return try! moc.fetch(f)
     }
@@ -260,7 +256,6 @@ final nonisolated class Repo: DataItem {
     static func reposFiltered(by filter: String?) -> [Repo] {
         let f = NSFetchRequest<Repo>(entityName: "Repo")
         f.returnsObjectsAsFaults = false
-        f.includesSubentities = false
         if let filter, !filter.isEmpty {
             f.predicate = NSPredicate(format: "fullName contains [cd] %@", filter)
         }
@@ -273,7 +268,6 @@ final nonisolated class Repo: DataItem {
         func mark<T: ListableItem>(type: T.Type) {
             let f = NSFetchRequest<T>(entityName: type.typeName)
             f.returnsObjectsAsFaults = false
-            f.includesSubentities = false
             f.predicate = predicate
             for i in try! managedObjectContext!.fetch(f) {
                 // Logging.shared.log("Ensuring item '%@' in repo '%@' is marked as updated - reasons: %@", S(i.title), S(i.repo.fullName), reasons.joined(separator: ", "))

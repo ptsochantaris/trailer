@@ -65,7 +65,6 @@ final nonisolated class PRLabel: DataItem {
 
         let f = NSFetchRequest<PRLabel>(entityName: "PRLabel")
         f.returnsObjectsAsFaults = false
-        f.includesSubentities = false
         if fromParent.isPr {
             f.predicate = NSPredicate(format: "name in %@ and pullRequests contains %@", namesOfItems, fromParent)
         } else {

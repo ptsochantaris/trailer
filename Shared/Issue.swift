@@ -79,7 +79,6 @@ final nonisolated class Issue: ListableItem {
     static func markEverythingRead(in section: Section, in moc: NSManagedObjectContext, settings: Settings.Cache) {
         let f = NSFetchRequest<Issue>(entityName: "Issue")
         f.returnsObjectsAsFaults = false
-        f.includesSubentities = false
         if section.visible {
             f.predicate = section.matchingPredicate
         }
@@ -90,7 +89,6 @@ final nonisolated class Issue: ListableItem {
 
     static func badgeCount(in moc: NSManagedObjectContext, settings: Settings.Cache) -> Int {
         let f = NSFetchRequest<Issue>(entityName: "Issue")
-        f.includesSubentities = false
         f.predicate = NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, includeInUnreadPredicate(settings: settings)])
         return badgeCount(from: f, in: moc, settings: settings)
     }
@@ -103,7 +101,6 @@ final nonisolated class Issue: ListableItem {
     @MainActor
     override static func hasOpen(in moc: NSManagedObjectContext, criterion: GroupingCriterion?) -> Bool {
         let f = NSFetchRequest<Issue>(entityName: "Issue")
-        f.includesSubentities = false
         f.fetchLimit = 1
         add(criterion: criterion, toFetchRequest: f, originalPredicate: ItemCondition.open.matchingPredicate, in: moc)
         return try! moc.count(for: f) > 0
@@ -121,7 +118,6 @@ final nonisolated class Issue: ListableItem {
     static func allClosed(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, includeAllGroups: Bool = false) -> [Issue] {
         let f = NSFetchRequest<Issue>(entityName: "Issue")
         f.returnsObjectsAsFaults = false
-        f.includesSubentities = false
         let p = ItemCondition.closed.matchingPredicate
         add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc, includeAllGroups: includeAllGroups)
         return try! moc.fetch(f)

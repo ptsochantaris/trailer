@@ -28,7 +28,6 @@ nonisolated extension Querying {
             f.fetchLimit = count
         }
         f.returnsObjectsAsFaults = false
-        f.includesSubentities = false
         return try! moc.fetch(f)
     }
 
@@ -42,7 +41,6 @@ nonisolated extension Querying {
     static func items(surviving: Bool, in moc: NSManagedObjectContext, prefetchRelationships: [String]? = nil) -> [Self] {
         let f = NSFetchRequest<Self>(entityName: typeName)
         f.relationshipKeyPathsForPrefetching = prefetchRelationships
-        f.includesSubentities = false
         if surviving {
             f.returnsObjectsAsFaults = false
             f.predicate = PostSyncAction.delete.excludingPredicate
@@ -56,7 +54,6 @@ nonisolated extension Querying {
     static func untouchedMergedItems(in moc: NSManagedObjectContext) -> [Self] {
         let f = NSFetchRequest<Self>(entityName: typeName)
         f.returnsObjectsAsFaults = false
-        f.includesSubentities = false
         f.predicate = NSCompoundPredicate(type: .and, subpredicates: [
             ItemCondition.merged.matchingPredicate,
             ApiServer.lastSyncSucceededPredicate,
@@ -68,7 +65,6 @@ nonisolated extension Querying {
     static func untouchedClosedItems(in moc: NSManagedObjectContext) -> [Self] {
         let f = NSFetchRequest<Self>(entityName: typeName)
         f.returnsObjectsAsFaults = false
-        f.includesSubentities = false
         f.predicate = NSCompoundPredicate(type: .and, subpredicates: [
             ItemCondition.closed.matchingPredicate,
             ApiServer.lastSyncSucceededPredicate,
@@ -80,7 +76,6 @@ nonisolated extension Querying {
     static func newOrUpdatedItems(in moc: NSManagedObjectContext, fromSuccessfulSyncOnly: Bool = false) -> [Self] {
         let f = NSFetchRequest<Self>(entityName: typeName)
         f.returnsObjectsAsFaults = false
-        f.includesSubentities = false
         let typePredicate = NSCompoundPredicate(type: .or, subpredicates: [PostSyncAction.isNew.matchingPredicate, PostSyncAction.isUpdated.matchingPredicate])
         if fromSuccessfulSyncOnly {
             f.predicate = NSCompoundPredicate(type: .and, subpredicates: [
@@ -96,7 +91,6 @@ nonisolated extension Querying {
     static func updatedItems(in moc: NSManagedObjectContext) -> [Self] {
         let f = NSFetchRequest<Self>(entityName: typeName)
         f.returnsObjectsAsFaults = false
-        f.includesSubentities = false
         f.predicate = PostSyncAction.isUpdated.matchingPredicate
         return try! moc.fetch(f)
     }
@@ -104,7 +98,6 @@ nonisolated extension Querying {
     static func newItems(in moc: NSManagedObjectContext) -> [Self] {
         let f = NSFetchRequest<Self>(entityName: typeName)
         f.returnsObjectsAsFaults = false
-        f.includesSubentities = false
         f.predicate = PostSyncAction.isNew.matchingPredicate
         return try! moc.fetch(f)
     }
@@ -115,7 +108,6 @@ nonisolated extension Querying {
         }
         let f = NSFetchRequest<Self>(entityName: typeName)
         f.returnsObjectsAsFaults = true
-        f.includesSubentities = false
         f.fetchLimit = 1
         f.predicate = NSPredicate(format: "nodeId == %@", nodeId)
         let object = try! moc.fetch(f).first
@@ -127,7 +119,6 @@ nonisolated extension Querying {
 
     static func nuke(query: String, in moc: NSManagedObjectContext) {
         let f = NSFetchRequest<Self>(entityName: typeName)
-        f.includesSubentities = false
         f.predicate = NSPredicate(format: query)
         let orphaned = try! moc.fetch(f)
         if !orphaned.isEmpty {
@@ -157,14 +148,12 @@ nonisolated extension Querying {
 
     static func countItems(in moc: NSManagedObjectContext) -> Int {
         let f = NSFetchRequest<Self>(entityName: typeName)
-        f.includesSubentities = false
         return try! moc.count(for: f)
     }
 
     static func nullNodeIdItems(in moc: NSManagedObjectContext) -> Int {
         let f = NSFetchRequest<Self>(entityName: typeName)
         f.fetchLimit = 1
-        f.includesSubentities = false
         f.predicate = NSPredicate(format: "nodeId == nil")
         return try! moc.count(for: f)
     }
@@ -172,7 +161,6 @@ nonisolated extension Querying {
     static func item(id: String, in moc: NSManagedObjectContext) -> Self? {
         let f = NSFetchRequest<Self>(entityName: typeName)
         f.fetchLimit = 1
-        f.includesSubentities = false
         f.propertiesToFetch = ["nodeId"]
         f.predicate = NSPredicate(format: "nodeId == %@", id)
         do {
@@ -423,7 +411,6 @@ nonisolated class DataItem: NSManagedObject, Querying {
         let entityName = typeName
         let f = NSFetchRequest<Self>(entityName: entityName)
         f.returnsObjectsAsFaults = false
-        f.includesSubentities = false
         f.predicate = NSPredicate(format: "apiServer == %@", server)
         let existingItems = try! moc.fetch(f)
         return existingItems.compactMap { $0.value(forKey: "nodeId") as? String }
@@ -438,7 +425,6 @@ nonisolated class DataItem: NSManagedObject, Querying {
         let entityName = typeName
         let f = NSFetchRequest<T>(entityName: entityName)
         f.returnsObjectsAsFaults = false
-        f.includesSubentities = false
         f.predicate = NSPredicate(format: "nodeId in %@", validNodes.map(\.id))
         let existingItems = try! moc.fetch(f)
         let existingItemIds = existingItems.map(\.nodeId)

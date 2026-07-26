@@ -1217,7 +1217,6 @@ nonisolated class ListableItem: DataItem, Listable {
         f.fetchBatchSize = 50
         f.relationshipKeyPathsForPrefetching = (itemType == PullRequest.self) ? ["labels", "statuses", "reviews"] : ["labels"]
         f.returnsObjectsAsFaults = false
-        f.includesSubentities = false
         let p = NSCompoundPredicate(andPredicateWithSubpredicates: Array(andPredicates))
         add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc)
         f.sortDescriptors = Array(sortDescriptors)
