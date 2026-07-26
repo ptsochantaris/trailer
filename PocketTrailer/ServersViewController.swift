@@ -23,12 +23,6 @@ final class ServersViewController: UITableViewController {
         apiSwitch.title = Settings.useV4API ? "Using v4 API" : "Using v3 API"
     }
 
-    deinit {
-        if let tableView {
-            NotificationCenter.default.removeObserver(tableView)
-        }
-    }
-
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         allServers = ApiServer.allApiServers(in: DataManager.main)

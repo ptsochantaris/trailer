@@ -1,6 +1,9 @@
 import CoreData
 import UIKit
-import WatchConnectivity
+
+// WCSession's delegate traffics in `[String: Any]` and non-Sendable reply handlers, none of which the
+// SDK annotates. `@preconcurrency` is the escape hatch for that.
+@preconcurrency import WatchConnectivity
 
 @MainActor
 final class WatchManager: NSObject, WCSessionDelegate {
@@ -31,10 +34,14 @@ final class WatchManager: NSObject, WCSessionDelegate {
         DataManager.dataFilesDirectory.appendingPathComponent("overview.plist")
     }
 
+    // WCSession delivers `[String: Any]` plists plus an unannotated reply handler, on its own queue.
+    // Neither can be made Sendable, so both are handed across explicitly: the dictionary is
+    // effectively immutable plist data we only read, and WCSession accepts the reply from any queue.
     nonisolated func session(_: WCSession, didReceiveMessage message: [String: Any], replyHandler: @escaping ([String: Any]) -> Void) {
+        nonisolated(unsafe) let message = message
+        nonisolated(unsafe) let replyHandler = replyHandler
         Task {
-            let reply = await handle(message: message, settings: Settings.cache)
-            replyHandler(reply)
+            await replyHandler(handle(message: message, settings: Settings.cache))
         }
     }
 
@@ -44,7 +51,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
         }
     }
 
-    private func handle(message: [String: Sendable], settings: Settings.Cache) async -> [String: Sendable] {
+    private func handle(message: [String: Any], settings: Settings.Cache) async -> [String: Sendable] {
         switch (message["command"] as? String).orEmpty {
         case "refresh":
             let status = await app.startRefresh()
@@ -110,7 +117,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
         }
     }
 
-    private func processList(message: [String: Sendable], settings: Settings.Cache) async -> [String: Sendable] {
+    private func processList(message: [String: Any], settings: Settings.Cache) async -> [String: Sendable] {
         var result = [String: Sendable]()
 
         switch (message["list"] as? String).orEmpty {

@@ -12,30 +12,29 @@ final class HiddenItemScan: UIViewController {
                 sender.isEnabled = true
             }
 
-            var hiddenCount = 0
-
             let settings = Settings.cache
-            func report(for item: ListableItem) {
-                let section = item.postProcess(settings: settings)
-                switch section {
-                case let .hidden(cause):
-                    let title = item.title ?? "<no title>"
-                    let numberString = String(item.number)
-                    Task { @MainActor in
-                        writeText("[\(item.repo.fullName.orEmpty) #\(numberString)]: \(title) -- \(cause.description)\n\n")
-                        hiddenCount += 1
-                    }
-                default:
-                    break
-                }
-            }
 
             textStorage.replaceCharacters(in: NSRange(location: 0, length: textStorage.length), with: "")
             writeText("Scanning...\n\n")
 
-            await withCheckedContinuation { continuation in
+            // The report lines are built on the child context's own queue, where these managed objects
+            // actually live, and only strings come back. Previously each line was assembled inside a
+            // `Task { @MainActor }`, which read `item.repo` from the main queue while the object
+            // belonged to the private one — and meant the count was read before any of those tasks had
+            // run, so "Done - n hidden items" was reliably wrong.
+            let lines: [String] = await withCheckedContinuation { continuation in
                 let moc = DataManager.main.buildChildContext()
                 moc.perform {
+                    var lines = [String]()
+
+                    func report(for item: ListableItem) {
+                        guard case let .hidden(cause) = item.postProcess(settings: settings) else {
+                            return
+                        }
+                        let title = item.title ?? "<no title>"
+                        lines.append("[\(item.repo.fullName.orEmpty) #\(item.number)]: \(title) -- \(cause.description)\n\n")
+                    }
+
                     for p in PullRequest.allItems(in: moc, prefetchRelationships: ["comments", "reactions", "reviews"]) {
                         report(for: p)
                     }
@@ -44,11 +43,14 @@ final class HiddenItemScan: UIViewController {
                         report(for: i)
                     }
 
-                    continuation.resume()
+                    continuation.resume(returning: lines)
                 }
             }
 
-            writeText("Done - \(hiddenCount) hidden items\n")
+            for line in lines {
+                writeText(line)
+            }
+            writeText("Done - \(lines.count) hidden items\n")
         }
     }
 

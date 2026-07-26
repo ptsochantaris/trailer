@@ -26,7 +26,15 @@ final class PRCell: UITableViewCell {
     @IBOutlet private var _description: UILabel!
     @IBOutlet private var _statuses: UILabel!
 
-    override func awakeFromNib() {
+    // Nonisolated to match NSObject's declaration; see the note in SectionHeaderView. Nib loading is
+    // on the main thread, so the view work below asserts that isolation.
+    override nonisolated func awakeFromNib() {
+        MainActor.assumeIsolated {
+            awakeFromNibOnMainActor()
+        }
+    }
+
+    private func awakeFromNibOnMainActor() {
         unreadCount.textColor = .white
         contentView.addSubview(unreadCount)
 

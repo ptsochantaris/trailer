@@ -1379,6 +1379,8 @@ nonisolated class ListableItem: DataItem, Listable {
     }
 
     #if os(iOS)
+        // Presentation: it builds a UIKit value, so the annotation just states what it already is.
+        @MainActor
         func dragItemForUrl(settings: Settings.Cache) -> UIDragItem {
             let url = URL(string: urlForOpening(settings: settings) ?? repo.webUrl.orEmpty) ?? URL(string: "https://github.com")!
             let text = "#\(number) - \(title.orEmpty)"

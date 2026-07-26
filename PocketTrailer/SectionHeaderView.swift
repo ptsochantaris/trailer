@@ -10,8 +10,13 @@ final class SectionHeaderView: UITableViewHeaderFooterView {
         callback?()
     }
 
-    override func awakeFromNib() {
+    // `awakeFromNib` is nonisolated on NSObject, so the override has to be too — under MainActor
+    // default isolation it would otherwise mismatch the declaration it overrides. Nib loading happens
+    // on the main thread, so the isolation is asserted for the part that touches views.
+    override nonisolated func awakeFromNib() {
         super.awakeFromNib()
-        action.setTitleColor(UIColor(named: "apptint"), for: .normal)
+        MainActor.assumeIsolated {
+            action.setTitleColor(UIColor(named: "apptint"), for: .normal)
+        }
     }
 }

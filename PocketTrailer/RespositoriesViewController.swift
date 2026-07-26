@@ -139,41 +139,43 @@ final class RespositoriesViewController: UITableViewController, UISearchResultsU
 
         API.isRefreshing = true
 
-        let tempContext = DataManager.main.buildChildContext()
-        tempContext.perform { [weak self] in
-            Task {
-                await API.fetchRepositories(to: tempContext, settings: Settings.cache)
-                if await ApiServer.shouldReportRefreshFailure(in: tempContext) {
-                    var errorServers = [String]()
-                    for apiServer in await ApiServer.allApiServers(in: tempContext) where apiServer.goodToGo && !apiServer.lastSyncSucceeded {
-                        errorServers.append(apiServer.label.orEmpty)
-                    }
-                    let serverNames = errorServers.joined(separator: ", ")
-                    Task { @MainActor in
-                        showMessage("Error", "Could not refresh repository list from \(serverNames), please ensure that the tokens you are using are valid")
-                        NotificationQueue.clear()
-                    }
-                } else {
-                    DataItem.nukeDeletedItems(in: tempContext)
-                    if tempContext.hasChanges {
-                        try? tempContext.save()
-                    }
-                    Task { @MainActor in
-                        await DataManager.saveDB()
-                        NotificationQueue.commit()
-                    }
+        // A main-queue child context, matching `API.performSync`. Everything done to it below —
+        // `fetchRepositories`, the `ApiServer` queries, `nukeDeletedItems`, the save — is main-actor
+        // code, so the private-queue context this used to build was being driven from the wrong queue.
+        // The old `perform { Task { … } }` wrapper also achieved nothing: the task escaped the perform
+        // block immediately. And the trailing work is now sequenced rather than split across sibling
+        // tasks, so the save completes before the UI is re-enabled.
+        let tempContext = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
+        tempContext.undoManager = nil
+        tempContext.parent = DataManager.main
+
+        Task { [weak self] in
+            await API.fetchRepositories(to: tempContext, settings: Settings.cache)
+
+            if ApiServer.shouldReportRefreshFailure(in: tempContext) {
+                let errorServers = ApiServer.allApiServers(in: tempContext)
+                    .filter { $0.goodToGo && !$0.lastSyncSucceeded }
+                    .map { $0.label.orEmpty }
+                let serverNames = errorServers.joined(separator: ", ")
+                showMessage("Error", "Could not refresh repository list from \(serverNames), please ensure that the tokens you are using are valid")
+                NotificationQueue.clear()
+            } else {
+                DataItem.nukeDeletedItems(in: tempContext)
+                if tempContext.hasChanges {
+                    try? tempContext.save()
                 }
-                Task { @MainActor [weak self] in
-                    guard let self else { return }
-                    preferencesDirty = true
-                    navigationItem.title = originalName
-                    actionsButton.isEnabled = ApiServer.someServersHaveAuthTokens(in: DataManager.main)
-                    tableView.alpha = 1.0
-                    tableView.isUserInteractionEnabled = true
-                    navigationItem.rightBarButtonItem?.isEnabled = true
-                    API.isRefreshing = false
-                }
+                await DataManager.saveDB()
+                NotificationQueue.commit()
             }
+
+            guard let self else { return }
+            preferencesDirty = true
+            navigationItem.title = originalName
+            actionsButton.isEnabled = ApiServer.someServersHaveAuthTokens(in: DataManager.main)
+            tableView.alpha = 1.0
+            tableView.isUserInteractionEnabled = true
+            navigationItem.rightBarButtonItem?.isEnabled = true
+            API.isRefreshing = false
         }
     }
 
