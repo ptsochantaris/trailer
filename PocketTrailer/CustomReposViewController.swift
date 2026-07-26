@@ -109,7 +109,7 @@ final class CustomReposViewController: UIViewController, UITableViewDelegate, UI
         if repoName == "*" {
             Task {
                 do {
-                    try await API.fetchAllRepos(owner: ownerName, from: server, moc: DataManager.main)
+                    try await API.fetchAllRepos(owner: ownerName, from: server, moc: DataManager.main, settings: Settings.cache)
 
                     let addedCount = Repo.newItems(in: DataManager.main).count
                     if Settings.displayPolicyForNewPrs == .hide, Settings.displayPolicyForNewIssues == .hide {

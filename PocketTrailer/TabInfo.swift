@@ -21,7 +21,7 @@ struct TabInfo: Equatable {
 
         let settings = Settings.cache
 
-        let prf = ListableItem.requestForItems(of: PullRequest.self, withFilter: nil, sectionIndex: -1, criterion: viewCriterion, settings: settings)
+        let prf = ListableItem.requestForItems(of: PullRequest.self, withFilter: nil, sectionIndex: -1, criterion: viewCriterion, settings: settings, moc: DataManager.main)
         if try! DataManager.main.count(for: prf) > 0 {
             let prUnreadCount = PullRequest.badgeCount(in: DataManager.main, criterion: viewCriterion, settings: settings)
             let badgeValue = prUnreadCount > 0 ? "\(prUnreadCount)" : nil
@@ -29,7 +29,7 @@ struct TabInfo: Equatable {
             items.append(i)
         }
 
-        let isf = ListableItem.requestForItems(of: Issue.self, withFilter: nil, sectionIndex: -1, criterion: viewCriterion, settings: settings)
+        let isf = ListableItem.requestForItems(of: Issue.self, withFilter: nil, sectionIndex: -1, criterion: viewCriterion, settings: settings, moc: DataManager.main)
         if try! DataManager.main.count(for: isf) > 0 {
             let issuesUnreadCount = Issue.badgeCount(in: DataManager.main, criterion: viewCriterion, settings: settings)
             let badgeValue = issuesUnreadCount > 0 ? "\(issuesUnreadCount)" : nil

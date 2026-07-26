@@ -169,12 +169,12 @@ final class WatchManager: NSObject, WCSessionDelegate {
         let f: NSFetchRequest<ListableItem>
         if !apiServerUri.isEmpty, let aid = DataManager.id(for: apiServerUri) {
             let criterion = GroupingCriterion.server(aid)
-            f = ListableItem.requestForItems(of: entity, withFilter: nil, sectionIndex: sectionIndex, criterion: criterion, onlyUnread: onlyUnread, settings: settings)
+            f = ListableItem.requestForItems(of: entity, withFilter: nil, sectionIndex: sectionIndex, criterion: criterion, onlyUnread: onlyUnread, settings: settings, moc: DataManager.main)
         } else if !group.isEmpty {
             let criterion = GroupingCriterion.group(group)
-            f = ListableItem.requestForItems(of: entity, withFilter: nil, sectionIndex: sectionIndex, criterion: criterion, onlyUnread: onlyUnread, settings: settings)
+            f = ListableItem.requestForItems(of: entity, withFilter: nil, sectionIndex: sectionIndex, criterion: criterion, onlyUnread: onlyUnread, settings: settings, moc: DataManager.main)
         } else {
-            f = ListableItem.requestForItems(of: entity, withFilter: nil, sectionIndex: sectionIndex, onlyUnread: onlyUnread, settings: settings)
+            f = ListableItem.requestForItems(of: entity, withFilter: nil, sectionIndex: sectionIndex, onlyUnread: onlyUnread, settings: settings, moc: DataManager.main)
         }
 
         f.fetchOffset = from
@@ -258,99 +258,143 @@ final class WatchManager: NSObject, WCSessionDelegate {
 
     //////////////////////////////
 
-    private func buildOverview(settings: Settings.Cache) async -> [String: Sendable] {
-        let allViewCriteria = SectionListViewController.tabBarSets.map(\.viewCriterion)
+    /// The counts for one view criterion. Pure numbers, so they can come back from the child context's
+    /// queue without anything managed crossing over.
+    private nonisolated struct CriterionCounts {
+        var myPrs: [String: Int] = [:]
+        var participatedPrs: [String: Int] = [:]
+        var mentionedPrs: [String: Int] = [:]
+        var mergedPrs: [String: Int] = [:]
+        var closedPrs: [String: Int] = [:]
+        var otherPrs: [String: Int] = [:]
+        var snoozedPrs: [String: Int] = [:]
+        var totalOpenPrs = 0
+        var unreadPrCount = 0
 
-        return await DataManager.runInChild(of: DataManager.main) { tempMoc in
-            var views = [[String: Sendable]]()
-            var totalUnreadPrCount = 0
-            var totalUnreadIssueCount = 0
+        var myIssues: [String: Int] = [:]
+        var participatedIssues: [String: Int] = [:]
+        var mentionedIssues: [String: Int] = [:]
+        var closedIssues: [String: Int] = [:]
+        var otherIssues: [String: Int] = [:]
+        var snoozedIssues: [String: Int] = [:]
+        var totalOpenIssues = 0
+        var unreadIssueCount = 0
 
-            for c in allViewCriteria {
-                let myPrs = WatchManager.counts(for: PullRequest.self, in: .mine, criterion: c, moc: tempMoc, settings: settings)
-                let participatedPrs = WatchManager.counts(for: PullRequest.self, in: .participated, criterion: c, moc: tempMoc, settings: settings)
-                let mentionedPrs = WatchManager.counts(for: PullRequest.self, in: .mentioned, criterion: c, moc: tempMoc, settings: settings)
-                let mergedPrs = WatchManager.counts(for: PullRequest.self, in: .merged, criterion: c, moc: tempMoc, settings: settings)
-                let closedPrs = WatchManager.counts(for: PullRequest.self, in: .closed, criterion: c, moc: tempMoc, settings: settings)
-                let otherPrs = WatchManager.counts(for: PullRequest.self, in: .all, criterion: c, moc: tempMoc, settings: settings)
-                let snoozedPrs = WatchManager.counts(for: PullRequest.self, in: .snoozed, criterion: c, moc: tempMoc, settings: settings)
-                let totalPrs = [myPrs, participatedPrs, mentionedPrs, mergedPrs, closedPrs, otherPrs, snoozedPrs].reduce(0) { $0 + $1["total"]! }
+        var totalPrs: Int {
+            [myPrs, participatedPrs, mentionedPrs, mergedPrs, closedPrs, otherPrs, snoozedPrs].reduce(0) { $0 + $1["total"]! }
+        }
 
-                let totalOpenPrs = WatchManager.countOpenAndVisible(of: PullRequest.self, criterion: c, moc: tempMoc, settings: settings)
-                let unreadPrCount = PullRequest.badgeCount(in: tempMoc, criterion: c, settings: settings)
-                totalUnreadPrCount += unreadPrCount
-
-                let myIssues = WatchManager.counts(for: Issue.self, in: .mine, criterion: c, moc: tempMoc, settings: settings)
-                let participatedIssues = WatchManager.counts(for: Issue.self, in: .participated, criterion: c, moc: tempMoc, settings: settings)
-                let mentionedIssues = WatchManager.counts(for: Issue.self, in: .mentioned, criterion: c, moc: tempMoc, settings: settings)
-                let closedIssues = WatchManager.counts(for: Issue.self, in: .closed, criterion: c, moc: tempMoc, settings: settings)
-                let otherIssues = WatchManager.counts(for: Issue.self, in: .all, criterion: c, moc: tempMoc, settings: settings)
-                let snoozedIssues = WatchManager.counts(for: Issue.self, in: .snoozed, criterion: c, moc: tempMoc, settings: settings)
-                let totalIssues = [myIssues, participatedIssues, mentionedIssues, closedIssues, otherIssues, snoozedIssues].reduce(0) { $0 + $1["total"]! }
-
-                let totalOpenIssues = WatchManager.countOpenAndVisible(of: Issue.self, criterion: c, moc: tempMoc, settings: settings)
-                let unreadIssueCount = Issue.badgeCount(in: tempMoc, criterion: c, settings: settings)
-                totalUnreadIssueCount += unreadIssueCount
-
-                let prList = [
-                    "mine": myPrs, "participated": participatedPrs, "mentioned": mentionedPrs,
-                    "merged": mergedPrs, "closed": closedPrs, "other": otherPrs, "snoozed": snoozedPrs,
-                    "total": totalPrs, "total_open": totalOpenPrs, "unread": unreadPrCount,
-                    "error": totalPrs == 0 ? PullRequest.reasonForEmpty(with: nil, criterion: c).string : ""
-                ] as [String: Sendable]
-
-                let issueList = [
-                    "mine": myIssues, "participated": participatedIssues, "mentioned": mentionedIssues,
-                    "closed": closedIssues, "other": otherIssues, "snoozed": snoozedIssues,
-                    "total": totalIssues, "total_open": totalOpenIssues, "unread": unreadIssueCount,
-                    "error": totalIssues == 0 ? Issue.reasonForEmpty(with: nil, criterion: c).string : ""
-                ] as [String: Sendable]
-
-                views.append([
-                    "title": (c?.label).orEmpty,
-                    "apiUri": (c?.apiServerId?.uriRepresentation().absoluteString).orEmpty,
-                    "prs": prList,
-                    "issues": issueList
-                ])
-            }
-            let badgeCount = totalUnreadPrCount + totalUnreadIssueCount
-            Task { @MainActor in
-                UNUserNotificationCenter.current().setBadgeCount(badgeCount)
-            }
-            return [
-                "views": views,
-                "preferIssues": Settings.preferIssuesInWatch,
-                "lastUpdated": Settings.lastSuccessfulRefresh ?? .distantPast
-            ]
+        var totalIssues: Int {
+            [myIssues, participatedIssues, mentionedIssues, closedIssues, otherIssues, snoozedIssues].reduce(0) { $0 + $1["total"]! }
         }
     }
 
-    private static func counts(for type: (some ListableItem).Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext, settings: Settings.Cache) -> [String: Int] {
+    private nonisolated static func criterionCounts(for c: GroupingCriterion?, moc: NSManagedObjectContext, settings: Settings.Cache) -> CriterionCounts {
+        var r = CriterionCounts()
+
+        r.myPrs = counts(for: PullRequest.self, in: .mine, criterion: c, moc: moc, settings: settings)
+        r.participatedPrs = counts(for: PullRequest.self, in: .participated, criterion: c, moc: moc, settings: settings)
+        r.mentionedPrs = counts(for: PullRequest.self, in: .mentioned, criterion: c, moc: moc, settings: settings)
+        r.mergedPrs = counts(for: PullRequest.self, in: .merged, criterion: c, moc: moc, settings: settings)
+        r.closedPrs = counts(for: PullRequest.self, in: .closed, criterion: c, moc: moc, settings: settings)
+        r.otherPrs = counts(for: PullRequest.self, in: .all, criterion: c, moc: moc, settings: settings)
+        r.snoozedPrs = counts(for: PullRequest.self, in: .snoozed, criterion: c, moc: moc, settings: settings)
+        r.totalOpenPrs = countOpenAndVisible(of: PullRequest.self, criterion: c, moc: moc, settings: settings)
+        r.unreadPrCount = PullRequest.badgeCount(in: moc, criterion: c, settings: settings)
+
+        r.myIssues = counts(for: Issue.self, in: .mine, criterion: c, moc: moc, settings: settings)
+        r.participatedIssues = counts(for: Issue.self, in: .participated, criterion: c, moc: moc, settings: settings)
+        r.mentionedIssues = counts(for: Issue.self, in: .mentioned, criterion: c, moc: moc, settings: settings)
+        r.closedIssues = counts(for: Issue.self, in: .closed, criterion: c, moc: moc, settings: settings)
+        r.otherIssues = counts(for: Issue.self, in: .all, criterion: c, moc: moc, settings: settings)
+        r.snoozedIssues = counts(for: Issue.self, in: .snoozed, criterion: c, moc: moc, settings: settings)
+        r.totalOpenIssues = countOpenAndVisible(of: Issue.self, criterion: c, moc: moc, settings: settings)
+        r.unreadIssueCount = Issue.badgeCount(in: moc, criterion: c, settings: settings)
+
+        return r
+    }
+
+    // Deliberately two phases. The counting is Core Data work against a child context, so it belongs
+    // on that context's own queue. But assembling the payload needs `criterion.label` and
+    // `reasonForEmpty`, and both of those read `DataManager.main` — the *main-queue* context. Doing
+    // them inside the child block, as this used to, was a genuine cross-queue access; it survived
+    // because the watch path is rarely exercised, so ThreadingDebug never caught it. They run on the
+    // main actor here, after the counts come back.
+    private func buildOverview(settings: Settings.Cache) async -> [String: Sendable] {
+        let allViewCriteria = SectionListViewController.tabBarSets.map(\.viewCriterion)
+
+        let perCriterion = await DataManager.runInChild(of: DataManager.main) { tempMoc in
+            allViewCriteria.map { WatchManager.criterionCounts(for: $0, moc: tempMoc, settings: settings) }
+        }
+
+        var views = [[String: Sendable]]()
+        var totalUnreadPrCount = 0
+        var totalUnreadIssueCount = 0
+
+        for (c, counts) in zip(allViewCriteria, perCriterion) {
+            totalUnreadPrCount += counts.unreadPrCount
+            totalUnreadIssueCount += counts.unreadIssueCount
+
+            let totalPrs = counts.totalPrs
+            let prList = [
+                "mine": counts.myPrs, "participated": counts.participatedPrs, "mentioned": counts.mentionedPrs,
+                "merged": counts.mergedPrs, "closed": counts.closedPrs, "other": counts.otherPrs, "snoozed": counts.snoozedPrs,
+                "total": totalPrs, "total_open": counts.totalOpenPrs, "unread": counts.unreadPrCount,
+                "error": totalPrs == 0 ? PullRequest.reasonForEmpty(with: nil, criterion: c).string : ""
+            ] as [String: Sendable]
+
+            let totalIssues = counts.totalIssues
+            let issueList = [
+                "mine": counts.myIssues, "participated": counts.participatedIssues, "mentioned": counts.mentionedIssues,
+                "closed": counts.closedIssues, "other": counts.otherIssues, "snoozed": counts.snoozedIssues,
+                "total": totalIssues, "total_open": counts.totalOpenIssues, "unread": counts.unreadIssueCount,
+                "error": totalIssues == 0 ? Issue.reasonForEmpty(with: nil, criterion: c).string : ""
+            ] as [String: Sendable]
+
+            views.append([
+                "title": (c?.label).orEmpty,
+                "apiUri": (c?.apiServerId?.uriRepresentation().absoluteString).orEmpty,
+                "prs": prList,
+                "issues": issueList
+            ])
+        }
+
+        // Already on the main actor here, so this no longer needs a Task to hop — just await it.
+        try? await UNUserNotificationCenter.current().setBadgeCount(totalUnreadPrCount + totalUnreadIssueCount)
+
+        return [
+            "views": views,
+            "preferIssues": Settings.preferIssuesInWatch,
+            "lastUpdated": Settings.lastSuccessfulRefresh ?? .distantPast
+        ]
+    }
+
+    private nonisolated static func counts(for type: (some ListableItem).Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext, settings: Settings.Cache) -> [String: Int] {
         ["total": countItems(of: type, in: section, criterion: criterion, moc: moc, settings: settings),
          "unread": badgeCount(for: type, in: section, criterion: criterion, moc: moc, settings: settings)]
     }
 
-    private static func countallItems<T: ListableItem>(of type: T.Type, criterion: GroupingCriterion?, moc: NSManagedObjectContext, settings: Settings.Cache) -> Int {
+    private nonisolated static func countallItems<T: ListableItem>(of type: T.Type, criterion: GroupingCriterion?, moc: NSManagedObjectContext, settings: Settings.Cache) -> Int {
         let f = NSFetchRequest<T>(entityName: type.typeName)
         f.includesSubentities = false
-        let p = Settings.hideUncommentedItems
+        let p = settings.hideUncommentedItems
             ? NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, type.includeInUnreadPredicate(settings: settings)])
             : Section.nonZeroPredicate
         DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc)
         return try! moc.count(for: f)
     }
 
-    private static func countItems<T: ListableItem>(of type: T.Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext, settings: Settings.Cache) -> Int {
+    private nonisolated static func countItems<T: ListableItem>(of type: T.Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext, settings: Settings.Cache) -> Int {
         let f = NSFetchRequest<T>(entityName: type.typeName)
         f.includesSubentities = false
-        let p = Settings.hideUncommentedItems
+        let p = settings.hideUncommentedItems
             ? NSCompoundPredicate(type: .and, subpredicates: [section.matchingPredicate, type.includeInUnreadPredicate(settings: settings)])
             : section.matchingPredicate
         DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc)
         return try! moc.count(for: f)
     }
 
-    private static func badgeCount<T: ListableItem>(for type: T.Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext, settings: Settings.Cache) -> Int {
+    private nonisolated static func badgeCount<T: ListableItem>(for type: T.Type, in section: Section, criterion: GroupingCriterion?, moc: NSManagedObjectContext, settings: Settings.Cache) -> Int {
         let f = NSFetchRequest<T>(entityName: type.typeName)
         f.includesSubentities = false
         let p = NSCompoundPredicate(type: .and, subpredicates: [section.matchingPredicate, type.includeInUnreadPredicate(settings: settings)])
@@ -358,10 +402,10 @@ final class WatchManager: NSObject, WCSessionDelegate {
         return ListableItem.badgeCount(from: f, in: moc, settings: settings)
     }
 
-    private static func countOpenAndVisible<T: ListableItem>(of type: T.Type, criterion: GroupingCriterion?, moc: NSManagedObjectContext, settings: Settings.Cache) -> Int {
+    private nonisolated static func countOpenAndVisible<T: ListableItem>(of type: T.Type, criterion: GroupingCriterion?, moc: NSManagedObjectContext, settings: Settings.Cache) -> Int {
         let f = NSFetchRequest<T>(entityName: type.typeName)
         f.includesSubentities = false
-        let p = Settings.hideUncommentedItems
+        let p = settings.hideUncommentedItems
             ? NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, ItemCondition.open.matchingPredicate, type.includeInUnreadPredicate(settings: settings)])
             : NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, ItemCondition.open.matchingPredicate])
         DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc)

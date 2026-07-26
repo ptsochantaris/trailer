@@ -92,7 +92,7 @@ final class MenuBarSet {
     }
 
     private func shouldShow(type: ListableItem.Type, settings: Settings.Cache) -> Bool {
-        let fc = ListableItem.requestForItems(of: type, withFilter: nil, sectionIndex: -1, criterion: viewCriterion, settings: settings)
+        let fc = ListableItem.requestForItems(of: type, withFilter: nil, sectionIndex: -1, criterion: viewCriterion, settings: settings, moc: DataManager.main)
         fc.fetchLimit = 1
         return try! DataManager.main.count(for: fc) > 0
     }
@@ -109,7 +109,7 @@ final class MenuBarSet {
             let somethingFailed = ApiServer.shouldReportRefreshFailure(in: DataManager.main) && (viewCriterion?.relatedServerFailed ?? true)
 
             let excludeSnoozed = !Settings.countVisibleSnoozedItems
-            let f = ListableItem.requestForItems(of: type, withFilter: menu.filter.stringValue, sectionIndex: -1, criterion: viewCriterion, excludeSnoozed: excludeSnoozed, settings: settings)
+            let f = ListableItem.requestForItems(of: type, withFilter: menu.filter.stringValue, sectionIndex: -1, criterion: viewCriterion, excludeSnoozed: excludeSnoozed, settings: settings, moc: DataManager.main)
             let countString = somethingFailed ? "X" : (Settings.hideMenubarCounts ? "" : String(try! DataManager.main.count(for: f)))
 
             let label = viewCriterion?.label

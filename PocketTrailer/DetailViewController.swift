@@ -857,7 +857,7 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
     private func itemFetchRequest(settings: Settings.Cache) -> NSFetchRequest<ListableItem> {
         let type: ListableItem.Type = viewingPrs ? PullRequest.self : Issue.self
         let text = navigationItem.searchController?.searchBar.text
-        return ListableItem.requestForItems(of: type, withFilter: text, sectionIndex: -1, criterion: currentTabBar?.viewCriterion, settings: settings)
+        return ListableItem.requestForItems(of: type, withFilter: text, sectionIndex: -1, criterion: currentTabBar?.viewCriterion, settings: settings, moc: DataManager.main)
     }
 
     func controllerWillChangeContent(_: NSFetchedResultsController<NSFetchRequestResult>) {

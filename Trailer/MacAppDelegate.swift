@@ -2,6 +2,7 @@ import Cocoa
 import CoreSpotlight
 import PopTimer
 import Sparkle
+
 // For `kAXTrustedCheckOptionPrompt`, which ApplicationServices still imports as a mutable global.
 @preconcurrency import ApplicationServices
 
@@ -357,7 +358,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, N
 
         let prMenu = window === menuBarSet.prMenu
         let type: ListableItem.Type = prMenu ? PullRequest.self : Issue.self
-        let f = ListableItem.requestForItems(of: type, withFilter: window.filter.stringValue, sectionIndex: -1, criterion: menuBarSet.viewCriterion, settings: Settings.cache)
+        let f = ListableItem.requestForItems(of: type, withFilter: window.filter.stringValue, sectionIndex: -1, criterion: menuBarSet.viewCriterion, settings: Settings.cache, moc: DataManager.main)
         let settings = Settings.cache
         for r in try! DataManager.main.fetch(f) {
             r.catchUpWithComments(settings: settings)

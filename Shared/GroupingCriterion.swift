@@ -1,6 +1,9 @@
 import CoreData
 
-enum GroupingCriterion {
+// A value enum, so nonisolated. Only `label` and `relatedServerFailed` reach for `DataManager.main`,
+// and they stay explicitly main-actor; everything else is pure and is used from model code and from
+// child-context queues.
+nonisolated enum GroupingCriterion {
     case server(NSManagedObjectID), group(String)
 
     var id: String {

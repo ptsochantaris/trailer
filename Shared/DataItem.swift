@@ -322,7 +322,9 @@ nonisolated class DataItem: NSManagedObject, Querying {
         }
     }
 
-    @MainActor
+    // Nonisolated: it only reads the context it is handed, via `Repo.allGroupLabels(in: moc)`, plus
+    // pure predicate building. The `@MainActor` it used to carry was not load-bearing and blocked
+    // building fetch requests for a non-main context on that context's own queue.
     static func add(criterion: GroupingCriterion?, toFetchRequest: NSFetchRequest<some ListableItem>, originalPredicate: NSPredicate, in moc: NSManagedObjectContext, includeAllGroups: Bool = false) {
         var andPredicates = [NSPredicate]()
         if let criterion {

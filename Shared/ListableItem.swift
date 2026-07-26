@@ -1096,8 +1096,11 @@ nonisolated class ListableItem: DataItem, Listable {
     private static let filterLabelPredicate = "SUBQUERY(labels, $label, $label.name contains[cd] %@).@count > 0"
     private static let filterStatusPredicate = "SUBQUERY(statuses, $status, $status.descriptionText contains[cd] %@).@count > 0"
 
-    @MainActor
-    static func requestForItems<T: ListableItem>(of itemType: T.Type, withFilter: String?, sectionIndex: Int, criterion: GroupingCriterion? = nil, onlyUnread: Bool = false, excludeSnoozed: Bool = false, settings: Settings.Cache) -> NSFetchRequest<T> {
+    // Takes the context it is building the request for. It used to hardcode `DataManager.main` at the
+    // bottom, which meant a request destined for some other context still had its group-label
+    // predicate computed from the main one — a cross-context read, and the only thing forcing this
+    // function onto the main actor.
+    nonisolated static func requestForItems<T: ListableItem>(of itemType: T.Type, withFilter: String?, sectionIndex: Int, criterion: GroupingCriterion? = nil, onlyUnread: Bool = false, excludeSnoozed: Bool = false, settings: Settings.Cache, moc: NSManagedObjectContext) -> NSFetchRequest<T> {
         let andPredicates = Lista<NSPredicate>()
 
         if onlyUnread {
@@ -1216,7 +1219,7 @@ nonisolated class ListableItem: DataItem, Listable {
         f.returnsObjectsAsFaults = false
         f.includesSubentities = false
         let p = NSCompoundPredicate(andPredicateWithSubpredicates: Array(andPredicates))
-        add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: DataManager.main)
+        add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc)
         f.sortDescriptors = Array(sortDescriptors)
         return f
     }

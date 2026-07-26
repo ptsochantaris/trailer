@@ -57,7 +57,7 @@ extension MenuWindow {
         func reloadData(filter: String?) {
             itemIds.removeAll(keepingCapacity: false)
 
-            let f = ListableItem.requestForItems(of: type, withFilter: filter, sectionIndex: -1, criterion: viewCriterion, settings: Settings.cache)
+            let f = ListableItem.requestForItems(of: type, withFilter: filter, sectionIndex: -1, criterion: viewCriterion, settings: Settings.cache, moc: DataManager.main)
             f.resultType = .dictionaryResultType
             f.fetchBatchSize = 0
             f.propertiesToFetch = DataSource.propertiesToFetch

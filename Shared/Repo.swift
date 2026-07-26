@@ -228,7 +228,8 @@ final nonisolated class Repo: DataItem {
         return all.contains { $0.displayPolicyForPrs != RepoDisplayPolicy.hide.rawValue }
     }
 
-    @MainActor
+    // Nonisolated: reads only the context it is handed. Called while building fetch requests, which
+    // can legitimately happen on a child context's own queue.
     static func allGroupLabels(in moc: NSManagedObjectContext) -> [String] {
         let allRepos = allItems(in: moc)
         let labels = allRepos.compactMap { $0.displayPolicyForPrs > 0 || $0.displayPolicyForIssues > 0 ? $0.groupLabel : nil }

@@ -95,9 +95,8 @@ final nonisolated class Issue: ListableItem {
         return badgeCount(from: f, in: moc, settings: settings)
     }
 
-    @MainActor
     static func badgeCount(in moc: NSManagedObjectContext, criterion: GroupingCriterion?, settings: Settings.Cache) -> Int {
-        let f = requestForItems(of: Issue.self, withFilter: nil, sectionIndex: -1, criterion: criterion, settings: settings)
+        let f = requestForItems(of: Issue.self, withFilter: nil, sectionIndex: -1, criterion: criterion, settings: settings, moc: moc)
         return badgeCount(from: f, in: moc, settings: settings)
     }
 

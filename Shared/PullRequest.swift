@@ -343,9 +343,8 @@ final nonisolated class PullRequest: ListableItem {
         return badgeCount(from: f, in: moc, settings: settings)
     }
 
-    @MainActor
     static func badgeCount(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, settings: Settings.Cache) -> Int {
-        let f = requestForItems(of: PullRequest.self, withFilter: nil, sectionIndex: -1, criterion: criterion, settings: settings)
+        let f = requestForItems(of: PullRequest.self, withFilter: nil, sectionIndex: -1, criterion: criterion, settings: settings, moc: moc)
         return badgeCount(from: f, in: moc, settings: settings)
     }
 
