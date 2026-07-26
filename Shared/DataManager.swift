@@ -12,6 +12,21 @@ nonisolated extension NSManagedObjectContext {
         child.parent = self
         return child
     }
+
+    /// Re-materialises an object that crossed a task boundary as an ID, which is how the sync
+    /// fan-outs get managed objects past `sending` — see the commentary in `V3Sync`.
+    ///
+    /// This should always succeed: the ID belongs to an object already registered in this context,
+    /// and whatever array the caller is iterating keeps it registered, so even the temporary IDs of
+    /// newly inserted items resolve. A nil result therefore means an item was quietly dropped from
+    /// the sync, which is worth a log rather than a silent skip.
+    func syncObject<T: NSManagedObject>(with id: NSManagedObjectID) async -> T? {
+        if let object = try? existingObject(with: id) as? T {
+            return object
+        }
+        await Logging.shared.log("Warning: sync could not resolve \(T.self) with ID \(id)")
+        return nil
+    }
 }
 
 @MainActor

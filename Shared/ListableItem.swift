@@ -1233,8 +1233,11 @@ nonisolated class ListableItem: DataItem, Listable {
         muted = newValue
         postProcess(settings: settings)
         if newValue {
+            // Read out of the object up front, so the task closure captures only the string —
+            // capturing `self` here would mean sending a managed object out of this context.
+            let uri = objectID.uriRepresentation().absoluteString
             Task {
-                await NotificationManager.shared.removeRelatedNotifications(for: objectID.uriRepresentation().absoluteString)
+                await NotificationManager.shared.removeRelatedNotifications(for: uri)
             }
         }
     }

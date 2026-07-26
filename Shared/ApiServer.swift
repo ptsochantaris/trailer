@@ -240,24 +240,20 @@ final nonisolated class ApiServer: NSManagedObject {
         resetDate = stats.resetAt
     }
 
+    // Deliberately sequential. These two checks used to run in a task group, but the child closures
+    // captured `self` — a managed object can never satisfy `sending`. Running them in order costs one
+    // extra round-trip on a manual "test server" press, and loses nothing else: the group used
+    // `waitForAll`, so the first failure already cancelled the other check rather than reporting both.
     @MainActor
     func test() async throws {
-        try await withThrowingTaskGroup { group in
-            if let graphQLPath {
-                group.addTask { @MainActor in
-                    await Logging.shared.log("Checking GraphQL interface on \(graphQLPath)")
-                    try await GraphQL.testApi(to: self)
-                }
-            }
+        if let graphQLPath {
+            await Logging.shared.log("Checking GraphQL interface on \(graphQLPath)")
+            try await GraphQL.testApi(to: self)
+        }
 
-            if let apiPath {
-                group.addTask { @MainActor in
-                    await Logging.shared.log("Checking REST interface on \(apiPath)")
-                    try await RestAccess.testApi(to: self)
-                }
-            }
-
-            try await group.waitForAll()
+        if let apiPath {
+            await Logging.shared.log("Checking REST interface on \(apiPath)")
+            try await RestAccess.testApi(to: self)
         }
     }
 

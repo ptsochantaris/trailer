@@ -286,7 +286,7 @@ enum GraphQL {
         return json
     }
 
-    private static func run(_ query: Query, for urlString: String, authToken: String, expectedNodeCost: Int?, attempts: Int = 5, newStats: @escaping (ApiStats) -> Void) async throws {
+    private static func run(_ query: Query, for urlString: String, authToken: String, expectedNodeCost: Int?, attempts: Int = 5, newStats: @MainActor @escaping (ApiStats) -> Void) async throws {
         if let expectedNodeCost {
             await Logging.shared.log("\(query.logPrefix)Queued - Expected Count: \(expectedNodeCost)")
         }
@@ -360,10 +360,14 @@ enum GraphQL {
         }
     }
 
-    static func runQueries(queries: Lista<Query>, on path: String, token: String, newStats: @escaping (ApiStats) -> Void) async throws {
+    // `newStats` is main-actor isolated rather than plain-escaping so that this closure can cross into
+    // the child tasks below: a global-actor-isolated closure is Sendable even though it captures
+    // non-Sendable state, because the isolation is what protects that state. It is invoked
+    // synchronously from `run`, which is already on the main actor.
+    static func runQueries(queries: Lista<Query>, on path: String, token: String, newStats: @MainActor @escaping (ApiStats) -> Void) async throws {
         try await withThrowingTaskGroup { group in
             for query in queries {
-                group.addTask { @MainActor in
+                group.addTask {
                     do {
                         try await run(query, for: path, authToken: token, expectedNodeCost: query.nodeCost, newStats: newStats)
                     } catch _ as CancellationError {
@@ -637,41 +641,36 @@ enum GraphQL {
         }
     }
 
-    static func fetchAllAuthoredPrs(from servers: [ApiServer], settings: Settings.Cache) async {
-        await withTaskGroup { group in
-            for server in servers {
-                if Settings.queryAuthoredPRs {
-                    let g = Group("pullRequests", ("states", "[OPEN]"), paging: settings.syncProfile.mediumPageSize) {
-                        prFragment(includeRepo: true, settings: settings)
-                    }
-                    group.addTask { @MainActor in
-                        if let nodes = await fetchAllAuthoredItems(from: server, label: "PRs", fields: { g }) {
-                            await checkAuthoredPrClosures(nodes: nodes, in: server, settings: settings)
-                        }
-                    }
-                } else {
-                    server.repos.filter { $0.displayPolicyForPrs == RepoDisplayPolicy.authoredOnly.rawValue }.forEach { $0.displayPolicyForPrs = RepoDisplayPolicy.hide.rawValue }
-                }
-            }
+    // These two handle a single server. Fanning out across servers is the orchestrator's job — see
+    // `V4Sync` — which is what keeps a task group out of this file. A child task closure may not
+    // capture an `ApiServer`, since `sending` requires a region disconnected from the main actor and
+    // a managed object never is; the orchestrator owns the context, so it can pass object IDs and
+    // re-materialise a server before calling in here.
+    static func fetchAuthoredPrs(from server: ApiServer, settings: Settings.Cache) async {
+        guard Settings.queryAuthoredPRs else {
+            server.repos.filter { $0.displayPolicyForPrs == RepoDisplayPolicy.authoredOnly.rawValue }.forEach { $0.displayPolicyForPrs = RepoDisplayPolicy.hide.rawValue }
+            return
+        }
+
+        let g = Group("pullRequests", ("states", "[OPEN]"), paging: settings.syncProfile.mediumPageSize) {
+            prFragment(includeRepo: true, settings: settings)
+        }
+        if let nodes = await fetchAllAuthoredItems(from: server, label: "PRs", fields: { g }) {
+            await checkAuthoredPrClosures(nodes: nodes, in: server, settings: settings)
         }
     }
 
-    static func fetchAllAuthoredIssues(from servers: [ApiServer], settings: Settings.Cache) async {
-        await withTaskGroup { group in
-            for server in servers {
-                if settings.queryAuthoredIssues {
-                    let g = Group("issues", ("states", "[OPEN]"), paging: .max) {
-                        issueFragment(includeRepo: true, settings: settings)
-                    }
-                    group.addTask { @MainActor in
-                        if let nodes = await fetchAllAuthoredItems(from: server, label: "Issues", fields: { g }) {
-                            checkAuthoredIssueClosures(nodes: nodes, in: server)
-                        }
-                    }
-                } else {
-                    server.repos.filter { $0.displayPolicyForIssues == RepoDisplayPolicy.authoredOnly.rawValue }.forEach { $0.displayPolicyForIssues = RepoDisplayPolicy.hide.rawValue }
-                }
-            }
+    static func fetchAuthoredIssues(from server: ApiServer, settings: Settings.Cache) async {
+        guard settings.queryAuthoredIssues else {
+            server.repos.filter { $0.displayPolicyForIssues == RepoDisplayPolicy.authoredOnly.rawValue }.forEach { $0.displayPolicyForIssues = RepoDisplayPolicy.hide.rawValue }
+            return
+        }
+
+        let g = Group("issues", ("states", "[OPEN]"), paging: .max) {
+            issueFragment(includeRepo: true, settings: settings)
+        }
+        if let nodes = await fetchAllAuthoredItems(from: server, label: "Issues", fields: { g }) {
+            checkAuthoredIssueClosures(nodes: nodes, in: server)
         }
     }
 
@@ -948,7 +947,7 @@ enum GraphQL {
         }
     }
 
-    private nonisolated final class NodeScanner: Sendable {
+    private final nonisolated class NodeScanner: Sendable {
         private let scannerMoc: NSManagedObjectContext
         private let parentType: DataItem.Type?
 

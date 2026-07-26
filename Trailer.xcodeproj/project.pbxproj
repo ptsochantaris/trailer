@@ -1670,6 +1670,7 @@
 				SDKROOT = macosx;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_STRICT_CONCURRENCY = complete;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -1703,6 +1704,7 @@
 				SDKROOT = macosx;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_STRICT_CONCURRENCY = complete;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

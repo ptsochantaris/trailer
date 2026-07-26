@@ -188,17 +188,7 @@ enum API {
                          Issue.self,
                          Repo.self]
 
-            let goodToGoServers = ApiServer.allApiServers(in: childMoc).filter(\.goodToGo)
-            try await withThrowingTaskGroup { group in
-                for server in goodToGoServers {
-                    for type in types {
-                        group.addTask { @MainActor in
-                            try await GraphQL.migrateV4Ids(for: type, in: server)
-                        }
-                    }
-                }
-                try await group.waitForAll()
-            }
+            try await IdMigration(moc: childMoc).run(types: types)
 
             if childMoc.hasChanges {
                 try childMoc.save()
@@ -316,56 +306,8 @@ enum API {
         return agoFormat(prefix: "updated", since: last).capitalFirstLetter
     }
 
-    private static func fetchUserTeams(from server: ApiServer, moc: NSManagedObjectContext) async {
-        for t in server.teams {
-            t.postSyncAction = PostSyncAction.delete.rawValue
-        }
-
-        let serverId = server.objectID
-        let result = await RestAccess.getPagedData(at: "/user/teams", from: server) { data, _ in
-            await Team.syncTeams(from: data, serverId: serverId, moc: moc)
-            return false
-        }
-        switch result {
-        case .cancelled, .ignored, .success:
-            break
-        case .deleted, .failed, .notFound:
-            server.lastSyncSucceeded = false
-        }
-    }
-
     static func fetchRepositories(to moc: NSManagedObjectContext) async {
-        ApiServer.resetSyncSuccess(in: moc)
-
-        await syncUserDetails(in: moc)
-
-        for r in Repo.items(surviving: true, in: moc) {
-            r.postSyncAction = r.shouldBeWipedIfNotInWatchlist ? PostSyncAction.delete.rawValue : PostSyncAction.doNothing.rawValue
-        }
-
-        let goodToGoServers = ApiServer.allApiServers(in: moc).filter(\.goodToGo)
-
-        await withTaskGroup { group in
-            for apiServer in goodToGoServers {
-                group.addTask { @MainActor in
-                    await syncWatchedRepos(from: apiServer, moc: moc)
-                }
-                group.addTask { @MainActor in
-                    await syncManuallyAddedRepos(from: apiServer, moc: moc)
-                }
-                group.addTask { @MainActor in
-                    await fetchUserTeams(from: apiServer, moc: moc)
-                }
-            }
-        }
-
-        if Settings.hideArchivedRepos {
-            Repo.hideArchivedRepos(in: moc)
-        }
-        for r in Repo.newItems(in: moc) where r.shouldSync {
-            NotificationQueue.add(type: .newRepoAnnouncement, for: r)
-        }
-        lastRepoCheck = Date()
+        await RepoSync(moc: moc).run()
     }
 
     private static func ensureApiServersHaveUserIds(in moc: NSManagedObjectContext) async {
@@ -400,45 +342,6 @@ enum API {
             if let l = await getRateLimit(from: apiServer) {
                 apiServer.updateApiStats(l)
             }
-        }
-    }
-
-    private static func syncManuallyAddedRepos(from server: ApiServer, moc: NSManagedObjectContext) async {
-        if !server.lastSyncSucceeded {
-            return
-        }
-
-        for repo in server.repos.filter(\.manuallyAdded) {
-            do {
-                try await fetchRepo(fullName: repo.fullName.orEmpty, from: server, moc: moc)
-            } catch {
-                server.lastSyncSucceeded = false
-            }
-        }
-    }
-
-    private static func syncWatchedRepos(from server: ApiServer, moc: NSManagedObjectContext) async {
-        if !server.lastSyncSucceeded {
-            return
-        }
-
-        let createNewRepos = Settings.automaticallyRemoveDeletedReposFromWatchlist
-        let result = await RestAccess.getPagedData(at: "/user/subscriptions", from: server) { data, _ in
-            await Repo.syncRepos(from: data, server: server, addNewRepos: createNewRepos, manuallyAdded: false, moc: moc)
-            return false
-        }
-        switch result {
-        case .success:
-            if !Settings.automaticallyRemoveDeletedReposFromWatchlist { // Ignore any missing repos in all cases if deleteGoneRepos is false
-                let reposThatWouldBeDeleted = Repo.items(surviving: false, in: server.managedObjectContext!)
-                for r in reposThatWouldBeDeleted {
-                    r.postSyncAction = PostSyncAction.doNothing.rawValue
-                }
-            }
-        case .cancelled, .ignored:
-            break
-        case .deleted, .failed, .notFound:
-            server.lastSyncSucceeded = false
         }
     }
 
@@ -503,7 +406,7 @@ enum API {
         await Repo.syncRepos(from: userList + orgList, server: server, addNewRepos: true, manuallyAdded: true, moc: moc)
     }
 
-    private static func syncUserDetails(in moc: NSManagedObjectContext) async {
+    fileprivate static func syncUserDetails(in moc: NSManagedObjectContext) async {
         for apiServer in ApiServer.allApiServers(in: moc).filter(\.goodToGo) {
             do {
                 let (data, _, _) = try await RestAccess.getData(in: "/user", from: apiServer)
@@ -516,6 +419,147 @@ enum API {
             } catch {
                 apiServer.lastSyncSucceeded = false
             }
+        }
+    }
+}
+
+// The one-time v4 ID migration, fanning out one query per (server, type) pair. Main-actor class for
+// the same reason as `RepoSync` below.
+@MainActor
+private final class IdMigration {
+    private let moc: NSManagedObjectContext
+
+    init(moc: NSManagedObjectContext) {
+        self.moc = moc
+    }
+
+    func run(types: [DataItem.Type]) async throws {
+        let goodToGoServers = ApiServer.allApiServers(in: moc).filter(\.goodToGo)
+        try await withThrowingTaskGroup { group in
+            for server in goodToGoServers {
+                let serverId = server.objectID
+                for type in types {
+                    group.addTask { [self] in
+                        try await migrate(type: type, serverId: serverId)
+                    }
+                }
+            }
+            try await group.waitForAll()
+        }
+    }
+
+    private func migrate(type: DataItem.Type, serverId: NSManagedObjectID) async throws {
+        guard let server: ApiServer = await moc.syncObject(with: serverId) else { return }
+        try await GraphQL.migrateV4Ids(for: type, in: server)
+    }
+}
+
+// The watchlist/repository fetch, which fans out three calls per server. A main-actor class for the
+// same reason as `V3Sync` — see the commentary there: `addTask` needs a region disconnected from the
+// main actor, which a captured `ApiServer` or context can never be, so the context lives here and
+// servers cross as object IDs.
+@MainActor
+private final class RepoSync {
+    private let moc: NSManagedObjectContext
+
+    init(moc: NSManagedObjectContext) {
+        self.moc = moc
+    }
+
+    func run() async {
+        ApiServer.resetSyncSuccess(in: moc)
+
+        await API.syncUserDetails(in: moc)
+
+        for r in Repo.items(surviving: true, in: moc) {
+            r.postSyncAction = r.shouldBeWipedIfNotInWatchlist ? PostSyncAction.delete.rawValue : PostSyncAction.doNothing.rawValue
+        }
+
+        let goodToGoServers = ApiServer.allApiServers(in: moc).filter(\.goodToGo)
+
+        await withTaskGroup { group in
+            for apiServer in goodToGoServers {
+                let serverId = apiServer.objectID
+                group.addTask { [self] in
+                    await syncWatchedRepos(serverId: serverId)
+                }
+                group.addTask { [self] in
+                    await syncManuallyAddedRepos(serverId: serverId)
+                }
+                group.addTask { [self] in
+                    await fetchUserTeams(serverId: serverId)
+                }
+            }
+        }
+
+        if Settings.hideArchivedRepos {
+            Repo.hideArchivedRepos(in: moc)
+        }
+        for r in Repo.newItems(in: moc) where r.shouldSync {
+            NotificationQueue.add(type: .newRepoAnnouncement, for: r)
+        }
+        lastRepoCheck = Date()
+    }
+
+    private func fetchUserTeams(serverId: NSManagedObjectID) async {
+        guard let server: ApiServer = await moc.syncObject(with: serverId) else { return }
+
+        for t in server.teams {
+            t.postSyncAction = PostSyncAction.delete.rawValue
+        }
+
+        let result = await RestAccess.getPagedData(at: "/user/teams", from: server) { [moc] data, _ in
+            await Team.syncTeams(from: data, serverId: serverId, moc: moc)
+            return false
+        }
+        switch result {
+        case .cancelled, .ignored, .success:
+            break
+        case .deleted, .failed, .notFound:
+            server.lastSyncSucceeded = false
+        }
+    }
+
+    private func syncManuallyAddedRepos(serverId: NSManagedObjectID) async {
+        guard let server: ApiServer = await moc.syncObject(with: serverId) else { return }
+
+        if !server.lastSyncSucceeded {
+            return
+        }
+
+        for repo in server.repos.filter(\.manuallyAdded) {
+            do {
+                try await API.fetchRepo(fullName: repo.fullName.orEmpty, from: server, moc: moc)
+            } catch {
+                server.lastSyncSucceeded = false
+            }
+        }
+    }
+
+    private func syncWatchedRepos(serverId: NSManagedObjectID) async {
+        guard let server: ApiServer = await moc.syncObject(with: serverId) else { return }
+
+        if !server.lastSyncSucceeded {
+            return
+        }
+
+        let createNewRepos = Settings.automaticallyRemoveDeletedReposFromWatchlist
+        let result = await RestAccess.getPagedData(at: "/user/subscriptions", from: server) { [moc] data, _ in
+            await Repo.syncRepos(from: data, server: server, addNewRepos: createNewRepos, manuallyAdded: false, moc: moc)
+            return false
+        }
+        switch result {
+        case .success:
+            if !Settings.automaticallyRemoveDeletedReposFromWatchlist { // Ignore any missing repos in all cases if deleteGoneRepos is false
+                let reposThatWouldBeDeleted = Repo.items(surviving: false, in: server.managedObjectContext!)
+                for r in reposThatWouldBeDeleted {
+                    r.postSyncAction = PostSyncAction.doNothing.rawValue
+                }
+            }
+        case .cancelled, .ignored:
+            break
+        case .deleted, .failed, .notFound:
+            server.lastSyncSucceeded = false
         }
     }
 }
