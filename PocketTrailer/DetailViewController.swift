@@ -42,7 +42,7 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
         a.addAction(UIAlertAction(title: "Mark All As Read", style: .default) { _ in
             self.markAllAsRead()
         })
-        if !SectionListViewController.tabBarSets.isEmpty {
+        if !TabInfo.allSets().isEmpty {
             a.addAction(UIAlertAction(title: "On Other Sections Too", style: .destructive) { _ in
                 app.markEverythingRead(settings: Settings.cache)
             })
@@ -202,8 +202,6 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
                 }
             }
         ]
-
-        newTabBarSets()
 
         updateSectionInfo()
     }
@@ -463,20 +461,20 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
     }
 
     @objc private func moveToNextTab() {
-        let items = SectionListViewController.tabBarSets
+        let items = TabInfo.allSets()
 
         if items.count > 1, let i = currentTabBar, let ind = items.firstIndex(of: i) {
             let nextIndex = (ind < items.count - 1) ? ind + 1 : 0
-            currentTabBar = SectionListViewController.tabBarSets[nextIndex]
+            currentTabBar = items[nextIndex]
         }
     }
 
     @objc private func moveToPreviousTab() {
-        let items = SectionListViewController.tabBarSets
+        let items = TabInfo.allSets()
 
         if items.count > 1, let i = currentTabBar, let ind = items.firstIndex(of: i) {
             let nextIndex = (ind > 0) ? ind - 1 : items.count - 1
-            currentTabBar = SectionListViewController.tabBarSets[nextIndex]
+            currentTabBar = items[nextIndex]
         }
     }
 
@@ -549,45 +547,22 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
         }
     }
 
-    private func newTabBarSets() {
-        var newSets = [TabInfo]()
-
-        for groupLabel in Repo.allGroupLabels(in: DataManager.main) {
-            let c = GroupingCriterion.group(groupLabel)
-            let s = TabInfo.items(for: c)
-            newSets.append(contentsOf: s)
-        }
-
-        if Settings.showSeparateApiServersInMenu {
-            for a in ApiServer.allApiServers(in: DataManager.main) where a.goodToGo {
-                let c = GroupingCriterion.server(a.objectID)
-                let s = TabInfo.items(for: c)
-                newSets.append(contentsOf: s)
-            }
-        } else {
-            let s = TabInfo.items(for: nil)
-            newSets.append(contentsOf: s)
-        }
-
-        SectionListViewController.tabBarSets = newSets
-    }
-
     private func updateSectionInfo() {
         let settings = Settings.cache
         let newFetchRequest = itemFetchRequest(settings: settings)
+        let currentTabCount = TabInfo.allSets().count
         if fetchedResultsController == nil {
             updateQuery(newFetchRequest: newFetchRequest)
             tableView.reloadData()
         } else {
             let latestFetchRequest = fetchedResultsController?.fetchRequest
-            let newCount = SectionListViewController.tabBarSets.count
-            if newCount != lastTabCount || latestFetchRequest != newFetchRequest {
+            if currentTabCount != lastTabCount || latestFetchRequest != newFetchRequest {
                 updateQuery(newFetchRequest: newFetchRequest)
                 tableView.reloadData()
             }
         }
 
-        lastTabCount = SectionListViewController.tabBarSets.count
+        lastTabCount = currentTabCount
 
         updateTitle()
         updateFooter()
@@ -595,7 +570,7 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
 
     private func selectTab(for item: ListableItem, overrideUrl: String?, andOpen: Bool) {
         var tabItem: TabInfo?
-        for d in SectionListViewController.tabBarSets {
+        for d in TabInfo.allSets() {
             if d.viewCriterion == nil || d.viewCriterion?.isRelated(to: item) ?? false {
                 tabItem = d
                 break
@@ -921,7 +896,6 @@ final class DetailViewController: UITableViewController, NSFetchedResultsControl
             if becauseOfChanges {
                 watchManager.updateContext()
             }
-            newTabBarSets()
             updateSectionInfo()
         }
 

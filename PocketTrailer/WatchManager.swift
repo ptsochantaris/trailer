@@ -328,7 +328,7 @@ final class WatchManager: NSObject, WCSessionDelegate {
     // because the watch path is rarely exercised, so ThreadingDebug never caught it. They run on the
     // main actor here, after the counts come back.
     private func buildOverview(settings: Settings.Cache) async -> [String: Sendable] {
-        let allViewCriteria = SectionListViewController.tabBarSets.map(\.viewCriterion)
+        let allViewCriteria = TabInfo.allSets().map(\.viewCriterion)
 
         let perCriterion = await DataManager.runInChild(of: DataManager.main) { tempMoc in
             allViewCriteria.map { WatchManager.criterionCounts(for: $0, moc: tempMoc, settings: settings) }

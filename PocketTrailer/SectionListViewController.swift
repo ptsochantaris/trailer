@@ -1,13 +1,15 @@
 import UIKit
 
 final class SectionListViewController: UITableViewController {
-    static var tabBarSets = [TabInfo]() {
-        didSet {
-            NotificationCenter.default.post(name: .tabBarSetUpdate, object: nil)
-        }
-    }
+    /// Owned by this view controller and rebuilt from the database on demand. This used to be a
+    /// `static var` that `DetailViewController` wrote to, announcing itself via a notification. That
+    /// made the sections list unable to refresh itself: the only post-sync write sat behind
+    /// `DetailViewController.updateStatus`'s `guard isViewLoaded`, so while the split view was
+    /// collapsed on iPhone the detail controller had never loaded and this list never changed.
+    private var tabBarSets = [TabInfo]()
 
-    private func updateTabs() {
+    private func refreshTabs() {
+        tabBarSets = TabInfo.allSets()
         tableView.reloadData()
     }
 
@@ -50,9 +52,6 @@ final class SectionListViewController: UITableViewController {
         super.viewDidLoad()
 
         observers = [
-            NotificationObserver(.tabBarSetUpdate, debounce: 0.01) { [weak self] _ in
-                self?.updateTabs()
-            },
             NotificationObserver(.showPreferences, debounce: 0.01) { [weak self] notification in
                 self?.performSegue(withIdentifier: "showPreferences", sender: notification.object as? Int)
             },
@@ -63,10 +62,23 @@ final class SectionListViewController: UITableViewController {
             NotificationObserver(.RefreshEnded, debounce: 0.1) { [weak self] _ in
                 self?.title = "Sections"
                 self?.statusMessage = nil
+                self?.refreshTabs()
+            },
+            // Observed directly rather than waiting to be told by `DetailViewController`, so the list
+            // stays correct even when that controller has never been loaded.
+            NotificationObserver(.dbSaved, debounce: 0.1) { [weak self] _ in
+                self?.refreshTabs()
             }
         ]
 
-        updateTabs()
+        refreshTabs()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        // Cheap insurance: anything that changed the database while this list was off-screen — repo
+        // visibility, a background sync — is picked up without needing to have observed it.
+        refreshTabs()
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -93,13 +105,13 @@ final class SectionListViewController: UITableViewController {
     }
 
     override func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
-        SectionListViewController.tabBarSets.count
+        tabBarSets.count
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Section", for: indexPath)
 
-        let section = SectionListViewController.tabBarSets[indexPath.row]
+        let section = tabBarSets[indexPath.row]
 
         var config = UIListContentConfiguration.valueCell()
         config.text = section.title
@@ -118,7 +130,7 @@ final class SectionListViewController: UITableViewController {
 
     override func tableView(_: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let splitViewController, let detail = splitViewController.viewController(for: .secondary) as? DetailViewController {
-            detail.currentTabBar = SectionListViewController.tabBarSets[indexPath.row]
+            detail.currentTabBar = tabBarSets[indexPath.row]
             splitViewController.show(.secondary)
         }
     }

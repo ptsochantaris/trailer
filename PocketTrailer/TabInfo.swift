@@ -8,10 +8,36 @@ struct TabInfo: Equatable {
     let viewCriterion: GroupingCriterion?
     let isPr: Bool
 
-    private let id = UUID()
-
+    /// Value equality, deliberately ignoring `badgeValue` and `title` — the badge changes on every
+    /// sync, and callers compare a tab they are holding against a freshly built list to find its
+    /// position. `isPr` plus the criterion is already unique, since each criterion yields at most one
+    /// pull request tab and one issue tab.
+    ///
+    /// This used to be identity equality on a per-instance `UUID`, which meant a recomputed tab never
+    /// matched an existing one. That forced every consumer to share a single stored array, and that
+    /// shared array was the reason the sections list could not refresh itself.
     static func == (lhs: Self, rhs: Self) -> Bool {
-        lhs.id == rhs.id
+        lhs.isPr == rhs.isPr && lhs.viewCriterion?.id == rhs.viewCriterion?.id
+    }
+
+    /// Every tab the app currently has, in display order.
+    @MainActor
+    static func allSets() -> [TabInfo] {
+        var newSets = [TabInfo]()
+
+        for groupLabel in Repo.allGroupLabels(in: DataManager.main) {
+            newSets.append(contentsOf: items(for: .group(groupLabel)))
+        }
+
+        if Settings.showSeparateApiServersInMenu {
+            for a in ApiServer.allApiServers(in: DataManager.main) where a.goodToGo {
+                newSets.append(contentsOf: items(for: .server(a.objectID)))
+            }
+        } else {
+            newSets.append(contentsOf: items(for: nil))
+        }
+
+        return newSets
     }
 
     @MainActor
