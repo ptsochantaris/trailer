@@ -21,7 +21,7 @@ Parts of Trailer are being split off into their own Swift Packages to make them 
 - [Semalot](https://github.com/ptsochantaris/semalot)
 - [KeyVine](https://github.com/ptsochantaris/key-vine)
 - [Maintini](https://github.com/ptsochantaris/maintini)
-- [PopTimer](https://github.com/ptsochantaris/poptimer)
+- [PopTimer](https://github.com/ptsochantaris/pop-timer)
 
 ## License
 
