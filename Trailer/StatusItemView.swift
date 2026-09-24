@@ -4,31 +4,23 @@ enum StatusItemView {
     enum State {
         case regular, grayed, highlighted, unread
 
-        var baseColor: NSColor {
-            if #available(macOS 15, *) { // 15, 26
-                .white
-            } else {
-                .black
-            }
-        }
-
         var foreground: NSColor {
             switch self {
             case .highlighted, .regular:
-                baseColor
+                .black
             case .grayed:
-                baseColor.withAlphaComponent(0.6)
+                .black.withAlphaComponent(0.6)
             case .unread:
                 NSColor(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)
             }
         }
 
-        var titleAttributes: [NSAttributedString.Key: Any] {
+        func titleAttributes(color: NSColor) -> [NSAttributedString.Key: Any] {
             let p = NSMutableParagraphStyle()
             p.alignment = .center
             p.lineBreakMode = .byTruncatingMiddle
             return [
-                .foregroundColor: baseColor,
+                .foregroundColor: color,
                 .font: NSFont.menuFont(ofSize: 6),
                 .paragraphStyle: p
             ]
@@ -48,7 +40,10 @@ enum StatusItemView {
         }
     }
 
-    static func makeIcon(type: ListableItem.Type, state: State, countLabel: String, title: String?) -> NSImage {
+    static func makeIcon(type: ListableItem.Type, state: State, countLabel: String, title: String?, appearance: NSAppearance) -> NSImage {
+        // Everything except the red unread count is drawn black and returned as a template, so AppKit tints it to match the menu bar
+        let baseColor: NSColor = state == .unread && appearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua ? .white : .black
+
         let stack = NSStackView()
         stack.spacing = 0
         stack.orientation = .vertical
@@ -61,7 +56,7 @@ enum StatusItemView {
         size.height *= scale
 
         let iconView = NSImageView()
-        iconView.contentTintColor = state.baseColor
+        iconView.contentTintColor = baseColor
         iconView.imageAlignment = .alignCenter
 
         let icon = img.resized(to: size, offset: .zero)
@@ -75,7 +70,7 @@ enum StatusItemView {
 
         if let title, !title.isEmpty {
             let titleText = PlainTextField(frame: .zero)
-            titleText.attributedStringValue = NSAttributedString(string: title, attributes: state.titleAttributes)
+            titleText.attributedStringValue = NSAttributedString(string: title, attributes: state.titleAttributes(color: baseColor))
             titleText.widthAnchor.constraint(equalToConstant: titleText.fittingSize.width).isActive = true
             stack.addArrangedSubview(titleText)
 
@@ -104,6 +99,7 @@ enum StatusItemView {
             stack.cacheDisplay(in: stackRect, to: bir)
             sivImage.addRepresentation(bir)
         }
+        sivImage.isTemplate = state != .unread
 
         return sivImage
     }

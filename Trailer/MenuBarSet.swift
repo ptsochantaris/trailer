@@ -125,7 +125,7 @@ final class MenuBarSet {
                 .regular
             }
 
-            let sivImage = StatusItemView.makeIcon(type: type, state: state, countLabel: countString, title: label)
+            let sivImage = StatusItemView.makeIcon(type: type, state: state, countLabel: countString, title: label, appearance: menu.statusItem?.button?.effectiveAppearance ?? NSApp.effectiveAppearance)
             let imageWidth = sivImage.size.width.rounded(.down) - 1
             var existingItem = menu.statusItem
 
