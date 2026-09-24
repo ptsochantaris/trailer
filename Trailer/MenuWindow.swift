@@ -140,10 +140,11 @@ final class MenuWindow: NSWindow, NSControlTextEditingDelegate {
     }
 
     func size(andShow makeVisible: Bool) {
-        guard let statusItemButtonFrame = statusItem?.button?.window?.frame,
-              let currentScreen = NSScreen.screens.first(where: { $0.frame.contains(statusItemButtonFrame) })
+        guard let statusItemWindow = statusItem?.button?.window,
+              let currentScreen = statusItemWindow.screen
         else { return }
 
+        let statusItemButtonFrame = statusItemWindow.frame
         let screenFrame = currentScreen.visibleFrame
 
         var menuHeight: CGFloat = 54
