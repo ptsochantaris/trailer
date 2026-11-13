@@ -44,12 +44,15 @@ final nonisolated class Repo: DataItem {
                 }
             }
 
+            // GitHub listing the repo for this token proves access; clearing only on created/updated
+            // left a stale 404 flag stuck forever on repos whose updatedAt never changes.
+            repo.inaccessible = false
+
             if node.created(in: moc) || node.updated(in: moc) {
                 let json = node.jsonPayload
                 repo.fullName = json.potentialString(named: "nameWithOwner")
                 repo.fork = json.potentialBool(named: "fork") ?? false
                 repo.webUrl = json.potentialString(named: "url")
-                repo.inaccessible = false
                 repo.archived = json.potentialBool(named: "isArchived") ?? false
                 repo.ownerNodeId = json.potentialObject(named: "owner")?.potentialString(named: "id")
                 if node.created(in: moc) {
@@ -91,11 +94,11 @@ final nonisolated class Repo: DataItem {
         }
 
         await v3items(with: filteredData, type: Repo.self, serverId: server.objectID, createNewItems: addNewRepos, moc: moc) { item, info, newOrUpdated, _ in
+            item.inaccessible = false
             if newOrUpdated {
                 item.fullName = info.potentialString(named: "full_name")
                 item.fork = info.potentialBool(named: "fork") ?? false
                 item.webUrl = info.potentialString(named: "html_url")
-                item.inaccessible = false
                 item.archived = info.potentialBool(named: "archived") ?? false
                 item.ownerNodeId = info.potentialObject(named: "owner")?.potentialString(named: "node_id")
                 item.manuallyAdded = manuallyAdded
